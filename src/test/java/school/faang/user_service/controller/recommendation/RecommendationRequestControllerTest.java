@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,15 +20,13 @@ class RecommendationRequestControllerTest {
     private static final String ANY_STRING_NOT_BLANK = "any";
     @Mock
     private RecommendationRequestService recommendationRequestService;
-    @Mock
-    private RecommendationRequestMapper recommendationRequestMapper;
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
 
     @Test
     void testRecommendationRequestIsNull() {
         assertThrows(
-                NullPointerException.class,
+                RuntimeException.class,
                 () -> recommendationRequestController.requestRecommendation(null));
     }
 
@@ -42,7 +39,7 @@ class RecommendationRequestControllerTest {
     @Test
     void testRequestFilterDtoIsNull() {
         assertThrows(
-                NullPointerException.class,
+                RuntimeException.class,
                 () -> recommendationRequestController.getRecommendationRequests(null));
     }
 
@@ -61,21 +58,21 @@ class RecommendationRequestControllerTest {
     @Test
     void testRejectionIsNull() {
         assertThrows(
-                NullPointerException.class,
+                RuntimeException.class,
                 () -> recommendationRequestController.rejectRequest(RANDOM_ID, null));
     }
 
     @Test
     void testRejectionIsEmpty() {
         assertThrows(
-                NullPointerException.class,
+                RuntimeException.class,
                 () -> recommendationRequestController.rejectRequest(RANDOM_ID, new RejectionDto()));
     }
 
     @Test
     void testRejectionReasonIsBlank() {
         assertThrows(
-                NullPointerException.class,
+                RuntimeException.class,
                 () -> recommendationRequestController.rejectRequest(RANDOM_ID, new RejectionDto(BLANK_STRING)));
     }
 

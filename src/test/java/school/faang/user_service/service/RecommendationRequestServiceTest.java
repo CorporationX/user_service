@@ -15,6 +15,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -28,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
-
     private static final long RANDOM_ID_FOR_REQUESTER = 18L;
     private static final long RANDOM_ID_FOR_RECEIVER = 121L;
     private static final int MORE_THEN_HALF_YEAR_IN_DAYS = 190;
@@ -47,6 +47,8 @@ class RecommendationRequestServiceTest {
     private SkillRequestRepository skillRequestRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private RecommendationRequestMapperImpl mapper;
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
     private User requester;
@@ -78,7 +80,6 @@ class RecommendationRequestServiceTest {
         receiver.setId(RANDOM_ID_FOR_RECEIVER);
         requestFilterDto = new RequestFilterDto(RANDOM_ID_FOR_FILTER, requester.getId(), receiver.getId(),
                 RANDOM_REQUEST_STATUS, RANDOM_MESSAGE, recommendation.getId(), LocalDateTime.now());
-
     }
 
     private void mockUserRepoAndSkillRepo(List<Skill> skills) {
@@ -89,12 +90,12 @@ class RecommendationRequestServiceTest {
 
     private void assertThrowsCreateMethod() {
         assertThrows(
-                IllegalArgumentException.class,
-                () -> recommendationRequestService.create(recommendationRequest));
+                RuntimeException.class,
+                () -> recommendationRequestService.create(mapper.toDto(recommendationRequest)));
     }
 
     private void verifyCreateMethod() {
-        recommendationRequestService.create(recommendationRequest);
+        recommendationRequestService.create(mapper.toDto(recommendationRequest));
         Mockito.verify(recommendationRequestRepository).create(
                 Mockito.anyLong(),
                 Mockito.anyLong(),
@@ -105,81 +106,77 @@ class RecommendationRequestServiceTest {
 
     @Test
     void testReceiverIsNotInDb() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         Mockito.when(userRepository.findById(requester.getId())).thenReturn(Optional.of(requester));
         Mockito.when(userRepository.findById(receiver.getId())).thenReturn(Optional.empty());
-
         assertThrowsCreateMethod();
     }
 
     @Test
     void testRequesterIsNotInDb() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         Mockito.when(userRepository.findById(requester.getId())).thenReturn(Optional.empty());
-
         assertThrowsCreateMethod();
     }
 
     @Test
     void testNotAllRequestSkillsInDb() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         List<Skill> skills = List.of(new Skill(), new Skill());
         mockUserRepoAndSkillRepo(skills);
-
         assertThrowsCreateMethod();
     }
 
     @Test
     void testAllRequestSkillsInDb() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         List<Skill> skills = List.of(new Skill(), new Skill(), new Skill());
         mockUserRepoAndSkillRepo(skills);
-
         verifyCreateMethod();
     }
 
     @Test
     void testLastRequestLessThanSixMonthsAgo() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         List<Skill> skills = List.of(new Skill(), new Skill(), new Skill());
         recommendationRequest.setCreatedAt(LocalDateTime.now());
-
         mockUserRepoAndSkillRepo(skills);
         Mockito.when(recommendationRequestRepository.findLatestPendingRequest(requester.getId(), receiver.getId()))
                 .thenReturn(Optional.of(recommendationRequest));
-
         assertThrowsCreateMethod();
     }
 
     @Test
     void testLastRequestMoreThanSixMonthsAgo() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         List<Skill> skills = List.of(new Skill(), new Skill(), new Skill());
         recommendationRequest.setCreatedAt(LocalDateTime.now().minusDays(MORE_THEN_HALF_YEAR_IN_DAYS));
-
         mockUserRepoAndSkillRepo(skills);
         Mockito.when(recommendationRequestRepository.findLatestPendingRequest(requester.getId(), receiver.getId()))
                 .thenReturn(Optional.of(recommendationRequest));
-
         verifyCreateMethod();
     }
 
     @Test
     void testFirstRequest() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         List<Skill> skills = List.of(new Skill(), new Skill(), new Skill());
         recommendationRequest.setCreatedAt(LocalDateTime.now().minusDays(MORE_THEN_HALF_YEAR_IN_DAYS));
-
         mockUserRepoAndSkillRepo(skills);
         Mockito.when(recommendationRequestRepository.findLatestPendingRequest(requester.getId(), receiver.getId()))
                 .thenReturn(Optional.empty());
-
         verifyCreateMethod();
     }
 
     @Test
     void testAddSkillInSkillRequestDb() {
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(recommendationRequest);
         List<Skill> skills = List.of(new Skill(), new Skill(), new Skill());
         recommendationRequest.setCreatedAt(LocalDateTime.now());
-
         mockUserRepoAndSkillRepo(skills);
         Mockito.when(recommendationRequestRepository.findLatestPendingRequest(requester.getId(), receiver.getId()))
                 .thenReturn(Optional.empty());
-
-        recommendationRequestService.create(recommendationRequest);
+        recommendationRequestService.create(mapper.toDto(recommendationRequest));
         Mockito.verify(
                 skillRequestRepository,
                 Mockito.times(recommendationRequest.getSkills().size())).create(Mockito.anyLong(), Mockito.anyLong()
@@ -193,19 +190,11 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testRequestIdInDb() {
-        Mockito.when(recommendationRequestRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(recommendationRequest));
-        recommendationRequestService.getRequest(Mockito.anyLong());
-    }
-
-    @Test
     void testRequestIdNotInDb() {
         Mockito.when(recommendationRequestRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.empty());
-
         assertThrows(
-                NullPointerException.class,
+                RuntimeException.class,
                 () -> recommendationRequestService.getRequest(Mockito.anyLong()));
     }
 
@@ -214,9 +203,8 @@ class RecommendationRequestServiceTest {
         recommendationRequest.setStatus(RequestStatus.REJECTED);
         Mockito.when(recommendationRequestRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(recommendationRequest));
-
         assertThrows(
-                IllegalArgumentException.class,
+                RuntimeException.class,
                 () -> recommendationRequestService.rejectRequest(Mockito.anyLong(), new RejectionDto()));
     }
 
@@ -225,9 +213,8 @@ class RecommendationRequestServiceTest {
         recommendationRequest.setStatus(RequestStatus.ACCEPTED);
         Mockito.when(recommendationRequestRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(recommendationRequest));
-
         assertThrows(
-                IllegalArgumentException.class,
+                RuntimeException.class,
                 () -> recommendationRequestService.rejectRequest(Mockito.anyLong(), new RejectionDto()));
     }
 }

@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -9,6 +10,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -24,33 +26,39 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private static final int SIX_MONTHS_IN_DAYS = 180;
+    private static final String MESSAGE_REQUESTER_OR_RECEIVER_EMPTY = "Requester or Receiver not in the database";
+    private static final String MESSAGE_NOT_ALL_SKILLS_IN_DB = "Not all skills are present in the database";
+    private static final String MESSAGE_LAST_REQUEST_SENT_LESS_6_MONTHS_AGO = "The last request was sent less than 6 months ago";
+    private static final String MESSAGE_RECOMMENDATION_REQUEST_NOT_IN_DB = "The recommendationRequest is not in the database";
+    private static final String MESSAGE_RECOMMENDATION_REQUEST_REJECTED_OR_ACCEPTED = "RecommendationRequest rejected or accepted";
 
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRepository skillRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final UserRepository userRepository;
+    private final RecommendationRequestMapper mapper;
 
-    public void create(RecommendationRequest recommendationRequest) {
+    public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        RecommendationRequest recommendationRequest = mapper.toEntity(recommendationRequestDto);
         validationRecommendationRequestForCreateMethod(recommendationRequest);
         saveRecommendationRequest(recommendationRequest);
         recommendationRequest.getSkills()
                 .forEach(skillRequest -> skillRequestRepository
                         .create(recommendationRequest.getId(), skillRequest.getId()));
+        return mapper.toDto(recommendationRequest);
     }
 
     private void validationRecommendationRequestForCreateMethod(RecommendationRequest recommendationRequest) {
         if (getById(recommendationRequest.getRequester()).isEmpty() ||
                 getById(recommendationRequest.getReceiver()).isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new RuntimeException(MESSAGE_REQUESTER_OR_RECEIVER_EMPTY);
         }
         Optional<RecommendationRequest> latestPendingRequest = getLatestRecommendationRequest(recommendationRequest);
-        if (!allSkillsPresent(recommendationRequest)) {
-            throw new IllegalArgumentException();
-        }
+        allSkillsPresent(recommendationRequest);
         if (latestPendingRequest.isPresent()) {
             if (DAYS.between(latestPendingRequest.get().getCreatedAt(),
                     LocalDateTime.now()) < SIX_MONTHS_IN_DAYS) {
-                throw new IllegalArgumentException();
+                throw new RuntimeException(MESSAGE_LAST_REQUEST_SENT_LESS_6_MONTHS_AGO);
             }
         }
     }
@@ -68,15 +76,14 @@ public class RecommendationRequestService {
         return userRepository.findById(user.getId());
     }
 
-    private boolean allSkillsPresent(RecommendationRequest recommendationRequest) {
+    private void allSkillsPresent(RecommendationRequest recommendationRequest) {
         List<Long> listIds = recommendationRequest.getSkills().stream()
                 .map(SkillRequest::getId)
                 .toList();
         List<Skill> allSkillsById = skillRepository.findAllById(listIds);
         if (!(allSkillsById.size() == recommendationRequest.getSkills().size())) {
-            throw new IllegalArgumentException();
+            throw new RuntimeException(MESSAGE_NOT_ALL_SKILLS_IN_DB);
         }
-        return true;
     }
 
     private Optional<RecommendationRequest> getLatestRecommendationRequest(
@@ -88,11 +95,12 @@ public class RecommendationRequestService {
                         recommendationRequest.getReceiver().getId());
     }
 
-    public List<RecommendationRequest> getRequests(RequestFilterDto filter) {
+    public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
         List<RecommendationRequest> recommendationRequests =
                 (List<RecommendationRequest>) recommendationRequestRepository.findAll();
         return recommendationRequests.stream()
                 .filter(request -> applyFilterToRequest(request, filter))
+                .map(mapper::toDto)
                 .toList();
     }
 
@@ -105,22 +113,20 @@ public class RecommendationRequestService {
                 && request.getRecommendation().getId() == filter.getRecommendationId();
     }
 
-    public RecommendationRequest getRequest(long id) {
-        Optional<RecommendationRequest> request = recommendationRequestRepository.findById(id);
-        if (request.isPresent()) {
-            return request.get();
-        } else {
-            throw new NullPointerException();
-        }
+    public RecommendationRequestDto getRequest(long id) {
+        return recommendationRequestRepository.findById(id)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new RuntimeException(MESSAGE_RECOMMENDATION_REQUEST_NOT_IN_DB));
     }
 
-    public RecommendationRequest rejectRequest(long id, RejectionDto rejectionDto) {
-        RecommendationRequest request = getRequest(id);
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
+        RecommendationRequestDto requestDto = getRequest(id);
+        RecommendationRequest request = mapper.toEntity(requestDto);
         if (request.getStatus() == RequestStatus.REJECTED || request.getStatus() == RequestStatus.ACCEPTED) {
-            throw new IllegalArgumentException();
+            throw new RuntimeException(MESSAGE_RECOMMENDATION_REQUEST_REJECTED_OR_ACCEPTED);
         }
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejectionDto.getReason());
-        return request;
+        return mapper.toDto(request);
     }
 }

@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
@@ -15,34 +13,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationRequestController {
     private final RecommendationRequestService service;
-    private final RecommendationRequestMapper mapper;
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest == null) {
-            throw new NullPointerException("Empty request");
+    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
+        if (recommendationRequestDto == null) {
+            throw new RuntimeException("Empty request");
         }
-        RecommendationRequest entity = mapper.toEntry(recommendationRequest);
-        service.create(entity);
-        return mapper.toDto(entity);
+        return service.create(recommendationRequestDto);
     }
 
     public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
         if (filter == null) {
-            throw new NullPointerException("Empty filter");
+            throw new RuntimeException("Empty filter");
         }
-        return service.getRequests(filter).stream()
-                .map(mapper::toDto)
-                .toList();
+        return service.getRequests(filter);
     }
 
     public RecommendationRequestDto getRecommendationRequest(long id) {
-        return mapper.toDto(service.getRequest(id));
+        return service.getRequest(id);
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         if (rejection == null || rejection.getReason().isBlank() || rejection.getReason().isEmpty()) {
-            throw new NullPointerException("Empty rejection");
+            throw new RuntimeException("Empty rejection");
         }
-        return mapper.toDto(service.rejectRequest(id, rejection));
+        return service.rejectRequest(id, rejection);
     }
 }

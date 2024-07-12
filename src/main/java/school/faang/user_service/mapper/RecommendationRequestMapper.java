@@ -10,17 +10,18 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = MapperMethods.class)
 public interface RecommendationRequestMapper {
     @Mapping(source = "skills", target = "skillsIds", qualifiedByName = "skillsToSkillsIds")
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
-    @Mapping(target = "skills", ignore = true)
+    @Mapping(source = "skillsIds", target = "skills",
+            qualifiedByName = "getSkillRequests")
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "receiverId", target = "receiver.id")
-    RecommendationRequest toEntry(RecommendationRequestDto recommendationRequestDto);
+    RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 
     @Named("skillsToSkillsIds")
     default List<Long> mapperSkillsToSkillsIds(List<SkillRequest> skills) {

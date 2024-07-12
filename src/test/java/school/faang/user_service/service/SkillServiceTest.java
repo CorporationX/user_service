@@ -48,10 +48,10 @@ public class SkillServiceTest {
     @Spy
     private SkillCandidateMapperImpl skillCandidateMapper;
 
-    @Spy
+    @Mock
     private SkillOfferRepository skillOfferRepository;
 
-    @Spy
+    @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     @Spy

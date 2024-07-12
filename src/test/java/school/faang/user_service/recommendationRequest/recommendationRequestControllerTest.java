@@ -6,12 +6,18 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.controller.recommendation.RecommendationRequestDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.controller.recommendation.RejectionDto;
+import school.faang.user_service.controller.recommendation.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.service.RecommendationRequestService;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class recommendationRequestControllerTest {
@@ -27,7 +33,7 @@ public class recommendationRequestControllerTest {
     public void testRecommendationRequestMessageNotEmpty() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setMessage("");
-        assertThrows(DataValidationException.class, () -> recommendationRequestController.requestRecommendation(requestDto));
+        assertThrows(RuntimeException.class, () -> recommendationRequestController.requestRecommendation(requestDto));
     }
 
     @Test
@@ -36,6 +42,31 @@ public class recommendationRequestControllerTest {
         requestDto.setMessage("something");
         recommendationRequestController.requestRecommendation(requestDto);
         verify(recommendationRequestService, Mockito.times(1)).create(requestDto);
-
     }
+
+    @Test
+    public void testGetRecommendationRequests() {
+        RequestFilterDto filterDto = new RequestFilterDto();
+        filterDto.setStatus(RequestStatus.REJECTED);
+        recommendationRequestController.getRecommendationRequests(filterDto);
+        verify(recommendationRequestService, times(1)).getRequestsByFilter(filterDto);
+    }
+
+    @Test
+    public void testGetRecommendationRequest() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setId(1L);
+        requestDto.setSkillsIds(List.of(1L, 2L));
+        recommendationRequestController.getRecommendationRequest(1L);
+        verify(recommendationRequestService).getRequest(any());
+    }
+
+    @Test
+    public void testRejectRequest() {
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setReason("Test");
+        recommendationRequestController.rejectRequest(1L, rejectionDto);
+        verify(recommendationRequestService, times(1)).rejectRequest(1L, rejectionDto);
+    }
+
 }

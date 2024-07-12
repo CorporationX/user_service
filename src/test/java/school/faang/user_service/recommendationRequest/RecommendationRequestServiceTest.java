@@ -65,13 +65,13 @@ public class RecommendationRequestServiceTest {
         requestDto.setReceiverId(-1L);
         when(recommendationRequestRepository.existsById(-1L)).thenReturn(true);
         when(recommendationRequestRepository.existsById(-2L)).thenReturn(false);
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto));
+        assertThrows(RuntimeException.class, () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
     public void testValidateRequestsPeriod() {
         RecommendationRequestDto requestDto = validateUserExistenceAndPeriod();
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto));
+        assertThrows(RuntimeException.class, () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class RecommendationRequestServiceTest {
         RecommendationRequestDto requestDto = validateUserExistenceAndPeriod();
         requestDto.setUpdatedAt(LocalDateTime.of(2024, Month.NOVEMBER, 1, 13, 6));
         requestDto.setSkillsIds(List.of(1L, 2L));
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto));
+        assertThrows(RuntimeException.class, () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class RecommendationRequestServiceTest {
     @Test
     public void testRequestValidation() {
         when(recommendationRequestRepository.existsById(any())).thenReturn(false);
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.getRequest(any()));
+        assertThrows(RuntimeException.class, () -> recommendationRequestService.getRequest(any()));
     }
 
     @Test

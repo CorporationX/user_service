@@ -12,16 +12,17 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.valitator.Error;
-import school.faang.user_service.valitator.ValidationResult;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class EventCreateEditValidatorTest {
@@ -40,33 +41,74 @@ class EventCreateEditValidatorTest {
                 .when(skillRepository)
                 .findAllByUserId(eventCreateEditDto.getOwnerId());
 
-
-        ValidationResult actualResult = validator.validate(eventCreateEditDto);
-
-        assertFalse(actualResult.hasErrors());
+        assertDoesNotThrow(() -> validator.validate(eventCreateEditDto));
     }
 
     @Test
-    void invalid() {
-        EventCreateEditDto eventCreateEditDto = getInvalidEventCreateEditDto();
+    void shouldThrowExceptionIfStartDateIsNull() {
+        Event event = getEvent();
+        LocalDateTime invalidStartDate = null;
+        EventCreateEditDto eventCreateEditDto = new EventCreateEditDto(
+                event.getTitle(),
+                invalidStartDate,
+                event.getEndDate(),
+                event.getOwner().getId(),
+                event.getDescription(),
+                event.getRelatedSkills().stream()
+                        .map(Skill::getId)
+                        .toList(),
+                event.getLocation(),
+                event.getMaxAttendees(),
+                event.getType(),
+                event.getStatus()
+        );
+
+        assertAll(
+                () -> {
+                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(eventCreateEditDto));
+                    assertThat(exception.getMessage()).isEqualTo("start-date не может быть пустым");
+                }
+        );
+
+    }
+
+    @Test
+    void shouldThrowExceptionIfMissingRequiredSkill() {
+        Event event = getEvent();
+        List<Skill> invalidSkills = List.of(getSkill(3L));
+        EventCreateEditDto eventCreateEditDto = new EventCreateEditDto(
+                event.getTitle(),
+                event.getStartDate(),
+                event.getEndDate(),
+                event.getOwner().getId(),
+                event.getDescription(),
+                Stream.of(event.getRelatedSkills(), invalidSkills)
+                        .flatMap(List::stream)
+                        .map(Skill::getId)
+                        .toList(),
+                event.getLocation(),
+                event.getMaxAttendees(),
+                event.getType(),
+                event.getStatus()
+        );
         Mockito.doReturn(getEvent().getRelatedSkills())
                 .when(skillRepository)
                 .findAllByUserId(eventCreateEditDto.getOwnerId());
 
-        ValidationResult actualResult = validator.validate(eventCreateEditDto);
-
-        assertThat(actualResult.getErrors()).hasSize(4);
-        assertThat(actualResult.getErrors()).contains(
-                Error.of("invalid.start-date", "start-date не может быть пустым"),
-                Error.of("invalid.title", "title не может быть пустым"),
-                Error.of("invalid.related-skill", "Не возможно установить skill, id: 3"),
-                Error.of("invalid.related-skill", "Не возможно установить skill, id: 4"));
+        assertAll(
+                () -> {
+                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(eventCreateEditDto));
+                    assertThat(exception.getMessage()).isEqualTo("Не возможно установить skill, id: 3");
+                }
+        );
     }
 
-    private EventCreateEditDto getEventCreateEditDto() {
+    @Test
+    void shouldThrowExceptionIfTitleIsEmpty() {
         Event event = getEvent();
-        return new EventCreateEditDto(
-                event.getTitle(),
+        String invalidTitle = "";
+        EventCreateEditDto eventCreateEditDto = new EventCreateEditDto(
+                invalidTitle,
                 event.getStartDate(),
                 event.getEndDate(),
                 event.getOwner().getId(),
@@ -79,21 +121,24 @@ class EventCreateEditValidatorTest {
                 event.getType(),
                 event.getStatus()
         );
+
+        assertAll(
+                () -> {
+                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(eventCreateEditDto));
+                    assertThat(exception.getMessage()).isEqualTo("title не может быть пустым");
+                }
+        );
     }
 
-    private EventCreateEditDto getInvalidEventCreateEditDto() {
+    private EventCreateEditDto getEventCreateEditDto() {
         Event event = getEvent();
-        String invalidTitele = "";
-        LocalDateTime invalidStartDate = null;
-        List<Skill> invalidSkills = List.of(getSkill(3L), getSkill(4L));
         return new EventCreateEditDto(
-                invalidTitele,
-                invalidStartDate,
+                event.getTitle(),
+                event.getStartDate(),
                 event.getEndDate(),
                 event.getOwner().getId(),
                 event.getDescription(),
-                Stream.of(event.getRelatedSkills(), invalidSkills)
-                        .flatMap(List::stream)
+                event.getRelatedSkills().stream()
                         .map(Skill::getId)
                         .toList(),
                 event.getLocation(),

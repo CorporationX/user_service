@@ -1,43 +1,45 @@
 package school.faang.user_service.mapper.event;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
+import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import school.faang.user_service.dto.event.EventCreateEditDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.Mapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 
-@Component
-@RequiredArgsConstructor
-public class EventCreateEditMapper implements Mapper<EventCreateEditDto, Event> {
+import java.util.List;
 
-    private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserRepository.class})
+public abstract class EventCreateEditMapper {
 
-    @Override
-    public Event map(EventCreateEditDto fromObject, Event toObject) {
-        copy(fromObject, toObject);
-        return toObject;
+    @Autowired
+    protected UserRepository userRepository;
+    @Autowired
+    protected SkillRepository skillRepository;
+
+    @Mappings({
+            @Mapping(target = "owner", expression = "java(findUserById(eventCreateEditDto.getOwnerId()))"),
+            @Mapping(target = "relatedSkills", expression = "java(findSkillsByIds(eventCreateEditDto.getRelatedSkillIds()))")
+    })
+    public abstract Event map(EventCreateEditDto eventCreateEditDto);
+
+    @Mappings({
+            @Mapping(target = "owner", expression = "java(findUserById(eventCreateEditDto.getOwnerId()))"),
+            @Mapping(target = "relatedSkills", expression = "java(findSkillsByIds(eventCreateEditDto.getRelatedSkillIds()))")
+    })
+    public abstract Event map(EventCreateEditDto eventCreateEditDto, @MappingTarget Event event);
+
+    protected User findUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    @Override
-    public Event map(EventCreateEditDto object) {
-        Event event = new Event();
-        copy(object, event);
-        return event;
-    }
-
-    private void copy(EventCreateEditDto objectDto, Event toObject) {
-        toObject.setTitle(objectDto.getTitle());
-        toObject.setStartDate(objectDto.getStartDate());
-        toObject.setEndDate(objectDto.getEndDate());
-        toObject.setOwner(getEntity(objectDto.getOwnerId(), userRepository));
-        toObject.setDescription(objectDto.getDescription());
-        toObject.setLocation(objectDto.getLocation());
-        toObject.setRelatedSkills(getEntities(objectDto.getRelatedSkillIds(), skillRepository));
-        toObject.setMaxAttendees(objectDto.getMaxAttendees());
-        toObject.setStatus(objectDto.getEventStatus());
-        toObject.setType(objectDto.getEventType());
+    protected List<Skill> findSkillsByIds(List<Long> ids) {
+        return skillRepository.findAllById(ids);
     }
 }

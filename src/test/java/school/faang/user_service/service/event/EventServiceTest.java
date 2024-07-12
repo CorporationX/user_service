@@ -1,12 +1,9 @@
 package school.faang.user_service.service.event;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserReadDto;
 import school.faang.user_service.dto.event.EventCreateEditDto;
@@ -21,20 +18,19 @@ import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventFilterDto;
 import school.faang.user_service.filter.event.EventStartDateAfterFilter;
 import school.faang.user_service.filter.event.EventTitleFilter;
-import school.faang.user_service.mapper.event.EventCreateEditMapper;
-import school.faang.user_service.mapper.event.EventReadMapper;
+import school.faang.user_service.mapper.event.EventCreateEditMapperImpl;
+import school.faang.user_service.mapper.event.EventReadMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.valitator.Error;
-import school.faang.user_service.valitator.ValidationResult;
 import school.faang.user_service.valitator.event.EventCreateEditValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -44,9 +40,9 @@ public class EventServiceTest {
     @Mock
     private EventCreateEditValidator createEditValidator;
     @Mock
-    private EventCreateEditMapper createEditMapper;
+    private EventCreateEditMapperImpl createEditMapper;
     @Mock
-    private EventReadMapper readMapper;
+    private EventReadMapperImpl readMapper;
     @Mock
     private EventRepository repository;
 
@@ -57,7 +53,7 @@ public class EventServiceTest {
     @BeforeEach
     void init() {
         List<EventFilter> eventFilters = List.of(new EventTitleFilter(), new EventStartDateAfterFilter());
-        eventService = new EventService(repository, createEditMapper, readMapper, createEditValidator, readMapper, eventFilters);
+        eventService = new EventService(repository, createEditMapper, readMapper, createEditValidator, eventFilters);
     }
 
     @Test
@@ -65,13 +61,13 @@ public class EventServiceTest {
         EventCreateEditDto eventCreateEditDto = getEventCreateEditDto();
         Event event = getEvent();
         EventReadDto eventReadDto = getEventReadDto();
-        doReturn(new ValidationResult()).when(createEditValidator).validate(eventCreateEditDto);
         doReturn(event).when(createEditMapper).map(eventCreateEditDto);
         doReturn(eventReadDto).when(readMapper).map(event);
 
         EventReadDto actualResult = eventService.create(eventCreateEditDto);
 
         assertThat(actualResult).isEqualTo(eventReadDto);
+        verify(createEditValidator).validate(eventCreateEditDto);
         verify(repository).save(event);
     }
 
@@ -90,15 +86,13 @@ public class EventServiceTest {
         assertThat(actualResult).isEqualTo(expectedResult);
     }
 
-
     @Test
-    void shouldThrowExceptionIfDtoInvalid() {
-        EventCreateEditDto eventCreateEditDto = getEventCreateEditDto();
-        ValidationResult validationResult = new ValidationResult();
-        validationResult.add(Error.of("invalid.start-date", "start-date не может быть пустым"));
-        doReturn(validationResult).when(createEditValidator).validate(eventCreateEditDto);
+    void shouldCreateStopIfNotValidated() {
+        EventCreateEditDto createEditDto = getEventCreateEditDto();
+        doThrow(new DataValidationException("any")).when(createEditValidator).validate(createEditDto);
 
-        assertThrows(DataValidationException.class, () -> eventService.create(eventCreateEditDto));
+        assertThrows(DataValidationException.class, () ->  eventService.create(createEditDto));
+        verify(createEditValidator).validate(createEditDto);
         verifyNoInteractions(repository, createEditMapper, readMapper);
     }
 

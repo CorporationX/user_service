@@ -5,35 +5,30 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import school.faang.user_service.dto.event.EventCreateEditDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.valitator.Error;
-import school.faang.user_service.valitator.ValidationResult;
-import school.faang.user_service.valitator.Validator;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class EventCreateEditValidator implements Validator<EventCreateEditDto> {
+public class EventCreateEditValidator {
 
     private final SkillRepository skillRepository;
 
-    @Override
-    public ValidationResult validate(EventCreateEditDto object) {
-        var validationResult = new ValidationResult();
+    public void validate(EventCreateEditDto object) {
         if (object.getStartDate() == null) {
-            validationResult.add(Error.of("invalid.start-date", getNotNullErrorText("start-date")));
+            throw new DataValidationException(getNotNullErrorText("start-date"));
         }
         if (StringUtils.isEmpty(object.getTitle())) {
-            validationResult.add(Error.of("invalid.title", getNotNullErrorText("title")));
+            throw new DataValidationException(getNotNullErrorText("title"));
         }
         for (Long relatedSkillId : object.getRelatedSkillIds()) {
             if (!getUserSkillIds(object.getOwnerId()).contains(relatedSkillId)) {
-                validationResult.add(Error.of("invalid.related-skill", String.format("Не возможно установить skill, id: %s", relatedSkillId)));
+                throw new DataValidationException(String.format("Не возможно установить skill, id: %s", relatedSkillId));
             }
         }
-        return validationResult;
     }
 
     private Set<Long> getUserSkillIds(Long ownerId) {

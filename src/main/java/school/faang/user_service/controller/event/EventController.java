@@ -31,9 +31,7 @@ public class EventController {
     }
 
     public void delete(Long id) {
-        if (!eventService.delete(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        eventService.delete(id);
     }
 
     public EventReadDto update(Long id, EventCreateEditDto editDto) {

@@ -1,29 +1,12 @@
 package school.faang.user_service.mapper.event;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.event.EventReadDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.Mapper;
-import school.faang.user_service.mapper.UserReadMapper;
 
-@Component
-@RequiredArgsConstructor
-public class EventReadMapper implements Mapper<Event, EventReadDto> {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface EventReadMapper {
 
-    private final UserReadMapper userReadMapper;
-
-    @Override
-    public EventReadDto map(Event object) {
-        return new EventReadDto(
-                object.getId(),
-                object.getTitle(),
-                object.getStartDate(),
-                object.getEndDate(),
-                getDto(object.getOwner(), userReadMapper),
-                object.getDescription(),
-                object.getLocation(),
-                object.getMaxAttendees()
-        );
-    }
+     EventReadDto map(Event event);
 }

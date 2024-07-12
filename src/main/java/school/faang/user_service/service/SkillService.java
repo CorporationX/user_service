@@ -68,7 +68,7 @@ public class SkillService {
             User receiver = skillOffer.getRecommendation().getReceiver();
             User author = skillOffer.getRecommendation().getAuthor();
             userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
-                            .user(receiver).guarantor(author).skill(skillOffer.getSkill()).build());
+                    .user(receiver).guarantor(author).skill(skillOffer.getSkill()).build());
         }
     }
 

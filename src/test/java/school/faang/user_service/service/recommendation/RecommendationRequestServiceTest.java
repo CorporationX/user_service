@@ -49,8 +49,8 @@ public class RecommendationRequestServiceTest {
         var entity = createEntity();
 
         when(requestRepository.save(entity)).thenReturn(entity);
-        when(requestMapper.toEntityList(dto)).thenReturn(entity);
-        when(requestMapper.toDtoList(entity)).thenReturn(dto);
+        when(requestMapper.toEntity(dto)).thenReturn(entity);
+        when(requestMapper.toDto(entity)).thenReturn(dto);
 
         var returnDto = service.create(dto);
 
@@ -116,7 +116,7 @@ public class RecommendationRequestServiceTest {
     void testRejectRequestAlreadyBeenReject() {
         var dto = createDto();
         when(requestRepository.findById(dto.getId()))
-                .thenReturn(Optional.of(requestMapper.toEntityList(dto)));
+                .thenReturn(Optional.of(requestMapper.toEntity(dto)));
         dto.setStatus(RequestStatus.REJECTED);
 
         var resultDto = service.rejectRequest(dto.getId(), "reason");
@@ -140,7 +140,7 @@ public class RecommendationRequestServiceTest {
         listEntity.forEach(entity -> entity.setStatus(RequestStatus.PENDING));
         when(requestRepository.findAll()).thenReturn(listEntity);
         var filterWithOneField = new RequestFilterDto(RequestStatus.PENDING, null);
-        var examineListDto = listEntity.stream().map(entity -> requestMapper.toDtoList(entity)).toList();
+        var examineListDto = listEntity.stream().map(entity -> requestMapper.toDto(entity)).toList();
 
         var resultListDto = service.getRequests(filterWithOneField);
 
@@ -204,7 +204,7 @@ public class RecommendationRequestServiceTest {
         for (int i = 0; i < 3; i++) {
             var dto = createDto();
             dto.setId((long) i);
-            listEntity.add(requestMapper.toEntityList(dto));
+            listEntity.add(requestMapper.toEntity(dto));
         }
         return listEntity;
     }

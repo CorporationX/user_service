@@ -1,10 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,17 +24,16 @@ public class RecommendationRequestController {
 
     @GetMapping(REQUEST)
     public RecommendationRequestDto getRecommendationRequest(Long id) {
-        return ResponseEntity.ok(requestService.getRequest(id)).getBody();
+        return requestService.getRequest(id);
     }
 
     @GetMapping(ALL_REQUESTS_FILTER)
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
-        return ResponseEntity.ok(requestService.getRequests(filter)).getBody();
+    public List<RecommendationRequestDto> getRecommendationRequests(Long receiverId, RequestFilterDto filter) {
+        return requestService.getRequests(receiverId, filter);
     }
 
     @PostMapping(REQUEST)
-    public RecommendationRequestDto rejectRequest(@RequestParam @Positive long recommendationRequestId,
-                                                                  @RequestParam @NotBlank @NotNull String reasonReject) {
-        return ResponseEntity.ok(requestService.rejectRequest(recommendationRequestId, reasonReject)).getBody();
+    public RecommendationRequestDto rejectRequest(@RequestParam Long recommendationRequestId, @RequestParam String reasonReject) {
+        return requestService.rejectRequest(recommendationRequestId, reasonReject);
     }
 }

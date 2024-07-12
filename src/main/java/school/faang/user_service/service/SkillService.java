@@ -51,8 +51,7 @@ public class SkillService {
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Optional<Skill> skill = skillRepository.findUserSkill(skillId, userId);
         if (skill.isPresent()) {
-            System.out.println("the skill is already learned");
-            return skillMapper.toDto(skill.get());
+            throw new DataValidationException("the skill is already learned");
         } else {
             List<SkillOffer> offersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
             if (offersOfSkill.size() >= MIN_SKILL_OFFERS) {

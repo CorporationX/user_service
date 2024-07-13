@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class GetRecommendationRequestTest {
 
-    public record GetRecommendationRequestTestParam(
+    private record GetRecommendationRequestTestParam(
             long requestedRecommendationID,
             Optional<RecommendationRequest> mockRecommendationRequest,
             Class<? extends Throwable> expectedException,

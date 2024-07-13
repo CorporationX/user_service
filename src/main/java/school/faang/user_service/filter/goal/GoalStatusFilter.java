@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.filter.goal;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalFilterDto;
@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 public class GoalStatusFilter implements GoalFilter {
     @Override
     public boolean isApplicable(GoalFilterDto filters) {
-        return filters.getStatus() != null;
+        return filters.getStatusPattern() != null;
     }
 
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto filters) {
-        return goals.filter(goal -> goal.getStatus().equals(filters.getStatus()))
+        return goals.filter(goal -> goal.getStatus().equals(filters.getStatusPattern()))
                 .toList()
                 .stream();
     }

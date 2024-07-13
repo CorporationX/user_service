@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.goal;
 
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,31 +14,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.controller.goal.validation.GoalControllerValidator;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
+@Tag(name = "GoalController", description = "Goal API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/goals")
 public class GoalController {
 
     private final GoalService goalService;
+    private final GoalControllerValidator goalControllerValidator;
 
     @PostMapping(value = "{userId}/goals/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public GoalDto createGoal(@Valid @PathVariable Long userId, @Valid @RequestBody GoalDto goalDto) {
-        goalService.createGoal(userId, goalDto);
-        return goalDto;
+    public GoalDto createGoal(@Valid @PathVariable Long userId, @RequestBody GoalDto goalDto) {
+        goalControllerValidator.validateCreation(goalDto);
+        return goalService.createGoal(userId, goalDto);
     }
 
     @PutMapping(value = "/goals/{goalId}")
     @ResponseStatus(HttpStatus.OK)
-    public GoalDto updateGoal(@Valid @PathVariable Long goalId, @Valid @RequestBody GoalDto goalDto) {
-        goalService.updateGoal(goalId, goalDto);
-        return goalDto;
+    public GoalDto updateGoal(@Valid @PathVariable Long goalId, @RequestBody GoalDto goalDto) {
+        goalControllerValidator.validateUpdating(goalDto);
+        return goalService.updateGoal(goalId, goalDto);
     }
 
     @DeleteMapping(value = "/goals/{goalId}")
@@ -47,13 +52,13 @@ public class GoalController {
 
     @GetMapping(value = "/goals/{goalId}/subtasks")
     @ResponseStatus(HttpStatus.OK)
-    private List<GoalDto> findSubtaskByGoalId(@Valid @PathVariable Long goalId, @Valid @RequestBody GoalFilterDto filters) {
-        return goalService.findSubtaskByGoalId(goalId, filters);
+    private List<GoalDto> findSubtaskByGoalId(@Valid @PathVariable Long goalId, @RequestBody GoalFilterDto filters) {
+        return goalService.findSubtasksByGoalId(goalId, filters);
     }
 
     @GetMapping(value = "/users/{userId}/goals")
     @ResponseStatus(HttpStatus.OK)
-    private List<GoalDto> findGoalsByUser(@Valid @PathVariable Long userId, @Valid @RequestBody GoalFilterDto filters) {
+    private List<GoalDto> findGoalsByUser(@Valid @PathVariable Long userId, @RequestBody GoalFilterDto filters) {
         return goalService.findGoalsByUserId(userId, filters);
     }
 }

@@ -46,22 +46,24 @@ public class RejectRecommendationRequestTest {
     ) {
     }
 
-    private static final long NOT_EXISTED_REQUEST_ID = -1;
-    private static final long ACCEPTED_REQUEST_ID = 1;
-    private static final long REJECTED_REQUEST_ID = 2;
-    private static final long PENDING_REQUEST_ID = 3;
-
     private static Stream<Arguments> provideTestData() {
-        LocalDateTime createAtDate = LocalDateTime.now();
-        LocalDateTime updatedAtDate = createAtDate.plusDays(1);
+
+        final long NOT_EXISTED_REQUEST_ID = -1;
+        final long ACCEPTED_REQUEST_ID = 1;
+        final long REJECTED_REQUEST_ID = 2;
+        final long PENDING_REQUEST_ID = 3;
+
+        final LocalDateTime CREATE_AT = LocalDateTime.now();
+        final LocalDateTime UPDATE_AT = CREATE_AT.plusDays(1);
+
         var acceptedRecommendationRequest = RecommendationRequest.builder()
                 .id(ACCEPTED_REQUEST_ID)
                 .requester(User.builder().id(1).build())
                 .receiver(User.builder().id(2).build())
                 .message("Test message")
                 .status(RequestStatus.ACCEPTED)
-                .createdAt(createAtDate)
-                .updatedAt(updatedAtDate)
+                .createdAt(CREATE_AT)
+                .updatedAt(UPDATE_AT)
                 .build();
 
         var rejectedRecommendationRequest = RecommendationRequest.builder()
@@ -70,8 +72,8 @@ public class RejectRecommendationRequestTest {
                 .receiver(User.builder().id(2).build())
                 .message("Test message")
                 .status(RequestStatus.REJECTED)
-                .createdAt(createAtDate)
-                .updatedAt(updatedAtDate)
+                .createdAt(CREATE_AT)
+                .updatedAt(UPDATE_AT)
                 .build();
 
         var pendingRecommendationRequest = RecommendationRequest.builder()
@@ -81,8 +83,8 @@ public class RejectRecommendationRequestTest {
                 .skills(List.of(SkillRequest.builder().id(1L).build()))
                 .message("Test message")
                 .status(RequestStatus.PENDING)
-                .createdAt(createAtDate)
-                .updatedAt(updatedAtDate)
+                .createdAt(CREATE_AT)
+                .updatedAt(UPDATE_AT)
                 .build();
 
         var rejectionRequest = new RejectionRequestDto("Wrong recommendation");
@@ -94,8 +96,8 @@ public class RejectRecommendationRequestTest {
                 List.of(1L),
                 1L,
                 2L,
-                createAtDate,
-                updatedAtDate
+                CREATE_AT,
+                UPDATE_AT
         );
 
         return Stream.of(

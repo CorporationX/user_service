@@ -117,7 +117,6 @@ class EventServiceTest {
                 0, 10L, List.of(10L, 20L), null, null,
                 null, null);
         Event eventWithSkill = new Event();
-//        eventWithSkill.setRelatedSkills();
         when(eventRepository.findAll())
                 .thenReturn(List.of(event, new Event()));
         when(eventFilterMapper.eventToEventFilterDto(event))

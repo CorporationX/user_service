@@ -18,10 +18,9 @@ public class EventController {
     public EventDto create(EventDto event) {
         if (validateEventDto(event)) {
             return eventService.create(event);
-        } else {
-            throw new DataValidationException("Не удалось создать событие!" +
-                    " Введены не верные данные.");
         }
+        throw new DataValidationException("Не удалось создать событие!" +
+                " Введены не верные данные.");
     }
 
     // получить событие

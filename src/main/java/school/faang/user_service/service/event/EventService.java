@@ -23,7 +23,6 @@ import java.util.Optional;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-//    private final SkillMapper skillMapper;
     private final EventMapper eventMapper;
     private final EventFilterMapper eventFilterMapper;
 
@@ -65,16 +64,14 @@ public class EventService {
 //    }
 
     public EventDto updateEvent(EventDto event) {
-        var optionalOldEvent = eventRepository.findById(event.getId());
+        var optionalOldEvent = eventRepository.findById(event.getId())
+                .orElseThrow(() -> new DataValidationException("Такого события не существует!"));
 
-        if (optionalOldEvent.isEmpty()) {
-            throw new DataValidationException("Такого события не существует!");
-        } else if (optionalOldEvent.get().getOwner().getId() != (event.getOwnerId())) {
-            throw new DataValidationException("Владелец новогшо события" +
+        if (optionalOldEvent.getOwner().getId() != (event.getOwnerId())) {
+            throw new DataValidationException("Владелец нового события" +
                     " не является владельцем обновляемого события!");
-        } else {
-            return saveEvent(event);
         }
+        return saveEvent(event);
     }
 
     // Получить все созданные пользователем события
@@ -97,19 +94,22 @@ public class EventService {
     private EventDto saveEvent(EventDto newEventDto) {
         Long ownerId = newEventDto.getOwnerId();
         Event event;
-        Optional<User> owner = userRepository.findById(ownerId);
-        if (owner.isEmpty()) {
-            throw new DataValidationException("Такого пользователя не существует!");
-        } else if (newEventDto.getRelatedSkillsIds().equals(owner.get()
-                .getSkills()
-                .stream()
-                .map(Skill::getId)
-                .toList())) {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() ->
+                        new DataValidationException("Такого пользователя не существует!"));
+        if (validateUserSkills(newEventDto, owner)) {
             event = eventRepository.save(eventMapper.eventDtoToEntity(newEventDto));
         } else {
             throw new DataValidationException("У пользователя нет необходимых навыков," +
                     " чтобы создать данное событие!");
         }
         return eventMapper.eventToDto(event);
+    }
+
+    public boolean validateUserSkills(EventDto eventDto, User user) {
+        return eventDto.getRelatedSkillsIds().equals(user.getSkills()
+                .stream()
+                .map(Skill::getId)
+                .toList());
     }
 }

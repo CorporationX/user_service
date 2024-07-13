@@ -13,16 +13,17 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventFilterMapper {
-    @Mapping(target = "ownerId", source = "owner", qualifiedByName = "map")
-    @Mapping(target = "relatedSkillIds", source = "relatedSkills", qualifiedByName = "map2")
+    @Mapping(target = "ownerId", source = "owner", qualifiedByName = "mapOwnerToOwnerId")
+    @Mapping(target = "relatedSkillIds", source = "relatedSkills",
+            qualifiedByName = "mapRelatedSkillsToTds")
     EventFilterDto eventToEventFilterDto(Event event);
 
-    @Named("map")
+    @Named("mapOwnerToOwnerId")
     default Long map(User user) {
         return user.getId();
     }
 
-    @Named("map2")
+    @Named("mapRelatedSkillsToTds")
     default List<Long> map2(List<Skill> skills) {
         return skills.stream()
                 .map(Skill::getId)

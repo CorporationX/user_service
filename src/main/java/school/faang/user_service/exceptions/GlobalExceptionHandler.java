@@ -21,8 +21,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String,String>> handleDuplicateMentorshipRequestException(DuplicateMentorshipRequestException ex) {
         return new ResponseEntity<>(Map.of("message",ex.getMessage(),"status",HttpStatus.BAD_REQUEST.toString()), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String,String>> handleValidationException(ValidationException ex) {
+    @ExceptionHandler(DataValidationException.class)
+    public ResponseEntity<Map<String,String>> handleValidationException(DataValidationException ex) {
         return new ResponseEntity<>(Map.of("message",ex.getMessage(),"status",HttpStatus.BAD_REQUEST.toString()), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(EntityNotFoundException.class)

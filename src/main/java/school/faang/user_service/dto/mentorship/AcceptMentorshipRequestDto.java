@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.mentorship;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

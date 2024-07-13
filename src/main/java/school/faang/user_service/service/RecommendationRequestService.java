@@ -49,11 +49,12 @@ public class RecommendationRequestService {
 
     public List<RequestFilterDto> getRequestsByFilter(RequestFilterDto filterDto) {
         Stream<RecommendationRequest> recommendationRequestsStream = recommendationRequestRepository.findAll().stream();
-        filters.stream().filter(filter -> filter.isApplicable(filterDto))
-                .forEach(filter -> filter.apply(recommendationRequestsStream, filterDto));
-        RecommendationRequest recommendationRequest = recommendationRequestFilterMapper.ToEntity(filterDto);
-        List<RecommendationRequest> recommendationRequests = recommendationRequestsStream.toList();
-        return recommendationRequests.stream().map(recommendationRequestFilterMapper::toDto).toList();
+        return filters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .reduce(recommendationRequestsStream,(stream, filter) -> filter.apply(stream, filterDto),
+                        ((subGenStream,stream)-> stream))
+                .distinct().map(recommendationRequestFilterMapper::toDto)
+                .toList();
     }
 
     public RecommendationRequestDto getRequest(Long id) {
@@ -64,7 +65,7 @@ public class RecommendationRequestService {
 
     private boolean validateRequest(Long id) {
         if (!recommendationRequestRepository.existsById(id)) {
-            throw new RuntimeException("Can't find Recommendation request by ID");
+            throw new DataValidationException("Can't find Recommendation request by ID");
         }
         return true;
     }
@@ -72,7 +73,7 @@ public class RecommendationRequestService {
     public RejectionDto rejectRequest(long id, RejectionDto rejectionDto) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).get();
         if (recommendationRequest == null) {
-            throw new RuntimeException("Can't find recommendation request by ID");
+            throw new DataValidationException("Can't find recommendation request by ID");
         }
         RecommendationRequest recommendationRequestEntity = recommendationRequestRejectionMapper.ToEntity(rejectionDto);
         if (recommendationRequest.getStatus() == RequestStatus.PENDING) {
@@ -84,13 +85,13 @@ public class RecommendationRequestService {
 
     private void validateReceiverExistence(RecommendationRequestDto requestDto) {
         if (!recommendationRequestRepository.existsById(requestDto.getReceiverId())) {
-            throw new RuntimeException("We haven't managed to find receiver in DataBase");
+            throw new DataValidationException("We haven't managed to find receiver in DataBase");
         }
     }
 
     private void validateRequesterExistence(RecommendationRequestDto requestDto) {
         if (!recommendationRequestRepository.existsById(requestDto.getRequesterId())) {
-            throw new RuntimeException("We haven't managed to find requester in DataBase");
+            throw new DataValidationException("We haven't managed to find requester in DataBase");
         }
     }
 
@@ -100,7 +101,7 @@ public class RecommendationRequestService {
         long monthsBetweenRequests = ChronoUnit.MONTHS.between(createdDate, updatedDate);
         if (monthsBetweenRequests <= REQUESTS_PERIOD_RESTRICTION) {
             String message = ("You can't send request for " + (REQUESTS_PERIOD_RESTRICTION - monthsBetweenRequests) + " days");
-            throw new RuntimeException(message);
+            throw new DataValidationException(message);
         }
     }
 
@@ -109,7 +110,7 @@ public class RecommendationRequestService {
         List<SkillRequest> existedSkillsRequestIds = skillRequestRepository.findAllById(skillsRequestIds);
 //        List<Long> existedSkillsRequestIds = skillsRequestIds.stream().filter(skillRequestRepository::existsById).toList();
         if (skillsRequestIds.size() != existedSkillsRequestIds.size()) {
-            throw new RuntimeException("One of skills have not been found in DataBase");
+            throw new DataValidationException("One of skills have not been found in DataBase");
         }
     }
 }

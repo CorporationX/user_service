@@ -16,11 +16,14 @@ public class SkillValidator {
     private final SkillRepository skillRepository;
 
     public void validateSkill(SkillDto skill) {
-        if (skill.getTitle() == null) throw new NullPointerException("skill name is null");
-        if (skill.getTitle().isBlank())
+        if (skill.getTitle() == null) {
+            throw new DataValidationException("skill name is null");
+        }
+        if (skill.getTitle().isBlank()) {
             throw new DataValidationException("skill name is either blank or empty");
-        else if (skillRepository.existsByTitle(skill.getTitle()))
+        } else if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException("skill already exists");
+        }
     }
 
     public void validateUserSkills(List<Skill> skills) {

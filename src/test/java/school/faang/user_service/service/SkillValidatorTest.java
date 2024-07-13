@@ -1,12 +1,12 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -26,9 +26,15 @@ public class SkillValidatorTest {
     @InjectMocks
     private SkillValidator skillValidator;
 
+    @BeforeEach
+    public void setUp() {
+        SkillDto skillDto = new SkillDto();
+        skillDto.setId(1L);
+    }
+
     @Test
     public void testSkillNameIsNull() {
-        Exception exception = Assert.assertThrows(NullPointerException.class,
+        Exception exception = Assert.assertThrows(DataValidationException.class,
                 () -> skillValidator.validateSkill(new SkillDto(1L, null)));
         String actualMessage = exception.getMessage();
         String expectedMessage = "skill name is null";

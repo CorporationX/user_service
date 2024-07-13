@@ -3,7 +3,7 @@ package school.faang.user_service.controller.recommendation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.service.recommendation.request.RecommendationRequestService;
 
@@ -22,7 +22,7 @@ public class RecommendationRequestController {
     }
 
     @PostMapping("/list")
-    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RecommendationRequestFilterDto filter) {
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RecommendationRequestFilter filter) {
         return mRecommendationRequestService.getRequests(filter);
     }
 

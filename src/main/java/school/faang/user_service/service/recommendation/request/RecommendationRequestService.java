@@ -3,7 +3,7 @@ package school.faang.user_service.service.recommendation.request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessage;
@@ -27,7 +27,7 @@ public class RecommendationRequestService {
     private final RecommendationRequestRepository mRecommendationReqRep;
     private final SkillRequestRepository mSkillReqRep;
     private final CreateRequestDtoValidator mCreateRequestValidator;
-    private final List<Filter<RecommendationRequestFilterDto, RecommendationRequestDto>> mRecommendationFilter;
+    private final List<Filter<RecommendationRequestFilter, RecommendationRequestDto>> mRecommendationFilter;
     private final RecommendationRequestMapper mRequestMapper;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
@@ -54,7 +54,7 @@ public class RecommendationRequestService {
         return createRequestFuture.join();
     }
 
-    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filter) {
+    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilter filter) {
         Stream<RecommendationRequestDto> requestsStream = StreamSupport
                 .stream(mRecommendationReqRep.findAll().spliterator(), false)
                 .map(mRequestMapper::toDto);

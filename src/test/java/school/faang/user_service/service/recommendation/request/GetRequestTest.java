@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -38,7 +38,7 @@ public class GetRequestTest {
     private RecommendationRequestService recommendationRequestService;
 
     private record GetRequestTestParam(
-            RecommendationRequestFilterDto filter,
+            RecommendationRequestFilter filter,
             Set<RecommendationRequestDto> expectedRecommendations
     ) {
     }
@@ -137,7 +137,7 @@ public class GetRequestTest {
 
         // Test 1
 
-        var messageFilterByWholeWord = RecommendationRequestFilterDto.builder().
+        var messageFilterByWholeWord = RecommendationRequestFilter.builder().
                 message("Text")
                 .build();
 
@@ -156,7 +156,7 @@ public class GetRequestTest {
 
         // Test 2
 
-        var substringFilter = RecommendationRequestFilterDto.builder()
+        var substringFilter = RecommendationRequestFilter.builder()
                 .message("boost")
                 .build();
 
@@ -175,7 +175,7 @@ public class GetRequestTest {
         // Test 3
 
         // combine 2 cases above
-        var combinedMessageFilter = RecommendationRequestFilterDto.builder()
+        var combinedMessageFilter = RecommendationRequestFilter.builder()
                 .message("message")
                 .build();
 
@@ -195,7 +195,7 @@ public class GetRequestTest {
 
         // Test 4
 
-        var requesterFilter = RecommendationRequestFilterDto.builder()
+        var requesterFilter = RecommendationRequestFilter.builder()
                 .requesterId(1L)
                 .build();
 
@@ -215,7 +215,7 @@ public class GetRequestTest {
 
         // Test 5
 
-        var receiverFilter = RecommendationRequestFilterDto.builder()
+        var receiverFilter = RecommendationRequestFilter.builder()
                 .receiverId(2L)
                 .build();
 
@@ -236,7 +236,7 @@ public class GetRequestTest {
         // Test 6
 
         // only one request with skillId=6
-        var skillFilter = RecommendationRequestFilterDto.builder()
+        var skillFilter = RecommendationRequestFilter.builder()
                 .skillIds(Set.of(6L))
                 .build();
 
@@ -254,7 +254,7 @@ public class GetRequestTest {
 
         // Test 7
 
-        var skillsFilter = RecommendationRequestFilterDto.builder()
+        var skillsFilter = RecommendationRequestFilter.builder()
                 .skillIds(Set.of(2L, 3L))
                 .build();
 
@@ -273,7 +273,7 @@ public class GetRequestTest {
 
         // Test 8
 
-        var skillFilterWithoutMatch = RecommendationRequestFilterDto.builder()
+        var skillFilterWithoutMatch = RecommendationRequestFilter.builder()
                 .skillIds(Set.of(1L, 6L))
                 .build();
 
@@ -289,7 +289,7 @@ public class GetRequestTest {
 
         // Test 9
 
-        var acceptedFilter = RecommendationRequestFilterDto.builder()
+        var acceptedFilter = RecommendationRequestFilter.builder()
                 .status(RequestStatus.ACCEPTED)
                 .build();
 
@@ -308,7 +308,7 @@ public class GetRequestTest {
 
         // Test 10
 
-        var rejectedFilter = RecommendationRequestFilterDto.builder()
+        var rejectedFilter = RecommendationRequestFilter.builder()
                 .status(RequestStatus.REJECTED)
                 .build();
 
@@ -327,7 +327,7 @@ public class GetRequestTest {
 
         // Test 11
 
-        var pendingFilter = RecommendationRequestFilterDto.builder()
+        var pendingFilter = RecommendationRequestFilter.builder()
                 .status(RequestStatus.PENDING)
                 .build();
 
@@ -345,7 +345,7 @@ public class GetRequestTest {
 
         // Test 12
 
-        var combinedFilter = RecommendationRequestFilterDto.builder()
+        var combinedFilter = RecommendationRequestFilter.builder()
                 .message("message")
                 .requesterId(1L)
                 .skillIds(Set.of(2L))

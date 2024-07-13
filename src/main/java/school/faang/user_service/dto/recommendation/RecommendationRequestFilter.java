@@ -10,7 +10,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @Builder
-public class RecommendationRequestFilterDto {
+public class RecommendationRequestFilter {
     Long requesterId;
     Long receiverId;
     RequestStatus status;

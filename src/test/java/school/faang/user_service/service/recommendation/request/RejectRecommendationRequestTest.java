@@ -37,7 +37,7 @@ public class RejectRecommendationRequestTest {
     @Autowired
     private RecommendationRequestService recommendationRequestService;
 
-    public record RejectRequestTestParam(
+    private record RejectRequestTestParam(
             long rejectedRequestID,
             RejectionRequestDto rejectionRequestDto,
             Optional<RecommendationRequest> mockRecommendationRequest,

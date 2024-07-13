@@ -2,6 +2,7 @@ package school.faang.user_service.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import school.faang.user_service.exception.IllegalEntityException;
 import school.faang.user_service.exception.IllegalSubscriptionException;
 
 import java.util.Arrays;
@@ -20,6 +21,6 @@ public enum PremiumPeriod {
         return Arrays.stream(PremiumPeriod.values())
             .filter(premiumPeriod -> premiumPeriod.days == days)
             .findFirst()
-            .orElseThrow(() -> new IllegalSubscriptionException(days));
+            .orElseThrow(() -> new IllegalEntityException(String.format("Premium period doesn't exist for %d days", days)));
     }
 }

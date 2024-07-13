@@ -7,9 +7,7 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.exception.PaymentFailureException;
-import school.faang.user_service.exception.PremiumAlreadyPurchasedException;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.*;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -28,7 +26,7 @@ public class PremiumService {
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         if (premiumRepository.existsByUserId(userId)) {
-            throw new PremiumAlreadyPurchasedException(userId);
+            throw new AlreadyPurchasedException(String.format("User with ID: %d already has a promotion.", userId));
         }
         PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(
             new PaymentRequest(
@@ -38,11 +36,11 @@ public class PremiumService {
             )
         );
         if (paymentResponse.status() != PaymentStatus.SUCCESS) {
-            throw new PaymentFailureException(paymentResponse.paymentNumber());
+            throw new PaymentFailureException(String.format("Payment with payment number: %d failed.", paymentResponse.paymentNumber()));
         }
         LocalDateTime startDate = LocalDateTime.now();
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
+            .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID: %d does not exist.", userId)));
         Premium premium = Premium.builder()
             .user(user)
             .startDate(startDate)

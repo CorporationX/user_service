@@ -12,9 +12,7 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.exception.PaymentFailureException;
-import school.faang.user_service.exception.PremiumAlreadyPurchasedException;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.*;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -115,7 +113,7 @@ class PremiumServiceTest {
     void testBuyPremiumPremiumAlreadyPurchasedException() {
         when(premiumRepository.existsByUserId(userId)).thenReturn(true);
 
-        assertThrows(PremiumAlreadyPurchasedException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
+        assertThrows(AlreadyPurchasedException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
     }
 
     @Test
@@ -134,6 +132,6 @@ class PremiumServiceTest {
         when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
+        assertThrows(EntityNotFoundException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
     }
 }

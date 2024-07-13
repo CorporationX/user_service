@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.dto.PremiumPeriod;
-import school.faang.user_service.exception.IllegalSubscriptionException;
+import school.faang.user_service.exception.IllegalEntityException;
 import school.faang.user_service.service.PremiumService;
 
 import java.time.LocalDateTime;
@@ -61,6 +61,6 @@ class PremiumControllerTest {
     @Test
     @DisplayName("Buy Premium Throws IllegalSubscriptionException")
     void testBuyPremiumIllegalSubscriptionException() {
-        assertThrows(IllegalSubscriptionException.class, () -> premiumController.buyPremium(userId, invalidDays));
+        assertThrows(IllegalEntityException.class, () -> premiumController.buyPremium(userId, invalidDays));
     }
 }

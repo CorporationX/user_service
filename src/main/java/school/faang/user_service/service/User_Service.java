@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -11,6 +12,8 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
@@ -34,6 +37,13 @@ public class User_Service {
     public void removeMenteeAndGoals(Long userId) {
         mentorshipService.removeMenteeFromUser(userId);
         mentorshipService.removeMenteeFromUserGoals(userId);
+    }
+
+    @Scheduled(cron = "@daily")
+    private void deleteInactiveUsers() {
+        StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .filter(user -> !user.isActive()).filter(user ->user.getUpdatedAt().plusDays(90).isBefore(LocalDateTime.now()))
+                .forEach(userRepository::delete);
     }
 
     private void removeGoals(Long userId) {

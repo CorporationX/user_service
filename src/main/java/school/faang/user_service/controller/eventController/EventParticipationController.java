@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.event;
+package school.faang.user_service.controller.eventController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

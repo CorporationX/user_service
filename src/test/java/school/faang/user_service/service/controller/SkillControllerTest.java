@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.controller;
 
 
 import org.junit.Assert;
@@ -16,8 +16,8 @@ import school.faang.user_service.dto.skill.SkillDto;
 
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapperImpl;
+import school.faang.user_service.service.SkillService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)

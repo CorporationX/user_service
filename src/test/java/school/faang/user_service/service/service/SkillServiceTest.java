@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.service;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -23,6 +23,7 @@ import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.SkillValidator;
 
 import java.util.ArrayList;
@@ -31,7 +32,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 
 @ExtendWith(MockitoExtension.class)

@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validator.UserValidator;
 
 import java.time.LocalDateTime;
 
@@ -19,13 +17,12 @@ import java.time.LocalDateTime;
 public class User_Service {
 
     private final UserRepository userRepository;
-    private final UserValidator userValidator;
-    private final UserMapper userMapper;
     private final EventRepository eventRepository;
     private final GoalRepository goalRepository;
+    private final MentorshipService mentorshipService;
+    private final UserMapper userMapper;
 
     public UserDto deactivate(Long userId) {
-        userValidator.validateUserId(userId);
         User user = userRepository.findById(userId).get();
         removeEvents(userId);
         removeGoals(userId);
@@ -34,14 +31,9 @@ public class User_Service {
         return userMapper.toUserDto(userRepository.save(user));
     }
 
-    public UserDto getUserDtoById(Long userId) {
-        userValidator.validateUserId(userId);
-        return userMapper.toUserDto(userRepository.findById(userId).get());
-    }
-
-    public User getUserById(Long userId) {
-        userValidator.validateUserId(userId);
-        return userRepository.findById(userId).get();
+    public void removeMenteeAndGoals(Long userId) {
+        mentorshipService.removeMenteeFromUser(userId);
+        mentorshipService.removeMenteeFromUserGoals(userId);
     }
 
     private void removeGoals(Long userId) {

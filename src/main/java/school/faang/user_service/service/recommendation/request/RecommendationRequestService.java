@@ -59,9 +59,11 @@ public class RecommendationRequestService {
                 .stream(mRecommendationReqRep.findAll().spliterator(), false)
                 .map(mRequestMapper::toDto);
 
-        mRecommendationFilter.stream()
-                .filter(candidate -> candidate.isApplicable(filter))
-                .forEach(candidate -> candidate.applyFilter(requestsStream, filter));
+        for (var candidate : mRecommendationFilter) {
+            if (candidate.isApplicable(filter)) {
+                requestsStream = candidate.applyFilter(requestsStream, filter);
+            }
+        }
 
         return requestsStream.collect(Collectors.toList());
     }
@@ -78,7 +80,7 @@ public class RecommendationRequestService {
 
         RequestStatus status = recommendation.getStatus();
 
-        if (! status.equals(RequestStatus.PENDING)) {
+        if (!status.equals(RequestStatus.PENDING)) {
             throw new RejectRecommendationException(
                     ExceptionMessage.IMPOSSIBLE_REJECTION,
                     recommendation.getStatus()

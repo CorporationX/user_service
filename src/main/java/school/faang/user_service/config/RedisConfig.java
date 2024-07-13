@@ -8,7 +8,11 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.lang.NonNull;
+import school.faang.user_service.listener.UserBanListener;
 
 @Configuration
 public class RedisConfig {
@@ -41,8 +45,21 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisMessageListenerContainer redisContainer(@NonNull RedisConnectionFactory connectionFactory, @NonNull MessageListenerAdapter listenerAdapter) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(listenerAdapter, new ChannelTopic(user_banChannelName));
+        return container;
+    }
+
+    @Bean
     public ChannelTopic mentorshipChannel() {
         return new ChannelTopic(mentorshipChannelName);
+    }
+
+    @Bean
+    public MessageListenerAdapter listenerAdapter(UserBanListener userBanListener) {
+        return new MessageListenerAdapter(userBanListener, "onMessage");
     }
 
 

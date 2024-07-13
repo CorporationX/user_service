@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.userDto.UserDto;
 import school.faang.user_service.dto.userDto.UserFilterDto;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.UserPremiumService;
 
 import java.util.List;
 
@@ -19,19 +19,19 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
     @Mock
-    private UserService userService;
+    private UserPremiumService userPremiumService;
 
     @Test
     void testGetListPremiumUsersNull() {
-        assertThrows(NullPointerException.class, () -> userController.getListPremiumUsers(null));
+        assertThrows(IllegalArgumentException.class, () -> userController.getListPremiumUsers(null));
     }
 
     @Test
     void testGetListPremiumUsersTrue() {
-        Mockito.when(userService.getPremiumUsers(Mockito.any())).thenReturn(List.of(new UserDto()));
+        Mockito.when(userPremiumService.getPremiumUsers(Mockito.any())).thenReturn(List.of(new UserDto()));
 
         userController.getListPremiumUsers(new UserFilterDto());
 
-        Mockito.verify(userService, Mockito.times(1)).getPremiumUsers(new UserFilterDto());
+        Mockito.verify(userPremiumService, Mockito.times(1)).getPremiumUsers(new UserFilterDto());
     }
 }

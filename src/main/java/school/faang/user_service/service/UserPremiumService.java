@@ -9,13 +9,12 @@ import school.faang.user_service.mapper.userPremium.UserPremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filter.userFilter.UserFilter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserPremiumService {
     private final UserRepository userRepository;
     private final UserPremiumMapper userPremiumMapper;
     private final List<UserFilter> userFilters;
@@ -27,14 +26,10 @@ public class UserService {
     }
 
     private List<User> getFilterUser(Stream<User> userStream, UserFilterDto userFilterDto) {
-        List<UserFilter> userFiltersTrue = userFilters.stream()
+        return userFilters.stream()
                 .filter(filter -> filter.isApplication(userFilterDto))
+                .reduce(userStream, (cumulativeStream, filter)
+                        -> filter.apply(cumulativeStream, userFilterDto), Stream::concat)
                 .toList();
-        List<User> filterUser = new ArrayList<>();
-        for (UserFilter userFilter : userFiltersTrue) {
-            filterUser = userFilter
-                    .apply(userStream, userFilterDto).toList();
-        }
-        return filterUser;
     }
 }

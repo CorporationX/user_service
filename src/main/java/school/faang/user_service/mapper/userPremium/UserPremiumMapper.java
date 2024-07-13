@@ -8,7 +8,6 @@ import school.faang.user_service.dto.userDto.UserDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.premium.Premium;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public interface UserPremiumMapper {
     @Mapping(source = "mentees", target = "menteesId", qualifiedByName = "listToId")
     @Mapping(source = "goals", target = "goalsId", qualifiedByName = "goalsToId")
     @Mapping(source = "skills", target = "skillsId", qualifiedByName = "skillsToId")
-    @Mapping(source = "premium", target = "premiumId", qualifiedByName = "premiumToId")
+    @Mapping(source = "premium.id", target = "premiumId")
     UserDto toDto(User user);
 
     User toEntity(UserDto userDto);
@@ -36,10 +35,5 @@ public interface UserPremiumMapper {
     @Named("skillsToId")
     default List<Long> skillsToId(List<Skill> users) {
         return users.stream().map(Skill::getId).toList();
-    }
-
-    @Named("premiumToId")
-    default long skillsToId(Premium premium) {
-        return premium.getId();
     }
 }

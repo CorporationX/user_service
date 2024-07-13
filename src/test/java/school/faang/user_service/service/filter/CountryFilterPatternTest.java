@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.entity.Country;
@@ -49,7 +50,7 @@ class CountryFilterPatternTest {
 
     @Test
     void testApply() {
-        userFilterDto = new UserFilterDto(null, "A");
+        Mockito.when(userFilterDto.getCountryFilter()).thenReturn("A");
         User userTest = new User();
         userTest.setCountry(new Country(1L, "A", null));
         List<User> resultUsers = List.of(userTest);
@@ -58,5 +59,4 @@ class CountryFilterPatternTest {
 
         assertEquals(resultUsers, testUsers.toList());
     }
-
 }

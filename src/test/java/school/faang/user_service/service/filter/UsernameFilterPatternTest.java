@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -48,7 +49,7 @@ class UsernameFilterPatternTest {
 
     @Test
     void testApply() {
-        userFilterDto = new UserFilterDto("A", null);
+        Mockito.when(userFilterDto.getUsernameFilter()).thenReturn("A");
         User userResult = new User();
         userResult.setUsername("A");
         List<User> resultUsers = List.of(userResult);

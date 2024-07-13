@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserPremiumServiceTest {
     @InjectMocks
-    private UserService userService;
+    private UserPremiumService userPremiumService;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -33,15 +33,16 @@ class UserServiceTest {
 
     @Test
     void testGetPremiumUsers() {
+        Mockito.when(userRepository.findPremiumUsers()).thenReturn(Stream.of(new User()));
+        Mockito.when(userFilters.stream()).thenReturn(Stream.of(usernameFilterPattern, countryFilterPattern));
+
         Mockito.when(usernameFilterPattern.isApplication(Mockito.any())).thenReturn(true);
         Mockito.when(usernameFilterPattern.apply(Mockito.any(), Mockito.any())).thenReturn(Stream.of(new User()));
         Mockito.when(countryFilterPattern.isApplication(Mockito.any())).thenReturn(true);
         Mockito.when(countryFilterPattern.apply(Mockito.any(), Mockito.any())).thenReturn(Stream.of(new User()));
-        Mockito.when(userFilters.stream()).thenReturn(Stream.of(usernameFilterPattern, countryFilterPattern));
-        Mockito.when(userRepository.findPremiumUsers()).thenReturn(Stream.of(new User()));
         Mockito.when(userPremiumMapper.toDto(Mockito.any())).thenReturn(new UserDto());
 
-        userService.getPremiumUsers(new UserFilterDto());
+        userPremiumService.getPremiumUsers(new UserFilterDto());
         Mockito.verify(userPremiumMapper, Mockito.times(1)).toDto(Mockito.any());
     }
 }

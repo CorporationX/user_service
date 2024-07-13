@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 public class EventTitleFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getTitlePattern() != null;
+        return filters.getTitlePattern() != null && !filters.getTitlePattern().isEmpty();
     }
     @Override
-    public void apply(Stream<Event> events, EventFilterDto filters) {
-        events.filter(event -> event.getTitle().matches(filters.getTitlePattern()));
+    public Stream<Event> apply(Stream <Event> events, EventFilterDto filters) {
+        return events.filter(event -> event.getTitle().equals(filters.getTitlePattern()));
     }
 }

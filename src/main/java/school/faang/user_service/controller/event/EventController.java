@@ -32,6 +32,9 @@ public class EventController {
         if (event.getStartDate() == null) {
             throw new IllegalArgumentException("У события должна быть дата начала");
         }
+        if (event.getRelatedSkills() == null) {
+            throw new IllegalArgumentException("Событие должно иметь связанные скилы");
+        }
     }
 
     public EventDto getEventById(Long eventId){

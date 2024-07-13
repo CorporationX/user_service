@@ -3,18 +3,24 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ResourceNotFoundException;
+import school.faang.user_service.filter.EventByOwnerFilter;
 import school.faang.user_service.filter.EventFilter;
+import school.faang.user_service.filter.EventTitleFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
@@ -26,34 +32,58 @@ public class EventService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
-    private final UserMapper userMapper;
     private final SkillMapper skillMapper;
-    private final List<EventFilter> eventFilters;
+    private final List<EventFilter> eventFilters = List.of(new EventByOwnerFilter(), new EventTitleFilter());
 
-    public EventDto create(EventDto event) {
-        if (!event.getRelatedSkills().stream()
-                .anyMatch(skill -> skill.getUserIds().contains(event.getOwnerId()))) {
-            throw new ResourceNotFoundException("Ошибка: пользователь не может создать событие с такими навыками");
-        } else {
-            Event eventEntity = eventMapper.toEntity(event);
-            return eventMapper.toDto(eventRepository.save(eventEntity));
+    public User ownerValidation(EventDto eventDto) {
+        return userRepository.findById(eventDto.getOwnerId())
+                .orElseThrow(() -> new DataValidationException("Ошибка: пользователь не найден"));
+    }
+
+    public List<Skill> skillValidation(EventDto eventDto) {
+        List<SkillDto> listSkillDto = eventDto.getRelatedSkills();
+        List<Skill> eventSkillList = skillMapper.toEntity(listSkillDto);
+        return eventSkillList.stream()
+                .peek(skill -> {
+                    if (!skillRepository.findById(skill.getId()).isPresent()) {
+                        throw new DataValidationException("Ошибка: навык с ID " + skill.getId() + " не найден");
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public void inputDataValidation(EventDto eventDto) {
+        User validatedOwner = ownerValidation(eventDto);
+        List<Skill> validatedSkillList = skillValidation(eventDto);
+        if (!validatedSkillList.stream()
+                .allMatch(skill -> skill.getUsers().contains(validatedOwner))) {
+            throw new DataValidationException("Ошибка: пользователь не обладает всеми необходимыми навыками");
         }
+    }
+
+    public EventDto create(EventDto eventDto) {
+        inputDataValidation(eventDto);
+        Event eventEntity = eventMapper.toEntity(eventDto);
+        return eventMapper.toDto(eventRepository.save(eventEntity));
     }
 
     public EventDto getEventById(long eventId) {
         if (!eventRepository.existsById(eventId)) {
             throw new ResourceNotFoundException("Ошибка: такого события не существует");
         } else {
-            return eventMapper.toDto(eventRepository.getById(eventId));
+            Event event = eventRepository.getById(eventId);
+            return eventMapper.toDto(event);
         }
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         Stream<Event> events = eventRepository.findAll().stream();
-        eventFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(events, filters));
-        return eventMapper.toDto(events.toList());
+        for (EventFilter filter : eventFilters) {
+            if (filter.isApplicable(filters)) {
+                events = filter.apply(events, filters);
+            }
+        }
+        return eventMapper.toDto(events.collect(Collectors.toList()));
     }
 
     public void deleteEvent(Long eventId) {
@@ -78,13 +108,6 @@ public class EventService {
         eventEntity.setRelatedSkills(skillMapper.toEntity(event.getRelatedSkills()));
         eventEntity.setLocation(event.getLocation());
         eventEntity.setMaxAttendees(event.getMaxAttendees());
-        /* eventEntity.setRelatedSkills(new ArrayList<>());
-                for (SkillDto skillDto : event.getRelatedSkills()) {
-                        Skill skill = skillMapper.toEntity(skillDto);
-                        Skill updatedSkill = skillRepository.findById(skill.getId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Ошибка: скилл не найден"));
-                        eventEntity.getRelatedSkills().add(updatedSkill);
-                }*/
         return eventMapper.toDto(eventRepository.save(eventEntity));
     }
 
@@ -96,13 +119,3 @@ public class EventService {
         return eventMapper.toDto(eventRepository.findParticipatedEventsByUserId(userId));
     }
 }
-
-/*public List<SkillDto> getSkills(SkillFilterDto filters) ‹
-List<Skill> skills = skillRepository.findAll():
-        return skills.stream()Stream<Skill>
-.filter(skill -> filters getTitlePattern() == null || skill.getTitle().contains(filters-getTitlePattern()))
-        .filter(skill -> filters getUserId() == null || skill.getUsers().stream().anyMatch(user -> user.getId() == filters getUserId()))
-        .filter(filter(skill -
-        filters-getOwned() == null || filters.getOwned() = skill.getUsers(),stream() .anyMatch(user > user-getI]() = filters.getUserIdO))))
-.map (skillMapper:: toDto) Stream<SkillDto>
-toList()*/

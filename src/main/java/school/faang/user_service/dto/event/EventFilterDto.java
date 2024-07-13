@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class EventFilterDto {
     private String titlePattern;
-    private Long ownerId;
-    private String skillPattern;
+    private Long ownerIdPattern;
 }

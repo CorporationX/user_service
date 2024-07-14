@@ -59,6 +59,9 @@ public class User {
     @Column(name = "experience")
     private Integer experience;
 
+    @Column(name = "banned", nullable = false)
+    private boolean banned;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")

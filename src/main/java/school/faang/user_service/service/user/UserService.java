@@ -66,6 +66,7 @@ public class UserService {
                 });
     }
 
+
     @Transactional
     public void saveUser(User user) {
         userValidator.validateUserNotExists(user);
@@ -211,5 +212,13 @@ public class UserService {
     @Transactional(readOnly = true)
     public Long authorizeUser(String userEmail, String userPassword) {
         return userRepository.findIdByEmailAndPassword(userEmail, userPassword);
+    }
+
+    @Transactional
+    public void banUser(Long userId) {
+        userRepository.findById(userId).ifPresent(user -> {
+            user.setBanned(true);
+            userRepository.save(user);
+        });
     }
 }

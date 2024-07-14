@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class FailedTest {
+
     @DisplayName("Test to check the functionality of the ci-pipeline")
     @Test
     void failedTest(){

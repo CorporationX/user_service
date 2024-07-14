@@ -15,7 +15,7 @@ public class UserController {
 
     public UserDto deactivateUser(long userId) {
         userValidator.validateUserId(userId);
-        UserDto user =user_Service.deactivate(userId);
+        UserDto user = user_Service.deactivate(userId);
         user_Service.removeMenteeAndGoals(userId);
         return user;
     }

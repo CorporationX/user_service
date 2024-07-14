@@ -26,7 +26,7 @@ public class RedisConfig {
     private String mentorshipChannelName;
 
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
-    private String user_banChannelName;
+    private String userBanChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -48,7 +48,7 @@ public class RedisConfig {
     public RedisMessageListenerContainer redisContainer(@NonNull RedisConnectionFactory connectionFactory, @NonNull MessageListenerAdapter listenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new ChannelTopic(user_banChannelName));
+        container.addMessageListener(listenerAdapter, new ChannelTopic(userBanChannelName));
         return container;
     }
 
@@ -58,13 +58,13 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(UserBanListener userBanListener) {
+    public MessageListenerAdapter listenerAdapterForUserBanChannel(UserBanListener userBanListener) {
         return new MessageListenerAdapter(userBanListener, "onMessage");
     }
 
 
     @Bean
     public ChannelTopic userBanChannel() {
-        return new ChannelTopic(user_banChannelName);
+        return new ChannelTopic(userBanChannelName);
     }
 }

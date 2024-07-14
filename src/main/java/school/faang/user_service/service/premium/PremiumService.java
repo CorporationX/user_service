@@ -59,12 +59,14 @@ public class PremiumService {
         PaymentPostPayRequestDto requestDto = new PaymentPostPayRequestDto(1, period.getPrice(), Currency.USD);
         ResponseEntity<PaymentPostPayResponseDto> response = paymentServiceClient.pay(requestDto);
 
-        if (
-                response.getStatusCode() != HttpStatus.OK ||
-                response.getBody() == null ||
-                response.getBody().status() != PaymentStatus.SUCCESS
-        ) {
+        if (!isValidResponse(response)) {
             throw new RuntimeException("Payment failed");
         }
+    }
+
+    private static boolean isValidResponse(ResponseEntity<PaymentPostPayResponseDto> response) {
+        return response.getStatusCode() == HttpStatus.OK &&
+                response.getBody() != null &&
+                response.getBody().status() == PaymentStatus.SUCCESS;
     }
 }

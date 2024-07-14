@@ -14,8 +14,11 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exeptions.DataValidationException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.recommendation.filter.RequestFilter;
 import school.faang.user_service.validator.ValidatorForRecommendationRequestService;
 
 import java.time.LocalDateTime;
@@ -39,6 +42,14 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestRepository requestRepository;
     @Mock
     private ValidatorForRecommendationRequestService validator;
+    @Mock
+    private SkillRequestRepository skillRequestRepository;
+    @Mock
+    private List<RequestFilter> requestFilters;
+
+
+
+
 
     @InjectMocks
     private RecommendationRequestService service;
@@ -51,6 +62,7 @@ public class RecommendationRequestServiceTest {
         when(requestRepository.save(entity)).thenReturn(entity);
         when(requestMapper.toEntity(dto)).thenReturn(entity);
         when(requestMapper.toDto(entity)).thenReturn(dto);
+        when(skillRequestRepository.save(dto)).thenReturn(entity);
 
         var returnDto = service.create(dto);
 
@@ -126,51 +138,25 @@ public class RecommendationRequestServiceTest {
 
     @Test
     void testGetRequestsSuccessfulApplyForEmptyFilter() {
-        var listEntity = createListDto();
-        when(requestRepository.findAll()).thenReturn(listEntity);
+        var listRequest = createListDto();
+        long idReceiver = 1L;
+        listRequest.forEach(request -> request.getReceiver().setId(idReceiver));
+        var filter = new RequestFilterDto();
+        when(requestRepository.findAllRecommendationRequestForReceiver(idReceiver))
+                .thenReturn(listRequest);
 
-        var resultListEntity = service.getRequests(new RequestFilterDto());
+        var resultList = service.getRequests(idReceiver, filter);
 
-        assertEquals(listEntity, resultListEntity);
+        assertEquals(listRequest, resultList);
     }
 
     @Test
-    void testDetRequestSuccessfulApplyForOneFieldFilter() {
-        var listEntity = createListDto();
-        listEntity.forEach(entity -> entity.setStatus(RequestStatus.PENDING));
-        when(requestRepository.findAll()).thenReturn(listEntity);
-        var filterWithOneField = new RequestFilterDto(RequestStatus.PENDING, null);
-        var examineListDto = listEntity.stream().map(entity -> requestMapper.toDto(entity)).toList();
+    void testGetRequestsNegativeId() {
+        var listRequest = createListDto();
+        long negativeIdReceiver = -1L;
+        var filter = new RequestFilterDto();
 
-        var resultListDto = service.getRequests(filterWithOneField);
-
-        assertEquals(examineListDto, resultListDto);
-    }
-
-    @Test
-    void testDetRequestSuccessfulApplyForTwoFieldFilter() {
-        var listEntity = createListDto();
-        listEntity.forEach(entity -> entity.setStatus(RequestStatus.PENDING));
-        when(requestRepository.findAll()).thenReturn(listEntity);
-        var filterWithTwoField = new RequestFilterDto(RequestStatus.PENDING, 1L);
-        var examineDto = createDto();
-        examineDto.setStatus(RequestStatus.PENDING);
-        var examineListDto = List.of(examineDto);
-
-        var resultListDto = service.getRequests(filterWithTwoField);
-
-        assertEquals(examineListDto, resultListDto);
-    }
-
-    @Test
-    void testDetRequestForEmptyList() {
-        var dto = createDto();
-        var listEntity = createListDto();
-        listEntity.forEach(entity -> entity.setStatus(RequestStatus.REJECTED));
-        when(requestRepository.findAll()).thenReturn(listEntity);
-        var filterWithOneField = new RequestFilterDto(RequestStatus.PENDING, 1L);
-
-        assertThrows(NoSuchElementException.class, () -> service.getRequests(filterWithOneField));
+        assertThrows(DataValidationException.class, () -> service.getRequests(negativeIdReceiver, filter));
     }
 
     private RecommendationRequestDto createDto() {

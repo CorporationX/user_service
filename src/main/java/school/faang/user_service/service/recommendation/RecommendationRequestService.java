@@ -51,6 +51,7 @@ public class RecommendationRequestService {
         }
     }
 
+    @Transactional
     public RecommendationRequestDto rejectRequest(@Positive long id, String reason) {
         Optional<RecommendationRequest> request = requestRepository.findById(id);
         if (request.isPresent()) {
@@ -69,6 +70,7 @@ public class RecommendationRequestService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<RecommendationRequestDto> getRequests(Long receiverId, RequestFilterDto filters) {
         if (receiverId == null || receiverId < 0) {
             log.error(RECIPIENT_ID_NULL_OR_NEGATIVE + receiverId);
@@ -82,6 +84,7 @@ public class RecommendationRequestService {
                 .toList();
     }
 
+    @Transactional
     private void saveSkillRequest(RecommendationRequestDto requestDto) {
         requestDto.getSkills().forEach(
                 skill -> skillRequestRepository.create(requestDto.getId(), skill.getSkillId()));

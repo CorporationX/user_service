@@ -116,7 +116,7 @@ class MentorshipServiceImplTest {
     public void testDeleteMentorshipRelationsFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(mentorshipRepository.findById(MENTOR_ID)).thenReturn(Optional.of(userMentee));
-        assertThrows(MentorshipNoSuchElementException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.deleteMentorshipRelations(MENTOR_ID, anyLong()));
     }
 }

@@ -3,18 +3,18 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.ListOfSkillsCandidateMapper;
+import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.repository.SkillRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private final ListOfSkillsCandidateMapper listOfSkillsCandidateMapper;
     private final SkillValidator skillValidator;
+    private final SkillCandidateMapper skillCandidateMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final long MIN_SKILL_OFFERS = 3;
@@ -45,7 +45,7 @@ public class SkillService {
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
         skillValidator.validateUserSkills(skills);
-        return listOfSkillsCandidateMapper.listToSkillCandidateDto(skills);
+        return skillCandidateMapper.toListDto(skills);
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {

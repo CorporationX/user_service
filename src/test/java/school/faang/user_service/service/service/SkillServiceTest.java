@@ -17,7 +17,6 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.ListOfSkillsCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.spy;
 
@@ -54,13 +52,11 @@ public class SkillServiceTest {
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
-    @Spy
-    private ListOfSkillsCandidateMapperImpl listOfSkillsCandidateMapper;
 
     @InjectMocks
     private SkillService skillService;
 
-    private final SkillDto skillDto = new SkillDto(1L, "title");
+    private SkillDto skillDto = new SkillDto(1L, "title");
 
     @Test
     public void testCreate() {

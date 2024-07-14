@@ -1,6 +1,5 @@
 package school.faang.user_service.validator;
 
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.Skill;

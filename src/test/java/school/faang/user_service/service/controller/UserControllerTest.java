@@ -3,6 +3,7 @@ package school.faang.user_service.service.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -13,7 +14,6 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.User_Service;
 import school.faang.user_service.validator.UserValidator;
@@ -27,7 +27,7 @@ public class UserControllerTest {
     private UserRepository user_repository;
 
     @Spy
-    private UserMapperImpl user_mapper = new UserMapperImpl();
+    private UserMapper user_mapper = Mappers.getMapper(UserMapper.class);
 
     @Spy
     private UserValidator user_validator = new UserValidator(user_repository);

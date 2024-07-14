@@ -40,7 +40,7 @@ public class UserServiceTest {
     private MentorshipService mentorshipService;
 
     @Spy
-    private UserMapperImpl userMapper = new UserMapperImpl();
+    private UserMapperImpl userMapper;
 
     @InjectMocks
     private User_Service user_service;

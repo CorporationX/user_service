@@ -18,22 +18,23 @@ public class MentorshipService {
 
     public void removeMenteeFromUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserValidationException("User not found"));
-        if (user.getMentees().isEmpty()) return;
         user.getMentees().forEach(mentee -> {
             mentee.getMentors().remove(user);
+            userRepository.save(mentee);
         });
     }
 
-    public void removeMenteeFromUserGoals(Long userId) {
+    public void removeMenteeGoals(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserValidationException("User not found"));
         user.getMentees().forEach(mentee -> {
             List<Goal> menteeGoals = mentee.getSetGoals();
             if (!menteeGoals.isEmpty()) {
                 menteeGoals.stream().filter(goal -> goal.getMentor().getId() == userId).forEach(goal -> {
-                    goal.setMentor(user);
+                    goal.setMentor(mentee);
                     goalRepository.save(goal);
                 });
             }
+            userRepository.save(mentee);
         });
     }
 }

@@ -12,7 +12,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.StreamSupport;
 
 @Component
@@ -35,8 +34,8 @@ public class User_Service {
     }
 
     public void removeMenteeAndGoals(Long userId) {
+        mentorshipService.removeMenteeGoals(userId);
         mentorshipService.removeMenteeFromUser(userId);
-        mentorshipService.removeMenteeFromUserGoals(userId);
     }
 
     @Scheduled(cron = "@daily")

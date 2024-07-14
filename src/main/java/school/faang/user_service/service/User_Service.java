@@ -40,7 +40,7 @@ public class User_Service {
     }
 
     @Scheduled(cron = "@daily")
-    private void deleteInactiveUsers() {
+    public void deleteInactiveUsers() {
         StreamSupport.stream(userRepository.findAll().spliterator(), false)
                 .filter(user -> !user.isActive()).filter(user ->user.getUpdatedAt().plusDays(90).isBefore(LocalDateTime.now()))
                 .forEach(userRepository::delete);

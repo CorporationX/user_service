@@ -46,6 +46,13 @@ public class SubscriptionService {
         return filterUsers(subscriptionRepo.findByFolloweeId(followeeId).toList(), filter);
     }
 
+    @Transactional
+    public List<Long> getFollowersIds(long followeeId) {
+        return subscriptionRepo.findByFolloweeId(followeeId)
+                .map(User::getId)
+                .toList();
+    }
+
     public int getFollowersCount(long followeeId) {
         return subscriptionRepo.findFollowersAmountByFolloweeId(followeeId);
     }

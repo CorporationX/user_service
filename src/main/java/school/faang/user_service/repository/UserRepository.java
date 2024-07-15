@@ -28,11 +28,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM users u 
-            WHERE u.id NOT IN (
-                SELECT u2.id FROM users u2
-                JOIN user_premium up ON up.user_id = u2.id
-                WHERE up.end_date > NOW()
-            )
+            LEFT JOIN user_premium up ON up.user_id = u.id
+            WHERE up.user_id IS NULL OR up.end_date < now()
     """)
     Stream<User> findRegularUsers();
 }

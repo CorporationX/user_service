@@ -19,13 +19,13 @@ public class EventParticipationValidator {
 
     public void checkUserIsExisting(long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new DataValidationException("User doesn't exist in the system");
+            throw new DataValidationException("User doesn't exist in the system ID = " + userId);
         }
     }
 
     public void checkEventIsExisting(long eventId) {
         if (!eventRepository.existsById(eventId)) {
-            throw new DataValidationException("Event doesn't exist in the system");
+            throw new DataValidationException("Event doesn't exist in the system ID = " + eventId);
         }
     }
 

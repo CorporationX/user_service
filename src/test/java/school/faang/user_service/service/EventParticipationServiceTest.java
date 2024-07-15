@@ -69,7 +69,7 @@ public class EventParticipationServiceTest {
     @Test
     @DisplayName("Test register participant :  non exist user")
     public void checkRegisterNonExistUser() {
-        String errorMessage = "User doesn't exist in the system";
+        String errorMessage = "User doesn't exist in the system ID = " + USER_ID_FIRST;
 
        doThrow(new DataValidationException(errorMessage))
                .when(eventParticipationValidator)
@@ -85,7 +85,7 @@ public class EventParticipationServiceTest {
     @Test
     @DisplayName("Test register participant :  non exist event")
     public void checkRegisterNonExistEvent() {
-        String errorMessage = "Event doesn't exist in the system";
+        String errorMessage = "Event doesn't exist in the system ID = " + EVENT_ID;
         doNothing().when(eventParticipationValidator).checkUserIsExisting(USER_ID_FIRST);
 
         doThrow(new DataValidationException(errorMessage))

@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.userDto.UserDto;
 import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -18,7 +19,7 @@ public class UserPremiumService {
     private final UserRepository userRepository;
     private final UserPremiumMapper userPremiumMapper;
     private final List<UserFilter> userFilters;
-
+    @Transactional(readOnly = true)
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<User> userStream = userRepository.findPremiumUsers();
         List<User> resultPremiumUserList = getFilterUser(userStream, userFilterDto);

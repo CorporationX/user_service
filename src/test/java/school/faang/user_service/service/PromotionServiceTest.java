@@ -10,10 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.*;
+import school.faang.user_service.dto.promotion.PromotionDto;
+import school.faang.user_service.entity.promotion.PromotionalPlan;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.entity.promotion.AudienceReach;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.exception.AlreadyPurchasedException;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -24,7 +24,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.promotiom.PromotionRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,8 +74,8 @@ class PromotionServiceTest {
             null,
             userId,
             eventId,
-            0,
-            promotionalPlan.getAudienceReach()
+            PromotionalPlan.BASIC,
+            0
         );
         paymentRequest = new PaymentRequest(
             0,
@@ -190,6 +189,7 @@ class PromotionServiceTest {
     @Test
     @DisplayName("Test promoting an event that does not exist")
     void testPromoteEventThrowsEntityNotFoundException() {
+
         when(promotionRepository.existsByEventId(eventId)).thenReturn(false);
         when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());

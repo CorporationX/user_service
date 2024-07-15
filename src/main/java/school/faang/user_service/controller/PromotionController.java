@@ -3,9 +3,8 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.PromotionDto;
-import school.faang.user_service.dto.PromotionalPlan;
-import school.faang.user_service.entity.promotion.AudienceReach;
+import school.faang.user_service.dto.promotion.PromotionDto;
+import school.faang.user_service.entity.promotion.PromotionalPlan;
 import school.faang.user_service.service.PromotionService;
 
 @RestController
@@ -18,25 +17,17 @@ public class PromotionController {
     @ResponseStatus(HttpStatus.OK)
     public PromotionDto promoteUser(
         @PathVariable long userId,
-        @RequestParam int impressions,
-        @RequestParam String audienceReach
+        @RequestParam String promotionalPlanName
     ) {
-        return promotionService.promoteUser(
-            userId,
-            PromotionalPlan.getPromotionalPlan(impressions, AudienceReach.fromName(audienceReach))
-        );
+        return promotionService.promoteUser(userId, PromotionalPlan.getFromName(promotionalPlanName));
     }
 
     @PostMapping("/event/promote/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public PromotionDto promoteEvent(
         @PathVariable long eventId,
-        @RequestParam int impressions,
-        @RequestParam String audienceReach
+        @RequestParam String promotionalPlanName
     ) {
-        return promotionService.promoteEvent(
-            eventId,
-            PromotionalPlan.getPromotionalPlan(impressions, AudienceReach.fromName(audienceReach))
-        );
+        return promotionService.promoteEvent(eventId, PromotionalPlan.getFromName(promotionalPlanName));
     }
 }

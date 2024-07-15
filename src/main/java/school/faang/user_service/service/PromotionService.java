@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.*;
+import school.faang.user_service.dto.promotion.PromotionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.Promotion;
+import school.faang.user_service.entity.promotion.PromotionalPlan;
 import school.faang.user_service.exception.*;
 import school.faang.user_service.mapper.PromotionMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -44,8 +46,8 @@ public class PromotionService {
             .orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", userId)));
         Promotion promotion = Promotion.builder()
             .user(user)
+            .promotionalPlan(promotionalPlan)
             .impressions(promotionalPlan.getImpressions())
-            .audienceReach(promotionalPlan.getAudienceReach())
             .build();
         promotionRepository.save(promotion);
         return promotionMapper.toDto(promotion);
@@ -70,8 +72,8 @@ public class PromotionService {
             .orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", eventId)));
         Promotion promotion = Promotion.builder()
             .event(event)
+            .promotionalPlan(promotionalPlan)
             .impressions(promotionalPlan.getImpressions())
-            .audienceReach(promotionalPlan.getAudienceReach())
             .build();
         promotionRepository.save(promotion);
         return promotionMapper.toDto(promotion);

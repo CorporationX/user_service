@@ -5,6 +5,8 @@ import lombok.*;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 
+import java.time.LocalDateTime;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,10 +28,18 @@ public class Promotion {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @Column(name = "impressions")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "promotional_plan", nullable = false)
+    private PromotionalPlan promotionalPlan;
+
+    @Column(name = "impressions", nullable = false)
     private int impressions;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "audience_reach")
-    private AudienceReach audienceReach;
+    @Column(name = "start_date", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime endDate;
 }

@@ -20,13 +20,11 @@ public class UserController {
 
     private final UserService userService;
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(@ParameterObject UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/regular")
     public List<UserDto> getRegularUsers(@ParameterObject UserFilterDto userFilterDto) {
         return userService.getRegularUsers(userFilterDto);

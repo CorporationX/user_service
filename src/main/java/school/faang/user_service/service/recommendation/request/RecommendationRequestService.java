@@ -13,6 +13,7 @@ import school.faang.user_service.mapper.recommendation.RecommendationRequestMapp
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator.CreateRequestDtoValidator;
+import school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator.RejectRequestValidator;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +28,7 @@ public class RecommendationRequestService {
     private final RecommendationRequestRepository mRecommendationReqRep;
     private final SkillRequestRepository mSkillReqRep;
     private final CreateRequestDtoValidator mCreateRequestValidator;
+    private final RejectRequestValidator mRejectRequestValidator;
     private final List<Filter<RecommendationRequestFilter, RecommendationRequestDto>> mRecommendationFilter;
     private final RecommendationRequestMapper mRequestMapper;
 
@@ -78,14 +80,7 @@ public class RecommendationRequestService {
                 id
         ).orElseThrow();
 
-        RequestStatus status = recommendation.getStatus();
-
-        if (!status.equals(RequestStatus.PENDING)) {
-            throw new RejectRecommendationException(
-                    ExceptionMessage.IMPOSSIBLE_REJECTION,
-                    recommendation.getStatus()
-            );
-        }
+        mRejectRequestValidator.validate(recommendation);
 
         recommendation.setStatus(RequestStatus.REJECTED);
         recommendation.setRejectionReason(rejectionDto.getReason());

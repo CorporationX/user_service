@@ -10,7 +10,10 @@ import school.faang.user_service.entity.RequestStatus;
 @NoArgsConstructor
 public class RequestFilterDto {
     private String descriptionPattern;
+
     private Long requesterId;
+
     private Long receiverId;
+
     private RequestStatus status;
 }

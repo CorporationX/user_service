@@ -4,7 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestDtoForRequest;
+import school.faang.user_service.dto.MentorshipRequestDtoForResponse;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.service.MentorshipRequestService;
@@ -18,11 +19,11 @@ public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    public MentorshipRequestDto requestMentorship(@Valid MentorshipRequestDto mentorshipRequestDto) {
-        return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+    public MentorshipRequestDtoForResponse requestMentorship(@Valid MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
+        return mentorshipRequestService.requestMentorship(mentorshipRequestDtoForRequest);
     }
 
-    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
+    public List<MentorshipRequestDtoForResponse> getRequests(RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);
     }
 

@@ -1,11 +1,11 @@
 package school.faang.user_service.service;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestDtoForRequest;
+import school.faang.user_service.dto.MentorshipRequestDtoForResponse;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -45,7 +46,8 @@ public class MentorshipRequestServiceTest {
                     mapperMock,
                     filters);
 
-    private final MentorshipRequestDto dto = new MentorshipRequestDto();
+    private final MentorshipRequestDtoForRequest requestDto = new MentorshipRequestDtoForRequest();
+    private final MentorshipRequestDtoForResponse responseDto = new MentorshipRequestDtoForResponse();
     private final RejectionDto rejectionDto = new RejectionDto();
     private final RequestFilterDto filterDto = new RequestFilterDto();
     private final MentorshipRequest request = new MentorshipRequest();
@@ -54,12 +56,20 @@ public class MentorshipRequestServiceTest {
     private final List<User> resultMentors = new ArrayList<>();
     private final LocalDateTime lastRequestTime = LocalDateTime.now().minusDays(85);
 
-    private MentorshipRequestDto prepareTestingRequestDto() {
-        dto.setId(1L);
-        dto.setRequesterId(55L);
-        dto.setReceiverId(10L);
-        dto.setDescription("abc");
-        return dto;
+    private MentorshipRequestDtoForRequest prepareTestingRequestDtoForRequest() {
+        requestDto.setId(1L);
+        requestDto.setRequesterId(55L);
+        requestDto.setReceiverId(10L);
+        requestDto.setDescription("abc");
+        return requestDto;
+    }
+
+    private MentorshipRequestDtoForResponse prepareTestingRequestDtoForResponse() {
+        responseDto.setId(1L);
+        responseDto.setRequesterId(55L);
+        responseDto.setReceiverId(10L);
+        responseDto.setDescription("abc");
+        return responseDto;
     }
 
     private MentorshipRequest prepareTestingRequest() {
@@ -70,35 +80,19 @@ public class MentorshipRequestServiceTest {
     }
 
     private User prepareTestingRequester() {
-        testRequester.setId(prepareTestingRequestDto().getRequesterId());
+        testRequester.setId(prepareTestingRequestDtoForRequest().getRequesterId());
         testRequester.setMentors(resultMentors);
         return testRequester;
     }
 
     private User prepareTestingReceiver() {
-        testReceiver.setId(prepareTestingRequestDto().getReceiverId());
+        testReceiver.setId(prepareTestingRequestDtoForRequest().getReceiverId());
         return testReceiver;
     }
 
     @Test
-    public void testRequestMentorshipIfRequesterDoesNotExist() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
-
-        assertThrows(RequestException.class, () -> mentorshipRequestService.requestMentorship(dto));
-    }
-
-    @Test
-    public void testRequestMentorshipIfReceiverDoesNotExist() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
-
-        assertThrows(RequestException.class, () -> mentorshipRequestService.requestMentorship(dto));
-    }
-
-    @Test
     public void testRequestMentorshipWithRequestToYourself() {
-        MentorshipRequestDto dto = new MentorshipRequestDto();
+        MentorshipRequestDtoForRequest dto = new MentorshipRequestDtoForRequest();
         dto.setRequesterId(100L);
         dto.setReceiverId(100L);
 
@@ -106,8 +100,24 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    public void testRequestMentorshipIfRequesterDoesNotExist() {
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
+        when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
+
+        assertThrows(RequestException.class, () -> mentorshipRequestService.requestMentorship(dto));
+    }
+
+    @Test
+    public void testRequestMentorshipIfReceiverDoesNotExist() {
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
+        when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
+
+        assertThrows(RequestException.class, () -> mentorshipRequestService.requestMentorship(dto));
+    }
+
+    @Test
     public void testRequestMentorshipWithEarlyRequest() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         MentorshipRequest request = prepareTestingRequest();
         when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
         when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
@@ -119,7 +129,7 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorshipSuccessful() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
         when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
 
@@ -134,43 +144,44 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testGetRequestApplyDescriptionFilter() {
         Stream<MentorshipRequest> requestStream = Stream.of(new MentorshipRequest());
-        Stream<MentorshipRequestDto> requestDtoStream = Stream.of(new MentorshipRequestDto());
+        Stream<MentorshipRequestDtoForResponse> requestDtoStream = Stream.of(new MentorshipRequestDtoForResponse());
+        MentorshipRequestDtoForResponse responseDto = prepareTestingRequestDtoForResponse();
         when(filters.get(0).isApplicable(new RequestFilterDto())).thenReturn(true);
         when(filters.get(0).apply(any(), any())).thenReturn(requestStream);
         when(mapperMock.toDto(requestStream)).thenReturn(requestDtoStream);
-        when(mapperMock.toDto(request)).thenReturn(dto);
+        when(mapperMock.toDto(request)).thenReturn(responseDto);
 
-        List<MentorshipRequestDto> methodResult = mentorshipRequestService.getRequests(filterDto);
+        List<MentorshipRequestDtoForResponse> methodResult = mentorshipRequestService.getRequests(filterDto);
 
-        assertEquals(methodResult, List.of(dto));
+        assertEquals(methodResult, List.of(responseDto));
     }
 
     @Test
-    public void testAcceptRequestIfRequestDoesNotExist() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
-        when(mentorshipRequestRepository.existsById(dto.getId())).thenReturn(false);
+    public void testAcceptRequestIfRequestDoesNotFind() {
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
+        Optional<MentorshipRequest> opt = mentorshipRequestRepository.findById(dto.getId());
+        when(opt).thenReturn(null);
 
-        assertThrows(RequestException.class, () -> mentorshipRequestService.acceptRequest(dto.getId()));
+        assertTrue(opt.isEmpty());
     }
 
     @Test
     public void testAcceptRequestIfMentorAlreadyExist() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         MentorshipRequest mr = prepareTestingRequest();
         User receiver = prepareTestingReceiver();
         resultMentors.add(receiver);
-        when(mentorshipRequestRepository.existsById(dto.getId())).thenReturn(true);
-        when(mentorshipRequestRepository.getReferenceById(dto.getId())).thenReturn(mr);
+        Optional<MentorshipRequest> opt = mentorshipRequestRepository.findById(dto.getId());
+        when(mentorshipRequestRepository.findById(dto.getId())).thenReturn(Optional.of(mr));
 
         assertThrows(RequestException.class, () -> mentorshipRequestService.acceptRequest(dto.getId()));
     }
 
     @Test
     public void testAcceptRequestSuccessful() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         MentorshipRequest mr = prepareTestingRequest();
-        when(mentorshipRequestRepository.existsById(dto.getId())).thenReturn(true);
-        when(mentorshipRequestRepository.getReferenceById(dto.getId())).thenReturn(mr);
+        when(mentorshipRequestRepository.findById(dto.getId())).thenReturn(Optional.of(mr));
 
         mentorshipRequestService.acceptRequest(dto.getId());
 
@@ -179,19 +190,20 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    public void testRejectRequestIfRequestDoesNotExist() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
-        when(mentorshipRequestRepository.existsById(dto.getId())).thenReturn(false);
+    public void testRejectRequestIfRequestDoesNotFind() {
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
+        Optional<MentorshipRequest> opt = mentorshipRequestRepository.findById(dto.getId());
+        when(opt).thenReturn(null);
 
-        assertThrows(RequestException.class, () -> mentorshipRequestService.rejectRequest(dto.getId(), rejectionDto));
+        assertTrue(opt.isEmpty());
     }
 
     @Test
     public void testRejectRequestSuccessful() {
-        MentorshipRequestDto dto = prepareTestingRequestDto();
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         rejectionDto.setReason("def");
-        when(mentorshipRequestRepository.existsById(dto.getId())).thenReturn(true);
-        when(mentorshipRequestRepository.getReferenceById(dto.getId())).thenReturn(request);
+        MentorshipRequest mr = prepareTestingRequest();
+        when(mentorshipRequestRepository.findById(dto.getId())).thenReturn(Optional.of(mr));
 
         mentorshipRequestService.rejectRequest(dto.getId(), rejectionDto);
 

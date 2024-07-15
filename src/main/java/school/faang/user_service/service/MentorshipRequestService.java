@@ -2,7 +2,8 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestDtoForRequest;
+import school.faang.user_service.dto.MentorshipRequestDtoForResponse;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -17,7 +18,6 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Component
@@ -30,20 +30,33 @@ public class MentorshipRequestService {
     private final List<MentorshipRequestFilter> filters;
     private static final int PAUSE_TIME = 3;
 
-    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    public MentorshipRequestDtoForResponse requestMentorship(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
 
-        if (!userRepository.existsById(mentorshipRequestDto.getRequesterId())) {
-            throw new RequestException(ErrorMessage.REQUESTER_DOES_NOT_EXIST);
-        }
-        if (!userRepository.existsById(mentorshipRequestDto.getReceiverId())) {
-            throw new RequestException(ErrorMessage.RECEIVER_DOES_NOT_EXIST);
-        }
-        if (mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
+        validatedRequesterAndReceiverIds(mentorshipRequestDtoForRequest);
+        validatedCreateTime(mentorshipRequestDtoForRequest);
+
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(
+                mentorshipRequestDtoForRequest.getRequesterId(),
+                mentorshipRequestDtoForRequest.getReceiverId(),
+                mentorshipRequestDtoForRequest.getDescription());
+
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
+    }
+
+    private void validatedRequesterAndReceiverIds(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
+        if (mentorshipRequestDtoForRequest.getRequesterId().equals(mentorshipRequestDtoForRequest.getReceiverId())) {
             throw new RequestException(ErrorMessage.REQUEST_TO_YOURSELF);
         }
 
+        if (!userRepository.existsById(mentorshipRequestDtoForRequest.getRequesterId()) ||
+                !userRepository.existsById(mentorshipRequestDtoForRequest.getReceiverId())) {
+            throw new RequestException(ErrorMessage.USER_DOES_NOT_EXIST);
+        }
+    }
+
+    private void validatedCreateTime(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
         mentorshipRequestRepository
-                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
+                .findLatestRequest(mentorshipRequestDtoForRequest.getRequesterId(), mentorshipRequestDtoForRequest.getReceiverId())
                 .ifPresent(request -> {
                             LocalDateTime currentDate = LocalDateTime.now();
                             LocalDateTime suitLastDate = currentDate.minusMonths(PAUSE_TIME);
@@ -51,18 +64,9 @@ public class MentorshipRequestService {
                                 throw new RequestException(ErrorMessage.EARLY_REQUEST);
                             }
                         });
-
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(
-                mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId(),
-                mentorshipRequestDto.getDescription());
-
-        Optional<User> requester = userRepository.findById(mentorshipRequestDto.getRequesterId());
-        Optional<User> receiver = userRepository.findById(mentorshipRequestDto.getReceiverId());
-        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    public List<MentorshipRequestDto> getRequests(RequestFilterDto filterDto) {
+    public List<MentorshipRequestDtoForResponse> getRequests(RequestFilterDto filterDto) {
         Stream<MentorshipRequest> requests = mentorshipRequestRepository.findAll().stream();
         return filters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
@@ -72,23 +76,22 @@ public class MentorshipRequestService {
     }
 
     public void acceptRequest(long id) {
-        if (!mentorshipRequestRepository.existsById(id)) {
-            throw new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST);
-        }
-        MentorshipRequest request = mentorshipRequestRepository.getReferenceById(id);
-        if (request.getRequester().getMentors().contains(mentorshipRequestRepository.getReferenceById(id).getReceiver())) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));
+        List<User> mentors = request.getRequester().getMentors();
+        if (mentors.contains(request.getReceiver())) {
             throw new RequestException(ErrorMessage.ALREADY_MENTOR);
         }
-        request.getRequester().getMentors().add(request.getReceiver());
+        mentors.add(request.getReceiver());
         request.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestRepository.save(request);
     }
 
-
     public void rejectRequest(long id, RejectionDto rejection) {
-        if (!mentorshipRequestRepository.existsById(id)) {
-            throw new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST);
-        }
-        mentorshipRequestRepository.getReferenceById(id).setStatus(RequestStatus.REJECTED);
-        mentorshipRequestRepository.getReferenceById(id).setRejectionReason(rejection.getReason());
+        MentorshipRequest request = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejection.getReason());
+        mentorshipRequestRepository.save(request);
     }
 }

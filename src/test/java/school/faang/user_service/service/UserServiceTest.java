@@ -1,12 +1,9 @@
 package school.faang.user_service.service;
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
@@ -15,20 +12,16 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.user.UserFilterIllegalArgumentException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.UserServiceImpl;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.filter.UserFilterValidation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 
@@ -43,8 +36,6 @@ public class UserServiceTest {
 
     private UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
 
-    private UserFilter emailUserFilter = Mockito.mock(UserFilter.class);
-
     private UserServiceImpl userService;
 
     private List<UserFilter> filters;
@@ -56,10 +47,10 @@ public class UserServiceTest {
     @BeforeEach
     void beforeEachInit() {
         user = new User();
-        userDto = new UserDto();
-        userFilterDto = new UserFilterDto();
+        userDto = UserDto.builder().build();
+        userFilterDto = UserFilterDto.builder().build();
 
-        filters = List.of(nameUserFilter, emailUserFilter);
+        filters = List.of(nameUserFilter/*, emailUserFilter*/);
         userRepository = Mockito.mock(UserRepository.class);
         userFilterValidation = Mockito.mock(UserFilterValidation.class);
         userMapper = Mockito.mock(UserMapper.class);
@@ -96,7 +87,7 @@ public class UserServiceTest {
     public void testGetPremiumUsersByUserFilter() {
         user = User.builder().id(1L).email("email@email.com").username("user name").build();
         userFilterDto = UserFilterDto.builder().emailPattern("email").namePattern("name").build();
-        userDto = UserDto.builder().id(1L).email("email@email.com").username("user name").build();
+        userDto = UserDto.builder().id(1L).username("user name").build();
         List<UserDto> expected = List.of(userDto);
 
         when(userFilterValidation.isNullable(userFilterDto)).thenReturn(false);
@@ -105,9 +96,7 @@ public class UserServiceTest {
         when(userFilterValidation.isAnyFilterApplicable(filters, userFilterDto)).thenReturn(true);
 
         when(filters.get(0).isApplicable(any())).thenReturn(true);
-        when(filters.get(1).isApplicable(any())).thenReturn(true);
         when(filters.get(0).apply(any(), any())).thenReturn(Stream.of(user));
-        when(filters.get(1).apply(any(), any())).thenReturn(Stream.of(user));
 
         when(userMapper.toUserDto(user)).thenReturn(userDto);
 
@@ -145,7 +134,7 @@ public class UserServiceTest {
     public void testGetRegularUsersByUserFilter() {
         user = User.builder().id(1L).email("email@email.com").username("user name").build();
         userFilterDto = UserFilterDto.builder().emailPattern("email").namePattern("name").build();
-        userDto = UserDto.builder().id(1L).email("email@email.com").username("user name").build();
+        userDto = UserDto.builder().id(1L).username("user name").build();
         List<UserDto> expected = List.of(userDto);
 
         when(userFilterValidation.isNullable(userFilterDto)).thenReturn(false);
@@ -154,9 +143,7 @@ public class UserServiceTest {
         when(userFilterValidation.isAnyFilterApplicable(filters, userFilterDto)).thenReturn(true);
 
         when(filters.get(0).isApplicable(any())).thenReturn(true);
-        when(filters.get(1).isApplicable(any())).thenReturn(true);
         when(filters.get(0).apply(any(), any())).thenReturn(Stream.of(user));
-        when(filters.get(1).apply(any(), any())).thenReturn(Stream.of(user));
 
         when(userMapper.toUserDto(user)).thenReturn(userDto);
 

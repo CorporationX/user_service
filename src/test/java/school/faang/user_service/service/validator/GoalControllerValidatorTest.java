@@ -2,18 +2,21 @@ package school.faang.user_service.service.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.validator.GoalControllerValidate;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
+@ExtendWith(MockitoExtension.class)
 public class GoalControllerValidatorTest {
+
     @InjectMocks
-    GoalControllerValidate validator;
+    private GoalControllerValidate validator;
 
     @BeforeEach
     public void setUp() {

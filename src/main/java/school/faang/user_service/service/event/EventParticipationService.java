@@ -33,17 +33,16 @@ public class EventParticipationService {
         eventParticipationRepository.unregister(eventId, userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getParticipant(long eventId) {
         eventParticipationValidator.checkEventIsExisting(eventId);
         return eventParticipationRepository.findAllParticipantsByEventId(eventId)
                 .stream().map(userMapper::toDto).toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getParticipantsCount(long eventId) {
         eventParticipationValidator.checkEventIsExisting(eventId);
         return eventParticipationRepository.countParticipants(eventId);
     }
-
 }

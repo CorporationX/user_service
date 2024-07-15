@@ -18,7 +18,6 @@ import java.util.List;
 public class UserController {
     private final UserPremiumService userPremiumService;
     @GetMapping(value = "/premium")
-    @ResponseStatus()
     public ResponseEntity<List<UserDto>> getListPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         if (userFilterDto == null) {
             log.error("userFilterDto ничего не содержит");

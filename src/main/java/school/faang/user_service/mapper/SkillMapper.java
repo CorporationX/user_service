@@ -21,7 +21,7 @@ public interface SkillMapper {
     Skill toEntity(SkillDto skillDto);
 
     @Mapping(source = "users", target = "usersIds", qualifiedByName = "map")
-    List<SkillDto> toDto(List<Skill> skills);
+    List<SkillDto> toDtoSkillEntity(List<Skill> skills);
 
     @Mapping(source = "users", target = "usersIds", qualifiedByName = "map")
     List<SkillCandidateDto> toCandidateDto(List<Skill> skills);

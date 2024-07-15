@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,19 +32,19 @@ public class SkillService {
     private final SkillValidator skillValidator;
     private final UserSkillGuaranteeRepository guaranteeRepository;
 
-    public SkillDto create(SkillDto skill) {
-        skillValidator.validateSkillTitleIsNotNullAndNotBlank(skill);
-        Skill skillEntity = skillMapper.toEntity(skill);
-        List<User> users = userRepository.findAllById(skill.userIds)
+    public SkillDto create(SkillDto skillDto) {
+        skillValidator.validateSkillTitleIsNotNullAndNotBlank(skillDto);
+        skillValidator.validateSkillTitleDosNotExists(skillDto);
+        Skill skill = skillMapper.toEntity(skillDto);
+        List<User> users = userRepository.findAllById(skillDto.userIds)
                 .stream()
                 .toList();
-        skillEntity.setUsers(users);
-        skillValidator.validateSkillTitleDosNotExists(skill);
-        return skillMapper.toDto(skillRepository.save(skillEntity));
+        skill.setUsers(users);
+        return skillMapper.toDto(skillRepository.save(skill));
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        return skillMapper.toDto(skillRepository.findAllByUserId(userId));
+        return skillMapper.toDtoSkillEntity(skillRepository.findAllByUserId(userId));
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
@@ -67,8 +66,9 @@ public class SkillService {
         if (userSkill.isEmpty() && allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
             skillRepository.assignSkillToUser(skillId, userId);
             addGuarantor(allOffersOfSkill);
+        } else {
+            log.info("the skill exists or there are no offers for the skill less than 3");
         }
-        log.info("the skill exists or there are no offers for the skill less than 3");
     }
 
     private void addGuarantor(List<SkillOffer> skillOfferList) {

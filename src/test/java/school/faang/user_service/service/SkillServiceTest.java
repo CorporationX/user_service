@@ -80,7 +80,7 @@ class SkillServiceTest {
         user.setId(userId);
         skillOffer = new SkillOffer();
         skillOffer.setId(skillId);
-        //skillOffer.setSkill(skill);
+        skillOffer.setSkill(skill);
     }
 
     @Test
@@ -107,14 +107,14 @@ class SkillServiceTest {
     @Test
     @DisplayName("testGetUserSkills")
     void testGetUserSkills() {
-        when(skillRepository.findAllByUserId(userId)).thenReturn(skillList());
-        when(skillMapper.toDto(skillList())).thenReturn(skillDtoList());
+        when(skillRepository.findAllByUserId(userId)).thenReturn(getSkillList());
+        when(skillMapper.toDtoSkillEntity(getSkillList())).thenReturn(getSkillDtoList());
 
         List<SkillDto> userSkillsResult = skillService.getUserSkills(userId);
 
         verify(skillRepository).findAllByUserId(userId);
-        verify(skillMapper).toDto(skillList());
-        assertEquals(userSkillsResult, skillDtoList());
+        verify(skillMapper).toDtoSkillEntity(getSkillList());
+        assertEquals(userSkillsResult, getSkillDtoList());
     }
 
     @Test
@@ -152,7 +152,7 @@ class SkillServiceTest {
         assertEquals(skillDtoResult, skillDto);
     }
 
-    private List<SkillDto> skillDtoList() {
+    private List<SkillDto> getSkillDtoList() {
         SkillDto firstSkillDto = new SkillDto();
         firstSkillDto.setTitle("title");
         firstSkillDto.setUserIds(List.of(userId));
@@ -162,7 +162,7 @@ class SkillServiceTest {
         return List.of(firstSkillDto, secondSkillDto);
     }
 
-    private List<Skill> skillList() {
+    private List<Skill> getSkillList() {
         Skill firstSkill = new Skill();
         firstSkill.setTitle("title");
         firstSkill.setUsers(List.of(user));

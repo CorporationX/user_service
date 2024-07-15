@@ -3,7 +3,6 @@ package school.faang.user_service.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import school.faang.user_service.exception.IllegalEntityException;
-import school.faang.user_service.exception.IllegalSubscriptionException;
 
 import java.util.Arrays;
 

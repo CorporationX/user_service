@@ -13,8 +13,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,8 +35,9 @@ import static org.mockito.Mockito.when;
 public class EventServiceTest {
     private EventService eventService;
     private EventRepository eventRepository;
-    private UserRepository userRepository;
+    private UserService userService;
     private EventMapper eventMapper;
+    private EventServiceValidator validator;
     @Spy
     private EventDescriptionFilter eventDescriptionFilter = new EventDescriptionFilter();
     @Spy
@@ -64,15 +66,16 @@ public class EventServiceTest {
     @BeforeEach
     void setUp() {
         eventRepository = Mockito.mock(EventRepository.class);
-        userRepository = Mockito.mock(UserRepository.class);
+        userService = Mockito.mock(UserService.class);
         eventMapper = Mockito.mock(EventMapper.class);
+        validator = Mockito.mock(EventServiceValidator.class);
         eventFilters = List.of(eventDescriptionFilter, eventOwnerFilter);
-        eventService = new EventService(eventRepository, userRepository, eventMapper, eventFilters);
+        eventService = new EventService(eventRepository, eventMapper, eventFilters, userService, validator);
     }
 
     private void prepareMocks() {
-        lenient().when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        lenient().when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
+        lenient().when(userService.findUserById(eventDto.getOwnerId())).thenReturn(user);
+        lenient().when(eventMapper.toEntity(eventDto, userService)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
         lenient().when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         lenient().when(eventRepository.save(event)).thenReturn(event);
@@ -83,10 +86,11 @@ public class EventServiceTest {
         user.setSkills(Collections.emptyList());
 
         prepareMocks();
+        doThrow(new DataValidationException("User hasn't required skills"))
+                .when(validator).validateRequiredSkills(user, event);
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
-        assertEquals("User hasn't required skills", exception.getMessage());
         verify(eventRepository, times(0)).save(event);
         verify(eventMapper, times(0)).toDto(eventRepository.save(event));
     }
@@ -165,6 +169,8 @@ public class EventServiceTest {
         user.setSkills(Collections.emptyList());
 
         prepareMocks();
+        doThrow(new DataValidationException("User hasn't required skills"))
+                .when(validator).validateRequiredSkills(user, event);
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));

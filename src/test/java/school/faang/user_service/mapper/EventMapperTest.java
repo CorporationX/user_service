@@ -8,9 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.repository.UserRepository;
-
-import java.util.Optional;
+import school.faang.user_service.service.user.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,7 +20,7 @@ public class EventMapperTest {
     @InjectMocks
     private EventMapperImpl eventMapper;
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
     private long eventId = 1L;
     private long ownerId = 2L;
     User user = User.builder()
@@ -34,13 +32,13 @@ public class EventMapperTest {
         EventDto eventDto = new EventDto();
         eventDto.setOwnerId(ownerId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(user));
+        when(userService.findUserById(ownerId)).thenReturn(user);
 
-        Event event = eventMapper.toEntity(eventDto, userRepository);
+        Event event = eventMapper.toEntity(eventDto, userService);
 
         assertNotNull(event.getOwner());
         assertEquals(ownerId, event.getOwner().getId());
-        verify(userRepository).findById(ownerId);
+        verify(userService).findUserById(ownerId);
     }
 
     @Test

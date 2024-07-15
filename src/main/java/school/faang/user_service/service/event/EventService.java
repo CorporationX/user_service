@@ -8,8 +8,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -18,29 +18,19 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
+    private final UserService userService;
+    private final EventServiceValidator validator;
 
     public EventDto create(EventDto eventDto) {
-        User owner = findUserById(eventDto.getOwnerId());
-        Event event = eventMapper.toEntity(eventDto, userRepository);
+        User owner = userService.findUserById(eventDto.getOwnerId());
+        Event event = eventMapper.toEntity(eventDto, userService);
         event.setOwner(owner);
 
-        hasRequiredSkills(owner, event);
+        validator.validateRequiredSkills(owner, event);
 
         return eventMapper.toDto(eventRepository.save(event));
-    }
-
-    private User findUserById(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("User not found"));
-    }
-
-    private void hasRequiredSkills(User owner, Event event) {
-        if (!owner.getSkills().containsAll(event.getRelatedSkills())) {
-            throw new DataValidationException("User hasn't required skills");
-        }
     }
 
     public EventDto getEvent(long eventId) {
@@ -62,15 +52,16 @@ public class EventService {
     }
 
     public void deleteEvent(long eventId) {
+        validator.validateEventId(eventId);
         eventRepository.deleteById(eventId);
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        User owner = findUserById(eventDto.getOwnerId());
-        Event event = eventMapper.toEntity(eventDto, userRepository);
+        User owner = userService.findUserById(eventDto.getOwnerId());
+        Event event = eventMapper.toEntity(eventDto, userService);
         event.setOwner(owner);
 
-        hasRequiredSkills(owner, event);
+        validator.validateRequiredSkills(owner, event);
 
         return eventMapper.toDto(eventRepository.save(event));
     }

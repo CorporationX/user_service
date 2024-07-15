@@ -10,7 +10,6 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +43,7 @@ public class EventControllerTest {
         assertEquals(textException, exception.getMessage());
         verify(eventService, times(0)).create(eventDto);
     }
+
     @Test
     public void testCreateUsingEventService() {
         eventController.create(eventDto);

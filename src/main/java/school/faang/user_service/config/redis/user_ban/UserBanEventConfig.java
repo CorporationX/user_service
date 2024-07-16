@@ -13,7 +13,7 @@ import school.faang.user_service.listener.user_ban.UserBanEventListener;
 @Configuration
 public class UserBanEventConfig {
 
-    @Value("${spring.data.redis.channels.user_ban_channel.name}")
+    @Value("${spring.data.channel.user_ban_channel.name}")
     private String userBanEventListenerTopic;
 
     @Bean

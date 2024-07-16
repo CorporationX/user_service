@@ -14,7 +14,7 @@ public class EventOwnerFilter implements EventFilter {
     }
 
     @Override
-    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+    public Stream<Event> applyNotSafe(Stream<Event> events, EventFilterDto filters) {
         return events
                 .filter(event -> event.getOwner() != null)
                 .filter(event -> event.getOwner().getId() == filters.getOwnerId());

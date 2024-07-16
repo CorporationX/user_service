@@ -4,11 +4,13 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventOwnerFilterTest {
@@ -41,5 +43,14 @@ public class EventOwnerFilterTest {
 
         assertTrue(result.contains(eventWithOwner), "Result contains true event");
         assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testApplyWithNullFilters() {
+        eventFilterDto = null;
+
+        DataValidationException exception =
+                assertThrows(DataValidationException.class, () -> filter.apply(events, eventFilterDto));
+        assertEquals("EventFilterDto can't be null", exception.getMessage());
     }
 }

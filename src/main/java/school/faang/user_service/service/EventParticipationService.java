@@ -24,8 +24,10 @@ public class EventParticipationService {
         if (!usersForEvent.isEmpty()) {
             log.warn("User already registered for event");
             throw new IllegalArgumentException("Пользователь уже зарегистрирован на событие");
+        } else {
+            eventParticipationRepository.register(eventId, userId);
         }
-        eventParticipationRepository.register(eventId, userId);
+
     }
 
     public void unRegisterParticipant(long eventId, long userId) {

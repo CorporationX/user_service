@@ -50,15 +50,15 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(recommendationRequestRepository.save(recommendationRequestEntity));
     }
 
-//    public List<RequestFilterDto> getRequestsByFilter(RequestFilterDto filterDto) {
-//        Stream<RecommendationRequest> recommendationRequestsStream = recommendationRequestRepository.findAll().stream();
-//        return filters.stream()
-//                .filter(filter -> filter.isApplicable(filterDto))
-//                .reduce(recommendationRequestsStream, (stream, filter) -> filter.apply(stream, filterDto),
-//                        ((subGenStream, stream) -> stream))
-//                .distinct().map(recommendationRequestFilterMapper::toDto)
-//                .toList();
-//    }
+    public List<RecommendationRequestDto> getRequestsByFilter(RequestFilterDto filterDto) {
+        Stream<RecommendationRequest> recommendationRequestsStream = recommendationRequestRepository.findAll().stream();
+        return filters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .reduce(recommendationRequestsStream, (stream, filter) -> filter.apply(stream, filterDto),
+                        ((subGenStream, stream) -> stream))
+                .distinct().map(recommendationRequestMapper::toDto)
+                .toList();
+    }
 
     @Transactional
     public RecommendationRequestDto getRequest(Long id) {

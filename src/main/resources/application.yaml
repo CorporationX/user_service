@@ -37,6 +37,8 @@ spring:
         name: profile_view_channel
       premium_bought:
         name: premium_bought_channel
+      user_ban_channel:
+        name: user_ban_channel
 
   profiles:
     active: test
@@ -72,6 +74,17 @@ aws:
   accessKey: access_key
   secretKey: secret_key
   region: bucket_region
+
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: user-bucket
+    isMocked: true
+    maxSizeBytes: 5242880
+    smallSize: 170
+    largeSize: 1080
 
 goals:
   limit:

@@ -16,23 +16,23 @@ import java.util.List;
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
-    // @PostMapping("/recommendationRequest")
+     @PostMapping("/recommendationRequest")
     public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
         validateRequestNotEmpty(recommendationRequest);
         return recommendationRequestService.create(recommendationRequest);
     }
 
-//    @PostMapping("/recommendationRequest")
-//    public List<RequestFilterDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
-//        return recommendationRequestService.getRequestsByFilter(filter);
-//    }
+    @PostMapping("/recommendationRequest/filtered")
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
+        return recommendationRequestService.getRequestsByFilter(filter);
+    }
 
-//    @GetMapping("/recommendationRequest/{id}")
+    @GetMapping("/recommendationRequest/{id}")
     public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
         return recommendationRequestService.getRequest(id);
     }
 
-//    @PostMapping("/recommendationRequest/{id}")
+    @PostMapping("/recommendationRequest/{id}")
     public RejectionDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         if (rejection == null) {
             throw new DataValidationException("");

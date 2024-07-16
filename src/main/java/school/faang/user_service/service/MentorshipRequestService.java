@@ -70,7 +70,9 @@ public class MentorshipRequestService {
         Stream<MentorshipRequest> requests = mentorshipRequestRepository.findAll().stream();
         return filters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
-                .flatMap(filter -> filter.apply(requests, filterDto))
+                .reduce(requests,
+                        (requests1, filter) -> filter.apply(requests1, filterDto),
+                        Stream::concat)
                 .map(mentorshipRequestMapper::toDto)
                 .toList();
     }

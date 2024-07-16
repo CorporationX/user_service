@@ -11,7 +11,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
-//import school.faang.user_service.mapper.recommendation.RecommendationRequestFilterMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestRejectionMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -31,7 +30,6 @@ public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
-//    private final RecommendationRequestFilterMapper recommendationRequestFilterMapper;
     private final RecommendationRequestRejectionMapper recommendationRequestRejectionMapper;
     private final List<Filter<RequestFilterDto, RecommendationRequest>> filters;
 
@@ -63,7 +61,7 @@ public class RecommendationRequestService {
     @Transactional
     public RecommendationRequestDto getRequest(Long id) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.getReferenceById(id);
-        if (recommendationRequest.getId()<=0){
+        if (recommendationRequest.getId() <= 0) {
             throw new DataValidationException("Haven't found recommendation request");
         }
         return recommendationRequestMapper.toDto(recommendationRequest);

@@ -116,11 +116,18 @@ class EventServiceTest {
         EventFilterDto filter = new EventFilterDto(null, null, null,
                 0, 10L, List.of(10L, 20L), null, null,
                 null, null);
+        event.setRelatedSkills(List.of(Skill.builder()
+                .id(30L)
+                .build(), Skill.builder()
+                .id(40L)
+                .build()));
         Event eventWithSkill = new Event();
+        eventWithSkill.setRelatedSkills(List.of(skill1, skill2));
         when(eventRepository.findAll())
-                .thenReturn(List.of(event, new Event()));
+                .thenReturn(List.of(event, eventWithSkill));
         when(eventFilterMapper.eventToEventFilterDto(event))
                 .thenReturn(filter);
+        when(eventMapper.eventToDto(event)).thenReturn(eventDto);
         assertEquals(filteredEvents, eventService.getEventsByFilter(filter));
     }
 

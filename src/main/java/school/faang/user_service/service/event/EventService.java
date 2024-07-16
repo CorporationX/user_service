@@ -44,7 +44,7 @@ public class EventService {
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventRepository.findAll()
                 .stream()
-                .filter(event -> eventFilterMapper.eventToEventFilterDto(event).equals(filter))
+                .filter(event -> filter.equals(eventFilterMapper.eventToEventFilterDto(event)))
                 .map(eventMapper::eventToDto)
                 .toList();
     }
@@ -55,13 +55,7 @@ public class EventService {
     }
 
     // Обновить событие
-//    public long updateEvent(EventDto event) {
-//        Optional<User> optionalUser = userRepository.findById(event.getOwnerId());
-//        if (optionalUser.isEmpty()) {
-//            throw new DataValidationException("Инициатор события не найден!");
-//        }
-//        return optionalUser.get().getFollowers().size();
-//    }
+
 
     public EventDto updateEvent(EventDto event) {
         var optionalOldEvent = eventRepository.findById(event.getId())

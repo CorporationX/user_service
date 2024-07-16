@@ -20,19 +20,17 @@ public class EventParticipationService {
     }
 
     public void registerParticipant(long eventId, long userId) {
-        if (!hasAnyParticipant(eventId, userId)) {
-            eventParticipationRepository.register(eventId, userId);
-        } else {
+        if (hasAnyParticipant(eventId, userId)) {
             throw new RuntimeException("User " + userId + " is already registered on event " + eventId);
         }
+        eventParticipationRepository.register(eventId, userId);
     }
 
     public void unregisterParticipant(long eventId, long userId) {
-        if (hasAnyParticipant(eventId, userId)) {
-            eventParticipationRepository.unregister(eventId, userId);
-        } else {
+        if (!hasAnyParticipant(eventId, userId)) {
             throw new RuntimeException("User " + userId + " is not registered on event " + eventId);
         }
+        eventParticipationRepository.unregister(eventId, userId);
     }
 
     public List<UserDto> getParticipant(long eventId) {

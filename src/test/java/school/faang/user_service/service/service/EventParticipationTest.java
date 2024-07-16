@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.EventParticipationService;
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ public class EventParticipationTest {
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
-    @Spy
-    private UserMapper userMapper;
+    @Mock
+    private UserMapperImpl userMapper;
     @InjectMocks
     private EventParticipationService eventParticipationService;
 

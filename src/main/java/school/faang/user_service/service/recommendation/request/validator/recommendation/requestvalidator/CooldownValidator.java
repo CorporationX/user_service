@@ -15,15 +15,15 @@ import java.time.Period;
 public class CooldownValidator implements Validator<RecommendationRequestDto> {
 
     @Qualifier("cooldownOfRequestRecommendation")
-    private final Period mCooldownPeriod;
-    private final RecommendationRequestRepository mRecommendationRequestRep;
+    private final Period cooldownPeriod;
+    private final RecommendationRequestRepository recommendationRequestRep;
 
     CooldownValidator(
             RecommendationRequestRepository recommendationRequestRepository,
             @Qualifier("cooldownOfRequestRecommendation") Period cooldownPeriod
     ) {
-        mRecommendationRequestRep = recommendationRequestRepository;
-        mCooldownPeriod = cooldownPeriod;
+        recommendationRequestRep = recommendationRequestRepository;
+        this.cooldownPeriod = cooldownPeriod;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class CooldownValidator implements Validator<RecommendationRequestDto> {
         Long receiverId = recommendationRequestDto.getReceiverId();
 
         var lastRequest =
-                mRecommendationRequestRep.findLatestRecommendationRequestFromRequesterToReceiver(
+                recommendationRequestRep.findLatestRecommendationRequestFromRequesterToReceiver(
                         requesterId, receiverId
                 );
 
@@ -46,7 +46,7 @@ public class CooldownValidator implements Validator<RecommendationRequestDto> {
         if (!isExceededCooldown(dateOfCurrentRequest, dateOfLastRequest)) {
             throw new ValidationException(
                 ExceptionMessage.RECOMMENDATION_COOLDOWN_NOT_EXCEEDED,
-                    mCooldownPeriod.toString()
+                    cooldownPeriod.toString()
             );
         }
 
@@ -54,7 +54,7 @@ public class CooldownValidator implements Validator<RecommendationRequestDto> {
     }
 
     private boolean isExceededCooldown(LocalDateTime newRequestDate, LocalDateTime oldRequestDate) {
-        LocalDateTime nextAllowedRequestDate = oldRequestDate.plus(mCooldownPeriod);
+        LocalDateTime nextAllowedRequestDate = oldRequestDate.plus(cooldownPeriod);
         return newRequestDate.isAfter(nextAllowedRequestDate);
     }
 }

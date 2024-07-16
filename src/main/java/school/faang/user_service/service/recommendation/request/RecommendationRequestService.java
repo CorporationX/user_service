@@ -6,8 +6,6 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.exception.ExceptionMessage;
-import school.faang.user_service.exception.RejectRecommendationException;
 import school.faang.user_service.service.recommendation.request.filter.Filter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -25,27 +23,27 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class RecommendationRequestService {
 
-    private final RecommendationRequestRepository mRecommendationReqRep;
-    private final SkillRequestRepository mSkillReqRep;
-    private final CreateRequestDtoValidator mCreateRequestValidator;
-    private final RejectRequestValidator mRejectRequestValidator;
-    private final List<Filter<RecommendationRequestFilter, RecommendationRequestDto>> mRecommendationFilter;
-    private final RecommendationRequestMapper mRequestMapper;
+    private final RecommendationRequestRepository recommendationReqRep;
+    private final SkillRequestRepository skillReqRep;
+    private final CreateRequestDtoValidator createRequestValidator;
+    private final RejectRequestValidator rejectRequestValidator;
+    private final List<Filter<RecommendationRequestFilter, RecommendationRequestDto>> recommendationFilter;
+    private final RecommendationRequestMapper requestMapper;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
 
-        mCreateRequestValidator.validate(recommendationRequestDto);
+        createRequestValidator.validate(recommendationRequestDto);
 
         CompletableFuture<RecommendationRequestDto> createRequestFuture = CompletableFuture.supplyAsync(
-                () -> mRecommendationReqRep.create(
+                () -> recommendationReqRep.create(
                         recommendationRequestDto.getRequesterId(),
                         recommendationRequestDto.getReceiverId(),
                         recommendationRequestDto.getMessage()
                 )
-        ).thenApply(mRequestMapper::toDto);
+        ).thenApply(requestMapper::toDto);
 
         CompletableFuture<Void> createSkillsRequestFuture = CompletableFuture.runAsync(
-                () -> mSkillReqRep.create(
+                () -> skillReqRep.create(
                         recommendationRequestDto.getRequesterId(),
                         recommendationRequestDto.getReceiverId()
                 )
@@ -58,10 +56,10 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilter filter) {
         Stream<RecommendationRequestDto> requestsStream = StreamSupport
-                .stream(mRecommendationReqRep.findAll().spliterator(), false)
-                .map(mRequestMapper::toDto);
+                .stream(recommendationReqRep.findAll().spliterator(), false)
+                .map(requestMapper::toDto);
 
-        for (var candidate : mRecommendationFilter) {
+        for (var candidate : recommendationFilter) {
             if (candidate.isApplicable(filter)) {
                 requestsStream = candidate.applyFilter(requestsStream, filter);
             }
@@ -71,20 +69,22 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto getRecommendationRequest(long id) {
-        var recommendationRequest = mRecommendationReqRep.findById(id).orElseThrow();
-        return mRequestMapper.toDto(recommendationRequest);
+        var recommendationRequest = recommendationReqRep.findById(id).orElseThrow();
+        return requestMapper.toDto(recommendationRequest);
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionRequestDto rejectionDto) {
-        var recommendation = mRecommendationReqRep.findById(
+        var recommendation = recommendationReqRep.findById(
                 id
         ).orElseThrow();
 
-        mRejectRequestValidator.validate(recommendation);
+        rejectRequestValidator.validate(recommendation);
 
         recommendation.setStatus(RequestStatus.REJECTED);
         recommendation.setRejectionReason(rejectionDto.getReason());
 
-        return mRequestMapper.toDto(recommendation);
+        recommendationReqRep.save(recommendation);
+
+        return requestMapper.toDto(recommendation);
     }
 }

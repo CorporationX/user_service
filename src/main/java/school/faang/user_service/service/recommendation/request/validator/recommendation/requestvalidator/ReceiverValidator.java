@@ -12,13 +12,13 @@ import school.faang.user_service.service.recommendation.request.validator.Valida
 @AllArgsConstructor
 public class ReceiverValidator implements Validator<RecommendationRequestDto> {
 
-    private final UserRepository mUserRep;
+    private final UserRepository userRep;
 
     @Override
     public boolean validate(final RecommendationRequestDto recommendationRequest) {
         Long receiverId = recommendationRequest.getReceiverId();
 
-        boolean receiverExists = mUserRep.existsById(receiverId);
+        boolean receiverExists = userRep.existsById(receiverId);
 
         if (!receiverExists) {
             throw new ValidationException(

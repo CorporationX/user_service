@@ -14,25 +14,25 @@ import java.util.List;
 @RequestMapping("/recommendation/request")
 public class RecommendationRequestController {
 
-    private final RecommendationRequestService mRecommendationRequestService;
+    private final RecommendationRequestService recommendationRequestService;
 
     @PostMapping
     public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
-        return mRecommendationRequestService.create(recommendationRequest);
+        return recommendationRequestService.create(recommendationRequest);
     }
 
     @PostMapping("/list")
     public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RecommendationRequestFilter filter) {
-        return mRecommendationRequestService.getRequests(filter);
+        return recommendationRequestService.getRequests(filter);
     }
 
     @GetMapping("/{id}")
     public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
-        return mRecommendationRequestService.getRecommendationRequest(id);
+        return recommendationRequestService.getRecommendationRequest(id);
     }
 
     @PutMapping("/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionRequestDto rejection) {
-        return mRecommendationRequestService.rejectRequest(id, rejection);
+        return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

@@ -12,13 +12,13 @@ import school.faang.user_service.service.recommendation.request.validator.Valida
 @AllArgsConstructor
 public class RequesterValidator implements Validator<RecommendationRequestDto> {
 
-    private final UserRepository mUserRep;
+    private final UserRepository userRep;
 
     @Override
     public boolean validate(final RecommendationRequestDto recommendationRequestDto) {
         Long requesterId = recommendationRequestDto.getRequesterId();
 
-        boolean requesterExists = mUserRep.existsById(requesterId);
+        boolean requesterExists = userRep.existsById(requesterId);
 
         if (! requesterExists) {
             throw new ValidationException(
@@ -27,6 +27,6 @@ public class RequesterValidator implements Validator<RecommendationRequestDto> {
             );
         }
 
-        return mUserRep.existsById(requesterId);
+        return userRep.existsById(requesterId);
     }
 }

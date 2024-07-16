@@ -14,12 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 public class SkillValidator implements Validator<RecommendationRequestDto> {
 
-    private final SkillRepository mSkellRep;
+    private final SkillRepository skillRep;
 
     @Override
     public boolean validate(final RecommendationRequestDto recommendationRequestDto) {
         List<Long> skillIds = recommendationRequestDto.getSkillIds();
-        boolean areSkillsExists = mSkellRep.countExisting(skillIds) == skillIds.size();
+        boolean areSkillsExists = skillRep.countExisting(skillIds) == skillIds.size();
 
         if (! areSkillsExists) {
             throw new ValidationException(

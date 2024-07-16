@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class CreateRequestDtoValidator implements Validator<RecommendationRequestDto> {
-    private final List<Validator<RecommendationRequestDto>> mCreateRequestValidators;
+    private final List<Validator<RecommendationRequestDto>> createRequestValidators;
 
 
     @Override
@@ -19,6 +19,6 @@ public class CreateRequestDtoValidator implements Validator<RecommendationReques
         if (data.getRequesterId().equals(data.getReceiverId())) {
             throw new ValidationException("Author and receiver of a recommendation request cannot be the same person");
         }
-        return mCreateRequestValidators.stream().allMatch(v -> v.validate(data));
+        return createRequestValidators.stream().allMatch(v -> v.validate(data));
     }
 }

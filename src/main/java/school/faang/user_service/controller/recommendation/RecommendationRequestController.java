@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -10,38 +12,40 @@ import school.faang.user_service.service.RecommendationRequestService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Component
+@RestController
+@RequestMapping(value = "/recommendation")
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
-
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
+    @PostMapping("/create")
+    public ResponseEntity<RecommendationRequestDto> requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest == null) {
             throw new IllegalArgumentException("The request contains an empty message");
         }
         if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
             throw new IllegalArgumentException("The request contains an empty message");
         }
-        return recommendationRequestService.create(recommendationRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.create(recommendationRequest));
     }
-
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+    @GetMapping("/requests")
+    public ResponseEntity<List<RecommendationRequestDto>> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
         if (filter == null) {
             throw new IllegalArgumentException("Фильтр пустой");
         }
-        return recommendationRequestService.getRequests(filter);
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.getRequests(filter));
     }
-
-    public RecommendationRequestDto getRecommendationRequest(long id) {
+    @GetMapping("/request/{id}")
+    public ResponseEntity<RecommendationRequestDto> getRecommendationRequest(@PathVariable Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("Аргумент не может быть отрицательным числом");
         }
-        return recommendationRequestService.getRequest(id);
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.getRequest(id));
     }
-
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+    @PutMapping("/reject/{id}")
+    public ResponseEntity<RecommendationRequestDto> rejectRequest(@PathVariable Long id,
+                                                                  @RequestBody RejectionDto rejection) {
         if (rejection == null) {
             throw new IllegalArgumentException("Аргумент пустой");
         }
-        return recommendationRequestService.rejectRequest(id, rejection);
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.rejectRequest(id, rejection));
     }
 }

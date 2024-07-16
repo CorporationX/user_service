@@ -5,7 +5,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 
@@ -14,8 +13,8 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationRequestMapper {
     @Mapping(source = "skills", target = "skillsId", qualifiedByName = "mapSkills")
-    @Mapping(source = "requester", target = "requesterId", qualifiedByName = "mapRequester")
-    @Mapping(source = "receiver", target = "recieverId", qualifiedByName = "mapReceiver")
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "recieverId")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
@@ -23,15 +22,5 @@ public interface RecommendationRequestMapper {
     @Named("mapSkills")
     default List<Long> mapSkills(List<SkillRequest> skillRequests) {
         return skillRequests.stream().map(SkillRequest::getId).toList();
-    }
-
-    @Named("mapRequester")
-    default long mapRequester(User user) {
-        return user.getId();
-    }
-
-    @Named("mapReceiver")
-    default long mapReceiver(User user) {
-        return user.getId();
     }
 }

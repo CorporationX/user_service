@@ -27,7 +27,7 @@ class StatusPatternFilterTest {
 
     @Test
     void testStatusPatternTrue() {
-        RequestFilterDto requestFilterDto = new RequestFilterDto(null, RequestStatus.ACCEPTED);
+        RequestFilterDto requestFilterDto = new RequestFilterDto(RequestStatus.ACCEPTED);
         boolean isApplication = statusPatternFilter.isApplication(requestFilterDto);
         Assertions.assertTrue(isApplication);
     }
@@ -41,7 +41,7 @@ class StatusPatternFilterTest {
 
     @Test
     void testStatusPatternApply() {
-        RequestFilterDto requestFilterDto = new RequestFilterDto(null, RequestStatus.ACCEPTED);
+        RequestFilterDto requestFilterDto = new RequestFilterDto(RequestStatus.ACCEPTED);
         RecommendationRequest request = new RecommendationRequest();
         request.setStatus(RequestStatus.ACCEPTED);
 

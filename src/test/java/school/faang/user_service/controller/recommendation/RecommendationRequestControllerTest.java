@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.ArrayList;
@@ -27,67 +28,55 @@ class RecommendationRequestControllerTest {
     private RecommendationRequestDto recommendationRequest;
     @Mock
     private RejectionDto rejection;
-    private RecommendationRequestDto validMessageRequest;
-    private RecommendationRequestDto blankMessageRequest;
-    private RecommendationRequestDto nullMessageRequest;
+    private RecommendationRequestDto messageRequest;
     private RequestFilterDto validRequestFilterDto;
 
     @BeforeEach
     void setUp() {
-        validMessageRequest = new RecommendationRequestDto();
-        validMessageRequest.setMessage("Все good");
-
-        blankMessageRequest = new RecommendationRequestDto();
-        blankMessageRequest.setMessage(" ");
-
-        nullMessageRequest = new RecommendationRequestDto();
-        nullMessageRequest.setMessage(null);
-
-        validRequestFilterDto = new RequestFilterDto();
-        validRequestFilterDto.setIdPattern(1L);
-
         recommendationRequest = new RecommendationRequestDto();
         recommendationRequest.setId(1L);
 
-        rejection = new RejectionDto();
-        rejection.setReason("Good");
-
+        validRequestFilterDto = createRequestFilterDtoWithId(RequestStatus.PENDING);
+        rejection = createRejectionDtoWithReason("Good");
     }
 
     @Test
     void testRequestRecommendationIsValid() {
-        when(recommendationRequestService.create(validMessageRequest)).thenReturn(validMessageRequest);
-        RecommendationRequestDto result = recommendationRequestController.requestRecommendation(validMessageRequest);
+        messageRequest = createRecommendationRequestDtoWithMessage("Все good");
+        when(recommendationRequestService.create(messageRequest)).thenReturn(messageRequest);
+        RecommendationRequestDto result = recommendationRequestController.requestRecommendation(messageRequest).getBody();
 
         assertNotNull(result);
-        assertEquals(validMessageRequest.getMessage(), result.getMessage());
+        assertEquals(messageRequest.getMessage(), result.getMessage());
 
-        verify(recommendationRequestService, times(1)).create(validMessageRequest);
+        verify(recommendationRequestService, times(1)).create(messageRequest);
     }
 
     @Test
     void testRequestRecommendationIsBlank() {
+        messageRequest = createRecommendationRequestDtoWithMessage(" ");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            recommendationRequestController.requestRecommendation(blankMessageRequest);
+            recommendationRequestController.requestRecommendation(messageRequest);
         });
 
         String expectedMessage = "The request contains an empty message";
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
-        verify(recommendationRequestService, never()).create(blankMessageRequest);
+        verify(recommendationRequestService, never()).create(messageRequest);
     }
 
     @Test
     void testRequestRecommendationIsNull() {
+        messageRequest = createRecommendationRequestDtoWithMessage(null);
         Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestController.requestRecommendation(nullMessageRequest));
+                () -> recommendationRequestController.requestRecommendation(messageRequest));
 
         String expectedMessage = "The request contains an empty message";
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
-        verify(recommendationRequestService, never()).create(nullMessageRequest);
+        verify(recommendationRequestService, never()).create(messageRequest);
     }
 
     @Test
@@ -102,7 +91,7 @@ class RecommendationRequestControllerTest {
 
         when(recommendationRequestService.getRequests(validRequestFilterDto)).thenReturn(expectedRequests);
 
-        List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(validRequestFilterDto);
+        List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(validRequestFilterDto).getBody();
 
         assertNotNull(result);
         assertEquals(expectedRequests.size(), result.size());
@@ -129,7 +118,7 @@ class RecommendationRequestControllerTest {
 
         when(recommendationRequestService.getRequest(testId)).thenReturn(recommendationRequest);
 
-        RecommendationRequestDto result = recommendationRequestController.getRecommendationRequest(testId);
+        RecommendationRequestDto result = recommendationRequestController.getRecommendationRequest(testId).getBody();
 
         assertNotNull(result);
         assertEquals(recommendationRequest, result);
@@ -168,11 +157,26 @@ class RecommendationRequestControllerTest {
         long testId = 1;
         when(recommendationRequestService.rejectRequest(testId, rejection)).thenReturn(recommendationRequest);
 
-        RecommendationRequestDto result = recommendationRequestController.rejectRequest(testId, rejection);
+        RecommendationRequestDto result = recommendationRequestController.rejectRequest(testId, rejection).getBody();
 
         assertNotNull(result);
         assertEquals(recommendationRequest, result);
 
         verify(recommendationRequestService, times(1)).rejectRequest(testId, rejection);
+    }
+    private RecommendationRequestDto createRecommendationRequestDtoWithMessage(String message){
+        RecommendationRequestDto result = new RecommendationRequestDto();
+        result.setMessage(message);
+        return result;
+    }
+    private RequestFilterDto createRequestFilterDtoWithId(RequestStatus requestStatus){
+        RequestFilterDto result = new RequestFilterDto();
+        result.setStatusFilter(requestStatus);
+        return result;
+    }
+    private RejectionDto createRejectionDtoWithReason(String reason){
+        RejectionDto result = new RejectionDto();
+        result.setReason(reason);
+        return result;
     }
 }

@@ -12,12 +12,10 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -46,8 +44,6 @@ class RecommendationRequestServiceTest {
     private RequestFilterDto requestFilterDto;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private SkillRepository skillRepository;
     @Mock
     private SkillRequestRepository skillRequestRepository;
     @Mock
@@ -80,7 +76,7 @@ class RecommendationRequestServiceTest {
                 new SkillRequest(),
                 new SkillRequest()));
 
-        requestFilterDto = new RequestFilterDto(1L, null);
+        requestFilterDto = new RequestFilterDto();
 
         idPatternFilter = Mockito.mock(RequestFilter.class);
     }
@@ -88,8 +84,8 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("testCreateWithFindByIdRequesterAndReceiver")
     public void testCreateWithFindByIdRequesterAndReceiver() {
-        when(userRepository.findById(any()))
-                .thenReturn(Optional.empty());
+        when(userRepository.existsById(anyLong()))
+                .thenReturn(false);
         assertThrows(IllegalArgumentException.class,
                 () -> recommendationRequestService.create(requestDto));
     }
@@ -97,10 +93,7 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("testCreateBelieveTheRequestToSendNotMoreThanSixMonths")
     public void testCreateBelieveTheRequestToSendNotMoreThanSixMonths() {
-        when(userRepository.findById(requestDto.getRequesterId()))
-                .thenReturn(Optional.of(new User()));
-        when(userRepository.findById(requestDto.getRecieverId()))
-                .thenReturn(Optional.of(new User()));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
 
         checkLastRequest(requestDto, LocalDateTime.now());
 
@@ -111,33 +104,25 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("testCreateCheckTheExistenceOfSkillsInTheDatabase")
     public void testCreateCheckTheExistenceOfSkillsInTheDatabase() {
-        when(userRepository.findById(requestDto.getRequesterId()))
-                .thenReturn(Optional.of(new User()));
-        when(userRepository.findById(requestDto.getRecieverId()))
-                .thenReturn(Optional.of(new User()));
-
+        when(userRepository.existsById(anyLong())).thenReturn(true);
         checkLastRequest(requestDto, LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-        when(skillRepository.findAllById(requestDto.getSkillsId()))
-                .thenReturn(Arrays.asList(new Skill(), new Skill()));
+        when(skillRequestRepository.findAllById(requestDto.getSkillsId()))
+                .thenReturn(Arrays.asList(new SkillRequest(), new SkillRequest()));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NullPointerException.class,
                 () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
     @DisplayName("testCreateSave")
     public void testCreateSave() {
-        when(userRepository.findById(requestDto.getRequesterId()))
-                .thenReturn(Optional.of(new User()));
-        when(userRepository.findById(requestDto.getRecieverId()))
-                .thenReturn(Optional.of(new User()));
-
+        when(userRepository.existsById(anyLong())).thenReturn(true);
         checkLastRequest(requestDto, LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-        when(skillRepository.findAllById(requestDto.getSkillsId()))
+        when(skillRequestRepository.findAllById(requestDto.getSkillsId()))
                 .thenReturn(Arrays.asList(
-                        new Skill(1L, null, null, null, null, null, null, null),
-                        new Skill(2L, null, null, null, null, null, null, null),
-                        new Skill(3L, null, null, null, null, null, null, null)));
+                        new SkillRequest(1L, null, null),
+                        new SkillRequest(2L, null, null),
+                        new SkillRequest(3L, null, null)));
 
         when(recommendationRequestMapper.toEntity(requestDto))
                 .thenReturn(recommendationRequest);

@@ -44,7 +44,7 @@ public class RecommendationValidatorTest {
     @Test
     void validateNotValidIdTest() {
         long notValidId = 0L;
-        assertThrows(DataValidationException.class, () -> recommendationValidator.validateId(notValidId));
+        assertThrows(IllegalArgumentException.class, () -> recommendationValidator.validateId(notValidId));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class RecommendationValidatorTest {
                 .authorId(-3l)
                 .content("Some content")
                 .build();
-        assertThrows(DataValidationException.class, () -> recommendationValidator.validateRecommendationDto(recommendationDto));
+        assertThrows(IllegalArgumentException.class, () -> recommendationValidator.validateRecommendationDto(recommendationDto));
     }
 
     @Test
@@ -95,6 +95,6 @@ public class RecommendationValidatorTest {
                 .authorId(3l)
                 .content("Some content")
                 .build();
-        assertThrows(DataValidationException.class, () -> recommendationValidator.validateRecommendationDto(recommendationDto));
+        assertThrows(IllegalArgumentException.class, () -> recommendationValidator.validateRecommendationDto(recommendationDto));
     }
 }

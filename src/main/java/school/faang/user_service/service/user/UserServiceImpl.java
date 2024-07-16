@@ -80,6 +80,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void banUserByIds(List<Long> userIds) {
+        userRepository.findAllById(userIds).stream()
+                .peek(user -> user.setIsBanned(true))
+                .forEach(userRepository::save);
+    }
+
+    @Override
     @Transactional
     public UserDto createUser(@Valid UserDto userDto) {
         User user = userMapper.toEntity(userDto);

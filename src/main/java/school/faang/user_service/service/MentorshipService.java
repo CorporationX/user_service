@@ -1,4 +1,4 @@
-package school.faang.user_service.service.impl;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class MentorshipServiceImpl implements MentorshipService {
+public class MentorshipService {
 
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipMapper mentorshipMapper;

@@ -10,7 +10,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.mentorship.MentorshipNoSuchElementException;
 import school.faang.user_service.mapper.mentorship.MentorshipMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.impl.MentorshipServiceImpl;
+import school.faang.user_service.service.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MentorshipServiceImplTest {
+class MentorshipServiceTest {
     @Mock
     private MentorshipRepository mentorshipRepository;
     @InjectMocks
-    private MentorshipServiceImpl mentorshipService;
+    private MentorshipService mentorshipService;
     @Spy
     private MentorshipMapperImpl mentorshipMapper;
     private User user;

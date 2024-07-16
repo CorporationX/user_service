@@ -9,7 +9,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public class PremiumBoughtTopic {
 
     @Bean
-    public ChannelTopic premiumBoughtChannel(@Value("${spring.data.redis.channels.premium_bought_channel.name}") String topicName) {
+    public ChannelTopic premiumBoughtChannel(@Value("${spring.data.channel.premium_bought.name}") String topicName) {
         return new ChannelTopic(topicName);
     }
 }

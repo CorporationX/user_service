@@ -13,7 +13,7 @@ import school.faang.user_service.publisher.MessagePublisher;
 @RequiredArgsConstructor
 public class PremiumBoughtEventPublisher implements MessagePublisher<PremiumBoughtEvent> {
 
-    @Value("${spring.data.redis.channels.premium_bought_channel.name}")
+    @Value("${spring.data.channel.premium_bought.name}")
     private String topic;
     private final RedisTemplate<String, Object> redisTemplate;
 

@@ -12,7 +12,7 @@ public class RecommendationRequestIdValidator {
     private final RecommendationRequestRepository recommendationRequestRepository;
 
     public void validateId(Long id) {
-        if (recommendationRequestRepository.findById(id).isEmpty()) {
+        if (!recommendationRequestRepository.existsById(id)) {
             throw new NoSuchElementException("There is no recommendation request with id " + id);
         }
     }

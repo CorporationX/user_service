@@ -89,7 +89,6 @@ public class EventParticipationTest {
 
     @Test
     public void testGetParticipantCount() {
-        //Почему не работает?
         when(eventParticipationService.getParticipantCount(1L)).thenReturn(1);
         Integer count = eventParticipationService.getParticipantCount(1L);
         assertEquals(1, count);

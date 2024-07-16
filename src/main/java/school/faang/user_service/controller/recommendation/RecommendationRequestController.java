@@ -1,31 +1,42 @@
 package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
 
-@Component
+@RestController
 @RequiredArgsConstructor
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
+    // @PostMapping("/recommendationRequest")
+    public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
         validateRequestNotEmpty(recommendationRequest);
         return recommendationRequestService.create(recommendationRequest);
     }
 
-    public List<RequestFilterDto> getRecommendationRequests(RequestFilterDto filter) {
-        return recommendationRequestService.getRequestsByFilter(filter);
-    }
+//    @PostMapping("/recommendationRequest")
+//    public List<RequestFilterDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
+//        return recommendationRequestService.getRequestsByFilter(filter);
+//    }
 
-    public RecommendationRequestDto getRecommendationRequest(long id) {
+//    @GetMapping("/recommendationRequest/{id}")
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
         return recommendationRequestService.getRequest(id);
     }
 
-    public RejectionDto rejectRequest(long id, RejectionDto rejection) {
+//    @PostMapping("/recommendationRequest/{id}")
+    public RejectionDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+        if (rejection == null) {
+            throw new DataValidationException("");
+        }
         return recommendationRequestService.rejectRequest(id, rejection);
     }
 

@@ -19,7 +19,7 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.FOUND)
-    public UserDto getUser(@PathVariable long userId) {
+    public UserDto getUser(@PathVariable Long userId) {
         return userService.getUser(userId);
     }
 

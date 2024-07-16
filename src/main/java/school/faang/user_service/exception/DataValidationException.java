@@ -5,7 +5,7 @@ public class DataValidationException extends IllegalArgumentException {
         this("Data validation failed");
     }
 
-    public DataValidationException(String errorMessage) {
-        super(errorMessage);
+    public DataValidationException(String message) {
+        super(message);
     }
 }

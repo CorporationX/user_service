@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import school.faang.user_service.conroller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exeption.event.DataValidationException;
 import school.faang.user_service.service.event.EventService;

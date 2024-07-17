@@ -1,4 +1,4 @@
-package school.faang.user_service.conroller.event;
+package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

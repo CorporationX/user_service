@@ -19,32 +19,34 @@ public class EventParticipationService {
 
     private final UserMapper userMapper;
 
-    public void registrParticipant(long eventId , long userId){
-        if(eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
-                .anyMatch(user -> user.getId() == userId)){
+    private boolean flag(long eventId , long userId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
+                .anyMatch(user -> user.getId() == userId);
+    }
+
+    public void registrParticipant(long eventId, long userId) {
+        if (flag(eventId , userId)){
             throw new RuntimeException("User is already registered for the event.");
         } else {
-            eventParticipationRepository.register(eventId , userId);
+            eventParticipationRepository.register(eventId, userId);
         }
     }
 
-    public void unregisterParticipant(long eventId , long userId){
-        if(eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
-                .anyMatch(user -> user.getId() == userId)){
-            eventParticipationRepository.unregister(eventId , userId);
+    public void unregisterParticipant(long eventId, long userId) {
+        if (flag(eventId , userId)){
+            eventParticipationRepository.unregister(eventId, userId);
         } else {
             throw new RuntimeException("User is not registered for the event.");
         }
     }
 
-    public List<UserDto> getPaticipant(long eventId){
-        List<UserDto> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
+    public List<UserDto> getPaticipant(long eventId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
                 .map(user -> userMapper.toDto(user))
                 .toList();
-        return participants;
     }
 
-    public int getParticipantCount(long eventId){
+    public int getParticipantCount(long eventId) {
         return eventParticipationRepository.countParticipants(eventId);
     }
 }

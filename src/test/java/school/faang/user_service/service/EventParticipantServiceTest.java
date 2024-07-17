@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Тест для EventParticipationService класса")
 public class EventParticipantServiceTest {
 
     @Mock
@@ -33,7 +35,8 @@ public class EventParticipantServiceTest {
     private EventParticipationService eventParticipationService;
 
     @Test
-    void registerPatricipant_UserRegistred_ThrowException() {
+    @DisplayName("Тестирование RunTimeException при зарегестрированном пользователе")
+    void registerPatricipant_whenThrowException() {
         long eventId = 1L;
         User firstUser = new User();
         firstUser.setId(1L);
@@ -43,6 +46,7 @@ public class EventParticipantServiceTest {
     }
 
     @Test
+    @DisplayName("Тест регистрации пользователя")
     void registerParticipant_UserRegistredForEvent(){
         long eventId = 1L;
         User firstUser = new User();
@@ -53,11 +57,13 @@ public class EventParticipantServiceTest {
     }
 
     @Test
-    void unregisterParticipant_UserNotRegistred_ThrowException(){
+    @DisplayName("Тестирование RunTimeException если пользователь не зарегестрирован")
+    void unregisterParticipant_whenThrowException(){
         assertThrows(RuntimeException.class , () -> eventParticipationService.unregisterParticipant(1L,1L));
     }
 
     @Test
+    @DisplayName("Тест удаление пользователя")
     void unregisterParticipant_UserUnRegisterForEvent(){
         long eventId = 1L;
         User firstUser = new User();
@@ -70,6 +76,7 @@ public class EventParticipantServiceTest {
     }
 
     @Test
+    @DisplayName("Тест выводим список всех участников")
     void getParticipants_ReturnListOfParticipants(){
         long eventId = 1L;
         User firstUser = new User();
@@ -85,6 +92,7 @@ public class EventParticipantServiceTest {
     }
 
     @Test
+    @DisplayName("Тест выводим число всех учатников")
     void getParticipantsCount_ReturnParticipantsCount(){
         long eventId = 1L;
         User firstUser = new User();

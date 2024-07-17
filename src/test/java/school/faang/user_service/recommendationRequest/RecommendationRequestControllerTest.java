@@ -19,7 +19,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-public class recommendationRequestControllerTest {
+public class RecommendationRequestControllerTest {
 
     @Mock
     private RecommendationRequestService recommendationRequestService;
@@ -43,14 +43,6 @@ public class recommendationRequestControllerTest {
         verify(recommendationRequestService, Mockito.times(1)).create(requestDto);
     }
 
-//    @Test
-//    public void testGetRecommendationRequests() {
-//        RequestFilterDto filterDto = new RequestFilterDto();
-//        filterDto.setStatus(RequestStatus.REJECTED);
-//        recommendationRequestController.getRecommendationRequests(filterDto);
-//        verify(recommendationRequestService, times(1)).getRequestsByFilter(filterDto);
-//    }
-
     @Test
     public void testGetRecommendationRequest() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
@@ -72,5 +64,4 @@ public class recommendationRequestControllerTest {
     public void testRejectNullRequest() {
         assertThrows(DataValidationException.class, () -> recommendationRequestController.rejectRequest(1L, null));
     }
-
 }

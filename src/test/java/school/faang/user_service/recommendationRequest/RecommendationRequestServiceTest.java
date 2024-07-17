@@ -46,7 +46,6 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestRepository recommendationRequestRepository;
     private SkillRequestRepository skillRequestRepository;
     private RecommendationRequestMapperImpl recommendationRequestMapper;
-//    private RecommendationRequestFilterMapperImpl recommendationRequestFilterMapper;
     private RecommendationRequestRejectionMapperImpl recommendationRequestRejectionMapper;
     private List<Filter<RequestFilterDto, RecommendationRequest>> filters;
     private RecommendationRequestService recommendationRequestService;
@@ -66,7 +65,6 @@ public class RecommendationRequestServiceTest {
         recommendationRequestRepository = mock(RecommendationRequestRepository.class);
         skillRequestRepository = mock(SkillRequestRepository.class);
         recommendationRequestMapper = mock(RecommendationRequestMapperImpl.class);
-//        recommendationRequestFilterMapper = mock(RecommendationRequestFilterMapperImpl.class);
         recommendationRequestRejectionMapper = mock(RecommendationRequestRejectionMapperImpl.class);
         createdAtFilter = mock(CreatedAtFilter.class);
         messageFilter = mock(MessageFilter.class);
@@ -80,7 +78,6 @@ public class RecommendationRequestServiceTest {
         recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository
                 , skillRequestRepository
                 , recommendationRequestMapper
-//                , recommendationRequestFilterMapper
                 , recommendationRequestRejectionMapper
                 , filters);
     }

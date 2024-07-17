@@ -1,26 +1,30 @@
 package school.faang.user_service.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.Country;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserDto {
-    private long id;
+
+    private Long id;
+
+    @NotBlank
+    @Size(min = 3, max = 64)
     private String username;
+
+    @NotBlank
+    @Email
     private String email;
+
+    @NotBlank
     private String phone;
-    private String password;
-    private boolean active;
-    private String aboutMe;
-    private Country country;
-    private String city;
-    private Integer experience;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private boolean isActive;
 }

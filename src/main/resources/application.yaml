@@ -41,7 +41,8 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
-  currency: USD
+  currency: EUR
+  dbCurrency: USD
   api: /api
   sendPayment: /payment
 

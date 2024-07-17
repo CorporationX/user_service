@@ -6,7 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.exception.premium.PremiumIllegalArgumentException;
-import school.faang.user_service.exception.premium.PremiumPaymentException;
+import school.faang.user_service.exception.payment.PaymentException;
+import school.faang.user_service.exception.promotion.PromotionIllegalArgumentException;
 
 /**
  * @author Evgenii Malkov
@@ -19,8 +20,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(PremiumPaymentException.class)
-    public ResponseEntity<String> handleRuntimeArgument(PremiumIllegalArgumentException ex) {
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<String> handleRuntimeArgument(PaymentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PromotionIllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(PromotionIllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

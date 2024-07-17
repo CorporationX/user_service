@@ -17,6 +17,8 @@ import school.faang.user_service.validator.SkillValidator;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 @ExtendWith(MockitoExtension.class)
 public class SkillValidatorTest {
 
@@ -58,6 +60,12 @@ public class SkillValidatorTest {
         Mockito.when(skillRepository.existsByTitle("title")).thenReturn(true);
         Assert.assertThrows(DataValidationException.class,
                 () -> skillValidator.validateSkill(new SkillDto(1L, "title")));
+    }
+
+    @Test
+    public void testSkillExistByTitleNoException() {
+        Mockito.when(skillRepository.existsByTitle("title")).thenReturn(false);
+        assertDoesNotThrow(()->skillValidator.validateSkill(new SkillDto(1L, "title")));
     }
 
     @Test

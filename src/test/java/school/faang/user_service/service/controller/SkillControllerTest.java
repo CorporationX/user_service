@@ -1,6 +1,5 @@
 package school.faang.user_service.service.controller;
 
-
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

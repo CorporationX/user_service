@@ -28,10 +28,13 @@ public class SkillValidatorTest {
     @InjectMocks
     private SkillValidator skillValidator;
 
+    private Skill skill;
+
     @BeforeEach
     public void setUp() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setId(1L);
+        skill = new Skill();
+        skill.setId(1L);
+        skill.setTitle("title");
     }
 
     @Test
@@ -72,5 +75,12 @@ public class SkillValidatorTest {
     public void testValidateUserSkills() {
         List<Skill> emptySKills = new ArrayList<>();
         Assert.assertThrows(DataValidationException.class, () -> skillValidator.validateUserSkills(emptySKills));
+    }
+
+    @Test
+    public void testValidateUserSkillsNoException() {
+        List<Skill> singleSkill = new ArrayList<>();
+        singleSkill.add(skill);
+        assertDoesNotThrow(()->skillValidator.validateUserSkills(singleSkill));
     }
 }

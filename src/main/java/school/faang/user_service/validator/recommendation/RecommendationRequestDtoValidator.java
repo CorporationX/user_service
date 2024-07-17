@@ -20,13 +20,6 @@ public class RecommendationRequestDtoValidator {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRepository skillRepository;
 
-    public void validateAll(RecommendationRequestDto recommendationRequestDto) {
-        validateMessage(recommendationRequestDto.getMessage());
-        validateRequesterAndReceiverIds(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());
-        validateRequestTimeDifference(recommendationRequestDto.getCreatedAt(), recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());
-        validateRequestedSkills(recommendationRequestDto.getSkills());
-    }
-
     public void validateMessage(String message) {
         if (message.isEmpty()) {
             throw new IllegalArgumentException("recommendation message can't be empty");

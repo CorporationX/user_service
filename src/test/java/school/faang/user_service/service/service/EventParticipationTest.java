@@ -3,7 +3,9 @@ package school.faang.user_service.service.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -15,8 +17,10 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.EventParticipationService;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -26,8 +30,8 @@ public class EventParticipationTest {
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
-    @Mock
-    private UserMapperImpl userMapper;
+    @Spy
+    private UserMapper userMapper;
     @InjectMocks
     private EventParticipationService eventParticipationService;
 

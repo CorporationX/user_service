@@ -17,7 +17,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private static final String MESSAGE_INVALID_ID_FOR_USER = "Invalid id for user";
     private static final String MESSAGE_USER_NOT_EXIST = "User does not exist";
     private static final String MESSAGE_USER_ALREADY_DEACTIVATED = "User is already deactivated";
     private static final int ONE_USER = 1;
@@ -58,9 +57,6 @@ public class UserService {
     }
 
     private User getValidationUser(long userId) {
-        if (userId < 0) {
-            throw new RuntimeException(MESSAGE_INVALID_ID_FOR_USER);
-        }
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException(MESSAGE_USER_NOT_EXIST));
         if (!user.isActive()) {
             throw new RuntimeException(MESSAGE_USER_ALREADY_DEACTIVATED);

@@ -23,11 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    private static final String MESSAGE_INVALID_ID_FOR_USER = "Invalid id for user";
     private static final String MESSAGE_USER_NOT_EXIST = "User does not exist";
     private static final String MESSAGE_USER_ALREADY_DEACTIVATED = "User is already deactivated";
     private static final int VALID_ID = 1;
-    private static final int INVALID_USER_ID = -VALID_ID;
     @Mock
     private MentorshipService mentorshipService;
     @Mock
@@ -52,16 +50,6 @@ class UserServiceTest {
         goal.setUsers(List.of(new User()));
         user.setGoals(List.of(goal));
         user.setOwnedEvents(List.of(new Event(), new Event()));
-    }
-
-    @Test
-    public void testUserIdIsLessThanZero() {
-        user.setId(INVALID_USER_ID);
-        assertEquals(
-                MESSAGE_INVALID_ID_FOR_USER,
-                assertThrows(
-                        RuntimeException.class,
-                        () -> userService.deactivatesUserProfile(user.getId())).getMessage());
     }
 
     @Test
@@ -106,6 +94,7 @@ class UserServiceTest {
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(userRepository).save(user);
     }
+
     @Test
     public void testUserToUserDto() {
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));

@@ -12,8 +12,7 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = MapperMethodUserDtoToUser.class)
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
     @Mapping(source = "ownedEvents", target = "ownedEventsIds", qualifiedByName = "ownedEventsToIds")
     @Mapping(source = "mentees", target = "menteesIds", qualifiedByName = "menteesOrMentorsToIds")
@@ -22,14 +21,17 @@ public interface UserMapper {
     @Mapping(source = "goals", target = "goalsIds", qualifiedByName = "setGoalsOrGoalToIds")
     UserDto toDto(User user);
 
-    @Mapping(source = "ownedEventsIds", target = "ownedEvents", qualifiedByName = "idsToOwnedEvents")
-    @Mapping(source = "menteesIds", target = "mentees", qualifiedByName = "idsToMenteesOrMentors")
-    @Mapping(source = "mentorsIds", target = "mentors", qualifiedByName = "idsToMenteesOrMentors")
-    @Mapping(source = "goalsIds", target = "goals", qualifiedByName = "idsToSetGoalsOrGoal")
+    @Mapping(target = "ownedEvents", ignore = true)
+    @Mapping(target = "mentees", ignore = true)
+    @Mapping(target = "mentors", ignore = true)
+    @Mapping(target = "goals", ignore = true)
     User toEntity(UserDto userDto);
 
     @Named("ownedEventsToIds")
     default List<Long> ownedEventsToIds(List<Event> ownedEvents) {
+        if (ownedEvents == null) {
+            return List.of();
+        }
         return ownedEvents.stream().map(Event::getId).toList();
     }
 
@@ -39,7 +41,10 @@ public interface UserMapper {
     }
 
     @Named("setGoalsOrGoalToIds")
-    default List<Long> setGoalsOrGoalToIds(List<Goal> users) {
-        return users.stream().map(Goal::getId).toList();
+    default List<Long> setGoalsOrGoalToIds(List<Goal> goals) {
+        if (goals == null) {
+            return List.of();
+        }
+        return goals.stream().map(Goal::getId).toList();
     }
 }

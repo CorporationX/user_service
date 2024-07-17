@@ -27,6 +27,7 @@ import school.faang.user_service.service.premium.PremiumService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -121,5 +122,29 @@ public class PremiumServiceTest {
         service.removePremium(userId);
 
         Mockito.verify(premiumRepository, Mockito.times(1)).deleteByUserId(userId);
+    }
+
+    @Test
+    public void testRemoveExpiredPremium() {
+        // given
+        Mockito.when(premiumRepository.findAllByEndDateBefore(Mockito.any())).thenReturn(List.of(getPremium()));
+
+        // when
+        service.removeExpiredUsers();
+
+        // then
+        Mockito.verify(premiumRepository, Mockito.times(1)).deleteByUserId(userId);
+    }
+
+    @Test
+    public void testDontRemoveExpiredPremiumIfNoUsers() {
+        // given
+        Mockito.when(premiumRepository.findAllByEndDateBefore(Mockito.any())).thenReturn(List.of());
+
+        // when
+        service.removeExpiredUsers();
+
+        // then
+        Mockito.verify(premiumRepository, Mockito.times(0)).deleteByUserId(userId);
     }
 }

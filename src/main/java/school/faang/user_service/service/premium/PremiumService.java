@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.payment_service.Currency;
 import school.faang.user_service.client.payment_service.PaymentServiceClient;
@@ -20,6 +21,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,16 @@ public class PremiumService {
     @Transactional
     public void removePremium(@NonNull final Long userId) {
         premiumRepository.deleteByUserId(userId);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?") // every day at midnight
+    @Transactional
+    public void removeExpiredUsers() {
+        List<Premium> expiredUsers = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
+
+        expiredUsers.forEach(expiredPremiumUser -> {
+            this.removePremium(expiredPremiumUser.getUser().getId());
+        });
     }
 
     private void payForPremium(final Integer days) {

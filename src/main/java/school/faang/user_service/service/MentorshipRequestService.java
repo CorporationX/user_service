@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.xml.bind.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.http.HttpStatus;
@@ -15,9 +14,8 @@ import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.exceptions.DuplicateMentorshipRequestException;
-import school.faang.user_service.exceptions.EntityNotFoundException;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -73,21 +71,24 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.existsById(mentorshipRequestDto.getRequesterId(), "Requester user does not exist!");
         mentorshipRequestValidator.existsById(mentorshipRequestDto.getReceiverId(), "Receiver user does not exist!");
 
-        mentorshipRequestRepository.findFreshRequest(mentorshipRequestDto.getRequesterId()).ifPresent((req) -> {
-            throw new DataValidationException("User has one request for last 3 months!");
-        });
+        checkIsTrialExpired(mentorshipRequestDto);
         Optional<MentorshipRequest> earlierMentorshipRequest = mentorshipRequestRepository
                 .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
         if (earlierMentorshipRequest.isPresent()) {
             throw new DataValidationException("Request already exists");
         }
-        MentorshipRequest createdRequest;
-        createdRequest = mentorshipRequestRepository
+        MentorshipRequest createdRequest = mentorshipRequestRepository
                 .create(mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
                         mentorshipRequestDto.getDescription());
 
         return mentorshipRequestMapper.toDto(createdRequest);
+    }
+
+    private void checkIsTrialExpired(MentorshipRequestDto mentorshipRequestDto) {
+        mentorshipRequestRepository.findFreshRequest(mentorshipRequestDto.getRequesterId()).ifPresent((req) -> {
+            throw new DataValidationException("User has one request for last 3 months!");
+        });
     }
 
     public ResponseEntity<List<MentorshipRequestDto>> getAllMentorshipRequests(MentorshipRequestFilterDto filterDto) {

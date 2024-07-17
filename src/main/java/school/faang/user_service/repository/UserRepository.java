@@ -26,5 +26,4 @@ public interface UserRepository extends CrudRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
-    boolean existsById(Long id);
 }

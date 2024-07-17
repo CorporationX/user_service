@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -53,6 +54,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("test that getUser calls all methods correctly + return test")
     public void testGetUser() {
         doNothing().when(userValidator).validateUserId(id);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
@@ -68,6 +70,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
         doNothing().when(userValidator).validateUserId(id);
         when(userRepository.findAllById(ids)).thenReturn(Collections.singleton(user));

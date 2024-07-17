@@ -2,6 +2,7 @@ package school.faang.user_service.validator;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -28,6 +29,7 @@ public class UserValidatorTest {
     }
 
     @Test
+    @DisplayName("test that validateUserId throws EntityNotFoundException when there is no User with given id in the database")
     public void testValidateUserId() {
         when(userRepository.existsById(userId)).thenReturn(false);
 

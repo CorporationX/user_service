@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.promotion.PromotionDto;
-import school.faang.user_service.entity.promotion.PromotionalPlan;
 import school.faang.user_service.service.PromotionService;
 
 @RestController
@@ -17,17 +16,19 @@ public class PromotionController {
     @ResponseStatus(HttpStatus.OK)
     public PromotionDto promoteUser(
         @PathVariable long userId,
-        @RequestParam String promotionalPlanName
+        @RequestParam String promotionalPlan,
+        @RequestParam String currency
     ) {
-        return promotionService.promoteUser(userId, PromotionalPlan.getFromName(promotionalPlanName));
+        return promotionService.promoteUser(userId, promotionalPlan, currency);
     }
 
     @PostMapping("/event/promote/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public PromotionDto promoteEvent(
         @PathVariable long eventId,
-        @RequestParam String promotionalPlanName
+        @RequestParam String promotionalPlan,
+        @RequestParam String currency
     ) {
-        return promotionService.promoteEvent(eventId, PromotionalPlan.getFromName(promotionalPlanName));
+        return promotionService.promoteEvent(eventId, promotionalPlan, currency);
     }
 }

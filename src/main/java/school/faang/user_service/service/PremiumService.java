@@ -7,7 +7,7 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.exception.*;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -15,10 +15,10 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validator.PaymentValidator;
 import school.faang.user_service.validator.PremiumValidator;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +32,11 @@ public class PremiumService {
     private final PaymentServiceClient paymentServiceClient;
 
     @Transactional
-    public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
+    public PremiumDto buyPremium(long userId, int days, String currencyName) {
+        PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
+        Currency currency = Currency.getFromName(currencyName);
         premiumValidator.validateUserAlreadyHasPremium(userId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(
-            new BigDecimal(premiumPeriod.getCost()),
-            Currency.USD
-        );
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(premiumPeriod.getCost(), currency);
         paymentValidator.validatePaymentSuccess(paymentResponse);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID: %d does not exist.", userId)));
@@ -49,8 +48,7 @@ public class PremiumService {
     public List<UserDto> showPremiumUsersFirst() {
         List<User> regularUsers = userRepository.findAll();
         List<User> premiumUsers = userRepository.findPremiumUsers();
-        ArrayList<User> combinedUsers = new ArrayList<>(premiumUsers);
-        combinedUsers.retainAll(regularUsers);
+        List<User> combinedUsers = combineUsers(regularUsers, premiumUsers);
         return userMapper.usersToUserDTOs(combinedUsers);
     }
 
@@ -62,6 +60,13 @@ public class PremiumService {
             .endDate(startDate.plusDays(premiumPeriod.getDays()))
             .build();
         premiumRepository.save(premium);
+        userRepository.save(user);
         return premium;
+    }
+
+    private List<User> combineUsers(List<User> regularUsers, List<User> premiumUsers) {
+        Set<User> combinedUsersSet = new LinkedHashSet<>(premiumUsers);
+        combinedUsersSet.addAll(regularUsers);
+        return combinedUsersSet.stream().toList();
     }
 }

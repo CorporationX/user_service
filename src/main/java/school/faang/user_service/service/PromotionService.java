@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.*;
+import school.faang.user_service.dto.Currency;
+import school.faang.user_service.dto.PaymentResponse;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.promotion.PromotionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.entity.promotion.PromotionalPlan;
-import school.faang.user_service.exception.*;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.PromotionMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -20,8 +22,9 @@ import school.faang.user_service.validator.PaymentValidator;
 import school.faang.user_service.validator.PromotionValidator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +43,11 @@ public class PromotionService {
         PromotionalPlan promotionalPlan = PromotionalPlan.getFromName(promotionalPlanName);
         Currency currency = Currency.getFromName(currencyName);
         promotionValidator.validateUserAlreadyHasPromotion(userId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost(), currency);
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost()
+            , currency);
         paymentValidator.validatePaymentSuccess(paymentResponse);
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", userId)));
+        User user =
+            userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(String.format("User with ID: %d does not exist.", userId)));
         Promotion promotion = createPromotionForUser(user, promotionalPlan);
         return promotionMapper.toDto(promotion);
     }
@@ -55,8 +59,7 @@ public class PromotionService {
         promotionValidator.validateEventAlreadyHasPromotion(eventId);
         PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost(), currency);
         paymentValidator.validatePaymentSuccess(paymentResponse);
-        Event event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", eventId)));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", eventId)));
         Promotion promotion = createPromotionForEvent(event, promotionalPlan);
         return promotionMapper.toDto(promotion);
     }
@@ -66,20 +69,14 @@ public class PromotionService {
         List<User> regularUsers = userRepository.findAll();
         List<User> promotedUser = userRepository.findPromotedUsers();
         updatePromotionImpressions(promotedUser);
-        List<User> combinedUsers = combineUsers(promotedUser, regularUsers);
+        List<User> combinedUsers = combineUsers(regularUsers, promotedUser);
         return userMapper.usersToUserDTOs(combinedUsers);
     }
 
     private Promotion createPromotionForUser(User user, PromotionalPlan promotionalPlan) {
         LocalDateTime startDate = LocalDateTime.now();
-        Promotion promotion = Promotion.builder()
-            .user(user)
-            .promotionalPlan(promotionalPlan)
-            .impressions(promotionalPlan.getImpressions())
-            .startDate(startDate)
-            .endDate(startDate.plusDays(promotionalPlan.getDurationInDays()))
-            .build();
-        userRepository.save(user);
+        Promotion promotion =
+            Promotion.builder().user(user).promotionalPlan(promotionalPlan).impressions(promotionalPlan.getImpressions()).startDate(startDate).endDate(startDate.plusDays(promotionalPlan.getDurationInDays())).build();
         promotionRepository.save(promotion);
         userRepository.save(user);
         return promotion;
@@ -87,14 +84,8 @@ public class PromotionService {
 
     private Promotion createPromotionForEvent(Event event, PromotionalPlan promotionalPlan) {
         LocalDateTime startDate = LocalDateTime.now();
-        Promotion promotion = Promotion.builder()
-            .event(event)
-            .promotionalPlan(promotionalPlan)
-            .impressions(promotionalPlan.getImpressions())
-            .startDate(startDate)
-            .endDate(startDate.plusDays(promotionalPlan.getDurationInDays()))
-            .build();
-        eventRepository.save(event);
+        Promotion promotion =
+            Promotion.builder().event(event).promotionalPlan(promotionalPlan).impressions(promotionalPlan.getImpressions()).startDate(startDate).endDate(startDate.plusDays(promotionalPlan.getDurationInDays())).build();
         promotionRepository.save(promotion);
         eventRepository.save(event);
         return promotion;
@@ -102,16 +93,15 @@ public class PromotionService {
 
     private void updatePromotionImpressions(List<User> promotedUsers) {
         promotedUsers.forEach(user -> {
-                Promotion promotion = user.getPromotion();
-                promotion.setImpressions(promotion.getImpressions() - 1);
-                promotionRepository.save(promotion);
-            }
-        );
+            Promotion promotion = user.getPromotion();
+            promotion.setImpressions(promotion.getImpressions() - 1);
+            promotionRepository.save(promotion);
+        });
     }
 
-    private List<User> combineUsers(List<User> promotedUsers, List<User> regularUsers) {
-        List<User> combinedUsers = new ArrayList<>(promotedUsers);
-        combinedUsers.retainAll(regularUsers);
-        return combinedUsers;
+    private List<User> combineUsers(List<User> regularUsers, List<User> promotedUsers) {
+        Set<User> combinedUsersSet = new LinkedHashSet<>(promotedUsers);
+        combinedUsersSet.addAll(regularUsers);
+        return combinedUsersSet.stream().toList();
     }
 }

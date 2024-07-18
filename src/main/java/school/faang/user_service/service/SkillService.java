@@ -10,6 +10,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -68,6 +69,7 @@ public class SkillService {
             addGuarantor(allOffersOfSkill);
         } else {
             log.info("the skill exists or there are no offers for the skill less than 3");
+            throw new DataValidationException("The skill exists or there are no offers for the skill less than 3");
         }
     }
 
@@ -81,5 +83,4 @@ public class SkillService {
                 .distinct()
                 .toList());
     }
-
 }

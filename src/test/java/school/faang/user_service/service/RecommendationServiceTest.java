@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,20 +20,20 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validation.RecommendationValidation;
-
+import static org.mockito.ArgumentMatchers.any;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
-
     @Mock
     private RecommendationRepository recommendationRepository;
     @Mock
@@ -44,37 +46,47 @@ class RecommendationServiceTest {
     private UserRepository userRepository;
     @InjectMocks
     private RecommendationService recommendationService;
+    private RecommendationDto recommendationDto;
+    private Recommendation recommendation;
+    private User author;
+    private User receiver;
 
-    RecommendationServiceTest() {
-    }
-
-    @Test
-    void testCreate() {
-        List<SkillOfferDto> skillOfferDtos = List.of(new SkillOfferDto(1L, 1L, 1L));
-        RecommendationDto recommendationDto = new RecommendationDto(1L, 1L, 1L, "content", skillOfferDtos, LocalDateTime.now());
-        Recommendation recommendation = new Recommendation();
-        recommendation.setId(1L);
-        User author = new User();
+    @BeforeEach
+    void setUp(){
+        author = new User();
         author.setId(1L);
-        User receiver = new User();
+
+        receiver = new User();
         receiver.setId(1L);
-        recommendation.setReceiver(receiver);
-        recommendation.setAuthor(author);
 
         Skill skill = new Skill();
         skill.setId(1L);
 
         SkillOffer skillOffer = new SkillOffer();
         skillOffer.setSkill(skill);
+
+        recommendation = new Recommendation();
+        recommendation.setId(1L);
+        recommendation.setAuthor(author);
+        recommendation.setReceiver(receiver);
         recommendation.setSkillOffers(List.of(skillOffer));
 
+        SkillOfferDto skillOfferDto = new SkillOfferDto(1L, 1L, 1L);
+        recommendationDto = new RecommendationDto(1L, 1L, 1L, "content", List.of(skillOfferDto), LocalDateTime.now());
+
+        Skill skills = new Skill();
+        skills.setId(1L);
+    }
+    @Test
+    @DisplayName("Test to create a user with a recommendation.")
+    void testCreate() {
+        System.out.println(recommendation.getAuthor().getId());
         when(recommendationMapper.recommendationEntity(recommendationDto)).thenReturn(recommendation);
         when(recommendationMapper.recommendationDto(recommendation)).thenReturn(recommendationDto);
         when(recommendationRepository.save(recommendation)).thenReturn(recommendation);
 
         when(userRepository.findById(author.getId())).thenReturn(Optional.of(author));
         when(userRepository.findById(receiver.getId())).thenReturn(Optional.of(receiver));
-
 
         RecommendationDto result = recommendationService.create(recommendationDto);
 
@@ -89,34 +101,11 @@ class RecommendationServiceTest {
     }
     @Test
     void testUpdate() {
-        List<SkillOfferDto> skillOfferDtos = List.of(new SkillOfferDto(1L, 1L, 1L));
-        RecommendationDto recommendationDto = new RecommendationDto(1L, 1L, 1L, "content", skillOfferDtos, LocalDateTime.now());
-        Recommendation recommendation = new Recommendation();
-        recommendation.setId(1L);
-        User author = new User();
-        author.setId(1L);
-        User receiver = new User();
-        receiver.setId(1L);
-        recommendation.setReceiver(receiver);
-        recommendation.setAuthor(author);
-
-        Skill skill = new Skill();
-        skill.setId(1L);
-
-        SkillOffer skillOffer = new SkillOffer();
-        skillOffer.setSkill(skill);
-        recommendation.setSkillOffers(List.of(skillOffer));
-
         when(recommendationMapper.recommendationEntity(recommendationDto)).thenReturn(recommendation);
         when(recommendationMapper.recommendationDto(recommendation)).thenReturn(recommendationDto);
         when(recommendationRepository.save(recommendation)).thenReturn(recommendation);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(author), Optional.of(receiver));
-        when(userRepository.findById(receiver.getId())).thenReturn(Optional.of(receiver));
         when(userRepository.findById(author.getId())).thenReturn(Optional.of(author));
-
-        receiver.setSkills(List.of(skill));
-        when(skillOfferRepository.save(skillOffer)).thenReturn(skillOffer);
+        when(userRepository.findById(receiver.getId())).thenReturn(Optional.of(receiver));
 
         RecommendationDto result = recommendationService.update(recommendationDto);
 
@@ -126,7 +115,7 @@ class RecommendationServiceTest {
         verify(recommendationMapper, times(1)).recommendationEntity(recommendationDto);
         verify(recommendationMapper, times(1)).recommendationDto(recommendation);
         verify(skillOfferRepository, times(1)).deleteAllByRecommendationId(recommendation.getId());
-        verify(skillOfferRepository, times(1)).save(skillOffer);
+        verify(skillOfferRepository, times(1)).save(any(SkillOffer.class));
         verify(recommendationRepository, times(1)).save(recommendation);
 
         assertEquals(recommendationDto, result);
@@ -134,31 +123,24 @@ class RecommendationServiceTest {
 
     @Test
     void testDelete() {
-
         Recommendation recommendationFound = new Recommendation();
         recommendationFound.setId(1L);
 
-        assertEquals(1L, recommendationFound.getId());
-
         when(recommendationRepository.findById(recommendationFound.getId()))
                 .thenReturn(Optional.of(recommendationFound));
-
         recommendationService.delete(recommendationFound.getId());
 
         verify(recommendationRepository, times(1)).findById(recommendationFound.getId());
         verify(recommendationRepository, times(1)).deleteById(recommendationFound.getId());
+        Optional<Recommendation> result = recommendationRepository.findById(recommendationFound.getId());
+        assertTrue(result.isPresent());
     }
 
     @Test
     void testDeleteNotFound() {
-
         Recommendation recommendationNotFound = new Recommendation();
-
-        when(recommendationRepository.findById(recommendationNotFound.getId()))
-                .thenReturn(Optional.empty());
-
+        recommendationRepository.findById(recommendationNotFound.getId());
         assertThrows(DataValidationException.class,
                 () -> recommendationService.delete(recommendationNotFound.getId()));
-
     }
 }

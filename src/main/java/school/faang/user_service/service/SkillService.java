@@ -1,6 +1,6 @@
 package school.faang.user_service.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -9,34 +9,31 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final UserRepository userRepository;
     private static final int MIN_SKILL_OFFERS = 3;
-
-    @Autowired
-    public SkillService(SkillRepository skillRepository, SkillMapper skillMapper, SkillOfferRepository skillOfferRepository, UserSkillGuaranteeRepository userSkillGuaranteeRepository) {
-        this.skillRepository = skillRepository;
-        this.skillMapper = skillMapper;
-        this.skillOfferRepository = skillOfferRepository;
-        this.userSkillGuaranteeRepository = userSkillGuaranteeRepository;
-    }
 
     public SkillDto create(SkillDto skillDto) {
         if (skillRepository.existsByTitle(skillDto.getTitle()))
-            throw new RuntimeException("Skill with title '" + skillDto.getTitle() + "' already exists");
+            throw new DataValidationException("Skill with title '" + skillDto.getTitle() + "' already exists");
 
         Skill skill = skillMapper.toEntity(skillDto);
         Skill savedSkill = skillRepository.save(skill);
@@ -49,15 +46,15 @@ public class SkillService {
                 .map(skillMapper::toDto)
                 .collect(Collectors.toList());
     }
+
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        // Получаем все скиллы, предложенные пользователю
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
         return skills.stream()
-                .collect(Collectors.groupingBy(Skill::getTitle))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
                 .map(entry -> {
-                    SkillDto skillDto = skillMapper.toDto(entry.getValue().get(0));
-                    long offersAmount = entry.getValue().size();
+                    SkillDto skillDto = skillMapper.toDto(entry.getKey());
+                    long offersAmount = entry.getValue();
                     return new SkillCandidateDto(skillDto, offersAmount);
                 })
                 .collect(Collectors.toList());
@@ -65,28 +62,42 @@ public class SkillService {
 
     @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
-        if (userSkill.isPresent()) {
-            return skillMapper.toDto(userSkill.get());
-        }
-        List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-        if (offers.size() <= MIN_SKILL_OFFERS) {
-            return null;
-        }
-        skillRepository.assignSkillToUser(skillId, userId);
-        Skill assignedSkill = skillRepository.findUserSkill(skillId, userId).orElseThrow();
-        assignSkillGuarantees(skillId, userId, offers);
-        return skillMapper.toDto(assignedSkill);
+        return skillRepository.findUserSkill(skillId, userId)
+                .map(skill -> {
+                    assignSkillGuarantees(skill, getUserById(userId), skillOfferRepository.findAllOffersOfSkill(skillId, userId));
+                    return skillMapper.toDto(skill);
+                })
+                .orElseGet(() -> {
+                    List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+                    if (offers.size() <= MIN_SKILL_OFFERS) {
+                        throw new EntityNotFoundException("Not enough skill offers for skillId: " + skillId + " and userId: " + userId + ". Minimum required: " + MIN_SKILL_OFFERS);
+                    }
+                    skillRepository.assignSkillToUser(skillId, userId);
+                    Skill assignedSkill = getAssignedSkill(skillId, userId);
+                    assignSkillGuarantees(assignedSkill, getUserById(userId), offers);
+                    return skillMapper.toDto(assignedSkill);
+                });
     }
-    private void assignSkillGuarantees(long skillId, long userId, List<SkillOffer> offers) {
+
+    private Skill getAssignedSkill(long skillId, long userId) {
+        return skillRepository.findUserSkill(skillId, userId).orElseThrow(() -> new EntityNotFoundException("User skill not found"));
+    }
+
+    private User getUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    private void assignSkillGuarantees(Skill skill, User user, List<SkillOffer> offers) {
         for (SkillOffer offer : offers) {
-            UserSkillGuarantee guarantee = UserSkillGuarantee.builder()
-                    .skill(Skill.builder().id(skillId).build())
-                    .user(User.builder().id(userId).build())
-                    .guarantor(offer.getRecommendation().getAuthor())
-                    .build();
-            userSkillGuaranteeRepository.save(guarantee);
+            User guarantor = offer.getRecommendation().getAuthor();
+            if (!skillRepository.findUserSkill(guarantor.getId(), skill.getId()).isPresent()) {
+                UserSkillGuarantee guarantee = UserSkillGuarantee.builder()
+                        .skill(skill)
+                        .user(user)
+                        .guarantor(guarantor)
+                        .build();
+                userSkillGuaranteeRepository.save(guarantee);
+            }
         }
     }
 }
-

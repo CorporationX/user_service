@@ -82,6 +82,7 @@ public class PromotionService {
             .startDate(startDate)
             .endDate(startDate.plusDays(promotionalPlan.getDurationInDays()))
             .build();
+        userRepository.save(user);
         promotionRepository.save(promotion);
         return promotion;
     }
@@ -95,6 +96,7 @@ public class PromotionService {
             .startDate(startDate)
             .endDate(startDate.plusDays(promotionalPlan.getDurationInDays()))
             .build();
+        eventRepository.save(event);
         promotionRepository.save(promotion);
         return promotion;
     }

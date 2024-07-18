@@ -28,20 +28,31 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    private long userId;
+
     @BeforeEach
     public void setUp() {
+        userId = 1L;
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    @DisplayName("testing getUserMethod")
+    @DisplayName("testing getUser method")
     void testGetUser() throws Exception {
-        long userId = 1L;
         UserDto userDto = UserDto.builder()
                 .id(userId).build();
         when(userService.getUser(userId)).thenReturn(userDto);
         mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isOk());
         verify(userService, times(1)).getUser(userId);
+    }
+
+    @Test
+    @DisplayName("testing checkUserExistence method")
+    void testCheckUserExistence() throws Exception {
+        when(userService.checkUserExistence(userId)).thenReturn(true);
+        mockMvc.perform(get("/users/exists/{userId}", userId))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).checkUserExistence(userId);
     }
 }

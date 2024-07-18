@@ -1,6 +1,5 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.redis;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -10,19 +9,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
-
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
-    @Value("${spring.data.redis.channels.recommendationChannel}")
-    private String recommendationChannelName;
-
     @Bean
-    public JedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
+    public JedisConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisProperties.getHost(), redisProperties.getPort());
         return new JedisConnectionFactory(config);
     }
 
@@ -38,8 +32,12 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic recommendationTopic() {
-        return new ChannelTopic(recommendationChannelName);
+    public ChannelTopic recommendationTopic(RedisProperties redisProperties) {
+        return new ChannelTopic(redisProperties.getChannels().getRecommendationChannel());
     }
-
+    
+    @Bean
+    public ChannelTopic subscriptionTopic(RedisProperties redisProperties) {
+        return new ChannelTopic(redisProperties.getChannels().getSubscriptionChannel());
+    }
 }

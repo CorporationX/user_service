@@ -3,13 +3,18 @@ package school.faang.user_service.service.subscription;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.redis.SubscriptionEvent;
+import school.faang.user_service.dto.event.redis.SubscriptionEventType;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.AbstractEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 
@@ -25,19 +30,24 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepo;
     private List<UserFilter> filters;
     private final UserMapper userMapper;
+    @Qualifier("subscriptionEventPublisher")
+    private final AbstractEventPublisher eventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException(REPEATED_SUBSCRIPTION_EXCEPTION.getMessage());
         }
-
         subscriptionRepo.followUser(followerId, followeeId);
+        
+        eventPublisher.convertAndSend(createSubscriptionEvent(followerId, followeeId, SubscriptionEventType.FOLLOW));
         log.info("User + (id=" + followerId + ") subscribed to user (id=" + followeeId + ").");
     }
-
+    
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionRepo.unfollowUser(followerId, followeeId);
+        
+        eventPublisher.convertAndSend(createSubscriptionEvent(followerId, followeeId, SubscriptionEventType.UNFOLLOW));
         log.info("User + (id=" + followerId + ") canceled subscription to user (id=" + followeeId + ").");
     }
 
@@ -73,6 +83,15 @@ public class SubscriptionService {
                 .distinct()
                 .map(userMapper::toDto)
                 .toList();
+    }
+    
+    private SubscriptionEvent createSubscriptionEvent(Long followerId, Long followeeId, SubscriptionEventType eventType) {
+        return SubscriptionEvent
+            .builder()
+            .followerId(followerId)
+            .followeeId(followeeId)
+            .eventType(eventType)
+            .build();
     }
 }
 

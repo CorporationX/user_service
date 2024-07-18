@@ -21,7 +21,7 @@ import static school.faang.user_service.exception.message.ExceptionMessage.USER_
 import static school.faang.user_service.exception.message.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
 
 @RestController
-@RequestMapping("subscriptions/")
+@RequestMapping("subscriptions")
 @AllArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;

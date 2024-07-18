@@ -1,13 +1,18 @@
 package school.faang.user_service.service.recommendation;
 
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
-import school.faang.user_service.dto.event.RecommendationEventDto;
+import school.faang.user_service.dto.event.redis.RecommendationEventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -20,10 +25,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -158,10 +159,9 @@ public class RecommendationService {
 
     private void sendNotification(Long idRecommendation, RecommendationDto recommendationDto) {
         RecommendationEventDto recommendationEventDto = RecommendationEventDto.builder()
-                .id(idRecommendation)
+                .recommendationId(idRecommendation)
                 .authorId(recommendationDto.getAuthorId())
                 .receiverId(recommendationDto.getReceiverId())
-                .createdAt(recommendationDto.getCreateAt())
                 .build();
 
         recommendationRequestedEventPublisher.convertAndSend(recommendationEventDto);

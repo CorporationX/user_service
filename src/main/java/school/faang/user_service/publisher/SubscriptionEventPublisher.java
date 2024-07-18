@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import school.faang.user_service.dto.event.redis.RecommendationEventDto;
+import school.faang.user_service.dto.event.redis.SubscriptionEvent;
 
 @Component
-public class RecommendationRequestedEventPublisher extends AbstractEventPublisher<RecommendationEventDto> {
-    public RecommendationRequestedEventPublisher(
+public class SubscriptionEventPublisher extends AbstractEventPublisher<SubscriptionEvent> {
+    public SubscriptionEventPublisher(
         RedisTemplate<String, Object> redisTemplate,
         ObjectMapper objectMapper,
-        @Qualifier("recommendationTopic") ChannelTopic topic
+        @Qualifier("subscriptionTopic") ChannelTopic topic
     ) {
         super(redisTemplate, objectMapper, topic);
     }

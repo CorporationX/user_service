@@ -6,7 +6,7 @@ import school.faang.user_service.dto.UserReadDto;
 import java.time.LocalDateTime;
 
 @Value
-public class EventReadDto {
+public class ReadEvetDto {
 
     Long id;
     String title;

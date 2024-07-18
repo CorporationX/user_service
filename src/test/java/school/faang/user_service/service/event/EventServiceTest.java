@@ -4,24 +4,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserReadDto;
-import school.faang.user_service.dto.event.EventCreateEditDto;
-import school.faang.user_service.dto.event.EventReadDto;
+import school.faang.user_service.dto.event.ReadEvetDto;
+import school.faang.user_service.dto.event.WriteEventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventFilterDto;
-import school.faang.user_service.filter.event.EventStartDateAfterFilter;
-import school.faang.user_service.filter.event.EventTitleFilter;
-import school.faang.user_service.mapper.event.EventCreateEditMapperImpl;
-import school.faang.user_service.mapper.event.EventReadMapperImpl;
+import school.faang.user_service.filter.event.EventStartDateAfterFieldFilter;
+import school.faang.user_service.filter.event.EventTitleFieldFilter;
+import school.faang.user_service.mapper.event.EventToReadEventDtoMapper;
+import school.faang.user_service.mapper.event.WriteEventDtoToEventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.valitator.event.EventCreateEditValidator;
+import school.faang.user_service.valitator.event.WriteEventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,13 +38,17 @@ import static org.mockito.Mockito.verifyNoInteractions;
 public class EventServiceTest {
 
     @Mock
-    private EventCreateEditValidator createEditValidator;
+    private WriteEventValidator writeEventValidator;
     @Mock
-    private EventCreateEditMapperImpl createEditMapper;
+    private WriteEventDtoToEventMapper writeEventDtoToEventMapper;
     @Mock
-    private EventReadMapperImpl readMapper;
+    private EventToReadEventDtoMapper eventToReadEventDtoMapper;
     @Mock
     private EventRepository repository;
+    @Mock
+    private EventTitleFieldFilter eventTitleFieldFilter;
+    @Mock
+    private EventStartDateAfterFieldFilter eventStartDateAfterFieldFilter;
 
     private EventService eventService;
 
@@ -52,35 +56,43 @@ public class EventServiceTest {
 
     @BeforeEach
     void init() {
-        List<EventFilter> eventFilters = List.of(new EventTitleFilter(), new EventStartDateAfterFilter());
-        eventService = new EventService(repository, createEditMapper, readMapper, createEditValidator, eventFilters);
+        eventService = new EventService(
+                repository,
+                writeEventDtoToEventMapper,
+                eventToReadEventDtoMapper,
+                writeEventValidator,
+                List.of(eventTitleFieldFilter, eventStartDateAfterFieldFilter));
     }
 
     @Test
     void create() {
-        EventCreateEditDto eventCreateEditDto = getEventCreateEditDto();
+        WriteEventDto writeEventDto = getWriteEventDto();
         Event event = getEvent();
-        EventReadDto eventReadDto = getEventReadDto();
-        doReturn(event).when(createEditMapper).map(eventCreateEditDto);
-        doReturn(eventReadDto).when(readMapper).map(event);
+        ReadEvetDto readEvetDto = getReadEvetDto();
+        doReturn(event).when(writeEventDtoToEventMapper).map(writeEventDto);
+        doReturn(readEvetDto).when(eventToReadEventDtoMapper).map(event);
 
-        EventReadDto actualResult = eventService.create(eventCreateEditDto);
+        ReadEvetDto actualResult = eventService.create(writeEventDto);
 
-        assertThat(actualResult).isEqualTo(eventReadDto);
-        verify(createEditValidator).validate(eventCreateEditDto);
+        assertThat(actualResult).isEqualTo(readEvetDto);
+        verify(writeEventValidator).validate(writeEventDto);
         verify(repository).save(event);
     }
 
     @Test
-    void findAllBy() {
+    void findAllByFilter() {
         EventFilterDto eventFilterDto = new EventFilterDto("2", DATE_NOW.minusDays(1));
-        List<EventReadDto> expectedResult = List.of(getEventReadDto("title2"), getEventReadDto("a2"));
+        List<ReadEvetDto> expectedResult = List.of(getReadEvetDto("title2"), getReadEvetDto("a2"));
         List<Event> events = List.of(getEvent("title"), getEvent("title2"), getEvent("atitle"), getEvent("a2"));
         doReturn(events).when(repository).findAll();
-        doReturn(expectedResult.get(0)).when(readMapper).map(events.get(1));
-        doReturn(expectedResult.get(1)).when(readMapper).map(events.get(3));
+        doReturn(true).when(eventTitleFieldFilter).isApplicable(eventFilterDto);
+        doReturn(true).when(eventStartDateAfterFieldFilter).isApplicable(eventFilterDto);
+        doReturn(Stream.of(events.get(1))).when(eventTitleFieldFilter).apply(Mockito.any(), Mockito.any());
+        doReturn(Stream.of(events.get(3))).when(eventStartDateAfterFieldFilter).apply(Mockito.any(), Mockito.any());
+        doReturn(expectedResult.get(0)).when(eventToReadEventDtoMapper).map(events.get(1));
+        doReturn(expectedResult.get(1)).when(eventToReadEventDtoMapper).map(events.get(3));
 
-        List<EventReadDto> actualResult = eventService.findAllBy(eventFilterDto);
+        List<ReadEvetDto> actualResult = eventService.findAllByFilter(eventFilterDto);
 
         assertThat(actualResult.size()).isEqualTo(2);
         assertThat(actualResult).isEqualTo(expectedResult);
@@ -88,12 +100,12 @@ public class EventServiceTest {
 
     @Test
     void shouldCreateStopIfNotValidated() {
-        EventCreateEditDto createEditDto = getEventCreateEditDto();
-        doThrow(new DataValidationException("any")).when(createEditValidator).validate(createEditDto);
+        WriteEventDto writeEventDto = getWriteEventDto();
+        doThrow(new DataValidationException("any")).when(writeEventValidator).validate(writeEventDto);
 
-        assertThrows(DataValidationException.class, () ->  eventService.create(createEditDto));
-        verify(createEditValidator).validate(createEditDto);
-        verifyNoInteractions(repository, createEditMapper, readMapper);
+        assertThrows(DataValidationException.class, () -> eventService.create(writeEventDto));
+        verify(writeEventValidator).validate(writeEventDto);
+        verifyNoInteractions(repository, writeEventDtoToEventMapper, eventToReadEventDtoMapper);
     }
 
     private Event getEvent(String title) {
@@ -119,9 +131,9 @@ public class EventServiceTest {
                 .build();
     }
 
-    private EventCreateEditDto getEventCreateEditDto() {
+    private WriteEventDto getWriteEventDto() {
         Event event = getEvent();
-        return new EventCreateEditDto(
+        return new WriteEventDto(
                 event.getTitle(),
                 event.getStartDate(),
                 event.getEndDate(),
@@ -137,9 +149,9 @@ public class EventServiceTest {
         );
     }
 
-    private EventReadDto getEventReadDto(String title) {
+    private ReadEvetDto getReadEvetDto(String title) {
         Event event = getEvent(title);
-        return new EventReadDto(
+        return new ReadEvetDto(
                 event.getId(),
                 event.getTitle(),
                 event.getStartDate(),
@@ -151,9 +163,9 @@ public class EventServiceTest {
         );
     }
 
-    private EventReadDto getEventReadDto() {
+    private ReadEvetDto getReadEvetDto() {
         Event event = getEvent();
-        return new EventReadDto(
+        return new ReadEvetDto(
                 event.getId(),
                 event.getTitle(),
                 event.getStartDate(),
@@ -168,7 +180,6 @@ public class EventServiceTest {
     private UserReadDto getUserReadDto(Long id) {
         return new UserReadDto(id);
     }
-
 
     private User getUser(Long id) {
         return User.builder()

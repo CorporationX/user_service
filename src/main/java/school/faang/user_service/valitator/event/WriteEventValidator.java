@@ -3,7 +3,7 @@ package school.faang.user_service.valitator.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import school.faang.user_service.dto.event.EventCreateEditDto;
+import school.faang.user_service.dto.event.WriteEventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
@@ -13,21 +13,34 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class EventCreateEditValidator {
+public class WriteEventValidator {
 
     private final SkillRepository skillRepository;
 
-    public void validate(EventCreateEditDto object) {
-        if (object.getStartDate() == null) {
-            throw new DataValidationException(getNotNullErrorText("start-date"));
+    public void validate(WriteEventDto object) {
+        checkStartDate(object);
+        checkText(object);
+        checkRelatedSkill(object);
+    }
+
+    private void checkRelatedSkill(WriteEventDto object) {
+        Set<Long> userSkillIds = getUserSkillIds(object.getOwnerId());
+        for (Long relatedSkillId : object.getRelatedSkillIds()) {
+            if (!userSkillIds.contains(relatedSkillId)) {
+                throw new DataValidationException(String.format("Не возможно установить skill, id: %s", relatedSkillId));
+            }
         }
+    }
+
+    private void checkText(WriteEventDto object) {
         if (StringUtils.isEmpty(object.getTitle())) {
             throw new DataValidationException(getNotNullErrorText("title"));
         }
-        for (Long relatedSkillId : object.getRelatedSkillIds()) {
-            if (!getUserSkillIds(object.getOwnerId()).contains(relatedSkillId)) {
-                throw new DataValidationException(String.format("Не возможно установить skill, id: %s", relatedSkillId));
-            }
+    }
+
+    private void checkStartDate(WriteEventDto object) {
+        if (object.getStartDate() == null) {
+            throw new DataValidationException(getNotNullErrorText("start-date"));
         }
     }
 

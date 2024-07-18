@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.event.EventCreateEditDto;
+import school.faang.user_service.dto.event.WriteEventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -25,30 +25,30 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class EventCreateEditValidatorTest {
+class WriteEventValidatorTest {
 
     @Mock
     private SkillRepository skillRepository;
     @InjectMocks
-    private EventCreateEditValidator validator;
+    private WriteEventValidator validator;
 
     @Test
     void shouldPassValidation() {
-        EventCreateEditDto eventCreateEditDto = getEventCreateEditDto();
-        Mockito.doReturn(eventCreateEditDto.getRelatedSkillIds().stream()
+        WriteEventDto writeEventDto = getWriteEventDto();
+        Mockito.doReturn(writeEventDto.getRelatedSkillIds().stream()
                         .map(this::getSkill)
                         .toList())
                 .when(skillRepository)
-                .findAllByUserId(eventCreateEditDto.getOwnerId());
+                .findAllByUserId(writeEventDto.getOwnerId());
 
-        assertDoesNotThrow(() -> validator.validate(eventCreateEditDto));
+        assertDoesNotThrow(() -> validator.validate(writeEventDto));
     }
 
     @Test
     void shouldThrowExceptionIfStartDateIsNull() {
         Event event = getEvent();
         LocalDateTime invalidStartDate = null;
-        EventCreateEditDto eventCreateEditDto = new EventCreateEditDto(
+        WriteEventDto writeEventDto = new WriteEventDto(
                 event.getTitle(),
                 invalidStartDate,
                 event.getEndDate(),
@@ -65,7 +65,7 @@ class EventCreateEditValidatorTest {
 
         assertAll(
                 () -> {
-                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(eventCreateEditDto));
+                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(writeEventDto));
                     assertThat(exception.getMessage()).isEqualTo("start-date не может быть пустым");
                 }
         );
@@ -76,7 +76,7 @@ class EventCreateEditValidatorTest {
     void shouldThrowExceptionIfMissingRequiredSkill() {
         Event event = getEvent();
         List<Skill> invalidSkills = List.of(getSkill(3L));
-        EventCreateEditDto eventCreateEditDto = new EventCreateEditDto(
+        WriteEventDto writeEventDto = new WriteEventDto(
                 event.getTitle(),
                 event.getStartDate(),
                 event.getEndDate(),
@@ -93,11 +93,11 @@ class EventCreateEditValidatorTest {
         );
         Mockito.doReturn(getEvent().getRelatedSkills())
                 .when(skillRepository)
-                .findAllByUserId(eventCreateEditDto.getOwnerId());
+                .findAllByUserId(writeEventDto.getOwnerId());
 
         assertAll(
                 () -> {
-                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(eventCreateEditDto));
+                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(writeEventDto));
                     assertThat(exception.getMessage()).isEqualTo("Не возможно установить skill, id: 3");
                 }
         );
@@ -107,7 +107,7 @@ class EventCreateEditValidatorTest {
     void shouldThrowExceptionIfTitleIsEmpty() {
         Event event = getEvent();
         String invalidTitle = "";
-        EventCreateEditDto eventCreateEditDto = new EventCreateEditDto(
+        WriteEventDto writeEventDto = new WriteEventDto(
                 invalidTitle,
                 event.getStartDate(),
                 event.getEndDate(),
@@ -124,15 +124,15 @@ class EventCreateEditValidatorTest {
 
         assertAll(
                 () -> {
-                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(eventCreateEditDto));
+                    var exception = assertThrows(DataValidationException.class, () -> validator.validate(writeEventDto));
                     assertThat(exception.getMessage()).isEqualTo("title не может быть пустым");
                 }
         );
     }
 
-    private EventCreateEditDto getEventCreateEditDto() {
+    private WriteEventDto getWriteEventDto() {
         Event event = getEvent();
-        return new EventCreateEditDto(
+        return new WriteEventDto(
                 event.getTitle(),
                 event.getStartDate(),
                 event.getEndDate(),

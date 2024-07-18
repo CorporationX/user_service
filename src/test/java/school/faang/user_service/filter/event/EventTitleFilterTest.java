@@ -1,5 +1,6 @@
 package school.faang.user_service.filter.event;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -8,6 +9,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,9 +23,18 @@ class EventTitleFilterTest {
         LocalDateTime fake_date = LocalDateTime.now();
         EventFilterDto eventFilterDto = new EventFilterDto("title", fake_date);
 
-        boolean actual = new EventTitleFilter().apply(getEvent(), eventFilterDto);
+        Event expectedEvent = getEvent();
+        Event eventIsFalse = getEvent();
+        eventIsFalse.setTitle("");
 
-        assertTrue(actual);
+        List<Event> actualEvents = new EventTitleFieldFilter()
+                .apply(List.of(expectedEvent, eventIsFalse).stream(), eventFilterDto)
+                .toList();
+
+        Assertions.assertThat(actualEvents).hasSize(1);
+        Event actualEvent = actualEvents.iterator().next();
+        Assertions.assertThat(actualEvent).isEqualTo(expectedEvent);
+
     }
 
     private Event getEvent() {

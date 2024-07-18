@@ -1,6 +1,5 @@
 package school.faang.user_service.dto.event;
 
-import lombok.Builder;
 import lombok.Value;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Value
-public class EventCreateEditDto  {
+public class WriteEventDto {
 
     String title;
     LocalDateTime startDate;

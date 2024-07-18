@@ -1,11 +1,9 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.server.ResponseStatusException;
-import school.faang.user_service.dto.event.EventCreateEditDto;
-import school.faang.user_service.dto.event.EventReadDto;
+import school.faang.user_service.dto.event.ReadEvetDto;
+import school.faang.user_service.dto.event.WriteEventDto;
 import school.faang.user_service.filter.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
 
@@ -17,33 +15,31 @@ public class EventController {
 
     private final EventService eventService;
 
-    public EventReadDto create(EventCreateEditDto eventCreateEditDto) {
-        return eventService.create(eventCreateEditDto);
+    public ReadEvetDto createEvent(WriteEventDto writeEventDto) {
+        return eventService.create(writeEventDto);
     }
 
-    public List<EventReadDto> getEventsByFilter(EventFilterDto filter) {
-        return eventService.findAllBy(filter);
+    public List<ReadEvetDto> getEventsByFilter(EventFilterDto filter) {
+        return eventService.findAllByFilter(filter);
     }
 
-    public EventReadDto getEvent(Long id) {
-        return eventService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ReadEvetDto getEvent(Long id) {
+        return eventService.findById(id);
     }
 
-    public void delete(Long id) {
+    public void deleteEvent(Long id) {
         eventService.delete(id);
     }
 
-    public EventReadDto update(Long id, EventCreateEditDto editDto) {
-        return eventService.update(id, editDto)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ReadEvetDto updateEvent(Long id, WriteEventDto writeEventDto) {
+        return eventService.update(id, writeEventDto);
     }
 
-    public List<EventReadDto> getOwnedEvents(long userId) {
+    public List<ReadEvetDto> getEventsByUserId(long userId) {
        return eventService.findAllByUserId(userId);
     }
 
-    public List<EventReadDto> getParticipatedEvents(long userId) {
+    public List<ReadEvetDto> getParticipatedEvents(long userId) {
         return eventService.findParticipatedEventsByUserId(userId);
     }
 

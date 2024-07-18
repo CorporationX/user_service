@@ -6,7 +6,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
-import school.faang.user_service.dto.event.EventCreateEditDto;
+import school.faang.user_service.dto.event.WriteEventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -15,8 +15,8 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserRepository.class})
-public abstract class EventCreateEditMapper {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public abstract class WriteEventDtoToEventMapper {
 
     @Autowired
     protected UserRepository userRepository;
@@ -24,16 +24,16 @@ public abstract class EventCreateEditMapper {
     protected SkillRepository skillRepository;
 
     @Mappings({
-            @Mapping(target = "owner", expression = "java(findUserById(eventCreateEditDto.getOwnerId()))"),
-            @Mapping(target = "relatedSkills", expression = "java(findSkillsByIds(eventCreateEditDto.getRelatedSkillIds()))")
+            @Mapping(target = "owner", expression = "java(findUserById(writeEventDto.getOwnerId()))"),
+            @Mapping(target = "relatedSkills", expression = "java(findSkillsByIds(writeEventDto.getRelatedSkillIds()))")
     })
-    public abstract Event map(EventCreateEditDto eventCreateEditDto);
+    public abstract Event map(WriteEventDto writeEventDto);
 
     @Mappings({
-            @Mapping(target = "owner", expression = "java(findUserById(eventCreateEditDto.getOwnerId()))"),
-            @Mapping(target = "relatedSkills", expression = "java(findSkillsByIds(eventCreateEditDto.getRelatedSkillIds()))")
+            @Mapping(target = "owner", expression = "java(findUserById(writeEventDto.getOwnerId()))"),
+            @Mapping(target = "relatedSkills", expression = "java(findSkillsByIds(writeEventDto.getRelatedSkillIds()))")
     })
-    public abstract Event map(EventCreateEditDto eventCreateEditDto, @MappingTarget Event event);
+    public abstract Event map(WriteEventDto writeEventDto, @MappingTarget Event event);
 
     protected User findUserById(Long id) {
         return userRepository.findById(id).orElse(null);

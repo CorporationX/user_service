@@ -1,5 +1,6 @@
 package school.faang.user_service.filter.event;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -8,9 +9,8 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class EventStartDateAfterFilterTest {
 
@@ -19,10 +19,17 @@ class EventStartDateAfterFilterTest {
     @Test
     void apply() {
         EventFilterDto eventFilterDto = new EventFilterDto("fake", DATE_NOW.minusDays(1));
+        Event expectedEvent = getEvent();
+        Event eventIsFalse = getEvent();
+        eventIsFalse.setStartDate(DATE_NOW.minusDays(2));
 
-        boolean actual = new EventStartDateAfterFilter().apply(getEvent(), eventFilterDto);
+        List<Event> actualEvents = new EventStartDateAfterFieldFilter()
+                .apply(List.of(expectedEvent, eventIsFalse).stream(), eventFilterDto)
+                .toList();
 
-        assertTrue(actual);
+        Assertions.assertThat(actualEvents).hasSize(1);
+        Event actualEvent = actualEvents.iterator().next();
+        Assertions.assertThat(actualEvent).isEqualTo(expectedEvent);
     }
 
     private Event getEvent() {

@@ -1,0 +1,17 @@
+name: ci
+on:
+  pull_request:
+    branches:
+      - 'griffon-master-bc5'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: action/checkout@v3
+        name: Setup Java JDK
+      - uses: actions/setup-java@v4.2.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          name: Test application
+          run: ./gradlew test

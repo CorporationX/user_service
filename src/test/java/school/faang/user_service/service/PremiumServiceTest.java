@@ -133,7 +133,7 @@ class PremiumServiceTest {
         verify(userRepository).save(any(User.class));
 
         assertNotNull(result);
-        assertEquals(result, premiumDto);
+        assertEquals(premiumDto, result);
     }
 
     @Test
@@ -163,9 +163,9 @@ class PremiumServiceTest {
 
         verify(userRepository).findAll();
         verify(userRepository).findPremiumUsers();
-        verify(userMapper).usersToUserDTOs(anyList());
+        verify(userMapper).usersToUserDTOs(combinedUsers);
 
         assertNotNull(result);
-        assertEquals(result, userDtos);
+        assertEquals(userDtos, result);
     }
 }

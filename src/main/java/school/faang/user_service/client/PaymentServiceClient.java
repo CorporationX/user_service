@@ -10,8 +10,6 @@ import school.faang.user_service.dto.Currency;
 import school.faang.user_service.dto.PaymentRequest;
 import school.faang.user_service.dto.PaymentResponse;
 
-import java.math.BigDecimal;
-
 @Component
 @RequiredArgsConstructor
 public class PaymentServiceClient {
@@ -23,7 +21,7 @@ public class PaymentServiceClient {
     @Value("${payment-service.port}")
     private int port;
 
-    public PaymentResponse sendPaymentRequest(BigDecimal amount, Currency currency) {
+    public PaymentResponse sendPaymentRequest(double amount, Currency currency) {
         PaymentRequest paymentRequest = PaymentRequest.builder()
             .amount(amount)
             .currency(currency)

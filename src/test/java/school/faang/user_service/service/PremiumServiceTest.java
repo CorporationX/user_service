@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,13 +11,17 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.exception.*;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.IllegalEntityException;
 import school.faang.user_service.mapper.PremiumMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.validator.PaymentValidator;
+import school.faang.user_service.validator.PremiumValidator;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,21 +43,37 @@ class PremiumServiceTest {
     private PremiumMapper premiumMapper;
 
     @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private PremiumValidator premiumValidator;
+
+    @Mock
+    private PaymentValidator paymentValidator;
+
+    @Mock
     private PaymentServiceClient paymentServiceClient;
 
     private long userId;
+    private int validDays;
+    private int invalidDays;
+    private String validCurrencyName;
+    private String invalidCurrencyName;
     private User user;
     private PremiumDto premiumDto;
-    private PremiumPeriod premiumPeriod;
-    private PaymentRequest paymentRequest;
-    private PaymentResponse successPaymentResponse;
-    private PaymentResponse errorPaymentResponse;
-
-    private ArgumentCaptor<Premium> premiumArgumentCaptor;
+    private PaymentResponse paymentResponse;
+    private List<User> regularUsers;
+    private List<User> premiumUsers;
+    private List<User> combinedUsers;
+    private List<UserDto> userDtos;
 
     @BeforeEach
     void setUp() {
         userId = 0;
+        validDays = 30;
+        invalidDays = 0;
+        validCurrencyName = "usd";
+        invalidCurrencyName = "";
         user = new User();
         premiumDto = new PremiumDto(
             null,
@@ -62,76 +81,91 @@ class PremiumServiceTest {
             LocalDateTime.now(),
             LocalDateTime.now()
         );
-        premiumPeriod = PremiumPeriod.MONTHLY;
-        paymentRequest = new PaymentRequest(
-            0,
-            new BigDecimal(premiumPeriod.getCost()),
-            Currency.USD
-        );
-        successPaymentResponse = new PaymentResponse(
+        paymentResponse = new PaymentResponse(
             PaymentStatus.SUCCESS,
             0,
             0,
-            new BigDecimal(premiumPeriod.getCost()),
+           0,
             Currency.USD,
             "Success payment"
         );
-        errorPaymentResponse = new PaymentResponse(
-            PaymentStatus.ERROR,
-            0,
-            0,
-            new BigDecimal(premiumPeriod.getCost()),
-            Currency.USD,
-            "Error payment"
+        User firstUser = User.builder().id(1).build();
+        User secondUser = User.builder().id(2).build();
+        User thirdUser = User.builder().id(3).build();
+        regularUsers = List.of(
+            firstUser,
+            secondUser,
+            thirdUser
         );
-        premiumArgumentCaptor = ArgumentCaptor.forClass(Premium.class);
-        reset(premiumRepository, userRepository, premiumMapper, paymentServiceClient);
+        premiumUsers = List.of(
+            secondUser,
+            thirdUser
+        );
+        combinedUsers = List.of(
+            secondUser,
+            thirdUser,
+            firstUser
+        );
+        UserDto firstUserDto = UserDto.builder().id(1L).build();
+        UserDto secondUserDto = UserDto.builder().id(2L).build();
+        UserDto thirdUserDto = UserDto.builder().id(3L).build();
+        userDtos = List.of(
+            secondUserDto,
+            thirdUserDto,
+            firstUserDto
+        );
     }
 
     @Test
     @DisplayName("Buy Premium Successfully")
     void testBuyPremium() {
-        when(premiumRepository.existsByUserId(userId)).thenReturn(false);
-        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(premiumMapper.toDto(premiumArgumentCaptor.capture())).thenReturn(premiumDto);
+        when(paymentServiceClient.sendPaymentRequest(anyDouble(), any(Currency.class))).thenReturn(paymentResponse);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(premiumMapper.toDto(any(Premium.class))).thenReturn(premiumDto);
 
-        PremiumDto result = premiumService.buyPremium(userId, premiumPeriod);
+        PremiumDto result = premiumService.buyPremium(userId, validDays, validCurrencyName);
 
-        verify(premiumRepository).existsByUserId(userId);
-        verify(paymentServiceClient).sendPaymentRequest(paymentRequest);
-        verify(userRepository).findById(userId);
-        verify(premiumRepository).save(premiumArgumentCaptor.capture());
-        verify(premiumMapper).toDto(premiumArgumentCaptor.capture());
+        verify(premiumValidator).validateUserAlreadyHasPremium(anyLong());
+        verify(paymentServiceClient).sendPaymentRequest(anyDouble(), any(Currency.class));
+        verify(paymentValidator).validatePaymentSuccess(any(PaymentResponse.class));
+        verify(userRepository).findById(anyLong());
+        verify(premiumRepository).save(any(Premium.class));
+        verify(userRepository).save(any(User.class));
 
         assertNotNull(result);
         assertEquals(result, premiumDto);
     }
 
     @Test
-    @DisplayName("Buy Premium Throws PremiumAlreadyPurchasedException")
-    void testBuyPremiumPremiumAlreadyPurchasedException() {
-        when(premiumRepository.existsByUserId(userId)).thenReturn(true);
+    void testBuyPremiumUserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(AlreadyPurchasedException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
+        assertThrows(EntityNotFoundException.class, () -> premiumService.buyPremium(userId, validDays, validCurrencyName));
     }
 
     @Test
-    @DisplayName("Buy Premium Throws PaymentFailureException")
-    void testBuyPremiumPaymentFailureException() {
-        when(premiumRepository.existsByUserId(userId)).thenReturn(false);
-        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(errorPaymentResponse);
-
-        assertThrows(PaymentFailureException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
+    void testBuyPremiumInvalidDays() {
+        assertThrows(IllegalEntityException.class, () -> premiumService.buyPremium(userId, invalidDays, validCurrencyName));
     }
 
     @Test
-    @DisplayName("Buy Premium Throws UserNotFoundException")
-    void testBuyPremiumUserNotFoundException() {
-        when(premiumRepository.existsByUserId(userId)).thenReturn(false);
-        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    void testBuyPremiumInvalidCurrency() {
+        assertThrows(IllegalEntityException.class, () -> premiumService.buyPremium(userId, validDays, invalidCurrencyName));
+    }
 
-        assertThrows(EntityNotFoundException.class, () -> premiumService.buyPremium(userId, premiumPeriod));
+    @Test
+    void testShowPremiumFirst() {
+        when(userRepository.findAll()).thenReturn(regularUsers);
+        when(userRepository.findPremiumUsers()).thenReturn(premiumUsers);
+        when(userMapper.usersToUserDTOs(anyList())).thenReturn(userDtos);
+
+        List<UserDto> result = premiumService.showPremiumUsersFirst();
+
+        verify(userRepository).findAll();
+        verify(userRepository).findPremiumUsers();
+        verify(userMapper).usersToUserDTOs(anyList());
+
+        assertNotNull(result);
+        assertEquals(result, userDtos);
     }
 }

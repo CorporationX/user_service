@@ -19,7 +19,6 @@ import school.faang.user_service.repository.promotiom.PromotionRepository;
 import school.faang.user_service.validator.PaymentValidator;
 import school.faang.user_service.validator.PromotionValidator;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +36,11 @@ public class PromotionService {
     private final PaymentServiceClient paymentServiceClient;
 
     @Transactional
-    public PromotionDto promoteUser(long userId, PromotionalPlan promotionalPlan) {
+    public PromotionDto promoteUser(long userId, String promotionalPlanName, String currencyName) {
+        PromotionalPlan promotionalPlan = PromotionalPlan.getFromName(promotionalPlanName);
+        Currency currency = Currency.getFromName(currencyName);
         promotionValidator.validateUserAlreadyHasPromotion(userId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(
-            new BigDecimal(promotionalPlan.getCost()),
-            Currency.USD
-        );
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost(), currency);
         paymentValidator.validatePaymentSuccess(paymentResponse);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", userId)));
@@ -51,12 +49,11 @@ public class PromotionService {
     }
 
     @Transactional
-    public PromotionDto promoteEvent(long eventId, PromotionalPlan promotionalPlan) {
+    public PromotionDto promoteEvent(long eventId, String promotionalPlanName, String currencyName) {
+        PromotionalPlan promotionalPlan = PromotionalPlan.getFromName(promotionalPlanName);
+        Currency currency = Currency.getFromName(currencyName);
         promotionValidator.validateEventAlreadyHasPromotion(eventId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(
-            new BigDecimal(promotionalPlan.getCost()),
-            Currency.USD
-        );
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost(), currency);
         paymentValidator.validatePaymentSuccess(paymentResponse);
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", eventId)));
@@ -84,6 +81,7 @@ public class PromotionService {
             .build();
         userRepository.save(user);
         promotionRepository.save(promotion);
+        userRepository.save(user);
         return promotion;
     }
 
@@ -98,6 +96,7 @@ public class PromotionService {
             .build();
         eventRepository.save(event);
         promotionRepository.save(promotion);
+        eventRepository.save(event);
         return promotion;
     }
 

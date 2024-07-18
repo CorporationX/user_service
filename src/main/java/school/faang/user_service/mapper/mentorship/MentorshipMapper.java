@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface MentorshipMapper {
 
-    MentorshipUserDto toUserDto(User user);
+    MentorshipUserDto toMentorshipUserDto(User user);
 
     List<MentorshipUserDto> toListUserDto(List<User> users);
 }

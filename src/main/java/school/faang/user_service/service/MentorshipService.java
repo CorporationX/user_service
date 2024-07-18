@@ -24,19 +24,19 @@ public class MentorshipService {
     @Transactional(readOnly = true)
     public List<MentorshipUserDto> getMentees(long userId) {
         return getUser(userId).getMentees().stream()
-                .map(mentorshipMapper::toUserDto)
+                .map(mentorshipMapper::toMentorshipUserDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<MentorshipUserDto> getMentors(long userId) {
         return getUser(userId).getMentors().stream()
-                .map(mentorshipMapper::toUserDto)
+                .map(mentorshipMapper::toMentorshipUserDto)
                 .toList();
     }
 
     @Transactional
-    public boolean deleteMentorshipRelations(long mentorId, long menteeId) {
+    public void deleteMentorshipRelations(long mentorId, long menteeId) {
         User mentor = getUser(mentorId);
         User mentee = getUser(menteeId);
         if (!mentor.getMentees().contains(mentee)) {
@@ -46,7 +46,7 @@ public class MentorshipService {
         mentor.getMentees().remove(mentee);
         mentee.getMentors().remove(mentor);
         mentorshipRepository.save(mentor);
-        return true;
+        mentorshipRepository.save(mentee);
     }
 
     private User getUser(long userId) {

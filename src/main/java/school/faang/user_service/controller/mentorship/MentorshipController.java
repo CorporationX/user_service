@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
@@ -33,14 +34,16 @@ public class MentorshipController {
     }
 
     @DeleteMapping(MENTEE)
-    public boolean deleteMentee(@RequestParam long menteeId) {
-        return mentorshipService.deleteMentorshipRelations(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMentee(@RequestParam long menteeId) {
+        mentorshipService.deleteMentorshipRelations(
                 userContext.getUserId(), menteeId);
     }
 
     @DeleteMapping(MENTOR)
-    public boolean deleteMentor(@RequestParam long mentorId) {
-        return mentorshipService.deleteMentorshipRelations(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMentor(@RequestParam long mentorId) {
+        mentorshipService.deleteMentorshipRelations(
                 mentorId, userContext.getUserId());
     }
 

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -70,6 +71,7 @@ class MentorshipServiceTest {
     }
 
     @Test
+    @DisplayName("Get mentees successful")
     public void testGetMenteesSuccessful() {
         when(mentorshipRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         List<MentorshipUserDto> userMentees = mentorshipService.getMentees(USER_ID);
@@ -79,6 +81,7 @@ class MentorshipServiceTest {
     }
 
     @Test
+    @DisplayName("Get mentees failure")
     public void testGetMenteesFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(MentorshipNoSuchElementException.class,
@@ -86,6 +89,7 @@ class MentorshipServiceTest {
     }
 
     @Test
+    @DisplayName("Get mentors successful")
     public void testGetMentorsFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(MentorshipNoSuchElementException.class,
@@ -93,6 +97,7 @@ class MentorshipServiceTest {
     }
 
     @Test
+    @DisplayName("Get mentors failure")
     public void testGetMentorsSuccessful() {
         when(mentorshipRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         List<MentorshipUserDto> userMentors = mentorshipService.getMentors(USER_ID);
@@ -102,6 +107,7 @@ class MentorshipServiceTest {
     }
 
     @Test
+    @DisplayName("Delete mentorship relations successful")
     public void testDeleteMentorshipRelationsSuccessful() {
         when(mentorshipRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(mentorshipRepository.findById(MENTEE_ID)).thenReturn(Optional.of(userMentee));
@@ -113,6 +119,7 @@ class MentorshipServiceTest {
     }
 
     @Test
+    @DisplayName("Delete mentorship relations failure")
     public void testDeleteMentorshipRelationsFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(mentorshipRepository.findById(MENTOR_ID)).thenReturn(Optional.of(userMentee));

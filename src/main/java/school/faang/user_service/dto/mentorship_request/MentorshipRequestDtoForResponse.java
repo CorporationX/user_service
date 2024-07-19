@@ -1,7 +1,6 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.mentorship_request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;

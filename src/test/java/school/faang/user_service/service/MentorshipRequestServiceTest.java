@@ -4,15 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.MentorshipRequestDtoForRequest;
-import school.faang.user_service.dto.MentorshipRequestDtoForResponse;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForResponse;
+import school.faang.user_service.dto.mentorship_request.RejectionDto;
+import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RequestException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -144,11 +144,9 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testGetRequestApplyDescriptionFilter() {
         Stream<MentorshipRequest> requestStream = Stream.of(new MentorshipRequest());
-        Stream<MentorshipRequestDtoForResponse> requestDtoStream = Stream.of(new MentorshipRequestDtoForResponse());
         MentorshipRequestDtoForResponse responseDto = prepareTestingRequestDtoForResponse();
         when(filters.get(0).isApplicable(new RequestFilterDto())).thenReturn(true);
         when(filters.get(0).apply(any(), any())).thenReturn(requestStream);
-        when(mapperMock.toDto(requestStream)).thenReturn(requestDtoStream);
         when(mapperMock.toDto(request)).thenReturn(responseDto);
 
         List<MentorshipRequestDtoForResponse> methodResult = mentorshipRequestService.getRequests(filterDto);
@@ -171,7 +169,6 @@ public class MentorshipRequestServiceTest {
         MentorshipRequest mr = prepareTestingRequest();
         User receiver = prepareTestingReceiver();
         resultMentors.add(receiver);
-        Optional<MentorshipRequest> opt = mentorshipRequestRepository.findById(dto.getId());
         when(mentorshipRequestRepository.findById(dto.getId())).thenReturn(Optional.of(mr));
 
         assertThrows(RequestException.class, () -> mentorshipRequestService.acceptRequest(dto.getId()));

@@ -1,13 +1,13 @@
 package school.faang.user_service.controller;
 
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import school.faang.user_service.dto.MentorshipRequestDtoForRequest;
-import school.faang.user_service.dto.MentorshipRequestDtoForResponse;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForResponse;
+import school.faang.user_service.dto.mentorship_request.RejectionDto;
+import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.service.MentorshipRequestService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    public MentorshipRequestDtoForResponse requestMentorship(@Valid MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
+    public MentorshipRequestDtoForResponse requestMentorship(@Validated MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDtoForRequest);
     }
 
@@ -27,11 +27,11 @@ public class MentorshipRequestController {
         return mentorshipRequestService.getRequests(filter);
     }
 
-    public void acceptRequest(long id) {
-        mentorshipRequestService.acceptRequest(id);
+    public MentorshipRequestDtoForResponse acceptRequest(@Positive long id) {
+        return mentorshipRequestService.acceptRequest(id);
     }
 
-    public void rejectRequest(long id, RejectionDto rejection) {
-        mentorshipRequestService.rejectRequest(id, rejection);
+    public MentorshipRequestDtoForResponse rejectRequest(@Positive long id, RejectionDto rejection) {
+        return mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

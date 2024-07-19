@@ -2,16 +2,16 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDtoForRequest;
-import school.faang.user_service.dto.MentorshipRequestDtoForResponse;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForResponse;
+import school.faang.user_service.dto.mentorship_request.RejectionDto;
+import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.ErrorMessage;
 import school.faang.user_service.exception.RequestException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -77,7 +77,7 @@ public class MentorshipRequestService {
                 .toList();
     }
 
-    public void acceptRequest(long id) {
+    public MentorshipRequestDtoForResponse acceptRequest(long id) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));
         List<User> mentors = request.getRequester().getMentors();
@@ -86,14 +86,16 @@ public class MentorshipRequestService {
         }
         mentors.add(request.getReceiver());
         request.setStatus(RequestStatus.ACCEPTED);
-        mentorshipRequestRepository.save(request);
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(request);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    public void rejectRequest(long id, RejectionDto rejection) {
+    public MentorshipRequestDtoForResponse rejectRequest(long id, RejectionDto rejection) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
-        mentorshipRequestRepository.save(request);
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(request);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 }

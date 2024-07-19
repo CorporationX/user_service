@@ -1,6 +1,15 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -10,22 +19,25 @@ import school.faang.user_service.service.event.EventService;
 import java.util.List;
 
 @RestController
+@RequestMapping("/event")
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
 
     // Создать событие
-    public EventDto create(EventDto event) {
+    @PostMapping("")
+    public ResponseEntity<EventDto> create(@RequestBody EventDto event) {
         if (validateEventDto(event)) {
-            return eventService.create(event);
+            return ResponseEntity.ok(eventService.create(event));
         }
         throw new DataValidationException("Не удалось создать событие!" +
                 " Введены не верные данные.");
     }
 
     // получить событие
-    public EventDto getEvent(long eventId) {
-        return eventService.getEvent(eventId);
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDto> getEvent(@PathVariable("id") long eventId) {
+        return ResponseEntity.ok(eventService.getEvent(eventId));
     }
 
     public boolean validateEventDto(EventDto event) {
@@ -37,32 +49,39 @@ public class EventController {
     }
 
     //Получить все события с фильтрами
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        return eventService.getEventsByFilter(filter);
+    @PostMapping("/filtered")
+    public ResponseEntity<List<EventDto>> getEventsByFilter(@RequestBody EventFilterDto filter) {
+        return ResponseEntity.ok(eventService.getEventsByFilter(filter));
     }
 
     // Удалить событие
-    public void deleteEvent(long idEvent) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable("id") long idEvent) {
         eventService.deleteEvent(idEvent);
+        return ResponseEntity.ok().build();
     }
 
      //Обновить событие
-    public EventDto updateEvent(EventDto event) {
+     @PatchMapping("")
+     public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto event) {
         if (event.getTitle().isBlank()
                 || event.getStartDate().toString().isBlank()
                 || event.getOwnerId() == null) {
             throw new DataValidationException("Событие не прошло согласование!");
         }
-        return eventService.updateEvent(event);
+         return ResponseEntity.ok(eventService.updateEvent(event));
     }
 
     // Получить все созданные пользователем события
-    public List<EventDto> getOwnedEvents(long userId) {
-        return eventService.getOwnedEvents(userId);
+    @GetMapping("/created/all")
+    public ResponseEntity<List<EventDto>> getOwnedEvents(@RequestParam("userId") long userId) {
+        return ResponseEntity.ok(eventService.getOwnedEvents(userId));
     }
 
     // Получить все события, в которых пользователь принимает участие
-    public List<EventDto> getParticipatedEvents(long userId) {
-        return eventService.getParticipatedEvents(userId);
+    @GetMapping("/participated/all")
+    public ResponseEntity<List<EventDto>> getParticipatedEvents(
+            @RequestParam("userId") long userId) {
+        return ResponseEntity.ok(eventService.getParticipatedEvents(userId));
     }
 }

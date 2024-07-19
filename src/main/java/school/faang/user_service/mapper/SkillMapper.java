@@ -23,4 +23,6 @@ public interface SkillMapper {
                 .map(User::getId)
                 .toList();
     }
+
+    Skill toEntity(SkillDto skillDto);
 }

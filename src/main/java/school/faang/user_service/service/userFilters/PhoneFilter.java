@@ -17,6 +17,6 @@ public class PhoneFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto userFilterDto) {
-        return userStream.filter(filter -> filter.getPhone().contains(userFilterDto.getPhonePattern()));
+        return userStream.filter(filter -> filter.getPhone().equals(userFilterDto.getPhonePattern()));
     }
 }

@@ -20,11 +20,18 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
     void unregister(long eventId, long userId);
 
     @Query(nativeQuery = true, value = """
-            SELECT u.* FROM user u
+            SELECT u.* FROM users u
             JOIN user_event ue ON u.id = ue.user_id
             WHERE ue.event_id = :eventId
             """)
     List<User> findAllParticipantsByEventId(long eventId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users u
+            JOIN user_event ue ON u.id = ue.user_id
+            WHERE ue.event_id = :eventId and ue.user_id = :userId
+            """)
+    List<User> findParticipantById(long eventId, long userId);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(ue.id) FROM user_event ue

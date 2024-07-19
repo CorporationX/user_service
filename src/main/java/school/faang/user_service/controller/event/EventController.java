@@ -61,15 +61,13 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
-     //Обновить событие
-     @PatchMapping("")
-     public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto event) {
-        if (event.getTitle().isBlank()
-                || event.getStartDate().toString().isBlank()
-                || event.getOwnerId() == null) {
-            throw new DataValidationException("Событие не прошло согласование!");
+    //Обновить событие
+    @PatchMapping("")
+    public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto event) {
+        if (event == null) {
+            throw new DataValidationException("Событие не передано!");
         }
-         return ResponseEntity.ok(eventService.updateEvent(event));
+        return ResponseEntity.ok(eventService.updateEvent(event));
     }
 
     // Получить все созданные пользователем события

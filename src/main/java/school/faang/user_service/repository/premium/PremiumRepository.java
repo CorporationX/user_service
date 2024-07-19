@@ -13,4 +13,6 @@ public interface PremiumRepository extends CrudRepository<Premium, Long> {
     boolean existsByUserId(long userId);
 
     List<Premium> findAllByEndDateBefore(LocalDateTime endDate);
+
+    void deleteByUserId(long userId);
 }

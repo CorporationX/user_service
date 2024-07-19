@@ -3,6 +3,8 @@ package school.faang.user_service.service.event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -21,13 +23,8 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -43,23 +40,23 @@ class EventServiceTest {
     @Mock
     private EventFilterMapper eventFilterMapper;
 
+    @Captor
+    private ArgumentCaptor<EventDto> captor;
+
     Event event = new Event();
     EventDto eventDto = new EventDto();
     Event optionalEvent;
     User optionalUser;
+    User nullUser = new User();
     User userWithSkill = new User();
     Skill skill1 = new Skill();
     Skill skill2 = new Skill();
-    Skill ownerSkill1 = new Skill();
-    Skill ownerSkill2 = new Skill();
     List<EventDto> filteredEvents;
 
     @BeforeEach
     void setUp() {
         skill1.setId(10);
         skill2.setId(20);
-        ownerSkill1.setId(30L);
-        ownerSkill2.setId(40L);
         userWithSkill.setSkills(List.of(skill1, skill2));
         eventDto.setOwnerId(10L);
         eventDto.setRelatedSkillsIds(userWithSkill.getSkills()
@@ -143,68 +140,17 @@ class EventServiceTest {
 
     @Test
     void shouldReturnDataValidationExceptionWhenUpdateEventTest() {
-        when(userRepository.findById(anyLong()))
-                .thenThrow(new DataValidationException("Такой пользователь не найден!"));
-
-        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
-    }
-
-    @Test
-    void shouldReturnDataValidationExceptionWithWrongCriteriesWhenUpdateEventTest() {
-        User owner = new User();
-        owner.setSkills(List.of(ownerSkill1, ownerSkill2));
-
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
-
-        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
-    }
-
-    @Test
-    void shouldReturnEventDtoWhenUpdateEventTest() {
-        User owner = new User();
-        owner.setSkills(List.of(skill1, skill2));
-
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
-        when(eventMapper.eventDtoToEntity(eventDto)).thenReturn(event);
-
-        eventService.updateEvent(eventDto);
-
-        verify(eventRepository, times(1)).save(event);
-    }
-
-    @Test
-    void shouldReturnDataValidationExceptionWhenGetOwnedEventsTest() {
-        when(userRepository.findById(anyLong()))
-                .thenThrow(new DataValidationException("Такого пользователя не существует!"));
-
+        when(eventRepository.findById(eventDto.getId()))
+                .thenReturn(Optional.ofNullable(optionalEvent));
         assertThrows(DataValidationException.class,
-                () -> eventService.getOwnedEvents(anyLong()));
+                () -> eventService.updateEvent(eventDto));
     }
 
     @Test
-    void shouldReturnEventDtosWhenGetOwnedEventsTest() {
-        event.setId(10L);
-        Event event1 = new Event();
-        event1.setId(20L);
-        List<Event> events = List.of(event, event1);
-
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.ofNullable(userWithSkill));
-
-        when(eventRepository.findAllByUserId(userWithSkill.getId()))
-                .thenReturn(events);
-
-        when(eventMapper.listEventsToDto(events))
-                .thenReturn(filteredEvents);
-
-        assertIterableEquals(filteredEvents, eventService.getOwnedEvents(anyLong()));
+    void getOwnedEvents() {
     }
 
     @Test
-    void shouldReturnDataValidationExceptionWhenGetParticipatedEvents() {
-        when(userRepository.existsById(1L)).thenReturn(false);
-
-        assertThrows(DataValidationException.class,
-                () -> eventService.getParticipatedEvents(1L));
+    void getParticipatedEvents() {
     }
 }

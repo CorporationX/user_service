@@ -10,6 +10,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -55,21 +56,16 @@ public class EventService {
 
     // Обновить событие
 
+
     public EventDto updateEvent(EventDto event) {
-        User owner = userRepository.findById(event.getOwnerId())
-                .orElseThrow(() -> new DataValidationException("Такой пользователь не найден!"));
+        var optionalOldEvent = eventRepository.findById(event.getId())
+                .orElseThrow(() -> new DataValidationException("Такого события не существует!"));
 
-        List<Long> skillsIds = owner.getSkills()
-                .stream()
-                .map(Skill::getId)
-                .toList();
-
-        event.getRelatedSkillsIds().forEach(skillId -> {
-            if (!skillsIds.contains(skillId)) {
-                throw new DataValidationException("Пользователь не соответствует критериям!");
-            }
-        });
-        return eventMapper.eventToDto(eventRepository.save(eventMapper.eventDtoToEntity(event)));
+        if (optionalOldEvent.getOwner().getId() != (event.getOwnerId())) {
+            throw new DataValidationException("Владелец нового события" +
+                    " не является владельцем обновляемого события!");
+        }
+        return saveEvent(event);
     }
 
     // Получить все созданные пользователем события

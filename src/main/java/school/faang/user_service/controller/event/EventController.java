@@ -47,14 +47,17 @@ public class EventController {
     }
 
      //Обновить событие
-    public EventDto updateEvent(EventDto event) {
-        if (event.getTitle().isBlank()
-                || event.getStartDate().toString().isBlank()
-                || event.getOwnerId() == null) {
+    public long updateEvent(EventDto event) {
+        if (!event.getTitle().isBlank()
+                && !event.getStartDate().toString().isBlank()
+                && event.getOwnerId() != null) {
             throw new DataValidationException("Событие не прошло согласование!");
         }
         return eventService.updateEvent(event);
     }
+//    public EventDto updateEvent(EventDto event) {
+//        return eventService.updateEvent(event);
+//    }
 
     // Получить все созданные пользователем события
     public List<EventDto> getOwnedEvents(long userId) {

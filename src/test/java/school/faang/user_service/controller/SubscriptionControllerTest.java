@@ -34,7 +34,7 @@ class SubscriptionControllerTest {
 
 
     @Test
-    void testFollowUser() {
+    void testFollowUserSuccessfullyFollowed() {
         subscriptionController.follow(followerId, followeeId);
         assertNotEquals(followerId, followeeId);
         verify(subscriptionService, atLeastOnce()).follow(followerId, followeeId);
@@ -42,7 +42,7 @@ class SubscriptionControllerTest {
 
 
     @Test
-    void testUnfollowUser() {
+    void testUnfollowUserSuccessfullyUnfollowed() {
         subscriptionController.unfollow(followerId, followeeId);
         assertNotEquals(followerId, followeeId);
         verify(subscriptionService, atLeastOnce()).unfollow(followerId, followeeId);
@@ -50,25 +50,25 @@ class SubscriptionControllerTest {
 
 
     @Test
-    void getFollowers() {
+    void testGetFollowersSuccessfully() {
         subscriptionController.getFollowers(followerId, dto);
         verify(subscriptionService, atLeastOnce()).getFollowers(followerId, dto);
     }
 
     @Test
-    void getFollowing() {
+    void testGetFollowingSuccessfully() {
         subscriptionController.getFollowing(followeeId, dto);
         verify(subscriptionService, atLeastOnce()).getFollowing(followeeId, dto);
     }
 
     @Test
-    void getFollowersCount() {
+    void testGetFollowersCountSuccessfully() {
         subscriptionController.getFollowersCount(followerId);
         verify(subscriptionService, atLeastOnce()).getFollowersCount(followerId);
     }
 
     @Test
-    void getFollowingCount() {
+    void testGetFollowingCountSuccessfully() {
         subscriptionController.getFollowingCount(followerId);
         verify(subscriptionService, atLeastOnce()).getFollowingCount(followerId);
     }

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ import java.util.Objects;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @PostMapping(value = "/{followerId}/follow/{followeeId}")
+    @PostMapping("/{followerId}/follow/{followeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void follow(@PathVariable Long followerId,
                        @PathVariable Long followeeId) {
@@ -38,7 +37,7 @@ public class SubscriptionController {
         }
     }
 
-    @PostMapping(value = "/{followerId}/unfollow/{followeeId}")
+    @PostMapping("/{followerId}/unfollow/{followeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void unfollow(@PathVariable Long followerId,
                          @PathVariable Long followeeId) {
@@ -50,24 +49,24 @@ public class SubscriptionController {
         }
     }
 
-    @GetMapping(value = "/get/{userId}/followers")
+    @GetMapping("/{userId}/followers")
     public List<UserDto> getFollowers(@PathVariable Long userId,
                                       @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowers(userId, filter);
     }
 
-    @GetMapping(value = "/get/{userId}/following")
+    @GetMapping("/{userId}/following")
     public List<UserDto> getFollowing(@PathVariable Long userId,
                                       @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowing(userId, filter);
     }
 
-    @GetMapping(value = "/{userId}/followers/count")
+    @GetMapping("/{userId}/followers/count")
     public Long getFollowersCount(@PathVariable Long userId) {
         return subscriptionService.getFollowersCount(userId);
     }
 
-    @GetMapping(value = "/get/{userId}/following/count")
+    @GetMapping("/{userId}/following/count")
     public Long getFollowingCount(@PathVariable Long userId) {
         return subscriptionService.getFollowingCount(userId);
     }

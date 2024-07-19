@@ -1,0 +1,107 @@
+package school.faang.user_service.service;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+    private static final String MESSAGE_USER_NOT_EXIST = "User does not exist";
+    private static final String MESSAGE_USER_ALREADY_DEACTIVATED = "User is already deactivated";
+    private static final int VALID_ID = 1;
+    @Mock
+    private MentorshipService mentorshipService;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private UserMapper mapper;
+    @InjectMocks
+    private UserService userService;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setId(VALID_ID);
+        user.setActive(true);
+        Goal goal = new Goal();
+        goal.setId((long) VALID_ID);
+        goal.setUsers(List.of(new User()));
+        user.setGoals(List.of(goal));
+        user.setOwnedEvents(List.of(new Event(), new Event()));
+    }
+
+    @Test
+    public void testUserIsNotInDb() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        assertEquals(
+                MESSAGE_USER_NOT_EXIST,
+                assertThrows(
+                        RuntimeException.class,
+                        () -> userService.deactivatesUserProfile(user.getId())).getMessage());
+    }
+
+    @Test
+    public void testUserAlreadyDeactivated() {
+        user.setActive(false);
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        assertEquals(
+                MESSAGE_USER_ALREADY_DEACTIVATED,
+                assertThrows(
+                        RuntimeException.class,
+                        () -> userService.deactivatesUserProfile(user.getId())).getMessage());
+    }
+
+    @Test
+    public void testGoalDeletedById() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        userService.deactivatesUserProfile(user.getId());
+        Mockito.verify(goalRepository).deleteById(Mockito.anyLong());
+    }
+
+    @Test
+    public void testEventDeletedById() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        userService.deactivatesUserProfile(user.getId());
+        Mockito.verify(eventRepository, Mockito.times(user.getOwnedEvents().size())).deleteById(Mockito.anyLong());
+    }
+
+    @Test
+    public void testUserSave() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mentorshipService.stopMentorship(Mockito.any())).thenReturn(user);
+        userService.deactivatesUserProfile(user.getId());
+        Mockito.verify(userRepository).save(user);
+    }
+
+    @Test
+    public void testUserToUserDto() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mentorshipService.stopMentorship(Mockito.any())).thenReturn(user);
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+        userService.deactivatesUserProfile(user.getId());
+        Mockito.verify(mapper).toDto(user);
+    }
+
+}

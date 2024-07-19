@@ -28,20 +28,20 @@ public record SkillService(SkillRepository skillRepository,
         }
         Skill skill = skillMapper.toEntity(skillDto);
         Skill savedSkill = skillRepository.save(skill);
-        return skillMapper.toDto(savedSkill);
+        return skillMapper.skillToDto(savedSkill);
     }
 
     public List<SkillDto> getUserSkills(long userId) {
         return skillRepository.findAllByUserId(userId)
                 .stream()
-                .map(skillMapper::toDto)
+                .map(skillMapper::skillToDto)
                 .toList();
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         return skillRepository.findSkillsOfferedToUser(userId)
                 .stream()
-                .collect(Collectors.groupingBy(skillMapper::toDto, Collectors.counting()))
+                .collect(Collectors.groupingBy(skillMapper::skillToDto, Collectors.counting()))
                 .entrySet()
                 .stream()
                 .map(entry -> new SkillCandidateDto(entry.getKey(), entry.getValue()))
@@ -57,10 +57,10 @@ public record SkillService(SkillRepository skillRepository,
                         new DataValidationException("No such skill!"));
                 skillRepository.assignSkillToUser(skillId, skillId);
                 addSkillGuaranty(userSkill, offers);
-                return skillMapper.toDto(userSkill);
+                return skillMapper.skillToDto(userSkill);
             }
         }
-        return skillMapper.toDto(userSkill);
+        return skillMapper.skillToDto(userSkill);
     }
 
     private void addSkillGuaranty(Skill userSkill, List<SkillOffer> offers) {

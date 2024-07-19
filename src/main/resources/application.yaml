@@ -41,6 +41,7 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  url: http://localhost:9080
 
 aws:
   accessKey: access_key
@@ -51,3 +52,16 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+executor:
+  premium-expiration:
+    corePoolSize: 10
+    maxPoolSize: 10
+    queueCapacity: 100
+    threadNamePrefix: "PremiumExpirationExecutor-"
+
+  promotion-expiration:
+    corePoolSize: 10
+    maxPoolSize: 10
+    queueCapacity: 100
+    threadNamePrefix: "PromotionExpirationExecutor-"

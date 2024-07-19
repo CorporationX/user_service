@@ -65,7 +65,7 @@ class PremiumServiceTest {
     private List<User> regularUsers;
     private List<User> premiumUsers;
     private List<User> combinedUsers;
-    private List<UserDto> userDtos;
+    private List<UserDto> usersDto;
 
     @BeforeEach
     void setUp() {
@@ -109,7 +109,7 @@ class PremiumServiceTest {
         UserDto firstUserDto = UserDto.builder().id(1L).build();
         UserDto secondUserDto = UserDto.builder().id(2L).build();
         UserDto thirdUserDto = UserDto.builder().id(3L).build();
-        userDtos = List.of(
+        usersDto = List.of(
             secondUserDto,
             thirdUserDto,
             firstUserDto
@@ -119,14 +119,14 @@ class PremiumServiceTest {
     @Test
     @DisplayName("Buy Premium Successfully")
     void testBuyPremium() {
-        when(paymentServiceClient.sendPaymentRequest(anyDouble(), any(Currency.class))).thenReturn(paymentResponse);
+        when(paymentServiceClient.sendPaymentRequest(any(PaymentRequest.class))).thenReturn(paymentResponse);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(premiumMapper.toDto(any(Premium.class))).thenReturn(premiumDto);
 
         PremiumDto result = premiumService.buyPremium(userId, validDays, validCurrencyName);
 
         verify(premiumValidator).validateUserAlreadyHasPremium(anyLong());
-        verify(paymentServiceClient).sendPaymentRequest(anyDouble(), any(Currency.class));
+        verify(paymentServiceClient).sendPaymentRequest(any(PaymentRequest.class));
         verify(paymentValidator).validatePaymentSuccess(any(PaymentResponse.class));
         verify(userRepository).findById(anyLong());
         verify(premiumRepository).save(any(Premium.class));
@@ -157,7 +157,7 @@ class PremiumServiceTest {
     void testShowPremiumFirst() {
         when(userRepository.findAll()).thenReturn(regularUsers);
         when(userRepository.findPremiumUsers()).thenReturn(premiumUsers);
-        when(userMapper.usersToUserDTOs(anyList())).thenReturn(userDtos);
+        when(userMapper.usersToUserDTOs(anyList())).thenReturn(usersDto);
 
         List<UserDto> result = premiumService.showPremiumUsersFirst();
 
@@ -166,6 +166,6 @@ class PremiumServiceTest {
         verify(userMapper).usersToUserDTOs(combinedUsers);
 
         assertNotNull(result);
-        assertEquals(userDtos, result);
+        assertEquals(usersDto, result);
     }
 }

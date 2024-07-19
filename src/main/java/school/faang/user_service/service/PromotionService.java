@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.Currency;
+import school.faang.user_service.dto.PaymentRequest;
 import school.faang.user_service.dto.PaymentResponse;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.promotion.PromotionDto;
@@ -43,8 +44,7 @@ public class PromotionService {
         PromotionalPlan promotionalPlan = PromotionalPlan.getFromName(promotionalPlanName);
         Currency currency = Currency.getFromName(currencyName);
         promotionValidator.validateUserAlreadyHasPromotion(userId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost()
-            , currency);
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(createPaymentRequest(promotionalPlan.getCost(), currency));
         paymentValidator.validatePaymentSuccess(paymentResponse);
         User user =
             userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(String.format("User with ID: %d does not exist.", userId)));
@@ -57,7 +57,7 @@ public class PromotionService {
         PromotionalPlan promotionalPlan = PromotionalPlan.getFromName(promotionalPlanName);
         Currency currency = Currency.getFromName(currencyName);
         promotionValidator.validateEventAlreadyHasPromotion(eventId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(promotionalPlan.getCost(), currency);
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(createPaymentRequest(promotionalPlan.getCost(), currency));
         paymentValidator.validatePaymentSuccess(paymentResponse);
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(String.format("Event with ID: %d does not exist.", eventId)));
         Promotion promotion = createPromotionForEvent(event, promotionalPlan);
@@ -89,6 +89,13 @@ public class PromotionService {
         promotionRepository.save(promotion);
         eventRepository.save(event);
         return promotion;
+    }
+
+    private PaymentRequest createPaymentRequest(double amount, Currency currency) {
+        return PaymentRequest.builder()
+            .amount(amount)
+            .currency(currency)
+            .build();
     }
 
     private void updatePromotionImpressions(List<User> promotedUsers) {

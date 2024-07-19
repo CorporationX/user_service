@@ -14,6 +14,6 @@ public class ExpirationScheduler {
     @Scheduled(cron = "0 0 0 * * ?")
     public void checkExpirations() {
         LocalDateTime currentDate = LocalDateTime.now();
-        expirationServices.forEach(expirationService -> expirationService.checkExpirations(currentDate));
+        expirationServices.forEach(expirationService -> expirationService.processExpiredItems(currentDate));
     }
 }

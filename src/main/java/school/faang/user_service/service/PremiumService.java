@@ -36,7 +36,7 @@ public class PremiumService {
         PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
         Currency currency = Currency.getFromName(currencyName);
         premiumValidator.validateUserAlreadyHasPremium(userId);
-        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(premiumPeriod.getCost(), currency);
+        PaymentResponse paymentResponse = paymentServiceClient.sendPaymentRequest(createPaymentRequest(premiumPeriod.getCost(), currency));
         paymentValidator.validatePaymentSuccess(paymentResponse);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID: %d does not exist.", userId)));
@@ -62,6 +62,13 @@ public class PremiumService {
         premiumRepository.save(premium);
         userRepository.save(user);
         return premium;
+    }
+
+    private PaymentRequest createPaymentRequest(double amount, Currency currency) {
+        return PaymentRequest.builder()
+            .amount(amount)
+            .currency(currency)
+            .build();
     }
 
     private List<User> combineUsers(List<User> regularUsers, List<User> premiumUsers) {

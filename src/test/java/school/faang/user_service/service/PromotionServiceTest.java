@@ -8,10 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.Currency;
-import school.faang.user_service.dto.PaymentResponse;
-import school.faang.user_service.dto.PaymentStatus;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.*;
 import school.faang.user_service.dto.promotion.PromotionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -76,8 +73,7 @@ class PromotionServiceTest {
     private List<User> regularUsers;
     private List<User> promotedUsers;
     private List<User> combinedUsers;
-    private List<UserDto> userDtos;
-
+    private List<UserDto> usersDto;
 
     @BeforeEach
     void setUp() {
@@ -104,9 +100,10 @@ class PromotionServiceTest {
             Currency.USD,
             "Success payment"
         );
-        User firstUser = User.builder().id(1).build();
-        User secondUser = User.builder().id(2).build();
-        User thirdUser = User.builder().id(3).build();
+        Promotion promotion = Promotion.builder().impressions(1).build();
+        User firstUser = User.builder().id(1).promotion(promotion).build();
+        User secondUser = User.builder().id(2).promotion(promotion).build();
+        User thirdUser = User.builder().id(3).promotion(promotion).build();
         regularUsers = List.of(
             firstUser,
             secondUser,
@@ -124,7 +121,7 @@ class PromotionServiceTest {
         UserDto firstUserDto = UserDto.builder().id(1L).build();
         UserDto secondUserDto = UserDto.builder().id(2L).build();
         UserDto thirdUserDto = UserDto.builder().id(3L).build();
-        userDtos = List.of(
+        usersDto = List.of(
             secondUserDto,
             thirdUserDto,
             firstUserDto
@@ -134,14 +131,14 @@ class PromotionServiceTest {
     @Test
     @DisplayName("Test promoting an user with valid parameters")
     void testPromoteUser() {
-        when(paymentServiceClient.sendPaymentRequest(anyDouble(), any(Currency.class))).thenReturn(paymentResponse);
+        when(paymentServiceClient.sendPaymentRequest(any(PaymentRequest.class))).thenReturn(paymentResponse);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(promotionMapper.toDto(any(Promotion.class))).thenReturn(promotionDto);
 
         PromotionDto result = promotionService.promoteUser(userId, validPromotionalPlanName, validCurrencyName);
 
         verify(promotionValidator).validateUserAlreadyHasPromotion(anyLong());
-        verify(paymentServiceClient).sendPaymentRequest(anyDouble(), any(Currency.class));
+        verify(paymentServiceClient).sendPaymentRequest(any(PaymentRequest.class));
         verify(paymentValidator).validatePaymentSuccess(any(PaymentResponse.class));
         verify(userRepository).findById(anyLong());
         verify(promotionRepository).save(any(Promotion.class));
@@ -172,14 +169,14 @@ class PromotionServiceTest {
     @Test
     @DisplayName("Test promoting an event with valid parameters")
     void testPromoteEvent() {
-        when(paymentServiceClient.sendPaymentRequest(anyDouble(), any(Currency.class))).thenReturn(paymentResponse);
+        when(paymentServiceClient.sendPaymentRequest(any(PaymentRequest.class))).thenReturn(paymentResponse);
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
         when(promotionMapper.toDto(any(Promotion.class))).thenReturn(promotionDto);
 
         PromotionDto result = promotionService.promoteEvent(eventId, validPromotionalPlanName, validCurrencyName);
 
         verify(promotionValidator).validateEventAlreadyHasPromotion(anyLong());
-        verify(paymentServiceClient).sendPaymentRequest(anyDouble(), any(Currency.class));
+        verify(paymentServiceClient).sendPaymentRequest(any(PaymentRequest.class));
         verify(paymentValidator).validatePaymentSuccess(any(PaymentResponse.class));
         verify(eventRepository).findById(anyLong());
         verify(promotionRepository).save(any(Promotion.class));
@@ -211,7 +208,7 @@ class PromotionServiceTest {
     void testShowPromotedUsersFirst() {
         when(userRepository.findAll()).thenReturn(regularUsers);
         when(userRepository.findPromotedUsers()).thenReturn(promotedUsers);
-        when(userMapper.usersToUserDTOs(anyList())).thenReturn(userDtos);
+        when(userMapper.usersToUserDTOs(anyList())).thenReturn(usersDto);
 
         List<UserDto> result = promotionService.showPromotedUsersFirst();
 
@@ -220,80 +217,6 @@ class PromotionServiceTest {
         verify(userMapper).usersToUserDTOs(combinedUsers);
 
         assertNotNull(result);
-        assertEquals(userDtos, result);
+        assertEquals(usersDto, result);
     }
-
-
-//
-//    @Test
-//    @DisplayName("Test promoting a user with payment failure")
-//    void testPromoteUserThrowsPaymentFailureException() {
-//        when(promotionRepository.existsByUserId(userId)).thenReturn(false);
-//        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(errorPaymentResponse);
-//
-//        assertThrows(PaymentFailureException.class, () -> promotionService.promoteUser(userId,
-//        promotionalPlan));
-//    }
-//
-//    @Test
-//    @DisplayName("Test promoting a user that does not exist")
-//    void testPromoteUserThrowsEntityNotFoundException() {
-//        when(promotionRepository.existsByUserId(userId)).thenReturn(false);
-//        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
-//        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-//
-//        assertThrows(EntityNotFoundException.class, () -> promotionService.promoteUser(userId,
-//        promotionalPlan));
-//    }
-//
-//    @Test
-//    @DisplayName("Test promoting an event with valid parameters")
-//    void testPromoteEvent() {
-//        when(promotionRepository.existsByEventId(eventId)).thenReturn(false);
-//        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
-//        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
-//        when(promotionMapper.toDto(promotionCaptor.capture())).thenReturn(promotionDto);
-//
-//        PromotionDto result = promotionService.promoteEvent(userId, promotionalPlan);
-//
-//        verify(promotionRepository).existsByEventId(eventId);
-//        verify(paymentServiceClient).sendPaymentRequest(paymentRequest);
-//        verify(eventRepository).findById(eventId);
-//        verify(promotionRepository).save(promotionCaptor.getValue());
-//        verify(promotionMapper).toDto(promotionCaptor.getValue());
-//
-//        assertNotNull(result);
-//        assertEquals(result, promotionDto);
-//    }
-//
-//    @Test
-//    @DisplayName("Test promoting an event that has already purchased promotion")
-//    void testPromoteEventThrowsAlreadyPurchasedException() {
-//        when(promotionRepository.existsByEventId(eventId)).thenReturn(true);
-//
-//        assertThrows(AlreadyPurchasedException.class, () -> promotionService.promoteEvent(userId,
-//        promotionalPlan));
-//    }
-//
-//    @Test
-//    @DisplayName("Test promoting an event with payment failure")
-//    void testPromoteEventThrowsPaymentFailureException() {
-//        when(promotionRepository.existsByEventId(eventId)).thenReturn(false);
-//        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(errorPaymentResponse);
-//
-//        assertThrows(PaymentFailureException.class, () -> promotionService.promoteEvent(userId,
-//        promotionalPlan));
-//    }
-//
-//    @Test
-//    @DisplayName("Test promoting an event that does not exist")
-//    void testPromoteEventThrowsEntityNotFoundException() {
-//
-//        when(promotionRepository.existsByEventId(eventId)).thenReturn(false);
-//        when(paymentServiceClient.sendPaymentRequest(paymentRequest)).thenReturn(successPaymentResponse);
-//        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
-//
-//        assertThrows(EntityNotFoundException.class, () -> promotionService.promoteEvent(userId,
-//        promotionalPlan));
-//    }
 }

@@ -1,11 +1,15 @@
 package school.faang.user_service.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
+@Getter
+@Setter
 public class RejectionDto {
-    Long id;
-    String reason;
+
+    @NotBlank(message = "Rejection reason should not be empty.")
+    private String rejectionReason;
 }

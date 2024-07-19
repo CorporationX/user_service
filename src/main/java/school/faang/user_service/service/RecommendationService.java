@@ -44,8 +44,9 @@ public class RecommendationService {
         validationIntervalAndSkill(recommendationDto);
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
-        processSkillAndGuarantees(recommendation);
         recommendationRepository.save(recommendation);
+        processSkillAndGuarantees(recommendation);
+
 
         return recommendationMapper.toDto(recommendation);
     }
@@ -112,7 +113,7 @@ public class RecommendationService {
         });
 
         boolean skillInRepository = recommendationDto.getSkillOffers().stream()
-                .allMatch(skill -> skillOfferRepository.existsById(skill.getSkillId()));
+                .allMatch(skill -> skillRepository.existsById(skill.getSkillId()));
 
         if (!skillInRepository) {
             throw new DataValidationException(SKILL_IS_NOT_FOUND);

@@ -1,12 +1,12 @@
 package school.faang.user_service.dto.recommendation;
 
 import jakarta.validation.constraints.Positive;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
+
 @Builder
 @Data
-@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SkillOfferDto {
     @Positive(message="skillId should be positive")
     private Long skillId;

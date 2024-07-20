@@ -12,7 +12,6 @@ import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.Validator;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,6 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final EventFilterMapper eventFilterMapper;
-    private final Validator validator;
 
     // Создать событие
     public EventDto create(EventDto eventDto) {
@@ -58,9 +56,6 @@ public class EventService {
     // Обновить событие
 
     public EventDto updateEvent(EventDto event) {
-        if (!validator.validateUpdatingEvent(event)) {
-            throw new DataValidationException("Событие не прошло согласование!");
-        }
         User owner = userRepository.findById(event.getOwnerId())
                 .orElseThrow(() -> new DataValidationException("Такой пользователь не найден!"));
 

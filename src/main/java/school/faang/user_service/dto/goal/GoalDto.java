@@ -2,7 +2,6 @@ package school.faang.user_service.dto.goal;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,13 +21,11 @@ public class GoalDto {
     @Schema(description = "goal id")
     private Long id;
     @Schema(description = "parent goal id")
-    @NotNull(message = "title is required")
     @NotBlank
     private Long parentId;
     @Schema(description = "title")
     private String title;
     @Schema(description = "description")
-    @NotNull(message = "description is required")
     @NotBlank
     private String description;
     @Schema(description = "status")

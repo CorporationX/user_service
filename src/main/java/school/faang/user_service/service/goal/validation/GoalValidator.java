@@ -2,6 +2,7 @@ package school.faang.user_service.service.goal.validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -13,10 +14,12 @@ import school.faang.user_service.repository.goal.GoalRepository;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GoalServiceValidator {
+public class GoalValidator {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final GoalRepository goalRepository;
+    @Value("${goal_validator.max_active_goals_per_user_for_creating_new_goal}")
+    private int maxGoalsCount;
 
 
     public void validateCreation(long userId, GoalDto goalDto) {
@@ -31,19 +34,7 @@ public class GoalServiceValidator {
         validateSkillsExistence(goalDto);
     }
 
-    public void validateDeleting(long goalId) {
-        validateGoalExistence(goalId);
-    }
-
-    public void validateFindingSubtasksByGoalId(long goalId) {
-        validateGoalExistence(goalId);
-    }
-
-    public void validateFindingGoalsByUserId(long userId) {
-        validateUserExistence(userId);
-    }
-
-    private void validateUserExistence(long userId) {
+    public void validateUserExistence(long userId) {
         if (!userRepository.existsById(userId)) {
             log.info("User with id {} does not exist", userId);
             throw new InvalidRequestParams("User not found");
@@ -51,8 +42,8 @@ public class GoalServiceValidator {
     }
 
     private void validateActiveGoalsCount(long userId) {
-        if (goalRepository.countActiveGoalsPerUser(userId) > 2) {
-            log.info("Active goals per user {} is greater than 2", userId);
+        if (goalRepository.countActiveGoalsPerUser(userId) > maxGoalsCount) {
+            log.info("Active goals count exceeded for user {}", userId);
             throw new InvalidRequestParams("Active goals count exceeded");
         }
     }
@@ -72,7 +63,7 @@ public class GoalServiceValidator {
         }
     }
 
-    private void validateGoalExistence(long goalId) {
+    public void validateGoalExistence(long goalId) {
         if (!goalRepository.existsById(goalId)) {
             log.info("Goal {} does not exist", goalId);
             throw new InvalidRequestParams("Goal not found");

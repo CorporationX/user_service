@@ -1,6 +1,7 @@
 package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.PremiumDto;
@@ -48,5 +49,10 @@ public class PremiumService {
         } else {
             throw new RuntimeException("Возникла проблема при оплает подписки. Пожалуйста попробуйте оплатить еще раз");
         }
+    }
+
+    @Scheduled(cron = "0 0 1 * * *")
+    private void deletePremium() {
+        premiumRepository.deleteAllExpiredPremium();
     }
 }

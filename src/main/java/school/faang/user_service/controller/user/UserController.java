@@ -31,6 +31,7 @@ import school.faang.user_service.service.csv.CSVFileService;
 import school.faang.user_service.service.csv.CsvFileConverter;
 import school.faang.user_service.service.user.UserService;
 
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -84,5 +85,10 @@ public class UserController {
     public UserDto createUser(@ParameterObject @RequestBody @Valid UserDto userDto){
         profilePicService.generateAndSetPic(userDto);
         return userService.createUser(userDto);
+    }
+
+    @GetMapping("/all/id")
+    public HashSet<Long> getAllUsersIds() {
+        return userService.getAllUsersIds();
     }
 }

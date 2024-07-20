@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -39,4 +40,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery = true, value = "SELECT COUNT(*) = 0 FROM users WHERE username = :valueToCheck")
     boolean isUsernameUnique(@Param("valueToCheck") String valueToCheck);
+
+    @Query(nativeQuery = true, value = "SELECT u.id FROM users u")
+    HashSet<Long> getAllUsersIds();
 }

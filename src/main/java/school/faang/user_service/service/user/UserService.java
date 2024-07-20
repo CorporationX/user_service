@@ -5,6 +5,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 
+import java.util.HashSet;
 import java.util.List;
 
 public interface UserService {
@@ -22,4 +23,6 @@ public interface UserService {
     UserDto getUserById(long userId);
 
     void banUserByIds(List<Long> userIds);
+
+    HashSet<Long> getAllUsersIds();
 }

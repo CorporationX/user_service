@@ -17,6 +17,7 @@ import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
 import school.faang.user_service.service.user.mentorship.MentorshipService;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -84,6 +85,11 @@ public class UserServiceImpl implements UserService {
         userRepository.findAllById(userIds).stream()
                 .peek(user -> user.setIsBanned(true))
                 .forEach(userRepository::save);
+    }
+
+    @Override
+    public HashSet<Long> getAllUsersIds() {
+        return userRepository.getAllUsersIds();
     }
 
     @Override

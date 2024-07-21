@@ -12,6 +12,7 @@ import java.util.List;
 public interface UserMapper {
     UserDto toDto(User user);
 
+    @Mapping(source = "countryId", target = "country.id")
     User toEntity(UserDto userDto);
 
     @Mapping(source = "active", target = "isActive")

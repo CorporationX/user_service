@@ -51,3 +51,8 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+  diceBear:
+    avatar_url:
+      full: https://api.dicebear.com/9.x/avataaars/svg?seed=
+      small: https://api.dicebear.com/9.x/avataaars/svg?size=32&seed=

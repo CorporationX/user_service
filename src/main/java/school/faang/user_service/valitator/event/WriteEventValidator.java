@@ -19,7 +19,7 @@ public class WriteEventValidator {
 
     public void validate(WriteEventDto object) {
         checkStartDate(object);
-        checkText(object);
+        checkTitle(object);
         checkRelatedSkill(object);
     }
 
@@ -27,12 +27,12 @@ public class WriteEventValidator {
         Set<Long> userSkillIds = getUserSkillIds(object.getOwnerId());
         for (Long relatedSkillId : object.getRelatedSkillIds()) {
             if (!userSkillIds.contains(relatedSkillId)) {
-                throw new DataValidationException(String.format("Не возможно установить skill, id: %s", relatedSkillId));
+                throw new DataValidationException(String.format("Can't install skill, id: %s", relatedSkillId));
             }
         }
     }
 
-    private void checkText(WriteEventDto object) {
+    private void checkTitle(WriteEventDto object) {
         if (StringUtils.isEmpty(object.getTitle())) {
             throw new DataValidationException(getNotNullErrorText("title"));
         }
@@ -51,6 +51,6 @@ public class WriteEventValidator {
     }
 
     private String getNotNullErrorText(String fieldName) {
-        return fieldName + " не может быть пустым";
+        return fieldName + " cannot be empty";
     }
 }

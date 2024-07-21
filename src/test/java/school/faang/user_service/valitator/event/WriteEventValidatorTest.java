@@ -66,7 +66,7 @@ class WriteEventValidatorTest {
         assertAll(
                 () -> {
                     var exception = assertThrows(DataValidationException.class, () -> validator.validate(writeEventDto));
-                    assertThat(exception.getMessage()).isEqualTo("start-date не может быть пустым");
+                    assertThat(exception.getMessage()).isEqualTo("start-date cannot be empty");
                 }
         );
 
@@ -98,7 +98,7 @@ class WriteEventValidatorTest {
         assertAll(
                 () -> {
                     var exception = assertThrows(DataValidationException.class, () -> validator.validate(writeEventDto));
-                    assertThat(exception.getMessage()).isEqualTo("Не возможно установить skill, id: 3");
+                    assertThat(exception.getMessage()).isEqualTo("Can't install skill, id: 3");
                 }
         );
     }
@@ -125,7 +125,7 @@ class WriteEventValidatorTest {
         assertAll(
                 () -> {
                     var exception = assertThrows(DataValidationException.class, () -> validator.validate(writeEventDto));
-                    assertThat(exception.getMessage()).isEqualTo("title не может быть пустым");
+                    assertThat(exception.getMessage()).isEqualTo("title cannot be empty");
                 }
         );
     }

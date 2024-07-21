@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.ReadEvetDto;
@@ -20,8 +21,9 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class EventService {
-    private final EventRepository repository;
+    private final EventRepository eventRepository;
     private final WriteEventDtoToEventMapper writeEventDtoToEventMapper;
     private final EventToReadEventDtoMapper eventToReadEventDtoMapper;
     private final WriteEventValidator validator;
@@ -31,12 +33,12 @@ public class EventService {
     public ReadEvetDto create(WriteEventDto eventDto) {
         validator.validate(eventDto);
         var event = writeEventDtoToEventMapper.map(eventDto);
-        repository.save(event);
+        eventRepository.save(event);
         return eventToReadEventDtoMapper.map(event);
     }
 
     public List<ReadEvetDto> findAllByFilter(EventFilterDto eventFilterDto) {
-        Stream<Event> eventStream = repository.findAll().stream();
+        Stream<Event> eventStream = eventRepository.findAll().stream();
         return eventFieldFilters.stream()
                 .filter(eventFieldFilter -> eventFieldFilter.isApplicable(eventFilterDto))
                 .flatMap(eventFieldFilter -> eventFieldFilter.apply(eventStream, eventFilterDto))
@@ -45,37 +47,44 @@ public class EventService {
     }
 
     public ReadEvetDto findById(Long id) {
-        return repository.findById(id)
+        return eventRepository.findById(id)
                 .map(eventToReadEventDtoMapper::map)
-                .orElseThrow(() -> new DataValidationException("Event not found"));
+                .orElseThrow(() -> {
+                    log.error("EventService.findById: event with id %s not found");
+                    return new DataValidationException(String.format("Event with id: %s not found", id));
+                });
     }
 
     @Transactional
     public void delete(Long id) {
-        Event entity = repository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
-        repository.delete(entity);
-        repository.flush();
+        Event entity = eventRepository.findById(id).orElseThrow(() -> new DataValidationException(String.format("Event with id: %s not found", id)));
+        eventRepository.delete(entity);
+        eventRepository.flush();
     }
 
     @Transactional
     public ReadEvetDto update(Long id, WriteEventDto eventDto) {
         validator.validate(eventDto);
-        return repository.findById(id)
+        return eventRepository.findById(id)
                 .map(entity -> writeEventDtoToEventMapper.map(eventDto, entity))
-                .map(repository::saveAndFlush)
+                .map(eventRepository::saveAndFlush)
                 .map(eventToReadEventDtoMapper::map)
-                .orElseThrow(() -> new DataValidationException("Event not found"));
+                .orElseThrow(() -> {
+                            log.error("EventService.update: event with id %s not found");
+                            return new DataValidationException(String.format("Event with id: %s not found", id));
+                        }
+                );
     }
 
 
     public List<ReadEvetDto> findAllByUserId(long userId) {
-        return repository.findAllByUserId(userId).stream()
+        return eventRepository.findAllByUserId(userId).stream()
                 .map(eventToReadEventDtoMapper::map)
                 .toList();
     }
 
     public List<ReadEvetDto> findParticipatedEventsByUserId(long userId) {
-        return repository.findParticipatedEventsByUserId(userId).stream()
+        return eventRepository.findParticipatedEventsByUserId(userId).stream()
                 .map(eventToReadEventDtoMapper::map)
                 .toList();
     }

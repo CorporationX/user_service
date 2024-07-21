@@ -39,7 +39,6 @@ public class UserService {
         events.forEach(event -> eventRepository.deleteById(event.getId()));
         user.setActive(false);
         return mapper.toDto(userRepository.save(mentorshipService.stopMentorship(user)));
-    }
 
     public UserDto getUser(Long userId) {
         if(userId == null){

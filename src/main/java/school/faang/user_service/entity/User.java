@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -95,7 +94,7 @@ public class User {
     @ManyToMany(mappedBy = "followers")
     private List<User> followees;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner")
     private List<Event> ownedEvents;
 
     @ManyToMany(mappedBy = "mentors")
@@ -107,7 +106,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
     private List<User> mentors;
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receiver")
     private List<MentorshipRequest> receivedMentorshipRequests;
 
     @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -122,8 +121,7 @@ public class User {
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Goal> setGoals;
 
-    @ToString.Exclude
-    @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "users")
     private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")

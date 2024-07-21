@@ -1,7 +1,9 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,14 +19,15 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
+@Setter
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final int USER_INACTIVE_DAYS_LIMIT = 90;
+    @Value("${user-service.user.max-inactive-days}")
+    private int USER_INACTIVE_DAYS_LIMIT;
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
@@ -39,54 +42,45 @@ public class UserService {
         stopPlannedEventActivities(user);
         user.setActive(false);
         stopMentorship(user);
-        userRepository.save(user);
         return userMapper.toDto(user);
     }
 
     private void stopUserGoalActivities(User user) {
-        List<Goal> userGoals = user.getGoals();
-        Iterator<Goal> iterator = userGoals.iterator();
-        while (iterator.hasNext()) {
-            Goal goal = iterator.next();
-            goal.getUsers().remove(user);
-            if (goal.getUsers().isEmpty()) {
-                goalRepository.delete(goal);
-                iterator.remove();
-            } else {
-                goalRepository.save(goal);
-            }
-        }
+        List<Goal> goalsToDelete = user.getGoals().stream()
+                .peek(goal -> goal.getUsers().remove(user))
+                .filter(goal -> goal.getUsers().isEmpty()).toList();
+        goalRepository.deleteAll(goalsToDelete);
     }
 
+
     private void stopPlannedEventActivities(User user) {
-        List<Event> ownedEvents = user.getOwnedEvents();
-        for (Event event : ownedEvents) {
-            if (event.getStatus() == EventStatus.PLANNED) {
-                event.setStatus(EventStatus.CANCELED);
-                eventRepository.save(event);
-            }
-        }
-        ownedEvents.removeIf(event -> event.getStatus() == EventStatus.CANCELED);
+        List<Event> cancelledEvents = user.getOwnedEvents().stream()
+                .filter(event -> event.getStatus() == EventStatus.PLANNED)
+                .peek(event -> event.setStatus(EventStatus.CANCELED)).toList();
+        eventRepository.saveAll(cancelledEvents);
+        user.getOwnedEvents().removeIf(event -> event.getStatus() == EventStatus.CANCELED);
     }
 
     private void stopMentorship(User user) {
-        List<User> menteesWithoutMentor = user.getMentees().stream()
-                .peek(mentee -> mentorshipService.deleteMentor(mentee.getId(), user.getId())).toList();
-        menteesWithoutMentor.forEach(mentee -> mentee.getGoals().stream()
-                .filter(goal -> goal.getMentor().equals(user))
-                .peek(goal -> goal.setMentor(mentee))
-                .forEach(goalRepository::save));
+        user.getMentees().forEach(mentee -> {
+            mentorshipService.deleteMentor(mentee.getId(), user.getId());
+            setGoalsMentorAsMentee(mentee, user);
+        });
     }
 
+    private void setGoalsMentorAsMentee(User mentee, User mentor) {
+        mentee.getGoals().stream()
+                .filter(goal -> goal.getMentor().equals(mentor))
+                .forEach(goal -> goal.setMentor(mentee));
+    }
 
     @Scheduled(cron = "@daily")
+    @Transactional
     public void deleteInactiveUsers() {
-        userRepository.findAll().stream()
+        List<User> inactiveUsers = userRepository.findAll().stream()
                 .filter(user -> !user.isActive())
                 .filter(user -> user.getUpdatedAt().plusDays(USER_INACTIVE_DAYS_LIMIT).isBefore(LocalDateTime.now()))
-                .forEach(user -> {
-                    userRepository.delete(user);
-                    log.info("User with ID: {} was deleted", user.getId());
-                });
+                .toList();
+        userRepository.deleteAll(inactiveUsers);
     }
 }

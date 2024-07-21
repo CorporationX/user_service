@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 
-import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -33,6 +34,12 @@ public class UserServiceTest {
         void getUserTest(){
                 Long userId = 1l;
                 service.getUser(userId);
-                verify()
+                Mockito.verify(repository, times(1))
+                        .findById(userId);
+        }
+
+        @Test
+        void getUsersByIdsTest(){
+
         }
 }

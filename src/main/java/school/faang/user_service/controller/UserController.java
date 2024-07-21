@@ -18,13 +18,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/users/{userId}")
-    @ResponseStatus(HttpStatus.FOUND)
-    public UserDto getUser(@PathVariable Long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
 
     @GetMapping("/users")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }

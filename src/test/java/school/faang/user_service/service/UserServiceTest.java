@@ -3,24 +3,24 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.UserValidator;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
     @InjectMocks
     private UserService userService;
@@ -49,14 +49,11 @@ public class UserServiceTest {
         userDto = new UserDto();
 
         userDtoList = List.of(userDto);
-
-        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     @DisplayName("test that getUser calls all methods correctly + return test")
     public void testGetUser() {
-        doNothing().when(userValidator).validateUserId(id);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
 
@@ -72,8 +69,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
-        doNothing().when(userValidator).validateUserId(id);
-        when(userRepository.findAllById(ids)).thenReturn(Collections.singleton(user));
+        when(userRepository.findAllById(ids)).thenReturn(List.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
 
         List<UserDto> result = userService.getUsersByIds(ids);

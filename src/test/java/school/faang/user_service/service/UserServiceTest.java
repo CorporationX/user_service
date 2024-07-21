@@ -19,6 +19,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.User_Service;
 
+import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;

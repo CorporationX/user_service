@@ -1,6 +1,6 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.user;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -13,11 +13,17 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
-@RequiredArgsConstructor
-public class UserService {
+public class User_Service {
+
+    @Autowired
     private final UserMapper mapper;
 
     private final UserRepository repository;
+
+    public User_Service(UserMapper mapper, UserRepository repository) {
+        this.mapper = mapper;
+        this.repository = repository;
+    }
 
     public UserDto getUser(Long userId){
         if(userId == null) {

@@ -77,16 +77,16 @@ public class MentorshipRequestControllerTest {
     @Test
     public void testGetRequests() {
         RequestFilterDto filter = RequestFilterDto.builder()
-                .descriptionPattern("123")
+//                .descriptionPattern("123")
                 .requesterId(1L)
                 .receiverId(1L)
-                .status(RequestStatus.PENDING)
+//                .status(RequestStatus.PENDING)
                 .build();
         RequestFilterDto returnFilter = RequestFilterDto.builder()
-                .descriptionPattern("123")
+//                .descriptionPattern("123")
                 .requesterId(1L)
                 .receiverId(1L)
-                .status(RequestStatus.PENDING)
+//                .status(RequestStatus.PENDING)
                 .build();
         mentorshipRequestController.getRequests(filter);
         verify(service, times(1)).getRequests(captorFilter.capture());

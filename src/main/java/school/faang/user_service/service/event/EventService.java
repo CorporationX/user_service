@@ -16,6 +16,7 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class EventService {
     private final EventMapper eventMapper;
     private final EventFilterMapper eventFilterMapper;
     private final SkillRepository skillRepository;
+    private final List<EventFilter> eventFilter;
 
     // Создать событие
     public EventDto create(EventDto eventDto) {
@@ -43,9 +45,11 @@ public class EventService {
 
     //Получить все события с фильтрами
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        return eventRepository.findAll()
-                .stream()
-                .filter(event -> filter.equals(eventFilterMapper.eventToEventFilterDto(event)))
+        Stream<Event> events = eventRepository.findAll().stream();
+
+        return eventFilter.stream()
+                .filter(filt -> filt.isApplicable(filter))
+                .flatMap(filt -> filt.apply(events, filter))
                 .map(eventMapper::eventToDto)
                 .toList();
     }

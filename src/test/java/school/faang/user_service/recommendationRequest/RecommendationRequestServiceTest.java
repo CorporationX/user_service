@@ -12,7 +12,6 @@ import school.faang.user_service.controller.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
-//import school.faang.user_service.mapper.recommendation.RecommendationRequestFilterMapperImpl;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestRejectionMapperImpl;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;

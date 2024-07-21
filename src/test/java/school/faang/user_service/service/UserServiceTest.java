@@ -20,6 +20,10 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ExtendWith(Extension.class)
+public class UserServiceTest {
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -13,13 +13,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
-import java.util.Set;
 
-import static java.util.Set.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -55,10 +52,9 @@ public class UserServiceTest {
                 secondUser.setId(2L);
                 thirdUser.setId(3L);
                 List<Long> userList = List.of(firstUser.getId(), secondUser.getId(),thirdUser.getId());
-                Iterable<Long> iterable = userList;
                 List<UserDto> dtoList = userList.stream()
                         .map(userLong -> service.getUser(userLong))
                         .toList();
-                assertEquals(dtoList , service.getUsersByIds(iterable));
+                assertEquals(dtoList , service.getUsersByIds(userList));
         }
 }

@@ -35,7 +35,7 @@ public class UserService {
         return dto;
     }
 
-    public List<UserDto> getUsersByIds(Iterable<Long> ids){
+    public List<UserDto> getUsersByIds(List<Long> ids){
         Assert.notNull(ids , "is cannot null");
         List<Optional<User>> result = new ArrayList<>();
         ids.forEach((id) -> {

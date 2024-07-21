@@ -64,4 +64,13 @@ public class UserService {
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();
     }
+    UserDto getUser(long userId){
+        Optional<User> user = repository.findById(userId);
+        UserDto dto = mapper.toDto(user.orElse(null));
+        return dto;
+    }
+
+    List<UserDto> getUsersByIds(List<Long> ids){
+        List<UserDto> dtoList = repository.findAllById(ids);
+    }
 }

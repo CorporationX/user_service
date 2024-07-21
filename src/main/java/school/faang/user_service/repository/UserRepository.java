@@ -40,4 +40,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
             select exists (select 1 from users where email = ?1)
             """)
     boolean existsUserByEmail(String email);
+
+    @Query(nativeQuery = true, value = """
+            select follower_id from subscription s where s.followee_id = :userId   
+            """)
+    List<Long> getIdsFollowersUser(long userId);
 }

@@ -2,9 +2,9 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentorship.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.mentorship.UserMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
@@ -55,5 +55,22 @@ public class MentorshipService {
 
         mentee.getMentors().remove(mentorFoDelete);
         mentorshipRepository.save(mentee);
+    }
+
+    public User stopMentorship(User user) {
+        user.getMentees()
+                .forEach(mentee -> mentee.setMentors(
+                        mentee.getMentors()
+                                .stream()
+                                .peek(mentor -> mentorsFilterAndPeek(user, mentor))
+                                .toList()
+                ));
+        return user;
+    }
+
+    private static void mentorsFilterAndPeek(User user, User mentor) {
+        if (mentor.getId() == user.getId()) {
+            mentor.setId(user.getId());
+        }
     }
 }

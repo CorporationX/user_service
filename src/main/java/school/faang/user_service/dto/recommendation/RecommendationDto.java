@@ -1,5 +1,7 @@
 package school.faang.user_service.dto.recommendation;
 
+import school.faang.user_service.dto.SkillOfferDto;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

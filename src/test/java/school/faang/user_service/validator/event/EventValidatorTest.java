@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeption.event.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exeption.event.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.filter.EventFilterDto;
 import school.faang.user_service.filter.impl.DescriptionPatternFilter;

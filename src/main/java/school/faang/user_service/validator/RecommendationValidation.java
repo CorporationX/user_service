@@ -1,11 +1,11 @@
-package school.faang.user_service.validation;
+package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exaception.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 

@@ -34,10 +34,10 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
 
-        @GetMapping("/users/{userId}")
-        UserDto getUser(@PathVariable long userId){
-            return service.getUser(userId);
-        }
+    @GetMapping("/users/{userId}")
+    UserDto getUser(@PathVariable Long userId){
+        return service.getUser(userId);
+    }
 
     @PostMapping("/users")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids){

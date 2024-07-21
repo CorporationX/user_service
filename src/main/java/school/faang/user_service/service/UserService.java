@@ -71,6 +71,9 @@ public class UserService {
     }
 
     List<UserDto> getUsersByIds(List<Long> ids){
-        List<UserDto> dtoList = repository.findAllById(ids);
+        Iterable<User> iterable = repository.findAllById(ids);
+        Stream<User> stream = StreamSupport.stream(iterable.spliterator(),false);
+        return stream.map(user -> mapper.toDto(user))
+                .toList();
     }
 }

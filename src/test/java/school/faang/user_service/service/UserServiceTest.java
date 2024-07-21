@@ -9,6 +9,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 
+import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +32,7 @@ public class UserServiceTest {
         @Test
         void getUserTest(){
                 Long userId = 1l;
-
+                service.getUser(userId);
+                verify()
         }
 }

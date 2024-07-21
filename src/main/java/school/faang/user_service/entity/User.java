@@ -59,6 +59,9 @@ public class User {
     @Column(name = "experience")
     private Integer experience;
 
+    @Column(name = "banned", nullable = false)
+    private boolean banned;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
@@ -68,6 +71,9 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "preference_contact")
+    private String preferenceContact;
 
     @ManyToMany
     @JoinTable(name = "subscription",

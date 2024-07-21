@@ -26,6 +26,10 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        mentorship_channel:
+          name: mentorship_channel
+        user_ban_channel:
+          name: user_ban_channel
 
 server:
   port: 8080

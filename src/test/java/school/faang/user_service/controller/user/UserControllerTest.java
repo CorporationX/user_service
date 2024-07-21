@@ -112,4 +112,11 @@ public class UserControllerTest {
         verify(converterCsvToPerson, times(1)).convertCsvToPerson(file);
         verify(userService, times(1)).convertCsvFile(persons);
     }
+
+    @Test
+    public void testAuthorizeUser() {
+        userController.authorizeUser("email", "password");
+
+        verify(userService, times(1)).authorizeUser("email", "password");
+    }
 }

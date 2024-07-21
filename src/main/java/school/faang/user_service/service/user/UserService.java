@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -13,10 +14,10 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +82,8 @@ public class UserService {
         return user.getGoals().stream()
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();
+
+        return dtoList;
     }
 
 }

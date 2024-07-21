@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.user.User_Service;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 public class UserController {
-    private final User_Service service;
+    private final UserService service;
 
     @GetMapping("/users/{userId}")
     UserDto getUser(@PathVariable long userId){

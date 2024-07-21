@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.User_Service;
+import school.faang.user_service.service.user.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -20,10 +20,17 @@ public class UserServiceTest {
         private UserMapper mapper;
 
         @InjectMocks
-        private User_Service service;
+        private UserService service;
 
         @Test
         void getUserTest_whenException(){
-            assertThrows(RuntimeException.class ,() -> service.getUser(1L));
+            Long userId = null;
+                assertThrows(RuntimeException.class ,() -> service.getUser(userId));
+        }
+
+        @Test
+        void getUserTest(){
+                Long userId = 1l;
+
         }
 }

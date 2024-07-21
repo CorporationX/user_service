@@ -13,14 +13,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
-public class User_Service {
+public class UserService {
 
     @Autowired
     private final UserMapper mapper;
 
     private final UserRepository repository;
 
-    public User_Service(UserMapper mapper, UserRepository repository) {
+    public UserService(UserMapper mapper, UserRepository repository) {
         this.mapper = mapper;
         this.repository = repository;
     }

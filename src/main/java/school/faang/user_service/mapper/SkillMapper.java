@@ -21,10 +21,10 @@ public interface SkillMapper {
     Skill toEntity(SkillDto skillDto);
 
     @Mapping(source = "users", target = "usersIds", qualifiedByName = "map")
-    List<SkillDto> toDtoSkillEntity(List<Skill> skills);
+    List<SkillDto> toDtoSkillList(List<Skill> skills);
 
     @Mapping(source = "users", target = "usersIds", qualifiedByName = "map")
-    List<SkillCandidateDto> toCandidateDto(List<Skill> skills);
+    List<SkillCandidateDto> toCandidateDtoList(List<Skill> skills);
 
     @Named("map")
     default List<Long> map(List<User> users) {

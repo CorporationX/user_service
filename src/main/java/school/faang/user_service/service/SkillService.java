@@ -37,7 +37,7 @@ public class SkillService {
         skillValidator.validateSkillTitleIsNotNullAndNotBlank(skillDto);
         skillValidator.validateSkillTitleDosNotExists(skillDto);
         Skill skill = skillMapper.toEntity(skillDto);
-        List<User> users = userRepository.findAllById(skillDto.userIds)
+        List<User> users = userRepository.findAllById(skillDto.getUserIds())
                 .stream()
                 .toList();
         skill.setUsers(users);
@@ -45,12 +45,12 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        return skillMapper.toDtoSkillEntity(skillRepository.findAllByUserId(userId));
+        return skillMapper.toDtoSkillList(skillRepository.findAllByUserId(userId));
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         skillValidator.validateSkillExistenceById(userId);
-        return skillMapper.toCandidateDto(skillRepository.findSkillsOfferedToUser(userId));
+        return skillMapper.toCandidateDtoList(skillRepository.findSkillsOfferedToUser(userId));
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
@@ -64,7 +64,7 @@ public class SkillService {
                                                     List<SkillOffer> allOffersOfSkill,
                                                     long skillId,
                                                     long userId) {
-        if (userSkill.isEmpty() && allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
+        if (userSkill.isPresent() && allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
             skillRepository.assignSkillToUser(skillId, userId);
             addGuarantor(allOffersOfSkill);
         } else {

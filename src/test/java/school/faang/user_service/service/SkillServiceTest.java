@@ -14,10 +14,13 @@ import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
 
@@ -49,6 +52,10 @@ class SkillServiceTest {
     @Mock
     private SkillMapper skillMapper;
 
+    @Mock
+    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+
+
     @Captor
     private ArgumentCaptor<Skill> skillCaptor;
 
@@ -60,6 +67,7 @@ class SkillServiceTest {
     private long skillId;
     private SkillOffer skillOffer;
     private static final int MIN_SKILL_OFFERS = 3;
+
 
     @InjectMocks
     private SkillService skillService;
@@ -81,13 +89,14 @@ class SkillServiceTest {
         skillOffer = new SkillOffer();
         skillOffer.setId(skillId);
         skillOffer.setSkill(skill);
+        skillOffer.setRecommendation(new Recommendation());
     }
 
     @Test
     @DisplayName("testCreate")
     void testCreate() {
         when(skillMapper.toEntity(skillDto)).thenReturn(skill);
-        when(userRepository.findAllById(skillDto.userIds))
+        when(userRepository.findAllById(any()))
                 .thenReturn(List.of(new User(), new User()));
         when(skillRepository.save(any())).thenReturn(skill);
         when(skillMapper.toEntity(skillDto)).thenReturn(skill);
@@ -108,12 +117,12 @@ class SkillServiceTest {
     @DisplayName("testGetUserSkills")
     void testGetUserSkills() {
         when(skillRepository.findAllByUserId(userId)).thenReturn(getSkillList());
-        when(skillMapper.toDtoSkillEntity(getSkillList())).thenReturn(getSkillDtoList());
+        when(skillMapper.toDtoSkillList(getSkillList())).thenReturn(getSkillDtoList());
 
         List<SkillDto> userSkillsResult = skillService.getUserSkills(userId);
 
         verify(skillRepository).findAllByUserId(userId);
-        verify(skillMapper).toDtoSkillEntity(getSkillList());
+        verify(skillMapper).toDtoSkillList(getSkillList());
         assertEquals(userSkillsResult, getSkillDtoList());
     }
 
@@ -124,13 +133,13 @@ class SkillServiceTest {
         SkillCandidateDto skillCandidateDto = new SkillCandidateDto();
         when(skillRepository.findSkillsOfferedToUser(userId))
                 .thenReturn(List.of(skill));
-        when(skillMapper.toCandidateDto(List.of(skill)))
+        when(skillMapper.toCandidateDtoList(List.of(skill)))
                 .thenReturn(List.of(skillCandidateDto));
 
         List<SkillCandidateDto> offeredSkillsResult = skillService.getOfferedSkills(userId);
 
         verify(skillRepository).findSkillsOfferedToUser(userId);
-        verify(skillMapper).toCandidateDto(List.of(skill));
+        verify(skillMapper).toCandidateDtoList(List.of(skill));
         assertEquals(offeredSkillsResult, List.of(skillCandidateDto));
 
     }
@@ -138,9 +147,9 @@ class SkillServiceTest {
     @Test
     void testAcquireSkillFromOffers() {
         when(skillRepository.findUserSkill(skillId, userId))
-                .thenReturn(Optional.empty());
+                .thenReturn(Optional.of(skill));
         when(offerRepository.findAllOffersOfSkill(skillId, userId))
-                .thenReturn(List.of(skillOffer));
+                .thenReturn(List.of(skillOffer, skillOffer, skillOffer));
         when(skillMapper.toDto(skill)).thenReturn(skillDto);
 
         SkillDto skillDtoResult = skillService.acquireSkillFromOffers(skillId, userId);

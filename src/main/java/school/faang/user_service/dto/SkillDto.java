@@ -14,5 +14,5 @@ import java.util.List;
 public class SkillDto {
     private Long id;
     private String title;
-    public List<Long> userIds;
+    private List<Long> userIds;
 }

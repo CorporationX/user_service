@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(Extension.class)
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

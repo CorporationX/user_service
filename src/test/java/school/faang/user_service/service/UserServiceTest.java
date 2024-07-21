@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,8 +46,6 @@ class UserServiceTest {
 
     private User user;
     private User mentee;
-    private Goal goal;
-    private Event event;
     private Goal mentorAssignedGoal;
 
     @BeforeEach
@@ -60,7 +59,7 @@ class UserServiceTest {
                 .goals(goalList)
                 .ownedEvents(ownedEvents)
                 .mentees(menteesList).build();
-        goal = Goal.builder()
+        Goal goal = Goal.builder()
                 .id(1L)
                 .users(userList).build();
         mentorAssignedGoal = Goal.builder()
@@ -68,7 +67,7 @@ class UserServiceTest {
         mentee = User.builder()
                 .id(2L)
                 .goals(List.of(mentorAssignedGoal)).build();
-        event = Event.builder().id(1L)
+        Event event = Event.builder().id(1L)
                 .status(EventStatus.PLANNED).build();
         menteesList.add(mentee);
         goalList.add(goal);
@@ -85,28 +84,27 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("testing deactivateUser by repository goal deletion")
+    @DisplayName("testing deactivateUser by goalRepository deleteAll method execution")
     public void testDeactivateUserWithRepositoryGoalDeletion() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         userService.deactivateUser(user.getId());
-        verify(goalRepository, times(1)).delete(goal);
+        verify(goalRepository, times(1)).deleteAll(any());
     }
 
     @Test
-    @DisplayName("testing deactivateUser by eventRepository save method execution")
+    @DisplayName("testing deactivateUser by eventRepository saveAll method execution")
     public void testDeactivateUserWithEventRepositorySaveExecution() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         userService.deactivateUser(user.getId());
-        verify(eventRepository, times(1)).save(event);
+        verify(eventRepository, times(1)).saveAll(any());
     }
 
     @Test
-    @DisplayName("testing deactivateUser by goalRepository save method execution")
-    public void testDeactivateUserWithGoalRepositorySaveMethodExecution() {
+    @DisplayName("testing deactivateUser by deleteMentor method execution")
+    public void testDeactivateUserWithDeleteMethodExecution() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         userService.deactivateUser(user.getId());
         verify(mentorshipService, times(1)).deleteMentor(mentee.getId(), user.getId());
-        verify(goalRepository, times(1)).save(mentorAssignedGoal);
         assertEquals(mentorAssignedGoal.getMentor(), mentee);
     }
 }

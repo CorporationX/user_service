@@ -64,13 +64,14 @@ public class UserService {
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();
     }
-    UserDto getUser(long userId){
+
+    public UserDto getUser(long userId){
         Optional<User> user = repository.findById(userId);
         UserDto dto = mapper.toDto(user.orElse(null));
         return dto;
     }
 
-    List<UserDto> getUsersByIds(List<Long> ids){
+    public List<UserDto> getUsersByIds(List<Long> ids){
         Iterable<User> iterable = repository.findAllById(ids);
         Stream<User> stream = StreamSupport.stream(iterable.spliterator(),false);
         return stream.map(user -> mapper.toDto(user))

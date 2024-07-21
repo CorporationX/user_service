@@ -6,18 +6,26 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Deactivate User API", description = "API for managing deactivate users")
 @RequiredArgsConstructor
 public class UserController {
+    private final UserService service;
     private static final String MESSAGE_INVALID_ID = "userId cannot be less than zero";
     private final UserService service;
 
@@ -29,9 +37,23 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     public UserDto deactivatesUserProfile(@PathVariable @Parameter(description = "ID of the user to deactivate") Long userId) {
+    @GetMapping("/users/{userId}")
+    UserDto getUser(@PathVariable long userId){
+        return service.getUser(userId);
+    }
+    }
+
+    @PostMapping("/users")
+    List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
+        return service.getUsersByIds(ids);
+        }
+
+        @PutMapping("/user/{userId}")
+    public UserDto deactivatesUserProfile(@PathVariable Long userId) {
         if (userId < 0) {
             throw new RuntimeException(MESSAGE_INVALID_ID);
         }
         return service.deactivatesUserProfile(userId);
     }
-}
+
+    }

@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import school.faang.user_service.repository.UserRepository;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(Extension.class)
 public class UserServiceTest {
 
@@ -17,8 +19,8 @@ public class UserServiceTest {
     private UserService service;
 
     @Test
-    void getUserTest_whenException{
-
+    void getUserTest_whenException(){
+        assertThrows(RuntimeException.class , service.getUser());
     }
 }
 

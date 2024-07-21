@@ -17,6 +17,8 @@ public class UserServiceTest {
     private UserService service;
 
     @Test
-    public
+    void getUserTest_whenException{
+
+    }
 }
 

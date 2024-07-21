@@ -19,7 +19,10 @@ public class UserService {
 
     private final UserRepository repository;
 
-    public UserDto getUser(long userId){
+    public UserDto getUser(Long userId){
+        if(userId == null) {
+            throw new RuntimeException("user id is null");
+        }
         Optional<User> user = repository.findById(userId);
         UserDto dto = mapper.toDto(user.orElse(null));
         return dto;

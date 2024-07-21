@@ -42,6 +42,11 @@ public interface UserRepository extends CrudRepository<User, Long> {
             """)
     boolean existsUserByEmail(String email);
 
+    @Query(nativeQuery = true, value = """
+            select follower_id from subscription s where s.followee_id = :userId   
+            """)
+    List<Long> getIdsFollowersUser(long userId);
+
     @Query(nativeQuery = true, value = "SELECT id  FROM users u WHERE u.email = ?1 AND u.password = ?2")
     Long findIdByEmailAndPassword(String email, String password);
 }

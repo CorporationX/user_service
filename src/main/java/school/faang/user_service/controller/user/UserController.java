@@ -32,6 +32,11 @@ public class UserController {
         return userMapper.toDto(userService.getById(userId));
     }
 
+    @GetMapping("/{userId}/followers")
+    public List<Long> getIdsFollowersUser(@PathVariable("userId") long userId) {
+        return userService.getIdsFollowersUser(userId);
+    }
+
     @PostMapping("/premium")
     public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         userFilterDtoValidator.checkIsNull(userFilterDto);

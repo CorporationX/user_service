@@ -20,7 +20,7 @@ public class UserServiceTest {
 
     @Test
     void getUserTest_whenException(){
-        assertThrows(RuntimeException.class , service.getUser());
+        assertThrows(RuntimeException.class ,() -> service.getUser(1L));
     }
 }
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
@@ -20,6 +21,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
+    @Spy
+    private AvatarService avatarService;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -53,7 +56,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("saveUser")
+    @DisplayName("save new user")
     public void saveUserTest() {
 
         when(userMapper.toEntity(userDto)).thenReturn(user);

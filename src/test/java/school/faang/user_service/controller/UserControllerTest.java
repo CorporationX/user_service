@@ -45,7 +45,7 @@ class UserControllerTest {
                 .thenReturn(userDto);
 
         // when - action
-        var response = mockMvc.perform(get("/api/users/{userId}", userId));
+        var response = mockMvc.perform(get("/users/{userId}", userId));
 
         // then - verify the output
         response.andExpect(status().isOk())
@@ -64,7 +64,7 @@ class UserControllerTest {
         when(userService.findUsersByIds(userIds))
                 .thenReturn(userDtoList);
         // when - action
-        var response = mockMvc.perform(post("/api/users/")
+        var response = mockMvc.perform(post("/users/")
                 .content(new ObjectMapper().writeValueAsString(userIds))
                 .contentType("application/json")
         );

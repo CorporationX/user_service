@@ -9,6 +9,8 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,9 @@ public class UserService {
     }
 
     List<UserDto> getUsersByIds(List<Long> ids){
-        List<UserDto> dtoList = repository.findAllById(ids);
+        Iterable<User> iterable = repository.findAllById(ids);
+        Stream<User> stream = StreamSupport.stream(iterable.spliterator(),false);
+        return stream.map(user -> mapper.toDto(user))
+                .toList();
     }
 }

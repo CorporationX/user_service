@@ -23,6 +23,7 @@ import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

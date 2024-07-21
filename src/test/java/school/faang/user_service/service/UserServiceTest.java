@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(Extension.class)
 public class UserServiceTest {
-
     @Mock
     private UserRepository repository;
 

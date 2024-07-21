@@ -61,6 +61,8 @@ class UserServiceTest {
     }
 
     @Test
+    void getUserTest_whenException(){
+        assertThrows(RuntimeException.class ,() -> service.getUser(1L));
     public void testUserIsNotInDb() {
         //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());

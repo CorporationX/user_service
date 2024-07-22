@@ -5,6 +5,8 @@ import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
 import school.faang.user_service.config.context.UserContext;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 public class FeignUserInterceptor implements RequestInterceptor {
 
@@ -12,6 +14,7 @@ public class FeignUserInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header("x-user-id", String.valueOf(userContext.getUserId()));
+        Optional<Long> userId = userContext.getUserId();
+        userId.ifPresent(value -> template.header("x-user-id", String.valueOf(value)));
     }
 }

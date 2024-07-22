@@ -9,7 +9,6 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
@@ -19,7 +18,6 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
@@ -34,6 +32,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,8 +57,8 @@ class UserServiceImplTest {
     private MentorshipService mentorshipService;
     @Mock
     private UserFilterService userFilterService;
-    @Spy
-    private UserMapper userMapper = new UserMapperImpl();
+    @Mock
+    private UserMapper userMapper;
     @Captor
     private ArgumentCaptor<User> captor;
     private User user;
@@ -82,6 +81,7 @@ class UserServiceImplTest {
     @BeforeEach
     public void setUp() {
         user = User.builder().username("name").email("test@mail.ru").password("password").build();
+        userDto = UserDto.builder().username("name").email("test@mail.ru").password("password").build();
     }
 
     @Test
@@ -142,7 +142,9 @@ class UserServiceImplTest {
     @Test
     public void testCreateUser() {
         when(userRepository.save(any(User.class))).thenReturn(user);
-        UserDto userDto = UserDto.builder().username("name").email("test@mail.ru").password("password").build();
+        when(userMapper.toEntity(userDto)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
         UserDto result = userServiceImpl.createUser(userDto);
 
         InOrder inOrder = inOrder(userMapper, userRepository);
@@ -187,5 +189,16 @@ class UserServiceImplTest {
 
         verify(userRepository, times(1)).findById(1L);
         verifyNoInteractions(userMapper, userContext, profileViewEventPublisher);
+    }
+
+    @Test
+    public void getAllUsers() {
+        List<User> users = List.of(user);
+        when(userRepository.findAll()).thenReturn(users);
+        when(userMapper.toDto(any(User.class))).thenReturn(userDto);
+
+        List<UserDto> result = userServiceImpl.findAllUsers();
+
+        assertIterableEquals(result, users.stream().map(userMapper::toDto).toList());
     }
 }

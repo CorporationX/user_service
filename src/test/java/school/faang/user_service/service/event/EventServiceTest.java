@@ -15,9 +15,9 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.Validator;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +44,7 @@ class EventServiceTest {
     @Mock
     private EventFilterMapper eventFilterMapper;
     @Mock
-    private SkillRepository skillRepository;
+    private Validator validator;
 
     Event event = new Event();
     EventDto eventDto = new EventDto();
@@ -94,8 +94,6 @@ class EventServiceTest {
                 .thenReturn(Optional.of(userWithSkill));
         when(eventMapper.eventDtoToEntity(eventDto))
                 .thenReturn(event);
-        when(skillRepository.findById(anyLong()))
-                .thenReturn(Optional.ofNullable(skill1));
         eventService.create(eventDto);
         verify(eventRepository, times(1)).save(event);
     }
@@ -150,6 +148,7 @@ class EventServiceTest {
     void shouldReturnDataValidationExceptionWhenUpdateEventTest() {
         when(userRepository.findById(anyLong()))
                 .thenThrow(new DataValidationException("Такой пользователь не найден!"));
+        when(validator.validateUpdatingEvent(eventDto)).thenReturn(true);
 
         assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
@@ -160,6 +159,7 @@ class EventServiceTest {
         owner.setSkills(List.of(ownerSkill1, ownerSkill2));
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
+        when(validator.validateUpdatingEvent(eventDto)).thenReturn(true);
 
         assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
@@ -171,6 +171,7 @@ class EventServiceTest {
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
         when(eventMapper.eventDtoToEntity(eventDto)).thenReturn(event);
+        when(validator.validateUpdatingEvent(eventDto)).thenReturn(true);
 
         eventService.updateEvent(eventDto);
 

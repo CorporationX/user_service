@@ -15,6 +15,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -42,6 +43,8 @@ class EventServiceTest {
     private UserRepository userRepository;
     @Mock
     private EventFilterMapper eventFilterMapper;
+    @Mock
+    private SkillRepository skillRepository;
 
     Event event = new Event();
     EventDto eventDto = new EventDto();
@@ -91,6 +94,8 @@ class EventServiceTest {
                 .thenReturn(Optional.of(userWithSkill));
         when(eventMapper.eventDtoToEntity(eventDto))
                 .thenReturn(event);
+        when(skillRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(skill1));
         eventService.create(eventDto);
         verify(eventRepository, times(1)).save(event);
     }

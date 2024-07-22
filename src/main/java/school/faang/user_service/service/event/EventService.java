@@ -10,12 +10,15 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.Validator;
 
+import javax.xml.stream.EventFilter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +28,8 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final EventFilterMapper eventFilterMapper;
-    private final Validator validator;
+    private final SkillRepository skillRepository;
+    private final List<EventFilter> eventFilter;
 
     // Создать событие
     public EventDto create(EventDto eventDto) {

@@ -69,8 +69,9 @@ public class SkillServiceTest {
         secondSkill.setId(secondSkillId);
         secondSkill.setTitle("Spring");
 
-        skillDto = new SkillDto(firstSkillId, "Java");
-        secondSkillDto = new SkillDto(secondSkillId, "Spring");
+//        skillDto = new SkillDto(firstSkillId, "Java");
+        skillDto = SkillDto.builder().id(firstSkillId).title("Java").build();
+        secondSkillDto = SkillDto.builder().id(secondSkillId).title("Spring").build();
 
         Recommendation recommendation1 = Recommendation.builder().receiver(User.builder().id(userId).username("Ivan").build()).build();
         Recommendation recommendation2 = Recommendation.builder().receiver(User.builder().id(userId).username("Ivan").build()).build();
@@ -88,7 +89,7 @@ public class SkillServiceTest {
         when(skillRepository.existsByTitle("Java")).thenReturn(false);
         when(skillMapper.toEntity(skillDto)).thenReturn(firstSkill);
         when(skillRepository.save(firstSkill)).thenReturn(firstSkill);
-        when(skillMapper.toDto(firstSkill)).thenReturn(skillDto);
+        when(skillMapper.skillToDto(firstSkill)).thenReturn(skillDto);
 
         SkillDto createdSkill = skillService.create(skillDto);
 
@@ -98,7 +99,7 @@ public class SkillServiceTest {
         verify(skillRepository).existsByTitle("Java");
         verify(skillMapper).toEntity(any());
         verify(skillRepository).save(any());
-        verify(skillMapper).toDto(any());
+        verify(skillMapper).skillToDto(any());
     }
 
     @Test
@@ -111,14 +112,14 @@ public class SkillServiceTest {
         verify(skillRepository).existsByTitle("Java");
         verify(skillMapper, never()).toEntity(any());
         verify(skillRepository, never()).save(any());
-        verify(skillMapper, never()).toDto(any());
+        verify(skillMapper, never()).skillToDto(any());
     }
 
     @Test
     void testGetUserSkillsSuccess() {
         when(skillRepository.findAllByUserId(userId)).thenReturn(List.of(firstSkill, secondSkill));
-        when(skillMapper.toDto(firstSkill)).thenReturn(skillDto);
-        when(skillMapper.toDto(secondSkill)).thenReturn(secondSkillDto);
+        when(skillMapper.skillToDto(firstSkill)).thenReturn(skillDto);
+        when(skillMapper.skillToDto(secondSkill)).thenReturn(secondSkillDto);
 
         List<SkillDto> result = skillService.getUserSkills(userId);
 
@@ -141,18 +142,18 @@ public class SkillServiceTest {
         List<Skill> skillsOfferedToUser = Arrays.asList(firstSkill, secondSkill);
 
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillsOfferedToUser);
-        when(skillMapper.toDto(firstSkill)).thenReturn(skillDto);
-        when(skillMapper.toDto(secondSkill)).thenReturn(secondSkillDto);
+        when(skillMapper.skillToDto(firstSkill)).thenReturn(skillDto);
+        when(skillMapper.skillToDto(secondSkill)).thenReturn(secondSkillDto);
 
         List<SkillCandidateDto> offeredSkills = skillService.getOfferedSkills(userId);
         assertThat(offeredSkills.size()).isEqualTo(2);
 
         SkillCandidateDto result1 = offeredSkills.get(0);
-        assertThat(result1.getSkillDto().getTitle()).isEqualTo("Java");
+        assertThat(result1.getSkillDto().getTitle()).isEqualTo("Spring");
         assertThat(result1.getOffersAmount()).isEqualTo(1);
 
         SkillCandidateDto result2 = offeredSkills.get(1);
-        assertThat(result2.getSkillDto().getTitle()).isEqualTo("Spring");
+        assertThat(result2.getSkillDto().getTitle()).isEqualTo("Java");
         assertThat(result2.getOffersAmount()).isEqualTo(1);
     }
 
@@ -167,7 +168,7 @@ public class SkillServiceTest {
     @Test
     void testAcquireSkillFromOffers_ExistingSkill() {
         when(skillRepository.findUserSkill(firstSkillId, userId)).thenReturn(Optional.of(firstSkill));
-        when(skillMapper.toDto(firstSkill)).thenReturn(skillDto);
+        when(skillMapper.skillToDto(firstSkill)).thenReturn(skillDto);
 
         SkillDto result = skillService.acquireSkillFromOffers(firstSkillId, userId);
 
@@ -175,7 +176,7 @@ public class SkillServiceTest {
         assertThat(result.getId()).isEqualTo(firstSkillId);
 
         verify(skillRepository).findUserSkill(firstSkillId, userId);
-        verify(skillMapper).toDto(firstSkill);
+        verify(skillMapper).skillToDto(firstSkill);
     }
 
     @Test
@@ -185,7 +186,7 @@ public class SkillServiceTest {
         when(skillRepository.findUserSkill(firstSkillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(firstSkillId, userId)).thenReturn(offers);
         when(skillRepository.findById(firstSkillId)).thenReturn(Optional.of(firstSkill));
-        when(skillMapper.toDto(firstSkill)).thenReturn(skillDto);
+        when(skillMapper.skillToDto(firstSkill)).thenReturn(skillDto);
 
         SkillDto result = skillService.acquireSkillFromOffers(firstSkillId, userId);
 
@@ -197,7 +198,7 @@ public class SkillServiceTest {
         verify(skillRepository).findUserSkill(firstSkillId, userId);
         verify(skillOfferRepository).findAllOffersOfSkill(firstSkillId, userId);
         verify(skillRepository).assignSkillToUser(firstSkillId, userId);
-        verify(skillMapper).toDto(firstSkill);
+        verify(skillMapper).skillToDto(firstSkill);
         verify(skillGuaranteeRepository, times(offers.size())).save(any(UserSkillGuarantee.class));
     }
 }

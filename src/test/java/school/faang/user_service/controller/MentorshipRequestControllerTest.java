@@ -80,13 +80,13 @@ public class MentorshipRequestControllerTest {
                 .descriptionPattern("123")
                 .requesterId(1L)
                 .receiverId(1L)
-                .status(RequestStatus.PENDING)
+                .status("PENDING")
                 .build();
         RequestFilterDto returnFilter = RequestFilterDto.builder()
                 .descriptionPattern("123")
                 .requesterId(1L)
                 .receiverId(1L)
-                .status(RequestStatus.PENDING)
+                .status("PENDING")
                 .build();
         mentorshipRequestController.getRequests(filter);
         verify(service, times(1)).getRequests(captorFilter.capture());

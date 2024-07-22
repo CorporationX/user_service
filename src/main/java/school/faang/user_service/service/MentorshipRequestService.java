@@ -90,7 +90,7 @@ public class MentorshipRequestService {
     }
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        if (rejection == null || rejection.getReason().isBlank()) {
+        if (rejection == null || rejection.getRejectionReason().isBlank()) {
             throw new IllegalArgumentException("Пустая причина отказа");
         }
         MentorshipRequest request = mentorshipRequestRepository.findById(id).orElse(null);
@@ -98,7 +98,7 @@ public class MentorshipRequestService {
             throw new IllegalArgumentException("Переданного запроса нет в базе");
         }
         request.setStatus(RequestStatus.REJECTED);
-        request.setRejectionReason(rejection.getReason());
+        request.setRejectionReason(rejection.getRejectionReason());
         return mapper.toDto(mentorshipRequestRepository.save(request));
     }
 

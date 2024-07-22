@@ -28,19 +28,19 @@ public final class TestDataFactory {
     }
 
     public static List<UserDto> createUserDtosList() {
-        var userDto1 = createUserDto();
-        var userDto2 = UserDto.builder()
+        var userDtoFirst = createUserDto();
+        var userDtoSecond = UserDto.builder()
                 .id(2L)
                 .username("Incognito2")
                 .email("incognito2@gmail.com")
                 .build();
-        var userDto3 = UserDto.builder()
+        var userDtoThird = UserDto.builder()
                 .id(3L)
                 .username("Incognito3")
                 .email("incognito3@gmail.com")
                 .build();
 
-        return of(userDto1, userDto2, userDto3);
+        return of(userDtoFirst, userDtoSecond, userDtoThird);
     }
 
     public static List<User> createUsersList() {

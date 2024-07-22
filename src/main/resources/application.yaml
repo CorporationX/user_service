@@ -55,3 +55,9 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

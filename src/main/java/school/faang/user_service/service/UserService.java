@@ -45,23 +45,23 @@ public class UserService {
         }
     }
 
-    private static List<Event> getEventsWithCanceledStatus(User user) {
-        return user.getOwnedEvents().stream()
-                .peek(event -> event.setStatus(EventStatus.CANCELED))
-                .toList();
-    }
-
-    private static List<Goal> getGoalsForDelete(User user) {
-        return user.getGoals().stream()
-                .filter(goal -> goal.getUsers().size() == ONE_USER)
-                .toList();
-    }
-
     private User getValidationUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException(MESSAGE_USER_NOT_EXIST));
         if (!user.isActive()) {
             throw new RuntimeException(MESSAGE_USER_ALREADY_DEACTIVATED);
         }
         return user;
+    }
+
+    private List<Event> getEventsWithCanceledStatus(User user) {
+        return user.getOwnedEvents().stream()
+                .peek(event -> event.setStatus(EventStatus.CANCELED))
+                .toList();
+    }
+
+    private List<Goal> getGoalsForDelete(User user) {
+        return user.getGoals().stream()
+                .filter(goal -> goal.getUsers().size() == ONE_USER)
+                .toList();
     }
 }

@@ -43,6 +43,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        //Arrange
         user = new User();
         user.setId(VALID_ID);
         user.setActive(true);
@@ -55,7 +56,9 @@ class UserServiceTest {
 
     @Test
     public void testUserIsNotInDb() {
+        //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        //Assert
         assertEquals(
                 MESSAGE_USER_NOT_EXIST,
                 assertThrows(
@@ -65,8 +68,11 @@ class UserServiceTest {
 
     @Test
     public void testUserAlreadyDeactivated() {
+        //Arrange
         user.setActive(false);
+        //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        //Assert
         assertEquals(
                 MESSAGE_USER_ALREADY_DEACTIVATED,
                 assertThrows(
@@ -76,31 +82,39 @@ class UserServiceTest {
 
     @Test
     public void testGoalDeletedById() {
+        //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(goalRepository).deleteById(Mockito.anyLong());
     }
 
     @Test
     public void testEventDeletedById() {
+        //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(eventRepository, Mockito.times(user.getOwnedEvents().size())).deleteById(Mockito.anyLong());
     }
 
     @Test
     public void testUserSave() {
+        //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
         Mockito.when(mentorshipService.stopMentorship(Mockito.any())).thenReturn(user);
+        //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(userRepository).save(user);
     }
 
     @Test
     public void testUserToUserDto() {
+        //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
         Mockito.when(mentorshipService.stopMentorship(Mockito.any())).thenReturn(user);
         Mockito.when(userRepository.save(user)).thenReturn(user);
+        //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(mapper).toDto(user);
     }

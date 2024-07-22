@@ -1,13 +1,14 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.service.RecommendationRequestService;
+import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
+import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
     @PostMapping("/create")
-    public ResponseEntity<RecommendationRequestDto> requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
+    public ResponseEntity<RecommendationRequestDto> requestRecommendation(@Valid @RequestBody RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest == null) {
             throw new IllegalArgumentException("The request contains an empty message");
         }
@@ -33,16 +34,16 @@ public class RecommendationRequestController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.getRequests(filter));
     }
-    @GetMapping("/request/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<RecommendationRequestDto> getRecommendationRequest(@PathVariable Long id) {
         if (id < 0) {
             throw new IllegalArgumentException("Аргумент не может быть отрицательным числом");
         }
         return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.getRequest(id));
     }
-    @PutMapping("/reject/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<RecommendationRequestDto> rejectRequest(@PathVariable Long id,
-                                                                  @RequestBody RejectionDto rejection) {
+                                                                  @Valid @RequestBody RejectionDto rejection) {
         if (rejection == null) {
             throw new IllegalArgumentException("Аргумент пустой");
         }

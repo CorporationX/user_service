@@ -9,8 +9,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -19,7 +19,8 @@ import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.filer.RequestFilter;
+import school.faang.user_service.service.recommendationRequest.filer.RequestFilter;
+import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -148,13 +149,20 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("testGetRequestsFindAll")
     public void testGetRequestsFindAll() {
-        when(statusPatternFilter.isApplication(any())).thenReturn(true);
-        when(statusPatternFilter.apply(any(), any())).thenReturn(Stream.of(recommendationRequest));
-        when(idPatternFilter.isApplication(any())).thenReturn(true);
-        when(idPatternFilter.apply(any(), any())).thenReturn(Stream.of(recommendationRequest));
-        when(requestFilter.stream()).thenReturn(Stream.of(statusPatternFilter, idPatternFilter));
-        when(recommendationRequestRepository.findAll()).thenReturn(List.of(new RecommendationRequest()));
-        when(recommendationRequestMapper.toDto(any())).thenReturn(new RecommendationRequestDto());
+        when(statusPatternFilter.isApplication(any()))
+                .thenReturn(true);
+        when(statusPatternFilter.apply(any(), any()))
+                .thenReturn(Stream.of(recommendationRequest));
+        when(idPatternFilter.isApplication(any()))
+                .thenReturn(true);
+        when(idPatternFilter.apply(any(), any()))
+                .thenReturn(Stream.of(recommendationRequest));
+        when(requestFilter.stream())
+                .thenReturn(Stream.of(statusPatternFilter, idPatternFilter));
+        when(recommendationRequestRepository.findAll())
+                .thenReturn(List.of(new RecommendationRequest()));
+        when(recommendationRequestMapper.toDto(any()))
+                .thenReturn(new RecommendationRequestDto());
         recommendationRequestService.getRequests(requestFilterDto);
 
         verify(recommendationRequestMapper, times(1)).toDto(any());

@@ -7,10 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.RecommendationRequestService;
+import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
 import java.util.ArrayList;
 import java.util.List;

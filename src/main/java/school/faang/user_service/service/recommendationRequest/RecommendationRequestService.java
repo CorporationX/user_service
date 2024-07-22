@@ -1,10 +1,10 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendationRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
@@ -12,7 +12,7 @@ import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.filer.RequestFilter;
+import school.faang.user_service.service.recommendationRequest.filer.RequestFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -34,21 +34,8 @@ public class RecommendationRequestService {
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         verificationObject(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
-
-        Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository
-                .findLatestPendingRequest(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
-        if (recommendationRequest.isPresent()) {
-            LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
-            if (recommendationRequest.get().getUpdatedAt().isAfter(localDateTime)) {
-                throw new IllegalArgumentException("Recommendation request can only be sent once every 6 months");
-            }
-        }
-
-        List<Long> skillsId = recommendationRequestDto.getSkillsId();
-        List<SkillRequest> skills = StreamSupport.stream(skillRequestRepository.findAllById(skillsId).spliterator(), false).toList();
-        if (skills.isEmpty()) {
-            throw new NullPointerException("One or more requested skills do not exist in the database");
-        }
+        heckForRequestsOfSixMonths(recommendationRequestDto);
+        List<SkillRequest> skills = checkSkillRequestInDatabase(recommendationRequestDto);
 
         RecommendationRequest newRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
         recommendationRequestRepository.save(newRequest);
@@ -58,7 +45,6 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(newRequest);
     }
 
-    //    @Transactional(readOnly = true)
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
         Stream<RecommendationRequest> recommendationRequestsAll = recommendationRequestRepository.findAll().stream();
         List<RecommendationRequest> result = requestFilter.stream()
@@ -71,7 +57,6 @@ public class RecommendationRequestService {
                 .toList();
     }
 
-    //    @Transactional(readOnly = true)
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = recommendationRequestRepository
                 .findById(id)
@@ -97,5 +82,25 @@ public class RecommendationRequestService {
         if (!userRepository.existsById(requesterId) || !userRepository.existsById(recieverId)) {
             throw new IllegalArgumentException("Requester or Reciever does not exist in the database");
         }
+    }
+
+    private void heckForRequestsOfSixMonths(RecommendationRequestDto recommendationRequestDto) {
+        Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository
+                .findLatestPendingRequest(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
+        if (recommendationRequest.isPresent()) {
+            LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
+            if (recommendationRequest.get().getUpdatedAt().isAfter(localDateTime)) {
+                throw new IllegalArgumentException("Recommendation request can only be sent once every 6 months");
+            }
+        }
+    }
+
+    private List<SkillRequest> checkSkillRequestInDatabase(RecommendationRequestDto recommendationRequestDto) {
+        List<Long> skillsId = recommendationRequestDto.getSkillsId();
+        List<SkillRequest> skills = StreamSupport.stream(skillRequestRepository.findAllById(skillsId).spliterator(), false).toList();
+        if (skills.isEmpty()) {
+            throw new NullPointerException("One or more requested skills do not exist in the database");
+        }
+        return skills;
     }
 }

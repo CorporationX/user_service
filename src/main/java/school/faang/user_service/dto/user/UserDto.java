@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -33,8 +35,7 @@ public class UserDto {
     private String password;
     private Long countryId;
     private boolean active;
-
     private UserProfilePic userProfilePic;
-
     private PreferredContact preferredContact;
+    private List<Long> subscriberIds;
 }

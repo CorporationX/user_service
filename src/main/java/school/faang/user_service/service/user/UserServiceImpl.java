@@ -39,6 +39,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<UserDto> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Override
     public List<UserDto> findPremiumUsers(UserFilterDto filterDto) {
         return userFilterService.applyFilters(userRepository.findPremiumUsers(), filterDto)
                 .map(userMapper::toDto)

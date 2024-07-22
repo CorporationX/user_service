@@ -6,6 +6,7 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public interface EventMapper {
 
     @Mapping(source = "relatedSkills", target = "relatedSkillsIds",
             qualifiedByName = "map")
+    @Mapping(source = "owner", target = "ownerId", qualifiedByName = "mapOwnerToOwnerId")
     EventDto eventToDto(Event event);
 
     @Named("map")
@@ -26,4 +28,9 @@ public interface EventMapper {
     }
 
     List<EventDto> listEventsToDto(List<Event> eventList);
+
+    @Named("mapOwnerToOwnerId")
+    default Long map(User owner) {
+        return owner.getId();
+    }
 }

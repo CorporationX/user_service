@@ -354,7 +354,7 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRejectRequestReasonNull() {
         long id = 1;
-        RejectionDto rejection = new RejectionDto(1L, "  ");
+        RejectionDto rejection = new RejectionDto( "  ");
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.rejectRequest(id, rejection);
         });
@@ -364,7 +364,7 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRejectRequestNull() {
         long id = 1;
-        RejectionDto rejection = new RejectionDto(2L, "asd");
+        RejectionDto rejection = new RejectionDto( "asd");
         when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.empty());
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.rejectRequest(id, rejection);
@@ -375,7 +375,7 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRejectRequestSaveToDb() {
         long id = 1;
-        RejectionDto rejection = new RejectionDto(2L, "Занят");
+        RejectionDto rejection = new RejectionDto( "Занят");
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setId(1L);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
@@ -393,7 +393,7 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRejectRequestReturn() {
         long id = 1;
-        RejectionDto rejection = new RejectionDto(2L, "Занят");
+        RejectionDto rejection = new RejectionDto( "Занят");
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setId(1L);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);

@@ -61,7 +61,8 @@ public class MentorshipRequestControllerTest {
     @NullSource
     public void testDescriptionIsNull(String descr) {
         dto.setDescription(descr);
-        Assert.assertThrows(IllegalArgumentException.class, () -> mentorshipRequestController.requestMentorship(dto));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestController.requestMentorship(dto));
     }
 
     @Test
@@ -80,13 +81,13 @@ public class MentorshipRequestControllerTest {
                 .descriptionPattern("123")
                 .requesterId(1L)
                 .receiverId(1L)
-                .status(RequestStatus.PENDING)
+                .status(String.valueOf(RequestStatus.PENDING))
                 .build();
         RequestFilterDto returnFilter = RequestFilterDto.builder()
                 .descriptionPattern("123")
                 .requesterId(1L)
                 .receiverId(1L)
-                .status(RequestStatus.PENDING)
+                .status(RequestStatus.PENDING.toString())
                 .build();
         mentorshipRequestController.getRequests(filter);
         verify(service, times(1)).getRequests(captorFilter.capture());

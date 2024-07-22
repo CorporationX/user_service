@@ -44,19 +44,19 @@ public final class TestDataFactory {
     }
 
     public static List<User> createUsersList() {
-        var user1 = createUser();
-        var user2 = User.builder()
+        var firstUser = createUser();
+        var secondUser = User.builder()
                 .id(2L)
                 .username("Incognito2")
                 .email("incognito2@gmail.com")
                 .build();
-        var user3 = User.builder()
+        var thirdUser = User.builder()
                 .id(3L)
                 .username("Incognito3")
                 .email("incognito3@gmail.com")
                 .build();
 
-        return of(user1, user2, user3);
+        return of(firstUser, secondUser, thirdUser);
     }
 
 }

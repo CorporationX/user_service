@@ -1,14 +1,11 @@
-package school.faang.user_service.Service.event;
+package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.eventParticipations.UserMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor

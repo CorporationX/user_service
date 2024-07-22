@@ -1,17 +1,17 @@
 package school.faang.user_service.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.dto.recomendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;

@@ -51,3 +51,5 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+springfox.documentation.swagger.v2.path: /api-docs

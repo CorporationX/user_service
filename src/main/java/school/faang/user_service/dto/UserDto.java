@@ -16,15 +16,16 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank
-    @Size(min = 3, max = 64)
+    @NotBlank(message = "username should not be blank")
+    @Size(min = 3, max = 64, message = "username length must be between 3 and 64 characters")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "email should not be blank")
     @Email
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "phone should not be blank")
+    @Size(max = 32, message = "phone length max 32 characters")
     private String phone;
     private boolean isActive;
 }

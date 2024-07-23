@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.userdto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

@@ -1,9 +1,8 @@
-package school.faang.user_service.service.userFilters;
+package school.faang.user_service.filter.user;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.userdto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.UserFilter;
 
 import java.util.stream.Stream;
 

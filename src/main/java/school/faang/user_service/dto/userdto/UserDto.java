@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.userdto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

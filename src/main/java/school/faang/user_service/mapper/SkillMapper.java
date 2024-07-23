@@ -15,14 +15,14 @@ public interface SkillMapper {
 
     Skill toEntity(SkillDto skilldto);
 
-    default List<SkillDto> toDto(List<Skill> skills){
+    default List<SkillDto> toDtoList(List<Skill> skills){
         return skills.stream()
-                .map(skill -> new SkillDto())
+                .map(skill -> toDto(skill))
                 .collect(Collectors.toList());
     }
-    default List<Skill> toEntity(List<SkillDto> skillsdto) {
+    default List<Skill> toEntityList(List<SkillDto> skillsdto) {
         return skillsdto.stream()
-                .map(skilldto -> new Skill())
+                .map(skilldto -> toEntity(skilldto))
                 .collect(Collectors.toList());
     }
 }

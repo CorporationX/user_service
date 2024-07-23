@@ -14,9 +14,11 @@ public class EventByOwnerFilter implements EventFilter {
     }
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
-        events.filter(event ->
-                event.getOwner().getId()==(filters.getOwnerIdPattern()))
-                .collect(Collectors.toList());
-        return events;
+        {
+            events.filter(event ->
+                            (event.getOwner().getId())==(filters.getOwnerIdPattern()))
+                    .collect(Collectors.toList());
+            return events;
+        }
     }
 }

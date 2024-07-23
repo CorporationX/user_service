@@ -21,6 +21,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.exception.ResourceNotFoundException;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -44,6 +45,8 @@ public class EventServiceTest {
     private UserRepository userRepository;
     @Mock
     private EventFilter filter;
+    @Mock
+    private EventValidator eventValidator;
 
     @InjectMocks
     private EventService eventService;
@@ -56,7 +59,7 @@ public class EventServiceTest {
         User user = new User();
         user.setId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        User result = eventService.ownerValidation(eventDto);
+        User result = eventValidator.ownerValidation(eventDto);
         assertNotNull(result);
         assertEquals(1L, result.getId());
     }
@@ -67,7 +70,7 @@ public class EventServiceTest {
         eventDto.setOwnerId(2L);
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
-            eventService.ownerValidation(eventDto);
+            eventValidator.ownerValidation(eventDto);
         });
         assertEquals("Ошибка: пользователь не найден", exception.getMessage());
     }
@@ -84,12 +87,12 @@ public class EventServiceTest {
         secondSkillDto.setId(2L);
         List skillDtoList = List.of(firstSkillDto, secondSkillDto);
         List skillList = List.of(firstSkill, secondSkill);
-        when(skillMapper.toEntity(skillDtoList)).thenReturn(skillList);
+        when(skillMapper.toEntityList(skillDtoList)).thenReturn(skillList);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillRepository.findById(2L)).thenReturn(Optional.of(secondSkill));
         EventDto eventDto = new EventDto();
         eventDto.setRelatedSkills(skillDtoList);
-        List result = eventService.skillValidation(eventDto);
+        List result = eventValidator.skillValidation(eventDto);
         assertNotNull(result);
         assertEquals(2, result.size());
         verify(skillRepository, times(2)).findById(anyLong());
@@ -115,11 +118,11 @@ public class EventServiceTest {
         EventDto eventDto = new EventDto();
         eventDto.setOwnerId(1L);
         eventDto.setRelatedSkills(skillDtoList);
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(skillList);
+        when(skillMapper.toEntityList(eventDto.getRelatedSkills())).thenReturn(skillList);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillRepository.findById(2L)).thenReturn(Optional.empty());
         DataValidationException exception = assertThrows(DataValidationException.class, () -> {
-            eventService.skillValidation(eventDto);
+            eventValidator.skillValidation(eventDto);
         });
         assertEquals("Ошибка: навык с ID " + secondSkill.getId() + " не найден", exception.getMessage());
 
@@ -145,12 +148,12 @@ public class EventServiceTest {
         EventDto eventDto = new EventDto();
         eventDto.setOwnerId(1L);
         eventDto.setRelatedSkills(skillDtoList);
-        List result = eventService.skillValidation(eventDto);
+        List result = eventValidator.skillValidation(eventDto);
         when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(skillList);
+        when(skillMapper.toEntityList(eventDto.getRelatedSkills())).thenReturn(skillList);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillRepository.findById(2L)).thenReturn(Optional.of(secondSkill));
-        assertDoesNotThrow(() -> eventService.inputDataValidation(eventDto));
+        assertDoesNotThrow(() -> eventValidator.inputDataValidation(eventDto));
     }
 
     @Test
@@ -175,11 +178,11 @@ public class EventServiceTest {
         eventDto.setRelatedSkills(skillDtoList);
         owner.setSkills(List.of(firstSkill));
         when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(skillList);
+        when(skillMapper.toEntityList(eventDto.getRelatedSkills())).thenReturn(skillList);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillRepository.findById(2L)).thenReturn(Optional.of(secondSkill));
         DataValidationException exception = assertThrows(DataValidationException.class, () -> {
-            eventService.inputDataValidation(eventDto);
+            eventValidator.inputDataValidation(eventDto);
         });
         assertEquals("Ошибка: пользователь не обладает всеми необходимыми навыками", exception.getMessage());
     }
@@ -206,7 +209,7 @@ public class EventServiceTest {
         eventDto.setRelatedSkills(skillDtoList);
         owner.setSkills(List.of(firstSkill));
         when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(skillList);
+        when(skillMapper.toEntityList(eventDto.getRelatedSkills())).thenReturn(skillList);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillRepository.findById(2L)).thenReturn(Optional.of(secondSkill));
         when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
@@ -238,7 +241,7 @@ public class EventServiceTest {
         eventDto.setRelatedSkills(skillDtoList);
         owner.setSkills(List.of(firstSkill));
         when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(skillList);
+        when(skillMapper.toEntityList(eventDto.getRelatedSkills())).thenReturn(skillList);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillRepository.findById(2L)).thenReturn(Optional.of(secondSkill));
         DataValidationException exception = assertThrows(DataValidationException.class, () -> {
@@ -300,7 +303,7 @@ public class EventServiceTest {
         when(eventMapper.toEntity(firstEventDto)).thenReturn(firstEvent);
         when(eventMapper.toEntity(secondEventDto)).thenReturn(secondEvent);
         when(eventRepository.findAll()).thenReturn(eventList);
-        when(eventMapper.toDto(eventList)).thenReturn(eventDtoList);
+        when(eventMapper.toDtoList(eventList)).thenReturn(eventDtoList);
         when(filter.isApplicable(filters)).thenReturn(true);
         doAnswer(invocation -> {
             Stream stream = invocation.getArgument(0);
@@ -330,7 +333,6 @@ public class EventServiceTest {
         Event eventEntity = new Event();
         eventEntity.setId(1L);
         eventEntity.setOwner(owner);
-        //eventEntity.setTitle("first");
         Skill firstSkill = new Skill();
         Skill secondSkill = new Skill();
         firstSkill.setId(1L);
@@ -345,13 +347,9 @@ public class EventServiceTest {
         List skillDtoList = List.of(firstSkillDto, secondSkillDto);
         List skillList = List.of(firstSkill, secondSkill);
         eventDto.setRelatedSkills(skillDtoList);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(skillList);
-        when(eventRepository.existsById(eventDto.getId())).thenReturn(true);
-        when(eventMapper.toEntity(eventDto)).thenReturn(eventEntity);
+        when(skillMapper.toEntityList(eventDto.getRelatedSkills())).thenReturn(skillList);
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(eventEntity));
         EventDto updatedEvent = eventService.updateEvent(eventDto.getId(), eventDto);
-        verify(eventRepository, times(1)).existsById(eventDto.getId());
-        verify(eventMapper, times(1)).toEntity(eventDto);
     }
 
     @Test
@@ -360,7 +358,7 @@ public class EventServiceTest {
         List events = new ArrayList<>();
         List expectedEventDto = new ArrayList<>();
         when(eventRepository.findAllByUserId(userId)).thenReturn(events);
-        when(eventMapper.toDto(events)).thenReturn(expectedEventDto);
+        when(eventMapper.toDtoList(events)).thenReturn(expectedEventDto);
         List actualEventDto = eventService.getOwnedEvents(userId);
         verify(eventRepository, times(1)).findAllByUserId(userId);
         assertEquals(expectedEventDto, actualEventDto);
@@ -372,7 +370,7 @@ public class EventServiceTest {
         List events = new ArrayList<>();
         List expectedEventDto = new ArrayList<>();
         when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(events);
-        when(eventMapper.toDto(events)).thenReturn(expectedEventDto);
+        when(eventMapper.toDtoList(events)).thenReturn(expectedEventDto);
         List actualEventDto = eventService.getParticipatedEvents(userId);
         verify(eventRepository, times(1)).findParticipatedEventsByUserId(userId);
         assertEquals(expectedEventDto, actualEventDto);

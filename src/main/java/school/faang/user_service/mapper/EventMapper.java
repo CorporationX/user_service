@@ -17,16 +17,15 @@ public interface EventMapper {
     @Mapping(source = "ownerId", target = "owner.id")
     Event toEntity(EventDto eventdto);
 
-    default List<EventDto> toDto(List<Event> events) {
+    default List<EventDto> toDtoList(List<Event> events) {
         return events.stream()
-                .map(event -> new EventDto())
+                .map(event -> toDto(event))
                 .collect(Collectors.toList());
     }
 
-    default List<Event> toEntity(List<EventDto> eventsDto) {
+    default List<Event> toEntityList(List<EventDto> eventsDto) {
         return eventsDto.stream()
-                .map(eventDto -> new Event())
+                .map(eventDto -> toEntity(eventDto))
                 .collect(Collectors.toList());
     }
 }
-//event.getId(), event.getTitle(), event.getStartDate(), event.getEndDate(), event.getOwner().getId(), event.getDescription(), event.getRelatedSkills(),event.getLocation(),event.getMaxAttendees()

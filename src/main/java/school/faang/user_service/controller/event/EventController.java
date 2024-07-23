@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -14,51 +15,31 @@ public class EventController {
 
     private final EventService eventService;
 
-    public EventDto create(EventDto event) {
-        validateEvent(event);
+    public EventDto create(@Valid EventDto event) {
         return eventService.create(event);
     }
 
-    public void validateEvent(EventDto event) {
-        if (event.getTitle() == null || event.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("Заголовок события не должен быть пустым");
-        }
-        if (event.getStartDate() == null) {
-            throw new IllegalArgumentException("У события должна быть дата начала");
-        }
-        if (event.getOwnerId() == null) {
-            throw new IllegalArgumentException("У события должен быть пользователь, который его запускает");
-        }
-        if (event.getStartDate() == null) {
-            throw new IllegalArgumentException("У события должна быть дата начала");
-        }
-        if (event.getRelatedSkills() == null) {
-            throw new IllegalArgumentException("Событие должно иметь связанные скилы");
-        }
-    }
-
-    public EventDto getEventById(Long eventId){
+    public EventDto getEventById(@Valid Long eventId) {
         return eventService.getEventById(eventId);
     }
 
-    private List<EventDto> getEventsByFilter(EventFilterDto filters){
+    private List<EventDto> getEventsByFilter(EventFilterDto filters) {
         return eventService.getEventsByFilter(filters);
     }
 
-    public void deleteEvent(Long eventId) {
+    public void deleteEvent(@Valid Long eventId) {
         eventService.deleteEvent(eventId);
     }
 
-    public EventDto updateEvent(Long eventId, EventDto event) {
-        validateEvent(event);
+    public EventDto updateEvent(@Valid Long eventId, @Valid EventDto event) {
         return eventService.updateEvent(eventId, event);
     }
 
-    public List<EventDto>  getOwnedEvents(Long userId) {
+    public List<EventDto> getOwnedEvents(@Valid Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    public List<EventDto>  getParticipatedEvents(Long userId) {
+    public List<EventDto> getParticipatedEvents(@Valid Long userId) {
         return eventService.getParticipatedEvents(userId);
     }
 }

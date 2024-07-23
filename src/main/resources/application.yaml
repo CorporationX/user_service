@@ -51,7 +51,3 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
-
-user-service:
-  user:
-    max-inactive-days: 90

@@ -3,8 +3,6 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
@@ -18,7 +16,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,9 +23,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @Value("${user-service.user.max-inactive-days}")
-    private int USER_INACTIVE_DAYS_LIMIT;
-
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
@@ -42,7 +36,7 @@ public class UserService {
         stopPlannedEventActivities(user);
         user.setActive(false);
         stopMentorship(user);
-        return userMapper.toDto(user);
+        return userMapper.toDto(userRepository.save(user));
     }
 
     private void stopUserGoalActivities(User user) {
@@ -52,13 +46,13 @@ public class UserService {
         goalRepository.deleteAll(goalsToDelete);
     }
 
-
     private void stopPlannedEventActivities(User user) {
         List<Event> cancelledEvents = user.getOwnedEvents().stream()
                 .filter(event -> event.getStatus() == EventStatus.PLANNED)
                 .peek(event -> event.setStatus(EventStatus.CANCELED)).toList();
         eventRepository.saveAll(cancelledEvents);
         user.getOwnedEvents().removeIf(event -> event.getStatus() == EventStatus.CANCELED);
+        userRepository.save(user);
     }
 
     private void stopMentorship(User user) {
@@ -72,15 +66,5 @@ public class UserService {
         mentee.getGoals().stream()
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
-    }
-
-    @Scheduled(cron = "@daily")
-    @Transactional
-    public void deleteInactiveUsers() {
-        List<User> inactiveUsers = userRepository.findAll().stream()
-                .filter(user -> !user.isActive())
-                .filter(user -> user.getUpdatedAt().plusDays(USER_INACTIVE_DAYS_LIMIT).isBefore(LocalDateTime.now()))
-                .toList();
-        userRepository.deleteAll(inactiveUsers);
     }
 }

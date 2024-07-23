@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.userDto.UserDto;
 import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.service.UserPremiumService;
@@ -24,5 +25,16 @@ public class UserController {
             throw new IllegalArgumentException("userFilterDto ничего не содержит");
         }
         return ResponseEntity.status(HttpStatus.OK).body(userPremiumService.getPremiumUsers(userFilterDto));
+    }
+
+    @GetMapping(value = "parseUser")
+    public void getStudentsParsing(@RequestBody MultipartFile multipartFile) {
+        if (multipartFile.isEmpty()) {
+            log.error("multipartFile isEmpty");
+            throw new IllegalArgumentException("multipartFile isEmpty");
+        }else{
+            InputStream
+            userPremiumService.get..
+        }
     }
 }

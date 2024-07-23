@@ -1,20 +1,20 @@
-package school.faang.user_service.service.userFilters;
+package school.faang.user_service.filter.user;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.userdto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
 
-class ExperienceMaxFilterTest {
+class ExperienceMinFilterTest {
     private User userFirst;
     private User userSecond;
     private User userThird;
-    private ExperienceMaxFilter experienceMaxFilter;
+    private ExperienceMinFilter experienceMinFilter;
     private UserFilterDto userFilterDto;
 
     @BeforeEach
@@ -22,38 +22,39 @@ class ExperienceMaxFilterTest {
         userFirst = new User();
         userSecond = new User();
         userThird = new User();
-        experienceMaxFilter = new ExperienceMaxFilter();
+        experienceMinFilter = new ExperienceMinFilter();
         userFilterDto = mock(UserFilterDto.class);
     }
 
     @Test
-    void testIsApplicableWhenExperienceMaxPatternIsNotZero() {
-        when(userFilterDto.getExperienceMax()).thenReturn(2);
-        assertTrue(experienceMaxFilter.isApplicable(userFilterDto));
+    void testIsApplicableWhenExperienceMinPatternIsNotZero() {
+        when(userFilterDto.getExperienceMin()).thenReturn(2);
+        assertTrue(experienceMinFilter.isApplicable(userFilterDto));
     }
 
     @Test
-    void testIsApplicableWhenExperienceMaxPatternIsZero() {
-        when(userFilterDto.getExperienceMax()).thenReturn(0);
-        assertFalse(experienceMaxFilter.isApplicable(userFilterDto));
+    void testIsApplicableWhenExperienceMinPatternIsZero() {
+        when(userFilterDto.getExperienceMin()).thenReturn(0);
+        assertFalse(experienceMinFilter.isApplicable(userFilterDto));
     }
 
     @Test
-    void testApplyWhenUsersMatchExperienceMaxPattern() {
+    void testApplyWhenUsersMatchExperienceMinPattern() {
         List<User> filteredUsers = getUserList();
-        when(userFilterDto.getExperienceMax()).thenReturn(3);
+        when(userFilterDto.getExperienceMin()).thenReturn(1);
 
-        filteredUsers = experienceMaxFilter.apply(filteredUsers.stream(), userFilterDto).toList();
+        filteredUsers = experienceMinFilter.apply(filteredUsers.stream(), userFilterDto).toList();
         assertEquals(2, filteredUsers.size());
         assertTrue(filteredUsers.contains(filteredUsers.get(0)));
         assertTrue(filteredUsers.contains(filteredUsers.get(1)));
+
     }
 
     @Test
-    void testApplyWhenNoUsersMatchExperienceMaxPattern() {
+    void testApplyWhenNoUsersMatchExperienceMinPattern() {
         List<User> filteredUsers = getUserList();
-        when(userFilterDto.getExperienceMax()).thenReturn(1);
-        filteredUsers = experienceMaxFilter.apply(filteredUsers.stream(), userFilterDto).toList();
+        when(userFilterDto.getExperienceMin()).thenReturn(4);
+        filteredUsers = experienceMinFilter.apply(filteredUsers.stream(), userFilterDto).toList();
         assertEquals(0, filteredUsers.size());
         assertTrue(filteredUsers.isEmpty());
     }
@@ -61,7 +62,7 @@ class ExperienceMaxFilterTest {
     List<User> getUserList() {
         userFirst.setExperience(2);
         userSecond.setExperience(2);
-        userThird.setExperience(10);
+        userThird.setExperience(0);
         return List.of(userFirst, userSecond, userThird);
     }
 }

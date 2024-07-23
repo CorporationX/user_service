@@ -1,20 +1,20 @@
-package school.faang.user_service.service.userFilters;
+package school.faang.user_service.filter.user;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.userdto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
 
-class NameFilterTest {
+class CityFilterTest {
     private User userFirst;
     private User userSecond;
     private User userThird;
-    private NameFilter nameFilter;
+    private CityFilter cityFilter;
     private UserFilterDto userFilterDto;
 
     @BeforeEach
@@ -22,46 +22,46 @@ class NameFilterTest {
         userFirst = new User();
         userSecond = new User();
         userThird = new User();
-        nameFilter = new NameFilter();
+        cityFilter = new CityFilter();
         userFilterDto = mock(UserFilterDto.class);
     }
 
     @Test
-    void testIsApplicableWhenNamePatternIsNotNull() {
-        when(userFilterDto.getNamePattern()).thenReturn("Kevin");
-        assertTrue(nameFilter.isApplicable(userFilterDto));
+    void testIsApplicableWhenCityPatternIsNotNull() {
+        when(userFilterDto.getCityPattern()).thenReturn("Moscow");
+        assertTrue(cityFilter.isApplicable(userFilterDto));
     }
 
     @Test
-    void testIsApplicableWhenNamePatternIsNull() {
-        when(userFilterDto.getNamePattern()).thenReturn(null);
-        assertFalse(nameFilter.isApplicable(userFilterDto));
+    void testIsApplicableWhenCityPatternIsNull() {
+        when(userFilterDto.getCityPattern()).thenReturn(null);
+        assertFalse(cityFilter.isApplicable(userFilterDto));
     }
 
     @Test
-    void testApplyWhenUsersMatchNamePattern() {
+    void testApplyWhenUsersMatchCityPattern() {
         List<User> filteredUsers = getUserList();
-        when(userFilterDto.getNamePattern()).thenReturn("Rik");
+        when(userFilterDto.getCityPattern()).thenReturn("Moscow");
 
-        filteredUsers = nameFilter.apply(filteredUsers.stream(), userFilterDto).toList();
+        filteredUsers = cityFilter.apply(filteredUsers.stream(), userFilterDto).toList();
         assertEquals(2, filteredUsers.size());
         assertTrue(filteredUsers.contains(filteredUsers.get(0)));
         assertTrue(filteredUsers.contains(filteredUsers.get(1)));
     }
 
     @Test
-    void testApplyWhenNoUsersMatchNamePattern() {
+    void testApplyWhenNoUsersMatchCityPattern() {
         List<User> filteredUsers = getUserList();
-        when(userFilterDto.getNamePattern()).thenReturn("Tomas");
-        filteredUsers = nameFilter.apply(filteredUsers.stream(), userFilterDto).toList();
+        when(userFilterDto.getCityPattern()).thenReturn("New York");
+        filteredUsers = cityFilter.apply(filteredUsers.stream(), userFilterDto).toList();
         assertEquals(0, filteredUsers.size());
         assertTrue(filteredUsers.isEmpty());
     }
 
     List<User> getUserList() {
-        userFirst.setUsername("Rik");
-        userSecond.setUsername("Rik");
-        userThird.setUsername("Victor");
+        userFirst.setCity("Moscow");
+        userSecond.setCity("Moscow");
+        userThird.setCity("others");
         return List.of(userFirst, userSecond, userThird);
     }
 }

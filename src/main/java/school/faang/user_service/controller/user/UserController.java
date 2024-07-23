@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Tag(name = "Users")
 @Slf4j
@@ -52,9 +52,10 @@ public class UserController {
         return userService.findPremiumUsers(filter);
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     @Operation(summary = "Get user by ID")
     public UserDto getUserById(@PathVariable("userId") long userId) {
+        log.info("Get user by ID {}", userId);
         return userService.getUserById(userId);
     }
 

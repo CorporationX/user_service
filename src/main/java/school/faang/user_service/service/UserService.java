@@ -14,6 +14,9 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -66,15 +69,17 @@ public class UserService {
     }
 
     public UserDto getUser(long userId){
-        Optional<User> user = repository.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
         UserDto dto = mapper.toDto(user.orElse(null));
         return dto;
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids){
-        Iterable<User> iterable = repository.findAllById(ids);
+        Iterable<User> iterable = userRepository.findAllById(ids);
         Stream<User> stream = StreamSupport.stream(iterable.spliterator(),false);
         return stream.map(user -> mapper.toDto(user))
                 .toList();
     }
+
+
 }

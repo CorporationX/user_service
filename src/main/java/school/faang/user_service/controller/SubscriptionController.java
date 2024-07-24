@@ -1,46 +1,71 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
-@Component
+@RestController
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeeId) throws DataValidationException {
-        if (followerId == followeeId) {
-            throw new DataValidationException("You cannot follow yourself!");
+    @PostMapping("/follow")
+    public ResponseEntity<String> followUser(@RequestParam long followerId, @RequestParam long followeeId) {
+        try {
+            if (followerId == followeeId) {
+                throw new DataValidationException("You cannot follow yourself!");
+            }
+            boolean success = subscriptionService.followUser(followerId, followeeId);
+            return ResponseEntity.ok(success ? "Followed successfully" : "Failed to follow");
+        } catch (DataValidationException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        subscriptionService.followUser(followerId, followeeId);
     }
 
-    public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
-        if (followerId == followeeId) {
-            throw new DataValidationException("You cannot unfollow yourself!");
+    @PostMapping("/unfollow")
+    public ResponseEntity<String> unfollowUser(@RequestParam long followerId, @RequestParam long followeeId) {
+        try {
+            if (followerId == followeeId) {
+                throw new DataValidationException("You cannot unfollow yourself!");
+            }
+            boolean success = subscriptionService.unfollowUser(followerId, followeeId);
+            return ResponseEntity.ok(success ? "Unfollowed successfully" : "Failed to unfollow");
+        } catch (DataValidationException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-        return subscriptionService.getFollowers(followeeId, filter);
+    @GetMapping("/followers")
+    public ResponseEntity<List<UserDto>> getFollowers(@RequestParam long followeeId, @RequestBody UserFilterDto filter) {
+        List<UserDto> followers = subscriptionService.getFollowers(followeeId, filter);
+        return ResponseEntity.ok(followers);
     }
 
-    public long getFollowersCount(long followerId) {
-        return subscriptionService.getFollowersCount(followerId);
+    @GetMapping("/followers/count")
+    public ResponseEntity<Long> getFollowersCount(@RequestParam long followerId) {
+        long count = subscriptionService.getFollowersCount(followerId);
+        return ResponseEntity.ok(count);
     }
 
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
-        return subscriptionService.getFollowing(followerId, filter);
+    @GetMapping("/following")
+    public ResponseEntity<List<UserDto>> getFollowing(@RequestParam long followerId, @RequestBody UserFilterDto filter) {
+        List<UserDto> following = subscriptionService.getFollowing(followerId, filter);
+        return ResponseEntity.ok(following);
     }
 
-    public long getFollowingCount(long followerId) {
-        return subscriptionService.getFollowingCount(followerId);
+    @GetMapping("/following/count")
+    public ResponseEntity<Long> getFollowingCount(@RequestParam long followerId) {
+        long count = subscriptionService.getFollowingCount(followerId);
+        return ResponseEntity.ok(count);
     }
 }

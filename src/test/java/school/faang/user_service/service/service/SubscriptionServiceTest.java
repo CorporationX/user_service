@@ -4,13 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
@@ -19,6 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,13 +33,20 @@ public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
-    @Mock
+    @Spy
     private UserMapperImpl userMapper;
+
+    @Mock
+    private UserFilter userFilter;
+
+    public void setup() {
+        when(userFilter.apply(any(User.class), any(UserFilterDto.class))).thenReturn(true);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, List.of(userFilter));
+    }
 
     @Test
     public void testFollowUsersWithExistingSubscription() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(true);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L)).thenReturn(true);
 
         assertThrows(DataValidationException.class,
                 () -> subscriptionService.followUser(1L, 2L));
@@ -47,8 +57,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testFollowUsersSuccess() throws DataValidationException {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(false);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L)).thenReturn(false);
         subscriptionService.followUser(1L, 2L);
 
         verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(1L, 2L);
@@ -65,6 +74,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testGetFollowers() {
+        setup();
         long followeeId = 1L;
         User user = createUser();
         List<User> mockUsers = List.of(user);
@@ -110,6 +120,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testGetFollowing() {
+        setup();
         long followerId = 1L;
         User user = createUser();
         List<User> mockUsers = List.of(user);
@@ -155,6 +166,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testFilterUsers() {
+        setup();
         User user = createUser();
         List<User> mockUsers = List.of(user);
         UserFilterDto filter = new UserFilterDto();

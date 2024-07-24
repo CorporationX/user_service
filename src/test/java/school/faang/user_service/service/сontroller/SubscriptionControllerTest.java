@@ -5,16 +5,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.SubscriptionController;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -32,30 +32,38 @@ public class SubscriptionControllerTest {
 
     @Test
     public void testFollowUserWithSameId() throws DataValidationException {
-        assertThrows(DataValidationException.class,
-                () -> subscriptionController.followUser(1L, 1L));
+        ResponseEntity<String> response = subscriptionController.followUser(1L, 1L);
+        assertEquals("You cannot follow yourself!", response.getBody());
+        assertEquals(400, response.getStatusCodeValue());
         verify(subscriptionService, never()).followUser(anyLong(), anyLong());
     }
 
     @Test
     public void testFollowUserWithDifferentId() throws DataValidationException {
-        subscriptionController.followUser(1L, 2L);
+        when(subscriptionService.followUser(1L, 2L)).thenReturn(true);
 
+        ResponseEntity<String> response = subscriptionController.followUser(1L, 2L);
+        assertEquals("Followed successfully", response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
         verify(subscriptionService, times(1)).followUser(1L, 2L);
     }
 
     @Test
     public void testUnfollowUserWithSameId() {
-        assertThrows(DataValidationException.class,
-                () -> subscriptionController.unfollowUser(1L, 1L));
+        ResponseEntity<String> response = subscriptionController.unfollowUser(1L, 1L);
+        assertEquals("You cannot unfollow yourself!", response.getBody());
+        assertEquals(400, response.getStatusCodeValue());
         verify(subscriptionService, never()).unfollowUser(anyLong(), anyLong());
     }
 
     @Test
-    public void testUnfollowUserWithDifferentId() throws DataValidationException {
-        subscriptionController.unfollowUser(1L, 2L);
-        verify(subscriptionService, times(1)).unfollowUser(1L, 2L);
-    }
+    public void testUnfollowUserWithDifferentId() {
+        when(subscriptionService.unfollowUser(1L, 2L)).thenReturn(true);
+
+        ResponseEntity<String> response = subscriptionController.unfollowUser(1L, 2L);
+        assertEquals("Unfollowed successfully", response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+        verify(subscriptionService, times(1)).unfollowUser(1L, 2L);    }
 
     @Test
     public void testGetFollowers() {
@@ -65,9 +73,9 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.getFollowers(followeeId, filter)).thenReturn(expected);
 
-        List<UserDto> actual = subscriptionController.getFollowers(followeeId, filter);
+        ResponseEntity<List<UserDto>> response = subscriptionController.getFollowers(followeeId, filter);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, response.getBody());
         verify(subscriptionService).getFollowers(followeeId, filter);
     }
 
@@ -78,9 +86,9 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.getFollowersCount(followerId)).thenReturn(expectedCount);
 
-        long actualCount = subscriptionController.getFollowersCount(followerId);
+        ResponseEntity<Long> response = subscriptionController.getFollowersCount(followerId);
 
-        assertEquals(expectedCount, actualCount);
+        assertEquals(expectedCount, response.getBody());
         verify(subscriptionService).getFollowersCount(followerId);
     }
 
@@ -92,9 +100,9 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.getFollowing(followeeId, filter)).thenReturn(expected);
 
-        List<UserDto> actual = subscriptionController.getFollowing(followeeId, filter);
+        ResponseEntity<List<UserDto>> response = subscriptionController.getFollowing(followeeId, filter);
 
-        assertEquals(expected, actual);
+        assertEquals(expected, response.getBody());
         verify(subscriptionService).getFollowing(followeeId, filter);
     }
 
@@ -105,9 +113,9 @@ public class SubscriptionControllerTest {
 
         when(subscriptionService.getFollowingCount(followerId)).thenReturn(expectedCount);
 
-        long actualCount = subscriptionController.getFollowingCount(followerId);
+        ResponseEntity<Long> response = subscriptionController.getFollowingCount(followerId);
 
-        assertEquals(expectedCount, actualCount);
+        assertEquals(expectedCount, response.getBody());
         verify(subscriptionService).getFollowingCount(followerId);
     }
 }

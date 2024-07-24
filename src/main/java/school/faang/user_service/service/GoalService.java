@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,11 +9,9 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
-import school.faang.user_service.mapper.GoalDtoMapper;
+import school.faang.user_service.mapper.goal.GoalDtoMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.skill.SkillService;
-import school.faang.user_service.service.goal.user.UserService;
-import school.faang.user_service.service.goal.validation.GoalValidator;
+import school.faang.user_service.validation.GoalValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +51,6 @@ public class GoalService {
 
     @Transactional
     public void deleteGoal(long goalId) {
-        goalValidator.validateGoalExistence(goalId);
         goalRepository.deleteById(goalId);
     }
 

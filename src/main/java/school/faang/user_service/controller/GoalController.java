@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.goal;
+package school.faang.user_service.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.GoalService;
 
 import java.util.List;
 

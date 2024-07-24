@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal.validation;
+package school.faang.user_service.validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +18,8 @@ public class GoalValidator {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final GoalRepository goalRepository;
-    @Value("${goal_validator.max_active_goals_per_user_for_creating_new_goal}")
-    private int maxGoalsCount;
+    @Value("${goal.max_active_goals:2}")
+    private int maxActiveGoals;
 
 
     public void validateCreation(long userId, GoalDto goalDto) {
@@ -42,7 +42,7 @@ public class GoalValidator {
     }
 
     private void validateActiveGoalsCount(long userId) {
-        if (goalRepository.countActiveGoalsPerUser(userId) > maxGoalsCount) {
+        if (goalRepository.countActiveGoalsPerUser(userId) > maxActiveGoals) {
             log.info("Active goals count exceeded for user {}", userId);
             throw new InvalidRequestParams("Active goals count exceeded");
         }

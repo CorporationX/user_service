@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.goal;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,10 +22,6 @@ public interface GoalDtoMapper {
 
     List<GoalDto> toDtos(List<Goal> goals);
 
-    @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "invitations", ignore = true)
-    @Mapping(target = "users", ignore = true)
-    @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
 
     @Named("skillsToIds")

@@ -1,0 +1,53 @@
+package school.faang.user_service.controller.userProfilePic;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.userProfile.UserProfileDto;
+import school.faang.user_service.service.userProfilePic.UserProfilePicService;
+import school.faang.user_service.validator.userProfilePic.UserProfilePicValidation;
+
+import java.io.IOException;
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/profile/image")
+public class UserProfilePicController {
+    private final UserProfilePicService userProfilePicService;
+    private final UserProfilePicValidation userProfilePicValidation;
+
+    //сохранение
+    @PostMapping("/creation/{userId}")
+    public ResponseEntity<UserProfileDto> addImageInProfile(@PathVariable Long userId,
+                                                            @RequestParam("file") MultipartFile multipartFile) throws IOException {
+        userProfilePicValidation.validMaxSize(multipartFile);
+        return ResponseEntity.status(HttpStatus.OK).body(userProfilePicService.addImageInProfile(userId, multipartFile));
+    }
+
+    //вариант с 2 фото и списком
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<List<byte[]>> getImageFromProfile(@PathVariable Long userId) throws IOException {
+//        return ResponseEntity.status(HttpStatus.OK).body(userProfilePicService.getImageFromProfile(userId));
+//    }
+
+    // вариант с 1 фото
+    @GetMapping("/{userId}")
+    public ResponseEntity<byte[]> getImageFromProfile(@PathVariable Long userId) throws IOException {
+        byte[] result = userProfilePicService.getImageFromProfile(userId).readAllBytes();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.IMAGE_JPEG);
+
+        return new  ResponseEntity<>(result, httpHeaders, HttpStatus.OK);
+    }
+
+    //удаление
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<UserProfileDto> deleteImageFromProfile(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userProfilePicService.deleteImageFromProfile(userId));
+    }
+}

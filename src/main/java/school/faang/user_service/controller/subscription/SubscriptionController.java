@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${servlet.pathV1}/subscription")
+@RequestMapping("/subscription")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final SubscriptionValidator subscriptionValidator;
@@ -67,5 +67,10 @@ public class SubscriptionController {
         subscriptionValidator.checkIdIsCorrect(followerId);
 
         return subscriptionService.getFollowingCount(followerId);
+    }
+
+    @GetMapping("/following/without-filters/{followerId}")
+    public List<UserDto> getFollowingId(@PathVariable long followerId) {
+        return subscriptionService.getFollowingId(followerId);
     }
 }

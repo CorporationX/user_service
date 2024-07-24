@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.user;
 
 import com.json.student.Person;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import school.faang.user_service.converter.starter.ConverterCsvToPerson;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ErrorResponse;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.UserFilterDtoValidator;
 import school.faang.user_service.validator.UserValidator;
@@ -20,6 +22,7 @@ import school.faang.user_service.validator.UserValidator;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 

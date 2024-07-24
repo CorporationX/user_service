@@ -68,6 +68,13 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserDto> getFollowingId(long followerId) {
+        List<Long> followeeIds = subscriptionRepository.findFoloweeIdByFollowerId(followerId);
+
+        return followeeIds.stream().map(UserDto::new).toList();
+    }
+
     private List<UserDto> filterUser(List<User> users, UserFilterDto filters) {
 
         return userFilters.stream()

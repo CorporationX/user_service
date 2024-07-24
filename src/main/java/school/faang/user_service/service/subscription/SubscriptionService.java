@@ -36,32 +36,42 @@ public class SubscriptionService {
         log.info("User + (id=" + followerId + ") subscribed to user (id=" + followeeId + ").");
     }
 
+    @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionRepo.unfollowUser(followerId, followeeId);
         log.info("User + (id=" + followerId + ") canceled subscription to user (id=" + followeeId + ").");
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         return filterUsers(subscriptionRepo.findByFolloweeId(followeeId).toList(), filter);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Long> getFollowersIds(long followeeId) {
         return subscriptionRepo.findByFolloweeId(followeeId)
                 .map(User::getId)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public int getFollowersCount(long followeeId) {
         return subscriptionRepo.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         return filterUsers(subscriptionRepo.findByFollowerId(followerId).toList(), filter);
     }
 
+    @Transactional(readOnly = true)
+    public List<Long> getFollowingIds(long followerId) {
+        return subscriptionRepo.findByFollowerId(followerId)
+                .map(User::getId)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public int getFollowingCount(long followerId) {
         return subscriptionRepo.findFolloweesAmountByFollowerId(followerId);
     }

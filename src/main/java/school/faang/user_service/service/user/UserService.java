@@ -24,7 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static school.faang.user_service.exception.message.ExceptionMessage.*;
+import static school.faang.user_service.exception.message.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_COUNTRY_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.REPEATED_USER_CREATION_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.USER_AVATAR_ABSENCE_EXCEPTION;
 
 @Slf4j
 @Service
@@ -67,19 +71,28 @@ public class UserService {
         return uploadUserAvatar(createdUser.getId(), avatar);
     }
 
+    @Transactional(readOnly = true)
     public UserDto getUser(long userId) {
         return userMapper.toDto(getUserEntity(userId));
     }
 
+    @Transactional(readOnly = true)
     public User getUserEntity(long userId) {
         return userRepository.findById(userId).orElseThrow(()
                 -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage()));
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        return userRepository.findAllById(ids)
-                .stream()
+        return userRepository.findAllById(ids).stream()
                 .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getAllUsersIds() {
+        return userRepository.findAll().stream()
+                .map(User::getId)
                 .toList();
     }
 

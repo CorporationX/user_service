@@ -17,5 +17,5 @@ import school.faang.user_service.client.paymentService.model.PaymentResponse;
 public interface PaymentServiceFeignClient {
 
     @PostMapping("${payment-service.api}${payment-service.sendPayment}")
-    PaymentResponse sendPayment(@RequestBody PaymentRequest request);
+    PaymentResponse sendPaymentRequest(@RequestBody PaymentRequest request);
 }

@@ -30,16 +30,14 @@ public class PremiumService {
     private final PremiumMapper mapper;
 
     @Transactional
-    public PremiumDto buyPremium(long userId, PremiumPeriod period) {
-        User user = findUserById(userId);
+    public long buyPremium(long userId, PremiumPeriod period) {
+        checkIfExistsUser(userId);
         boolean existPremium = premiumRepository.existsByUserId(userId);
         if (existPremium) {
             throw new PremiumIllegalArgumentException(
                     "User with id: " + userId + " already has a premium subscription");
         }
-        Premium premium = savePremium(user, period.getDays());
-        paymentClient.sendPayment(userId, period.getPrice());
-        return mapper.toPremiumDto(premium);
+        return paymentClient.sendPaymentRequest(userId, period.getPrice());
     }
 
     private Premium savePremium(User user, int days) {
@@ -58,5 +56,12 @@ public class PremiumService {
                 .orElseThrow(() ->
                         new PremiumIllegalArgumentException(
                                 "User with id: " + userId + " not found"));
+    }
+
+    private void checkIfExistsUser(long userId) {
+        boolean exists = userRepository.existsById(userId);
+        if (!exists) {
+            throw new PremiumIllegalArgumentException("User with id: " + userId + " not found");
+        }
     }
 }

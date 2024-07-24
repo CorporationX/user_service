@@ -22,13 +22,13 @@ public class PromotionController {
     private final PromotionService service;
 
     @PostMapping("/user/buy")
-    public PromotionDto buyUserPromotion(@RequestParam long promotionId) {
+    public long buyUserPromotion(@RequestParam long promotionId) {
         long userId = userContext.getUserId();
         return service.buyUserPromotion(userId, promotionId);
     }
 
     @PostMapping("/event/buy")
-    public PromotionDto buyEventPromotion(@RequestParam long eventId,
+    public long buyEventPromotion(@RequestParam long eventId,
                                           @RequestParam long promotionId) {
         return service.buyEventPromotion(eventId, promotionId);
     }

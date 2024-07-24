@@ -38,21 +38,17 @@ public class PromotionService {
     private final PromotionMapper promotionMapper;
 
     @Transactional
-    public PromotionDto buyUserPromotion(long userId, long promotionId) {
-        User user = findUserById(userId);
+    public long buyUserPromotion(long userId, long promotionId) {
+        checkIfExistsUser(userId);
         PromotionTariff tariff = findTariffById(promotionId);
-        saveUserPromotion(user, tariff);
-        paymentClient.sendPayment(userId, tariff.getPriceUsd());
-        return promotionMapper.tariffToPromotionDto(tariff);
+        return paymentClient.sendPaymentRequest(userId, tariff.getPriceUsd());
     }
 
     @Transactional
-    public PromotionDto buyEventPromotion(long eventId, long promotionId) {
+    public long buyEventPromotion(long eventId, long promotionId) {
         Event event = findEventById(eventId);
         PromotionTariff tariff = findTariffById(promotionId);
-        saveEventPromotion(event, tariff);
-        paymentClient.sendPayment(event.getId(), tariff.getPriceUsd());
-        return promotionMapper.tariffToPromotionDto(tariff);
+        return paymentClient.sendPaymentRequest(event.getId(), tariff.getPriceUsd());
     }
 
     public List<PromotionDto> getAllPromotionTariffs() {
@@ -89,5 +85,12 @@ public class PromotionService {
     private Event findEventById(long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new PromotionIllegalArgumentException("Event not found id: " + eventId));
+    }
+
+    private void checkIfExistsUser(long userId) {
+        boolean exists = userRepository.existsById(userId);
+        if (!exists) {
+            throw new PromotionIllegalArgumentException("User with id: " + userId + " not found");
+        }
     }
 }

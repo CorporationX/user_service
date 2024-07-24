@@ -7,13 +7,13 @@ import java.math.BigDecimal;
 
 public record PaymentRequest(
         @NotNull
-        long paymentNumber,
+        long requestId,
 
         @Min(1)
         @NotNull
         BigDecimal amount,
 
         @NotNull
-        String currency
+        Currency currency
 ) {
 }

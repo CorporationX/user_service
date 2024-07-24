@@ -26,7 +26,7 @@ public class PremiumController {
     private final PremiumService premiumService;
 
     @PostMapping
-    public PremiumDto buyPremium(@RequestParam @Positive int days) {
+    public long buyPremium(@RequestParam @Positive int days) {
         PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
         return premiumService.buyPremium(userContext.getUserId(), premiumPeriod);
     }

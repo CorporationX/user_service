@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
@@ -27,7 +27,7 @@ class RecommendationRequestControllerTest {
     @Mock
     private RecommendationRequestDto recommendationRequest;
     @Mock
-    private RejectionDto rejection;
+    private RejectionRequestDto rejection;
     private RecommendationRequestDto messageRequest;
     private RequestFilterDto validRequestFilterDto;
 
@@ -50,33 +50,6 @@ class RecommendationRequestControllerTest {
         assertEquals(messageRequest.getMessage(), result.getMessage());
 
         verify(recommendationRequestService, times(1)).create(messageRequest);
-    }
-
-    @Test
-    void testRequestRecommendationIsBlank() {
-        messageRequest = createRecommendationRequestDtoWithMessage(" ");
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            recommendationRequestController.requestRecommendation(messageRequest);
-        });
-
-        String expectedMessage = "The request contains an empty message";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-        verify(recommendationRequestService, never()).create(messageRequest);
-    }
-
-    @Test
-    void testRequestRecommendationIsNull() {
-        messageRequest = createRecommendationRequestDtoWithMessage(null);
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestController.requestRecommendation(messageRequest));
-
-        String expectedMessage = "The request contains an empty message";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-        verify(recommendationRequestService, never()).create(messageRequest);
     }
 
     @Test
@@ -174,8 +147,8 @@ class RecommendationRequestControllerTest {
         result.setStatusFilter(requestStatus);
         return result;
     }
-    private RejectionDto createRejectionDtoWithReason(String reason){
-        RejectionDto result = new RejectionDto();
+    private RejectionRequestDto createRejectionDtoWithReason(String reason){
+        RejectionRequestDto result = new RejectionRequestDto();
         result.setReason(reason);
         return result;
     }

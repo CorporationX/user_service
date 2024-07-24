@@ -8,7 +8,5 @@ import school.faang.user_service.entity.RequestStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestFilterDto {
-//    private Long idPattern;
-//    private RequestStatus statusPattern;
     private RequestStatus statusFilter;
 }

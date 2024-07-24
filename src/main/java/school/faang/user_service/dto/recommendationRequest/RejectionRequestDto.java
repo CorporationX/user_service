@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class RejectionDto {
+public class RejectionRequestDto {
     @NotBlank
     private String reason;
 }

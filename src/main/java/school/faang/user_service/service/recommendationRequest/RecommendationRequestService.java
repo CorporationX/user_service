@@ -2,17 +2,17 @@ package school.faang.user_service.service.recommendationRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.recommendationRequest.filer.RequestFilter;
+import school.faang.user_service.filter.recomendation.RequestFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -33,7 +33,7 @@ public class RecommendationRequestService {
     private final List<RequestFilter> requestFilter;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        verificationObject(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
+        checkExistenceObjectByIds(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
         heckForRequestsOfSixMonths(recommendationRequestDto);
         List<SkillRequest> skills = checkSkillRequestInDatabase(recommendationRequestDto);
 
@@ -64,12 +64,12 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(request);
     }
 
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
+    public RecommendationRequestDto rejectRequest(long id, RejectionRequestDto rejectionRequestDto) {
         return recommendationRequestRepository.findById(id)
                 .map(request -> {
                     if (request.getStatus() == RequestStatus.PENDING) {
                         request.setStatus(RequestStatus.REJECTED);
-                        request.setRejectionReason(rejectionDto.getReason());
+                        request.setRejectionReason(rejectionRequestDto.getReason());
                         recommendationRequestRepository.save(request);
                         return recommendationRequestMapper.toDto(request);
                     } else {
@@ -78,7 +78,7 @@ public class RecommendationRequestService {
                 }).orElseThrow(() -> new IllegalArgumentException("Request not found"));
     }
 
-    private void verificationObject(long requesterId, long recieverId) {
+    private void checkExistenceObjectByIds(long requesterId, long recieverId) {
         if (!userRepository.existsById(requesterId) || !userRepository.existsById(recieverId)) {
             throw new IllegalArgumentException("Requester or Reciever does not exist in the database");
         }

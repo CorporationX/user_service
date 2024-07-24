@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
@@ -19,12 +19,6 @@ public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
     @PostMapping("/create")
     public ResponseEntity<RecommendationRequestDto> requestRecommendation(@Valid @RequestBody RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest == null) {
-            throw new IllegalArgumentException("The request contains an empty message");
-        }
-        if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
-            throw new IllegalArgumentException("The request contains an empty message");
-        }
         return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.create(recommendationRequest));
     }
     @GetMapping("/requests")
@@ -43,7 +37,7 @@ public class RecommendationRequestController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<RecommendationRequestDto> rejectRequest(@PathVariable Long id,
-                                                                  @Valid @RequestBody RejectionDto rejection) {
+                                                                  @Valid @RequestBody RejectionRequestDto rejection) {
         if (rejection == null) {
             throw new IllegalArgumentException("Аргумент пустой");
         }

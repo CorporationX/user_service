@@ -1,8 +1,9 @@
-package school.faang.user_service.service.recommendationRequest.filer;
+package school.faang.user_service.filter.recomendation;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.filter.recomendation.RequestFilter;
 
 import java.util.stream.Stream;
 

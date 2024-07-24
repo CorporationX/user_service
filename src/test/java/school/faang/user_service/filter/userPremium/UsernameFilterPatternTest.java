@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.userPremium;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,9 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userDto.UserFilterDto;
+import school.faang.user_service.dto.userPremium.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.filter.userFilter.UsernameFilterPattern;
+import school.faang.user_service.filter.userPremium.UsernameFilterPattern;
 
 import java.util.List;
 import java.util.stream.Stream;

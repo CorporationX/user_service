@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recomendation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,18 +8,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.recommendationRequest.filer.RequestFilter;
+import school.faang.user_service.filter.recomendation.RequestFilter;
 import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
 import java.time.LocalDateTime;
@@ -48,13 +48,11 @@ class RecommendationRequestServiceTest {
     @Mock
     private SkillRequestRepository skillRequestRepository;
     @Mock
-    private RequestFilter idPatternFilter;
-    @Mock
     private RequestFilter statusPatternFilter;
     @Mock
     private List<RequestFilter> requestFilter;
     RecommendationRequestDto requestDto;
-    RejectionDto rejectionDto;
+    RejectionRequestDto rejectionRequestDto;
     RecommendationRequest recommendationRequest;
 
 
@@ -65,8 +63,8 @@ class RecommendationRequestServiceTest {
         requestDto.setRecieverId(1L);
         requestDto.setSkillsId(Arrays.asList(1L, 2L, 3L));
 
-        rejectionDto = new RejectionDto();
-        rejectionDto.setReason("Отказано");
+        rejectionRequestDto = new RejectionRequestDto();
+        rejectionRequestDto.setReason("Отказано");
 
         recommendationRequest = new RecommendationRequest();
         recommendationRequest.setId(1);
@@ -78,8 +76,6 @@ class RecommendationRequestServiceTest {
                 new SkillRequest()));
 
         requestFilterDto = new RequestFilterDto();
-
-        idPatternFilter = Mockito.mock(RequestFilter.class);
     }
 
     @Test
@@ -153,12 +149,8 @@ class RecommendationRequestServiceTest {
                 .thenReturn(true);
         when(statusPatternFilter.apply(any(), any()))
                 .thenReturn(Stream.of(recommendationRequest));
-        when(idPatternFilter.isApplication(any()))
-                .thenReturn(true);
-        when(idPatternFilter.apply(any(), any()))
-                .thenReturn(Stream.of(recommendationRequest));
         when(requestFilter.stream())
-                .thenReturn(Stream.of(statusPatternFilter, idPatternFilter));
+                .thenReturn(Stream.of(statusPatternFilter));
         when(recommendationRequestRepository.findAll())
                 .thenReturn(List.of(new RecommendationRequest()));
         when(recommendationRequestMapper.toDto(any()))
@@ -198,7 +190,7 @@ class RecommendationRequestServiceTest {
         when(recommendationRequestRepository.findById(id))
                 .thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestService.rejectRequest(id, rejectionDto));
+                () -> recommendationRequestService.rejectRequest(id, rejectionRequestDto));
     }
 
     @Test
@@ -211,7 +203,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(Optional.of(recommendationRequest));
 
         assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestService.rejectRequest(id, rejectionDto));
+                () -> recommendationRequestService.rejectRequest(id, rejectionRequestDto));
     }
 
     @Test
@@ -227,7 +219,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(recommendationRequest);
         when(recommendationRequestMapper.toDto(recommendationRequest))
                 .thenReturn(requestDto);
-        recommendationRequestService.rejectRequest(id, rejectionDto);
+        recommendationRequestService.rejectRequest(id, rejectionRequestDto);
 
         verify(recommendationRequestRepository, times(1))
                 .save(recommendationRequest);

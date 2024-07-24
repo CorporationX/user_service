@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,11 @@ import school.faang.user_service.validator.SkillValidator;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SkillService {
     private static final int MIN_SKILL_OFFERS = 3;
-    private static final Logger log = LoggerFactory.getLogger(SkillService.class);
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final UserRepository userRepository;

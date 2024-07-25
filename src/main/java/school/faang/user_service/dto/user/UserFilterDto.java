@@ -2,6 +2,7 @@ package school.faang.user_service.dto.user;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +39,10 @@ public class UserFilterDto {
     @Size(max = 255)
     private String skillPattern;
 
+    @NotNull
     private int experienceMin;
+
+    @NotNull
     private int experienceMax;
     @Min(1)
     @Max(10)

@@ -1,6 +1,8 @@
 package school.faang.user_service.service.recommendationRequest;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
@@ -8,6 +10,7 @@ import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -22,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
@@ -60,7 +64,10 @@ public class RecommendationRequestService {
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = recommendationRequestRepository
                 .findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Request with ID " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.error(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
+                    return new NoSuchElementException(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
+                });
         return recommendationRequestMapper.toDto(request);
     }
 
@@ -73,14 +80,19 @@ public class RecommendationRequestService {
                         recommendationRequestRepository.save(request);
                         return recommendationRequestMapper.toDto(request);
                     } else {
-                        throw new IllegalArgumentException("The status is not PENDING");
+                        log.error(ExceptionMessages.DISCREPANCY_OF_STATUS);
+                        throw new IllegalStateException(ExceptionMessages.DISCREPANCY_OF_STATUS);
                     }
-                }).orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                }).orElseThrow(() -> {
+                    log.error(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
+                    return new NoSuchElementException(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
+                });
     }
 
     private void checkExistenceObjectByIds(long requesterId, long recieverId) {
         if (!userRepository.existsById(requesterId) || !userRepository.existsById(recieverId)) {
-            throw new IllegalArgumentException("Requester or Reciever does not exist in the database");
+            log.error(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
+            throw new EntityNotFoundException(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
         }
     }
 
@@ -90,16 +102,19 @@ public class RecommendationRequestService {
         if (recommendationRequest.isPresent()) {
             LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
             if (recommendationRequest.get().getUpdatedAt().isAfter(localDateTime)) {
-                throw new IllegalArgumentException("Recommendation request can only be sent once every 6 months");
+                log.error(ExceptionMessages.RECOMMENDATION_FREQUENCY);
+                throw new IllegalStateException(ExceptionMessages.RECOMMENDATION_FREQUENCY);
             }
         }
     }
 
     private List<SkillRequest> checkSkillRequestInDatabase(RecommendationRequestDto recommendationRequestDto) {
         List<Long> skillsId = recommendationRequestDto.getSkillsId();
-        List<SkillRequest> skills = StreamSupport.stream(skillRequestRepository.findAllById(skillsId).spliterator(), false).toList();
+        List<SkillRequest> skills = StreamSupport
+                .stream(skillRequestRepository.findAllById(skillsId).spliterator(), false).toList();
         if (skills.isEmpty()) {
-            throw new NullPointerException("One or more requested skills do not exist in the database");
+            log.error(ExceptionMessages.REQUEST_SKILL);
+            throw new NullPointerException(ExceptionMessages.REQUEST_SKILL);
         }
         return skills;
     }

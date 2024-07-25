@@ -1,5 +1,6 @@
 package school.faang.user_service.service.recomendation;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ class RecommendationRequestServiceTest {
     public void testCreateWithFindByIdRequesterAndReceiver() {
         when(userRepository.existsById(anyLong()))
                 .thenReturn(false);
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> recommendationRequestService.create(requestDto));
     }
 
@@ -94,7 +95,7 @@ class RecommendationRequestServiceTest {
 
         checkLastRequest(requestDto, LocalDateTime.now());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalStateException.class,
                 () -> recommendationRequestService.create(requestDto));
     }
 
@@ -189,7 +190,7 @@ class RecommendationRequestServiceTest {
         long id = 1;
         when(recommendationRequestRepository.findById(id))
                 .thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NoSuchElementException.class,
                 () -> recommendationRequestService.rejectRequest(id, rejectionRequestDto));
     }
 
@@ -202,7 +203,7 @@ class RecommendationRequestServiceTest {
         when(recommendationRequestRepository.findById(id))
                 .thenReturn(Optional.of(recommendationRequest));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalStateException.class,
                 () -> recommendationRequestService.rejectRequest(id, rejectionRequestDto));
     }
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.controller.ApiPath;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
 import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
@@ -14,14 +15,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/recommendation")
+@RequestMapping(ApiPath.REQUEST_RECOMMENDATION)
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<RecommendationRequestDto> requestRecommendation(@Valid @RequestBody RecommendationRequestDto recommendationRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.create(recommendationRequest));
     }
-    @GetMapping("/requests")
+    @GetMapping()
     public ResponseEntity<List<RecommendationRequestDto>> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
         if (filter == null) {
             throw new IllegalArgumentException("Фильтр пустой");

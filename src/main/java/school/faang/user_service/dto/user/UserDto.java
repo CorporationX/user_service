@@ -21,4 +21,8 @@ public class UserDto {
     private String smallPicId;
     private String phone;
     private String preferenceContact;
+
+    public UserDto(long id) {
+        this.id = id;
+    }
 }

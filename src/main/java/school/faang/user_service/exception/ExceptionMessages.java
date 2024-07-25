@@ -14,4 +14,8 @@ public final class ExceptionMessages {
     public static final String MENTORSHIP_FREQUENCY = "You are eligible for only one mentorship within 3 months.";
     public static final String MENTORSHIP_REQUEST_NOT_FOUND = "Mentorship request cannot be found.";
     public static final String MENTORSHIP_ALREADY_ONGOING = "You already mentor this user.";
+
+    // userProfilePic
+    public static final String USER_NOT_FOUND = "User with this id not in database";
+    public static final String CLOUD_SENDING = "Failed to put request object before sending to cloud";
 }

@@ -12,7 +12,6 @@ import school.faang.user_service.service.userProfilePic.UserProfilePicService;
 import school.faang.user_service.validator.userProfilePic.UserProfilePicValidation;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +20,6 @@ public class UserProfilePicController {
     private final UserProfilePicService userProfilePicService;
     private final UserProfilePicValidation userProfilePicValidation;
 
-    //сохранение
     @PostMapping("/creation/{userId}")
     public ResponseEntity<UserProfileDto> addImageInProfile(@PathVariable Long userId,
                                                             @RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -29,23 +27,15 @@ public class UserProfilePicController {
         return ResponseEntity.status(HttpStatus.OK).body(userProfilePicService.addImageInProfile(userId, multipartFile));
     }
 
-    //вариант с 2 фото и списком
-//    @GetMapping("/{userId}")
-//    public ResponseEntity<List<byte[]>> getImageFromProfile(@PathVariable Long userId) throws IOException {
-//        return ResponseEntity.status(HttpStatus.OK).body(userProfilePicService.getImageFromProfile(userId));
-//    }
-
-    // вариант с 1 фото
     @GetMapping("/{userId}")
     public ResponseEntity<byte[]> getImageFromProfile(@PathVariable Long userId) throws IOException {
         byte[] result = userProfilePicService.getImageFromProfile(userId).readAllBytes();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.IMAGE_JPEG);
 
-        return new  ResponseEntity<>(result, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(result, httpHeaders, HttpStatus.OK);
     }
 
-    //удаление
     @DeleteMapping("/{userId}")
     public ResponseEntity<UserProfileDto> deleteImageFromProfile(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(userProfilePicService.deleteImageFromProfile(userId));

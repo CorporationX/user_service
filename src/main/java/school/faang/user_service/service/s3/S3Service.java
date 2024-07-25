@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.ExceptionMessages;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +19,6 @@ import java.lang.module.FindException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-//@ConditionalOnProperty(value = "services.s3.isMocked", havingValue = "false")
 public class S3Service {
     private static final int MAX_IMAGE_LARGE_PHOTO = 1080;
     private static final int MAX_IMAGE_SMALL_PHOTO = 170;
@@ -78,8 +78,8 @@ public class S3Service {
                     bucketName, key, multipartFile.getInputStream(), objectMetadata);
             s3Client.putObject(putObjectRequest);
         } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new FindException("Не удалось положить объект запроса перед отправкой в облако");
+            log.error(ExceptionMessages.CLOUD_SENDING, e);
+            throw new FindException(ExceptionMessages.CLOUD_SENDING, e);
         }
     }
 }

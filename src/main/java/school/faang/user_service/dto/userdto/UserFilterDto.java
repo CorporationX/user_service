@@ -2,6 +2,7 @@ package school.faang.user_service.dto.userdto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,14 +13,31 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserFilterDto {
+
+    @Size(max = 255)
     private String namePattern;
+
+    @Size(max = 255)
     private String aboutPattern;
+
+    @Size(max = 255)
     private String emailPattern;
+
+    @Size(max = 255)
     private String contactPattern;
+
+    @Size(max = 255)
     private String countryPattern;
+
+    @Size(max = 255)
     private String cityPattern;
+
+    @Size(max = 255)
     private String phonePattern;
+
+    @Size(max = 255)
     private String skillPattern;
+
     private int experienceMin;
     private int experienceMax;
     @Min(1)

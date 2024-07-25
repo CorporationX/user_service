@@ -25,7 +25,7 @@ public class SkillService {
     private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-   private final UserService userService;
+    private final UserService userService;
     private final SkillOfferRepository offerRepository;
     private final SkillValidator skillValidator;
     private final UserSkillGuaranteeRepository guaranteeRepository;

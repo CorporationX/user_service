@@ -31,6 +31,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     /**
      * Database
      */
@@ -57,6 +58,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
+
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+    implementation ("io.swagger:swagger-annotations:1.6.14")
 
     /**
      * Test containers

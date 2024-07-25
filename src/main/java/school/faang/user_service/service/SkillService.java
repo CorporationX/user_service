@@ -2,19 +2,15 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
@@ -29,7 +25,7 @@ public class SkillService {
     private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private final UserRepository userRepository;
+   private final UserService userService;
     private final SkillOfferRepository offerRepository;
     private final SkillValidator skillValidator;
     private final UserSkillGuaranteeRepository guaranteeRepository;
@@ -38,10 +34,7 @@ public class SkillService {
         skillValidator.validateSkillTitleIsNotNullAndNotBlank(skillDto);
         skillValidator.validateSkillTitleDosNotExists(skillDto);
         Skill skill = skillMapper.toEntity(skillDto);
-        List<User> users = userRepository.findAllById(skillDto.getUserIds())
-                .stream()
-                .toList();
-        skill.setUsers(users);
+        userService.extracted(skillDto, skill);
         return skillMapper.toDto(skillRepository.save(skill));
     }
 

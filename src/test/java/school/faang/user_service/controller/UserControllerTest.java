@@ -63,4 +63,5 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.goalsIds", hasSize(1)))
                 .andExpect(jsonPath("$.ownedEventsIds", hasSize(1)));
     }
+
 }

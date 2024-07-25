@@ -10,6 +10,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -47,4 +48,6 @@ public interface UserMapper {
         }
         return goals.stream().map(Goal::getId).toList();
     }
+
+    UserDto toDto(Optional<User> user);
 }

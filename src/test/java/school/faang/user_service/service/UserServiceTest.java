@@ -1,13 +1,14 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
@@ -118,6 +119,39 @@ class UserServiceTest {
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(mapper).toDto(user);
+    }
+
+    @Test
+    @DisplayName("Тест RunTimeException , когда userId = null")
+    public void getUserWhenTrows(){
+        assertThrows(
+                RuntimeException.class ,
+                () -> userService.getUser(null)
+        );
+    }
+
+    @Test
+    @DisplayName("Тест получаем пользователя")
+    public void getUser(){
+        Long userId = 1L;
+        userService.getUser(userId);
+        Mockito.verify(userRepository,Mockito.times(1))
+                .findById(userId);
+    }
+
+    @Test
+    @DisplayName("Тест получаем всех пользователей")
+    public void getUsersByIds(){
+        User firstUser = new User();
+        User secondUser = new User();
+        firstUser.setId(1L);
+        secondUser.setId(2L);
+        List<Long> ids = List.of(firstUser.getId(), secondUser.getId());
+        List<UserDto> dtoList = ids.stream()
+                .map(num -> userRepository.findById(num))
+                .map(result -> mapper.toDto(result))
+                .toList();
+        assertEquals(dtoList , userService.getUsersByIds(ids));
     }
 
 }

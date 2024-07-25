@@ -41,6 +41,22 @@ public class UserService {
         return mapper.toDto(userRepository.save(mentorshipService.stopMentorship(user)));
     }
 
+    public UserDto getUser(Long userId){
+        if(userId == null){
+            throw new RuntimeException("userId is can't null");
+        }
+        Optional<User> user = userRepository.findById(userId);
+        UserDto dto = mapper.toDto(user.orElse(null));
+        return dto;
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids){
+        return ids.stream()
+                .map(num -> userRepository.findById(num))
+                .map(user -> mapper.toDto(user))
+                .toList();
+    }
+
     private void deleteGoalFromDbIfPresent(List<Goal> goalsForDeleteFromDB) {
         if (!goalsForDeleteFromDB.isEmpty()) {
             goalsForDeleteFromDB.forEach(goal -> goalRepository
@@ -67,19 +83,5 @@ public class UserService {
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();
     }
-
-    public UserDto getUser(long userId){
-        Optional<User> user = userRepository.findById(userId);
-        UserDto dto = mapper.toDto(user.orElse(null));
-        return dto;
-    }
-
-    public List<UserDto> getUsersByIds(List<Long> ids){
-        Iterable<User> iterable = userRepository.findAllById(ids);
-        Stream<User> stream = StreamSupport.stream(iterable.spliterator(),false);
-        return stream.map(user -> mapper.toDto(user))
-                .toList();
-    }
-
 
 }

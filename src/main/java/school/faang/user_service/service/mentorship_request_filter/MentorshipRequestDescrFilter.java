@@ -13,15 +13,15 @@ public class MentorshipRequestDescrFilter implements MentorshipRequestFilter {
 
     @Override
     public boolean isApplecable(RequestFilterDto filters) {
-//        return filters.getDescriptionPattern() != null;
-        return false;
+        return filters.getDescriptionPattern() != null;
     }
 
     @Override
-    public List<MentorshipRequest> apply(List<MentorshipRequest> requests, RequestFilterDto filters) {
-//        return requests.stream()
-//                .filter(request -> request.getDescription().contains(filters.getDescriptionPattern()))
-//                .toList();
-        return null;
+    public List<MentorshipRequest> apply(List<MentorshipRequest> requests,
+                                         RequestFilterDto filters) {
+        return requests.stream()
+                .filter(request -> request.getDescription()
+                        .contains(filters.getDescriptionPattern()))
+                .toList();
     }
 }

@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,7 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Nested
 @ExtendWith(MockitoExtension.class)
 class SkillServiceTest {
 
@@ -94,7 +92,7 @@ class SkillServiceTest {
     @DisplayName("testCreate")
     void testCreate() {
         when(skillMapper.toEntity(skillDto)).thenReturn(skill);
-        when(userService.extracted(skillDto, skill))
+        when(userService.getAllUsersByIds(skillDto.getUserIds()))
                 .thenReturn(List.of(new User(), new User()));
         when(skillRepository.save(any())).thenReturn(skill);
         when(skillMapper.toEntity(skillDto)).thenReturn(skill);

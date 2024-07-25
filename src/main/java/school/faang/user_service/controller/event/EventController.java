@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,13 +28,18 @@ public class EventController {
 
     // Создать событие
     @PostMapping("")
-    public ResponseEntity<EventDto> create(@RequestBody EventDto event) {
+    public ResponseEntity<EventDto> create(@RequestBody @Valid EventDto event) {
+        return ResponseEntity.ok(eventService.create(event));
+        /*
         if (validateEventDto(event)) {
             return ResponseEntity.ok(eventService.create(event));
         }
         throw new DataValidationException("Не удалось создать событие!" +
                 " Введены не верные данные.");
+        */
+
     }
+
 
     // получить событие
     @GetMapping("/{id}")
@@ -63,10 +70,12 @@ public class EventController {
 
     //Обновить событие
     @PatchMapping("")
-    public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto event) {
+    public ResponseEntity<EventDto> updateEvent(@RequestBody @Valid EventDto event) {
+        /*
         if (event == null) {
             throw new DataValidationException("Событие не передано!");
         }
+        */
         return ResponseEntity.ok(eventService.updateEvent(event));
     }
 

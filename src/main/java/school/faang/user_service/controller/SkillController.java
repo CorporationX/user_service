@@ -1,6 +1,8 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -11,7 +13,7 @@ import java.util.List;
 @Component
 public record SkillController(SkillService skillService) {
     public SkillDto create(SkillDto skillDto) {
-        validateSkill(skillDto);
+        //validateSkill(skillDto);
         return skillService.create(skillDto);
     }
 

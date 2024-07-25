@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        validateMentorshipRequest(mentorshipRequestDto);
+        //validateMentorshipRequest(mentorshipRequestDto);
         MentorshipRequest entity = mapper.toEntity(mentorshipRequestDto);
         return mapper.toDto(mentorshipRequestRepository.save(entity));
     }
@@ -84,7 +85,7 @@ public class MentorshipRequestService {
     }
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        if (rejection == null || rejection.getRejectionReason().isBlank()) {
+        if (rejection == null) {
             throw new IllegalArgumentException("Пустая причина отказа");
         }
         MentorshipRequest request = mentorshipRequestRepository.findById(id).orElse(null);

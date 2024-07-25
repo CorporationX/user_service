@@ -18,10 +18,11 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @NotNull(message = "Дто не может быть пустым")
 public class MentorshipRequestDto {
     private Long id;
-    @NotNull(message = "Описание не может быть пустым")
+    //@NotNull(message = "Описание не может быть пустым")
     @NotBlank(message = "Описание не может быть пустым")
     private String description;
     @NotNull(message = "Пользователь, который отправляет запрос на менторство не может быть пустым")

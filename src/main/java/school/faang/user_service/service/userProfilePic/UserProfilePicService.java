@@ -1,6 +1,5 @@
 package school.faang.user_service.service.userProfilePic;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class UserProfilePicService {
     private User checkTheUserInTheDatabase(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
             log.error(ExceptionMessages.USER_NOT_FOUND);
-            return new EntityNotFoundException(ExceptionMessages.USER_NOT_FOUND);
+            return new NullPointerException(ExceptionMessages.USER_NOT_FOUND);
         });
     }
 }

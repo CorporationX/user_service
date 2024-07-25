@@ -11,10 +11,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserDtoDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.EventParticipationService;
 
@@ -80,15 +79,15 @@ public class EventParticipationTest {
 
     @Test
     public void testGetParticipant() {
-        UserDto userDto = new UserDto();
+        UserDtoDto userDto = new UserDtoDto();
         userDto.setId(1L);
         userDto.setUsername("JohnDoe");
         userDto.setEmail("johndor@example.com");
-        List<UserDto> userDtoList = List.of(userDto);
+        List<UserDtoDto> userDtoList = List.of(userDto);
 
         when(userMapper.toDtoList(Mockito.anyList())).thenReturn(userDtoList);
 
-        List<UserDto> result = eventParticipationService.getParticipant(1L);
+        List<UserDtoDto> result = eventParticipationService.getParticipant(1L);
         assertEquals(1L, result.get(0).getId());
     }
 

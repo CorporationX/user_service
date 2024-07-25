@@ -21,6 +21,12 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM users u
+            WHERE u.id = :id
+            """)
+    User findUserById(Long id);
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users u
             JOIN user_premium up ON up.user_id = u.id
             WHERE up.end_date > NOW()
             """)

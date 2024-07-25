@@ -34,7 +34,7 @@ public class SkillService {
         skillValidator.validateSkillTitleIsNotNullAndNotBlank(skillDto);
         skillValidator.validateSkillTitleDosNotExists(skillDto);
         Skill skill = skillMapper.toEntity(skillDto);
-        userService.extracted(skillDto, skill);
+        skill.setUsers(userService.extracted(skillDto, skill));
         return skillMapper.toDto(skillRepository.save(skill));
     }
 

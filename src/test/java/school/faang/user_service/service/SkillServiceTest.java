@@ -18,9 +18,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
-import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
 
@@ -41,7 +39,7 @@ class SkillServiceTest {
     private SkillRepository skillRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
     private SkillValidator skillValidator;
@@ -96,7 +94,7 @@ class SkillServiceTest {
     @DisplayName("testCreate")
     void testCreate() {
         when(skillMapper.toEntity(skillDto)).thenReturn(skill);
-        when(userRepository.findAllById(any()))
+        when(userService.extracted(skillDto, skill))
                 .thenReturn(List.of(new User(), new User()));
         when(skillRepository.save(any())).thenReturn(skill);
         when(skillMapper.toEntity(skillDto)).thenReturn(skill);

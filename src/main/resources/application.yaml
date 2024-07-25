@@ -1,3 +1,7 @@
+application:
+  title: User Service Api
+  version: 1.0.0
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver

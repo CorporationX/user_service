@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userdto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 
 @ExtendWith(MockitoExtension.class)

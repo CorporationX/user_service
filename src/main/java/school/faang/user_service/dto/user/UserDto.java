@@ -26,4 +26,5 @@ public class UserDto {
     @Email
     @NotBlank(message = "email should not be blank", groups = {Create.class, Update.class})
     private String email;
+
 }

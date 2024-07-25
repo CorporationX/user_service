@@ -1,12 +1,14 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -22,14 +24,15 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static school.faang.user_service.exception.recommendation.RecommendationError.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Data
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
@@ -39,39 +42,37 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final static int INTERVAL_DATE = 6;
 
-    @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        validationIntervalAndSkill(recommendationDto);
+        validateIntervalAndSkill(recommendationDto);
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
-        recommendationRepository.save(recommendation);
         processSkillAndGuarantees(recommendation);
+        recommendationRepository.save(recommendation);
 
 
         return recommendationMapper.toDto(recommendation);
     }
 
-    @Transactional
     public RecommendationDto update(RecommendationDto recommendationDto) {
-        validationIntervalAndSkill(recommendationDto);
+        validateIntervalAndSkill(recommendationDto);
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
 
         processSkillAndGuarantees(recommendation);
-
         recommendationRepository.save(recommendation);
+
 
         return recommendationMapper.toDto(recommendation);
     }
 
     public void delete(long id) {
-        validationAvailabilityRecommendation(id);
+        validateAvailabilityRecommendation(id);
         recommendationRepository.deleteById(id);
     }
 
-    @Transactional
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset, limit);
+    @Transactional(readOnly = true)
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Recommendation> allRecommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
 
         return allRecommendations.getContent().stream()
@@ -79,9 +80,9 @@ public class RecommendationService {
                 .toList();
     }
 
-    @Transactional
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset, limit);
+    @Transactional(readOnly = true)
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Recommendation> allRecommendations = recommendationRepository.findAllByAuthorId(authorId, pageable);
 
         return allRecommendations.getContent().stream()
@@ -89,7 +90,7 @@ public class RecommendationService {
                 .toList();
     }
 
-    private void validationIntervalAndSkill(RecommendationDto recommendationDto) {
+    private void validateIntervalAndSkill(RecommendationDto recommendationDto) {
         User author = findUserById(recommendationDto.getAuthorId());
         User receiver = findUserById(recommendationDto.getReceiverId());
 
@@ -120,7 +121,7 @@ public class RecommendationService {
         }
     }
 
-    private void validationAvailabilityRecommendation(long id) {
+    private void validateAvailabilityRecommendation(long id) {
         if (recommendationRepository.findById(id).isEmpty()) {
             throw new DataValidationException(RECOMMENDATION_IS_NOT_FOUND);
         }

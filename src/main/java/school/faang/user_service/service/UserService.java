@@ -14,10 +14,9 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    public void extracted(SkillDto skillDto, Skill skill) {
-        List<User> users = userRepository.findAllById(skillDto.getUserIds())
+    public List<User> extracted(SkillDto skillDto, Skill skill) {
+        return userRepository.findAllById(skillDto.getUserIds())
                 .stream()
                 .toList();
-        skill.setUsers(users);
     }
 }

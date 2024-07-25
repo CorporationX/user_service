@@ -31,10 +31,10 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
 
     @Query(nativeQuery = true, value = """
             SELECT * FROM mentorship_request
-            WHERE requester_id = :requesterId AND created_at >= current_timestamp - interval '3 months'
+            WHERE requester_id = :requesterId AND created_at >= current_timestamp - INTERVAL :interval
             ORDER BY created_at DESC
             LIMIT 1;
             """)
-    Optional<MentorshipRequest> findFreshRequest(long requesterId);
+    Optional<MentorshipRequest> findFreshRequest(long requesterId,String interval);
 
 }

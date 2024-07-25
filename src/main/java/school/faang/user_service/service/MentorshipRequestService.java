@@ -1,7 +1,12 @@
 package school.faang.user_service.service;
 
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,6 +20,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.DataValidationException;
+
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -26,16 +32,21 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
 
+    @Getter
+    @Value("${variables.interval}")
+    private String interval;
+
     public void acceptRequest(AcceptMentorshipRequestDto acceptMentorshipRequestDto) {
         MentorshipRequest editingRequest = getMentorshipRequest(acceptMentorshipRequestDto.getId());
-
-        Optional<Mentorship> lastMentorship = mentorshipRepository.getLastMentorship(acceptMentorshipRequestDto.getReceiverId(), acceptMentorshipRequestDto.getRequesterId());
+        Optional<Mentorship> lastMentorship = mentorshipRepository
+                .getLastMentorship(acceptMentorshipRequestDto.getReceiverId(), acceptMentorshipRequestDto.getRequesterId());
         lastMentorship.ifPresent((mentorship) -> {
             throw new DataValidationException("You have already accepted request!!");
         });
@@ -60,7 +71,7 @@ public class MentorshipRequestService {
         checkIsTrialExpired(mentorshipRequestDto);
         MentorshipRequest earlierMentorshipRequest = mentorshipRequestRepository
                 .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
-                .orElseThrow(()->new DataValidationException("Request already exists"));
+                .orElseThrow(() -> new DataValidationException("Request already exists"));
         MentorshipRequest createdRequest = mentorshipRequestRepository
                 .create(mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
@@ -92,8 +103,10 @@ public class MentorshipRequestService {
     }
 
     private void checkIsTrialExpired(MentorshipRequestDto mentorshipRequestDto) {
-        mentorshipRequestRepository.findFreshRequest(mentorshipRequestDto.getRequesterId()).ifPresent((req) -> {
-            throw new DataValidationException("User has one request for last 3 months!");
-        });
+        mentorshipRequestRepository
+                .findFreshRequest(mentorshipRequestDto.getRequesterId(), interval)
+                .ifPresent((req) -> {
+                    throw new DataValidationException("User has one request for last 3 months!");
+                });
     }
 }

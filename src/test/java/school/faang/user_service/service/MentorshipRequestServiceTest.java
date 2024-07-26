@@ -12,10 +12,10 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RequestException;
-import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.util.filter.Filter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,8 +37,8 @@ public class MentorshipRequestServiceTest {
     MentorshipRequestRepository mentorshipRequestRepository = Mockito.mock(MentorshipRequestRepository.class);
     UserRepository userRepository = Mockito.mock(UserRepository.class);
     MentorshipRequestMapper mapperMock = Mockito.mock(MentorshipRequestMapper.class);
-    MentorshipRequestFilter filterMock = Mockito.mock(MentorshipRequestFilter.class);
-    List<MentorshipRequestFilter> filters = List.of(filterMock);
+    Filter filterMock = Mockito.mock(Filter.class);
+    List<Filter<RequestFilterDto, MentorshipRequest>> filters = List.of(filterMock);
 
     MentorshipRequestService mentorshipRequestService =
             new MentorshipRequestService(mentorshipRequestRepository,

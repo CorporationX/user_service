@@ -45,7 +45,7 @@ class SubscriptionControllerTest {
                 DataValidationException.class,
                 () -> subscriptionController.followUser(followerId, followeeId)
         );
-        assertEquals("Unable to follow yourself", e.getMessage());
+        assertEquals("Unable to follow/unfollow yourself", e.getMessage());
 
         Mockito.verifyNoInteractions(subscriptionService);
     }
@@ -71,7 +71,7 @@ class SubscriptionControllerTest {
                 DataValidationException.class,
                 () -> subscriptionController.unfollowUser(followerId, followeeId)
         );
-        assertEquals("Unable to unfollow yourself", e.getMessage());
+        assertEquals("Unable to follow/unfollow yourself", e.getMessage());
 
         Mockito.verifyNoInteractions(subscriptionService);
     }

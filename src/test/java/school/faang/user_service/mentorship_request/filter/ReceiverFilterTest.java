@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship_request.ReceiverFilter;
+import school.faang.user_service.util.filter.mentorship.ReceiverFilter;
 
 import java.util.ArrayList;
 import java.util.List;

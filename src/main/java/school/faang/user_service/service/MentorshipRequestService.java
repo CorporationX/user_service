@@ -9,12 +9,13 @@ import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.ErrorMessage;
 import school.faang.user_service.exception.RequestException;
-import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.util.filter.Filter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +28,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
-    private final List<MentorshipRequestFilter> filters;
+    private final List<Filter<RequestFilterDto, MentorshipRequest>> filters;
     private static final int PAUSE_TIME = 3;
 
     public MentorshipRequestDtoForResponse requestMentorship(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {

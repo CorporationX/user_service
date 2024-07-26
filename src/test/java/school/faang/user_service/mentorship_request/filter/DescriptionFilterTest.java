@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.filter.mentorship_request.DescriptionFilter;
+import school.faang.user_service.util.filter.mentorship.DescriptionFilter;
 
 import java.util.ArrayList;
 import java.util.List;

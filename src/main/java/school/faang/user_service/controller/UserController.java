@@ -22,4 +22,9 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> userIds) {
         return userService.findUsersByIds(userIds);
     }
+
+    @PutMapping("/users/{userId}")
+    public void deactivateUserById(@PathVariable Long userId) {
+        userService.deactivateUserById(userId);
+    }
 }

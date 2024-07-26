@@ -13,7 +13,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -28,7 +27,7 @@ public class SkillService {
     private final SkillMapper skillMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private static final int MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skillDto) {
@@ -64,30 +63,29 @@ public class SkillService {
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         return skillRepository.findUserSkill(skillId, userId)
                 .map(skill -> {
-                    assignSkillGuarantees(skill, getUserById(userId), skillOfferRepository.findAllOffersOfSkill(skillId, userId));
+                    assignSkillGuarantees(skill, userService.getUserById(userId), skillOfferRepository.findAllOffersOfSkill(skillId, userId));
                     return skillMapper.toDto(skill);
                 })
                 .orElseGet(() -> {
                     List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-                    if (offers.size() <= MIN_SKILL_OFFERS) {
-                        throw new EntityNotFoundException("Not enough skill offers for skillId: " + skillId + " and userId: " + userId + ". Minimum required: " + MIN_SKILL_OFFERS);
+                    if (offers.size() < MIN_SKILL_OFFERS) {
+                        throw new EntityNotFoundException("Not enough skill offers for skillId: "
+                                + skillId + " and userId: " + userId
+                                + ". Minimum required: " + MIN_SKILL_OFFERS);
                     }
                     skillRepository.assignSkillToUser(skillId, userId);
-                    Skill assignedSkill = getAssignedSkill(skillId, userId);
-                    assignSkillGuarantees(assignedSkill, getUserById(userId), offers);
+                    Skill assignedSkill = getSkill(skillId, userId);
+                    assignedSkill = assignSkillGuarantees(assignedSkill, userService.getUserById(userId), offers);
                     return skillMapper.toDto(assignedSkill);
                 });
     }
 
-    private Skill getAssignedSkill(long skillId, long userId) {
-        return skillRepository.findUserSkill(skillId, userId).orElseThrow(() -> new EntityNotFoundException("User skill not found"));
+    private Skill getSkill(long skillId, long userId) {
+        return skillRepository.findUserSkill(skillId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("User skill not found"));
     }
 
-    private User getUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-    }
-
-    private void assignSkillGuarantees(Skill skill, User user, List<SkillOffer> offers) {
+    private Skill assignSkillGuarantees(Skill skill, User user, List<SkillOffer> offers) {
         for (SkillOffer offer : offers) {
             User guarantor = offer.getRecommendation().getAuthor();
             if (!skillRepository.findUserSkill(guarantor.getId(), skill.getId()).isPresent()) {
@@ -99,5 +97,6 @@ public class SkillService {
                 userSkillGuaranteeRepository.save(guarantee);
             }
         }
+        return skill;
     }
 }

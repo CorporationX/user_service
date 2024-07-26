@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.Skill;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             JOIN recommendation r ON r.id = so.recommendation_id
             WHERE r.receiver_id = :userId
             """)
-    List<Skill> findSkillsOfferedToUser(long userId);
+    List<Skill> findSkillsOfferedToUser(@Param("userId") long userId);
 
     @Query(nativeQuery = true, value = """
             SELECT s.* FROM skill s

@@ -20,29 +20,29 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    @PostMapping("/{userId}/offered/{skillId}")
+    @PostMapping("/")
     public SkillDto create(@RequestBody SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);
     }
 
-    @GetMapping("/{userId}/offered")
+    @GetMapping("/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    @GetMapping("/{userId}/offered/candidates")
+    @GetMapping("/offered/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
         return skillService.getOfferedSkills(userId);
     }
 
-    @PostMapping("/{userId}/offered/{skillId}/acquire")
-    public SkillDto acquireSkillFromOffers(@PathVariable long skillid, @PathVariable long userid) {
-        return skillService.acquireSkillFromOffers(skillid, userid);
+    @PostMapping("/{userId}/acquire/{skillId}")
+    public SkillDto acquireSkillFromOffers(@PathVariable long userId, @PathVariable long skillId) {
+        return skillService.acquireSkillFromOffers(userId, skillId);
     }
 
     private void validateSkill(SkillDto skill) {
-        if (skill.getTitle() == null || skill.getTitle().trim().isEmpty()) {
+        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
             throw new DataValidationException("Skill title cannot be empty");
         }
     }

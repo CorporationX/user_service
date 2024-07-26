@@ -49,5 +49,5 @@ public interface UserMapper {
         return goals.stream().map(Goal::getId).toList();
     }
 
-    UserDto toDto(Optional<User> user);
+     UserDto toDto(Optional<User> user);
 }

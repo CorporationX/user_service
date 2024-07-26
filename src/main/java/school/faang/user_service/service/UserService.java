@@ -41,7 +41,7 @@ public class UserService {
         return mapper.toDto(userRepository.save(mentorshipService.stopMentorship(user)));
     }
 
-    public UserDto getUser(Long userId){
+    public UserDto getUser(Long userId) {
         if(userId == null){
             throw new RuntimeException("userId is can't null");
         }
@@ -50,7 +50,7 @@ public class UserService {
         return dto;
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids){
+    public List<UserDto> getUsersByIds(List<Long> ids) {
         return ids.stream()
                 .map(num -> userRepository.findById(num))
                 .map(user -> mapper.toDto(user))

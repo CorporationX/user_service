@@ -40,7 +40,7 @@ public class UserController {
         }
 
     @PostMapping("/users")
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+    List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
         return service.getUsersByIds(ids);
         }
 

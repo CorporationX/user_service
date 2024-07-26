@@ -35,7 +35,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        //validateMentorshipRequest(mentorshipRequestDto);
+        validateMentorshipRequest(mentorshipRequestDto);
         MentorshipRequest entity = mapper.toEntity(mentorshipRequestDto);
         return mapper.toDto(mentorshipRequestRepository.save(entity));
     }

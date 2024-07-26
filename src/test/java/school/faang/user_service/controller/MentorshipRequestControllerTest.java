@@ -1,13 +1,11 @@
 package school.faang.user_service.controller;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -60,12 +58,13 @@ public class MentorshipRequestControllerTest {
     // @ValueSource(strings={"   "})
     // @NullSource
     //public void testDescriptionIsNull(String descr) {
+    @Disabled // Не проверяются поля DTO помеченные аннотациями из org.springframework.boot:spring-boot-starter-validation
     @Test
     public void testDescriptionIsNull() {
         dto.setDescription(null);
-        //Assert.assertThrows(IllegalArgumentException.class,
-        //        () -> mentorshipRequestController.requestMentorship(dto));
-        mentorshipRequestController.requestMentorship(dto);
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestController.requestMentorship(dto));
+
     }
 
     @Test

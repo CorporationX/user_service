@@ -17,9 +17,11 @@ public class MentorshipRequestDescrFilter implements MentorshipRequestFilter {
     }
 
     @Override
-    public List<MentorshipRequest> apply(List<MentorshipRequest> requests, RequestFilterDto filters) {
+    public List<MentorshipRequest> apply(List<MentorshipRequest> requests,
+                                         RequestFilterDto filters) {
         return requests.stream()
-                .filter(request -> request.getDescription().contains(filters.getDescriptionPattern()))
+                .filter(request -> request.getDescription()
+                        .contains(filters.getDescriptionPattern()))
                 .toList();
     }
 }

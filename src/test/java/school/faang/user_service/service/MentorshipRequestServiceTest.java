@@ -354,7 +354,7 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRejectRequestReasonNull() {
         long id = 1;
-        RejectionDto rejection = new RejectionDto("  ");
+        RejectionDto rejection = new RejectionDto( "  ");
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.rejectRequest(id, rejection);
         });

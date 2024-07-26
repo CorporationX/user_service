@@ -17,6 +17,7 @@ import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.Validator;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,8 @@ class EventServiceTest {
     private UserRepository userRepository;
     @Mock
     private EventFilterMapper eventFilterMapper;
+    @Mock
+    private Validator validator;
 
     Event event = new Event();
     EventDto eventDto = new EventDto();
@@ -141,36 +144,39 @@ class EventServiceTest {
                 .deleteById(10L);
     }
 
-//    @Test
-//    void shouldReturnDataValidationExceptionWhenUpdateEventTest() {
-//        when(userRepository.findById(anyLong()))
-//                .thenThrow(new DataValidationException("Такой пользователь не найден!"));
-//
-//        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
-//    }
-//
-//    @Test
-//    void shouldReturnDataValidationExceptionWithWrongCriteriesWhenUpdateEventTest() {
-//        User owner = new User();
-//        owner.setSkills(List.of(ownerSkill1, ownerSkill2));
-//
-//        when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
-//
-//        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
-//    }
-//
-//    @Test
-//    void shouldReturnEventDtoWhenUpdateEventTest() {
-//        User owner = new User();
-//        owner.setSkills(List.of(skill1, skill2));
-//
-//        when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
-//        when(eventMapper.eventDtoToEntity(eventDto)).thenReturn(event);
-//
-//        eventService.updateEvent(eventDto);
-//
-//        verify(eventRepository, times(1)).save(event);
-//    }
+    @Test
+    void shouldReturnDataValidationExceptionWhenUpdateEventTest() {
+        when(userRepository.findById(anyLong()))
+                .thenThrow(new DataValidationException("Такой пользователь не найден!"));
+        when(validator.validateUpdatingEvent(eventDto)).thenReturn(true);
+
+        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
+    }
+
+    @Test
+    void shouldReturnDataValidationExceptionWithWrongCriteriesWhenUpdateEventTest() {
+        User owner = new User();
+        owner.setSkills(List.of(ownerSkill1, ownerSkill2));
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
+        when(validator.validateUpdatingEvent(eventDto)).thenReturn(true);
+
+        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
+    }
+
+    @Test
+    void shouldReturnEventDtoWhenUpdateEventTest() {
+        User owner = new User();
+        owner.setSkills(List.of(skill1, skill2));
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
+        when(eventMapper.eventDtoToEntity(eventDto)).thenReturn(event);
+        when(validator.validateUpdatingEvent(eventDto)).thenReturn(true);
+
+        eventService.updateEvent(eventDto);
+
+        verify(eventRepository, times(1)).save(event);
+    }
 
     @Test
     void shouldReturnDataValidationExceptionWhenGetOwnedEventsTest() {

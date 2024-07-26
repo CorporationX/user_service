@@ -3,30 +3,24 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestDescrFilter;
-import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestReceiverFilter;
-import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestRequesterFilter;
-import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestStatusFilter;
+import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestFilter;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 
 @Component
@@ -51,9 +45,9 @@ public class MentorshipRequestService {
         List<MentorshipRequest> filteredMentorshipRequest = new LinkedList<>(mentorshipRequest);
         List<MentorshipRequestFilter> filters = new LinkedList<>();
         for (MentorshipRequestFilter filter : requestFilters) {
-                if (filter.isApplecable(requestFilter)) {
-                    filters.add(filter);
-                }
+            if (filter.isApplecable(requestFilter)) {
+                filters.add(filter);
+            }
         }
         for (MentorshipRequestFilter filter : filters) {
             filteredMentorshipRequest = (filter.apply(filteredMentorshipRequest, requestFilter));

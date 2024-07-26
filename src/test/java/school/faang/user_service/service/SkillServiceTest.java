@@ -69,14 +69,21 @@ public class SkillServiceTest {
         secondSkill.setId(secondSkillId);
         secondSkill.setTitle("Spring");
 
-//        skillDto = new SkillDto(firstSkillId, "Java");
-        skillDto = SkillDto.builder().id(firstSkillId).title("Java").build();
-        secondSkillDto = SkillDto.builder().id(secondSkillId).title("Spring").build();
+        skillDto = new SkillDto();
+        skillDto.setId(firstSkillId);
+        skillDto.setTitle(firstSkill.getTitle());
+        secondSkillDto = new SkillDto();
 
-        Recommendation recommendation1 = Recommendation.builder().receiver(User.builder().id(userId).username("Ivan").build()).build();
-        Recommendation recommendation2 = Recommendation.builder().receiver(User.builder().id(userId).username("Ivan").build()).build();
-        Recommendation recommendation3 = Recommendation.builder().receiver(User.builder().id(userId).username("Ivan").build()).build();
-        Recommendation recommendation4 = Recommendation.builder().receiver(User.builder().id(userId).username("Ivan").build()).build();
+        secondSkillDto.setId(secondSkillId);
+        secondSkillDto.setTitle(secondSkill.getTitle());
+        Recommendation recommendation1 = Recommendation.builder().receiver(User.builder()
+                .id(userId).username("Ivan").build()).build();
+        Recommendation recommendation2 = Recommendation.builder().receiver(User.builder()
+                .id(userId).username("Ivan").build()).build();
+        Recommendation recommendation3 = Recommendation.builder().receiver(User.builder()
+                .id(userId).username("Ivan").build()).build();
+        Recommendation recommendation4 = Recommendation.builder().receiver(User.builder()
+                .id(userId).username("Ivan").build()).build();
 
         skillOffer = new SkillOffer(1L, firstSkill, recommendation1);
         skillOffer2 = new SkillOffer(1L, firstSkill, recommendation2);

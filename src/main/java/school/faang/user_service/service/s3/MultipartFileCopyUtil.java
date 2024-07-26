@@ -1,12 +1,13 @@
 package school.faang.user_service.service.s3;
 
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-
+@Component
 public class MultipartFileCopyUtil {
-    public static MultipartFile copyMultipartFile(MultipartFile multipartFile, int maxSize) throws IOException {
+    public MultipartFile compressionMultipartFile(MultipartFile multipartFile, int maxSize) throws IOException {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

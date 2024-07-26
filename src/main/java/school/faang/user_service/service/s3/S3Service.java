@@ -23,14 +23,17 @@ public class S3Service {
     private static final int MAX_IMAGE_LARGE_PHOTO = 1080;
     private static final int MAX_IMAGE_SMALL_PHOTO = 170;
     private final AmazonS3 s3Client;
+    private final MultipartFileCopyUtil multipartFileCopyUtil;
 
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
     public UserProfilePic uploadProfile(MultipartFile multipartFile, String folder) throws IOException {
 
-        MultipartFile largeImage = MultipartFileCopyUtil.copyMultipartFile(multipartFile, MAX_IMAGE_LARGE_PHOTO);
-        MultipartFile smallImage = MultipartFileCopyUtil.copyMultipartFile(multipartFile, MAX_IMAGE_SMALL_PHOTO);
+        MultipartFile largeImage = multipartFileCopyUtil
+                .compressionMultipartFile(multipartFile, MAX_IMAGE_LARGE_PHOTO);
+        MultipartFile smallImage = multipartFileCopyUtil
+                .compressionMultipartFile(multipartFile, MAX_IMAGE_SMALL_PHOTO);
 
         ObjectMetadata objectMetadataOne = collectMetadata(largeImage);
         ObjectMetadata objectMetadataTwo = collectMetadata(smallImage);
@@ -72,7 +75,10 @@ public class S3Service {
         return objectMetadata;
     }
 
-    private void sendingRequestToTheCloud(String bucketName, String key, MultipartFile multipartFile, ObjectMetadata objectMetadata) {
+    private void sendingRequestToTheCloud(String bucketName,
+                                          String key,
+                                          MultipartFile multipartFile,
+                                          ObjectMetadata objectMetadata) {
         try {
             PutObjectRequest putObjectRequest = new PutObjectRequest(
                     bucketName, key, multipartFile.getInputStream(), objectMetadata);

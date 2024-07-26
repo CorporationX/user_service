@@ -30,8 +30,6 @@ public class EventService {
     private final EventFilterMapper eventFilterMapper;
     private final SkillRepository skillRepository;
     private final List<EventFilter> eventFilter;
-    private final SkillRepository skillRepository;
-    private final List<EventFilter> eventFilter;
     private final Validator validator;
 
     // Создать событие
@@ -50,11 +48,9 @@ public class EventService {
 
     //Получить все события с фильтрами
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        Stream<Event> events = eventRepository.findAll().stream();
-
-        return eventFilter.stream()
-                .filter(filt -> filt.isApplicable(filter))
-                .flatMap(filt -> filt.apply(events, filter))
+        return eventRepository.findAll()
+                .stream()
+                .filter(event -> filter.equals(eventFilterMapper.eventToEventFilterDto(event)))
                 .map(eventMapper::eventToDto)
                 .toList();
     }

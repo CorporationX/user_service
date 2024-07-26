@@ -1,4 +1,4 @@
-package school.faang.user_service.Service;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,11 +51,11 @@ public class SkillService {
     public List<SkillCandidateDto> getOfferedSkills(long usedId) {
         List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(usedId);
         List<SkillDto> offeredSkillDtos = skillMapper.toDto(offeredSkills);
-        Map<SkillDto, Long> skills = new HashMap<>();
+        Map<SkillDto, Long> map = new HashMap<>();
         List<SkillCandidateDto> skillCandidateDtos = new ArrayList<>();
 
-        offeredSkillDtos.forEach(skillDto -> skills.put(skillDto, skills.getOrDefault(skillDto, 0L) + 1));
-        skills.forEach((key, value) -> skillCandidateDtos.add(new SkillCandidateDto(key, value)));
+        offeredSkillDtos.forEach(skillDto -> map.put(skillDto, map.getOrDefault(skillDto, 0L) + 1));
+        map.forEach((key, value) -> skillCandidateDtos.add(new SkillCandidateDto(key, value)));
         return skillCandidateDtos;
     }
 

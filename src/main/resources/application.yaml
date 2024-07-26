@@ -25,7 +25,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
 
 server:
   port: 8080
@@ -49,10 +49,46 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    #endpoint: http://192.168.1.100:9000
+    accessKey: accessKey
+    secretKey: secretKey
+    bucketName: caveri-testing-backet
 
   diceBear:
-    avatar_url:
-      full: https://api.dicebear.com/9.x/avataaars/svg?seed=
-      small: https://api.dicebear.com/9.x/avataaars/svg?size=32&seed=
+    avatarUrl:
+      url: https://api.dicebear.com/9.x/
+      fullPostfix: /svg?seed=
+      smallPostfix: /svg?size=${services.diceBear.avatarUrl.size}&seed=
+      size: 32
+    styles:
+      - adventurer
+      - adventurer-neutral
+      - avataaars
+      - avataaars-neutral
+      - big-ears
+      - big-ears-neutral
+      - big-smile
+      - bottts
+      - bottts-neutral
+      - croodles
+      - croodles-neutral
+      - dylan
+      - fun-emoji
+      - glass
+      - icons
+      - identicon
+      - initials
+      - lorelei
+      - lorelei-neutral
+      - micah
+      - miniavs
+      - notionists
+      - notionists-neutral
+      - open-peeps
+      - personas
+      - pixel-art
+      - pixel-art-neutral
+      - rings
+      - shapes
+      - thumbs
+

@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.StyleAvatarConfig;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -21,8 +21,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    @Spy
-    private AvatarService avatarService;
+    @Mock
+    private StyleAvatarConfig styleAvatarConfig;
+
+    @Mock
+    private  AmazonS3Service amazonS3Service;
+
+    @Mock
+    private  RestTemplateService restTemplateService;
+    @Mock
+    private AvatarService avatarService = new AvatarService(styleAvatarConfig,amazonS3Service, restTemplateService);
     @Mock
     private UserRepository userRepository;
     @Mock

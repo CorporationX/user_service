@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.controller.ApiPath;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
 import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class RecommendationRequestController {
         return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.create(recommendationRequest));
     }
     @GetMapping()
-    public ResponseEntity<List<RecommendationRequestDto>> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
+    public ResponseEntity<List<RecommendationRequestDto>> getRecommendationRequests(@RequestBody RecommendationRequestFilterDto filter) {
         if (filter == null) {
             throw new IllegalArgumentException("Фильтр пустой");
         }
@@ -38,7 +38,7 @@ public class RecommendationRequestController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<RecommendationRequestDto> rejectRequest(@PathVariable Long id,
-                                                                  @Valid @RequestBody RejectionRequestDto rejection) {
+                                                                  @Valid @RequestBody RecommendationRejectionDto rejection) {
         if (rejection == null) {
             throw new IllegalArgumentException("Аргумент пустой");
         }

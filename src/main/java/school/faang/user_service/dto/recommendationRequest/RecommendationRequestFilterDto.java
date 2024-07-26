@@ -7,6 +7,6 @@ import school.faang.user_service.entity.RequestStatus;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestFilterDto {
+public class RecommendationRequestFilterDto {
     private RequestStatus statusFilter;
 }

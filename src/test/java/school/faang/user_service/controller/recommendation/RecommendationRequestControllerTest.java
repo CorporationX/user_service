@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
@@ -27,16 +27,16 @@ class RecommendationRequestControllerTest {
     @Mock
     private RecommendationRequestDto recommendationRequest;
     @Mock
-    private RejectionRequestDto rejection;
+    private RecommendationRejectionDto rejection;
     private RecommendationRequestDto messageRequest;
-    private RequestFilterDto validRequestFilterDto;
+    private RecommendationRequestFilterDto validRecommendationRequestFilterDto;
 
     @BeforeEach
     void setUp() {
         recommendationRequest = new RecommendationRequestDto();
         recommendationRequest.setId(1L);
 
-        validRequestFilterDto = createRequestFilterDtoWithId(RequestStatus.PENDING);
+        validRecommendationRequestFilterDto = createRequestFilterDtoWithId(RequestStatus.PENDING);
         rejection = createRejectionDtoWithReason("Good");
     }
 
@@ -62,15 +62,15 @@ class RecommendationRequestControllerTest {
         expectedRequests.add(expectedOne);
         expectedRequests.add(expectedTwo);
 
-        when(recommendationRequestService.getRequests(validRequestFilterDto)).thenReturn(expectedRequests);
+        when(recommendationRequestService.getRequests(validRecommendationRequestFilterDto)).thenReturn(expectedRequests);
 
-        List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(validRequestFilterDto).getBody();
+        List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(validRecommendationRequestFilterDto).getBody();
 
         assertNotNull(result);
         assertEquals(expectedRequests.size(), result.size());
         assertEquals(expectedRequests, result);
 
-        verify(recommendationRequestService, times(1)).getRequests(validRequestFilterDto);
+        verify(recommendationRequestService, times(1)).getRequests(validRecommendationRequestFilterDto);
     }
 
     @Test
@@ -142,13 +142,13 @@ class RecommendationRequestControllerTest {
         result.setMessage(message);
         return result;
     }
-    private RequestFilterDto createRequestFilterDtoWithId(RequestStatus requestStatus){
-        RequestFilterDto result = new RequestFilterDto();
+    private RecommendationRequestFilterDto createRequestFilterDtoWithId(RequestStatus requestStatus){
+        RecommendationRequestFilterDto result = new RecommendationRequestFilterDto();
         result.setStatusFilter(requestStatus);
         return result;
     }
-    private RejectionRequestDto createRejectionDtoWithReason(String reason){
-        RejectionRequestDto result = new RejectionRequestDto();
+    private RecommendationRejectionDto createRejectionDtoWithReason(String reason){
+        RecommendationRejectionDto result = new RecommendationRejectionDto();
         result.setReason(reason);
         return result;
     }

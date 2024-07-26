@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -20,7 +19,7 @@ import school.faang.user_service.mapper.recommendationRequest.RecommendationRequ
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.filter.recomendation.RequestFilter;
+import school.faang.user_service.filter.recomendation.RecommendationRequestFilter;
 import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
 
 import java.time.LocalDateTime;
@@ -43,17 +42,17 @@ class RecommendationRequestServiceTest {
     @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
     @Mock
-    private RequestFilterDto requestFilterDto;
+    private RecommendationRequestFilterDto recommendationRequestFilterDto;
     @Mock
     private UserRepository userRepository;
     @Mock
     private SkillRequestRepository skillRequestRepository;
     @Mock
-    private RequestFilter statusPatternFilter;
+    private RecommendationRequestFilter statusPatternFilter;
     @Mock
-    private List<RequestFilter> requestFilter;
+    private List<RecommendationRequestFilter> recommendationRequestFilter;
     RecommendationRequestDto requestDto;
-    RejectionRequestDto rejectionRequestDto;
+    RecommendationRejectionDto recommendationRejectionDto;
     RecommendationRequest recommendationRequest;
 
 
@@ -64,8 +63,8 @@ class RecommendationRequestServiceTest {
         requestDto.setRecieverId(1L);
         requestDto.setSkillsId(Arrays.asList(1L, 2L, 3L));
 
-        rejectionRequestDto = new RejectionRequestDto();
-        rejectionRequestDto.setReason("Отказано");
+        recommendationRejectionDto = new RecommendationRejectionDto();
+        recommendationRejectionDto.setReason("Отказано");
 
         recommendationRequest = new RecommendationRequest();
         recommendationRequest.setId(1);
@@ -76,7 +75,7 @@ class RecommendationRequestServiceTest {
                 new SkillRequest(),
                 new SkillRequest()));
 
-        requestFilterDto = new RequestFilterDto();
+        recommendationRequestFilterDto = new RecommendationRequestFilterDto();
     }
 
     @Test
@@ -150,13 +149,13 @@ class RecommendationRequestServiceTest {
                 .thenReturn(true);
         when(statusPatternFilter.apply(any(), any()))
                 .thenReturn(Stream.of(recommendationRequest));
-        when(requestFilter.stream())
+        when(recommendationRequestFilter.stream())
                 .thenReturn(Stream.of(statusPatternFilter));
         when(recommendationRequestRepository.findAll())
                 .thenReturn(List.of(new RecommendationRequest()));
         when(recommendationRequestMapper.toDto(any()))
                 .thenReturn(new RecommendationRequestDto());
-        recommendationRequestService.getRequests(requestFilterDto);
+        recommendationRequestService.getRequests(recommendationRequestFilterDto);
 
         verify(recommendationRequestMapper, times(1)).toDto(any());
     }
@@ -191,7 +190,7 @@ class RecommendationRequestServiceTest {
         when(recommendationRequestRepository.findById(id))
                 .thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class,
-                () -> recommendationRequestService.rejectRequest(id, rejectionRequestDto));
+                () -> recommendationRequestService.rejectRequest(id, recommendationRejectionDto));
     }
 
     @Test
@@ -204,7 +203,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(Optional.of(recommendationRequest));
 
         assertThrows(IllegalStateException.class,
-                () -> recommendationRequestService.rejectRequest(id, rejectionRequestDto));
+                () -> recommendationRequestService.rejectRequest(id, recommendationRejectionDto));
     }
 
     @Test
@@ -220,7 +219,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(recommendationRequest);
         when(recommendationRequestMapper.toDto(recommendationRequest))
                 .thenReturn(requestDto);
-        recommendationRequestService.rejectRequest(id, rejectionRequestDto);
+        recommendationRequestService.rejectRequest(id, recommendationRejectionDto);
 
         verify(recommendationRequestRepository, times(1))
                 .save(recommendationRequest);

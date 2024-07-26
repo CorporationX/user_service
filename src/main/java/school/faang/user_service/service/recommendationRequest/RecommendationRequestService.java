@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RejectionRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RequestFilterDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
@@ -15,7 +15,7 @@ import school.faang.user_service.mapper.recommendationRequest.RecommendationRequ
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.filter.recomendation.RequestFilter;
+import school.faang.user_service.filter.recomendation.RecommendationRequestFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -34,7 +34,7 @@ public class RecommendationRequestService {
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserRepository userRepository;
     private final SkillRequestRepository skillRequestRepository;
-    private final List<RequestFilter> requestFilter;
+    private final List<RecommendationRequestFilter> recommendationRequestFilter;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         checkExistenceObjectByIds(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
@@ -49,9 +49,9 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(newRequest);
     }
 
-    public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
+    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filter) {
         Stream<RecommendationRequest> recommendationRequestsAll = recommendationRequestRepository.findAll().stream();
-        List<RecommendationRequest> result = requestFilter.stream()
+        List<RecommendationRequest> result = recommendationRequestFilter.stream()
                 .filter(filterOne -> filterOne.isApplication(filter))
                 .reduce(recommendationRequestsAll, (cumulativeStream, filterOne) ->
                         filterOne.apply(cumulativeStream, filter), Stream::concat)
@@ -71,12 +71,12 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(request);
     }
 
-    public RecommendationRequestDto rejectRequest(long id, RejectionRequestDto rejectionRequestDto) {
+    public RecommendationRequestDto rejectRequest(long id, RecommendationRejectionDto recommendationRejectionDto) {
         return recommendationRequestRepository.findById(id)
                 .map(request -> {
                     if (request.getStatus() == RequestStatus.PENDING) {
                         request.setStatus(RequestStatus.REJECTED);
-                        request.setRejectionReason(rejectionRequestDto.getReason());
+                        request.setRejectionReason(recommendationRejectionDto.getReason());
                         recommendationRequestRepository.save(request);
                         return recommendationRequestMapper.toDto(request);
                     } else {

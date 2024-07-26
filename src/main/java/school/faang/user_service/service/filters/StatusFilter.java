@@ -1,7 +1,7 @@
 package school.faang.user_service.service.filters;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.controller.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.util.filter.Filter;

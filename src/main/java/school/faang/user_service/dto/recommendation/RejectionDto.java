@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.recommendation;
+package school.faang.user_service.dto.recommendation;
 
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;

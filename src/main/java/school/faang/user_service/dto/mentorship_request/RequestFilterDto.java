@@ -3,12 +3,13 @@ package school.faang.user_service.dto.mentorship_request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.dto.filter.FilterDto;
 import school.faang.user_service.entity.RequestStatus;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestFilterDto {
+public class RequestFilterDto extends FilterDto {
     private String descriptionPattern;
 
     private Long requesterId;

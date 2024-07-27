@@ -26,46 +26,46 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ApiPath.REQUEST_MENTORSHIP)
-@Tag(name = "Пример контроллера", description = "Описание контроллера")
+@Tag(name = "Mentorship controller", description = "Methods for working with mentoring requests")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping
-    @Operation(summary = "Приветственный метод 111", description = "Возвращает приветственное сообщение 1")
+    @Operation(summary = "Receiving a mentoring request", description = "Method gets from database and returns the required instruction request")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Операция успешно заершена"),
-            @ApiResponse(responseCode = "404", description = "Не найдено")
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Mentoring request not found")
     })
     public ResponseEntity<MentorshipRequestDto> requestMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mentorshipRequestService.requestMentorship(mentorshipRequestDto));
     }
 
     @GetMapping
-    @Operation(summary = "Приветственный метод 222", description = "Возвращает приветственное сообщение 2")
+    @Operation(summary = "Receiving list of requests for mentoring", description = "Method gets from database and returns the required instruction")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Операция успешно заершена"),
-            @ApiResponse(responseCode = "404", description = "Не найдено")
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Mentoring request not found")
     })
     public ResponseEntity<List<MentorshipRequestDto>> getRequests(@RequestBody(required = false) RequestFilterDto filters) {
         return ResponseEntity.status(HttpStatus.OK).body(mentorshipRequestService.getRequests(filters));
     }
 
     @PatchMapping("/{id}/accept")
-    @Operation(summary = "Приветственный метод 333", description = "Возвращает приветственное сообщение 3")
+    @Operation(summary = "Receiving a mentoring request", description = "Method gets from database and returns the required instruction")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Операция успешно заершена"),
-            @ApiResponse(responseCode = "404", description = "Не найдено")
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Mentoring request not found")
     })
     public ResponseEntity<MentorshipRequestDto> acceptMentorship(@PathVariable("id") long id) {
         return ResponseEntity.status(HttpStatus.OK).body(mentorshipRequestService.acceptRequest(id));
     }
 
     @PatchMapping("/{id}/reject")
-    @Operation(summary = "Приветственный метод 444", description = "Возвращает приветственное сообщение 4")
+    @Operation(summary = "Reject the request for membership", description = "Method gets the required request for the Menorah from the database and changes status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Операция успешно заершена"),
-            @ApiResponse(responseCode = "404", description = "Не найдено")
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Mentoring request not found")
     })
     public ResponseEntity<MentorshipRequestDto> rejectMentorship(@PathVariable("id") long id, @RequestBody @Valid RejectionDto rejectionDto) {
         return ResponseEntity.status(HttpStatus.OK).body(mentorshipRequestService.rejectRequest(id, rejectionDto));

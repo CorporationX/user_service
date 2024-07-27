@@ -1,11 +1,11 @@
-package school.faang.user_service.dto.userDto;
+package school.faang.user_service.dto.userPremium;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class UserDto {
+public class UserPremiumDto {
     private long id;
     private String username;
     private String email;

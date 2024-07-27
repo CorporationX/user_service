@@ -2,9 +2,10 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -18,6 +19,7 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFilter> userFilters;
+    private final UserMapper userMapper;
 
     public void followUser(long followerId, long followeeId) throws DataFormatException {
         validateUsersSubs(followerId, followeeId);
@@ -78,7 +80,7 @@ public class SubscriptionService {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .flatMap(filter -> filter.apply(users, filters))
-                .map(UserDto::toDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 }

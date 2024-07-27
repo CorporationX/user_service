@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.payment_service.Currency;
-import school.faang.user_service.client.payment_service.PaymentServiceClient;
-import school.faang.user_service.client.payment_service.PaymentStatus;
 import school.faang.user_service.client.payment_service.PaymentPostPayRequestDto;
 import school.faang.user_service.client.payment_service.PaymentPostPayResponseDto;
+import school.faang.user_service.client.payment_service.PaymentServiceClient;
+import school.faang.user_service.client.payment_service.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
@@ -31,6 +31,12 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumMapper premiumMapper;
+
+    private static boolean isValidResponse(ResponseEntity<PaymentPostPayResponseDto> response) {
+        return response.getStatusCode() == HttpStatus.OK &&
+               response.getBody() != null &&
+               response.getBody().status() == PaymentStatus.SUCCESS;
+    }
 
     @Transactional
     public PremiumDto buyPremium(@NonNull final Long userId, @NonNull final Integer days) {
@@ -74,11 +80,5 @@ public class PremiumService {
         if (!isValidResponse(response)) {
             throw new RuntimeException("Payment failed");
         }
-    }
-
-    private static boolean isValidResponse(ResponseEntity<PaymentPostPayResponseDto> response) {
-        return response.getStatusCode() == HttpStatus.OK &&
-                response.getBody() != null &&
-                response.getBody().status() == PaymentStatus.SUCCESS;
     }
 }

@@ -8,7 +8,7 @@ public class Validator {
     public boolean validateUpdatingEvent(EventDto eventDto) {
 
         return !eventDto.getTitle().isBlank()
-                && !eventDto.getStartDate().toString().isBlank()
-                && eventDto.getOwnerId() != null;
+               && !eventDto.getStartDate().toString().isBlank()
+               && eventDto.getOwnerId() != null;
     }
 }

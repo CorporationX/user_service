@@ -5,10 +5,9 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
-import java.util.List;
-
-import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.service.MentorshipRequestService;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor

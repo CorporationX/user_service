@@ -27,28 +27,28 @@ public interface RecommendationRequestMapper {
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
     @Named("idToUser")
-    default User idToUser(Long id){
-        if(id == null) return null;
+    default User idToUser(Long id) {
+        if (id == null) return null;
         User user = new User();
         user.setId(id);
         return user;
     }
 
     @Named("stringToEnum")
-    default RequestStatus stringToEnum(String status){
-        if(status == null) return null;
+    default RequestStatus stringToEnum(String status) {
+        if (status == null) return null;
         return RequestStatus.valueOf(status.toUpperCase());
     }
 
     @Named("skillRequestToSkillRequestId")
-    default List<Long> skillRequestToSkillRequestId(List<SkillRequest> skillRequestList){
+    default List<Long> skillRequestToSkillRequestId(List<SkillRequest> skillRequestList) {
         return skillRequestList.stream()
                 .map(SkillRequest::getId)
                 .toList();
     }
 
     @Named("skillRequestIdToSkillRequest")
-    default List<SkillRequest> skillRequestIdToSillRequestId(List<Long> skillRequestIdList){
+    default List<SkillRequest> skillRequestIdToSillRequestId(List<Long> skillRequestIdList) {
         return skillRequestIdList.stream()
                 .map(id -> {
                     SkillRequest skillRequest = new SkillRequest();
@@ -59,7 +59,7 @@ public interface RecommendationRequestMapper {
     }
 
     @Named("enumToString")
-    default String enumToString(RequestStatus status){
+    default String enumToString(RequestStatus status) {
         if (status == null) return null;
         return status.name();
     }

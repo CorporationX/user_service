@@ -28,7 +28,7 @@ public class UserService {
     public UserDto findUserById(long userId) {
         return userRepository.findById(userId)
                 .map(userMapper::toDto)
-                    .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }
 
     public List<UserDto> findUsersByIds(List<Long> userIds) {

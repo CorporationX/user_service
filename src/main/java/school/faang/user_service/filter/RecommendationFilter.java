@@ -9,9 +9,10 @@ public class RecommendationFilter {
 
     public boolean matchesFilter(RecommendationRequest recommendationRequest, RequestFilterDto filter) {
         if (filter != null && filter.getStatus() != null
-                && !filter.getStatus().toUpperCase().equals(recommendationRequest.getStatus().name())) return false;
+            && !filter.getStatus().toUpperCase().equals(recommendationRequest.getStatus().name())) return false;
         if (filter != null
-                && filter.getRequesterId() != null && !filter.getRequesterId().equals(recommendationRequest.getRequester().getId())) return false;
+            && filter.getRequesterId() != null && !filter.getRequesterId().equals(recommendationRequest.getRequester().getId()))
+            return false;
         return filter == null || filter.getReceiverId() == null || filter.getReceiverId().equals(recommendationRequest.getReceiver().getId());
     }
 }

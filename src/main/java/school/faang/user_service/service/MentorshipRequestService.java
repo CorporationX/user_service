@@ -106,12 +106,12 @@ public class MentorshipRequestService {
 
         if (requesterId == null) {
             throw new IllegalArgumentException("Пользователь, который отправляет запрос на менторство не может быть" +
-                    " быть пустым");
+                                               " быть пустым");
         }
 
         if (receiverId == null) {
             throw new IllegalArgumentException("Пользователь, которому направляется запрос на менторство не может" +
-                    "быть пустым");
+                                               "быть пустым");
         }
 
         if (Objects.equals(requesterId, mentorshipRequestDto.getReceiverId())) {
@@ -129,7 +129,7 @@ public class MentorshipRequestService {
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository
                 .findLatestRequest(requesterId, receiverId).orElse(null);
         if (mentorshipRequest != null
-                && mentorshipRequestDto.getCreatedAt().minusMonths(3).isBefore(mentorshipRequest.getCreatedAt())
+            && mentorshipRequestDto.getCreatedAt().minusMonths(3).isBefore(mentorshipRequest.getCreatedAt())
         ) {
             throw new IllegalArgumentException("Запрос на менторство можно отправить только раз в 3 месяца");
         }

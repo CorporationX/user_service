@@ -31,7 +31,7 @@ public class EventController {
             return ResponseEntity.ok(eventService.create(event));
         }
         throw new DataValidationException("Не удалось создать событие!" +
-                " Введены не верные данные.");
+                                          " Введены не верные данные.");
     }
 
     // получить событие
@@ -42,10 +42,10 @@ public class EventController {
 
     public boolean validateEventDto(EventDto event) {
         return !event.getTitle().isEmpty()
-                && !event.getTitle().isBlank()
-                && event.getTitle().length() <= 64
-                && event.getStartDate() != null
-                && event.getOwnerId() != 0;
+               && !event.getTitle().isBlank()
+               && event.getTitle().length() <= 64
+               && event.getStartDate() != null
+               && event.getOwnerId() != 0;
     }
 
     //Получить все события с фильтрами

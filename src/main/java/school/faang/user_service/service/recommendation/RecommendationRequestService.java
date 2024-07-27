@@ -28,13 +28,13 @@ public class RecommendationRequestService {
     private static final String RECIPIENT_ID_NULL_OR_NEGATIVE = "recipientID apply in getRequest method was null or negative id: ";
     private final RecommendationRequestMapper requestMapper;
     private final RecommendationRequestRepository requestRepository;
-    private final ValidatorForRecommendationRequestService validator;
+    private final ValidatorForRecommendationRequestService recommendationServiceValidator;
     private final SkillRequestRepository skillRequestRepository;
     private final List<RequestFilter> requestFilters;
 
     @Transactional
     public RecommendationRequestDto create(RecommendationRequestDto requestDto) {
-        validator.validatorData(requestDto);
+        recommendationServiceValidator.validatorData(requestDto);
         saveSkillRequest(requestDto);
         RecommendationRequest request = requestRepository.save(requestMapper.toEntity(requestDto));
         return requestMapper.toDto(request);
@@ -85,8 +85,9 @@ public class RecommendationRequestService {
     }
 
     @Transactional
-    private void saveSkillRequest(RecommendationRequestDto requestDto) {
-        requestDto.getSkills().forEach(
-                skill -> skillRequestRepository.create(requestDto.getId(), skill.getSkillId()));
+    public void saveSkillRequest(RecommendationRequestDto requestDto) {
+        requestDto.getSkillIds().stream()
+                .filter(skill -> skillRequestRepository.existsById(skill.getSkillId()))
+                .forEach(skill -> skillRequestRepository.create(requestDto.getId(), skill.getSkillId()));
     }
 }

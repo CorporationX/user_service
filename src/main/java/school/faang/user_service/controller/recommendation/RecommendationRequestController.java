@@ -3,6 +3,7 @@ package school.faang.user_service.controller.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +20,7 @@ import java.util.List;
 @Validated
 public class RecommendationRequestController {
     private static final String REQUEST = "/request";
-    private static final String ALL_REQUESTS_FILTER = "/requests";
+    private static final String FILTERED_REQUESTS = "/requests";
     private final RecommendationRequestService requestService;
 
     @GetMapping(REQUEST)
@@ -27,13 +28,13 @@ public class RecommendationRequestController {
         return requestService.getRequest(id);
     }
 
-    @GetMapping(ALL_REQUESTS_FILTER)
+    @GetMapping(FILTERED_REQUESTS)
     public List<RecommendationRequestDto> getRecommendationRequests(Long receiverId, RequestFilterDto filter) {
         return requestService.getRequests(receiverId, filter);
     }
 
-    @PostMapping(REQUEST)
-    public RecommendationRequestDto rejectRequest(@RequestParam Long recommendationRequestId, @RequestParam String reasonReject) {
-        return requestService.rejectRequest(recommendationRequestId, reasonReject);
+    @PostMapping(REQUEST + "/{id}")
+    public RecommendationRequestDto rejectRequest(@PathVariable("id") Long recommendationRequestId, @RequestParam String rejectionReason) {
+        return requestService.rejectRequest(recommendationRequestId, rejectionReason);
     }
 }

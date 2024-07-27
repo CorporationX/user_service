@@ -1,5 +1,6 @@
 package school.faang.user_service.service.recommendation;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -62,7 +63,7 @@ public class RecommendationRequestServiceTest {
         when(requestRepository.save(entity)).thenReturn(entity);
         when(requestMapper.toEntity(dto)).thenReturn(entity);
         when(requestMapper.toDto(entity)).thenReturn(dto);
-        when(skillRequestRepository.save(dto)).thenReturn(entity);
+        when(skillRequestRepository.save(entity)).thenReturn(entity);
 
         var returnDto = service.create(dto);
 
@@ -165,7 +166,7 @@ public class RecommendationRequestServiceTest {
         dto.setRecieverId(2L);
         dto.setRequesterId(3L);
         dto.setMessage("message");
-        dto.setSkills(List.of(new SkillRequestDto(), new SkillRequestDto()));
+        dto.setSkillIds(List.of(new SkillRequestDto(), new SkillRequestDto()));
         dto.setUpdatedAt(LocalDateTime.now().minusMonths(7));
         return dto;
     }

@@ -22,13 +22,12 @@ public class RecommendationRequestDto {
     private Long requesterId;
     @Positive
     private Long recieverId;
-    @NotNull
     @NotBlank
     private String message;
     private RequestStatus status;
     private String rejectionReason;
     @NotNull
-    private List<SkillRequestDto> skills;
+    private List<SkillRequestDto> skillIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

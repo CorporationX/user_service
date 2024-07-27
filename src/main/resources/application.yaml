@@ -55,4 +55,4 @@ services:
     isMocked: true
 
 variables:
-  interval: '3 months'
+  interval: 3

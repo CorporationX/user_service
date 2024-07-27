@@ -41,19 +41,16 @@ public class MentorshipRequestService {
 
     @Getter
     @Value("${variables.interval}")
-    private String interval;
+    private long interval;
 
     public void acceptRequest(AcceptMentorshipRequestDto acceptMentorshipRequestDto) {
         MentorshipRequest editingRequest = getMentorshipRequest(acceptMentorshipRequestDto.getId());
-        Optional<Mentorship> lastMentorship = mentorshipRepository
-                .getLastMentorship(acceptMentorshipRequestDto.getReceiverId(), acceptMentorshipRequestDto.getRequesterId());
-        lastMentorship.ifPresent((mentorship) -> {
-            throw new DataValidationException("You have already accepted request!!");
-        });
+        getLastMentorship(acceptMentorshipRequestDto);
         mentorshipRepository.create(acceptMentorshipRequestDto.getReceiverId(), acceptMentorshipRequestDto.getRequesterId());
         editingRequest.setStatus(RequestStatus.ACCEPTED);
         mentorshipRequestRepository.save(editingRequest);
     }
+
 
     public void rejectRequest(RejectRequestDto rejectRequestDto) {
         MentorshipRequest mentorshipRequest = getMentorshipRequest(rejectRequestDto.getId());
@@ -69,9 +66,12 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.existsById(mentorshipRequestDto.getReceiverId(), "Receiver user does not exist!");
 
         checkIsTrialExpired(mentorshipRequestDto);
-        MentorshipRequest earlierMentorshipRequest = mentorshipRequestRepository
-                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
-                .orElseThrow(() -> new DataValidationException("Request already exists"));
+        Optional<MentorshipRequest> earlierMentorshipRequest = mentorshipRequestRepository
+                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
+        earlierMentorshipRequest.ifPresent((request) -> {
+            throw new DataValidationException("Request already exists");
+        });
+
         MentorshipRequest createdRequest = mentorshipRequestRepository
                 .create(mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
@@ -80,7 +80,7 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(createdRequest);
     }
 
-    public ResponseEntity<List<MentorshipRequestDto>> getAllMentorshipRequests(MentorshipRequestFilterDto filterDto) {
+    public List<MentorshipRequestDto> getAllMentorshipRequests(MentorshipRequestFilterDto filterDto) {
         Stream<MentorshipRequest> resultQuery = mentorshipRequestRepository.findAll().stream();
         if (filterDto.getDescription() != null) {
             resultQuery = resultQuery.filter(req -> req.getDescription().contains(filterDto.getDescription()));
@@ -91,22 +91,32 @@ public class MentorshipRequestService {
         if (filterDto.getReceiverId() != null) {
             resultQuery = resultQuery.filter(req -> req.getReceiver().getId() == filterDto.getReceiverId());
         }
-        return new ResponseEntity<>(resultQuery.map(mentorshipRequestMapper::toDto).toList(), HttpStatus.OK);
+        return resultQuery.map(mentorshipRequestMapper::toDto).toList();
     }
 
     private MentorshipRequest getMentorshipRequest(Long rejectRequestId) {
-        Optional<MentorshipRequest> foundRequest = mentorshipRequestRepository.findById(rejectRequestId);
-        if (foundRequest.isPresent()) {
-            return foundRequest.get();
-        }
-        throw new EntityNotFoundException("Mentorship request not found!");
+        return mentorshipRequestRepository
+                .findById(rejectRequestId)
+                .orElseThrow(() -> new EntityNotFoundException("Mentorship request not found!"));
     }
 
     private void checkIsTrialExpired(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestRepository
-                .findFreshRequest(mentorshipRequestDto.getRequesterId(), interval)
+                .findFirstByRequesterIdAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(
+                        mentorshipRequestDto.getRequesterId(),
+                        mentorshipRequestDto.getCreatedAt().minusMonths(interval)
+                )
                 .ifPresent((req) -> {
                     throw new DataValidationException("User has one request for last 3 months!");
                 });
+    }
+
+    private void getLastMentorship(AcceptMentorshipRequestDto acceptMentorshipRequestDto) {
+        Optional<Mentorship> lastMentorship = mentorshipRepository
+                .getLastMentorship(acceptMentorshipRequestDto.getReceiverId(),
+                        acceptMentorshipRequestDto.getRequesterId());
+        if (lastMentorship.isPresent()) {
+            throw new DataValidationException("You have already accepted request!!");
+        }
     }
 }

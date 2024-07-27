@@ -38,6 +38,6 @@ public class MentorshipRequestController {
     }
     @PostMapping("/all")
     public ResponseEntity<List<MentorshipRequestDto>> getAllMentorshipRequests(@RequestBody MentorshipRequestFilterDto filterDto) {
-        return mentorshipRequestService.getAllMentorshipRequests(filterDto);
+        return ResponseEntity.status(200).body(mentorshipRequestService.getAllMentorshipRequests(filterDto));
     }
 }

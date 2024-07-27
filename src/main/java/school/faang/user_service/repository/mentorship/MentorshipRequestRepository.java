@@ -9,6 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.MentorshipRequest;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -29,12 +30,8 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
             """)
     Optional<MentorshipRequest> findLatestRequest(long requesterId, long receiverId);
 
-    @Query(nativeQuery = true, value = """
-            SELECT * FROM mentorship_request
-            WHERE requester_id = :requesterId AND created_at >= current_timestamp - INTERVAL :interval
-            ORDER BY created_at DESC
-            LIMIT 1;
-            """)
-    Optional<MentorshipRequest> findFreshRequest(long requesterId,String interval);
+
+    Optional<MentorshipRequest> findFirstByRequesterIdAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(
+            long requesterId, LocalDateTime interval);
 
 }

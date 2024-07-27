@@ -58,6 +58,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
+    implementation ("org.jsonschema2pojo:jsonschema2pojo-core:1.1.1")
 
     /**
      * Test containers
@@ -81,6 +82,14 @@ jsonSchema2Pojo {
     targetPackage = "com.json.student"
     setSourceType("jsonschema")
 }
+
+//sourceSets {
+//    main {
+//        java {
+//            srcDirs += "${project.buildDir}/generated-sources/js2p"
+//        }
+//    }
+//}
 
 tasks.withType<Test> {
     useJUnitPlatform()

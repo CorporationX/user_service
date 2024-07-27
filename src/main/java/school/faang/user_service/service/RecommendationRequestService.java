@@ -21,18 +21,17 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static java.time.LocalDateTime.now;
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MONTHS;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
+    private static final int RECOMMENDATION_REQUEST_LIMIT = 6;
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final UserRepository userRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationFilter recommendationFilter;
     private final RecommendationRequestMapper recommendationRequestMapper;
-
-    private static final int RECOMMENDATION_REQUEST_LIMIT = 6;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) throws EntityNotFoundException {
         var requester = findUserById(recommendationRequestDto.getRequesterId());
@@ -47,6 +46,7 @@ public class RecommendationRequestService {
 
         return recommendationRequestMapper.toDto(savedRecommendationRequest);
     }
+
     private User findUserById(Long userId) throws EntityNotFoundException {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " not found."));
@@ -78,7 +78,7 @@ public class RecommendationRequestService {
 
     private boolean isWithinSixMonthsTillNow(LocalDateTime createdAt, LocalDateTime updatedAt) {
         return MONTHS.between(updatedAt, now()) < RECOMMENDATION_REQUEST_LIMIT ||
-                MONTHS.between(createdAt, now()) < RECOMMENDATION_REQUEST_LIMIT;
+               MONTHS.between(createdAt, now()) < RECOMMENDATION_REQUEST_LIMIT;
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {

@@ -1,6 +1,11 @@
 package school.faang.user_service.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 @AllArgsConstructor

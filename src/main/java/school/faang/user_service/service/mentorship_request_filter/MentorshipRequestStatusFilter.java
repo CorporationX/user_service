@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
-import java.util.Objects;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Data
-public class MentorshipRequestStatusFilter implements MentorshipRequestFilter{
+public class MentorshipRequestStatusFilter implements MentorshipRequestFilter {
     @Override
     public boolean isApplecable(RequestFilterDto filters) {
         return filters.getStatus() != null;

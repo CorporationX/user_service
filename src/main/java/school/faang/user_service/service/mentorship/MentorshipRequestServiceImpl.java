@@ -45,9 +45,9 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         validateRequestUsers(users);
 
 //        Check if USER made request in last 3 months, correct me if it should check for requests of requester responder pair
-        LocalDateTime cooldownThreshold = LocalDateTime.now().minusMonths(MONTHS_COOLDOWN);
+
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository.findLatestRequestByRequester(requesterId);
-        validateLastRequestDate(latestRequest, cooldownThreshold);
+        validateLastRequestDate(latestRequest, MONTHS_COOLDOWN);
 
         MentorshipRequest response = mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestMapper.toDto(response);

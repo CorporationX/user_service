@@ -31,7 +31,8 @@ public class mentorshipRequestValidator {
         }
     }
 
-    public static void validateLastRequestDate(Optional<MentorshipRequest> latestRequest , LocalDateTime cooldownThreshold) {
+    public static void validateLastRequestDate(Optional<MentorshipRequest> latestRequest , int monthsCooldown) {
+        LocalDateTime cooldownThreshold = LocalDateTime.now().minusMonths(monthsCooldown);
         if (latestRequest.isPresent() && latestRequest.get()
                 .getCreatedAt()
                 .isAfter(cooldownThreshold)) {

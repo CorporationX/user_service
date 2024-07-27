@@ -9,5 +9,4 @@ import school.faang.user_service.entity.User;
 public interface UserProfilePicMapper {
 
     UserProfileDto toDto(User user);
-//    User toEntity(UserProfileDto userProfileDto);
 }

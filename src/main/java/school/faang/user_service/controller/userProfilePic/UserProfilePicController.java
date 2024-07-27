@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.controller.ApiPath;
 import school.faang.user_service.dto.userProfile.UserProfileDto;
 import school.faang.user_service.service.userProfilePic.UserProfilePicService;
 import school.faang.user_service.validator.userProfilePic.UserProfilePicValidation;
@@ -15,12 +16,12 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/profile/image")
+@RequestMapping(ApiPath.USER_PROFILE_PIC)
 public class UserProfilePicController {
     private final UserProfilePicService userProfilePicService;
     private final UserProfilePicValidation userProfilePicValidation;
 
-    @PostMapping("/creation/{userId}")
+    @PostMapping("/{userId}")
     public ResponseEntity<UserProfileDto> addImageInProfile(@PathVariable Long userId,
                                                             @RequestParam("file") MultipartFile multipartFile) throws IOException {
         userProfilePicValidation.validMaxSize(multipartFile);

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exception.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,4 +49,8 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             WHERE gs.goal_id = ?1)
             """)
     List<Skill> findSkillsByGoalId(long goalId);
+
+    default Skill getById(long skillId) {
+        return findById(skillId).orElseThrow(() -> new NotFoundException("Skill by id " + skillId + " not found"));
+    }
 }

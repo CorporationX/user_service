@@ -17,6 +17,8 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static school.faang.user_service.validation.mentorship.mentorshipRequestValidator.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,37 +33,22 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
-        long requesterId = mentorshipRequest.getRequester()
-                .getId();
-        long receiverId = mentorshipRequest.getReceiver()
-                .getId();
+        long requesterId = mentorshipRequest.getRequester().getId();
+        long receiverId = mentorshipRequest.getReceiver().getId();
 
 //        Redundant tho, because the same check is done when checking if both users exists, but its more clear error
-        if (requesterId == receiverId) {
-            throw new IllegalArgumentException("Cannot request from yourself");
-        }
-
-        if (mentorshipRequest.getDescription()
-                .length() < 4) {
-            throw new IllegalArgumentException("Mentorship description is too short, it should be at least 4 characters");
-        }
+        validateSelfRequest(requesterId, receiverId);
+        validateDescription(mentorshipRequest);
 
 //        Ensure both users exist
-        Iterable<User> users = userRepository.findAllById(List.of(requesterId, receiverId));
-        if (((Collection<User>) users).size() != 2) {
-            throw new NoSuchElementException("One or both users not found");
-        }
+        Collection<User> users = (Collection<User>) userRepository.findAllById(List.of(requesterId, receiverId));
+        validateRequestUsers(users);
 
 //        Check if USER made request in last 3 months, correct me if it should check for requests of requester responder pair
-        LocalDateTime cooldownThreshold = LocalDateTime.now()
-                .minusMonths(MONTHS_COOLDOWN);
+        LocalDateTime cooldownThreshold = LocalDateTime.now().minusMonths(MONTHS_COOLDOWN);
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository.findLatestRequestByRequester(requesterId);
+        validateLastRequestDate(latestRequest, cooldownThreshold);
 
-        if (latestRequest.isPresent() && latestRequest.get()
-                .getCreatedAt()
-                .isAfter(cooldownThreshold)) {
-            throw new IllegalArgumentException("A mentorship request has already been made within the last " + MONTHS_COOLDOWN + " months");
-        }
         MentorshipRequest response = mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestMapper.toDto(response);
     }
@@ -71,16 +58,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
 
         Iterable<MentorshipRequest> filteredRequests = mentorshipRequestRepository.findAllByFilter(filter.getDescription(), filter.getRequesterId(), filter.getResponderId(), filter.getStatus()
-                .ordinal());
+                                                                                                                                                                                    .ordinal());
         List<MentorshipRequest> requests = new ArrayList<>();
         filteredRequests.forEach(requests::add);
-        List<MentorshipRequestDto> response = requests.stream()
-                .map(mentorshipRequestMapper::toDto)
-                .toList();
+        List<MentorshipRequestDto> response = requests.stream().map(mentorshipRequestMapper::toDto).toList();
 
-        if(response.isEmpty()) {
-            throw new NoSuchElementException("No mentorship requests found");
-        }
+        validateRequestsCount(response);
 
         return response;
     }
@@ -89,20 +72,19 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     public MentorshipRequestDto acceptRequest(long id) {
         MentorshipRequest request = findMembershipById(id);
 
-        if (request.getStatus() == RequestStatus.ACCEPTED) {
-            throw new IllegalArgumentException("Mentorship request with id " + id + " already accepted");
-        }
+        validateRequestAccepted(request);
 
-        boolean mentorshipExists = mentorshipRepository.findByMentorAndMentee(request.getReceiver()
-                                                                                      .getId(), request.getRequester()
-                                                                                      .getId());
+        boolean mentorshipExists = mentorshipRepository.findByMentorAndMentee(request.getReceiver().getId(), request.getRequester().getId());
 
-        if (mentorshipExists) {
-            throw new IllegalArgumentException("Mentorship already exists");
-        }
+        validateMentorshipExistance(mentorshipExists);
 
-        request.getRequester()
-                .setMentors(List.of(request.getReceiver()));
+        List<User> mentors = request.getRequester().getMentors();
+        mentors.add(request.getReceiver());
+        request.getRequester().setMentors(mentors);
+
+        List<User> mentees = request.getReceiver().getMentors();
+        mentees.add(request.getRequester());
+        request.getReceiver().setMentees(mentees);
 
         request.setStatus(RequestStatus.ACCEPTED);
         MentorshipRequest response = mentorshipRequestRepository.save(request);
@@ -112,23 +94,18 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
         MentorshipRequest request = findMembershipById(id);
-        if (request.getStatus() == RequestStatus.ACCEPTED) {
-            throw new IllegalArgumentException("Mentorship request with id " + id + " already accepted");
-        } else if (request.getStatus() == RequestStatus.REJECTED) {
-            throw new IllegalArgumentException("Mentorship request with id " + id + " already rejected");
-        }
+        validateRequestAccepted(request);
+        validateRequestRejected(request);
 
         request.setStatus(RequestStatus.REJECTED);
         request.setDescription(rejection.getReason());
 
         MentorshipRequest response = mentorshipRequestRepository.save(request);
-        System.out.println(response.getStatus());
-        System.out.println(mentorshipRequestMapper.toDto(response));
         return mentorshipRequestMapper.toDto(response);
     }
 
     public MentorshipRequest findMembershipById(long id) {
         return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Mentorship request with id " + id + " doesnt exist"));
+                                          .orElseThrow(() -> new NoSuchElementException("Mentorship request with id " + id + " doesnt exist"));
     }
 }

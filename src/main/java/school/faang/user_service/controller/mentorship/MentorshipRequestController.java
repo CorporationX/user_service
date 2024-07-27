@@ -21,22 +21,22 @@ public class MentorshipRequestController {
 
 
     @GetMapping
-    public List<MentorshipRequestDto> getRequests(@Valid @ModelAttribute RequestFilterDto filter) {
+    public List<MentorshipRequestDto> getRequests(@Valid RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);
     }
 
-    @PostMapping(path = "accept")
-    public MentorshipRequestDto acceptRequest(@Valid @RequestParam long id) {
+    @PostMapping(path = "accept/{id}")
+    public MentorshipRequestDto acceptRequest(@Valid @PathVariable long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
 
-    @PostMapping(path = "reject")
-    public MentorshipRequestDto rejectRequest(@Valid @RequestParam long id, @RequestBody RejectionDto rejection) {
+    @PostMapping(path = "reject/{id}")
+    public MentorshipRequestDto rejectRequest(@Valid @PathVariable long id, @RequestBody RejectionDto rejection) {
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 
     @PostMapping
-    public MentorshipRequestDto requestMentorship( @RequestBody MentorshipRequestDto mentorshipRequestDto) {
+    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 }

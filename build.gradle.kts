@@ -1,6 +1,8 @@
+import java.math.RoundingMode
+
 plugins {
     java
-    jacoco
+    id("jacoco")
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
@@ -109,7 +111,7 @@ val jacocoInclude = listOf(
     "**/mapper/**"
 )
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
@@ -121,7 +123,7 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(false)
         csv.required.set(false)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 
     classDirectories.setFrom(
@@ -141,7 +143,7 @@ tasks.jacocoTestCoverageVerification {
             )
             enabled = true
             limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
+                minimum = BigDecimal("0.8").setScale(2, RoundingMode.HALF_UP)
             }
         }
     }

@@ -1,4 +1,4 @@
-package school.faang.user_service.exception.skill;
+package school.faang.user_service.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

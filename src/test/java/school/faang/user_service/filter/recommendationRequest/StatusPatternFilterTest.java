@@ -1,4 +1,4 @@
-package school.faang.user_service.filter.recomendation;
+package school.faang.user_service.filter.recommendationRequest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.recomendation;
+package school.faang.user_service.service.recommendationRequest;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +19,7 @@ import school.faang.user_service.mapper.recommendationRequest.RecommendationRequ
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.filter.recomendation.RecommendationRequestFilter;
-import school.faang.user_service.service.recommendationRequest.RecommendationRequestService;
+import school.faang.user_service.filter.recommendationRequest.RecommendationRequestFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

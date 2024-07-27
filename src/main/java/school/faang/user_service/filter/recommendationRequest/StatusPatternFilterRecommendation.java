@@ -1,4 +1,4 @@
-package school.faang.user_service.filter.recomendation;
+package school.faang.user_service.filter.recommendationRequest;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;

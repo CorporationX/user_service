@@ -107,7 +107,7 @@ class MentorshipRequestServiceImplTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.acceptRequest(1L));
 
-        assertEquals("Mentorship request with id 1 already accepted", exception.getMessage());
+        assertEquals("Mentorship request already accepted", exception.getMessage());
     }
 
     @Test
@@ -139,7 +139,7 @@ class MentorshipRequestServiceImplTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.rejectRequest(1L, new RejectionDto()));
 
-        assertEquals("Mentorship request with id 1 already accepted", exception.getMessage());
+        assertEquals("Mentorship request already accepted", exception.getMessage());
     }
 
     @Test
@@ -150,7 +150,7 @@ class MentorshipRequestServiceImplTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.rejectRequest(1L, new RejectionDto()));
 
-        assertEquals("Mentorship request with id 1 already rejected", exception.getMessage());
+        assertEquals("Mentorship request already rejected", exception.getMessage());
     }
 
     @Test

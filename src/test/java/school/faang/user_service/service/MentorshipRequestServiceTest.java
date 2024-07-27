@@ -1,10 +1,12 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
+import school.faang.user_service.dto.mentorship.AcceptMentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -30,27 +32,24 @@ public class MentorshipRequestServiceTest {
     private  UserRepository userRepository;
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper;
-    @Test
-    public void testSimpleLogic() {
-        int a =1;
-        int b =2;
-        assertEquals(3,a+b);
+
+    private AcceptMentorshipRequestDto acceptMentorshipRequestDto;
+    private MentorshipRequestDto mentorshipRequestDto;
+    private Long userId;
+    @BeforeEach
+    public void setUp() {
+        userId = 1L;
+        mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setDescription("Request");
+        mentorshipRequestDto.setRequesterId(1L);
+        mentorshipRequestDto.setReceiverId(2L);
     }
-//    @Test
-//    public void testRequestMentorshipRequesterExists() {
-//        MentorshipRequestDto dto = new MentorshipRequestDto();
-//        dto.setRequesterId(100L);
-//        dto.setDescription("123");
-//        when(mentorshipRepository.existsById(dto.getRequesterId())).thenReturn(false);
-//        assertThrows(DataValidationException.class,()->mentorshipRequestService.requestMentorship(dto));
-//    }
-//    public void testRequestMentorshipReceiverExists() {
-//        MentorshipRequestDto dto = new MentorshipRequestDto();
-//        dto.setRequesterId(1L);
-//        dto.setReceiverId(1000L);
-//        dto.setDescription("123");
-//        when(mentorshipRepository.existsById(dto.getRequesterId())).thenReturn(false);
-//        assertThrows(DataValidationException.class,()->mentorshipRequestService.requestMentorship(dto));
-//    }
+    @Test
+    public void testMentorshipRequest(){
+        when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(true);
+        when(userRepository.existsById(mentorshipRequestDto.getReceiverId())).thenReturn(true);
+
+        MentorshipRequestDto result = mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+    }
 
 }

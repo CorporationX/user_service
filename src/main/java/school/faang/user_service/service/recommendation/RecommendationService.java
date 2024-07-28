@@ -2,6 +2,7 @@ package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -32,58 +33,98 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
 
-    public RecommendationDto create(RecommendationDto recommendationDto){
+    public RecommendationDto create(RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
-        User author = recommendation.getAuthor();
-        User receiver = recommendation.getReceiver();
 
         checkNotRecommendBeforeSixMonths(recommendationDto);
-        List<SkillOfferDto> skillOfferDtos = recommendationDto.getSkillOffers();
-        checkForSkills(skillOfferDtos);
+        checkForSkills(recommendationDto.getSkillOffers());
         saveSkillOffers(recommendation);
 
+        recommendationRepository.save(recommendation);
+
+        return recommendationMapper.toDto(recommendation);
     }
 
-    private void checkNotRecommendBeforeSixMonths(RecommendationDto recommendationDto){
+    public RecommendationDto update(RecommendationDto recommendationDto){
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+
+        checkNotRecommendBeforeSixMonths(recommendationDto);
+        checkForSkills(recommendationDto.getSkillOffers());
+        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        saveSkillOffers(recommendation);
+
+        recommendationRepository.save(recommendation);
+
+        return recommendationMapper.toDto(recommendation);
+    }
+
+    public void delete(long recommendationId){
+        recommendationRepository.deleteById(recommendationId);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(long recieverId, Pageable pageable){
+        List<Recommendation> recommendations = recommendationRepository
+                .findAllByReceiverId(recieverId, pageable)
+                .getContent();
+
+        return recommendations.stream()
+                .map(recommendationMapper::toDto)
+                .toList();
+    }
+
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable){
+        List<Recommendation> recommendations = recommendationRepository
+                .findAllByAuthorId(authorId, pageable)
+                .getContent();
+
+        return recommendations.stream()
+                .map(recommendationMapper::toDto)
+                .toList();
+    }
+
+    private void checkNotRecommendBeforeSixMonths(RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                         recommendationDto.getAuthorId(),
                         recommendationDto.getReceiverId())
                 .orElseThrow(() -> {
                     log.error("");
-                    return new IllegalStateException("аргумент не найдеен");
+                    return new IllegalStateException("аргумент не найден");
                 });
         LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
-        if (recommendation.getUpdatedAt().isAfter(localDateTime)){
+        if (recommendation.getUpdatedAt().isAfter(localDateTime)) {
             log.error(" рекомендация может быть один раз в 6 месяцев");
             throw new IllegalStateException("рекомендация может быть один раз в 6 месяцев");
         }
     }
-    private void checkForSkills(List<SkillOfferDto> skillOfferDtos){
+
+    private void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
         for (SkillOfferDto skillOfferDto : skillOfferDtos) {
-            if (!skillOfferRepository.existsById(skillOfferDto.getSkillId())){
+            if (!skillOfferRepository.existsById(skillOfferDto.getSkillId())) {
                 throw new NullPointerException("Навыка нет в системе");
             }
         }
     }
-    private void saveSkillOffers(Recommendation recommendation){
+
+    private void saveSkillOffers(Recommendation recommendation) {
         User author = recommendation.getAuthor();
         User receiver = recommendation.getReceiver();
 
-        List<Skill> skills = skillRepository.findAllByUserId(receiver.getId());
+        List<Skill> existingSkills = skillRepository.findAllByUserId(receiver.getId());
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
 
+        boolean AuthorSkillGuarantee = userSkillGuaranteeRepository.existsById(author.getId());
+
         for (SkillOffer skillOffer : skillOffers) {
-            Skill skill = skillRepository.findById(skillOffer.getSkill().getId())
-                    .orElseThrow(() -> new DataValidationException(""));
-            if (skills.contains(skillOffer.getSkill()) && !userSkillGuaranteeRepository.existsById(author.getId())){
-                addAndSaveGuarantee(author, receiver, skill);
+            if (existingSkills.contains(skillOffer.getSkill()) && !AuthorSkillGuarantee) {
+                addAndSaveGuarantee(author, receiver, skillOffer.getSkill());
             } else {
                 skillOfferRepository.save(skillOffer);
             }
         }
     }
-    private void addAndSaveGuarantee(User author, User receiver, Skill skill){
+
+    private void addAndSaveGuarantee(User author, User receiver, Skill skill) {
         userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
                 .user(receiver)
                 .skill(skill)

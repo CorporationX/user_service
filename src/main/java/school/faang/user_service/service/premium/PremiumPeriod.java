@@ -15,9 +15,6 @@ public enum PremiumPeriod {
     THREE_MONTH(90, new BigDecimal(25)),
     YEAR(365, new BigDecimal(80));
 
-    private final int days;
-    private final BigDecimal price;
-
     private static final Map<Integer, PremiumPeriod> DAYS_TO_PERIOD_MAP = new HashMap<>();
 
     static {
@@ -25,6 +22,9 @@ public enum PremiumPeriod {
             DAYS_TO_PERIOD_MAP.put(period.getDays(), period);
         }
     }
+
+    private final int days;
+    private final BigDecimal price;
 
     public static PremiumPeriod getPremiumPeriod(int days) {
         return Optional.ofNullable(DAYS_TO_PERIOD_MAP.get(days))

@@ -8,10 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.service.user.UserFilter;
@@ -34,13 +36,16 @@ public class SubscriptionServiceTest {
     @Mock
     private UserFilter nameFilter;
 
+    @Spy
+    private UserMapperImpl userMapper;
+
     @InjectMocks
     private SubscriptionService subscriptionService;
 
     @BeforeEach
     public void setUp() {
         List<UserFilter> userFilters = List.of(nameFilter, aboutFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters, userMapper);
     }
 
     //Positive test
@@ -125,7 +130,7 @@ public class SubscriptionServiceTest {
         when(aboutFilter.apply(users, filter)).thenReturn(Stream.of());
 
         //expect
-        UserDto fuserDto = new UserDto(0L, "John", null);
+        UserDto fuserDto = new UserDto(0L, "John", null, null);
         List<UserDto> userDtos = List.of(fuserDto);
 
         //assert

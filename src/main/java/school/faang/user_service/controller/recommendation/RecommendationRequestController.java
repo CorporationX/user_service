@@ -22,19 +22,19 @@ public class RecommendationRequestController {
         return recommendationRequestService.create(recommendationRequest);
     }
 
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter){
+    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 
-    public RecommendationRequestDto getRecommendationRequest(long id){
+    public RecommendationRequestDto getRecommendationRequest(long id) {
         return recommendationRequestService.getRequest(id);
     }
 
-    public RecommendationRequestDto getRecommendationRequest(RequestFilterDto filter){
+    public RecommendationRequestDto getRecommendationRequest(RequestFilterDto filter) {
         return recommendationRequestService.getRequest(filter);
     }
 
-    public RecommendationRequestDto rejectRequest(long id, @Valid RejectionDto rejection){
+    public RecommendationRequestDto rejectRequest(long id, @Valid RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

@@ -53,4 +53,4 @@ services:
     isMocked: true
 
 goal:
-  max_active_goals = 2
+  max_active_goals: 2

@@ -4,9 +4,9 @@ package school.faang.user_service.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,41 +31,41 @@ public class GoalController {
     private final GoalService goalService;
 
     @Operation(summary = "Create Goal", description = "create new goal")
-    @PostMapping("{userId}/goals/create")
+    @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public GoalDto createGoal(@Valid  @Parameter(description = "user id") @PathVariable Long userId,
-                              @RequestBody GoalDto goalDto) {
+    public GoalDto createGoal(@Parameter(description = "user id") @PathVariable Long userId,
+                              @Validated @RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 
     @Operation(summary = "Update Goal", description = "update goal by goal id")
-    @PutMapping("/goals/{goalId}")
+    @PutMapping("/{goalId}")
     @ResponseStatus(HttpStatus.OK)
-    public GoalDto updateGoal(@Valid  @Parameter(description = "goal id") @PathVariable Long goalId,
-                              @RequestBody GoalDto goalDto) {
+    public GoalDto updateGoal(@Parameter(description = "goal id") @PathVariable Long goalId,
+                              @Validated @RequestBody GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
     }
 
     @Operation(summary = "Delete goal", description = "delete goal by goal id")
-    @DeleteMapping("/goals/{goalId}")
+    @DeleteMapping("/{goalId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteGoal(@Valid @Parameter(description = "goal id") @PathVariable Long goalId) {
+    public void deleteGoal(@Parameter(description = "goal id") @PathVariable Long goalId) {
         goalService.deleteGoal(goalId);
     }
 
     @Operation(summary = "Find subtasks", description = "find subtasks by goal id")
-    @GetMapping("/goals/{goalId}/subtasks")
+    @GetMapping("/{goalId}/subtasks")
     @ResponseStatus(HttpStatus.OK)
-    private List<GoalDto> findSubtaskByGoalId(@Valid  @Parameter(description = "goal id") @PathVariable Long goalId,
-                                              @RequestBody GoalFilterDto filters) {
+    private List<GoalDto> findSubtaskByGoalId(@Parameter(description = "goal id") @PathVariable Long goalId,
+                                              @Validated @RequestBody GoalFilterDto filters) {
         return goalService.findSubtasksByGoalId(goalId, filters);
     }
 
     @Operation(summary = "Find goals", description = "find goals by user id")
-    @GetMapping("/users/{userId}/goals")
+    @GetMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    private List<GoalDto> findGoalsByUser(@Valid  @Parameter(description = "user id") @PathVariable Long userId,
-                                          @RequestBody GoalFilterDto filters) {
+    private List<GoalDto> findGoalsByUser(@Parameter(description = "user id") @PathVariable Long userId,
+                                          @Validated @RequestBody GoalFilterDto filters) {
         return goalService.findGoalsByUserId(userId, filters);
     }
 }

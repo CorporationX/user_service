@@ -24,4 +24,6 @@ public class SkillService {
     public void assignSkillToUser(Long skillId, Long userId) {
         skillRepository.assignSkillToUser(skillId, userId);
     }
+
+    public boolean existsById(Long id) { return skillRepository.existsById(id); }
 }

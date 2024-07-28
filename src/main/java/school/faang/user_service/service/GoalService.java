@@ -9,10 +9,11 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
-import school.faang.user_service.mapper.goal.GoalDtoMapper;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ import java.util.Optional;
 public class GoalService {
     private final GoalRepository goalRepository;
     private final List<GoalFilter> filters;
-    private final GoalDtoMapper goalDtoMapper;
+    private final GoalMapper goalMapper;
     private final GoalValidator goalValidator;
     private final SkillService skillService;
     private final UserService userService;
@@ -29,24 +30,28 @@ public class GoalService {
     @Transactional
     public GoalDto createGoal(long userId, GoalDto goalDto) {
         goalValidator.validateCreation(userId, goalDto);
-        Goal goal = goalDtoMapper.toEntity(goalDto);
+        Goal goal = goalMapper.toEntity(goalDto);
         goal.setStatus(GoalStatus.ACTIVE);
-        goal.setUsers(userService.findAllById(goalDto.getUsersId()));
-        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveId()));
-        return goalDtoMapper.toDto(goalRepository.save(goal));
+        if (goalDto.getUserIds() != null) {
+            goal.setUsers(userService.findAllById(goalDto.getUserIds()));
+        }
+        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveIds()));
+        return goalMapper.toDto(goalRepository.save(goal));
     }
 
     @Transactional
     public GoalDto updateGoal(long goalId, GoalDto goalDto) {
         goalValidator.validateUpdating(goalId, goalDto);
-        Goal goal = goalDtoMapper.toEntity(goalDto);
+        Goal goal = goalMapper.toEntity(goalDto);
         goal.setId(goalId);
-        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
+        if (goal.getStatus() != null && goal.getStatus().equals(GoalStatus.COMPLETED)) {
             updateUsersAndSkillsWhenGoalCompleted(goal);
         }
-        goal.setUsers(userService.findAllById(goalDto.getUsersId()));
-        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveId()));
-        return goalDtoMapper.toDto(goalRepository.save(goal));
+        if (goal.getUsers() != null) {
+            goal.setUsers(userService.findAllById(goalDto.getUserIds()));
+        }
+        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveIds()));
+        return goalMapper.toDto(goalRepository.save(goal));
     }
 
     @Transactional
@@ -72,7 +77,7 @@ public class GoalService {
         for (GoalFilter applicableFilter : applicableFilters) {
             filteredGoals = applicableFilter.apply(filteredGoals.stream(), filter).toList();
         }
-        return goalDtoMapper.toDtos(filteredGoals);
+        return goalMapper.toDtos(filteredGoals);
     }
 
     private void updateUsersAndSkillsWhenGoalCompleted(Goal goal) {
@@ -80,11 +85,16 @@ public class GoalService {
         if (entityOpt.isPresent()) {
             Goal goalEntity = entityOpt.get();
             goalEntity.getUsers().forEach(user -> {
-                List<Skill> currentUserSkills = user.getSkills();
-                currentUserSkills.addAll(skillService.findSkillsByGoalId(goal.getId()));
-                user.setSkills(currentUserSkills);
-                userService.save(user);
-                currentUserSkills.forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId()));
+                List<Skill> currentUserSkills;
+                if (user.getSkills() != null) {
+                    currentUserSkills = user.getSkills();
+                } else {
+                    currentUserSkills = new ArrayList<>();
+                }
+                    currentUserSkills.addAll(skillService.findSkillsByGoalId(goal.getId()));
+                    user.setSkills(currentUserSkills);
+                    userService.save(user);
+                    currentUserSkills.forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId()));
             });
         }
     }

@@ -12,12 +12,12 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface GoalDtoMapper {
+public interface GoalMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(source = "mentor.id", target = "mentorId")
-    @Mapping(source = "users", target = "usersId", qualifiedByName = "usersToIds")
-    @Mapping(source = "skillsToAchieve", target = "skillsToAchieveId", qualifiedByName = "skillsToIds")
+    @Mapping(source = "users", conditionExpression = "java(usersExist(goal))", target = "userIds", qualifiedByName = "usersToIds")
+    @Mapping(source = "skillsToAchieve", target = "skillsToAchieveIds", qualifiedByName = "skillsToIds")
     GoalDto toDto(Goal goal);
 
     List<GoalDto> toDtos(List<Goal> goals);
@@ -36,5 +36,9 @@ public interface GoalDtoMapper {
         return users.stream()
                 .map(User::getId)
                 .toList();
+    }
+
+    default boolean usersExist(Goal goal) {
+        return goal.getUsers() != null;
     }
 }

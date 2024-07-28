@@ -21,7 +21,6 @@ public class GoalDto {
     @Schema(description = "goal id")
     private Long id;
     @Schema(description = "parent goal id")
-    @NotBlank
     private Long parentId;
     @Schema(description = "title")
     private String title;
@@ -39,7 +38,7 @@ public class GoalDto {
     @Schema(description = "mentor id")
     private Long mentorId;
     @Schema(description = "users id")
-    private List<Long> usersId;
+    private List<Long> userIds;
     @Schema(description = "skills id")
-    private List<Long> skillsToAchieveId;
+    private List<Long> skillsToAchieveIds;
 }

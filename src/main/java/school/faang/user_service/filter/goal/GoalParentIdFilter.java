@@ -16,6 +16,7 @@ public class GoalParentIdFilter implements GoalFilter {
 
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto filters) {
-        return goals.filter(goal -> Objects.equals(goal.getParent().getId(), filters.getParentIdPattern()));
+        return goals.filter(goal -> goal.getParent() != null &&
+                Objects.equals(goal.getParent().getId(), filters.getParentIdPattern()));
     }
 }

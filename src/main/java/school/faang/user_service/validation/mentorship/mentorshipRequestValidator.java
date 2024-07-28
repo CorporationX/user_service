@@ -25,8 +25,8 @@ public class mentorshipRequestValidator {
         }
     }
 
-    public static void validateRequestUsers(Collection<User> users) {
-        if (users.size() != 2) {
+    public static void validateRequestUsers(Optional<User> user) {
+        if (user.isEmpty()) {
             throw new NoSuchElementException("One or both users not found");
         }
     }

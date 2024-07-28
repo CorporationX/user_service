@@ -42,7 +42,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
 //        Ensure both users exist
         Collection<User> users = (Collection<User>) userRepository.findAllById(List.of(requesterId, receiverId));
-        validateRequestUsers(users);
+        Optional<User> requester = userRepository.findById(requesterId);
+        Optional<User> receiver = userRepository.findById(receiverId);
+        validateRequestUsers(requester);
+        validateRequestUsers(receiver);
 
 //        Check if USER made request in last 3 months, correct me if it should check for requests of requester responder pair
 

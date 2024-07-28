@@ -1,6 +1,8 @@
 package school.faang.user_service.service.mentorship;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Request Mentorship")
 class MentorshipRequestServiceImplTest {
 
     @Mock
@@ -45,14 +48,14 @@ class MentorshipRequestServiceImplTest {
     @InjectMocks
     private MentorshipRequestServiceImpl mentorshipRequestService;
 
-    private User requester;
-    private User receiver;
-    private MentorshipRequest mentorshipRequest;
-    private MentorshipRequestDto mentorshipRequestDto;
-    private RequestFilterDto filter;
+    private static User requester;
+    private static User receiver;
+    private static MentorshipRequest mentorshipRequest;
+    private static MentorshipRequestDto mentorshipRequestDto;
+    private static RequestFilterDto filter;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setUp() {
         requester = new User();
         requester.setId(1L);
         receiver = new User();
@@ -77,8 +80,10 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Save request")
     void requestMentorship_shouldSaveRequest_whenValid() {
-        when(userRepository.findAllById(any())).thenReturn(List.of(requester, receiver));
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(requester));
+        when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(receiver));
         when(mentorshipRequestRepository.findLatestRequestByRequester(requester.getId())).thenReturn(Optional.empty());
         when(mentorshipRequestMapper.toEntity(any(MentorshipRequestDto.class))).thenReturn(mentorshipRequest);
         when(mentorshipRequestRepository.save(any(MentorshipRequest.class))).thenReturn(mentorshipRequest);
@@ -91,6 +96,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Accept request throw not found")
     void acceptRequest_shouldThrowException_whenRequestNotFound() {
         when(mentorshipRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -100,6 +106,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Accept request throw already accepted")
     void acceptRequest_shouldThrowException_whenRequestAlreadyAccepted() {
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
@@ -111,6 +118,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Accept request throw already exists")
     void acceptRequest_shouldThrowException_whenMentorshipAlreadyExists() {
         mentorshipRequest.setStatus(RequestStatus.PENDING);
 
@@ -123,6 +131,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Reject request throw not found")
     void rejectRequest_shouldThrowException_whenRequestNotFound() {
         when(mentorshipRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -132,6 +141,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Reject request throw already accepted")
     void rejectRequest_shouldThrowException_whenRequestAlreadyAccepted() {
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
@@ -143,6 +153,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Reject request throw already rejected")
     void rejectRequest_shouldThrowException_whenRequestAlreadyRejected() {
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
 
@@ -154,6 +165,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get filtered requests")
     void getRequests_shouldReturnFilteredRequests() {
         MentorshipRequest request1 = new MentorshipRequest();
         MentorshipRequest request2 = new MentorshipRequest();

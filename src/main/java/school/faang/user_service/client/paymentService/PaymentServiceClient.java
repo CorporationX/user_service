@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.client.paymentService.model.Currency;
 import school.faang.user_service.client.paymentService.model.PaymentRequest;
+import school.faang.user_service.client.paymentService.model.Product;
 import school.faang.user_service.exception.payment.PaymentException;
 import school.faang.user_service.kafka.producer.PaymentRequestProducer;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Evgenii Malkov
@@ -29,30 +31,26 @@ public class PaymentServiceClient {
     @Value("${payment-service.dbCurrency:USD}")
     private String dbCurrency;
 
-    public long sendPaymentRequest(long entityId, BigDecimal price) {
+    public PaymentRequest sendPaymentRequest(String requestId, BigDecimal price, Product product) {
         if (!this.currency.equals(this.dbCurrency)) {
             price = currencyService.convertPriceFromDbCurrency(price, this.currency);
         }
-        long requestId = generateRequestId(entityId, price);
-        PaymentRequest request = new PaymentRequest(requestId, price, Currency.valueOf(currency));
+        PaymentRequest request = new PaymentRequest(
+                requestId,
+                price,
+                Currency.valueOf(currency), product);
         sendPaymentRequest(request);
-        return requestId;
+        return request;
     }
 
     private void sendPaymentRequest(PaymentRequest request) {
         try {
             requestProducer.sendPaymentRequest(objectMapper.writeValueAsString(request));
+            log.info("Sent payment request {}", request.requestId());
         } catch (Exception e) {
             log.error("Failed payment: {}", request.requestId());
             log.error(e.getMessage());
             throw new PaymentException("Failed payment: " + request.requestId(), e);
         }
-    }
-
-    private long generateRequestId(long entityId, BigDecimal price) {
-        long priceInCents = price.movePointRight(2).longValue();
-        long currentTimeMillis = Instant.now().toEpochMilli();
-        String paymentIdString = String.format("%s-%s-%s", entityId, priceInCents, currentTimeMillis);
-        return paymentIdString.hashCode() & 0xffffffffL;
     }
 }

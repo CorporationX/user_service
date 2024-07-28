@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.client.paymentService.model.PaymentRequest;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.model.premium.PremiumPeriod;
 import school.faang.user_service.service.PremiumService;
 
@@ -26,7 +26,7 @@ public class PremiumController {
     private final PremiumService premiumService;
 
     @PostMapping
-    public long buyPremium(@RequestParam @Positive int days) {
+    public PaymentRequest buyPremium(@RequestParam @Positive int days) {
         PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
         return premiumService.buyPremium(userContext.getUserId(), premiumPeriod);
     }

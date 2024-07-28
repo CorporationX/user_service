@@ -42,6 +42,8 @@ spring:
       enable-auto-commit: false
     listener:
       ack-mode: manual
+    retry:
+      attempts: 3
 
 server:
   port: 8080

@@ -2,18 +2,21 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.paymentService.PaymentServiceClient;
-import school.faang.user_service.dto.premium.PremiumDto;
+import school.faang.user_service.client.paymentService.model.PaymentRequest;
+import school.faang.user_service.client.paymentService.model.PaymentStatus;
+import school.faang.user_service.client.paymentService.model.Product;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.entity.promotion.PremiumPaymentRequest;
 import school.faang.user_service.exception.premium.PremiumIllegalArgumentException;
-import school.faang.user_service.mapper.premium.PremiumMapper;
+import school.faang.user_service.exception.promotion.PromotionIllegalArgumentException;
 import school.faang.user_service.model.premium.PremiumPeriod;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.repository.promotion.PremiumPaymentRequestRepository;
 
 import java.time.LocalDateTime;
 
@@ -27,20 +30,31 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final PaymentServiceClient paymentClient;
     private final UserRepository userRepository;
-    private final PremiumMapper mapper;
+    private final PremiumPaymentRequestRepository paymentRequestRepository;
 
     @Transactional
-    public long buyPremium(long userId, PremiumPeriod period) {
-        checkIfExistsUser(userId);
+    public PaymentRequest buyPremium(long userId, PremiumPeriod period) {
+        User user = findUserById(userId);
+
         boolean existPremium = premiumRepository.existsByUserId(userId);
         if (existPremium) {
             throw new PremiumIllegalArgumentException(
                     "User with id: " + userId + " already has a premium subscription");
         }
-        return paymentClient.sendPaymentRequest(userId, period.getPrice());
+        PremiumPaymentRequest request = paymentRequestRepository.save(
+                PremiumPaymentRequest.builder()
+                        .days(period.getDays())
+                        .status(PaymentStatus.CREATED.toString())
+                        .userId(user.getId())
+                        .build());
+
+        return paymentClient.sendPaymentRequest(request.getId().toString(),
+                period.getPrice(), Product.PREMIUM);
     }
 
-    private Premium savePremium(User user, int days) {
+    @Transactional
+    public void savePremium(long userId, int days) {
+        User user = findUserById(userId);
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalDateTime endDateTime = currentDateTime.plusDays(days);
         Premium premium = Premium.builder()
@@ -48,20 +62,12 @@ public class PremiumService {
                 .startDate(currentDateTime)
                 .endDate(endDateTime)
                 .build();
-        return premiumRepository.save(premium);
+        premiumRepository.save(premium);
+        log.info("Saved premium userId: {}, days: {}", userId, days);
     }
 
     private User findUserById(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new PremiumIllegalArgumentException(
-                                "User with id: " + userId + " not found"));
-    }
-
-    private void checkIfExistsUser(long userId) {
-        boolean exists = userRepository.existsById(userId);
-        if (!exists) {
-            throw new PremiumIllegalArgumentException("User with id: " + userId + " not found");
-        }
+                .orElseThrow(() -> new PromotionIllegalArgumentException("User not found id: " + userId));
     }
 }

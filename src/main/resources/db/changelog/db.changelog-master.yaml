@@ -15,3 +15,7 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
       file: db/changelog/changeset/user_V008__init_promotion.sql
+  - include:
+      file: db/changelog/changeset/user_V009__insert_promotion_data.sql
+  - include:
+      file: db/changelog/changeset/user_V010__payment_request.sql

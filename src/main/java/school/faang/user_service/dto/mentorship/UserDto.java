@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.*;
 
 @Data
 @Builder
@@ -16,7 +15,6 @@ public class UserDto {
     private String email;
     private String phone;
     private String aboutMe;
-    private Country country;
     private String city;
     private Integer experience;
 }

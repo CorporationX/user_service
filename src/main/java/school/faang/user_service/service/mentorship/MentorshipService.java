@@ -36,7 +36,7 @@ public class MentorshipService {
         return userMapper.toDtoList(user);
     }
 
-    public void deleteMentee(long menteeId, long mentorId) {
+    public UserDto deleteMentee(long menteeId, long mentorId) {
         User mentor = mentorshipRepository.findById(mentorId)
                 .orElseThrow(() -> new NotFoundException(MENTOR_NOT_FOUND));
         List<User> immutableMentees = mentor.getMentors();
@@ -48,9 +48,10 @@ public class MentorshipService {
         mentees.remove(mentee);
         mentor.setMentors(mentees);
         mentorshipRepository.save(mentor);
+        return userMapper.toDto(mentor);
     }
 
-    public void deleteMentor(long menteeId, long mentorId) {
+    public UserDto deleteMentor(long menteeId, long mentorId) {
         User mentee = mentorshipRepository.findById(menteeId)
                 .orElseThrow(() -> new NotFoundException(MENTEE_NOT_FOUND));
         List<User> immutableMentors = mentee.getMentors();
@@ -62,5 +63,6 @@ public class MentorshipService {
         mentors.remove(mentor);
         mentee.setMentors(mentors);
         mentorshipRepository.save(mentee);
+        return userMapper.toDto(mentee);
     }
 }

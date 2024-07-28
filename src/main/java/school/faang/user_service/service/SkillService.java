@@ -16,6 +16,7 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,20 +51,17 @@ public class SkillService {
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Optional<Skill> skill = skillRepository.findUserSkill(skillId, userId);
-        if (skill.isPresent()) {
-            throw new DataValidationException("the skill is already learned");
-        } else {
             List<SkillOffer> offersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
             if (offersOfSkill.size() >= MIN_SKILL_OFFERS) {
                 skillRepository.assignSkillToUser(skillId, userId);
                 addGuarantee(offersOfSkill);
                 return getSkillById(skillId);
-            } else throw new DataValidationException("not enough offers to acquire the skill...");
-        }
+            }
+        return skillMapper.toDto(skill.get());
     }
 
     public void addGuarantee(List<SkillOffer> skillOffers) {
-        if (skillOffers.isEmpty()) throw new IllegalArgumentException("the list of offers is empty");
+        skillValidator.validateSkillOffers(skillOffers);
         for (SkillOffer skillOffer : skillOffers) {
             User receiver = skillOffer.getRecommendation().getReceiver();
             User author = skillOffer.getRecommendation().getAuthor();

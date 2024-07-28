@@ -2,6 +2,7 @@ package school.faang.user_service.service.service;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,11 +53,15 @@ public class SkillServiceTest {
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
-
     @InjectMocks
     private SkillService skillService;
 
-    private SkillDto skillDto = new SkillDto(1L, "title");
+    private SkillDto skillDto;
+
+    @BeforeEach
+    public void setUp() {
+        skillDto = new SkillDto(1L, "title");
+    }
 
     @Test
     public void testCreate() {

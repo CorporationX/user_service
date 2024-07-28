@@ -12,14 +12,13 @@ import java.util.Optional;
 public class CountryService {
     private final CountryRepository countryRepository;
 
-    public Country getCountryOrCreate(String title) {
+    public synchronized Country getCountryOrCreate(String title) {
         Optional<Country> country = countryRepository.findByTitle(title);
-        if(country.isEmpty()) {
+        if (country.isEmpty()) {
             Country newCountry = new Country();
             newCountry.setTitle(title);
             return countryRepository.save(newCountry);
-        }
-        else {
+        } else {
             return country.get();
         }
     }

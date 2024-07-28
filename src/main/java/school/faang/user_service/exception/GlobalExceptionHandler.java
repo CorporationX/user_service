@@ -26,6 +26,12 @@ public class GlobalExceptionHandler {
         return new ResponseError("Error processing the file. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseError illegalArgumentException(IllegalArgumentException exception) {
+        log.error(exception.getMessage(), exception);
+        return new ResponseError(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseError methodArgumentNotValidException(MethodArgumentNotValidException exception) {
         log.error(exception.getMessage(), exception);

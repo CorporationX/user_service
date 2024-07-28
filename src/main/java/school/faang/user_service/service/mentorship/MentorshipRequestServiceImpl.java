@@ -14,8 +14,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static school.faang.user_service.validation.mentorship.mentorshipRequestValidator.*;
 
@@ -41,14 +43,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         validateDescription(mentorshipRequest);
 
 //        Ensure both users exist
-        Collection<User> users = (Collection<User>) userRepository.findAllById(List.of(requesterId, receiverId));
         Optional<User> requester = userRepository.findById(requesterId);
         Optional<User> receiver = userRepository.findById(receiverId);
         validateRequestUsers(requester);
         validateRequestUsers(receiver);
 
 //        Check if USER made request in last 3 months, correct me if it should check for requests of requester responder pair
-
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository.findLatestRequestByRequester(requesterId);
         validateLastRequestDate(latestRequest, MONTHS_COOLDOWN);
 
@@ -77,7 +77,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         validateRequestAccepted(request);
 
-        boolean mentorshipExists = mentorshipRepository.findByMentorAndMentee(request.getReceiver().getId(), request.getRequester().getId());
+        boolean mentorshipExists = mentorshipRepository.findByMentorAndMentee(request.getReceiver().getId(),
+                                                                              request.getRequester().getId());
 
         validateMentorshipExistance(mentorshipExists);
 

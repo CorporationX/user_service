@@ -15,29 +15,29 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.User_Service;
+import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.UserValidator;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
     @Mock
-    private User_Service user_service;
+    private UserService userService;
 
     @Mock
-    private UserRepository user_repository;
+    private UserRepository userRepository;
 
     @Spy
-    private UserMapper user_mapper = Mappers.getMapper(UserMapper.class);
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Spy
-    private UserValidator user_validator = new UserValidator(user_repository);
+    private UserValidator userValidator = new UserValidator(userRepository);
 
     @InjectMocks
     private UserController userController;
 
     private Long userId = 1L;
     private User user = User.builder().id(userId).build();
-    private UserDto userDto = user_mapper.toUserDto(user);
+    private UserDto userDto = userMapper.toUserDto(user);
 
     @Test
     public void testDeactivateUserThrowsException() {
@@ -46,12 +46,12 @@ public class UserControllerTest {
 
     @Test
     public void testDeactivateUser() {
-        Mockito.doNothing().when(user_validator).validateUserId(userId);
-        Mockito.doNothing().when(user_service).removeMenteeAndGoals(userId);
-        Mockito.when(user_service.deactivate(userId)).thenReturn(userDto);
+        Mockito.doNothing().when(userValidator).validateUserId(userId);
+        Mockito.doNothing().when(userService).removeMenteeAndGoals(userId);
+        Mockito.when(userService.deactivate(userId)).thenReturn(userDto);
         userController.deactivateUser(userId);
-        Mockito.verify(user_service, Mockito.times(1)).deactivate(userId);
-        Mockito.verify(user_service, Mockito.times(1)).removeMenteeAndGoals(userId);
+        Mockito.verify(userService, Mockito.times(1)).deactivate(userId);
+        Mockito.verify(userService, Mockito.times(1)).removeMenteeAndGoals(userId);
     }
 
 }

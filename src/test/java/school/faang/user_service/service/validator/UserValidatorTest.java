@@ -2,6 +2,7 @@ package school.faang.user_service.service.validator;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,12 +22,17 @@ public class UserValidatorTest {
     @InjectMocks
     private UserValidator validator;
 
+    @BeforeEach
+    public void setUp() {
+        validator = new UserValidator(userRepository);
+    }
+
     @Test
     public void testValidateUserId() {
         Mockito.when(userRepository.existsById(1L)).thenReturn(false);
         Exception exceptionForNull = Assert.assertThrows(UserValidationException.class, () -> validator.validateUserId(null));
         Exception exceptionForNegativeId = Assert.assertThrows(UserValidationException.class, () -> validator.validateUserId(-1L));
-        Exception exceptionForNotFoundUser = Assert.assertThrows(UserValidationException.class, () -> validator.validateUserId(1L));
+        Exception exceptionForNotFoundUser = Assert.assertThrows(UserValidationException.class, () -> validator.validateThatUserIdExist(1L));
         String expectedMessage = "user id is either null or less than zero";
         String expectedMessageForNotFoundUser = "user wasn't found";
         Assertions.assertEquals(expectedMessage, exceptionForNull.getMessage());

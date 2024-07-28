@@ -18,7 +18,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.service.User_Service;
+import school.faang.user_service.service.UserService;
+import school.faang.user_service.validator.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +43,11 @@ public class UserServiceTest {
     @Spy
     private UserMapperImpl userMapper;
 
+    @Mock
+    private UserValidator userValidator;
+
     @InjectMocks
-    private User_Service user_service;
+    private UserService userService;
 
     private User user;
     private User mentee;
@@ -64,6 +68,7 @@ public class UserServiceTest {
         List<Event> events = new ArrayList<>();
         events.add(event);
         user.setOwnedEvents(events);
+        UserValidator userValidator = new UserValidator(userRepository);
     }
 
     @Test
@@ -71,7 +76,8 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Mockito.when((eventRepository).save(Mockito.any(Event.class))).thenReturn(null);
         Mockito.doNothing().when(goalRepository).delete(Mockito.any(Goal.class));
-        user_service.deactivate(user.getId());
+        Mockito.doNothing().when(userValidator).validateThatUserIdExist(1L);
+        userService.deactivate(user.getId());
         Mockito.verify(userRepository, Mockito.times(3)).findById(user.getId());
         Mockito.verify(goalRepository, Mockito.times(1)).delete(Mockito.any(Goal.class));
         Mockito.verify(eventRepository, Mockito.times(1)).save(Mockito.any(Event.class));
@@ -84,7 +90,7 @@ public class UserServiceTest {
     public void testRemoveMenteesAndGoals() {
         Mockito.doNothing().when(mentorshipService).removeMenteeFromUser(1L);
         Mockito.doNothing().when(mentorshipService).removeMenteeGoals(1L);
-        user_service.removeMenteeAndGoals(1L);
+        userService.removeMenteeAndGoals(1L);
         Mockito.verify(mentorshipService, Mockito.times(1)).removeMenteeFromUser(1L);
         Mockito.verify(mentorshipService, Mockito.times(1)).removeMenteeGoals(1L);
     }

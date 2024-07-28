@@ -10,26 +10,27 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.UserValidator;
 
 import java.time.LocalDateTime;
 import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
-public class User_Service {
+public class UserService {
 
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
     private final UserMapper userMapper;
+    private final UserValidator userValidator;
 
     public UserDto deactivate(Long userId) {
         User user = userRepository.findById(userId).get();
         removeEvents(userId);
         removeGoals(userId);
         user.setActive(false);
-        user.setUpdatedAt(LocalDateTime.now());
         return userMapper.toUserDto(userRepository.save(user));
     }
 
@@ -46,6 +47,7 @@ public class User_Service {
     }
 
     private void removeGoals(Long userId) {
+        userValidator.validateThatUserIdExist(userId);
         User user = userRepository.findById(userId).get();
         if (!user.getGoals().isEmpty()) {
             user.getGoals().forEach(goal -> {
@@ -58,6 +60,7 @@ public class User_Service {
     }
 
     private void removeEvents(Long userId) {
+        userValidator.validateThatUserIdExist(userId);
         User user = userRepository.findById(userId).get();
         if (!user.getOwnedEvents().isEmpty()) {
             user.getOwnedEvents().forEach(event -> {

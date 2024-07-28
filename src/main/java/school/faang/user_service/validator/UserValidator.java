@@ -15,6 +15,9 @@ public class UserValidator {
         if (userId == null || userId <= 0) {
             throw new UserValidationException("user id is either null or less than zero");
         }
+    }
+
+    public void validateThatUserIdExist(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new UserValidationException("user wasn't found");
         }

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserDto {
     private Long id;
-    boolean active;
-    List<Goal> goals;
-    List<Event> events;
+    private boolean active;
+    private List<Goal> goals;
+    private List<Event> events;
 }

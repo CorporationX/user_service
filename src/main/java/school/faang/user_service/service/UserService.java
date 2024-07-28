@@ -1,0 +1,21 @@
+package school.faang.user_service.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
+        return userMapper.usersToUserDTOs(userRepository.findAllById(ids));
+    }
+}

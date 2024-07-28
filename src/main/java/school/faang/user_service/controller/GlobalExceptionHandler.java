@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String,String> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public Map<String, String> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("Method argument not valid", e);
         return getMapWithFieldsThatHaveNotPassedValidation(e);
     }
@@ -51,6 +51,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FeignException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleFeignException(FeignException e) {
+        log.error("Feign exception", e);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+    }
 
     private HashMap<String, String> getMapWithFieldsThatHaveNotPassedValidation(MethodArgumentNotValidException e) {
         return new HashMap<>(e.getBindingResult().getAllErrors().stream()

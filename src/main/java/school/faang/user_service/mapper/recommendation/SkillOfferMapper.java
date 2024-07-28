@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.recommendation;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -8,9 +8,11 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillOfferMapper {
+
     @Mapping(source = "skill.id", target = "skillId")
     @Mapping(source = "recommendation.id", target = "recommendationId")
     SkillOfferDto toDto (SkillOffer skillOffer);
+
     @Mapping(source = "skillId", target = "skill.id")
     @Mapping(source = "recommendationId", target = "recommendation.id")
     SkillOffer toEntity(SkillOfferDto skillOfferDto);

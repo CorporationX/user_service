@@ -2,11 +2,6 @@ package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
@@ -14,35 +9,35 @@ import school.faang.user_service.service.RecommendationService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/recommendations")
+@RequestMapping(value = "api/v1/recommendations")
 @RequiredArgsConstructor
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @PostMapping("/get/recommendation")
+    @PostMapping("/recommendation")
     public RecommendationDto giveRecommendation(@RequestBody
                                                 @Valid RecommendationDto recommendationDto) {
         return recommendationService.create(recommendationDto);
     }
 
-    @PutMapping("/update/recommendation")
+    @PutMapping("/recommendation/setting")
     public RecommendationDto updateRecommendation(@Valid RecommendationDto recommendationDto) {
         return recommendationService.update(recommendationDto);
     }
 
-    @DeleteMapping("/delete/recommendation/{id}")
+    @DeleteMapping("/recommendation/{id}")
     public void deleteRecommendation(@PathVariable long id) {
         recommendationService.delete(id);
     }
 
-    @GetMapping("/get/user/all/recommendations/{receiverId}")
+    @GetMapping("/receiver/{receiverId}")
     public List<RecommendationDto> getUserAllRecommendations(@PathVariable long receiverId,
                                                              @RequestParam("page") int page,
                                                              @RequestParam("size") int size) {
         return recommendationService.getAllUserRecommendations(receiverId, page, size);
     }
 
-    @GetMapping("/get/given/all/recommendations/{authorId}")
+    @GetMapping("/author/{authorId}")
     public List<RecommendationDto> getGivenAllRecommendations(@PathVariable long authorId,
                                                               @RequestParam("page") int page,
                                                               @RequestParam("size") int size) {

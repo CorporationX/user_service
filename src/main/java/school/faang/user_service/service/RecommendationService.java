@@ -14,9 +14,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityException;
-import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.exception.recommendation.DataValidationException;
+import school.faang.user_service.exception.recommendation.EntityException;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -43,7 +43,12 @@ public class RecommendationService {
     private final static int INTERVAL_DATE = 6;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        validateIntervalAndSkill(recommendationDto);
+        Long userId = recommendationDto.getAuthorId();
+        Long receiver = recommendationDto.getReceiverId();
+
+        validateInterval(userId, receiver);
+        validateSkill(recommendationDto);
+
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
         processSkillAndGuarantees(recommendation);
@@ -54,7 +59,12 @@ public class RecommendationService {
     }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
-        validateIntervalAndSkill(recommendationDto);
+        Long userId = recommendationDto.getAuthorId();
+        Long receiver = recommendationDto.getReceiverId();
+
+        validateInterval(userId, receiver);
+        validateSkill(recommendationDto);
+
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
 
@@ -90,9 +100,11 @@ public class RecommendationService {
                 .toList();
     }
 
-    private void validateIntervalAndSkill(RecommendationDto recommendationDto) {
-        User author = findUserById(recommendationDto.getAuthorId());
-        User receiver = findUserById(recommendationDto.getReceiverId());
+    private void validateInterval(Long userId, Long receiverId) {
+        User author = findUserById(userId);
+        if (!userRepository.existsById(receiverId)) {
+            throw new EntityException(ENTITY_IS_NOT_FOUND);
+        }
 
         List<Recommendation> recommendationsGiven = author.getRecommendationsGiven();
         if (recommendationsGiven == null) {
@@ -100,7 +112,7 @@ public class RecommendationService {
         }
 
         Optional<LocalDateTime> lastRecommendationDate = recommendationsGiven.stream()
-                .filter(recommendation -> recommendation.getReceiver().getId() == receiver.getId())
+                .filter(recommendation -> recommendation.getReceiver().getId() == receiverId)
                 .map(Recommendation::getCreatedAt)
                 .max(LocalDateTime::compareTo);
 
@@ -112,9 +124,19 @@ public class RecommendationService {
                 throw new DataValidationException(RECOMMENDATION_EXPIRATION_TIME_NOT_PASSED);
             }
         });
+    }
 
-        boolean skillInRepository = recommendationDto.getSkillOffers().stream()
-                .allMatch(skill -> skillRepository.existsById(skill.getSkillId()));
+    private void validateSkill(RecommendationDto recommendationDto) {
+        List<Long> skillOffersDto = recommendationDto.getSkillOffers().stream()
+                .map(SkillOfferDto::getSkillId)
+                .toList();
+        List<SkillOffer> skillOffers = (List<SkillOffer>) skillOfferRepository.findAllById(skillOffersDto);
+
+        Set<Long> existingSkillIds = skillOffers.stream()
+                .map(skill -> skill.getSkill().getId())
+                .collect(Collectors.toSet());
+
+        boolean skillInRepository = existingSkillIds.containsAll(skillOffersDto);
 
         if (!skillInRepository) {
             throw new DataValidationException(SKILL_IS_NOT_FOUND);
@@ -132,8 +154,7 @@ public class RecommendationService {
                 .orElseThrow(() -> new EntityException(ENTITY_IS_NOT_FOUND));
     }
 
-    @Transactional
-    public void processSkillAndGuarantees(Recommendation recommendation) {
+    private void processSkillAndGuarantees(Recommendation recommendation) {
         User author = recommendation.getAuthor();
         User receiver = recommendation.getReceiver();
 
@@ -142,10 +163,12 @@ public class RecommendationService {
         List<Skill> existingReceiverSkills = skillRepository.findAllByUserId(receiver.getId());
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
 
+        boolean authorHasGuarantee = userSkillGuaranteeRepository.existsById(authorId);
+
         skillOffers.forEach(skillOffer -> {
             long skillOfferId = skillOffer.getId();
             if (existingReceiverSkills.contains(skillOffer.getSkill())
-                    && !userSkillGuaranteeRepository.existsById(authorId)) {
+                    && !authorHasGuarantee) {
                 addNewGuarantee(author, receiver, skillOfferId);
             } else {
                 skillOfferRepository.save(skillOffer);
@@ -153,7 +176,7 @@ public class RecommendationService {
         });
     }
 
-    public void addNewGuarantee(User guarantee, User receiver, Long skillId) {
+    private void addNewGuarantee(User guarantee, User receiver, Long skillId) {
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() -> new DataValidationException(SKILL_IS_NOT_FOUND));
 

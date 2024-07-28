@@ -91,7 +91,7 @@ public class MentorshipRequestService {
         if (filterDto.getReceiverId() != null) {
             resultQuery = resultQuery.filter(req -> req.getReceiver().getId() == filterDto.getReceiverId());
         }
-        return resultQuery.map(mentorshipRequestMapper::toDto).toList();
+        return mentorshipRequestMapper.toDtoList(resultQuery.toList());
     }
 
     private MentorshipRequest getMentorshipRequest(Long rejectRequestId) {

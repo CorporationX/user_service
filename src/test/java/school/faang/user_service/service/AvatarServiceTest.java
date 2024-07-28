@@ -10,8 +10,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.AmazonCredentials;
+import school.faang.user_service.config.StyleAvatarConfig;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,10 +30,12 @@ public class AvatarServiceTest {
 
     @Mock
     private AmazonCredentials amazonCredentials =
-            new AmazonCredentials(String.valueOf(1), String.valueOf(2), String.valueOf(3));
+            new AmazonCredentials(String.valueOf(1), String.valueOf(2), String.valueOf(3), String.valueOf(4));
     @Mock
     private AmazonS3Service amazonS3Service;
 
+    @Mock
+    private StyleAvatarConfig styleAvatarConfig;
 
     @Mock
     private RestTemplateService restTemplateService;
@@ -54,8 +59,9 @@ public class AvatarServiceTest {
                 .password("abracadabra")
                 .build();
 
-        avatarService.setFullAvatarUrl(fullAvatarUrl);
-        avatarService.setSmallAvatarUrl(smallAvatarUrl);
+        avatarService.setFullPostfix("/svg?seed=");
+        avatarService.setSmallPostfix("/svg?size=32&seed=");
+        avatarService.setUrl("https://api.dicebear.com/9.x/");
     }
 
     @Test
@@ -67,6 +73,7 @@ public class AvatarServiceTest {
 
         byte[] file = new byte[1];
         when(restTemplateService.getImageBytes(any())).thenReturn(file);
+        when(styleAvatarConfig.getStyles()).thenReturn(List.of("avataaars"));
         when(amazonS3Service.uploadFile(eq(expectedFullUrl), eq(file))).thenReturn(expectedFullUrl);
         when(amazonS3Service.uploadFile(eq(expectedSmallUrl), eq(file))).thenReturn(expectedSmallUrl);
 

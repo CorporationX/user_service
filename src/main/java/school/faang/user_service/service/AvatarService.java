@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,27 +32,12 @@ public class AvatarService {
     private final RestTemplateService restTemplateService;
 
 
-    @Setter
-    private String smallAvatarUrl;
-
-    @Setter
-    private String fullAvatarUrl;
-
-    @PostConstruct
-    void init() {
-        List<String> styles = styleAvatarConfig.getStyles();
-        Collections.shuffle(styles);
-
-        String newStyle = styles.iterator().next();
-        smallAvatarUrl = url + newStyle + smallPostfix;
-        fullAvatarUrl = url + newStyle + fullPostfix;
-    }
-
-
     public void setDefaultUserAvatar(User user) {
 
-        String originalAvatarUrl = fullAvatarUrl + user.hashCode();
-        String miniAvatarUrl = smallAvatarUrl + user.hashCode();
+        String randomStyleUrl = getStyle();
+
+        String originalAvatarUrl = randomStyleUrl + fullPostfix + user.hashCode();
+        String miniAvatarUrl = randomStyleUrl + smallPostfix + user.hashCode();
 
         String keyForOriginalAvatar = amazonS3Service.uploadFile(originalAvatarUrl, restTemplateService.getImageBytes(originalAvatarUrl));
         String keyForSmallAvatar = amazonS3Service.uploadFile(miniAvatarUrl, restTemplateService.getImageBytes(miniAvatarUrl));
@@ -62,5 +46,12 @@ public class AvatarService {
                 .fileId(keyForOriginalAvatar)
                 .smallFileId(keyForSmallAvatar)
                 .build());
+    }
+
+    private String getStyle() {
+        List<String> styles = styleAvatarConfig.getStyles();
+        Collections.shuffle(styles);
+        String newStyle = styles.get(0);
+        return url + newStyle;
     }
 }

@@ -30,14 +30,6 @@ public class EventController {
     @PostMapping("")
     public ResponseEntity<EventDto> create(@RequestBody @Valid EventDto event) {
         return ResponseEntity.ok(eventService.create(event));
-        /*
-        if (validateEventDto(event)) {
-            return ResponseEntity.ok(eventService.create(event));
-        }
-        throw new DataValidationException("Не удалось создать событие!" +
-                " Введены не верные данные.");
-        */
-
     }
 
 
@@ -71,11 +63,6 @@ public class EventController {
     //Обновить событие
     @PatchMapping("")
     public ResponseEntity<EventDto> updateEvent(@RequestBody @Valid EventDto event) {
-        /*
-        if (event == null) {
-            throw new DataValidationException("Событие не передано!");
-        }
-        */
         return ResponseEntity.ok(eventService.updateEvent(event));
     }
 

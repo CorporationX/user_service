@@ -43,7 +43,7 @@ public class MentorshipRequestControllerTest {
     @BeforeEach
     public void initializeDto() {
         this.dto = new MentorshipRequestDto(
-                1L, null, 1L, 2L, RequestStatus.PENDING, "reason",
+                1L, "desc", 1L, 2L, RequestStatus.PENDING, "reason",
                 LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 40),
                 LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 40)
         );
@@ -54,18 +54,6 @@ public class MentorshipRequestControllerTest {
         );
     }
 
-    // @ParameterizedTest
-    // @ValueSource(strings={"   "})
-    // @NullSource
-    //public void testDescriptionIsNull(String descr) {
-    @Disabled // Не проверяются поля DTO помеченные аннотациями из org.springframework.boot:spring-boot-starter-validation
-    @Test
-    public void testDescriptionIsNull() {
-        dto.setDescription(null);
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> mentorshipRequestController.requestMentorship(dto));
-
-    }
 
     @Test
     public void testServiceRequestMentorship() {

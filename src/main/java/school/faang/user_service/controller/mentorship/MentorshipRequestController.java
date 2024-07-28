@@ -24,7 +24,6 @@ public class MentorshipRequestController {
 
     @PostMapping("/mentorship")
     public MentorshipRequestDto requestMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipRequestDto) {
-        //validateRequestMentorship(mentorshipRequestDto);
         return service.requestMentorship(mentorshipRequestDto);
     }
 
@@ -38,11 +37,5 @@ public class MentorshipRequestController {
 
     public MentorshipRequestDto rejectRequest(long id, @RequestBody @Valid RejectionDto rejection) {
         return service.rejectRequest(id, rejection);
-    }
-
-    private void validateRequestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isBlank()) {
-            throw new IllegalArgumentException("Описание не может быть пустым");
-        }
     }
 }

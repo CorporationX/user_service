@@ -13,7 +13,6 @@ import java.util.List;
 @Component
 public record SkillController(SkillService skillService) {
     public SkillDto create(SkillDto skillDto) {
-        //validateSkill(skillDto);
         return skillService.create(skillDto);
     }
 
@@ -30,12 +29,6 @@ public record SkillController(SkillService skillService) {
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         validateId(skillId, userId);
         return skillService.acquireSkillFromOffers(skillId, userId);
-    }
-
-    private void validateSkill(SkillDto skillDto) {
-        if (skillDto.getTitle() == null || skillDto.getTitle().trim().isEmpty()) {
-            throw new DataValidationException("Skill title cant be empty or null");
-        }
     }
 
     private void validateId(Long... ids) {

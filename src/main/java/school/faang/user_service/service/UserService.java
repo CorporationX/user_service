@@ -13,6 +13,7 @@ import school.faang.user_service.validator.UserValidator;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final UserValidator userValidator;
@@ -21,22 +22,24 @@ public class UserService {
     @Transactional
     public UserDto createUser(UserDto userDto, MultipartFile userAvatar) {
         User user = userMapper.toEntity(userDto);
+        user.setActive(true);
         user = userRepository.save(user);
         if (userAvatar == null) {
-            avatarService.setRandomAvatar(user);
+            user = avatarService.setRandomAvatar(user);
         } else {
             // todo: Gevorg's part
         }
-        return userMapper.toDto(user);
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Transactional
     public void updateUserAvatar(long userId, MultipartFile multipartFile) {
         User user = userValidator.validateUserExistence(userId);
         if (multipartFile == null) {
-            avatarService.setRandomAvatar(user);
+            user = avatarService.setRandomAvatar(user);
         } else {
             // todo: Добавление аватара пользователя; Will be done by Gevorg
         }
+        userRepository.save(user);
     }
 }

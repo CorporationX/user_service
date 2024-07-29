@@ -49,20 +49,21 @@ aws:
 
 services:
   s3:
-    bucket-name: user_bucket
+    bucket-name: bucketNam
     isMocked: true
   avatar:
-    avatar-prefix: avatar
-    small-avatar-prefix: small_avatar
+    pattern: avatar_%d.${dice-bear.file-type}
+    small-pattern: small_avatar_%d.${dice-bear.file-type}
     small-file-width: 200
     small-file-height: 200
     seed-range: 20000
+    content-type: image/jpeg
 
 dice-bear:
   url: https://api.dicebear.com
   version: 9.x
   file-type: jpeg
-  generation-param: seed
+  params: seed=%d
   styles: >
     adventurer-neutral, 
     adventurer, 

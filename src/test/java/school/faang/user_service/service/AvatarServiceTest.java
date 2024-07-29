@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,20 +7,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.UserRepository;
 
-import java.io.File;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,13 +20,10 @@ import static org.mockito.Mockito.when;
 public class AvatarServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private S3Service s3Service;
 
     @Mock
-    private AmazonS3 s3Client;
-
-    @Mock
-    private FileService fileService;
+    private UtilsService utilsService;
 
     @Mock
     private RestTemplate restTemplate;
@@ -47,59 +33,52 @@ public class AvatarServiceTest {
 
     private User user;
     private byte[] avatarBytes;
-    private String mockFileName;
-    private File mockFile;
-    private String mockSmallFileName;
-    private File mockSmallFile;
-    private ResponseEntity<Resource> responseEntity;
+    private byte[] smallAvatarBytes;
+    private String generationUrl;
+    private int smallAvatarWidth;
+    private int smallAvatarHeight;
+    private String extension;
 
     @BeforeEach
     void setUp() {
-        int seedRange = 100;
+        generationUrl = "https://api.dicebear.com/9.x/style/jpeg?seed=0";
+        smallAvatarWidth = 200;
+        smallAvatarHeight = 200;
+        extension = "jpeg";
 
         avatarService.setSTYLES(new String[]{"style"});
-        avatarService.setSEED_RANGE(seedRange);
-        avatarService.setAVATAR_GENERATOR_URL_PATTERN("url");
-        avatarService.setAVATAR_PREFIX("avatar");
-        avatarService.setSMALL_AVATAR_PREFIX("small_avatar");
-        avatarService.setFILE_EXTENSION("jpeg");
-        avatarService.setSMALL_FILE_WIDTH(200);
-        avatarService.setSMALL_FILE_HEIGHT(200);
+        avatarService.setGENERATION_URL_PATTERN(generationUrl);
+        avatarService.setSEED_RANGE(1);
+        avatarService.setEXTENSION(extension);
+        avatarService.setBUCKET_NAME("bucket-name");
+        avatarService.setAVATAR_ID_PATTERN("avatar_%d.jpeg");
+        avatarService.setSMALL_AVATAR_ID_PATTERN("small_avatar_%d.jpeg");
+        avatarService.setSMALL_FILE_WIDTH(smallAvatarWidth);
+        avatarService.setSMALL_FILE_HEIGHT(smallAvatarHeight);
+        avatarService.setCONTENT_TYPE("image/jpeg");
 
-        mockFileName = "avatar_1.jpeg";
-        mockSmallFileName = "small_avatar_1.jpeg";
 
         user = User.builder()
                 .id(1L)
                 .build();
 
-        avatarBytes = new byte[0];
-
-        mockFile = mock(File.class);
-        mockSmallFile = mock(File.class);
-
-        Resource resource = new ByteArrayResource(avatarBytes);
-        System.out.println(new Object().hashCode());
-        responseEntity = new ResponseEntity<>(resource, HttpStatus.OK);
+        avatarBytes = new byte[1000];
+        smallAvatarBytes = new byte[1000];
     }
 
     @Test
     @DisplayName("testing updateAvatarToRandom method")
     void testUpdateAvatarToRandom() {
-        when(fileService.convertResponseToByteArray(responseEntity)).thenReturn(avatarBytes);
-        when(fileService.resizeImageFile(mockFile, 200, 200, mockSmallFileName))
-                .thenReturn(mockSmallFile);
-        when(restTemplate.getForEntity(anyString(), eq(Resource.class))).thenReturn(responseEntity);
-        when(fileService.convertByteArrayToFile(any(), eq(mockFileName))).thenReturn(mockFile);
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(restTemplate.getForObject(generationUrl, byte[].class)).thenReturn(avatarBytes);
+        when(utilsService.resizeImage(avatarBytes, smallAvatarWidth, smallAvatarHeight, extension))
+                .thenReturn(smallAvatarBytes);
 
         avatarService.setRandomAvatar(user);
 
-        verify(fileService, times(1)).convertResponseToByteArray(responseEntity);
-        verify(fileService, times(1)).resizeImageFile(mockFile, 200, 200, mockSmallFileName);
-        verify(s3Client, times(2)).putObject(any(PutObjectRequest.class));
-        verify(mockFile, times(1)).delete();
-        verify(mockSmallFile, times(1)).delete();
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(restTemplate, times(1)).getForObject(anyString(), eq(byte[].class));
+        verify(utilsService, times(1)).resizeImage(avatarBytes, smallAvatarWidth,
+                smallAvatarHeight, extension);
+        verify(s3Service, times(2))
+                .uploadToS3(anyString(), eq(avatarBytes), anyString(), anyString());
     }
 }

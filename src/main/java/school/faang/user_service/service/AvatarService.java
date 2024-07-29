@@ -75,7 +75,7 @@ public class AvatarService {
         } catch (RestClientException e) {
             String errMessage = String.format("Could not get image from URL: %s", url);
             log.error(errMessage, e);
-            throw new RuntimeException(errMessage);
+            throw new RuntimeException();
         }
     }
 }

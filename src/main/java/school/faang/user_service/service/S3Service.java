@@ -21,8 +21,7 @@ public class S3Service {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(imageBytes.length);
         metadata.setContentType(contentType);
-        PutObjectRequest putObjectRequest =
-                new PutObjectRequest(bucketName, fileName, inputStream, metadata);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName, inputStream, metadata);
         s3Client.putObject(putObjectRequest);
     }
 }

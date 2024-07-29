@@ -49,7 +49,7 @@ aws:
 
 services:
   s3:
-    bucket-name: bucketNam
+    bucket-name: bucketName
     isMocked: true
   avatar:
     pattern: avatar_%d.${dice-bear.file-type}
@@ -70,3 +70,12 @@ dice-bear:
     big-ears-neutral, 
     big-ears, 
     pixel-art
+
+thread-pool:
+  size:
+    min: 10
+    max: 20
+  keep-alive:
+    time: 60
+    time-unit: SECONDS
+  queue-size: 10000

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +25,21 @@ import java.util.concurrent.TimeUnit;
                 version = "1.0.0")
 )
 public class UserServiceApplication {
+
+    @Value("${thread-pool.size.min}")
+    private int POOL_MIN_SIZE;
+
+    @Value("${thread-pool.size.max}")
+    private int POOL_MAX_SIZE;
+
+    @Value("${thread-pool.keep-alive.time}")
+    private long KEEP_ALIVE_TIME;
+
+    @Value("${thread-pool.keep-alive.time-unit}")
+    private TimeUnit KEEP_ALIVE_TIME_UNIT;
+
+    @Value("${thread-pool.queue-size}")
+    private int POOL_QUEUE_SIZE;
 
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApplication.class, args);
@@ -43,6 +59,10 @@ public class UserServiceApplication {
 
     @Bean
     public ThreadPoolExecutor threadPool() {
-        return new ThreadPoolExecutor(10, 20, 60L, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
+        return new ThreadPoolExecutor(POOL_MIN_SIZE,
+                POOL_MAX_SIZE,
+                KEEP_ALIVE_TIME,
+                KEEP_ALIVE_TIME_UNIT,
+                new LinkedBlockingQueue<>(POOL_QUEUE_SIZE));
     }
 }

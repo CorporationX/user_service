@@ -40,8 +40,6 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
     private User user;
-package school.faang.user_service.service;
-
 
     @BeforeEach
     void setUp() {

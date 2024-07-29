@@ -1,8 +1,7 @@
 package school.faang.user_service.service.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -14,9 +13,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,31 +37,29 @@ public class UserService {
         events.forEach(event -> eventRepository.deleteById(event.getId()));
         user.setActive(false);
         return mapper.toDto(userRepository.save(mentorshipService.stopMentorship(user)));
+    }
 
-    public UserDto getUser(Long userId) {
-        if(userId == null){
-            throw new RuntimeException("userId is can't null");
-        }
+    public UserDto getUser (long userId){
         Optional<User> user = userRepository.findById(userId);
         UserDto dto = mapper.toDto(user.orElse(null));
         return dto;
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserDto> getUsersByIds (List < Long > ids) {
         return ids.stream()
                 .map(num -> userRepository.findById(num))
                 .map(user -> mapper.toDto(user))
                 .toList();
     }
 
-    private void deleteGoalFromDbIfPresent(List<Goal> goalsForDeleteFromDB) {
+    private void deleteGoalFromDbIfPresent (List < Goal > goalsForDeleteFromDB) {
         if (!goalsForDeleteFromDB.isEmpty()) {
             goalsForDeleteFromDB.forEach(goal -> goalRepository
                     .deleteById(goal.getId()));
         }
     }
 
-    private User getValidationUser(long userId) {
+    private User getValidationUser ( long userId){
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException(MESSAGE_USER_NOT_EXIST));
         if (!user.isActive()) {
             throw new RuntimeException(MESSAGE_USER_ALREADY_DEACTIVATED);
@@ -72,18 +67,15 @@ public class UserService {
         return user;
     }
 
-    private List<Event> getEventsWithCanceledStatus(User user) {
+    private List<Event> getEventsWithCanceledStatus (User user) {
         return user.getOwnedEvents().stream()
                 .peek(event -> event.setStatus(EventStatus.CANCELED))
                 .toList();
     }
 
-    private List<Goal> getGoalsForDelete(User user) {
+    private List<Goal> getGoalsForDelete (User user){
         return user.getGoals().stream()
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();
-
-        return dtoList;
     }
-
 }

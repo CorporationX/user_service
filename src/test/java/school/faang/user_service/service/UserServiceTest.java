@@ -17,16 +17,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.user.User_Service;
+import school.faang.user_service.service.user.UserService;
 
-import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
 import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-
-@ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,9 +58,12 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserTest_whenException(){
-        assertThrows(RuntimeException.class ,() -> service.getUser(1L));
-    public void testUserIsNotInDb() {
+    void getUserTest_whenException() {
+        assertThrows(RuntimeException.class, () -> userService.getUser(1L));
+    }
+
+    @Test
+        public void testUserIsNotInDb() {
         //Act
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
         //Assert
@@ -128,15 +125,6 @@ class UserServiceTest {
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(mapper).toDto(user);
-    }
-
-    @Test
-    @DisplayName("Тест RunTimeException , когда userId = null")
-    public void getUserWhenTrows() {
-        assertThrows(
-                RuntimeException.class ,
-                () -> userService.getUser(null)
-        );
     }
 
     @Test

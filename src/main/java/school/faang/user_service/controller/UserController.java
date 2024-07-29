@@ -1,7 +1,6 @@
 package school.faang.user_service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,12 +34,12 @@ public class UserController {
     })
 
     @GetMapping("/users/{userId}")
-    UserDto getUser(@PathVariable Long userId){
+    public UserDto getUser(@PathVariable long userId){
         return service.getUser(userId);
     }
 
     @PostMapping("/users")
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
         return service.getUsersByIds(ids);
         }
 

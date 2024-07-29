@@ -13,6 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.filter.user.UserAboutFilter;
 import school.faang.user_service.filter.user.UserEmailFilter;
@@ -48,6 +49,9 @@ class SubscriptionServiceTest {
 
     @Mock
     private List<UserFilter> userFilters;
+
+    @Mock
+    private FollowerEventPublisher eventPublisher;
 
     private UserFilterDto userFilterDto;
 
@@ -88,7 +92,7 @@ class SubscriptionServiceTest {
     @Test
     public void testGetFollowers() {
         userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters, eventPublisher);
 
         User userAnna = User.builder()
                 .id(1L)
@@ -151,7 +155,7 @@ class SubscriptionServiceTest {
     @Test
     public void testFindByFollowerIdIsInvoked() {
         userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters, eventPublisher);
 
         Stream<User> users = Stream.of(user);
 
@@ -169,7 +173,7 @@ class SubscriptionServiceTest {
     @Test
     public void testGetFollowing() {
         userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters, eventPublisher);
 
         User userAnna = User.builder()
                 .id(1L)
@@ -232,7 +236,7 @@ class SubscriptionServiceTest {
     @Test
     public void testFindByFolloweeIdIsInvoked() {
         userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userValidator, userFilters, eventPublisher);
 
         Stream<User> users = Stream.of(user);
 

@@ -6,11 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.util.TestDataFactory;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static school.faang.user_service.util.TestDataFactory.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -38,14 +39,13 @@ class UserControllerTest {
     @Test
     void getUser() throws Exception {
         // given - precondition
-        var userDto = TestDataFactory.createUserDto();
-        var userId = userDto.getId();
+        var userDto = createUserDto();
 
-        when(userService.findUserById(userId))
+        when(userService.findUserById(USER_ID))
                 .thenReturn(userDto);
 
         // when - action
-        var response = mockMvc.perform(get("/users/{userId}", userId));
+        var response = mockMvc.perform(get("/users/{userId}", USER_ID));
 
         // then - verify the output
         response.andExpect(status().isOk())
@@ -59,7 +59,7 @@ class UserControllerTest {
     void getUsersByIds() throws Exception {
         // given - precondition
         List<Long> userIds = of(1L, 2L, 3L);
-        var userDtoList = TestDataFactory.createUserDtosList();
+        var userDtoList = createUserDtosList();
 
         when(userService.findUsersByIds(userIds))
                 .thenReturn(userDtoList);
@@ -76,5 +76,24 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].id").value(userDtoList.get(0).getId()))
                 .andExpect(jsonPath("$[1].id").value(userDtoList.get(1).getId()))
                 .andExpect(jsonPath("$[2].id").value(userDtoList.get(2).getId()));
+    }
+
+    @Test
+    void givenUserIdWhenDeactivateUserByIdThenReturnDeactivatedUser() throws Exception {
+        // given - precondition
+        var userDto = createUserDto();
+
+        when(userService.deactivateUserById(USER_ID))
+                .thenReturn(userDto);
+
+        // when - action
+        var response = mockMvc.perform(patch("/users/{userId}/deactivate", USER_ID)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(userDto.getId()))
+                .andDo(print());
     }
 }

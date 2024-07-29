@@ -29,7 +29,7 @@ public class S3Service {
     private static final Logger log = LoggerFactory.getLogger(S3Service.class);
 
     @Value("${services.s3.bucket-name}")
-    private String bucketName;
+    String bucketName;
 
 
     private final AmazonS3 s3Client;
@@ -41,16 +41,9 @@ public class S3Service {
         this.userRepository = userRepository;
     }
 
-    public String uploadAvatar(Long userId,MultipartFile file) throws IOException {
+    public String uploadAvatar(Long userId, MultipartFile file) throws IOException {
+        User user = findUserById(userId).get();
         UserProfilePic userProfilePic = new UserProfilePic();
-
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if(userOptional.isEmpty()){
-            throw new IllegalArgumentException("User not found");
-        }
-
-        User user = userOptional.get();
 
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
@@ -65,23 +58,12 @@ public class S3Service {
 
         user.setUserProfilePic(userProfilePic);
 
-        convertImageToObjectMetaDataAndUpload(largeImage,largeAvatarKey);
-        convertImageToObjectMetaDataAndUpload(smallImage,smallAvatarKey);
+        convertImageToObjectMetaDataAndUpload(largeImage, largeAvatarKey);
+        convertImageToObjectMetaDataAndUpload(smallImage, smallAvatarKey);
 
         userRepository.save(user);
         return "file uploaded";
     }
-
-    private void convertImageToObjectMetaDataAndUpload(BufferedImage image, String key) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", os);
-        byte[] buffer = os.toByteArray();
-        InputStream is = new ByteArrayInputStream(buffer);
-        ObjectMetadata meta = new ObjectMetadata();
-        meta.setContentLength(buffer.length);
-        s3Client.putObject(new PutObjectRequest(bucketName, key, is, meta));
-    }
-
 
     public byte[] downloadAvatar(Long userId) {
         S3Object s3Object = s3Client.getObject(bucketName, "avatars/" + userId + "/large.jpg");
@@ -89,15 +71,19 @@ public class S3Service {
         try {
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return null;
     }
 
     public String deleteAvatar(Long userId) {
-        s3Client.deleteObject(bucketName, "avatars/" + userId + "/large.jpg");
-        s3Client.deleteObject(bucketName, "avatars/" + userId + "/small.jpg");
-        return "Avatar removed";
+        if (findUserById(userId).isPresent()) {
+            s3Client.deleteObject(bucketName, "avatars/" + userId + "/large.jpg");
+            s3Client.deleteObject(bucketName, "avatars/" + userId + "/small.jpg");
+            return "Avatar removed";
+        } else {
+            return "User not found!";
+        }
     }
 
 
@@ -122,6 +108,24 @@ public class S3Service {
         g2d.dispose();
 
         return resizedImage;
+    }
+
+    private void convertImageToObjectMetaDataAndUpload(BufferedImage image, String key) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", os);
+        byte[] buffer = os.toByteArray();
+        InputStream is = new ByteArrayInputStream(buffer);
+        ObjectMetadata meta = new ObjectMetadata();
+        meta.setContentLength(buffer.length);
+        s3Client.putObject(new PutObjectRequest(bucketName, key, is, meta));
+    }
+
+    private Optional<User> findUserById(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return userOptional;
     }
 }
 

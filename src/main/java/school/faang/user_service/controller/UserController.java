@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 
 import java.util.List;
 
@@ -23,8 +23,8 @@ import java.util.List;
 @RequestMapping("/api")
 @Tag(name = "Deactivate User API", description = "API for managing deactivate users")
 public class UserController {
-    private final UserService service;
     private static final String MESSAGE_INVALID_ID = "userId cannot be less than zero";
+    private final UserService service;
 
     @PutMapping("/user/{userId}")
     @Operation(summary = "Deactivate User Profile", description = "Deactivates the profile of a user identified by their user ID.")
@@ -32,24 +32,23 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User profile deactivated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user ID"),
             @ApiResponse(responseCode = "404", description = "User not found")
+
     })
-
-    @GetMapping("/users/{userId}")
-    UserDto getUser(@PathVariable Long userId){
-        return service.getUser(userId);
-    }
-
-    @PostMapping("/users")
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
-        return service.getUsersByIds(ids);
-        }
-
-        @PutMapping("/user/{userId}")
-    public UserDto deactivatesUserProfile(@PathVariable long userId){
+    public UserDto deactivatesUserProfile(@PathVariable @Parameter(description = "ID of the user to deactivate") Long userId) {
         if (userId < 0) {
             throw new RuntimeException(MESSAGE_INVALID_ID);
         }
         return service.deactivatesUserProfile(userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        return service.getUser(userId);
+    }
+
+    @PostMapping("/user")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return service.getUsersByIds(ids);
     }
 
 }

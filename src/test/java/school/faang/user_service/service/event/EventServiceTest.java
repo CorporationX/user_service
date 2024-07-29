@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserReadDto;
+import school.faang.user_service.dto.user.ReadUserDto;
 import school.faang.user_service.dto.event.ReadEvetDto;
 import school.faang.user_service.dto.event.WriteEventDto;
 import school.faang.user_service.entity.Skill;
@@ -177,8 +177,8 @@ public class EventServiceTest {
         );
     }
 
-    private UserReadDto getUserReadDto(Long id) {
-        return new UserReadDto(id);
+    private ReadUserDto getUserReadDto(Long id) {
+        return new ReadUserDto(id);
     }
 
     private User getUser(Long id) {

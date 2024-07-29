@@ -1,7 +1,7 @@
 package school.faang.user_service.dto.event;
 
 import lombok.Value;
-import school.faang.user_service.dto.UserReadDto;
+import school.faang.user_service.dto.user.ReadUserDto;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +12,7 @@ public class ReadEvetDto {
     String title;
     LocalDateTime startDate;
     LocalDateTime endDate;
-    UserReadDto owner;
+    ReadUserDto owner;
     String description;
     String location;
     int maxAttendees;

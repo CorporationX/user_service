@@ -27,6 +27,10 @@ spring:
         profile_view_channel:
             name: profile_view_channel
 
+  mvc:
+    servlet:
+      path: /api
+
 server:
   port: 8080
 
@@ -51,3 +55,9 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

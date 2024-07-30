@@ -31,7 +31,7 @@ public class UserService {
         removeEvents(userId);
         removeGoals(userId);
         user.setActive(false);
-        return userMapper.toUserDto(userRepository.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     public void removeMenteeAndGoals(Long userId) {

@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.subscription;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +12,7 @@ import java.util.List;
 @Controller
 public class SubscriptionController {
     private SubscriptionService subscriptionService;
+    private SubscriptionControllerValidator validator;
 
     @Autowired
     public SubscriptionController(SubscriptionService subscriptionService) {
@@ -19,16 +20,12 @@ public class SubscriptionController {
     }
 
     public void followUser(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("Нельзя подписаться на самого себя");
-        }
+        validator.validate(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("Нельзя подписаться на самого себя");
-        }
+        validator.validate(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 

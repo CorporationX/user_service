@@ -14,12 +14,12 @@ import static org.junit.Assert.assertTrue;
 
 class UserAboutFilterTest {
 
-    UserFilter filter;
+    private UserFilter filter;
 
     private UserFilterDto filterDtoNotNull;
     private UserFilterDto filterDtoNull;
 
-    Stream<User> users;
+    private Stream<User> users;
 
     @BeforeEach
     void setUp() {

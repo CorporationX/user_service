@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 
 import org.junit.jupiter.api.Assertions;
@@ -20,8 +20,6 @@ import school.faang.user_service.filters.UserFilter;
 import school.faang.user_service.filters.UserNameFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.subscription.SubscriptionService;
-import school.faang.user_service.service.subscription.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;

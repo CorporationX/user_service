@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserExperienceMinFilterTest {
 
-    UserFilter filter;
+    private UserFilter filter;
 
     private UserFilterDto filterDtoNotNull;
     private UserFilterDto filterDtoNull;
 
-    Stream<User> users;
+    private Stream<User> users;
 
     @BeforeEach
     void setUp() {

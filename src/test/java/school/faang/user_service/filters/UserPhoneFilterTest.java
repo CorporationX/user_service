@@ -14,12 +14,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserPhoneFilterTest {
-    UserFilter filter;
+    private UserFilter filter;
 
     private UserFilterDto filterDtoNotNull;
     private UserFilterDto filterDtoNull;
 
-    Stream<User> users;
+    private Stream<User> users;
 
     @BeforeEach
     void setUp() {

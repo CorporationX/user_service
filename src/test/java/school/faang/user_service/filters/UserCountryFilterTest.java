@@ -15,12 +15,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 class UserCountryFilterTest {
-    UserFilter filter;
+    private UserFilter filter;
 
     private UserFilterDto filterDtoNotNull;
     private UserFilterDto filterDtoNull;
 
-    Stream<User> users;
+    private Stream<User> users;
 
     @BeforeEach
     void setUp() {

@@ -1,6 +1,5 @@
 package school.faang.user_service.filters;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -8,7 +7,6 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-
 public class UserCountryFilter implements UserFilter<UserFilterDto, User> {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {

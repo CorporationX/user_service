@@ -19,8 +19,8 @@ public class MapperTest {
 
     @Test
     public void testMapperToDto() {
-        User actualUser = userMapper.toUser(userDto);
-        UserDto actualUserDto = userMapper.toUserDto(actualUser);
+        User actualUser = userMapper.toEntity(userDto);
+        UserDto actualUserDto = userMapper.toDto(actualUser);
         Assertions.assertEquals(user, actualUser);
         Assertions.assertEquals(userDto, actualUserDto);
     }

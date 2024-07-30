@@ -37,7 +37,7 @@ public class UserControllerTest {
 
     private Long userId = 1L;
     private User user = User.builder().id(userId).build();
-    private UserDto userDto = userMapper.toUserDto(user);
+    private UserDto userDto = userMapper.toDto(user);
 
     @Test
     public void testDeactivateUserThrowsException() {

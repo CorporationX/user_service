@@ -31,24 +31,23 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User profile deactivated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user ID"),
             @ApiResponse(responseCode = "404", description = "User not found")
+
     })
-
-    @GetMapping("/users/{userId}")
-    public UserDto getUser(@PathVariable Long userId){
-        return service.getUser(userId);
-    }
-
-    @PostMapping("/users")
-    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
-        return service.getUsersByIds(ids);
-        }
-
-        @PutMapping("/user/{userId}")
     public UserDto deactivatesUserProfile(@PathVariable long userId){
         if (userId < 0) {
             throw new RuntimeException(MESSAGE_INVALID_ID);
         }
         return service.deactivatesUserProfile(userId);
     }
+
+    @GetMapping("/user/{userId}")
+    public UserDto getUser(@PathVariable Long userId){
+        return service.getUser(userId);
+    }
+
+    @PostMapping("/user")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
+        return service.getUsersByIds(ids);
+        }
 
 }

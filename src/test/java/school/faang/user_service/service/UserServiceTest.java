@@ -128,7 +128,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Тест получаем пользователя")
-    public void getUser() {
+    public void getUser(){
         Long userId = 1L;
         userService.getUser(userId);
         Mockito.verify(userRepository,Mockito.times(1))
@@ -137,7 +137,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Тест получаем всех пользователей")
-    public void getUsersByIds() {
+    public void getUsersByIds(){
         User firstUser = new User();
         User secondUser = new User();
         firstUser.setId(1L);

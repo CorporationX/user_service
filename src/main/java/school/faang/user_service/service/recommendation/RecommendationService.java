@@ -21,6 +21,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -89,7 +90,7 @@ public class RecommendationService {
                         recommendationDto.getReceiverId())
                 .orElseThrow(() -> {
                     log.error("");
-                    return new IllegalStateException("аргумент не найден");
+                    return new NoSuchElementException("аргумент не найден");
                 });
         LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
         if (recommendation.getUpdatedAt().isAfter(localDateTime)) {
@@ -116,7 +117,9 @@ public class RecommendationService {
         boolean AuthorSkillGuarantee = userSkillGuaranteeRepository.existsById(author.getId());
 
         for (SkillOffer skillOffer : skillOffers) {
-            if (existingSkills.contains(skillOffer.getSkill()) && !AuthorSkillGuarantee) {
+            if (skillOffer.getSkill() != null
+                    && existingSkills.contains(skillOffer.getSkill())
+                    && !AuthorSkillGuarantee) {
                 addAndSaveGuarantee(author, receiver, skillOffer.getSkill());
             } else {
                 skillOfferRepository.save(skillOffer);

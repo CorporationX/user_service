@@ -17,7 +17,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 import java.util.Optional;

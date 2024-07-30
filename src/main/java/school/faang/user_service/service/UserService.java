@@ -39,7 +39,7 @@ public class UserService {
         return mapper.toDto(userRepository.save(mentorshipService.stopMentorship(user)));
     }
 
-    public UserDto getUser (long userId){
+    public UserDto getUser (Long userId){
         Optional<User> user = userRepository.findById(userId);
         UserDto dto = mapper.toDto(user.orElse(null));
         return dto;

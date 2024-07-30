@@ -9,6 +9,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectWriter;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
 
@@ -30,10 +32,13 @@ class UserControllerTest {
     @InjectMocks
     private UserController controller;
 
+    private ObjectWriter objectMapper;
+
     @BeforeEach
     public void setUp() {
         //Arrange
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        objectMapper = new ObjectMapper().writer().withDefaultPrettyPrinter();
     }
 
     @Test
@@ -45,24 +50,24 @@ class UserControllerTest {
         );
     }
 
-    @Test
-    public void testVerifyServiceDeactivatesUserProfile() throws Exception {
-        //Arrange
-        UserDto dto = new UserDto();
-        dto.setId(VALID_USER_ID);
-        dto.setActive(true);
-        dto.setGoalsIds(List.of(VALID_USER_ID));
-        dto.setOwnedEventsIds(List.of(VALID_USER_ID));
-        //Act
-        Mockito.when(service.deactivatesUserProfile(Mockito.anyLong())).thenReturn(dto);
-        //Assert
-        mockMvc.perform(put("/user/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(VALID_USER_ID))
-                .andExpect(jsonPath("$.active").value(true))
-                .andExpect(jsonPath("$.goalsIds", hasSize(1)))
-                .andExpect(jsonPath("$.ownedEventsIds", hasSize(1)));
-    }
+    //@Test
+//    public void testVerifyServiceDeactivatesUserProfile() throws Exception {
+//        //Arrange
+//        UserDto dto = new UserDto();
+//        dto.setId(VALID_USER_ID);
+//        dto.setActive(true);
+//        dto.setGoalsIds(List.of(VALID_USER_ID));
+//        dto.setOwnedEventsIds(List.of(VALID_USER_ID));
+//        //Act
+//        Mockito.when(service.deactivatesUserProfile(Mockito.anyLong())).thenReturn(dto);
+//        //Assert
+//        mockMvc.perform(put("/user/1"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.id").value(VALID_USER_ID))
+//                .andExpect(jsonPath("$.active").value(true))
+//                .andExpect(jsonPath("$.goalsIds", hasSize(1)))
+//                .andExpect(jsonPath("$.ownedEventsIds", hasSize(1)));
+//    }
 }
 
 

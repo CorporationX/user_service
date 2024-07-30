@@ -7,7 +7,6 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
@@ -16,16 +15,6 @@ public interface EventMapper {
 
     @Mapping(source = "ownerId", target = "owner.id")
     Event toEntity(EventDto eventdto);
-
-    default List<EventDto> toDtoList(List<Event> events) {
-        return events.stream()
-                .map(event -> toDto(event))
-                .collect(Collectors.toList());
-    }
-
-    default List<Event> toEntityList(List<EventDto> eventsDto) {
-        return eventsDto.stream()
-                .map(eventDto -> toEntity(eventDto))
-                .collect(Collectors.toList());
-    }
+    List<EventDto> toDtoList(List<Event> events);
+    List<Event> toEntityList(List<EventDto> eventsDto);
 }

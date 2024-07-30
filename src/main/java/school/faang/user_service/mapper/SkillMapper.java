@@ -17,17 +17,9 @@ public interface SkillMapper {
 
     Skill toEntity(SkillDto skilldto);
 
-    default List<SkillDto> toDtoList(List<Skill> skills) {
-        return skills.stream()
-                .map(skill -> toDto(skill))
-                .collect(Collectors.toList());
-    }
+    List<SkillDto> toDtoList(List<Skill> skills);
   
-    default List<Skill> toEntityList(List<SkillDto> skillsdto) {
-        return skillsdto.stream()
-                .map(skilldto -> toEntity(skilldto))
-                .collect(Collectors.toList());
-    }
+    List<Skill> toEntityList(List<SkillDto> skillsdto);
   
     default List<SkillCandidateDto> toSkillCandidateDtoList(List<Skill> skillList) {
         Map<String, List<Skill>> skillsByTitle = skillList.stream()
@@ -36,7 +28,7 @@ public interface SkillMapper {
         return skillsByTitle.values()
                 .stream()
                 .map(skills -> {
-                    SkillDto skillDto = toSkillDto(skills.get(0));
+                    SkillDto skillDto = toDto(skills.get(0));
                     long offersAmount = skills.size();
                     return new SkillCandidateDto(skillDto, offersAmount);
                 })

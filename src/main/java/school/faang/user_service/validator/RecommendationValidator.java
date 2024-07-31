@@ -1,5 +1,6 @@
 package school.faang.user_service.validator;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,21 +22,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecommendationValidator {
     @Value("${recommendation.service.recommendation_period_in_month}")
-    private int RECOMMENDATION_PERIOD_MONTHS;
+    private int recommendationPeriodInMonths;
 
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
 
-    public void validateRecommendation(RecommendationDto recommendationDto) {
-        if (recommendationDto.getContent().isBlank()) {
-            throw new DataValidationException("The recommendation content is empty");
-        }
-    }
 
     public void validateBeforeAction(RecommendationDto recommendationDto) {
         validateLastUpdate(recommendationDto);
-        validateSkills(recommendationDto);
         validateSkillRepository(recommendationDto);
     }
 
@@ -47,10 +42,11 @@ public class RecommendationValidator {
 
     public void validateById(long id) {
         if (!userRepository.existsById(id)) {
-            throw new DataValidationException("The user doesn't exist in the system. ID : " + id);
+            throw new EntityNotFoundException("The user doesn't exist in the system. ID : " + id);
         }
     }
-    private void validateLastUpdate(RecommendationDto recommendationDto) {
+
+    public void validateLastUpdate(RecommendationDto recommendationDto) {
         long authorId = recommendationDto.getAuthorId();
         long receiverId = recommendationDto.getReceiverId();
 
@@ -61,16 +57,15 @@ public class RecommendationValidator {
             LocalDateTime lastUpdate = lastRecommendation.get().getUpdatedAt();
             LocalDateTime nowDate = LocalDateTime.now();
 
-            if (ChronoUnit.MONTHS.between(nowDate, lastUpdate) <= RECOMMENDATION_PERIOD_MONTHS) {
+            if (ChronoUnit.MONTHS.between(nowDate, lastUpdate) <= recommendationPeriodInMonths) {
                 String errorMessage = String.format("The author (ID : %d) cannot give a recommendation to a user (ID : %d)because it hasn't been %d months or more."
-                        , authorId, receiverId, RECOMMENDATION_PERIOD_MONTHS);
+                        , authorId, receiverId, recommendationPeriodInMonths);
                 throw new DataValidationException(errorMessage);
             }
         }
     }
 
-    private void validateSkills(RecommendationDto recommendationDto) {
-        List<SkillOfferDto> skillOffers = recommendationDto.getSkillOffers();
+    public void validateSkillOffers(List<SkillOfferDto> skillOffers) {
         if ((skillOffers == null) || (skillOffers.isEmpty())) {
             throw new DataValidationException("The skill offers list is empty or null");
         }
@@ -91,4 +86,20 @@ public class RecommendationValidator {
         }
     }
 
+    public void validateOfferSkillsIsExisting(List<SkillOfferDto> skillOfferDtos) {
+        for (SkillOfferDto skillOfferDto : skillOfferDtos) {
+            if (!skillRepository.existsById(skillOfferDto.getSkillId())) {
+                String errorMessage =
+                        String.format("The offerd skill with ID : %d is doesn't exist in the system"
+                                , skillOfferDto.getSkillId());
+                throw new EntityNotFoundException(errorMessage);
+            }
+        }
+    }
+
+    public void recommendationExist(long recommendationID) {
+        if (!recommendationRepository.existsById(recommendationID)) {
+            throw new EntityNotFoundException("Recommendation with ID = " + recommendationID + "doesn't exist in the System");
+        }
+    }
 }

@@ -1,10 +1,12 @@
 package school.faang.user_service.service.s3;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+
 @Component
 public class MultipartFileCopyUtil {
     public MultipartFile compressionMultipartFile(MultipartFile multipartFile, int maxSize) throws IOException {
@@ -58,5 +60,14 @@ public class MultipartFileCopyUtil {
                         .toFile(dest);
             }
         };
+
+    }
+
+    public ObjectMetadata collectMetadata(MultipartFile multipartFile) {
+        long fileSize = multipartFile.getSize();
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(fileSize);
+        objectMetadata.setContentType(multipartFile.getContentType());
+        return objectMetadata;
     }
 }

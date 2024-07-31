@@ -24,7 +24,6 @@ public class S3Service {
     private static final int MAX_IMAGE_SMALL_PHOTO = 170;
     private final AmazonS3 s3Client;
     private final MultipartFileCopyUtil multipartFileCopyUtil;
-
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
@@ -35,8 +34,8 @@ public class S3Service {
         MultipartFile smallImage = multipartFileCopyUtil
                 .compressionMultipartFile(multipartFile, MAX_IMAGE_SMALL_PHOTO);
 
-        ObjectMetadata objectMetadataOne = collectMetadata(largeImage);
-        ObjectMetadata objectMetadataTwo = collectMetadata(smallImage);
+        ObjectMetadata objectMetadataOne = multipartFileCopyUtil.collectMetadata(largeImage);
+        ObjectMetadata objectMetadataTwo = multipartFileCopyUtil.collectMetadata(smallImage);
 
         String keyOne = String.format("Origin%s%d%s",
                 folder, System.currentTimeMillis(), largeImage.getOriginalFilename());
@@ -65,14 +64,6 @@ public class S3Service {
     public void deleteImage(UserProfilePic userProfilePic) {
         s3Client.deleteObject(bucketName, userProfilePic.getFileId());
         s3Client.deleteObject(bucketName, userProfilePic.getSmallFileId());
-    }
-
-    private ObjectMetadata collectMetadata(MultipartFile multipartFile) {
-        long fileSize = multipartFile.getSize();
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(fileSize);
-        objectMetadata.setContentType(multipartFile.getContentType());
-        return objectMetadata;
     }
 
     private void sendingRequestToTheCloud(String bucketName,

@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/recommendation")
+@RequestMapping("/recommendations")
 @RequiredArgsConstructor
 public class RecommendationController {
     private final RecommendationService recommendationService;
@@ -21,15 +21,14 @@ public class RecommendationController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RecommendationDto giveRecommendation(@Valid RecommendationDto recommendation) {
-        recommendationValidator.validateRecommendation(recommendation);
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping
+    @PutMapping({"/recommendationId/"})
     @ResponseStatus(HttpStatus.OK)
-    public RecommendationDto updateRecommendation(RecommendationDto updated) {
-        recommendationValidator.validateRecommendation(updated);
-        return recommendationService.update(updated);
+    public RecommendationDto updateRecommendation(@PathVariable long recommendationID, @Valid RecommendationDto updatedDto) {
+
+        return recommendationService.update(recommendationID,updatedDto);
     }
 
     @DeleteMapping

@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -15,6 +17,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.SkillOfferMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -22,6 +25,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.RecommendationValidator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -38,40 +42,47 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationValidator recommendationValidator;
+    private final SkillOfferMapper skillOfferMapper;
     private final UserRepository userRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        recommendationValidator.validateBeforeAction(recommendationDto);
+        recommendationValidator.validateLastUpdate(recommendationDto);
+        recommendationValidator.validateOfferSkillsIsExisting(recommendationDto.getSkillOffers());
+
+        saveSkillOffers(recommendationDto);
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         Recommendation savedRecommendation = recommendationRepository.save(recommendation);
-        saveSkillOffers(recommendation);
         return recommendationMapper.toDto(savedRecommendation);
     }
 
-    private void saveSkillOffers(Recommendation recommendation) {
-        long authorId = recommendation.getAuthor().getId();
-        long receiverId = recommendation.getReceiver().getId();
+    private void saveSkillOffers(RecommendationDto recommendationDto) {
+        long authorId = recommendationDto.getAuthorId();
+        long receiverId = recommendationDto.getReceiverId();
 
-        List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-        List<Skill> receiverSkills = getReceiverSkills(receiverId);
+        List<UserSkillGuarantee> userSkillGuaranteeListToSave = new ArrayList<>();
+        List<SkillOfferDto> skillOfferDtosToSave = new ArrayList<>();
 
-        for (var skillOffer : skillOffers) {
-            long skillId = skillOffer.getSkill().getId();
+        List<SkillOfferDto> skillOfferDtoList = recommendationDto.getSkillOffers();
+        List<Long> receiverSkillIds = getUserSkillsByUserId(receiverId);
 
-            if (receiverSkills.contains(skillOffer.getSkill()) && !guaranteeExist(receiverId, skillId, authorId)) {
-
-                updateSkillGuaranteeRepository(receiverId, skillId, authorId);
+        for (SkillOfferDto skillOffer : skillOfferDtoList) {
+            long skillId = skillOffer.getSkillId();
+            if (receiverSkillIds.contains(skillId) && !guaranteeExist(receiverId, skillId, authorId)) {
+                userSkillGuaranteeListToSave.add(getSkillGuaranteeEntity(receiverId, skillId, authorId));
             } else {
-                skillOfferRepository.save(skillOffer);
+                skillOfferDtosToSave.add(skillOffer);
             }
         }
+        userSkillGuaranteeRepository.saveAll(userSkillGuaranteeListToSave);
+        skillOfferRepository.saveAll(skillOfferMapper.toSkillOfferEntityList(skillOfferDtosToSave));
     }
 
-    private List<Skill> getReceiverSkills(long receiverId) {
-        Optional<User> user = userRepository.findById(receiverId);
-        return user.map(User::getSkills).orElse(Collections.emptyList());
+    private List<Long> getUserSkillsByUserId(long receiverId) {
+        User user = userRepository.findById(receiverId).orElseThrow(
+                () -> new EntityNotFoundException("Couldn't find user with ID= " + receiverId));
+        return user.getSkills().stream().map(Skill::getId).toList();
     }
 
     private boolean guaranteeExist(long receiverId, long skillId, long authorId) {
@@ -83,8 +94,13 @@ public class RecommendationService {
     }
 
     @Transactional
-    public RecommendationDto update(RecommendationDto recommendationDto) {
-        recommendationValidator.validateBeforeAction(recommendationDto);
+    public RecommendationDto update(long recommendationID,RecommendationDto recommendationDto) {
+        recommendationValidator.recommendationExist(recommendationID);
+        recommendationValidator.validateLastUpdate(recommendationDto);
+        recommendationValidator.validateOfferSkillsIsExisting(recommendationDto.getSkillOffers());
+
+        skillOfferRepository.deleteAllByRecommendationId(recommendationID);
+
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         recommendationRepository.update(recommendation.getAuthor().getId(),
                 recommendation.getReceiver().getId(),
@@ -143,7 +159,7 @@ public class RecommendationService {
         }
     }
 
-    private void updateSkillGuaranteeRepository(long receiverId, long skillId, long authorId) {
+    private UserSkillGuarantee getSkillGuaranteeEntity(long receiverId, long skillId, long authorId) {
         User user = userRepository.findById(receiverId)
                 .orElseThrow(() -> new DataValidationException("Couldn't find the user in the system"));
 
@@ -158,6 +174,6 @@ public class RecommendationService {
         userSkillGuarantee.setGuarantor(guarantor);
         userSkillGuarantee.setSkill(skill);
 
-        userSkillGuaranteeRepository.save(userSkillGuarantee);
+        return userSkillGuarantee;
     }
 }

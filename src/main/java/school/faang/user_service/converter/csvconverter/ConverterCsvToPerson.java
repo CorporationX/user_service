@@ -16,6 +16,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class ConverterCsvToPerson {
+
     public List<Person> convertCsvToPerson(MultipartFile file) {
         CsvMapper csvMapper = new CsvMapper();
         CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
@@ -26,6 +27,22 @@ public class ConverterCsvToPerson {
                     .readValues(file.getInputStream());
             List<Map<String, String>> mapData = mapMappingIterator.readAll();
             return mapDataToPersons(mapData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Person> convertorToPerson(MultipartFile file) {
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema csvSchema = csvMapper.schemaFor(PersonSchema.class).withHeader().withColumnReordering(true);
+        List<Person> persons = new ArrayList<>();
+        try {
+            MappingIterator<Person> mappingIterator = csvMapper
+                    .readerFor(Person.class)
+                    .with(csvSchema)
+                    .readValues(file.getInputStream());
+            persons.addAll(mappingIterator.readAll());
+            return persons;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 
 @ExtendWith(MockitoExtension.class)
-public class S3ServiceTest {
+class S3ServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -48,7 +48,7 @@ public class S3ServiceTest {
     }
 
     @Test
-    public void testUploadAvatar_Success() throws IOException {
+     void testUploadAvatar_Success() throws IOException {
         User user = new User();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
@@ -77,7 +77,7 @@ public class S3ServiceTest {
     }
 
     @Test
-    void testDownloadAvatar() throws IOException {
+    void testDownloadAvatar(){
         Long userId = 1L;
         S3Object s3Object = mock(S3Object.class);
 

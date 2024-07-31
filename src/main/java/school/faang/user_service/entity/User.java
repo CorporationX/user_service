@@ -33,13 +33,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "username", length = 64, nullable = false, unique = true)
     @NotBlank(message = "Field cannot be blank")
+    @Column(name = "username", length = 64, nullable = false, unique = true)
     private String username;
 
-    @Column(name = "email", length = 64, nullable = false, unique = true)
     @NotBlank(message = "Field cannot be blank")
     @Email(message = "It must be in the email format")
+    @Column(name = "email", length = 64, nullable = false, unique = true)
     private String email;
 
     @Column(name = "phone", length = 32, unique = true)

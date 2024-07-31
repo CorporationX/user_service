@@ -6,8 +6,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.repository.UserRepository;
-
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -26,10 +23,8 @@ import java.util.Optional;
 
 @Service
 public class S3Service {
-    private static final Logger log = LoggerFactory.getLogger(S3Service.class);
-
     @Value("${services.s3.bucket-name}")
-    String bucketName;
+     String bucketName;
 
 
     private final AmazonS3 s3Client;
@@ -75,6 +70,8 @@ public class S3Service {
         }
         return null;
     }
+
+
 
     public String deleteAvatar(Long userId) {
         if (findUserById(userId).isPresent()) {

@@ -1,7 +1,6 @@
 package school.faang.user_service.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,7 +12,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.service.user.UserService;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @RestController
@@ -36,18 +34,18 @@ public class UserController {
 
     @PostMapping("/users/{userId}/avatar")
     public ResponseEntity<String> uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException {
-        return new ResponseEntity<>(s3Service.uploadAvatar(userId,file), HttpStatus.OK);
+        return new ResponseEntity<>(s3Service.uploadAvatar(userId, file), HttpStatus.OK);
     }
 
     @GetMapping("/users/{userId}/avatar")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Long userId) {
         byte[] data = s3Service.downloadAvatar(userId);
-        ByteArrayResource resource = new ByteArrayResource(data);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
 
-        return new ResponseEntity<>(data,headers,HttpStatus.OK);
+        return new ResponseEntity<>(data, headers, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/users/{userId}/avatar")

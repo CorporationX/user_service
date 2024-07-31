@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/byList")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);

@@ -1,37 +1,82 @@
 package school.faang.user_service.controller.user;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userPremium.UserPremiumDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.userPremium.UserFilterDto;
+import school.faang.user_service.dto.userPremium.UserPremiumDto;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.userPremium.UserPremiumService;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-    @InjectMocks
-    private UserPremiumController userController;
-    @Mock
-    private UserPremiumService userPremiumService;
 
-    @Test
-    void testGetListPremiumUsersNull() {
-        assertThrows(IllegalArgumentException.class, () -> userController.getListPremiumUsers(null));
-    }
+  private static final long DEFAULT_ID = 1L;
 
-    @Test
-    void testGetListPremiumUsersTrue() {
-        Mockito.when(userPremiumService.getPremiumUsers(Mockito.any())).thenReturn(List.of(new UserPremiumDto()));
+  private ResponseEntity responseEntity;
 
-        userController.getListPremiumUsers(new UserFilterDto());
+  @InjectMocks
+  private UserPremiumController userPremiumController;
+  @Mock
+  private UserPremiumService userPremiumService;
 
-        Mockito.verify(userPremiumService, Mockito.times(1)).getPremiumUsers(new UserFilterDto());
-    }
+  @InjectMocks
+  private UserController userController;
+  @Mock
+  private UserService userService;
+
+  private UserDto createUserDto() {
+    return UserDto.builder()
+        .id(2L)
+        .username("JaneSmith")
+        .email("janesmith@example.com")
+        .phone("0987654321")
+        .aboutMe("About Jane Smith")
+        .city("London")
+        .active(false)
+        .premium("")
+        .build();
+  }
+
+  @Test
+  void testGetListPremiumUsersNull() {
+    assertThrows(IllegalArgumentException.class,
+        () -> userPremiumController.getListPremiumUsers(null));
+  }
+
+  @Test
+  void testGetListPremiumUsersTrue() {
+    Mockito.when(userPremiumService.getPremiumUsers(Mockito.any()))
+        .thenReturn(List.of(new UserPremiumDto()));
+
+    userPremiumController.getListPremiumUsers(new UserFilterDto());
+
+    Mockito.verify(userPremiumService, Mockito.times(1)).getPremiumUsers(new UserFilterDto());
+  }
+
+  @Test
+  @DisplayName("Проверка ответа с статусом 200, типом сообщения и тела сообщения если пользователь был деактивирован.")
+  void testGetMenteesReturnsValidResponseEntity() {
+    when(userService.deactivateUser(DEFAULT_ID)).thenReturn(createUserDto());
+    responseEntity = userController.deactivateUser(DEFAULT_ID);
+    assertNotNull(responseEntity);
+    assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
+    assertEquals(createUserDto(), responseEntity.getBody());
+  }
+
 }

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RecommendationRequestDto {
     private Long id;
     @Positive
@@ -27,7 +29,7 @@ public class RecommendationRequestDto {
     private RequestStatus status;
     private String rejectionReason;
     @NotNull
-    private List<SkillRequestDto> skillIds;
+    private List<SkillRequestDto> skillDtos;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -20,12 +20,12 @@ public interface RecommendationRequestMapper {
 
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "recieverId")
-    @Mapping(source = "skills", target = "skillIds")
+    @Mapping(source = "skills", target = "skillDtos")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "recieverId", target = "receiver.id")
-    @Mapping(source = "skillIds", target = "skills")
+    @Mapping(source = "skillDtos", target = "skills")
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 
     List<SkillRequestDto> toListDto(List<SkillRequest> skillRequests);

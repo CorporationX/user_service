@@ -80,7 +80,7 @@ public class ValidatorForRecommendationRequestServiceTest {
         dto.setRecieverId(2L);
         dto.setRequesterId(3L);
         dto.setMessage("message");
-        dto.setSkillIds(List.of(
+        dto.setSkillDtos(List.of(
                 new SkillRequestDto(1L, 2L, 3L),
                 new SkillRequestDto(2L, 2L, 2L))
         );

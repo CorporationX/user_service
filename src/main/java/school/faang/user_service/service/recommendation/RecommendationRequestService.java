@@ -35,7 +35,9 @@ public class RecommendationRequestService {
     @Transactional
     public RecommendationRequestDto create(RecommendationRequestDto requestDto) {
         recommendationServiceValidator.validatorData(requestDto);
-        saveSkillRequest(requestDto);
+        requestDto.getSkillDtos().stream()
+                .filter(skill -> !skillRequestRepository.existsById(skill.getSkillId()))
+                .forEach(skill -> skillRequestRepository.create(requestDto.getId(), skill.getSkillId()));
         RecommendationRequest request = requestRepository.save(requestMapper.toEntity(requestDto));
         return requestMapper.toDto(request);
     }
@@ -82,12 +84,5 @@ public class RecommendationRequestService {
                 .flatMap(filter -> filter.apply(allRequest, filters))
                 .map(requestMapper::toDto)
                 .toList();
-    }
-
-    @Transactional
-    public void saveSkillRequest(RecommendationRequestDto requestDto) {
-        requestDto.getSkillIds().stream()
-                .filter(skill -> skillRequestRepository.existsById(skill.getSkillId()))
-                .forEach(skill -> skillRequestRepository.create(requestDto.getId(), skill.getSkillId()));
     }
 }

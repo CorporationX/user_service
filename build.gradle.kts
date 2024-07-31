@@ -80,6 +80,7 @@ jsonSchema2Pojo {
     targetDirectory = file("${project.buildDir}/generated-sources/js2p")
     targetPackage = "com.json.student"
     setSourceType("jsonschema")
+    generateBuilders = true
 }
 
 tasks.withType<Test> {

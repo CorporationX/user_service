@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -163,5 +164,17 @@ public class UserServiceTest {
 
         assertEquals(result, 1L);
         verify(userRepository, times(1)).findIdByEmailAndPassword("email", "password");
+    }
+
+    @Test
+    public void testGetAllUsersId() {
+        assertDoesNotThrow(() -> userService.getAllUsersId());
+        verify(userRepository).findAllUserIds();
+    }
+
+    @Test
+    public void testGetUserByPostId() {
+        assertDoesNotThrow(() -> userService.getUserByPostId(12L));
+        verify(userRepository).getUserByPostId(12L);
     }
 }

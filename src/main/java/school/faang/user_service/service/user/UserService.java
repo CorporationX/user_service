@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.cache.HashMapCountry;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFeedDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -226,5 +227,16 @@ public class UserService {
             user.setBanned(true);
             userRepository.save(user);
         });
+    }
+
+    @Transactional
+    public List<Long> getAllUsersId() {
+        return userRepository.findAllUserIds();
+    }
+
+    @Transactional
+    public UserFeedDto getUserByPostId(Long postId) {
+        User user = userRepository.getUserByPostId(postId);
+        return userMapper.toUserFeedDto(user);
     }
 }

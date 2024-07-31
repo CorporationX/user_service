@@ -22,6 +22,7 @@ import school.faang.user_service.validator.UserValidator;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -121,5 +122,17 @@ public class UserControllerTest {
         userController.authorizeUser("email", "password");
 
         verify(userService, times(1)).authorizeUser("email", "password");
+    }
+
+    @Test
+    public void testGetAllUsersId() {
+        assertDoesNotThrow(() -> userController.getAllUsersId());
+        verify(userService).getAllUsersId();
+    }
+
+    @Test
+    public void testGetUserByPostId() {
+        assertDoesNotThrow(() -> userController.getUserByPostId(12L));
+        verify(userService).getUserByPostId(12L);
     }
 }

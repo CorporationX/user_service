@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFeedDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface UserMapper {
     User toEntity(UserDto userDto);
 
     List<UserDto> toDtoList(List<User> users);
+
+    UserFeedDto toUserFeedDto(User user);
 }

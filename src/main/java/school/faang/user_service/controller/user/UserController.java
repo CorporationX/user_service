@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.converter.starter.ConverterCsvToPerson;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFeedDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.user.UserService;
@@ -78,5 +79,15 @@ public class UserController {
     @GetMapping("/authorize/{userEmail}/{userPassword}")
     public Long authorizeUser(@PathVariable("userEmail") String userEmail, @PathVariable("userPassword") String userPassword){
         return userService.authorizeUser(userEmail, userPassword);
+    }
+
+    @GetMapping("/ids")
+    List<Long> getAllUsersId() {
+        return userService.getAllUsersId();
+    }
+
+    @GetMapping("/postId/{postId}")
+    UserFeedDto getUserByPostId(@PathVariable long postId) {
+        return userService.getUserByPostId(postId);
     }
 }

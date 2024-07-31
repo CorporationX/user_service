@@ -45,9 +45,9 @@ public class SkillServiceImpl implements SkillService {
             throw new DataValidationException(String.format("Skill with title %s has already exist", skill.getTitle()));
         }
 
-        Skill savedSkill = skillRepository.save(skillMapper.toSkill(skill));
+        Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
 
-        return skillMapper.toSkillDto(savedSkill);
+        return skillMapper.toDto(savedSkill);
     }
 
     @Transactional(readOnly = true)

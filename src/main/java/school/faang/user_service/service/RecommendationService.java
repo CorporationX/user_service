@@ -106,7 +106,7 @@ public class RecommendationService {
                 recommendation.getReceiver().getId(),
                 recommendationDto.getContent());
 
-        updateSkillOfferRepositoryAndGuaranteeRepository(recommendation);
+        //updateSkillOfferRepositoryAndGuaranteeRepository(recommendation);
         return recommendationMapper.toDto(recommendation);
     }
 
@@ -136,7 +136,7 @@ public class RecommendationService {
         return recommendations.stream().map(recommendationMapper::toDto).toList();
     }
 
-    private void updateSkillOfferRepositoryAndGuaranteeRepository(Recommendation recommendation) {
+   /* private void updateSkillOfferRepositoryAndGuaranteeRepository(Recommendation recommendation) {
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         for (var skillOffer : recommendation.getSkillOffers()) {
             skillOfferRepository.create(skillOffer.getSkill().getId(), recommendation.getId());
@@ -158,7 +158,7 @@ public class RecommendationService {
             }
         }
     }
-
+*/
     private UserSkillGuarantee getSkillGuaranteeEntity(long receiverId, long skillId, long authorId) {
         User user = userRepository.findById(receiverId)
                 .orElseThrow(() -> new DataValidationException("Couldn't find the user in the system"));

@@ -1,9 +1,10 @@
 package school.faang.user_service.validator;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -19,13 +20,13 @@ public class EventParticipationValidator {
 
     public void checkUserIsExisting(long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new DataValidationException("User doesn't exist in the system ID = " + userId);
+            throw new EntityNotFoundException("User doesn't exist in the system ID = " + userId);
         }
     }
 
     public void checkEventIsExisting(long eventId) {
         if (!eventRepository.existsById(eventId)) {
-            throw new DataValidationException("Event doesn't exist in the system ID = " + eventId);
+            throw new EntityNotFoundException("Event doesn't exist in the system ID = " + eventId);
         }
     }
 

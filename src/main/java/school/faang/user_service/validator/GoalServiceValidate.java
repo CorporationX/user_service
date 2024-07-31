@@ -2,8 +2,10 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.service.goal.SkillService;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public class GoalServiceValidate {
     private final SkillService skillService;
     private final static int MAX_NUMBERS_GOAL_USER = 3;
 
-    public void validateCreateGoal(long userId, Goal goal, int countUserActive, List<String> allGoalTitles) {
+    public void validateCreateGoal(long userId, GoalDto goal, int countUserActive, List<String> allGoalTitles) {
         if (allGoalTitles.contains(goal.getTitle())) {
             throw new IllegalArgumentException("A goal with the same name already exists");
         } else if (countUserActive >= MAX_NUMBERS_GOAL_USER) {
@@ -36,6 +38,12 @@ public class GoalServiceValidate {
 
     public void validateDeleteGoal(Stream<Goal> goal) {
         goal.findFirst().orElseThrow(() -> new NoSuchElementException("A goal with this ID does not exist"));
+    }
+
+    // Сменить название метода
+    public void validUpdate(Goal goal) {
+        if(goal.getStatus() == GoalStatus.COMPLETED)
+            throw new IllegalStateException("The goal cannot be updated because it is already completed");
     }
 
     private boolean existByTitle(List<Skill> skills) {

@@ -13,12 +13,12 @@ import java.util.List;
 public interface GoalMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
-    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "map")
+    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "mapSkillToSkillsId")
     GoalDto toGoalDto(Goal goal);
 
     Goal toGoal(GoalDto goalDto);
 
-    default List<Long> map(List<Skill> skills) {
+    default List<Long> mapSkillToSkillsId(List<Skill> skills) {
         return skills.stream().map(Skill::getId).toList();
     }
 }

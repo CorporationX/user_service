@@ -3,10 +3,10 @@ package school.faang.user_service.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -43,10 +43,16 @@ public interface UserRepository extends CrudRepository<User, Long> {
     boolean existsUserByEmail(String email);
 
     @Query(nativeQuery = true, value = """
-            select follower_id from subscription s where s.followee_id = :userId   
+            select follower_id from subscription s where s.followee_id = :userId
             """)
     List<Long> getIdsFollowersUser(long userId);
 
     @Query(nativeQuery = true, value = "SELECT id  FROM users u WHERE u.email = ?1 AND u.password = ?2")
     Long findIdByEmailAndPassword(String email, String password);
+
+    @Query(nativeQuery = true, value = "SELECT u.id FROM users u")
+    List<Long> findAllUserIds();
+
+    @Query(nativeQuery = true, value = "SELECT u.* FROM users u JOIN post p ON u.id = p.author_id WHERE p.id = ?1")
+    User getUserByPostId(Long postId);
 }

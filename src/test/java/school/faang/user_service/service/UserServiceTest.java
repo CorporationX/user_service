@@ -24,6 +24,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,10 +49,7 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private MentorshipService mentorshipService;
-
-    @InjectMocks
-    private UserService userService;
-
+  
     private User user;
     private User mentee;
     private Goal mentorAssignedGoal;
@@ -106,5 +112,17 @@ class UserServiceTest {
         userService.deactivateUser(user.getId());
         verify(mentorshipService, times(1)).deleteMentor(mentee.getId(), user.getId());
         assertEquals(mentorAssignedGoal.getMentor(), mentee);
+    }
+  
+    @Test
+    @DisplayName("invoke findAll method and mapper method")
+    public void testToInvokeRepositoryAndMapperMethodsWhenGetUsersDtoByIds() {
+        List<Long> ids = new ArrayList<>(List.of(1L, 2L));
+
+        when(userRepository.findAllById(anyList())).thenReturn(new ArrayList<>());
+        userService.getUsersDtoByIds(ids);
+
+        verify(userRepository, times(1)).findAllById(anyList());
+        verify(userMapper, times(1)).usersToUserDTOs(anyList());
     }
 }

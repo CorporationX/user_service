@@ -67,4 +67,8 @@ public class UserService {
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
     }
+  
+    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
+          return userMapper.usersToUserDTOs(userRepository.findAllById(ids));
+      }
 }

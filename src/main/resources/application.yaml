@@ -49,5 +49,8 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://192.168.1.100:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    isMocked: false

@@ -24,14 +24,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.UserRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -39,6 +31,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
+    @InjectMocks
+    private UserService userService;
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -49,7 +44,7 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private MentorshipService mentorshipService;
-  
+
     private User user;
     private User mentee;
     private Goal mentorAssignedGoal;
@@ -84,9 +79,8 @@ class UserServiceTest {
     @Test
     @DisplayName("testing deactivateUser by providing non existing user id")
     public void testDeactivateUserWithNonExistingUserId() {
-        long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.deactivateUser(userId));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.deactivateUser(user.getId()));
     }
 
     @Test
@@ -113,7 +107,7 @@ class UserServiceTest {
         verify(mentorshipService, times(1)).deleteMentor(mentee.getId(), user.getId());
         assertEquals(mentorAssignedGoal.getMentor(), mentee);
     }
-  
+
     @Test
     @DisplayName("invoke findAll method and mapper method")
     public void testToInvokeRepositoryAndMapperMethodsWhenGetUsersDtoByIds() {

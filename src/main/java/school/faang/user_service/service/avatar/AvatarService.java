@@ -35,7 +35,6 @@ public class AvatarService {
     public String getRandomAvatarUrl() {
         String encodedSeed = URLEncoder.encode(getRandomName(), StandardCharsets.UTF_8);
         String encodedBackground = URLEncoder.encode(getRandomBackground(), StandardCharsets.UTF_8);
-        System.err.println(DICEBEAR_API_URL + "?seed=" + encodedSeed + "&backgroundColor=" + encodedBackground);
         return DICEBEAR_API_URL + "?seed=" + encodedSeed + "&backgroundColor=" + encodedBackground;
     }
 

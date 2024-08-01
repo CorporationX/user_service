@@ -39,6 +39,12 @@ public class UserServiceImpl implements UserService {
 //        goal is done by that person and remove, otherwise just update list
         userGoals.forEach(goal -> {
             List<User> goalUsers = goal.getUsers();
+
+//            avoid exception if null, should be impossible but still
+            if (goalUsers == null) {
+                return;
+            }
+
             goalUsers.removeIf(goalUser -> goalUser.getId() == userId);
             if(goal.getUsers().isEmpty()){
                 goalRepository.deleteById(goal.getId());

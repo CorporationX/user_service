@@ -1,4 +1,4 @@
-package school.faang.user_service.exception.user;
+package school.faang.user_service.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
-public class UserExceptionHandler {
+public class DefaultExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {

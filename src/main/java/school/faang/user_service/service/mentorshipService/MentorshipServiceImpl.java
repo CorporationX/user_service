@@ -5,8 +5,6 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
 
@@ -15,8 +13,6 @@ import java.util.List;
 public class MentorshipServiceImpl implements MentorshipService {
 
     private final UserRepository userRepository;
-    private final MentorshipRepository mentorshipRepository;
-    private final GoalRepository goalRepository;
 
     @Override
     public void deactivateMentorship(long userId) {
@@ -32,6 +28,11 @@ public class MentorshipServiceImpl implements MentorshipService {
 
 //            remove mentor from every mentee mentor list
             List<User> userMentors = mentee.getMentors();
+
+            if(userMentors == null) {
+                return;
+            }
+
             userMentors.removeIf(mentor -> mentor.getId() == userId);
             mentee.setMentors(userMentors);
         });

@@ -24,4 +24,5 @@ public class UserDTO {
     private List<Long> mentorIds;
     private List<Long> menteeIds;
     private List<Long> goalIds;
+    private List<Long> subscriberIds;
 }

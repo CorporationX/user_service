@@ -16,6 +16,7 @@ public interface UserMapper {
     @Mapping(source = "participatedEvents", target = "participatedEventIds", qualifiedByName = "mapEventsToEventIds")
     @Mapping(source = "mentors", target = "mentorIds", qualifiedByName = "mapUsersToUserIds")
     @Mapping(source = "mentees", target = "menteeIds", qualifiedByName = "mapUsersToUserIds")
+    @Mapping(source = "followers", target = "subscriberIds", qualifiedByName = "mapUsersToUserIds")
     UserDTO toDTO(User user);
 
     @Mapping(source = "mentorIds", target = "mentors", qualifiedByName = "mapUserIdsToUserDtos")

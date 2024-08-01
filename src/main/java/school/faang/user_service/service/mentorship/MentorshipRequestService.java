@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.MentorshipStartEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -12,6 +13,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filter.RequestFilter;
@@ -38,6 +40,8 @@ public class MentorshipRequestService {
     private UserRepository userRepository;
 
     private List<RequestFilter> requestFilters;
+
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -76,6 +80,10 @@ public class MentorshipRequestService {
                 .orElseThrow(() -> new DataValidationException(NO_USER_IN_DB.getMessage())));
 
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+
+        mentorshipStartEventPublisher.convertAndSend(new MentorshipStartEvent(mentorshipRequest.getRequester().getId()
+                , mentorshipRequest.getReceiver().getId()));
+
         mentorshipRequestRepository.save(mentorshipRequest);
     }
 

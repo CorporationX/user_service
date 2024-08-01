@@ -23,6 +23,7 @@ spring:
       host: localhost
       channels:
         recommendationChannel: recommendation_channel
+        mentorshipChannel: mentorship_channel
 
 
 thread:

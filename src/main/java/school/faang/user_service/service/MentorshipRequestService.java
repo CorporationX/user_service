@@ -41,13 +41,13 @@ public class MentorshipRequestService {
     @Getter
     @Value("${variables.interval}")
     private long interval;
-
+    @Transactional
     public MentorshipRequestDto acceptRequest(AcceptMentorshipRequestDto acceptMentorshipRequestDto) {
         MentorshipRequest editingRequest = getMentorshipRequest(acceptMentorshipRequestDto.getId());
         getLastMentorship(acceptMentorshipRequestDto);
         mentorshipRepository.create(acceptMentorshipRequestDto.getReceiverId(), acceptMentorshipRequestDto.getRequesterId());
         editingRequest.setStatus(RequestStatus.ACCEPTED);
-        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(editingRequest));
+        return mentorshipRequestMapper.toDto(editingRequest);
     }
 
 

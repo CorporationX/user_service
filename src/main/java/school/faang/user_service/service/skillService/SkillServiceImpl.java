@@ -62,7 +62,7 @@ public class SkillServiceImpl implements SkillService {
         }
 
         List<Skill> skillList = skillRepository.findAllByUserId(userId);
-        return skillMapper.toSkillDtoList(skillList);
+        return skillMapper.toDtoList(skillList);
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +116,7 @@ public class SkillServiceImpl implements SkillService {
 
             userSkillGuaranteeRepository.saveAll(userSkillGuarantees);
 
-            return skillMapper.toSkillDto(skill.get());
+            return skillMapper.toDto(skill.get());
         } else {
             throw new DataValidationException("User doesn't have enough offers to acquire skill");
         }

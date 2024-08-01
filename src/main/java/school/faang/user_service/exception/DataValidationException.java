@@ -6,4 +6,8 @@ public class DataValidationException extends RuntimeException {
         super(messageError.getMessage());
     }
 
+    public DataValidationException(String messageError) {
+        super(messageError);
+    }
+
 }

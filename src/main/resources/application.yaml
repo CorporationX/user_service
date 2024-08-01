@@ -30,6 +30,10 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
 server:
   port: 8080
@@ -53,5 +57,11 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    accessKey: user
+    secretKey: password
+    endpoint: http://127.0.0.1:9001
+    bucketName: user-bucket
+    maxSizeBytes: 5242880
+    smallSize: 170
+    largeSize: 1080
     isMocked: true

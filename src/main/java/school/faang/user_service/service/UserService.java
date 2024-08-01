@@ -1,8 +1,7 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service;
 
 import com.json.student.Person;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,8 +13,9 @@ import java.util.List;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final ConverterCsvToPerson csvToPerson;
 
@@ -26,7 +26,6 @@ public class UserService {
             throw new DataValidationException(String.format(msg, file.getOriginalFilename()));
         }
         List<Person> persons = csvToPerson.convertorToPerson(file);
-
     }
 
 }

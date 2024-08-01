@@ -1,23 +1,21 @@
-package school.faang.user_service.controller.user;
+package school.faang.user_service.controller;
 
-import com.json.student.Person;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
-    private final UserService userService;
 
+    private final UserService userService;
 
     @PostMapping("/upload/csv")
     public void addUsersFromFile(@NotNull @RequestParam("file") MultipartFile file) {

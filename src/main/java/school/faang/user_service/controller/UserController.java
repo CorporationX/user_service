@@ -11,6 +11,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
 
@@ -19,6 +20,8 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final S3Service s3Service;
+    private final UserValidator userValidator;
+    private final UserService user_Service;
 
     @Autowired
     public UserController(UserService userService, UserMapper userMapper, S3Service s3Service) {
@@ -27,10 +30,17 @@ public class UserController {
         this.s3Service = s3Service;
     }
 
+    public UserDto deactivateUser(long userId) {
+        userValidator.validateUserId(userId);
+        UserDto user = user_Service.deactivate(userId);
+        user_Service.removeMenteeAndGoals(userId);
+        return user;
+    }
+
     @GetMapping("/users/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userMapper.toDto(userService.findUserById(userId));
-    }
+        }
 
     @PostMapping("/users/{userId}/avatar")
     public ResponseEntity<String> uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException {

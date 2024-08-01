@@ -54,8 +54,4 @@ services:
 
 recommendation:
   service:
-    recommendation_period_months: 6
-    recommendation_pageable_page : 5
-    recommendation_pageable_size : 20
-
-
+    recommendation_period: 6

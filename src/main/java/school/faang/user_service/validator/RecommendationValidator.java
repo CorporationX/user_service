@@ -21,7 +21,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class RecommendationValidator {
-    @Value("${recommendation.service.recommendation_period_in_month}")
+    @Value("${recommendation.service.recommendation_period}")
     private int recommendationPeriodInMonths;
 
     private final RecommendationRepository recommendationRepository;
@@ -32,12 +32,6 @@ public class RecommendationValidator {
     public void validateBeforeAction(RecommendationDto recommendationDto) {
         validateLastUpdate(recommendationDto);
         validateSkillRepository(recommendationDto);
-    }
-
-    public void validateRecommendationById(long id) {
-        if (!recommendationRepository.existsById(id)) {
-            throw new DataValidationException("The recommendation doesn't exist in the system. ID : " + id);
-        }
     }
 
     public void validateById(long id) {
@@ -62,12 +56,6 @@ public class RecommendationValidator {
                         , authorId, receiverId, recommendationPeriodInMonths);
                 throw new DataValidationException(errorMessage);
             }
-        }
-    }
-
-    public void validateSkillOffers(List<SkillOfferDto> skillOffers) {
-        if ((skillOffers == null) || (skillOffers.isEmpty())) {
-            throw new DataValidationException("The skill offers list is empty or null");
         }
     }
 

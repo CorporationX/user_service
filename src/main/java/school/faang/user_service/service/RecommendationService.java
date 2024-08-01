@@ -14,7 +14,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillOfferMapper;
@@ -26,17 +25,13 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.RecommendationValidator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
-    @Value("${recommendation.service.pageable_page}")
-    private int PAGEABLE_PAGE_PARAMETER;
-    @Value("${recommendation.service.pageable_size}")
-    private int PAGEABLE_SIZE_PARAMETER;
+
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
@@ -47,7 +42,7 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     @Transactional
-    public RecommendationDto create(RecommendationDto recommendationDto) {
+    public RecommendationDto createRecommendational(RecommendationDto recommendationDto) {
         recommendationValidator.validateLastUpdate(recommendationDto);
         recommendationValidator.validateOfferSkillsIsExisting(recommendationDto.getSkillOffers());
 
@@ -94,71 +89,46 @@ public class RecommendationService {
     }
 
     @Transactional
-    public RecommendationDto update(long recommendationID,RecommendationDto recommendationDto) {
-        recommendationValidator.recommendationExist(recommendationID);
+    public RecommendationDto updateRecommendation(long recommendationId, RecommendationDto recommendationDto) {
+        recommendationValidator.recommendationExist(recommendationId);
         recommendationValidator.validateLastUpdate(recommendationDto);
         recommendationValidator.validateOfferSkillsIsExisting(recommendationDto.getSkillOffers());
 
-        skillOfferRepository.deleteAllByRecommendationId(recommendationID);
-
+        skillOfferRepository.deleteAllByRecommendationId(recommendationId);
+        saveSkillOffers(recommendationDto);
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+
         recommendationRepository.update(recommendation.getAuthor().getId(),
                 recommendation.getReceiver().getId(),
                 recommendationDto.getContent());
 
-        //updateSkillOfferRepositoryAndGuaranteeRepository(recommendation);
         return recommendationMapper.toDto(recommendation);
     }
 
     @Transactional
     public void delete(long id) {
-        recommendationValidator.validateById(id);
+        recommendationValidator.recommendationExist(id);
         recommendationRepository.deleteById(id);
     }
 
     @Transactional
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
-        Pageable pageable = PageRequest.of(PAGEABLE_PAGE_PARAMETER, PAGEABLE_SIZE_PARAMETER);
-        Page<Recommendation> pageRecommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
+        User user = userRepository.findById(receiverId).orElseThrow(()->
+                new EntityNotFoundException("Couldn't Find user with ID = " + receiverId + " in the systmem"));
+        List<Recommendation> userRecommendations = user.getRecommendationsReceived();
 
-        List<Recommendation> recommendations = pageRecommendations.getContent();
-
-        return recommendations.stream().map(recommendationMapper::toDto).toList();
+        return userRecommendations.stream().map(recommendationMapper::toDto).toList();
     }
 
     @Transactional
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
-        Pageable pageable = PageRequest.of(PAGEABLE_PAGE_PARAMETER, PAGEABLE_PAGE_PARAMETER);
-        Page<Recommendation> pageRecommendations = recommendationRepository.findAllByAuthorId(authorId, pageable);
+        User user = userRepository.findById(authorId).orElseThrow(()->
+                new EntityNotFoundException("Couldn't Find user with ID = " + authorId + " in the systmem"));
+        List<Recommendation> recommendationsGiven = user.getRecommendationsGiven();
 
-        List<Recommendation> recommendations = pageRecommendations.getContent();
-
-        return recommendations.stream().map(recommendationMapper::toDto).toList();
+        return recommendationsGiven.stream().map(recommendationMapper::toDto).toList();
     }
 
-   /* private void updateSkillOfferRepositoryAndGuaranteeRepository(Recommendation recommendation) {
-        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-        for (var skillOffer : recommendation.getSkillOffers()) {
-            skillOfferRepository.create(skillOffer.getSkill().getId(), recommendation.getId());
-        }
-
-        long authorId = recommendation.getAuthor().getId();
-        long receiverId = recommendation.getReceiver().getId();
-
-        List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-        List<Skill> receiverSkills = getReceiverSkills(receiverId);
-
-        for (var skillOffer : skillOffers) {
-            long skillId = skillOffer.getSkill().getId();
-            skillOfferRepository.create(skillId, recommendation.getId());
-
-            if (receiverSkills.contains(skillOffer.getSkill()) && !guaranteeExist(receiverId, skillId, authorId)) {
-
-                updateSkillGuaranteeRepository(receiverId, skillId, authorId);
-            }
-        }
-    }
-*/
     private UserSkillGuarantee getSkillGuaranteeEntity(long receiverId, long skillId, long authorId) {
         User user = userRepository.findById(receiverId)
                 .orElseThrow(() -> new DataValidationException("Couldn't find the user in the system"));

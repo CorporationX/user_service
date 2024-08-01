@@ -8,6 +8,5 @@ public final class ApiPath {
   public static final String USER_PREMIUM = "/users/premium";
   public static final String USERS = "/users";
 
-  private ApiPath() {
-  }
+    private ApiPath() {}
 }

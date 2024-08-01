@@ -20,8 +20,6 @@ public interface SkillOfferMapper {
     @Mapping(source = "skillId", target = "skill.id")
     SkillOffer toEntity(SkillOfferDto skillOfferDto);
 
-    //@Named("toSkillOfferDtoList")
     List<SkillOfferDto> toSkillOfferDtoList(List<SkillOffer> skillOffers);
-    //@Named("toSkillOfferEntityList")
     List<SkillOffer> toSkillOfferEntityList(List<SkillOfferDto> skillOffersDto);
 }

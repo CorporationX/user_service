@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Component;
@@ -84,7 +85,7 @@ public class MentorshipRequestService {
     }
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        if (rejection == null || rejection.getRejectionReason().isBlank()) {
+        if (rejection == null) {
             throw new IllegalArgumentException("Пустая причина отказа");
         }
         MentorshipRequest request = mentorshipRequestRepository.findById(id).orElse(null);
@@ -97,13 +98,15 @@ public class MentorshipRequestService {
     }
 
     private void validateMentorshipRequest(MentorshipRequestDto mentorshipRequestDto) {
+        /*
         if (mentorshipRequestDto == null) {
             throw new IllegalArgumentException("Дто не может быть пустым");
         }
+        */
 
         Long requesterId = mentorshipRequestDto.getRequesterId();
         Long receiverId = mentorshipRequestDto.getReceiverId();
-
+        /*
         if (requesterId == null) {
             throw new IllegalArgumentException("Пользователь, который отправляет запрос на менторство не может быть" +
                                                " быть пустым");
@@ -113,6 +116,7 @@ public class MentorshipRequestService {
             throw new IllegalArgumentException("Пользователь, которому направляется запрос на менторство не может" +
                                                "быть пустым");
         }
+         */
 
         if (Objects.equals(requesterId, mentorshipRequestDto.getReceiverId())) {
             throw new IllegalArgumentException("Вы сделали запрос на менторство самому себе");

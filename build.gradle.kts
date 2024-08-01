@@ -58,7 +58,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
-    implementation ("org.jsonschema2pojo:jsonschema2pojo-core:1.1.1")
+    implementation("com.sun.codemodel:codemodel:2.6")
+    implementation("org.jsonschema2pojo:jsonschema2pojo-core:1.2.1")
+    implementation("org.apache.commons:commons-lang3:3.0")
 
     /**
      * Test containers

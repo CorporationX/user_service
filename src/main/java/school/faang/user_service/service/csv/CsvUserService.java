@@ -7,6 +7,7 @@ import com.json.student.Address;
 import com.json.student.ContactInfo;
 import com.json.student.Person;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.person.PersonMapper;
 import school.faang.user_service.repository.CountryRepository;
 import org.springframework.transaction.PlatformTransactionManager;
+import school.faang.user_service.repository.UserRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +36,7 @@ public class CsvUserService {
     private final CountryRepository countryRepository;
     private final PlatformTransactionManager transactionManager;
     private final EntityManager entityManager;
+    private final UserRepository userRepository;
 
 
     public ResponseEntity<String> getStudentsParsing(MultipartFile multipartFile) {
@@ -61,11 +64,13 @@ public class CsvUserService {
 
             for (User user : users) {
                 String countryTitle = user.getCountry().getTitle();
-                user.setUsername(user.getEmail());
+//                user.setUsername(user.get);
                 user.setPassword("111");
                 Country country = findCountryByTitle(countryTitle);
                 user.setCountry(country);
             }
+
+//            Iterable<User> userAll = userRepository.saveAll(users);
 
             batchInsertUsers(users);
 
@@ -89,6 +94,14 @@ public class CsvUserService {
         try {
             for (int i = 0; i < users.size(); i++) {
                 User user = users.get(i);
+
+//                String sql = "INSERT INTO users (username, password, email) VALUES (:username, :password, :email) ON CONFLICT (id) DO NOTHING";
+//                Query query = entityManager.createNativeQuery(sql);
+//                query.setParameter("username", user.getUsername());
+//                query.setParameter("password", user.getPassword());
+//                query.setParameter("email", user.getEmail());
+//                query.executeUpdate();
+
                 entityManager.persist(user);
                 entityManager.flush();
                 entityManager.clear();

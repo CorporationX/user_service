@@ -3,6 +3,12 @@ package school.faang.user_service.controller;
 public final class ApiPath {
 
     public static final String REQUEST_MENTORSHIP = "/mentorship/requests";
-
+    public static final String SUBSCRIPTION = "/subscriptions";
+    public static final String FOLLOW = "/subscription";
+    public static final String UNFOLLOW = "/unsubscription";
+    public static final String FOLLOWERS = SUBSCRIPTION + "/followers";
+    public static final String FOLLOWERS_COUNT = FOLLOWERS + "/count";
+    public static final String FOLLOWING = SUBSCRIPTION + "/following";
+    public static final String FOLLOWING_COUNT = FOLLOWING + "/count";
     private ApiPath() {}
 }

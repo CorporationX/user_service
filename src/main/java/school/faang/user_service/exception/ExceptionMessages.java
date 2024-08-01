@@ -14,4 +14,9 @@ public final class ExceptionMessages {
     public static final String MENTORSHIP_FREQUENCY = "You are eligible for only one mentorship within 3 months.";
     public static final String MENTORSHIP_REQUEST_NOT_FOUND = "Mentorship request cannot be found.";
     public static final String MENTORSHIP_ALREADY_ONGOING = "You already mentor this user.";
+
+    // subscription
+    public static final String SELF_SUBSCRIPTION = "You cannot follow yourself!";
+    public static final String SELF_UNSUBSCRIPTION = "You cannot unfollow yourself!";
+    public static final String EXISTING_SUBSCRIPTION = "You are already following this account";
 }

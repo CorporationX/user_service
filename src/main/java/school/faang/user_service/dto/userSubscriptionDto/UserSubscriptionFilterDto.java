@@ -1,11 +1,11 @@
-package school.faang.user_service.dto.user;
+package school.faang.user_service.dto.userSubscriptionDto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserFilterDto {
+public class UserSubscriptionFilterDto {
     private String namePattern;
     private String aboutPattern;
     private String emailPattern;

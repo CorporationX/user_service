@@ -7,10 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.SubscriptionController;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.userSubscriptionDto.UserSubscriptionDto;
+import school.faang.user_service.dto.userSubscriptionDto.UserSubscriptionFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
 
@@ -68,12 +68,12 @@ public class SubscriptionControllerTest {
     @Test
     public void testGetFollowers() {
         long followeeId = 1L;
-        UserFilterDto filter = new UserFilterDto();
-        List<UserDto> expected = List.of(new UserDto());
+        UserSubscriptionFilterDto filter = new UserSubscriptionFilterDto();
+        List<UserSubscriptionDto> expected = List.of(new UserSubscriptionDto());
 
         when(subscriptionService.getFollowers(followeeId, filter)).thenReturn(expected);
 
-        ResponseEntity<List<UserDto>> response = subscriptionController.getFollowers(followeeId, filter);
+        ResponseEntity<List<UserSubscriptionDto>> response = subscriptionController.getFollowers(followeeId, filter);
 
         assertEquals(expected, response.getBody());
         verify(subscriptionService).getFollowers(followeeId, filter);
@@ -95,12 +95,12 @@ public class SubscriptionControllerTest {
     @Test
     public void testGetFollowing() {
         long followeeId = 1L;
-        UserFilterDto filter = new UserFilterDto();
-        List<UserDto> expected = List.of(new UserDto());
+        UserSubscriptionFilterDto filter = new UserSubscriptionFilterDto();
+        List<UserSubscriptionDto> expected = List.of(new UserSubscriptionDto());
 
         when(subscriptionService.getFollowing(followeeId, filter)).thenReturn(expected);
 
-        ResponseEntity<List<UserDto>> response = subscriptionController.getFollowing(followeeId, filter);
+        ResponseEntity<List<UserSubscriptionDto>> response = subscriptionController.getFollowing(followeeId, filter);
 
         assertEquals(expected, response.getBody());
         verify(subscriptionService).getFollowing(followeeId, filter);

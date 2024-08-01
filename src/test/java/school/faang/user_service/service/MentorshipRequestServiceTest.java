@@ -31,8 +31,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
@@ -49,7 +48,7 @@ public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
-    @Spy
+    @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
 
     private AcceptMentorshipRequestDto acceptMentorshipRequestDto;
@@ -81,10 +80,8 @@ public class MentorshipRequestServiceTest {
         resultQuery = List.of(firstRequest, secondRequest);
         resultList = resultQuery.stream().map(mentorshipRequestMapper::toDto).toList();
 
-        mentorship = new Mentorship();
-        mentorship.setId(1L);
-        mentorship.setMentee(new User());
-        mentorship.setMentor(new User());
+        mentorship =  Mentorship.builder().id(1L).mentee(new User()).mentor(new User()).build();
+
 
         mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setDescription("Description");
@@ -102,25 +99,35 @@ public class MentorshipRequestServiceTest {
         rejectRequestDto.setId(1L);
         rejectRequestDto.setRejectReason("No reason just wish!!!");
 
-        mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setDescription("Request");
-        mentorshipRequestDto.setRequesterId(1L);
-        mentorshipRequestDto.setReceiverId(2L);
-        mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
-        mentorshipRequestDto.setUpdatedAt(LocalDateTime.now());
+        mentorshipRequestDto = MentorshipRequestDto.builder()
+                .description("Request")
+                .requesterId(1L)
+                .receiverId(2L)
+                .status(RequestStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
     }
 
     @Test
     public void testAcceptRequest() {
+
         when(mentorshipRequestRepository.findById(acceptMentorshipRequestDto.getId()))
                 .thenReturn(Optional.of(mentorshipRequest));
+
         when(mentorshipRepository.getLastMentorship(acceptMentorshipRequestDto.getReceiverId(),
                 acceptMentorshipRequestDto.getRequesterId()))
                 .thenReturn(Optional.empty());
-        when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(mentorshipRequest);
 
-        mentorshipRequestService.acceptRequest(acceptMentorshipRequestDto);
-        assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
+        when(mentorshipRepository
+                .create(acceptMentorshipRequestDto.getReceiverId(),
+                        acceptMentorshipRequestDto.getRequesterId())).thenReturn(mentorship);
+
+        when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(mentorshipRequest);
+        when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(mentorshipRequestDto);
+        MentorshipRequestDto result =  mentorshipRequestService.acceptRequest(acceptMentorshipRequestDto);
+
+        assertEquals(RequestStatus.ACCEPTED,result.getStatus());
     }
 
     @Test
@@ -184,10 +191,7 @@ public class MentorshipRequestServiceTest {
 
 
         MentorshipRequestDto result = mentorshipRequestService.requestMentorship(mentorshipRequestDto);
-        verify(mentorshipRequestRepository).create(
-                mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId(),
-                mentorshipRequestDto.getDescription());
+        
         assertEquals(mentorshipRequestDto,result);
 
     }
@@ -195,14 +199,14 @@ public class MentorshipRequestServiceTest {
         return list.stream().filter(el->el.getDescription().contains("Java")).toList();
     }
     private List<MentorshipRequestDto> getResultList(){
-        MentorshipRequestDto first = new MentorshipRequestDto();
-        first.setId(1L);
-        first.setRequesterId(1L);
-        first.setReceiverId(2L);
-        first.setDescription("Java");
-        first.setCreatedAt(LocalDateTime.now());
-        first.setUpdatedAt(LocalDateTime.now());
-
+        MentorshipRequestDto first = MentorshipRequestDto.builder()
+                .id(1L)
+                .requesterId(1L)
+                .receiverId(2L)
+                .description("Java")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         return List.of(first);
     }
 }

@@ -10,10 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentorship.AcceptMentorshipRequestDto;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
-import school.faang.user_service.dto.mentorship.RejectRequestDto;
+import school.faang.user_service.dto.mentorship.*;
 import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 
@@ -21,6 +18,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.DataValidationException;
 
+import school.faang.user_service.mapper.MentorshipMapperImpl;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -38,17 +36,18 @@ public class MentorshipRequestService {
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
+    private final MentorshipMapperImpl mentorshipMapperImpl;
 
     @Getter
     @Value("${variables.interval}")
     private long interval;
 
-    public void acceptRequest(AcceptMentorshipRequestDto acceptMentorshipRequestDto) {
+    public MentorshipRequestDto acceptRequest(AcceptMentorshipRequestDto acceptMentorshipRequestDto) {
         MentorshipRequest editingRequest = getMentorshipRequest(acceptMentorshipRequestDto.getId());
         getLastMentorship(acceptMentorshipRequestDto);
         mentorshipRepository.create(acceptMentorshipRequestDto.getReceiverId(), acceptMentorshipRequestDto.getRequesterId());
         editingRequest.setStatus(RequestStatus.ACCEPTED);
-        mentorshipRequestRepository.save(editingRequest);
+        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(editingRequest));
     }
 
 

@@ -11,7 +11,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -46,7 +46,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public RecommendationDto update(RecommendationDto recommendationDto){
+    public RecommendationDto update(RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
         checkNotRecommendBeforeSixMonths(recommendationDto);
@@ -59,11 +59,11 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public void delete(long recommendationId){
+    public void delete(long recommendationId) {
         recommendationRepository.deleteById(recommendationId);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long recieverId, Pageable pageable){
+    public List<RecommendationDto> getAllUserRecommendations(long recieverId, Pageable pageable) {
         List<Recommendation> recommendations = recommendationRepository
                 .findAllByReceiverId(recieverId, pageable)
                 .getContent();
@@ -73,7 +73,7 @@ public class RecommendationService {
                 .toList();
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable){
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
         List<Recommendation> recommendations = recommendationRepository
                 .findAllByAuthorId(authorId, pageable)
                 .getContent();
@@ -89,20 +89,20 @@ public class RecommendationService {
                         recommendationDto.getAuthorId(),
                         recommendationDto.getReceiverId())
                 .orElseThrow(() -> {
-                    log.error("");
-                    return new NoSuchElementException("аргумент не найден");
+                    log.error(ExceptionMessages.ARGUMENT_NOT_FOUND);
+                    return new NoSuchElementException(ExceptionMessages.ARGUMENT_NOT_FOUND);
                 });
         LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
         if (recommendation.getUpdatedAt().isAfter(localDateTime)) {
-            log.error(" рекомендация может быть один раз в 6 месяцев");
-            throw new IllegalStateException("рекомендация может быть один раз в 6 месяцев");
+            log.error(ExceptionMessages.RECOMMENDATION_FREQUENCY);
+            throw new IllegalStateException(ExceptionMessages.RECOMMENDATION_FREQUENCY);
         }
     }
 
     private void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
         for (SkillOfferDto skillOfferDto : skillOfferDtos) {
             if (!skillOfferRepository.existsById(skillOfferDto.getSkillId())) {
-                throw new NullPointerException("Навыка нет в системе");
+                throw new NullPointerException(ExceptionMessages.SKILL_NOT_FOUND);
             }
         }
     }

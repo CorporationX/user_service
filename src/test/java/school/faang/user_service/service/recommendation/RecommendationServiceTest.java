@@ -8,6 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -29,6 +33,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -93,8 +99,8 @@ class RecommendationServiceTest {
     @Test
     @DisplayName("findFirstOrderException")
     void testCheckNotRecommendBeforeSixMonthsOrderException() {
-        Mockito.when(recommendationRepository
-                        .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong()))
+        when(recommendationRepository
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong()))
                 .thenThrow(new RuntimeException("exception"));
 
         Exception exception = assertThrows(RuntimeException.class, () ->
@@ -122,7 +128,7 @@ class RecommendationServiceTest {
         findFirstOrderValid();
         recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
 
-        Mockito.when(skillOfferRepository.existsById(Mockito.anyLong()))
+        when(skillOfferRepository.existsById(Mockito.anyLong()))
                 .thenThrow(new NullPointerException("exception"));
         Exception exception = assertThrows(NullPointerException.class, () ->
                 recommendationService.create(recommendationDto));
@@ -133,92 +139,269 @@ class RecommendationServiceTest {
     @Test
     @DisplayName("saveSkillOffersAddAndSaveGuarantee")
     void testAddAndSaveGuarantee() {
-        Mockito.when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
                 .thenReturn(recommendation);
         findFirstOrderValid();
         recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
 
-        Mockito.when(skillOfferRepository.existsById(Mockito.anyLong())).thenReturn(true);
-        Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong()))
+        when(skillOfferRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        when(skillRepository.findAllByUserId(Mockito.anyLong()))
                 .thenReturn(List.of(skill));
-        Mockito.when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
+        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
                 .thenReturn(false);
-        Mockito.when(userSkillGuaranteeRepository.save(any(UserSkillGuarantee.class)))
+        when(userSkillGuaranteeRepository.save(any(UserSkillGuarantee.class)))
                 .thenReturn(new UserSkillGuarantee());
 
         recommendationService.create(recommendationDto);
 
-        Mockito.verify(skillRepository, Mockito.times(1))
+        verify(skillRepository, times(1))
                 .findAllByUserId(Mockito.anyLong());
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(1))
+        verify(userSkillGuaranteeRepository, times(1))
                 .existsById(Mockito.anyLong());
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(1))
+        verify(userSkillGuaranteeRepository, times(1))
                 .save(any(UserSkillGuarantee.class));
     }
 
     @Test
     @DisplayName("saveSkillOffers")
-    void testSaveSkillOffers(){
-        Mockito.when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+    void testSaveSkillOffers() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
                 .thenReturn(recommendation);
         findFirstOrderValid();
         recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
 
-        Mockito.when(skillOfferRepository.existsById(Mockito.anyLong())).thenReturn(true);
-        Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong()))
+        when(skillOfferRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        when(skillRepository.findAllByUserId(Mockito.anyLong()))
                 .thenReturn(List.of(skill));
-        Mockito.when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
+        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
                 .thenReturn(true);
-        Mockito.when(skillOfferRepository.save(Mockito.any(SkillOffer.class))).thenReturn(new SkillOffer());
+        when(skillOfferRepository.save(Mockito.any(SkillOffer.class))).thenReturn(new SkillOffer());
 
         recommendationService.create(recommendationDto);
 
-        Mockito.verify(skillRepository, Mockito.times(1))
+        verify(skillRepository, times(1))
                 .findAllByUserId(Mockito.anyLong());
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(1))
+        verify(userSkillGuaranteeRepository, times(1))
                 .existsById(Mockito.anyLong());
-        Mockito.verify(skillOfferRepository, Mockito.times(1))
+        verify(skillOfferRepository, times(1))
                 .save(Mockito.any(SkillOffer.class));
     }
 
     @Test
     @DisplayName("fullMethodCreate")
-    void testCreate(){
-        Mockito.when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+    void testCreate() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
                 .thenReturn(recommendation);
         findFirstOrderValid();
         recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
 
-        Mockito.when(skillOfferRepository.existsById(Mockito.anyLong()))
+        when(skillOfferRepository.existsById(Mockito.anyLong()))
                 .thenReturn(true);
-        Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong()))
+        when(skillRepository.findAllByUserId(Mockito.anyLong()))
                 .thenReturn(List.of(skill));
-        Mockito.when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
+        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
                 .thenReturn(true);
-        Mockito.when(skillOfferRepository.save(Mockito.any(SkillOffer.class)))
+        when(skillOfferRepository.save(Mockito.any(SkillOffer.class)))
                 .thenReturn(new SkillOffer());
-        Mockito.when(recommendationRepository.save(any(Recommendation.class)))
+        when(recommendationRepository.save(any(Recommendation.class)))
                 .thenReturn(new Recommendation());
-        Mockito.when(recommendationMapper.toDto(any(Recommendation.class)))
+        when(recommendationMapper.toDto(any(Recommendation.class)))
                 .thenReturn(recommendationDto);
 
         recommendationService.create(recommendationDto);
 
-        Mockito.verify(skillRepository, Mockito.times(1))
+        verify(skillRepository, times(1))
                 .findAllByUserId(Mockito.anyLong());
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(1))
+        verify(userSkillGuaranteeRepository, times(1))
                 .existsById(Mockito.anyLong());
-        Mockito.verify(skillOfferRepository, Mockito.times(1))
+        verify(skillOfferRepository, times(1))
                 .save(Mockito.any(SkillOffer.class));
-        Mockito.verify(recommendationRepository, Mockito.times(1))
+        verify(recommendationRepository, times(1))
                 .save(any(Recommendation.class));
-        Mockito.verify(recommendationMapper, Mockito.times(1))
+        verify(recommendationMapper, times(1))
                 .toDto(any(Recommendation.class));
     }
 
+    @Test
+    @DisplayName("updateFindFirstOrderException")
+    void testUpdateCheckNotRecommendBeforeSixMonthsOrderException() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
+                .thenThrow(new RuntimeException("exception"));
+        Exception exception = assertThrows(RuntimeException.class, () -> recommendationService.update(recommendationDto));
+
+        assertEquals("exception", exception.getMessage());
+
+    }
+
+    @Test
+    @DisplayName("updateRecommendationMoreThanOneTimeException")
+    void testUpdateRecommendationMoreThanOneTimeException() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        findFirstOrderValid();
+        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(5, ChronoUnit.MONTHS));
+        assertThrows(IllegalStateException.class, () -> recommendationService.update(recommendationDto));
+    }
+
+    @Test
+    @DisplayName("updateCheckForSkillsException")
+    void testUpdateCheckForSkillsException() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        findFirstOrderValid();
+        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
+        when(skillOfferRepository.existsById(anyLong())).thenThrow(new RuntimeException("Навыка нет в системе"));
+        Exception exception = assertThrows(RuntimeException.class, () -> recommendationService.update(recommendationDto));
+        assertEquals("Навыка нет в системе", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("updateAddAndSaveGuarantee")
+    void testUpdateSaveException() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        findFirstOrderValid();
+        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
+        when(skillOfferRepository.existsById(anyLong()))
+                .thenReturn(true);
+        Mockito.doNothing().when(skillOfferRepository)
+                .deleteAllByRecommendationId(anyLong());
+        when(skillRepository.findAllByUserId(anyLong()))
+                .thenReturn(List.of(skill));
+        when(userSkillGuaranteeRepository.existsById(anyLong()))
+                .thenReturn(false);
+        when(userSkillGuaranteeRepository.save(any(UserSkillGuarantee.class)))
+                .thenReturn(new UserSkillGuarantee());
+
+        recommendationService.update(recommendationDto);
+
+        verify(recommendationMapper, times(1))
+                .toEntity(any(RecommendationDto.class));
+        verify(recommendationRepository, times(1))
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong());
+        verify(skillOfferRepository, times(1))
+                .existsById(anyLong());
+        verify(skillOfferRepository, times(1))
+                .deleteAllByRecommendationId(anyLong());
+        verify(userSkillGuaranteeRepository, times(1))
+                .existsById(anyLong());
+        verify(userSkillGuaranteeRepository, times(1))
+                .save(any(UserSkillGuarantee.class));
+    }
+
+    @Test
+    @DisplayName("updateSkillOfferSave")
+    void testUpdateSkillOfferSave() {
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        findFirstOrderValid();
+        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
+        when(skillOfferRepository.existsById(anyLong()))
+                .thenReturn(true);
+        Mockito.doNothing().when(skillOfferRepository)
+                .deleteAllByRecommendationId(anyLong());
+        when(skillRepository.findAllByUserId(anyLong()))
+                .thenReturn(List.of(skill));
+        when(userSkillGuaranteeRepository.existsById(anyLong()))
+                .thenReturn(true);
+        when(skillOfferRepository.save(any(SkillOffer.class))).thenReturn(new SkillOffer());
+
+        recommendationService.update(recommendationDto);
+
+        verify(recommendationMapper, times(1))
+                .toEntity(any(RecommendationDto.class));
+        verify(recommendationRepository, times(1))
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong());
+        verify(skillOfferRepository, times(1))
+                .existsById(anyLong());
+        verify(skillOfferRepository, times(1))
+                .deleteAllByRecommendationId(anyLong());
+        verify(userSkillGuaranteeRepository, times(1))
+                .existsById(anyLong());
+        verify(skillOfferRepository, times(1)).save(any(SkillOffer.class));
+    }
+
+    @Test
+    @DisplayName("delete")
+    void testDelete() {
+        long recommendationId = 1L;
+        Mockito.doNothing().when(recommendationRepository).deleteById(anyLong());
+        recommendationService.delete(recommendationId);
+    }
+
+    @Test
+    @DisplayName("getAllUserRecommendationsException")
+    void testGetAllUserRecommendationsException() {
+        Pageable pageable = PageRequest.of(0, 10);
+        long recieverId = 1L;
+        when(recommendationRepository.findAllByReceiverId(anyLong(), any(Pageable.class)))
+                .thenThrow(new RuntimeException("exception"));
+
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.getAllUserRecommendations(recieverId, pageable));
+
+        assertEquals("exception", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("getAllUserRecommendationsValid")
+    void testGetAllUserRecommendationsValid() {
+        long receiverId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<Recommendation> recommendations = List.of(recommendation);
+        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
+        List<RecommendationDto> expectedDtos = List.of(recommendationDto);
+
+        when(recommendationRepository.findAllByReceiverId(receiverId, pageable)).thenReturn(recommendationPage);
+        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+
+        List<RecommendationDto> actualDtos = recommendationService.getAllUserRecommendations(receiverId, pageable);
+
+        assertEquals(expectedDtos, actualDtos);
+        verify(recommendationRepository, times(1)).findAllByReceiverId(receiverId, pageable);
+        verify(recommendationMapper, times(1)).toDto(recommendation);
+    }
+
+    @Test
+    @DisplayName("getAllGivenRecommendationsException")
+    void testGetAllGivenRecommendationsException() {
+        Pageable pageable = PageRequest.of(0, 10);
+        long authorId = 1L;
+        when(recommendationRepository.findAllByAuthorId(anyLong(), any(Pageable.class)))
+                .thenThrow(new RuntimeException("exception"));
+
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.getAllGivenRecommendations(authorId, pageable));
+
+        assertEquals("exception", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("getAllGivenRecommendationsValid")
+    void testGetAllGivenRecommendationsValid() {
+        long authorId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<Recommendation> recommendations = List.of(recommendation);
+        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
+        List<RecommendationDto> expectedDtos = List.of(recommendationDto);
+
+        when(recommendationRepository.findAllByAuthorId(authorId, pageable)).thenReturn(recommendationPage);
+        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+
+        List<RecommendationDto> actualDtos = recommendationService.getAllGivenRecommendations(authorId, pageable);
+
+        assertEquals(expectedDtos, actualDtos);
+        verify(recommendationRepository, times(1)).findAllByAuthorId(authorId, pageable);
+        verify(recommendationMapper, times(1)).toDto(recommendation);
+    }
+
     private void findFirstOrderValid() {
-        Mockito.when(recommendationRepository
-                        .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong()))
+        when(recommendationRepository
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(recommendationFindFirst));
     }
 }

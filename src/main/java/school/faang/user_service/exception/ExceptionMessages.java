@@ -14,4 +14,9 @@ public final class ExceptionMessages {
     public static final String MENTORSHIP_FREQUENCY = "You are eligible for only one mentorship within 3 months.";
     public static final String MENTORSHIP_REQUEST_NOT_FOUND = "Mentorship request cannot be found.";
     public static final String MENTORSHIP_ALREADY_ONGOING = "You already mentor this user.";
+
+    //recommendation
+    public static final String ARGUMENT_NOT_FOUND = "Argument not in database.";
+    public static final String RECOMMENDATION_FREQUENCY = "Recommendation can be updated only once every 6 months.";
+    public static final String SKILL_NOT_FOUND = "Skill not in database.";
 }

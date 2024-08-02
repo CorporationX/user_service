@@ -21,7 +21,6 @@ public class GoalValidator {
     @Value("${goal.max_active_goals:2}")
     private int maxActiveGoals;
 
-
     public void validateCreation(long userId, GoalDto goalDto) {
         validateUserExistence(userId);
         validateActiveGoalsCount(userId);
@@ -45,6 +44,13 @@ public class GoalValidator {
         }
     }
 
+    public void validateGoalExistence(long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            log.info("Goal {} does not exist", goalId);
+            throw new DataValidationException("Goal not found");
+        }
+    }
+
     private void validateActiveGoalsCount(long userId) {
         if (goalRepository.countActiveGoalsPerUser(userId) > maxActiveGoals) {
             log.info("Active goals count exceeded for user {}", userId);
@@ -64,13 +70,6 @@ public class GoalValidator {
         if (goalRepository.findById(goalId).isPresent() && goalRepository.findById(goalId).get().getStatus() == GoalStatus.COMPLETED) {
             log.info("Goal {} already completed", goalId);
             throw new DataValidationException("Goal already completed");
-        }
-    }
-
-    public void validateGoalExistence(long goalId) {
-        if (!goalRepository.existsById(goalId)) {
-            log.info("Goal {} does not exist", goalId);
-            throw new DataValidationException("Goal not found");
         }
     }
 }

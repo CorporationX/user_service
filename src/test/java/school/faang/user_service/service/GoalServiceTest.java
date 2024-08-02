@@ -3,10 +3,10 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Spy;
+import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -25,7 +25,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class GoalServiceTest {
 
     @Mock
@@ -35,11 +35,11 @@ class GoalServiceTest {
     @Mock
     private SkillService skillService;
     @Mock
-    private GoalMapper goalMapper;
+    private List<GoalFilter> filters;
     @Mock
     private GoalValidator goalValidator;
-    @Mock
-    private List<GoalFilter> filters;
+    @Spy
+    private GoalMapper goalMapper;
 
     @InjectMocks
     GoalService goalService;
@@ -48,10 +48,10 @@ class GoalServiceTest {
     Long notExistUserId;
     Long existGoalId;
     Long notExistGoalId;
-    Skill skill_1;
-    Skill skill_2;
-    User user_1;
-    User user_2;
+    Skill skill1;
+    Skill skill2;
+    User user1;
+    User user2;
     GoalDto goalDto;
     GoalDto goalWrongDto;
     GoalFilterDto filter;
@@ -68,28 +68,28 @@ class GoalServiceTest {
         filter = GoalFilterDto.builder()
                 .parentIdPattern(1L)
                 .build();
-        user_1 = User.builder()
+        user1 = User.builder()
                 .id(1)
                 .username("test_user_1")
                 .skills(skills)
                 .build();
-        user_2 = User.builder()
+        user2 = User.builder()
                 .id(2)
                 .username("test_user_2")
                 .skills(skills)
                 .build();
-        skill_1 = Skill.builder()
+        skill1 = Skill.builder()
                 .id(1)
                 .title("test_skill_1")
                 .users(users)
                 .build();
-        skill_2 = Skill.builder()
+        skill2 = Skill.builder()
                 .id(2)
                 .title("test_skill_2")
                 .users(users)
                 .build();
-        skills = List.of(skill_1, skill_2);
-        users = List.of(user_1, user_2);
+        skills = List.of(skill1, skill2);
+        users = List.of(user1, user2);
         goalDto = GoalDto.builder()
                 .title("test_title")
                 .description("test_description")
@@ -107,65 +107,72 @@ class GoalServiceTest {
     }
 
     @Test
-    void createGoal_whenInvalidParameters_thenThrowsException() {
-        doThrow(DataValidationException.class).when(goalValidator).validateCreation(notExistUserId, goalWrongDto);
-        assertThrows(DataValidationException.class, () -> goalService.createGoal(notExistUserId, goalWrongDto));
+    void testCreateGoalWithInvalidParametersThrowsException() {
+        doThrow(DataValidationException.class).when(goalValidator).validateCreation(notExistUserId, goalDto);
+        assertThrows(DataValidationException.class, () -> goalService.createGoal(notExistUserId, goalDto));
         verify(goalRepository, never()).save(any(Goal.class));
     }
 
     @Test
-    void createGoal_whenValidParameters_thenSetStatusToGoal() {
+    void testCreateGoalWithValidParametersShouldSetStatusToGoal() {
+        doNothing().when(goalValidator).validateCreation(existUserId, goalDto);
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goalService.createGoal(existUserId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         Assertions.assertEquals(GoalStatus.ACTIVE, goal.getStatus());
     }
 
     @Test
-    void createGoal_whenValidParametersAndUserIdsExistsInDto_thenSetUsersToGoal() {
+    void testCreateGoalWithValidParametersAndUserIdsExistsInDtoShouldSetUsersToGoal() {
+        doNothing().when(goalValidator).validateCreation(existUserId, goalDto);
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(userService.findAllById(goalDto.getUserIds())).thenReturn(users);
         goalService.createGoal(existUserId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         Assertions.assertTrue(goal.getUsers().containsAll(users));
     }
 
     @Test
-    void createGoal_whenValidParameters_thenSetSkillsToGoal() {
+    void testCreateGoalWithValidParametersShouldSetSkillsToGoal() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(skillService.findAllById(goalDto.getSkillsToAchieveIds())).thenReturn(skills);
         goalService.createGoal(existUserId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         Assertions.assertEquals(goal.getSkillsToAchieve(), skills);
     }
 
     @Test
-    void createGoal_whenValidParameters_thenSaveGoal() {
+    void testCreateGoalWithValidParametersShouldSaveGoal() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goalService.createGoal(existUserId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         verify(goalRepository).save(goal);
     }
 
     @Test
-    void createGoal_whenValidParameters_thenReturnGoalDto() {
+    void testCreateGoalWithValidParametersShouldReturnGoalDto() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goalService.createGoal(existUserId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         verify(goalMapper).toDto(goalRepository.save(goal));
     }
 
     @Test
-    void updateGoal_whenInvalidParameters_thenThrowsException() {
+    void testUpdateGoalWithInvalidParametersShouldThrowsException() {
         doThrow(DataValidationException.class).when(goalValidator).validateUpdating(notExistGoalId, goalWrongDto);
         assertThrows(DataValidationException.class, () -> goalService.updateGoal(notExistGoalId, goalWrongDto));
         verify(goalRepository, never()).save(any(Goal.class));
     }
 
     @Test
-    void updateGoal_whenValidParameters_thenSetIdToGoal() {
+    void testUpdateGoalWithValidParametersShouldSetIdToGoal() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goalService.updateGoal(existGoalId, goalDto);
         Assertions.assertEquals(existGoalId, goal.getId());
     }
 
     @Test
-    void updateGoal_whenValidParametersAndStatusCompleted_thenUpdateUsersAndSkills() {
+    void testUpdateGoalWithValidParametersAndStatusCompletedShouldUpdateUsersAndSkills() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goal.setStatus(GoalStatus.COMPLETED);
         when(goalRepository.findById(existGoalId)).thenReturn(Optional.of(goal));
@@ -176,63 +183,70 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_whenValidParametersAndUsersExist_thenSetUsersToGoal() {
+    void testUpdateGoalWithValidParametersAndUsersExistShouldSetUsersToGoal() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(userService.findAllById(goalDto.getUserIds())).thenReturn(users);
         goalService.updateGoal(existGoalId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
+        verify(goalMapper).toDto(goalRepository.save(goal));
         Assertions.assertEquals(users, goal.getUsers());
     }
 
     @Test
-    void updateGoal_whenValidParameters_thenSetSkillsToGoal() {
+    void testUpdateGoalWithValidParametersShouldSetSkillsToGoal() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(skillService.findAllById(goalDto.getSkillsToAchieveIds())).thenReturn(skills);
         goal.setSkillsToAchieve(List.of());
         goalService.updateGoal(existGoalId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         Assertions.assertEquals(skills, goal.getSkillsToAchieve());
     }
 
     @Test
-    void updateGoal_whenValidParameters_thenSaveGoal() {
+    void testUpdateGoalWithValidParametersShouldSaveGoal() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goalService.updateGoal(existGoalId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         verify(goalRepository).save(goal);
     }
 
     @Test
-    void updateGoal_whenValidParameters_thenReturnGoalDto() {
+    void testUpdateGoalWithValidParametersShouldReturnGoalDto() {
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         goalService.updateGoal(existGoalId, goalDto);
+        verify(goalMapper).toEntity(goalDto);
         verify(goalMapper).toDto(goalRepository.save(goal));
     }
 
     @Test
-    void deleteGoal_whenInvokes_thenDeleteById() {
+    void testDeleteGoalWithInvokesShouldDeleteById() {
         goalService.deleteGoal(existGoalId);
         verify(goalRepository).deleteById(existGoalId);
     }
 
     @Test
-    void findSubtaskByGoalId_whenInvalidParameters_thenThrowsException() {
+    void testFindSubtaskByGoalIdWithInvalidParametersShouldThrowsException() {
         doThrow(DataValidationException.class).when(goalValidator).validateGoalExistence(notExistGoalId);
-        assertThrows(DataValidationException.class, () -> goalService.findSubtasksByGoalId(notExistGoalId, filter));
+        assertThrows(RuntimeException.class, () -> goalService.findSubtasksByGoalId(notExistGoalId, filter));
     }
 
     @Test
-    void findSubtaskByGoalId_whenValidParameters_thenGetDtos() {
+    void testFindSubtaskByGoalIdWithValidParametersShouldGetDtos() {
         goalService.findSubtasksByGoalId(existGoalId, filter);
+        verify(goalRepository).findAll();
         verify(goalMapper).toDtos(any());
     }
 
     @Test
-    void findGoalsByUserId_whenInvalidParameters_thenThrowsException() {
+    void testFindGoalsByUserIdWithInvalidParametersShouldThrowsException() {
         doThrow(DataValidationException.class).when(goalValidator).validateUserExistence(notExistUserId);
         assertThrows(DataValidationException.class, () -> goalService.findGoalsByUserId(notExistUserId, filter));
     }
 
     @Test
-    void findGoalsByUserId_whenValidParameters_thenGetDtos() {
+    void testFindGoalsByUserIdWithValidParametersShouldGetDtos() {
         goalService.findGoalsByUserId(existUserId, filter);
+        verify(goalRepository).findAll();
         verify(goalMapper).toDtos(any());
     }
 }

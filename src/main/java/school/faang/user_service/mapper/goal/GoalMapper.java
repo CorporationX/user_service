@@ -25,7 +25,7 @@ public interface GoalMapper {
     Goal toEntity(GoalDto goalDto);
 
     @Named("skillsToIds")
-    default List<Long> toIds(List<Skill> skillsToAchieve) {
+    default List<Long> skillsToIds(List<Skill> skillsToAchieve) {
         return skillsToAchieve.stream()
                 .map(Skill::getId)
                 .toList();
@@ -39,6 +39,6 @@ public interface GoalMapper {
     }
 
     default boolean usersExist(Goal goal) {
-        return goal.getUsers() != null;
+        return goal.getUsers() != null && !goal.getUsers().isEmpty();
     }
 }

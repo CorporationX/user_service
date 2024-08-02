@@ -32,10 +32,7 @@ public class GoalService {
         goalValidator.validateCreation(userId, goalDto);
         Goal goal = goalMapper.toEntity(goalDto);
         goal.setStatus(GoalStatus.ACTIVE);
-        if (goalDto.getUserIds() != null) {
-            goal.setUsers(userService.findAllById(goalDto.getUserIds()));
-        }
-        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveIds()));
+        setUsersAndSkills(goalDto, goal);
         return goalMapper.toDto(goalRepository.save(goal));
     }
 
@@ -47,10 +44,7 @@ public class GoalService {
         if (goal.getStatus() != null && goal.getStatus().equals(GoalStatus.COMPLETED)) {
             updateUsersAndSkillsWhenGoalCompleted(goal);
         }
-        if (goal.getUsers() != null) {
-            goal.setUsers(userService.findAllById(goalDto.getUserIds()));
-        }
-        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveIds()));
+        setUsersAndSkills(goalDto, goal);
         return goalMapper.toDto(goalRepository.save(goal));
     }
 
@@ -59,25 +53,23 @@ public class GoalService {
         goalRepository.deleteById(goalId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         goalValidator.validateGoalExistence(goalId);
         return getFilteredGoals(filter);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<GoalDto> findGoalsByUserId(long userId, GoalFilterDto filter) {
         goalValidator.validateUserExistence(userId);
         return getFilteredGoals(filter);
     }
 
-    private List<GoalDto> getFilteredGoals(GoalFilterDto filter) {
-        List<GoalFilter> applicableFilters = getApplicableGoalFilters(filter);
-        List<Goal> filteredGoals = goalRepository.findAll();
-        for (GoalFilter applicableFilter : applicableFilters) {
-            filteredGoals = applicableFilter.apply(filteredGoals.stream(), filter).toList();
+    private void setUsersAndSkills(GoalDto goalDto, Goal goal) {
+        if (goalDto.getUserIds() != null && !goalDto.getUserIds().isEmpty()) {
+            goal.setUsers(userService.findAllById(goalDto.getUserIds()));
         }
-        return goalMapper.toDtos(filteredGoals);
+        goal.setSkillsToAchieve(skillService.findAllById(goalDto.getSkillsToAchieveIds()));
     }
 
     private void updateUsersAndSkillsWhenGoalCompleted(Goal goal) {
@@ -97,6 +89,15 @@ public class GoalService {
                     currentUserSkills.forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId()));
             });
         }
+    }
+
+    private List<GoalDto> getFilteredGoals(GoalFilterDto filter) {
+        List<GoalFilter> applicableFilters = getApplicableGoalFilters(filter);
+        List<Goal> filteredGoals = goalRepository.findAll();
+        for (GoalFilter applicableFilter : applicableFilters) {
+            filteredGoals = applicableFilter.apply(filteredGoals.stream(), filter).toList();
+        }
+        return goalMapper.toDtos(filteredGoals);
     }
 
     private List<GoalFilter> getApplicableGoalFilters(GoalFilterDto filter) {

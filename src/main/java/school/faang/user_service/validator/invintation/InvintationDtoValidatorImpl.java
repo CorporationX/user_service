@@ -1,4 +1,4 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.validator.invintation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -9,13 +9,13 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.skill.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validation.skill.SkillValidator;
-import school.faang.user_service.validation.user.UserValidator;
+import school.faang.user_service.validator.skill.SkillValidator;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,9 +45,9 @@ public class SkillServiceImpl implements SkillService {
             throw new DataValidationException(String.format("Skill with title %s has already exist", skill.getTitle()));
         }
 
-        Skill savedSkill = skillRepository.save(skillMapper.toSkill(skill));
+        Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
 
-        return skillMapper.toSkillDto(savedSkill);
+        return skillMapper.toDto(savedSkill);
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +62,7 @@ public class SkillServiceImpl implements SkillService {
         }
 
         List<Skill> skillList = skillRepository.findAllByUserId(userId);
-        return skillMapper.toSkillDtoList(skillList);
+        return skillMapper.toDtoList(skillList);
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +116,7 @@ public class SkillServiceImpl implements SkillService {
 
             userSkillGuaranteeRepository.saveAll(userSkillGuarantees);
 
-            return skillMapper.toSkillDto(skill.get());
+            return skillMapper.toDto(skill.get());
         } else {
             throw new DataValidationException("User doesn't have enough offers to acquire skill");
         }

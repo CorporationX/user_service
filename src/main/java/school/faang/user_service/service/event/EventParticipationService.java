@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.validator.EventParticipationValidator;
+import school.faang.user_service.validator.eventParticipation.EventParticipationValidator;
 
 import java.util.List;
 

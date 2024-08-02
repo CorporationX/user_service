@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.ResourceNotFoundException;
-import school.faang.user_service.filter.EventFilter;
+import school.faang.user_service.filters.Event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.validator.EventValidator;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
 import java.util.Optional;

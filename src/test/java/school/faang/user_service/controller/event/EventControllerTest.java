@@ -6,21 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.service.event.EventService;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @RequiredArgsConstructor
 @ExtendWith(MockitoExtension.class)
@@ -38,13 +33,15 @@ class EventControllerTest {
     }
 
     @Test
-    public void shouldReturnEventDtoWhenCreateTest() throws Exception {
-        EventDto eventDto = new EventDto();
-        eventDto.setRelatedSkillsIds(List.of(1L, 2L));
-
-        when(eventService.create(eventDto)).thenReturn(eventDto);
-
-        mockMvc.perform(post("/event/"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    public void shouldReturnEventDtoWhenGetEventTest() throws Exception {
+        //given
+        EventDto result = new EventDto();
+        //whenn
+        when(eventService.getEvent(1L)).thenReturn(result);
+        //thenn
+        mockMvc.perform(get("/event/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
     }
 }

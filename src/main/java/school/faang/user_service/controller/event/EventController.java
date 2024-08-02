@@ -32,7 +32,7 @@ public class EventController {
     private final EventService eventService;
 
     // Создать событие
-    @PostMapping("")
+    @PostMapping("/")
     @Operation(summary = "Создание события",
             description = "Позволяет создать новое событие. " +
                     "Для создания события необходимо передать ДТО события.")
@@ -66,7 +66,7 @@ public class EventController {
         return !event.getTitle().isEmpty()
                 && !event.getTitle().isBlank()
                 && event.getTitle().length() <= 64
-                && event.getStartDate() != null
+//                && event.getStartDate() != null
                 && event.getOwnerId() != 0;
     }
 

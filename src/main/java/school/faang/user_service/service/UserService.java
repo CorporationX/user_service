@@ -82,75 +82,45 @@ public class UserService {
                 .readValue(new File("src/main/resources/json/person.json"),
                         new TypeReference<List<Person>>() {
                         });
-        System.out.println(persons);
+
+//        class ListType$1 extends TypeReference<List<Person>> {
+//        }
 
         List<User> studentsToUsers = new ArrayList<>();
-        //List<Country> countries = countryRepository.findAll();
-        //List<String> countryTitles = new ArrayList<>();
-        //countries.forEach(country -> countryTitles.add(country.getTitle()));
-        //System.out.println(countryTitles);
+        List<User> saveStudentsToUsers = new ArrayList<>();
 
         persons.forEach(person -> {
             User studentToUser = personMapper.toUser(person);
-            //System.out.println(studentToUser.getUsername());
             boolean existsByUsernameResult = userRepository.existsByUsername(studentToUser.getUsername());
             boolean existsByEmailResult = userRepository.existsByEmail(studentToUser.getEmail());
             boolean existsByPhoneResult = userRepository.existsByPhone(studentToUser.getPhone());
             validateUserBeforeSave(studentToUser, existsByUsernameResult, existsByEmailResult,existsByPhoneResult);
             if(!existsByUsernameResult && !existsByEmailResult && !existsByPhoneResult) {
                 studentToUser.setPassword(generatePassword());
-                //System.out.println(generatePassword());
                 Country userCountry = studentToUser.getCountry();
-                //System.out.println("userCountry:" + userCountry);
 
                 if (userCountry != null) {
                     String userCountryTitle = userCountry.getTitle();
 
-
-//                    if (!countryTitles.contains(userCountryTitle)) {
-//                        System.out.println(userCountryTitle);
-//                        Country saveCountry = countryRepository.save(userCountry);
-//                        System.out.println("saveCountry: " + saveCountry);
-//                        studentToUser.setCountry(saveCountry);
-//                        System.out.println("setCountry: " + studentToUser.getCountry());
-//                        countryTitles.add(saveCountry.getTitle());
-//                    }
-//
-//                    List<Country> equalsCountries = countryRepository.findAll().stream().filter(
-//                            country -> country.getTitle().equals(userCountryTitle)).limit(1).toList();
-//                    System.out.println("equalsCountries" + equalsCountries);
-//                    Country equalsCountry = equalsCountries.get(0);
-//                    System.out.println("equalsCountry: " + equalsCountry);
-//
-//                    studentToUser.setCountry(equalsCountry);
-//                    System.out.println("assignedCountry: " + studentToUser.getCountry());
-
                     boolean existsCountryByTitleResult = countryRepository.existsCountryByTitle(userCountryTitle);
-                    //System.out.println(!existsCountryByTitleResult);
                     if (!existsCountryByTitleResult) {
                         Country saveCountry = countryRepository.save(userCountry);
-                        //System.out.println("saveCountry: " + saveCountry);
                         studentToUser.setCountry(saveCountry);
-                        //System.out.println("setCountry: " + studentToUser.getCountry());
-                        //countryTitles.add(saveCountry.getTitle());
                     }
                     List<Country> equalsCountries = countryRepository.findAll().stream().filter(
                             country -> country.getTitle().equals(userCountryTitle)).limit(1).toList();
-                    //System.out.println("equalsCountries" + equalsCountries);
                     Country equalsCountry = equalsCountries.get(0);
-                    //System.out.println("equalsCountry: " + equalsCountry);
-
                     studentToUser.setCountry(equalsCountry);
-                    //System.out.println("assignedCountry: " + studentToUser.getCountry());
-
                 }
                 userRepository.save(studentToUser);
+                saveStudentsToUsers.add(studentToUser);
             }
             studentsToUsers.add(studentToUser);
         });
-
-        //System.out.println("studentsToUsers" + studentsToUsers);
-        return userMapper.toDtoList(studentsToUsers);
+        System.out.println("studentsToUsers" + studentsToUsers);
+        System.out.println("saveStudentsToUsers" + saveStudentsToUsers);
+        //return userMapper.toDtoList(studentsToUsers);
+        return userMapper.toDtoList(saveStudentsToUsers);
     }
 
     private void validateUserBeforeSave(User studentToUser,

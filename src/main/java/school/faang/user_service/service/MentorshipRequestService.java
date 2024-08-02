@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Component;

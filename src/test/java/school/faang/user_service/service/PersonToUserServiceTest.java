@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,15 +15,12 @@ import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,23 +43,10 @@ public class PersonToUserServiceTest {
     @Mock
     private UserMapper userMapperMock;
 
-    @Mock
-    private ObjectMapper objectMapperMock;
-
     InputStream testInputStream = new ByteArrayInputStream("test data".getBytes());
-    private final Person testPerson = new Person();
     private final User testUser = new User();
     private final UserDto testUserDto = new UserDto();
     private final Country testCountry = new Country();
-
-    static class ListType$1 extends TypeReference<List<Person>> {
-    }
-
-    private Person prepareTestingPerson() {
-        testPerson.setFirstName("Kate");
-        testPerson.setLastName("Braun");
-        return testPerson;
-    }
 
     private User prepareTestingUser() {
         Country userCountry = prepareTestingCountry();
@@ -104,19 +86,9 @@ public class PersonToUserServiceTest {
     public void testSaveUsersIfEmailAlreadyExist() throws IOException {
         User user = prepareTestingUser();
         UserDto userDto = prepareTestingUserDto();
-        //Person person = prepareTestingPerson();
-        //List<Person> persons = new ArrayList<>();
-        //persons.add(person);
         when(personMapperMock.toUser(any())).thenReturn(user);
         when(userRepository.existsByEmail(any())).thenReturn(true);
         when(userMapperMock.toDtoList(anyList())).thenReturn(List.of(userDto));
-////        when(objectMapperMock.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false))
-////                .thenReturn(objectMapperMock);
-//        when(objectMapperMock
-//                .readValue(new File("src/main/resources/json/person.json"),
-//                        ListType$1.class
-//                        //new TypeReference<List<Person>>() {
-//                        )).thenReturn((ListType$1) persons);
 
         userService.saveUsers(testInputStream);
 

@@ -63,10 +63,6 @@ public class UserService {
         Reader myReader = new FileReader("students-copy.csv");
         CsvMapper mapper = new CsvMapper();
 
-        //mapper.enable(CsvParser.Feature.IGNORE_TRAILING_UNMAPPABLE);
-        //mapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
-        //mapper.disable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-
         CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator(',');
         MappingIterator<Person> personMappingIterator = mapper
                 .readerFor(Person.class)
@@ -82,9 +78,6 @@ public class UserService {
                 .readValue(new File("src/main/resources/json/person.json"),
                         new TypeReference<List<Person>>() {
                         });
-
-//        class ListType$1 extends TypeReference<List<Person>> {
-//        }
 
         List<User> studentsToUsers = new ArrayList<>();
         List<User> saveStudentsToUsers = new ArrayList<>();
@@ -119,7 +112,6 @@ public class UserService {
         });
         System.out.println("studentsToUsers" + studentsToUsers);
         System.out.println("saveStudentsToUsers" + saveStudentsToUsers);
-        //return userMapper.toDtoList(studentsToUsers);
         return userMapper.toDtoList(saveStudentsToUsers);
     }
 
@@ -130,13 +122,10 @@ public class UserService {
 
         if (existsByUsernameResult) {
             log.warn("User with username {} already exists", studentToUser.getUsername());
-            //throw new DataValidationException("User with username " + studentToUser.getUsername() + " already exists");
         }  else if (existsByEmailResult) {
             log.warn("User with email {} already exists", studentToUser.getEmail());
-            //throw new DataValidationException("User with email " + studentToUser.getEmail() + " already exists");
         } else if (existsByPhoneResult) {
             log.warn("User with phone number {} already exists", studentToUser.getPhone());
-            //throw new DataValidationException("User with phone number " + studentToUser.getPhone() + " already exists");
         }
     }
 

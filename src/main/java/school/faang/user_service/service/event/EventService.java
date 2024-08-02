@@ -105,7 +105,16 @@ public class EventService {
                 .orElseThrow(() ->
                         new DataValidationException("Такого пользователя не существует!"));
         if (validateUserSkills(newEventDto, owner)) {
-            event = eventRepository.save(eventMapper.eventDtoToEntity(newEventDto));
+            Event newEvent = eventMapper.eventDtoToEntity(newEventDto);
+            newEvent.setOwner(owner);
+            List<Skill> skills = newEventDto.getRelatedSkillsIds().stream()
+                    .map(skillId -> skillRepository.findById(skillId)
+                            .orElseThrow(
+                                    () -> new DataValidationException(
+                                            "Такого навыка не существует!")))
+                    .toList();
+            newEvent.setRelatedSkills(skills);
+            event = eventRepository.save(newEvent);
         } else {
             throw new DataValidationException("У пользователя нет необходимых навыков," +
                                               " чтобы создать данное событие!");

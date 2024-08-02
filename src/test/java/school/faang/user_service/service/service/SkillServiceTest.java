@@ -1,6 +1,5 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.service;
 
-import feign.Param;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,15 +14,14 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.skill.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.skillService.SkillServiceImpl;
-import school.faang.user_service.validation.skill.SkillValidator;
-import school.faang.user_service.validation.user.UserValidator;
+import school.faang.user_service.validator.skill.SkillValidator;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +83,7 @@ public class SkillServiceTest {
         when(skillValidator.titleIsValid(skillDto.getTitle())).thenReturn(true);
         when(skillValidator.existByTitle(skillDto.getTitle())).thenReturn(false);
 
-        when(skillRepository.save(skillMapper.toSkill(skillDto))).thenReturn(expectedSkill);
+        when(skillRepository.save(skillMapper.toEntity(skillDto))).thenReturn(expectedSkill);
 
         SkillDto actual = skillService.create(skillDto);
 

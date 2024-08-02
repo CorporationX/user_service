@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,14 +15,13 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.event.EventParticipationService;
-import school.faang.user_service.validator.EventParticipationValidator;
+import school.faang.user_service.validator.eventParticipation.EventParticipationValidator;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;

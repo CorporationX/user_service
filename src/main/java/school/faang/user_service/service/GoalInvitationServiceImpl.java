@@ -7,11 +7,11 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.filters.InvitationFilter;
+import school.faang.user_service.filters.Invitation.InvitationFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.validator.InvintationDtoValidator;
+import school.faang.user_service.validator.invintation.InvintationDtoValidator;
 
 import java.util.List;
 import java.util.NoSuchElementException;

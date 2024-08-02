@@ -51,3 +51,12 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+task:
+  expired-premium-remove:
+    remove-premium-interval : "@weekly"
+    batch-size : 10
+    thread-pool:
+      core-pool-size : 10
+      max-pool-capacity : 20
+      queue-capacity : 500

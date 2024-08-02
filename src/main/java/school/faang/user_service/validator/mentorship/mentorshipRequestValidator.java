@@ -1,4 +1,4 @@
-package school.faang.user_service.validation.mentorship;
+package school.faang.user_service.validator.mentorship;
 
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;

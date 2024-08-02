@@ -9,7 +9,7 @@ import school.faang.user_service.service.RecommendationService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/v1/recommendations")
+@RequestMapping(value = "/recommendations")
 @RequiredArgsConstructor
 public class RecommendationController {
     private final RecommendationService recommendationService;
@@ -21,7 +21,8 @@ public class RecommendationController {
     }
 
     @PutMapping("/recommendation/setting")
-    public RecommendationDto updateRecommendation(@Valid RecommendationDto recommendationDto) {
+    public RecommendationDto updateRecommendation(@RequestBody
+                                                      @Valid RecommendationDto recommendationDto) {
         return recommendationService.update(recommendationDto);
     }
 

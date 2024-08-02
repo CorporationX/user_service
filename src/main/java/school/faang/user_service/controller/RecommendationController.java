@@ -14,19 +14,19 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @PostMapping("/recommendation")
+    @PostMapping
     public RecommendationDto giveRecommendation(@RequestBody
                                                 @Valid RecommendationDto recommendationDto) {
         return recommendationService.create(recommendationDto);
     }
 
-    @PutMapping("/recommendation/setting")
+    @PutMapping
     public RecommendationDto updateRecommendation(@RequestBody
                                                       @Valid RecommendationDto recommendationDto) {
         return recommendationService.update(recommendationDto);
     }
 
-    @DeleteMapping("/recommendation/{id}")
+    @DeleteMapping("/{id}")
     public void deleteRecommendation(@PathVariable long id) {
         recommendationService.delete(id);
     }

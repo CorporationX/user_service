@@ -27,10 +27,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,6 +63,9 @@ public class RecommendationServiceTest {
     private UserSkillGuarantee guarantee;
     private final static int INTERVAL_DATE = 6;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private List<UserSkillGuarantee> guarantees;
+    private List<SkillOffer> skillOffersToSave;
+
 
     @BeforeEach
     void setUp() {
@@ -107,6 +107,8 @@ public class RecommendationServiceTest {
                 .user(receiver)
                 .skill(skill)
                 .build();
+
+        guarantees = List.of(guarantee);
     }
 
     @Test
@@ -140,45 +142,59 @@ public class RecommendationServiceTest {
 
     @Test
     public void testCreateWithNotFoundSkill() {
-        successValidate();
+        SkillOfferDto skillOfferDto = SkillOfferDto.builder()
+                .recommendationId(1L)
+                .skillId(1L)
+                .build();
+        SkillOfferDto skillOfferDto1 = SkillOfferDto.builder()
+                .recommendationId(1L)
+                .skillId(2L)
+                .build();
+
+        recommendationDto = RecommendationDto.builder()
+                .authorId(1L)
+                .receiverId(2L)
+                .skillOffers(List.of(skillOfferDto, skillOfferDto1))
+                .build();
+
+        successValidate(Set.of(1L, 2L));
 
         DataValidationException ex = assertThrows(DataValidationException.class,
                 () -> recommendationService.create(recommendationDto));
-        String expMessage = String.format("%s: %s", SKILL_IS_NOT_FOUND.getMessage(), Collections.emptyList());
+        String expMessage = String.format("%s: %s", SKILL_IS_NOT_FOUND.getMessage(), List.of(2L));
         assertEquals(ex.getMessage(), expMessage);
     }
 
-//    @Test
-//    public void testCreateSuccessWithAddNewGuarantee() {
-//        successValidate(skillOffers);
-//        successForCreateGuarantee();
-//
-//    }
-//
-//    @Test
-//    public void testCreateSuccessWithoutAddNewGuaranteeWithAuthorHasGuarantee() {
-//        successValidate(skillOffers);
-//        withoutAddGuarantee(skills, true);
-//    }
-//
-//    @Test
-//    public void testUpdateSuccess() {
-//        successValidate(skillOffers);
-//
-//        when(recommendationMapper.toEntity(recommendationDto)).thenReturn(recommendation);
-//        when(skillRepository.findAllByUserId(receiver.getId())).thenReturn(skills);
-//        when(userSkillGuaranteeRepository.existsById(author.getId())).thenReturn(false);
-//        when(skillRepository.findById(skill.getId())).thenReturn(Optional.of(skill));
-//        when(userSkillGuaranteeRepository.save(guarantee)).thenReturn(guarantee);
-//        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
-//
-//        RecommendationDto result = recommendationService.update(recommendationDto);
-//
-//        assertNotNull(result);
-//
-//        verify(skillOfferRepository).deleteAllByRecommendationId(1L);
-//        verify(recommendationRepository).save(recommendation);
-//    }
+    @Test
+    public void testCreateSuccessWithAddNewGuarantee() {
+        successValidate(Set.of(1L));
+        successForCreateGuarantee(List.of(1L));
+    }
+
+    @Test
+    public void testCreateSuccessWithoutAddNewGuaranteeWithAuthorHasGuarantee() {
+        successValidate(Set.of(1L));
+        withoutAddGuarantee(skills, true);
+    }
+
+    @Test
+    public void testUpdateSuccess() {
+        successValidate(Set.of(1L));
+
+        when(recommendationMapper.toEntity(recommendationDto)).thenReturn(recommendation);
+        when(skillRepository.findAllByUserId(receiver.getId())).thenReturn(skills);
+        when(userSkillGuaranteeRepository.existsById(author.getId())).thenReturn(false);
+        when(skillRepository.findAllById(List.of(1L))).thenReturn(skills);
+        when(userSkillGuaranteeRepository.saveAll(guarantees)).thenReturn(guarantees);
+        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+
+        RecommendationDto result = recommendationService.update(recommendationDto);
+
+        assertNotNull(result);
+
+        verify(skillOfferRepository).deleteAllByRecommendationId(1L);
+        verify(recommendationRepository).save(recommendation);
+    }
 
     @Test
     public void deleteRecommendationWhichNotExist() {
@@ -186,8 +202,8 @@ public class RecommendationServiceTest {
 
         when(recommendationRepository.findById(recommendationDto.getId())).thenReturn(Optional.empty());
         DataValidationException ex = assertThrows(DataValidationException.class, () -> recommendationService.delete(recommendationDto.getId()));
-
-        assertEquals(ex.getMessage(), RECOMMENDATION_IS_NOT_FOUND.getMessage());
+        String expMessage = String.format("%s: %d", RECOMMENDATION_IS_NOT_FOUND.getMessage(), recommendationDto.getId());
+        assertEquals(ex.getMessage(), expMessage);
     }
 
     @Test
@@ -228,12 +244,12 @@ public class RecommendationServiceTest {
         verify(recommendationRepository, times(1)).findAllByAuthorId(anyLong(), any(Pageable.class));
     }
 
-    private void successForCreateGuarantee() {
+    private void successForCreateGuarantee(List<Long> skillOfferIds) {
         when(recommendationMapper.toEntity(recommendationDto)).thenReturn(recommendation);
         when(skillRepository.findAllByUserId(receiver.getId())).thenReturn(skills);
         when(userSkillGuaranteeRepository.existsById(author.getId())).thenReturn(false);
-        when(skillRepository.findById(skill.getId())).thenReturn(Optional.of(skill));
-        when(userSkillGuaranteeRepository.save(guarantee)).thenReturn(guarantee);
+        when(skillRepository.findAllById(skillOfferIds)).thenReturn(skills);
+        when(userSkillGuaranteeRepository.saveAll(guarantees)).thenReturn(guarantees);
         when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
 
         recommendationService.create(recommendationDto);
@@ -241,8 +257,8 @@ public class RecommendationServiceTest {
         verify(recommendationMapper).toEntity(recommendationDto);
         verify(skillRepository).findAllByUserId(receiver.getId());
         verify(userSkillGuaranteeRepository).existsById(author.getId());
-        verify(skillRepository).findById(skill.getId());
-        verify(userSkillGuaranteeRepository).save(guarantee);
+        verify(skillRepository).findAllById(skillOfferIds);
+        verify(userSkillGuaranteeRepository).saveAll(guarantees);
         verify(recommendationMapper).toDto(recommendation);
     }
 
@@ -250,6 +266,7 @@ public class RecommendationServiceTest {
         when(recommendationMapper.toEntity(recommendationDto)).thenReturn(recommendation);
         when(skillRepository.findAllByUserId(receiver.getId())).thenReturn(receiverSkills);
         when(userSkillGuaranteeRepository.existsById(author.getId())).thenReturn(hasGuarantee);
+        when(skillOfferRepository.saveAll(skillOffers)).thenReturn(skillOffers);
         when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
 
         recommendationService.create(recommendationDto);
@@ -260,18 +277,11 @@ public class RecommendationServiceTest {
         verify(recommendationMapper).toDto(recommendation);
     }
 
-    private void successValidate() {
-        Set<Long> requestedSkillIds = Set.of(1L, 2L);
-        Skill skill = new Skill();
-        skill.setId(1L);
-        SkillOffer skillOffer = new SkillOffer();
-        skillOffer.setSkill(skill);
-        List<SkillOffer> foundSkillOffers = Collections.singletonList(skillOffer);
-
+    private void successValidate(Set<Long> skillIds) {
         recommendation.setCreatedAt(LocalDateTime.now().minusMonths(7));
         author.setRecommendationsGiven(Collections.singletonList(recommendation));
 
-        when(skillOfferRepository.findAllById(requestedSkillIds)).thenReturn(foundSkillOffers);
+        when(skillOfferRepository.findAllById(skillIds)).thenReturn(skillOffers);
         when(userRepository.findById(author.getId())).thenReturn(Optional.of(author));
         when(userRepository.existsById(receiver.getId())).thenReturn(true);
     }

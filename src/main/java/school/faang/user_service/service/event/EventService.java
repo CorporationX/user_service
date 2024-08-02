@@ -18,7 +18,6 @@ import school.faang.user_service.service.Validator;
 import javax.xml.stream.EventFilter;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +117,7 @@ public class EventService {
             event = eventRepository.save(newEvent);
         } else {
             throw new DataValidationException("У пользователя нет необходимых навыков," +
-                    " чтобы создать данное событие!");
+                                              " чтобы создать данное событие!");
         }
         return eventMapper.eventToDto(event);
     }

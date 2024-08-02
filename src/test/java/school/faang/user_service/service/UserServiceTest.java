@@ -133,36 +133,36 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Тест получаем пользователя")
-    public void testGetUser(){
+    public void testGetUser() {
         Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         Mockito.when(mapper.toDto(any())).thenReturn(dtoUser);
-        assertEquals(dtoUser , userService.getUser(1L));
+        assertEquals(dtoUser, userService.getUser(1L));
     }
 
     @Test
     @DisplayName("Тест получение пользователя на исключение")
-    public void testGetUser_whenException(){
+    public void testGetUser_whenException() {
         Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class,() ->
+        assertThrows(RuntimeException.class, () ->
                 userService.getUser(1L));
     }
 
     @Test
     @DisplayName("Тест получаем список всех пользователей")
-    public void testGetUsersByIds(){
+    public void testGetUsersByIds() {
         Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         Mockito.when(mapper.toDto(any())).thenReturn(dtoUser);
         dtoUser = mapper.toDto(user);
         dtoList = List.of(dtoUser);
-        assertEquals(dtoList , userService.getUsersByIds(ids));
+        assertEquals(dtoList, userService.getUsersByIds(ids));
     }
 
     @Test
     @DisplayName("Тест исключение при получении списка пользователей")
-    public void testGetUsersByIds_whenException(){
+    public void testGetUsersByIds_whenException() {
         Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class , () ->
-        userService.getUsersByIds(ids));
+        assertThrows(RuntimeException.class, () ->
+                userService.getUsersByIds(ids));
     }
 
 }

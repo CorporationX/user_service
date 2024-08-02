@@ -38,7 +38,7 @@ class UserControllerTest {
     private UserController controller;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private UserDto firstUser , secondUser;
+    private UserDto firstUser, secondUser;
     private List<Long> ids;
 
     @BeforeEach
@@ -91,20 +91,20 @@ class UserControllerTest {
         Mockito.when(service.getUser(anyLong())).thenReturn(firstUser);
         mockMvc.perform(get("/api/user/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id",is(1)))
-                .andExpect(jsonPath("$.username",is("Sasha")))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.username", is("Sasha")))
                 .andExpect(jsonPath("$.email", is("sasha@yandex.ru")));
     }
 
     @Test
     public void testGetUsersByIds() throws Exception {
-        List<UserDto> dtoList = Arrays.asList(firstUser , secondUser);
+        List<UserDto> dtoList = Arrays.asList(firstUser, secondUser);
         Mockito.when(service.getUsersByIds(ids)).thenReturn(dtoList);
         mockMvc.perform(post("/api/user")
-                .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ids)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",hasSize(2)))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[1].id", is(2)));
     }

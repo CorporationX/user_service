@@ -46,7 +46,7 @@ public class UserService {
         return dto;
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserDto> getUsersByIds (List < Long > ids){
         return ids.stream()
                 .map(num -> userRepository.findById(num))
                 .map(user -> mapper.toDto(user.orElseThrow(() ->
@@ -54,14 +54,14 @@ public class UserService {
                 .toList();
     }
 
-    private void deleteGoalFromDbIfPresent(List<Goal> goalsForDeleteFromDB) {
+    private void deleteGoalFromDbIfPresent (List < Goal > goalsForDeleteFromDB) {
         if (!goalsForDeleteFromDB.isEmpty()) {
             goalsForDeleteFromDB.forEach(goal -> goalRepository
                     .deleteById(goal.getId()));
         }
     }
 
-    private User getValidationUser(long userId) {
+    private User getValidationUser ( long userId){
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException(MESSAGE_USER_NOT_EXIST));
         if (!user.isActive()) {
             throw new RuntimeException(MESSAGE_USER_ALREADY_DEACTIVATED);
@@ -69,13 +69,13 @@ public class UserService {
         return user;
     }
 
-    private List<Event> getEventsWithCanceledStatus(User user) {
+    private List<Event> getEventsWithCanceledStatus (User user) {
         return user.getOwnedEvents().stream()
                 .peek(event -> event.setStatus(EventStatus.CANCELED))
                 .toList();
     }
 
-    private List<Goal> getGoalsForDelete(User user) {
+    private List<Goal> getGoalsForDelete (User user){
         return user.getGoals().stream()
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();

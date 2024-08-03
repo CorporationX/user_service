@@ -17,23 +17,17 @@ public class S3Config {
     private String accessKey;
     @Value("${services.s3.secretKey}")
     private String secretKey;
-    @Value("${services.s3.bucketName}")
-    private String bucketName;
     @Value("${services.s3.endpoint}")
     private String endpoint;
 
     @Bean
     public AmazonS3 s3Client() {
         log.info("Создание клиента AmazonS3 с ключем: {}", accessKey);
-        AmazonS3 amazonS3 = AmazonS3ClientBuilder.standard()
+        return AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(
                         new AwsClientBuilder.EndpointConfiguration(endpoint, null))
                 .withCredentials(
                         new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
                 .build();
-        if (!amazonS3.doesBucketExistV2(bucketName)) {
-            amazonS3.createBucket(bucketName);
-        }
-        return amazonS3;
     }
 }

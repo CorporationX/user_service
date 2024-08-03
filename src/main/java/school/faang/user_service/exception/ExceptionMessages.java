@@ -16,7 +16,7 @@ public final class ExceptionMessages {
     public static final String MENTORSHIP_ALREADY_ONGOING = "You already mentor this user.";
 
     // userProfilePic
-    public static final String USER_NOT_FOUND = "User with this id not in database.";
+    public static final String USER_NOT_FOUND = "User with this id %d not in database.";
     public static final String CLOUD_SENDING = "Failed to put request object before sending to cloud.";
     public static final String PICTURE_LOADING_RESTRICTION = "The file exceeds the size of 5 MB.";
 }

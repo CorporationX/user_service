@@ -53,8 +53,9 @@ public class UserProfilePicService {
 
     private User checkTheUserInTheDatabase(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
-            log.error(ExceptionMessages.USER_NOT_FOUND);
-            return new NullPointerException(ExceptionMessages.USER_NOT_FOUND);
+            String errorMessage = String.format(ExceptionMessages.USER_NOT_FOUND, userId);
+            log.error(errorMessage);
+            return new NullPointerException(errorMessage);
         });
     }
 }

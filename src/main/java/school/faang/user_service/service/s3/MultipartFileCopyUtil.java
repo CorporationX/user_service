@@ -62,12 +62,4 @@ public class MultipartFileCopyUtil {
         };
 
     }
-
-//    public ObjectMetadata collectMetadata(MultipartFile multipartFile) {
-//        long fileSize = multipartFile.getSize();
-//        ObjectMetadata objectMetadata = new ObjectMetadata();
-//        objectMetadata.setContentLength(fileSize);
-//        objectMetadata.setContentType(multipartFile.getContentType());
-//        return objectMetadata;
-//    }
 }

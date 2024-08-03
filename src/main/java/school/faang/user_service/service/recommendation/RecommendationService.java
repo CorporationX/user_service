@@ -20,8 +20,10 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -100,10 +102,17 @@ public class RecommendationService {
     }
 
     private void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
-        for (SkillOfferDto skillOfferDto : skillOfferDtos) {
-            if (!skillOfferRepository.existsById(skillOfferDto.getSkillId())) {
-                throw new NullPointerException(ExceptionMessages.SKILL_NOT_FOUND);
-            }
+        List<Long> skillOfferIds = skillOfferDtos.stream()
+                .map(SkillOfferDto::getId)
+                .toList();
+
+        List<SkillOffer> skillOffers = StreamSupport
+                .stream(skillOfferRepository.findAllById(skillOfferIds).spliterator(), false)
+                .toList();
+
+        if (skillOffers.size() != skillOfferIds.size()) {
+            log.error(ExceptionMessages.SKILL_NOT_FOUND);
+            throw new NullPointerException(ExceptionMessages.SKILL_NOT_FOUND);
         }
     }
 
@@ -116,22 +125,23 @@ public class RecommendationService {
 
         boolean AuthorSkillGuarantee = userSkillGuaranteeRepository.existsById(author.getId());
 
+        List<UserSkillGuarantee> listForGuaranteeRepository = new ArrayList<>();
+        List<SkillOffer> listForOfferRepository = new ArrayList<>();
+
         for (SkillOffer skillOffer : skillOffers) {
             if (skillOffer.getSkill() != null
                     && existingSkills.contains(skillOffer.getSkill())
                     && !AuthorSkillGuarantee) {
-                addAndSaveGuarantee(author, receiver, skillOffer.getSkill());
+                listForGuaranteeRepository.add(UserSkillGuarantee.builder()
+                        .user(receiver)
+                        .skill(skillOffer.getSkill())
+                        .guarantor(author)
+                        .build());
             } else {
-                skillOfferRepository.save(skillOffer);
+                listForOfferRepository.add(skillOffer);
             }
         }
-    }
-
-    private void addAndSaveGuarantee(User author, User receiver, Skill skill) {
-        userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
-                .user(receiver)
-                .skill(skill)
-                .guarantor(author)
-                .build());
+        userSkillGuaranteeRepository.saveAll(listForGuaranteeRepository);
+        skillOfferRepository.saveAll(listForOfferRepository);
     }
 }

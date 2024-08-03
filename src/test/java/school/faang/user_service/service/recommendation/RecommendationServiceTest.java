@@ -27,6 +27,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,7 +129,7 @@ class RecommendationServiceTest {
         findFirstOrderValid();
         recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
 
-        when(skillOfferRepository.existsById(Mockito.anyLong()))
+        when(skillOfferRepository.findAllById(anyList()).spliterator())
                 .thenThrow(new NullPointerException("exception"));
         Exception exception = assertThrows(NullPointerException.class, () ->
                 recommendationService.create(recommendationDto));
@@ -149,8 +150,8 @@ class RecommendationServiceTest {
                 .thenReturn(List.of(skill));
         when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
                 .thenReturn(false);
-        when(userSkillGuaranteeRepository.save(any(UserSkillGuarantee.class)))
-                .thenReturn(new UserSkillGuarantee());
+        when(userSkillGuaranteeRepository.saveAll(List.of(any(UserSkillGuarantee.class))))
+                .thenReturn(List.of(new UserSkillGuarantee()));
 
         recommendationService.create(recommendationDto);
 
@@ -159,7 +160,7 @@ class RecommendationServiceTest {
         verify(userSkillGuaranteeRepository, times(1))
                 .existsById(Mockito.anyLong());
         verify(userSkillGuaranteeRepository, times(1))
-                .save(any(UserSkillGuarantee.class));
+                .saveAll(List.of(any(UserSkillGuarantee.class)));
     }
 
     @Test

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.ExceptionMessages;
 
 import java.io.IOException;
@@ -20,36 +19,17 @@ import java.lang.module.FindException;
 @RequiredArgsConstructor
 @Slf4j
 public class S3Service {
-    private static final int MAX_IMAGE_LARGE_PHOTO = 1080;
-    private static final int MAX_IMAGE_SMALL_PHOTO = 170;
     private final AmazonS3 s3Client;
-    private final MultipartFileCopyUtil multipartFileCopyUtil;
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
-    public UserProfilePic uploadProfile(MultipartFile multipartFile, String folder) throws IOException {
-
-        MultipartFile largeImage = multipartFileCopyUtil
-                .compressionMultipartFile(multipartFile, MAX_IMAGE_LARGE_PHOTO);
-        MultipartFile smallImage = multipartFileCopyUtil
-                .compressionMultipartFile(multipartFile, MAX_IMAGE_SMALL_PHOTO);
-
-        ObjectMetadata objectMetadataOne = multipartFileCopyUtil.collectMetadata(largeImage);
-        ObjectMetadata objectMetadataTwo = multipartFileCopyUtil.collectMetadata(smallImage);
-
+    public String uploadProfile(MultipartFile multipartFile, String folder) {
+        ObjectMetadata objectMetadataOne = collectMetadata(multipartFile);
         String keyOne = String.format("Origin%s%d%s",
-                folder, System.currentTimeMillis(), largeImage.getOriginalFilename());
-        String keyTwo = String.format("Small%s%d%s",
-                folder, System.currentTimeMillis(), smallImage.getOriginalFilename());
+                folder, System.currentTimeMillis(), multipartFile.getOriginalFilename());
+        sendingRequestToTheCloud(bucketName, keyOne, multipartFile, objectMetadataOne);
 
-        sendingRequestToTheCloud(bucketName, keyOne, largeImage, objectMetadataOne);
-        sendingRequestToTheCloud(bucketName, keyTwo, smallImage, objectMetadataTwo);
-
-        UserProfilePic userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId(keyOne);
-        userProfilePic.setSmallFileId(keyTwo);
-
-        return userProfilePic;
+        return keyOne;
     }
 
     public InputStream downloadingByteImage(String key) {
@@ -61,9 +41,16 @@ public class S3Service {
         }
     }
 
-    public void deleteImage(UserProfilePic userProfilePic) {
-        s3Client.deleteObject(bucketName, userProfilePic.getFileId());
-        s3Client.deleteObject(bucketName, userProfilePic.getSmallFileId());
+    public void deleteImage(String key) {
+        s3Client.deleteObject(bucketName, key);
+    }
+
+    private ObjectMetadata collectMetadata(MultipartFile multipartFile) {
+        long fileSize = multipartFile.getSize();
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(fileSize);
+        objectMetadata.setContentType(multipartFile.getContentType());
+        return objectMetadata;
     }
 
     private void sendingRequestToTheCloud(String bucketName,

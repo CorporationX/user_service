@@ -87,7 +87,7 @@ class UserProfilePicServiceTest {
     @DisplayName("addImageInProfileToDtoValid")
     void testAddImageInProfileToDto() throws IOException {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(s3Service.uploadProfile(any(MultipartFile.class), any(String.class))).thenReturn(userProfilePic);
+        when(s3Service.uploadProfile(any(MultipartFile.class), any(String.class))).thenReturn(new String());
         when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
 
         UserProfileDto result = userProfilePicService.addImageInProfile(userId, multipartFile);
@@ -128,7 +128,7 @@ class UserProfilePicServiceTest {
     @DisplayName("deleteImageException")
     void testDeleteImageFromProfileException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        doThrow(new RuntimeException("exception")).when(s3Service).deleteImage(any(UserProfilePic.class));
+        doThrow(new RuntimeException("exception")).when(s3Service).deleteImage(anyString());
 
         Exception exception = assertThrows(RuntimeException.class, () ->
                 userProfilePicService.deleteImageFromProfile(userId));
@@ -141,7 +141,7 @@ class UserProfilePicServiceTest {
     @DisplayName("saveImageException")
     void testDeleteImageFromProfileSaveException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        doNothing().when(s3Service).deleteImage(any(UserProfilePic.class));
+        doNothing().when(s3Service).deleteImage(anyString());
         doThrow(new RuntimeException("exception")).when(userRepository).save(any(User.class));
 
         Exception exception = assertThrows(RuntimeException.class, () ->
@@ -154,14 +154,14 @@ class UserProfilePicServiceTest {
     @DisplayName("dtoInUserProfileDtoValid")
     void testDeleteImageFromProfileToDtoValid() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        doNothing().when(s3Service).deleteImage(any(UserProfilePic.class));
+        doNothing().when(s3Service).deleteImage(anyString());
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
 
         userProfilePicService.deleteImageFromProfile(userId);
 
         verify(userRepository, times(1)).findById(anyLong());
-        verify(s3Service, times(1)).deleteImage(any(UserProfilePic.class));
+        verify(s3Service, times(1)).deleteImage(anyString());
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
     }
 }

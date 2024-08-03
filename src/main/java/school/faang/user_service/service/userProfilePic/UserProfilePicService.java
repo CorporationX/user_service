@@ -10,6 +10,7 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.s3.MultipartFileCopyUtil;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;
@@ -19,23 +20,34 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 @Slf4j
 public class UserProfilePicService {
+    private static final int MAX_IMAGE_LARGE_PHOTO = 1080;
+    private static final int MAX_IMAGE_SMALL_PHOTO = 170;
 
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final UserProfilePicMapper userProfilePicMapper;
+    private final MultipartFileCopyUtil multipartFileCopyUtil;
 
     public UserProfileDto addImageInProfile(Long userId, MultipartFile multipartFile) throws IOException {
         User user = checkTheUserInTheDatabase(userId);
 
         String folder = user.getId() + user.getUsername();
-        UserProfilePic userProfilePic = s3Service.uploadProfile(multipartFile, folder);
+        MultipartFile multipartFileUtilLarge = multipartFileCopyUtil
+                .compressionMultipartFile(multipartFile, MAX_IMAGE_LARGE_PHOTO);
+        MultipartFile multipartFileUtilSmall = multipartFileCopyUtil
+                .compressionMultipartFile(multipartFile, MAX_IMAGE_SMALL_PHOTO);
+
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId(s3Service.uploadProfile(multipartFileUtilLarge, folder));
+        userProfilePic.setSmallFileId(s3Service.uploadProfile(multipartFileUtilSmall, folder));
+
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
 
         return userProfilePicMapper.toDto(user);
     }
 
-    public InputStream getImageFromProfile(Long userId) throws IOException {
+    public InputStream getImageFromProfile(Long userId) {
         User user = checkTheUserInTheDatabase(userId);
 
         return s3Service.downloadingByteImage(user.getUserProfilePic().getFileId());
@@ -44,7 +56,8 @@ public class UserProfilePicService {
     public UserProfileDto deleteImageFromProfile(Long userId) {
         User user = checkTheUserInTheDatabase(userId);
 
-        s3Service.deleteImage(user.getUserProfilePic());
+        s3Service.deleteImage(user.getUserProfilePic().getFileId());
+        s3Service.deleteImage(user.getUserProfilePic().getSmallFileId());
         user.setUserProfilePic(null);
         userRepository.save(user);
 

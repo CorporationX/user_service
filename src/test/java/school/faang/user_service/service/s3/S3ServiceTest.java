@@ -130,18 +130,11 @@ class S3ServiceTest {
     @DisplayName("deleteImage")
     void testDeleteImage() {
         String fileId = "file-id";
-        String smallFileId = "small-file-id";
-
-        UserProfilePic userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId(fileId);
-        userProfilePic.setSmallFileId(smallFileId);
 
         doNothing().when(s3Client).deleteObject(eq(bucketName), eq(fileId));
-        doNothing().when(s3Client).deleteObject(eq(bucketName), eq(smallFileId));
 
-        s3Service.deleteImage(userProfilePic);
+        s3Service.deleteImage(fileId);
 
         verify(s3Client, times(1)).deleteObject(eq(bucketName), eq(fileId));
-        verify(s3Client, times(1)).deleteObject(eq(bucketName), eq(smallFileId));
     }
 }

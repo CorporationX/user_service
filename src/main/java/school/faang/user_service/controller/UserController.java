@@ -6,13 +6,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Deactivate User API", description = "API for managing deactivate users")
@@ -33,5 +35,14 @@ public class UserController {
             throw new RuntimeException(MESSAGE_INVALID_ID);
         }
         return service.deactivatesUserProfile(userId);
+    }
+
+    @GetMapping("/premium")
+    public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
+        if (userFilterDto == null) {
+            log.error("Incorrect data entry");
+            throw new RuntimeException("userFilterDto contains nothing");
+        }
+        return service.getPremiumUsers(userFilterDto);
     }
 }

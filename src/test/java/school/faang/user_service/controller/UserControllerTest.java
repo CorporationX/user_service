@@ -10,12 +10,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,8 +30,11 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @Mock
     private UserService service;
+    @Mock
+    private UserFilterDto userFilterDto;
     @InjectMocks
     private UserController controller;
+    private List<UserDto> users;
 
     @BeforeEach
     public void setUp() {
@@ -62,5 +68,20 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.active").value(true))
                 .andExpect(jsonPath("$.goalsIds", hasSize(1)))
                 .andExpect(jsonPath("$.ownedEventsIds", hasSize(1)));
+    }
+
+    @Test
+    public void testGetPremiumUsersWhenUserFilterDtoIsEmpty() {
+        UserFilterDto userFilterDto = null;
+
+        assertThrows(RuntimeException.class,
+                () -> controller.getPremiumUsers(userFilterDto));
+    }
+
+    @Test
+    public void testGetPremiumUsersWhenUserFilterDtoIsNotNull() {
+        when(controller.getPremiumUsers(userFilterDto)).thenReturn(users);
+
+        assertThat(controller.getPremiumUsers(userFilterDto));
     }
 }

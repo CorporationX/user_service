@@ -7,9 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -18,9 +21,11 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -37,9 +42,12 @@ class UserServiceTest {
     private EventRepository eventRepository;
     @Mock
     private UserMapper mapper;
+    @Mock
+    private List<UserFilter> userFilters;
     @InjectMocks
     private UserService userService;
     private User user;
+    private UserFilterDto userFilterDto;
 
     @BeforeEach
     void setUp() {
@@ -119,4 +127,20 @@ class UserServiceTest {
         Mockito.verify(mapper).toDto(user);
     }
 
+    @Test
+    public void testGetPremiumUsersMultipleUsers() {
+        Stream<User> users = Stream.of(user, user, user);
+        when(userRepository.findPremiumUsers()).thenReturn( users);
+
+        List<UserDto> premiumUsers = userService.getPremiumUsers(userFilterDto);
+        assertEquals(3, premiumUsers.size());
+    }
+
+    @Test
+    public void testGetPremiumUsersNoUsers() {
+        when(userRepository.findPremiumUsers()).thenReturn(Stream.empty());
+
+        List<UserDto> premiumUsers = userService.getPremiumUsers(userFilterDto);
+        assertEquals(0, premiumUsers.size());
+    }
 }

@@ -7,8 +7,8 @@ import school.faang.user_service.dto.UserDto;
 @RestController
 public class UserController {
 
-    public UserDto createUser(@RequestParam ) {
-
+    public UserDto createUser() {
+        return null;
     }
 
 }

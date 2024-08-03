@@ -11,14 +11,15 @@ public class UserProfilePicController {
     private final UserProfilePicService userProfilePicService;
 
     public UserProfilePicDto saveProfilePic(UserProfilePicDto userProfilePicDto) {
+        return null;
 
     }
 
     public UserProfilePicDto getProfilePic() {
-
+        return null;
     }
 
     public UserProfilePicDto deleteProfilePic() {
-
+        return null;
     }
 }

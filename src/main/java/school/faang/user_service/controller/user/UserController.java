@@ -10,7 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -21,7 +28,9 @@ import school.faang.user_service.service.user.parse.DataFromFileService;
 import java.io.IOException;
 import java.util.List;
 
-import static school.faang.user_service.exception.message.ExceptionMessage.*;
+import static school.faang.user_service.exception.message.ExceptionMessage.AVATAR_FILE_SIZE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_FILE_IN_REQUEST;
 
 @Slf4j
 @RestController
@@ -48,8 +57,15 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @PostMapping ("/ids")
-    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) { return userService.getUsersByIds(ids); }
+    @GetMapping
+    public List<Long> getAllUsersIds() {
+        return userService.getAllUsersIds();
+    }
+
+    @PostMapping("/ids")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return userService.getUsersByIds(ids);
+    }
 
     @PostMapping("/{userId}/avatar")
     public UserDto uploadUserAvatar(@PathVariable Long userId, MultipartFile file) {

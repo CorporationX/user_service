@@ -51,3 +51,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+goal:
+  max_active_goals: 2

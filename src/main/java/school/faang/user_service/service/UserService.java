@@ -8,6 +8,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,4 +21,14 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.toDto(user);
     }
+
+    public List<User> findAllById(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public boolean existsById(Long userId) { return userRepository.existsById(userId); }
 }

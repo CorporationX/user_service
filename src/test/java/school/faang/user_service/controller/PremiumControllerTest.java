@@ -49,6 +49,5 @@ class PremiumControllerTest {
         MvcResult requestResult = mockMvc.perform(post("/premium/buyPremium?days={days}", days).header("x-user-id", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json")).andReturn();
-//        assertEquals(requestResult.getResponse().getContentAsString(), requestResult.toString());
     }
 }

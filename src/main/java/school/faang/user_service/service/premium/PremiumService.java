@@ -32,12 +32,12 @@ public class PremiumService {
 
     private final PremiumMapper mapper;
 
+    private final PremiumValidator validator;
+
     private final PaymentServiceClient serviceClient;
 
     public PremiumDto buyPremium(long id, PremiumPeriod period) {
-        if (premiumRepository.existsByUserId(id)) {
-            throw new DataValidationException("Премиум подписка уже оформлена");
-        }
+        validator.validate(id);
         PaymentRequest request = new PaymentRequest(new Random().nextLong(), BigDecimal.valueOf(period.getCost()), Currency.USD);
         PaymentResponse response = serviceClient.sendPayment(request);
         if (response.status().equals("SUCCESS")) {

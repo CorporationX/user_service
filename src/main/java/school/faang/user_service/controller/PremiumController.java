@@ -18,7 +18,7 @@ import school.faang.user_service.service.premium.PremiumService;
 public class PremiumController {
     private final PremiumService service;
 
-    @PostMapping("/buyPremium")
+    @PostMapping("/buy")
     public PremiumDto buyPremium(@RequestHeader("x-user-id") long id, @RequestParam int days) {
         return service.buyPremium(id, PremiumPeriod.fromDays(days));
     }

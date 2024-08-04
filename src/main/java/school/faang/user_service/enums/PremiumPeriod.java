@@ -1,9 +1,12 @@
 package school.faang.user_service.enums;
 
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import school.faang.user_service.exception.DataValidationException;
 
-
+@Getter
+@RequiredArgsConstructor
 public enum PremiumPeriod {
     MONTH (30, 10),
     THREEMONTH (90, 25),
@@ -11,18 +14,6 @@ public enum PremiumPeriod {
 
     private final int days;
     private final int cost;
-    PremiumPeriod(int days, int cost) {
-        this.days = days;
-        this.cost = cost;
-    }
-
-    public int getDays() {
-        return this.days;
-    }
-
-    public int getCost() {
-        return this.cost;
-    }
 
     public static PremiumPeriod fromDays(int days) {
         return switch (days) {

@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -51,6 +52,7 @@ public class SkillService {
         return skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("the skill is not found"));
     }
 
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = findById(skillId);
         Optional<Skill> offeredSkill = skillRepository.findUserSkill(skillId, userId);

@@ -59,6 +59,7 @@ services:
     seed-range: 20000
     content-type: image/jpeg
 
+springfox.documentation.swagger.v2.path: /api-docs
 dice-bear:
   url: https://api.dicebear.com
   version: 9.x

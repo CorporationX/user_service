@@ -22,13 +22,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+class UserControllerTest {
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private UserController userController;
-
-    @Mock
-    private UserService userService;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -88,5 +87,13 @@ public class UserControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isAccepted());
         verify(userService, times(1)).updateUserAvatar(userId, mockMultipartFile);
+    }
+
+    @Test
+    @DisplayName("testing deactivateUser userService deactivate deactivateUser method execution")
+    public void testDeactivateUserWithUserServiceExecution(){
+        long userId = 1L;
+        userController.deactivateUser(userId);
+        verify(userService, times(1)).deactivateUser(userId);
     }
 }

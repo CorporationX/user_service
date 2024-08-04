@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.repository.UserRepository;
 import java.util.Optional;
 
 @Component
@@ -22,5 +26,13 @@ public class UserValidator {
             throw new RuntimeException(errMessage);
         }
         return userOptional.get();
+    }
+
+    public void validateUserId(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException(
+                    "there is no User with id:\n" +
+                            userId);
+        }
     }
 }

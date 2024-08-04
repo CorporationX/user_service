@@ -16,7 +16,6 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class SkillService {
     private final long MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
-        skillValidator.validateSkill(skill);
+        skillValidator.validateSkillDto(skill);
         Skill skillEntity = skillMapper.toEntity(skill);
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }
@@ -45,7 +44,6 @@ public class SkillService {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
-        skillValidator.validateUserSkills(skills);
         return skillCandidateMapper.toListDto(skills);
     }
 
@@ -61,7 +59,7 @@ public class SkillService {
     }
 
     public void addGuarantee(List<SkillOffer> skillOffers) {
-        skillValidator.validateSkillOffers(skillOffers);
+        skillValidator.validateSkillOfferList(skillOffers);
         for (SkillOffer skillOffer : skillOffers) {
             User receiver = skillOffer.getRecommendation().getReceiver();
             User author = skillOffer.getRecommendation().getAuthor();

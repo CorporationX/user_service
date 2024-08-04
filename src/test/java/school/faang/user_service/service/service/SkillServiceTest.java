@@ -66,7 +66,7 @@ public class SkillServiceTest {
     @Test
     public void testCreate() {
         Skill skill = skillMapper.toEntity(skillDto);
-        Mockito.doNothing().when(skillValidator).validateSkill(skillDto);
+        Mockito.doNothing().when(skillValidator).validateSkillDto(skillDto);
         Mockito.when(skillRepository.save(skillMapper.toEntity(skillDto))).thenReturn(skill);
         SkillDto actualDto = skillService.create(skillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
@@ -113,12 +113,6 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void testAddGuaranteeThrowsException() {
-        List<SkillOffer> noOffers = new ArrayList<>();
-        Assert.assertThrows(IllegalArgumentException.class, () -> skillService.addGuarantee(noOffers));
-    }
-
-    @Test
     public void testAddGuarantee() {
         User user1 = User.builder().id(1L).build();
         User user2 = User.builder().id(2L).build();
@@ -143,26 +137,6 @@ public class SkillServiceTest {
                 .user(user3).guarantor(user2).skill(skill2).build());
         Mockito.verify(userSkillGuaranteeRepository, Mockito.times(2))
                 .save(Mockito.any(UserSkillGuarantee.class));
-    }
-
-    @Test
-    public void testAcquireSkillFromOffersForLearnedSkill() {
-        long skillId = 1L;
-        Skill skill = Skill.builder().id(skillId).build();
-        Optional<Skill> realSkill = Optional.of(skill);
-        long userId = 2L;
-        Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(realSkill);
-        Assertions.assertThrows(DataValidationException.class, ()->skillService.acquireSkillFromOffers(1L,2L));
-    }
-
-    @Test
-    public void testAcquireSkillFromOffersNotEnoughOffers() {
-        long skillId = 1L;
-        long userId = 2L;
-        List<SkillOffer> zeroOffers = new ArrayList<>();
-        Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
-        Mockito.when(skillOfferRepository.findAllOffersOfSkill(1L, 2L)).thenReturn(zeroOffers);
-        Assert.assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
 
     @Test

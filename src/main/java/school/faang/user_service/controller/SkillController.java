@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
-
 import java.util.List;
 
 @RestController
@@ -25,12 +24,12 @@ public class SkillController {
         return skillService.create(skill);
     }
 
-    @GetMapping("/All/{userId}")
+    @GetMapping("/get/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    @GetMapping("/Offered/{userId}")
+    @GetMapping("/offered/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
         return skillService.getOfferedSkills(userId);
     }

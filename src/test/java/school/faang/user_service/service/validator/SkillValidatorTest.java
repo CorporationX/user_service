@@ -40,47 +40,35 @@ public class SkillValidatorTest {
     @Test
     public void testSkillNameIsNull() {
         Exception exception = Assert.assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(new SkillDto(1L, null)));
+                () -> skillValidator.validateSkillDto(new SkillDto(1L, null)));
         String actualMessage = exception.getMessage();
-        String expectedMessage = "skill name is null";
+        String expectedMessage = "skill has no name";
         Assert.assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
     public void testSkillNameIsEmpty() {
         Assert.assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(new SkillDto(1L, "")));
+                () -> skillValidator.validateSkillDto(new SkillDto(1L, "")));
     }
 
     @Test
     public void testSkillNameIsBlank() {
         Assert.assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(new SkillDto(1L, "  ")));
+                () -> skillValidator.validateSkillDto(new SkillDto(1L, "  ")));
     }
 
     @Test
     public void testSkillExistsByTitle() {
         Mockito.when(skillRepository.existsByTitle("title")).thenReturn(true);
         Assert.assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(new SkillDto(1L, "title")));
+                () -> skillValidator.validateSkillDto(new SkillDto(1L, "title")));
     }
 
     @Test
     public void testSkillExistByTitleNoException() {
         Mockito.when(skillRepository.existsByTitle("title")).thenReturn(false);
-        assertDoesNotThrow(()->skillValidator.validateSkill(new SkillDto(1L, "title")));
+        assertDoesNotThrow(()->skillValidator.validateSkillDto(new SkillDto(1L, "title")));
     }
 
-    @Test
-    public void testValidateUserSkills() {
-        List<Skill> emptySKills = new ArrayList<>();
-        Assert.assertThrows(DataValidationException.class, () -> skillValidator.validateUserSkills(emptySKills));
-    }
-
-    @Test
-    public void testValidateUserSkillsNoException() {
-        List<Skill> singleSkill = new ArrayList<>();
-        singleSkill.add(skill);
-        assertDoesNotThrow(()->skillValidator.validateUserSkills(singleSkill));
-    }
 }

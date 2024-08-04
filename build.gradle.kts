@@ -58,7 +58,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
-    implementation ("org.springdoc:springdoc-openapi-ui:1.6.14")
+    implementation("io.springfox:springfox-swagger2:2.9.2")
 
     /**
      * Test containers

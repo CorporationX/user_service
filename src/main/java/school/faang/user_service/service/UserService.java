@@ -25,7 +25,7 @@ public class UserService {
         user.setActive(true);
         user = userRepository.save(user);
         if (userAvatar == null) {
-            user = avatarService.setRandomAvatar(user);
+            avatarService.setRandomAvatar(user);
         } else {
             // todo: Gevorg's part
         }
@@ -36,7 +36,7 @@ public class UserService {
     public void updateUserAvatar(long userId, MultipartFile multipartFile) {
         User user = userValidator.validateUserExistence(userId);
         if (multipartFile == null) {
-            user = avatarService.setRandomAvatar(user);
+            avatarService.setRandomAvatar(user);
         } else {
             // todo: Добавление аватара пользователя; Will be done by Gevorg
         }

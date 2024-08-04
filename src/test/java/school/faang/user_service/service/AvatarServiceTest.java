@@ -4,10 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
+import school.faang.user_service.config.AvatarConfig;
 import school.faang.user_service.entity.User;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -28,7 +28,6 @@ public class AvatarServiceTest {
     @Mock
     private RestTemplate restTemplate;
 
-    @InjectMocks
     private AvatarService avatarService;
 
     private User user;
@@ -41,22 +40,24 @@ public class AvatarServiceTest {
 
     @BeforeEach
     void setUp() {
+        AvatarConfig avatarConfig = new AvatarConfig();
+        avatarService = new AvatarService(avatarConfig, s3Service, utilsService, restTemplate);
+
         generationUrl = "https://api.dicebear.com/9.x/style/jpeg?seed=0";
         smallAvatarWidth = 200;
         smallAvatarHeight = 200;
         extension = "jpeg";
 
-        avatarService.setSTYLES(new String[]{"style"});
-        avatarService.setGENERATION_URL_PATTERN(generationUrl);
-        avatarService.setSEED_RANGE(1);
-        avatarService.setEXTENSION(extension);
-        avatarService.setBUCKET_NAME("bucket-name");
-        avatarService.setAVATAR_ID_PATTERN("avatar_%d.jpeg");
-        avatarService.setSMALL_AVATAR_ID_PATTERN("small_avatar_%d.jpeg");
-        avatarService.setSMALL_FILE_WIDTH(smallAvatarWidth);
-        avatarService.setSMALL_FILE_HEIGHT(smallAvatarHeight);
-        avatarService.setCONTENT_TYPE("image/jpeg");
-
+        avatarConfig.setSTYLES(new String[]{"style"});
+        avatarConfig.setGENERATION_URL_PATTERN(generationUrl);
+        avatarConfig.setSEED_RANGE(1);
+        avatarConfig.setEXTENSION(extension);
+        avatarConfig.setBUCKET_NAME("bucket-name");
+        avatarConfig.setAVATAR_ID_PATTERN("avatar_%d.jpeg");
+        avatarConfig.setSMALL_AVATAR_ID_PATTERN("small_avatar_%d.jpeg");
+        avatarConfig.setSMALL_FILE_WIDTH(smallAvatarWidth);
+        avatarConfig.setSMALL_FILE_HEIGHT(smallAvatarHeight);
+        avatarConfig.setCONTENT_TYPE("image/jpeg");
 
         user = User.builder()
                 .id(1L)

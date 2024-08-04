@@ -59,7 +59,6 @@ class UserServiceTest {
     public void testCreateUser() {
         when(userMapper.toEntity(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
-        when(avatarService.setRandomAvatar(user)).thenReturn(user);
         userService.createUser(userDto, null);
         verify(userRepository, times(2)).save(user);
         verify(avatarService, times(1)).setRandomAvatar(user);
@@ -70,7 +69,6 @@ class UserServiceTest {
     @DisplayName("testing updateUserAvatar method with null multipartFile")
     public void testUpdateUser() {
         when(userValidator.validateUserExistence(user.getId())).thenReturn(user);
-        when(avatarService.setRandomAvatar(user)).thenReturn(user);
         userService.updateUserAvatar(userId, null);
         verify(avatarService, times(1)).setRandomAvatar(user);
         verify(userRepository, times(1)).save(user);

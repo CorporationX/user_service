@@ -39,7 +39,6 @@ public class PremiumService {
             int end = Math.min(start + batchSize, premiumList.size());
             List<Premium> batch = premiumList.subList(start, end);
 
-//            executorService.submit(() -> batch.forEach(premiumRepository::delete));
             executorService.submit(() ->
                     premiumRepository.deleteAllById(batch.stream()
                             .map(Premium::getId)

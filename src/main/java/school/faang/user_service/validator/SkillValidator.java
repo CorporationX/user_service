@@ -24,7 +24,7 @@ public class SkillValidator {
 
     public void validateSkillOfferList(List<SkillOffer> skillOffersList) {
         if (skillOffersList == null || skillOffersList.isEmpty()) {
-            throw new DataValidationException("List of skillOffer is empty");
+            throw new DataValidationException("List of skillOffers is empty");
         }
     }
 }

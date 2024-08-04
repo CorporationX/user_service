@@ -7,7 +7,6 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
@@ -16,6 +15,7 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,30 +47,33 @@ public class SkillService {
         return skillCandidateMapper.toListDto(skills);
     }
 
-    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        Optional<Skill> skill = skillRepository.findUserSkill(skillId, userId);
-            List<SkillOffer> offersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-            if (offersOfSkill.size() >= MIN_SKILL_OFFERS) {
-                skillRepository.assignSkillToUser(skillId, userId);
-                addGuarantee(offersOfSkill);
-                return getSkillById(skillId);
-            }
-        return skillMapper.toDto(skill.get());
+    public Skill findById(long skillId) {
+        return skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("the skill is not found"));
     }
 
-    public void addGuarantee(List<SkillOffer> skillOffers) {
-        skillValidator.validateSkillOfferList(skillOffers);
-        for (SkillOffer skillOffer : skillOffers) {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        Skill skill = findById(skillId);
+        Optional<Skill> offeredSkill = skillRepository.findUserSkill(skillId, userId);
+        if (offeredSkill.isEmpty()) {
+            if (skillOfferRepository.countAllOffersOfSkill(skillId, userId) >= MIN_SKILL_OFFERS) {
+                addSkillGuarantors(skillId, userId, skill);
+                skillRepository.assignSkillToUser(skillId, userId);
+            }
+        }
+        return skillMapper.toDto(skill);
+    }
+
+    private void addSkillGuarantors(long skillId, long userId, Skill skill) {
+        skillOfferRepository.findAllOffersOfSkill(skillId, userId).forEach(skillOffer -> {
             User receiver = skillOffer.getRecommendation().getReceiver();
             User author = skillOffer.getRecommendation().getAuthor();
-            userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
+            UserSkillGuarantee guarantee = userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
                     .user(receiver).guarantor(author).skill(skillOffer.getSkill()).build());
-        }
-    }
-
-    public SkillDto getSkillById(long skillId) {
-        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("the skill is not found"));
-        return skillMapper.toDto(skill);
+            if (skill.getGuarantees() == null) {
+                skill.setGuarantees(new ArrayList<>());
+            }
+            skill.getGuarantees().add(guarantee);
+        });
     }
 
 }

@@ -12,11 +12,13 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.UserValidator;
+
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,24 +32,36 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-    @Mock
-    private UserMapper userMapper;
-    @Mock
-    private EventRepository eventRepository;
+
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserValidator userValidator;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private EventRepository eventRepository;
+
     @Mock
     private GoalRepository goalRepository;
+
     @Mock
     private MentorshipService mentorshipService;
 
-    private User user;
     private User mentee;
     private Goal mentorAssignedGoal;
+    private long id;
+    private List<Long> ids;
+    private User user;
+    private UserDto userDto;
+    private List<UserDto> userDtoList;
 
     @BeforeEach
     public void setUp() {
@@ -55,6 +69,13 @@ class UserServiceTest {
         List<User> userList = new ArrayList<>();
         List<User> menteesList = new ArrayList<>();
         List<Event> ownedEvents = new ArrayList<>();
+
+        id = 1L;
+        ids = List.of(id);
+
+        userDto = new UserDto();
+
+        userDtoList = List.of(userDto);
         user = User.builder()
                 .id(1L)
                 .goals(goalList)
@@ -74,6 +95,36 @@ class UserServiceTest {
         goalList.add(goal);
         userList.add(user);
         ownedEvents.add(event);
+    }
+
+    @Test
+    @DisplayName("test that getUser calls all methods correctly + return test")
+    public void testGetUser() {
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        UserDto result = userService.getUser(id);
+
+        verify(userValidator).validateUserId(id);
+        verify(userRepository).findById(id);
+        verify(userMapper).toDto(user);
+
+        assertEquals(result, userDto);
+    }
+
+    @Test
+    @DisplayName("test that getUsersByIds calls all methods correctly + return test")
+    public void testGetUsersByIds() {
+        when(userRepository.findAllById(ids)).thenReturn(List.of(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        List<UserDto> result = userService.getUsersByIds(ids);
+
+        verify(userValidator).validateUserId(id);
+        verify(userRepository).findAllById(ids);
+        verify(userMapper).toDto(user);
+
+        assertEquals(result, userDtoList);
     }
 
     @Test

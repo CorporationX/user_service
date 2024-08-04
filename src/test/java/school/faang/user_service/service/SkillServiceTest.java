@@ -85,7 +85,7 @@ public class SkillServiceTest {
         when(skillValidator.titleIsValid(skillDto.getTitle())).thenReturn(true);
         when(skillValidator.existByTitle(skillDto.getTitle())).thenReturn(false);
 
-        when(skillRepository.save(skillMapper.toSkill(skillDto))).thenReturn(expectedSkill);
+        when(skillRepository.save(skillMapper.toEntity(skillDto))).thenReturn(expectedSkill);
 
         SkillDto actual = skillService.create(skillDto);
 

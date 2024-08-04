@@ -13,14 +13,12 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillMapper {
 
-    SkillDto toDto(Skill skill);
+    SkillDto toSkillDto(Skill skill);
 
-    Skill toEntity(SkillDto skilldto);
+    List<SkillDto> toSkillDtoList(List<Skill> skillList);
 
-    List<SkillDto> toDtoList(List<Skill> skills);
-  
-    List<Skill> toEntityList(List<SkillDto> skillsdto);
-  
+    Skill toSkill(SkillDto skill);
+
     default List<SkillCandidateDto> toSkillCandidateDtoList(List<Skill> skillList) {
         Map<String, List<Skill>> skillsByTitle = skillList.stream()
                 .collect(Collectors.groupingBy(Skill::getTitle));
@@ -28,7 +26,7 @@ public interface SkillMapper {
         return skillsByTitle.values()
                 .stream()
                 .map(skills -> {
-                    SkillDto skillDto = toDto(skills.get(0));
+                    SkillDto skillDto = toSkillDto(skills.get(0));
                     long offersAmount = skills.size();
                     return new SkillCandidateDto(skillDto, offersAmount);
                 })

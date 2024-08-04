@@ -2,6 +2,7 @@ package school.faang.user_service.service.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,6 @@ class S3ServiceTest {
     private S3Service s3Service;
     @Mock
     private AmazonS3 s3Client;
-    @Mock
-    private MultipartFileCopyUtil multipartFileCopyUtil;
     private MultipartFile multipartFile;
     String contentType = "image/jpeg";
     String folder = "folder";
@@ -41,18 +40,6 @@ class S3ServiceTest {
     @BeforeEach
     void init() {
         multipartFile = Mockito.mock(MultipartFile.class);
-    }
-
-    @Test
-    @DisplayName("compressionException")
-    void testUploadProfileCompressionException() throws IOException {
-        when(multipartFileCopyUtil.compressionMultipartFile(any(MultipartFile.class), anyInt()))
-                .thenThrow(new RuntimeException("exception"));
-
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                s3Service.uploadProfile(multipartFile, folder));
-
-        assertEquals("exception", exception.getMessage());
     }
 
     @Test
@@ -70,22 +57,16 @@ class S3ServiceTest {
 
     @Test
     @DisplayName("collectMetadataValid")
-    void testUploadProfileCollectMetadataException() throws IOException {
-        when(multipartFileCopyUtil.compressionMultipartFile(any(MultipartFile.class), anyInt()))
-                .thenReturn(multipartFile);
+    void testUploadProfileCollectMetadataValid() {
         when(multipartFile.getContentType()).thenReturn(contentType);
         s3Service.uploadProfile(multipartFile, folder);
 
-        verify(multipartFileCopyUtil, times(2))
-                .compressionMultipartFile(any(MultipartFile.class), anyInt());
-        verify(multipartFile, times(2)).getContentType();
+        verify(multipartFile, times(1)).getContentType();
     }
 
     @Test
     @DisplayName("sendingRequestToTheCloudValid")
-    void testSendingRequestToTheCloudValid() throws IOException {
-        when(multipartFileCopyUtil.compressionMultipartFile(any(MultipartFile.class), anyInt()))
-                .thenReturn(multipartFile);
+    void testSendingRequestToTheCloudValid() {
         when(multipartFile.getContentType())
                 .thenReturn(contentType);
         when(s3Client.putObject(any(PutObjectRequest.class)))
@@ -93,11 +74,9 @@ class S3ServiceTest {
 
         s3Service.uploadProfile(multipartFile, folder);
 
-        verify(multipartFileCopyUtil, times(2))
-                .compressionMultipartFile(any(MultipartFile.class), anyInt());
-        verify(multipartFile, times(2))
+        verify(multipartFile, times(1))
                 .getContentType();
-        verify(s3Client, times(2))
+        verify(s3Client, times(1))
                 .putObject(any(PutObjectRequest.class));
     }
 
@@ -120,7 +99,7 @@ class S3ServiceTest {
         byte[] actualContent = new byte[expectedContent.length];
         actualInputStream.read(actualContent);
 
-        assertArrayEquals(expectedContent, actualContent);
+        Assertions.assertArrayEquals(expectedContent, actualContent);
 
         verify(s3Client, times(1)).getObject(eq(bucketName), eq(key));
         verify(s3Object, times(1)).getObjectContent();

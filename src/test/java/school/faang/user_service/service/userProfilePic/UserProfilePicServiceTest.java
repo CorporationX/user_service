@@ -14,13 +14,15 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.s3.MultipartFileCopyUtil;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,16 +37,17 @@ class UserProfilePicServiceTest {
     private S3Service s3Service;
     @Mock
     private UserProfilePicMapper userProfilePicMapper;
+    @Mock
+    private MultipartFileCopyUtil multipartFileCopyUtil;
     private MultipartFile multipartFile;
     private InputStream inputStream;
     private User user;
     private UserProfileDto userProfileDto;
-    private UserProfilePic userProfilePic;
     private final Long userId = 1L;
 
     @BeforeEach
     void init() {
-        userProfilePic = new UserProfilePic();
+        UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setFileId("1");
         userProfilePic.setSmallFileId("2");
 
@@ -72,32 +75,22 @@ class UserProfilePicServiceTest {
     }
 
     @Test
-    @DisplayName("uploadProfileException")
-    void testAddImageInProfileUploadProfileException() throws IOException {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(s3Service.uploadProfile(any(MultipartFile.class), anyString())).thenThrow(new IOException("exception"));
-
-        Exception exception = assertThrows(IOException.class, () ->
-                userProfilePicService.addImageInProfile(userId, multipartFile));
-
-        assertEquals("exception", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("addImageInProfileToDtoValid")
     void testAddImageInProfileToDto() throws IOException {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(s3Service.uploadProfile(any(MultipartFile.class), any(String.class))).thenReturn(new String());
+        when(multipartFileCopyUtil.compressionMultipartFile(any(MultipartFile.class), anyInt()))
+                .thenReturn(multipartFile);
+        when(s3Service.uploadProfile(any(MultipartFile.class), anyString())).thenReturn("");
+        when(userRepository.save(any(User.class))).thenReturn(new User());
         when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
 
-        UserProfileDto result = userProfilePicService.addImageInProfile(userId, multipartFile);
+        userProfilePicService.addImageInProfile(userId, multipartFile);
 
         verify(userRepository, times(1)).findById(anyLong());
-        verify(s3Service, times(1)).uploadProfile(any(MultipartFile.class), anyString());
+        verify(multipartFileCopyUtil, times(2)).compressionMultipartFile(any(MultipartFile.class), anyInt());
+        verify(s3Service, times(2)).uploadProfile(any(MultipartFile.class), anyString());
         verify(userRepository, times(1)).save(any(User.class));
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
-
-        assertNotNull(result);
     }
 
     @Test
@@ -114,7 +107,7 @@ class UserProfilePicServiceTest {
 
     @Test
     @DisplayName("GetImageFromProfileValid")
-    void testGetImageFromProfile() throws IOException {
+    void testGetImageFromProfile() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
         when(s3Service.downloadingByteImage(anyString())).thenReturn(inputStream);
 
@@ -161,7 +154,7 @@ class UserProfilePicServiceTest {
         userProfilePicService.deleteImageFromProfile(userId);
 
         verify(userRepository, times(1)).findById(anyLong());
-        verify(s3Service, times(1)).deleteImage(anyString());
+        verify(s3Service, times(2)).deleteImage(anyString());
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
     }
 }

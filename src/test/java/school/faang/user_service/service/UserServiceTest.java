@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.user.UserFilterIllegalArgumentException;
+import school.faang.user_service.exception.user.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserServiceImpl;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.filter.UserFilterValidation;
 
@@ -36,7 +36,7 @@ public class UserServiceTest {
 
     private UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
 
-    private UserServiceImpl userService;
+    private UserService userService;
 
     private List<UserFilter> filters;
 
@@ -55,7 +55,7 @@ public class UserServiceTest {
         userFilterValidation = Mockito.mock(UserFilterValidation.class);
         userMapper = Mockito.mock(UserMapper.class);
 
-        userService = new UserServiceImpl(userRepository, filters, userFilterValidation, userMapper);
+        userService = new UserService(userRepository, filters, userFilterValidation, userMapper);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class UserServiceTest {
 
         when(userFilterValidation.isNullable(userFilterDto)).thenReturn(true);
 
-        assertThrows(UserFilterIllegalArgumentException.class, () -> userService.getPremiumUsers(userFilterDto));
+        assertThrows(DataValidationException.class, () -> userService.getPremiumUsers(userFilterDto));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class UserServiceTest {
 
         when(userFilterValidation.isNullable(userFilterDto)).thenReturn(true);
 
-        assertThrows(UserFilterIllegalArgumentException.class, () -> userService.getRegularUsers(userFilterDto));
+        assertThrows(DataValidationException.class, () -> userService.getRegularUsers(userFilterDto));
     }
 
     @Test

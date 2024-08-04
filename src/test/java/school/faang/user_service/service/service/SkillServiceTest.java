@@ -100,7 +100,7 @@ public class SkillServiceTest {
     public void testGetSkillByIdThrowsException() {
         Optional<Skill> skill = Optional.empty();
         Mockito.when(skillRepository.findById(1L)).thenReturn(skill);
-        Assert.assertThrows(DataValidationException.class, () -> skillService.getSkillById(1L));
+        Assert.assertThrows(DataValidationException.class, () -> skillService.findById(1L));
     }
 
     @Test
@@ -109,51 +109,32 @@ public class SkillServiceTest {
         skill.setId(1L);
         Optional<Skill> someSkill = Optional.of(skill);
         Mockito.when(skillRepository.findById(1L)).thenReturn(someSkill);
-        assertEquals(skillMapper.toDto(skill), skillService.getSkillById(1L));
-    }
-
-    @Test
-    public void testAddGuarantee() {
-        User user1 = User.builder().id(1L).build();
-        User user2 = User.builder().id(2L).build();
-        User user3 = User.builder().id(3L).build();
-        Skill skill1 = Skill.builder().id(1L).title("title1").build();
-        Skill skill2 = Skill.builder().id(2L).title("title2").build();
-        Recommendation recommendation1 = Recommendation.builder().author(user1).receiver(user3).build();
-        Recommendation recommendation2 = Recommendation.builder().author(user2).receiver(user3).build();
-        SkillOffer offer1 = SkillOffer.builder().skill(skill1).recommendation(recommendation1).build();
-        SkillOffer offer2 = SkillOffer.builder().skill(skill2).recommendation(recommendation2).build();
-        List<SkillOffer> offers = List.of(offer1, offer2);
-        Mockito.when(userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
-                .user(user3).guarantor(user1).skill(skill1).build())).thenReturn(UserSkillGuarantee.builder()
-                .user(user3).guarantor(user1).skill(skill1).build());
-        Mockito.when(userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
-                .user(user3).guarantor(user2).skill(skill2).build())).thenReturn(UserSkillGuarantee.builder()
-                .user(user3).guarantor(user2).skill(skill2).build());
-        skillService.addGuarantee(offers);
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(1)).save(UserSkillGuarantee.builder()
-                .user(user3).guarantor(user1).skill(skill1).build());
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(1)).save(UserSkillGuarantee.builder()
-                .user(user3).guarantor(user2).skill(skill2).build());
-        Mockito.verify(userSkillGuaranteeRepository, Mockito.times(2))
-                .save(Mockito.any(UserSkillGuarantee.class));
+        assertEquals(skill, skillService.findById(1L));
     }
 
     @Test
     public void testAcquireSkillFromOffers() {
-        SkillService skillServiceTest = spy(skillService);
         Skill skill = Skill.builder().id(1L).title("title").build();
         User user = User.builder().id(1L).build();
         User otherUser = User.builder().id(2L).build();
-        Recommendation recommendation = Recommendation.builder().author(user).receiver(otherUser).build();
+        Recommendation recommendation = Recommendation.builder().author(otherUser).receiver(user).build();
         SkillOffer offer = SkillOffer.builder().skill(skill).recommendation(recommendation).build();
+        UserSkillGuarantee guarantee = UserSkillGuarantee.builder()
+                .user(user).guarantor(otherUser).skill(offer.getSkill()).build();
         List<SkillOffer> threeOffers = List.of(offer, offer, offer);
+
+        Mockito.when(skillRepository.findById(1L)).thenReturn(Optional.of(skill));
         Mockito.when(skillRepository.findUserSkill(1L, 1L)).thenReturn(Optional.empty());
+        Mockito.when(skillOfferRepository.countAllOffersOfSkill(1L,1L)).thenReturn(3);
         Mockito.when(skillOfferRepository.findAllOffersOfSkill(1L, 1L)).thenReturn(threeOffers);
-        Mockito.doNothing().when(skillServiceTest).addGuarantee(threeOffers);
-        Mockito.doReturn(skillMapper.toDto(skill)).when(skillServiceTest).getSkillById(1L);
-        skillServiceTest.acquireSkillFromOffers(1L, 1L);
+        Mockito.doNothing().when(skillRepository).assignSkillToUser(1L,1L);
+        Mockito.when(userSkillGuaranteeRepository.save(Mockito.any(UserSkillGuarantee.class))).thenReturn(guarantee);
+        skillService.acquireSkillFromOffers(1L, 1L);
+
         Mockito.verify(skillRepository, Mockito.times(1)).assignSkillToUser(1L, 1L);
-        Mockito.verify(skillServiceTest, Mockito.times(1)).addGuarantee(threeOffers);
+        Mockito.verify(skillRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(skillRepository, Mockito.times(1)).findUserSkill(1L, 1L);
+        Mockito.verify(skillOfferRepository, Mockito.times(1)).findAllOffersOfSkill(1L, 1L);
+        Assertions.assertEquals(guarantee, skill.getGuarantees().get(0));
     }
 }

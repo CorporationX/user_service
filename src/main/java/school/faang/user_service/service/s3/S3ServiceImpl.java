@@ -1,18 +1,23 @@
 package school.faang.user_service.service.s3;
 
+import com.amazonaws.SdkClientException;
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.entity.UserProfilePic;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Data
@@ -24,7 +29,7 @@ public class S3ServiceImpl implements S3Service {
     private String bucketName;
 
     @Override
-    public String uploadFile(MultipartFile file, String folder) {
+    public String uploadFile(MultipartFile file) {
         long fileSize = file.getSize();
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(fileSize);
@@ -34,12 +39,13 @@ public class S3ServiceImpl implements S3Service {
         try {
             PutObjectRequest putObjectRequest = new PutObjectRequest(
                     bucketName, key, file.getInputStream(), objectMetadata);
-        } catch (Exception e) {
-//            log.error(e.getMessage());
+            s3Client.putObject(putObjectRequest);
+            log.info(bucketName, key, file.getOriginalFilename(), objectMetadata);
+        } catch (IOException e) {
+            log.error("S3Service" + e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
-        UserProfilePic userProfilePic = new UserProfilePic();
         return key;
     }
 
@@ -50,12 +56,11 @@ public class S3ServiceImpl implements S3Service {
 
     @Override
     public InputStream downloadFile(String key) {
-        return null;
+        try {
+            return s3Client.getObject(bucketName, key).getObjectContent();
+        } catch (Exception e) {
+            log.error("S3Service downloadFile" + e.getMessage(), e);
+            throw new SdkClientException(e);
+        }
     }
-
-    public boolean isObjectExist(String key) {
-        return s3Client.doesObjectExist(bucketName, key);
-    }
-
-
 }

@@ -2,12 +2,18 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.ResourceDto;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -15,8 +21,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    // вынеси в application
-    private static final int FILE_LIMIT = 5000000;
+    @Value("${services.s3.fileLimit}")
+    private int FILE_LIMIT;
 
     @GetMapping("/users/{userId}")
     public UserDto getUser(@PathVariable long userId) {
@@ -29,7 +35,8 @@ public class UserController {
     }
 
     @PostMapping("usersPic/{userId}")
-    public ResourceDto addUsersPic(@PathVariable long userId, @RequestBody MultipartFile file) throws FileSizeLimitExceededException {
+    public UserProfilePicDto addUsersPic(@PathVariable long userId, @RequestBody MultipartFile file) throws IOException {
+        System.out.println(file.getSize());
         if (file.getSize() > FILE_LIMIT) {
             throw new FileSizeLimitExceededException("File Size Limit ", file.getSize(), FILE_LIMIT);
         }
@@ -37,12 +44,20 @@ public class UserController {
     }
 
     @GetMapping("usersPic/{userId}")
-    public ResourceDto getUserPic(@PathVariable long userId) {
-        return null;
+    public ResponseEntity<byte[]> getUserPic(@PathVariable long userId) throws IOException {
+        byte[] imageBytes = null;
+        try {
+            imageBytes = userService.getUserPic(userId).readAllBytes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 
     @DeleteMapping("usersPic/{userId}")
     public void deleteUserPic(@PathVariable long userId) {
-
+        userService.deleteUserPic(userId);
     }
 }

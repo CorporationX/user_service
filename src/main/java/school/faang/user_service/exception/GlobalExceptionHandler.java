@@ -1,4 +1,4 @@
-package school.faang.user_service.exception.skill;
+package school.faang.user_service.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import school.faang.user_service.exception.skill.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class SkillExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -32,9 +33,14 @@ public class SkillExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DataValidationException.class)
+    @ExceptionHandler(school.faang.user_service.exception.skill.DataValidationException.class)
     public ResponseEntity<Object> handleDataValidationException(DataValidationException ex) {
         return new ResponseEntity<>(response(ex), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(response(ex), HttpStatus.NOT_FOUND);
     }
 
     private Map<String, String> response(Exception ex) {

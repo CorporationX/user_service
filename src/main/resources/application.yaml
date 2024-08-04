@@ -27,6 +27,24 @@ spring:
         profile_view_channel:
             name: profile_view_channel
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      client-id: userservice
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: false
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: userservice
+      enable-auto-commit: false
+    listener:
+      ack-mode: manual
+    retry:
+      attempts: 3
+
 server:
   port: 8080
 
@@ -41,6 +59,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  currency: EUR
+  dbCurrency: USD
+  api: /api
+  sendPayment: /payment
 
 aws:
   accessKey: access_key
@@ -51,3 +73,9 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+kafka-topic:
+  consumer:
+    payment-response: userservice.payment.response
+  producer:
+    payment-request: paymentservice.payment.request

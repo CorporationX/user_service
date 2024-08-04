@@ -61,6 +61,11 @@ dependencies {
     implementation("io.springfox:springfox-swagger2:2.9.2")
 
     /**
+     * Kafka
+     */
+    implementation("org.springframework.kafka:spring-kafka")
+
+    /**
      * Test containers
      */
     implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))

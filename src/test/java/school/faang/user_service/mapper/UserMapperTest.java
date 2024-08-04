@@ -41,7 +41,7 @@ public class UserMapperTest {
 
     @Test
     public void toEntity() {
-        UserDto userDto = new UserDto(id, userName, email);
+        UserDto userDto = UserDto.builder().id(id).username(userName).email(email).build();
         User resultUser = userMapper.toEntity(userDto);
         assertUser(resultUser);
     }

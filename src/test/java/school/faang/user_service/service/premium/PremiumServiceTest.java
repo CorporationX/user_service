@@ -46,15 +46,16 @@ class PremiumServiceTest {
                 .id(1L)
                 .endDate(LocalDateTime.now().minusDays(1))
                 .build();
+        List<Long> premiumId = List.of(1L);
         when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
                 .thenReturn(List.of(premium));
-        doNothing().when(premiumRepository).delete(premium);
+        doNothing().when(premiumRepository).deleteAllById(premiumId);
 
         premiumService.removingExpiredPremiumAccess(10);
 
         verify(premiumRepository, times(1))
                 .findAllByEndDateBefore(any(LocalDateTime.class));
         verify(premiumRepository, times(1))
-                .delete(any(Premium.class));
+                .deleteAllById(anyList());
     }
 }

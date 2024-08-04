@@ -15,7 +15,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class User_Controller {
+public class UserController {
     private final UserService userService;
     private final FileValidator fileValidator;
 

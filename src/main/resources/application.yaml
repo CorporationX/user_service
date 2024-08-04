@@ -58,3 +58,5 @@ premium:
       cron: "0 0 10 * * MON"
     batchSize:
       size: 100
+    threadPool:
+      count: 100

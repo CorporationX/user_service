@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.premium.Premium;
@@ -18,12 +19,13 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class PremiumService {
-    private static final int COUNT_THREAD = 100;
+    @Value("${premium.removal.threadPool.count}")
+    private int countThread;
     private final PremiumRepository premiumRepository;
 
     @Transactional
     public void removingExpiredPremiumAccess(int batchSize) {
-        ExecutorService executorService = Executors.newFixedThreadPool(COUNT_THREAD);
+        ExecutorService executorService = Executors.newFixedThreadPool(countThread);
 
         List<Premium> premiumList = premiumRepository
                 .findAllByEndDateBefore(LocalDateTime.now());

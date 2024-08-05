@@ -10,6 +10,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.image.ImageMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
 
@@ -23,8 +24,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final S3Service s3Service;
+    private final ImageMapper imageMapper;
 
-    // вынеси в application
     private final static int MAX_IMAGE_PIC = 1080;
     private final static int MIN_IMAGE_PIC = 170;
 
@@ -44,8 +45,9 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User " + userId + " not found"));
 
         UserProfilePic userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId(s3Service.uploadFile(convertFilePermissions(file, MAX_IMAGE_PIC)));
-        userProfilePic.setSmallFileId(s3Service.uploadFile(convertFilePermissions(file, MIN_IMAGE_PIC)));
+
+        userProfilePic.setFileId(s3Service.uploadFile(imageMapper.convertFilePermissions(file, MAX_IMAGE_PIC)));
+        userProfilePic.setSmallFileId(s3Service.uploadFile(imageMapper.convertFilePermissions(file, MIN_IMAGE_PIC)));
 
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
@@ -65,15 +67,12 @@ public class UserService {
     public void deleteUserPic(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User " + userId + " not found"));
 
-        s3Service.delete(user.getUserProfilePic().getFileId());
-        s3Service.delete(user.getUserProfilePic().getSmallFileId());
-    }
+        s3Service.deleteFile(user.getUserProfilePic().getFileId());
+        s3Service.deleteFile(user.getUserProfilePic().getSmallFileId());
 
-    private MultipartFile convertFilePermissions(MultipartFile file, int permission) throws IOException {
-        Thumbnails.of(file.getInputStream())
-                .size(permission, permission)
-                .toFile(file.getOriginalFilename());
+        user.getUserProfilePic().setFileId(null);
+        user.getUserProfilePic().setSmallFileId(null);
 
-        return file;
+        userRepository.save(user);
     }
 }

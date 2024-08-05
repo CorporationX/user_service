@@ -1,7 +1,6 @@
 package school.faang.user_service.service.s3;
 
 import com.amazonaws.SdkClientException;
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -50,7 +48,7 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public void delete(String key) {
+    public void deleteFile(String key) {
         s3Client.deleteObject(bucketName, key);
     }
 

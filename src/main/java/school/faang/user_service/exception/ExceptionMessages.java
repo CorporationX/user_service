@@ -15,6 +15,12 @@ public final class ExceptionMessages {
     public static final String MENTORSHIP_REQUEST_NOT_FOUND = "Mentorship request cannot be found.";
     public static final String MENTORSHIP_ALREADY_ONGOING = "You already mentor this user.";
 
+    // recommendation
+    public static final String RECOMMENDATION_REQUEST_NOT_FOUND = "Request cannot be found.";
+    public static final String DISCREPANCY_OF_STATUS = "Status does not match condition.";
+    public static final String RECOMMENDATION_FREQUENCY ="Recommendation request can only be sent once every 6 months.";
+    public static final String REQUEST_SKILL = "One or more requested skills do not exist in the database";
+
     // subscription
     public static final String SELF_SUBSCRIPTION = "You cannot follow yourself!";
     public static final String SELF_UNSUBSCRIPTION = "You cannot unfollow yourself!";

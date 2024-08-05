@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.userPremium;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,12 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userDto.UserDto;
-import school.faang.user_service.dto.userDto.UserFilterDto;
+import school.faang.user_service.dto.userPremium.UserPremiumDto;
+import school.faang.user_service.dto.userPremium.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.userPremium.UserPremiumMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.filter.userFilter.UserFilter;
+import school.faang.user_service.filter.userPremium.UserPremiumFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,11 +25,11 @@ class UserPremiumServiceTest {
     @Mock
     private UserPremiumMapper userPremiumMapper;
     @Mock
-    private List<UserFilter> userFilters;
+    private List<UserPremiumFilter> userFilters;
     @Mock
-    private UserFilter usernameFilterPattern;
+    private UserPremiumFilter usernameFilterPattern;
     @Mock
-    private UserFilter countryFilterPattern;
+    private UserPremiumFilter countryFilterPattern;
 
     @Test
     void testGetPremiumUsers() {
@@ -40,7 +40,7 @@ class UserPremiumServiceTest {
         Mockito.when(usernameFilterPattern.apply(Mockito.any(), Mockito.any())).thenReturn(Stream.of(new User()));
         Mockito.when(countryFilterPattern.isApplication(Mockito.any())).thenReturn(true);
         Mockito.when(countryFilterPattern.apply(Mockito.any(), Mockito.any())).thenReturn(Stream.of(new User()));
-        Mockito.when(userPremiumMapper.toDto(Mockito.any())).thenReturn(new UserDto());
+        Mockito.when(userPremiumMapper.toDto(Mockito.any())).thenReturn(new UserPremiumDto());
 
         userPremiumService.getPremiumUsers(new UserFilterDto());
         Mockito.verify(userPremiumMapper, Mockito.times(1)).toDto(Mockito.any());

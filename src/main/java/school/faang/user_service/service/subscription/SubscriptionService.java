@@ -37,6 +37,7 @@ public class SubscriptionService {
         return true;
     }
 
+    @Transactional(readOnly = true)
     public List<UserSubscriptionDto> getFollowers(long followeeId, UserSubscriptionFilterDto filter) {
         List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
         return filterUsers(followers, filter).stream()
@@ -57,10 +58,12 @@ public class SubscriptionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public long getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
+    @Transactional(readOnly = true)
     public List<UserSubscriptionDto> getFollowing(long followerId, UserSubscriptionFilterDto filter) {
         List<User> followings = subscriptionRepository.findByFollowerId(followerId).toList();
         return filterUsers(followings, filter).stream()
@@ -68,6 +71,7 @@ public class SubscriptionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public long getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }

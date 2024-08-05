@@ -80,7 +80,7 @@ class UserProfilePicServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
         when(multipartFileCopyUtil.compressionMultipartFile(any(MultipartFile.class), anyInt()))
                 .thenReturn(multipartFile);
-        when(s3Service.uploadProfile(any(MultipartFile.class), anyString())).thenReturn("");
+        when(s3Service.uploadFile(any(MultipartFile.class), anyString())).thenReturn("");
         when(userRepository.save(any(User.class))).thenReturn(new User());
         when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
 
@@ -88,7 +88,7 @@ class UserProfilePicServiceTest {
 
         verify(userRepository, times(1)).findById(anyLong());
         verify(multipartFileCopyUtil, times(2)).compressionMultipartFile(any(MultipartFile.class), anyInt());
-        verify(s3Service, times(2)).uploadProfile(any(MultipartFile.class), anyString());
+        verify(s3Service, times(2)).uploadFile(any(MultipartFile.class), anyString());
         verify(userRepository, times(1)).save(any(User.class));
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
     }

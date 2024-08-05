@@ -38,8 +38,8 @@ public class UserProfilePicService {
                 .compressionMultipartFile(multipartFile, MAX_IMAGE_SMALL_PHOTO);
 
         UserProfilePic userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId(s3Service.uploadProfile(multipartFileUtilLarge, folder));
-        userProfilePic.setSmallFileId(s3Service.uploadProfile(multipartFileUtilSmall, folder));
+        userProfilePic.setFileId(s3Service.uploadFile(multipartFileUtilLarge, folder));
+        userProfilePic.setSmallFileId(s3Service.uploadFile(multipartFileUtilSmall, folder));
 
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);

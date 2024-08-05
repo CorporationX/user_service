@@ -23,7 +23,7 @@ public class S3Service {
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
-    public String uploadProfile(MultipartFile multipartFile, String folder) {
+    public String uploadFile(MultipartFile multipartFile, String folder) {
         ObjectMetadata objectMetadataOne = collectMetadata(multipartFile);
         String keyOne = String.format("Origin%s%d%s",
                 folder, System.currentTimeMillis(), multipartFile.getOriginalFilename());

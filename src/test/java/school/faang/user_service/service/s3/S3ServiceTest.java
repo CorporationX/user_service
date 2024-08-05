@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.entity.UserProfilePic;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -59,7 +58,7 @@ class S3ServiceTest {
     @DisplayName("collectMetadataValid")
     void testUploadProfileCollectMetadataValid() {
         when(multipartFile.getContentType()).thenReturn(contentType);
-        s3Service.uploadProfile(multipartFile, folder);
+        s3Service.uploadFile(multipartFile, folder);
 
         verify(multipartFile, times(1)).getContentType();
     }
@@ -72,7 +71,7 @@ class S3ServiceTest {
         when(s3Client.putObject(any(PutObjectRequest.class)))
                 .thenReturn(new PutObjectResult());
 
-        s3Service.uploadProfile(multipartFile, folder);
+        s3Service.uploadFile(multipartFile, folder);
 
         verify(multipartFile, times(1))
                 .getContentType();
@@ -89,19 +88,17 @@ class S3ServiceTest {
         S3Object s3Object = mock(S3Object.class);
         S3ObjectInputStream s3ObjectInputStream = new S3ObjectInputStream(expectedInputStream, null);
 
-        when(s3Client.getObject(eq(bucketName), eq(key))).thenReturn(s3Object);
+        when(s3Client.getObject(bucketName, key)).thenReturn(s3Object);
         when(s3Object.getObjectContent()).thenReturn(s3ObjectInputStream);
 
         InputStream actualInputStream = s3Service.downloadingByteImage(key);
 
         assertNotNull(actualInputStream);
-        byte[] expectedContent = testData.getBytes();
-        byte[] actualContent = new byte[expectedContent.length];
-        actualInputStream.read(actualContent);
+        byte[] actualContent = actualInputStream.readAllBytes();
 
-        Assertions.assertArrayEquals(expectedContent, actualContent);
+        Assertions.assertArrayEquals(testData.getBytes(), actualContent);
 
-        verify(s3Client, times(1)).getObject(eq(bucketName), eq(key));
+        verify(s3Client, times(1)).getObject(bucketName, key);
         verify(s3Object, times(1)).getObjectContent();
     }
 

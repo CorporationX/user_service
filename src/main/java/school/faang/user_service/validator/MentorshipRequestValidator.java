@@ -18,10 +18,28 @@ public class MentorshipRequestValidator {
         checkUsersExisting(requesterId);
         checkUsersExisting(receiverId);
         checkRequesterIsNotEqualsReceiver(requesterId, receiverId);
+        checkDescription(mentorshipRequestDto);
         checkRecommendationRequestStatus(mentorshipRequestDto.getStatus());
         return true;
     }
 
+    public boolean checkDates(MentorshipRequestDto mentorshipRequestDto) {
+        LocalDateTime timeNow = LocalDateTime.now();
+        LocalDateTime timeRequest = mentorshipRequestDto.getCreatedAt();
+        int compareResult = timeRequest.plusMonths(3).compareTo(timeNow);
+        if (compareResult >= 0) {
+            throw new RuntimeException("Заявка уже была оформлена");
+        }
+        return true;
+    }
+  
+    private boolean checkDescription(MentorshipRequestDto mentorshipRequestDto) {
+        if(mentorshipRequestDto.getDescription() == null && mentorshipRequestDto.getDescription().isBlank()){
+           throw new DataValidationException("Description can't be blank");
+        }
+        return true;
+    }
+    
     private void checkUsersExisting(Long userId) {
         userService.existsById(userId);
     }

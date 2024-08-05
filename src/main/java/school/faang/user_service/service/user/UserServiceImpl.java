@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDTO;
 import school.faang.user_service.dto.notification.UserNotificationDto;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -36,6 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsById(long userId) {
         if (!userRepository.existsById(userId)) {
+            log.info("пользователь с id= {} не существует", userId);
             throw new NoSuchElementException(String.format("user with id: %d is not exists", userId));
         }
         return true;

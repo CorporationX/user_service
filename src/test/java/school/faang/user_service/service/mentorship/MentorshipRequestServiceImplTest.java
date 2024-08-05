@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.MentorshipStartEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -27,7 +28,6 @@ class MentorshipRequestServiceImplTest {
     private static final long MENTORSHIP_REQUEST_ID = 1L;
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
-
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock

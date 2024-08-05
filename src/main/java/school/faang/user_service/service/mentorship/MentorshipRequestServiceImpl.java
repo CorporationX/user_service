@@ -24,17 +24,21 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipService mentorshipService;
     private final MentorshipEventPublisher mentorshipEventPublisher;
 
-    @Override
-    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        mentorshipRequestValidator.validateMentorshipRequest(mentorshipRequestDto);
-        mentorshipRequestDto.setStatus(RequestStatus.PENDING);
+@Override
+public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    mentorshipRequestValidator.validateMentorshipRequest(mentorshipRequestDto);
+    mentorshipRequestDto.setStatus(RequestStatus.PENDING);
+    MentorshipRequestDto latestRequestDto = findLatestRequestDTO(userId, mentorId);
+    if (latestRequestDto == null || mentorshipRequestValidator.checkDates(latestRequestDto)) {
         MentorshipRequest savedMentorshipRequest = mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(mentorshipRequestDto));
-        return mentorshipRequestMapper.toDto(savedMentorshipRequest);
+        return mentorshipRequestMapper.toDto(savedMentorshipRequest)
     }
+    return null;
+}
 
-    @Override
-    public void acceptRequest(long id) {
-        MentorshipRequest mentorshipRequest = findEntityById(id);
+@Override
+public void acceptRequest(long id) {
+   MentorshipRequest mentorshipRequest = findEntityById(id);
         long requesterId = mentorshipRequest.getRequester().getId();
         long receiverId = mentorshipRequest.getReceiver().getId();
         boolean isRequestAlreadyAccepted = mentorshipRequestRepository.existAcceptedRequest(requesterId, receiverId);
@@ -51,6 +55,14 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     public List<MentorshipRequestDto> findAll() {
         return mentorshipRequestMapper.toDtoList(mentorshipRequestRepository.findAll());
+    }
+  
+    private MentorshipRequestDto findLatestRequestDTO(Long userId, Long mentorId) {
+        Optional<MentorshipRequest> optional = mentorshipRequestRepository.findLatestRequest(userId, mentorId);
+        if (optional.isEmpty()) {
+            return null;
+        }
+        return mentorshipRequestMapper.toDto(optional.get());
     }
 
     private MentorshipRequest findEntityById(long id) {

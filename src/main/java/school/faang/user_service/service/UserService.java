@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;

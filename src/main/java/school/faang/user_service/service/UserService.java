@@ -2,7 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserCreateDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
@@ -29,9 +29,9 @@ public class UserService {
                 .orElseThrow(() -> new DataValidationException(USER_DOES_NOT_EXIST.getMessage()));
     }
 
-    public UserDto createUser(UserDto userDto) {
+    public UserCreateDto createUser(UserCreateDto userDto) {
         User user = userMapper.toEntity(userDto);
         userRepository.save(user);
-        return userMapper.toDto(user);
+        return userMapper.toDtoCreated(user);
     }
 }

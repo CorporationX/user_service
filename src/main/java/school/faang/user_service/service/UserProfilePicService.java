@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserCreateDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.entity.User;
@@ -49,18 +50,18 @@ public class UserProfilePicService {
     @Value("${defaultAvatar.url}")
     private String url;
 
-    public void putDefaultPicWhileCreating(UserDto userDto) {
+    public void putDefaultPicWhileCreating(UserCreateDto userDto) {
         byte[] image = restTemplate.getForObject(url, byte[].class);
         if (image == null) {
             throw new DataValidationException(GENERATION_EXCEPTION.getMessage());
         }
 
-        InputStream smallDefaultPic = compressPic(new ByteArrayInputStream(image), smallSize);
-        String key = String.format("default_small_%s_%s", userDto.getUsername(), LocalDateTime.now());
-        s3Client.putObject(bucketName, key, smallDefaultPic, null);
+        InputStream defaultPic = compressPic(new ByteArrayInputStream(image), largeSize);
+        String key = String.format("default_%s_%s", userDto.getUsername(), LocalDateTime.now());
+        s3Client.putObject(bucketName, key, defaultPic, null);
 
         UserProfilePicDto userProfilePicDto = new UserProfilePicDto();
-        userProfilePicDto.setSmallFileId(key);
+        userProfilePicDto.setFileId(key);
         userDto.setUserProfilePicDto(userProfilePicDto);
     }
 

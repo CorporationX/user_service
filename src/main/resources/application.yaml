@@ -66,4 +66,4 @@ services:
     largeSize: 1080
     isMocked: true
 defaultAvatar:
-  url: https://api.dicebear.com/9.x/adventurer/svg?seed=Cuddles
+  url: https://api.dicebear.com/9.x/adventurer/jpg?seed=Cuddles

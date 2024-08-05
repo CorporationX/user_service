@@ -29,7 +29,7 @@ public class RecommendationRequestDto {
     private RequestStatus status;
     private String rejectionReason;
     @NotNull
-    private List<SkillRequestDto> skillDtos;
+    private List<SkillRequestDto> skillRequestDtos;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

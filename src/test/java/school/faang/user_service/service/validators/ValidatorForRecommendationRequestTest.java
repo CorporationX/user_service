@@ -6,11 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.exeptions.DataValidationException;
-import school.faang.user_service.exeptions.NotFoundElement;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundEntityException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.validator.ValidatorForRecommendationRequestService;
+import school.faang.user_service.validator.ValidatorForRecommendationRequest;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ValidatorForRecommendationRequestServiceTest {
+class ValidatorForRecommendationRequestTest {
 
     @Mock
     private UserRepository userRepository;
@@ -28,7 +28,7 @@ class ValidatorForRecommendationRequestServiceTest {
     private RecommendationRequestRepository requestRepository;
 
     @InjectMocks
-    private ValidatorForRecommendationRequestService validator;
+    private ValidatorForRecommendationRequest validator;
 
     private RecommendationRequestDto validRequestDto;
     private RecommendationRequestDto invalidRequestDto;
@@ -56,14 +56,14 @@ class ValidatorForRecommendationRequestServiceTest {
         dto.setRequesterId(1L);
         dto.setRecieverId(1L);
 
-        assertThrows(DataValidationException.class, () -> validator.validatorData(dto));
+        assertThrows(DataValidationException.class, () -> validator.validate(dto));
     }
 
     @Test
     void shouldThrowExceptionWhenRequesterDoesNotExist() {
         when(userRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(NotFoundElement.class, () -> validator.validatorData(validRequestDto));
+        assertThrows(NotFoundEntityException.class, () -> validator.validate(validRequestDto));
     }
 
     @Test
@@ -71,7 +71,7 @@ class ValidatorForRecommendationRequestServiceTest {
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.existsById(2L)).thenReturn(false);
 
-        assertThrows(NotFoundElement.class, () -> validator.validatorData(validRequestDto));
+        assertThrows(NotFoundEntityException.class, () -> validator.validate(validRequestDto));
     }
 
     @Test
@@ -80,7 +80,7 @@ class ValidatorForRecommendationRequestServiceTest {
         when(userRepository.existsById(2L)).thenReturn(true);
         when(requestRepository.existsById(1L)).thenReturn(true);
 
-        assertThrows(DataValidationException.class, () -> validator.validatorData(invalidRequestDto));
+        assertThrows(DataValidationException.class, () -> validator.validate(invalidRequestDto));
     }
 
     @Test
@@ -89,7 +89,7 @@ class ValidatorForRecommendationRequestServiceTest {
         when(userRepository.existsById(2L)).thenReturn(true);
         when(requestRepository.existsById(1L)).thenReturn(false);
 
-        validator.validatorData(validRequestDto);
+        validator.validate(validRequestDto);
 
         verify(userRepository, times(1)).existsById(1L);
         verify(userRepository, times(1)).existsById(2L);

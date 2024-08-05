@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 public class RequestSkillsFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getSkills() != null && !filter.getSkills().isEmpty();
+        return filter.getSkillRequestDtos() != null && !filter.getSkillRequestDtos().isEmpty();
     }
 
     @Override
     public Stream<RecommendationRequest> apply(List<RecommendationRequest> requests, RequestFilterDto filter) {
-        return requests.stream().filter(request -> request.getSkills().containsAll(filter.getSkills()));
+        return requests.stream().filter(request -> request.getSkills().containsAll(filter.getSkillRequestDtos()));
     }
 }

@@ -1,5 +1,8 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,22 +28,23 @@ public class RecommendationRequestController {
     private final RecommendationRequestService requestService;
 
     @PostMapping(REQUEST)
-    public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequestDto) {
+    public RecommendationRequestDto requestRecommendation(@RequestBody @NotNull RecommendationRequestDto recommendationRequestDto) {
         return requestService.create(recommendationRequestDto);
     }
 
     @GetMapping(REQUEST)
-    public RecommendationRequestDto getRecommendationRequest(Long id) {
+    public RecommendationRequestDto getRecommendationRequest(@Positive Long id) {
         return requestService.getRequest(id);
     }
 
     @GetMapping(FILTERED_REQUESTS)
-    public List<RecommendationRequestDto> getRecommendationRequests(Long receiverId, RequestFilterDto filter) {
-        return requestService.getRequests(receiverId, filter);
+    public List<RecommendationRequestDto> getRecommendationRequests(@Positive Long receiverId, @NotNull RequestFilterDto filter) {
+        return requestService.getFilteredRequests(receiverId, filter);
     }
 
     @PostMapping(REQUEST + "/{id}")
-    public RecommendationRequestDto rejectRequest(@PathVariable("id") Long recommendationRequestId, @RequestParam String rejectionReason) {
+    public RecommendationRequestDto rejectRequest(@PathVariable("id") @Positive Long recommendationRequestId,
+                                                  @RequestParam @NotBlank String rejectionReason) {
         return requestService.rejectRequest(recommendationRequestId, rejectionReason);
     }
 }

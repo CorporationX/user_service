@@ -9,14 +9,14 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exeptions.DataValidationException;
-import school.faang.user_service.exeptions.NotFoundElement;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundEntityException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.filter.RequestFilter;
 import school.faang.user_service.service.recommendation.filter.impl.RequestSkillsFilter;
-import school.faang.user_service.validator.ValidatorForRecommendationRequestService;
+import school.faang.user_service.validator.ValidatorForRecommendationRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +40,7 @@ public class RecommendationRequestServiceTest {
 
     private RecommendationRequestRepository requestRepository = Mockito.mock(RecommendationRequestRepository.class);
 
-    private ValidatorForRecommendationRequestService recommendationServiceValidator = Mockito.mock(ValidatorForRecommendationRequestService.class);
+    private ValidatorForRecommendationRequest recommendationServiceValidator = Mockito.mock(ValidatorForRecommendationRequest.class);
 
     private SkillRequestRepository skillRequestRepository = Mockito.mock(SkillRequestRepository.class);
 
@@ -60,7 +60,7 @@ public class RecommendationRequestServiceTest {
         requestDto.setRecieverId(2L);
         requestDto.setMessage("Test message");
         requestDto.setStatus(RequestStatus.PENDING);
-        requestDto.setSkillDtos(Collections.emptyList());
+        requestDto.setSkillRequestDtos(Collections.emptyList());
 
         recommendationRequest = new RecommendationRequest();
         recommendationRequest.setId(1L);
@@ -75,7 +75,7 @@ public class RecommendationRequestServiceTest {
 
     @Test
     void testCreate() {
-        doNothing().when(recommendationServiceValidator).validatorData(any());
+        doNothing().when(recommendationServiceValidator).validate(any());
         when(skillRequestRepository.existsById(anyLong())).thenReturn(true);
         when(requestRepository.save(any())).thenReturn(recommendationRequest);
         when(requestMapper.toEntity(any())).thenReturn(recommendationRequest);
@@ -83,8 +83,8 @@ public class RecommendationRequestServiceTest {
 
         RecommendationRequestDto createdRequest = recommendationRequestService.create(requestDto);
 
-        verify(recommendationServiceValidator, times(1)).validatorData(any());
-        verify(skillRequestRepository, times(requestDto.getSkillDtos().size())).existsById(anyLong());
+        verify(recommendationServiceValidator, times(1)).validate(any());
+        verify(skillRequestRepository, times(requestDto.getSkillRequestDtos().size())).existsById(anyLong());
         verify(requestRepository, times(1)).save(any());
         verify(requestMapper, times(1)).toEntity(any());
         verify(requestMapper, times(1)).toDto(any());
@@ -109,7 +109,7 @@ public class RecommendationRequestServiceTest {
     void testGetRequestNotFound() {
         when(requestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        NotFoundElement exception = assertThrows(NotFoundElement.class, () -> recommendationRequestService.getRequest(1L));
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> recommendationRequestService.getRequest(1L));
 
         assertEquals("Not found RequestRecommendation for id: 1", exception.getMessage());
     }
@@ -136,13 +136,13 @@ public class RecommendationRequestServiceTest {
     void testRejectRequestNotFound() {
         when(requestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        NotFoundElement exception = assertThrows(NotFoundElement.class, () -> recommendationRequestService.rejectRequest(1L, "Reason"));
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> recommendationRequestService.rejectRequest(1L, "Reason"));
 
         assertEquals("Not found RequestRecommendation for id: 1", exception.getMessage());
     }
 
     @Test
-    void testGetRequests() {
+    void testGetFilteredRequests() {
         List<RecommendationRequest> requests = List.of(recommendationRequest);
         RequestFilterDto filters = new RequestFilterDto();
         var receiverId = 1L;
@@ -153,7 +153,7 @@ public class RecommendationRequestServiceTest {
         when(requestFilters.get(0).isApplicable(any())).thenReturn(true);
         when(requestFilters.get(0).apply(any(), any())).thenReturn(Stream.of(recommendationRequest));
 
-        List<RecommendationRequestDto> requestDtos = recommendationRequestService.getRequests(receiverId, filters);
+        List<RecommendationRequestDto> requestDtos = recommendationRequestService.getFilteredRequests(receiverId, filters);
 
         verify(requestRepository, times(1)).findAllRecommendationRequestForReceiver(receiverId);
         verify(requestMapper, times(requests.size())).toDto(recommendationRequest);
@@ -163,8 +163,8 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testGetRequestsInvalidReceiverId() {
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> recommendationRequestService.getRequests(-1L, new RequestFilterDto()));
+    void testGetFilteredRequestsInvalidReceiverId() {
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> recommendationRequestService.getFilteredRequests(-1L, new RequestFilterDto()));
 
         assertEquals("recipientID apply in getRequest method was null or negative id: -1", exception.getMessage());
     }

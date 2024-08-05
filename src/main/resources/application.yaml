@@ -61,3 +61,9 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+
+scheduler:
+  clear-events:
+    cron: "0 0 0 * * SUN"
+    chunk-size: 100 # –азмер подсписка дл€ удалени€ событий

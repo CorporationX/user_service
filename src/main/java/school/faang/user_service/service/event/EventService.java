@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -11,7 +13,13 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
@@ -22,6 +30,10 @@ public class EventService {
     private final List<EventFilter> eventFilters;
     private final UserService userService;
     private final EventServiceValidator validator;
+
+    @Value("${scheduler.clear-events.chunk-size}")
+    @Setter
+    private int chunkSize;
 
     public EventDto create(EventDto eventDto) {
         User owner = userService.findUserById(eventDto.getOwnerId());
@@ -77,4 +89,30 @@ public class EventService {
                 .map(eventMapper::toDto)
                 .toList();
     }
+
+
+    public void clearPastEvents() {
+        List<Event> events = eventRepository.findAll();
+        List<Event> pastEvents = events.stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
+
+        List<List<Event>> partitions = partitionList(pastEvents, chunkSize);
+        ExecutorService executor = Executors.newFixedThreadPool(partitions.size());
+
+        for (List<Event> partition : partitions) {
+            executor.submit(() -> eventRepository.deleteAllByIdInBatch(
+                    partition.stream().map(Event::getId).toList()
+            ));
+        }
+        executor.shutdown();
+    }
+
+    private <T> List<List<T>> partitionList(List<T> list, int size) {
+        int numPartitions = (list.size() + size - 1) / size;
+        return IntStream.range(0, numPartitions)
+                .mapToObj(i -> list.subList(i * size, Math.min((i + 1) * size, list.size())))
+                .toList();
+    }
+
 }

@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.mapper.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
 
@@ -21,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 
+import static school.faang.user_service.exception.MessageError.GENERATION_EXCEPTION;
+
 @Service
 @RequiredArgsConstructor
 public class UserProfilePicService {
@@ -29,6 +35,7 @@ public class UserProfilePicService {
     private final AmazonS3 s3Client;
     private final UserRepository userRepository;
     private final UserProfilePicMapper userProfilePicMapper;
+    private final RestTemplate restTemplate;
 
     @Value("${services.s3.bucketName}")
     private String bucketName;
@@ -38,6 +45,24 @@ public class UserProfilePicService {
 
     @Value("${services.s3.largeSize}")
     private int largeSize;
+
+    @Value("${defaultAvatar.url}")
+    private String url;
+
+    public void putDefaultPicWhileCreating(UserDto userDto) {
+        byte[] image = restTemplate.getForObject(url, byte[].class);
+        if (image == null) {
+            throw new DataValidationException(GENERATION_EXCEPTION.getMessage());
+        }
+
+        InputStream smallDefaultPic = compressPic(new ByteArrayInputStream(image), smallSize);
+        String key = String.format("default_small_%s_%s", userDto.getUsername(), LocalDateTime.now());
+        s3Client.putObject(bucketName, key, smallDefaultPic, null);
+
+        UserProfilePicDto userProfilePicDto = new UserProfilePicDto();
+        userProfilePicDto.setSmallFileId(key);
+        userDto.setUserProfilePicDto(userProfilePicDto);
+    }
 
     private InputStream compressPic(InputStream inputStream, int size) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -57,8 +82,8 @@ public class UserProfilePicService {
     public UserProfilePicDto saveUserProfilePic(Long id, MultipartFile file) {
         User user = userService.findUserById(id);
 
-        String smallPic = String.format("small%s%d", file.getName(), LocalDateTime.now());
-        String largePic = String.format("large%s%d", file.getName(), LocalDateTime.now());
+        String smallPic = String.format("small%s%s", file.getName(), LocalDateTime.now());
+        String largePic = String.format("large%s%s", file.getName(), LocalDateTime.now());
 
         try {
             s3Client.putObject(bucketName, smallPic, compressPic(file.getInputStream(), smallSize), null);

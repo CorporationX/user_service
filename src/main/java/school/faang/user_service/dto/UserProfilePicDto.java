@@ -1,10 +1,9 @@
 package school.faang.user_service.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
+@Data
 public class UserProfilePicDto {
-    @NotBlank
     private String fileId;
-    @NotBlank
     private String smallFileId;
 }

@@ -59,9 +59,11 @@ services:
   s3:
     accessKey: user
     secretKey: password
-    endpoint: http://127.0.0.1:9001
+    endpoint: http://127.0.0.1:9000
     bucketName: user-bucket
     maxSizeBytes: 5242880
     smallSize: 170
     largeSize: 1080
     isMocked: true
+defaultAvatar:
+  url: https://api.dicebear.com/9.x/adventurer/svg?seed=Cuddles

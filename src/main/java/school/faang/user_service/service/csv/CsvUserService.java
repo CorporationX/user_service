@@ -7,9 +7,9 @@ import com.json.student.Address;
 import com.json.student.ContactInfo;
 import com.json.student.Person;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,6 +30,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CsvUserService {
     private CsvToObjectConverter csvToObjectConverter;
     private final PersonMapper personMapper;
@@ -64,13 +65,10 @@ public class CsvUserService {
 
             for (User user : users) {
                 String countryTitle = user.getCountry().getTitle();
-//                user.setUsername(user.get);
                 user.setPassword("111");
                 Country country = findCountryByTitle(countryTitle);
                 user.setCountry(country);
             }
-
-//            Iterable<User> userAll = userRepository.saveAll(users);
 
             batchInsertUsers(users);
 
@@ -94,22 +92,35 @@ public class CsvUserService {
         try {
             for (int i = 0; i < users.size(); i++) {
                 User user = users.get(i);
+                boolean existsByUsernameResult = userRepository.existsByUsername(user.getUsername());
+                boolean existsByEmailResult = userRepository.existsByEmail(user.getEmail());
+                boolean existsByPhoneResult = userRepository.existsByPhone(user.getPhone());
 
-//                String sql = "INSERT INTO users (username, password, email) VALUES (:username, :password, :email) ON CONFLICT (id) DO NOTHING";
-//                Query query = entityManager.createNativeQuery(sql);
-//                query.setParameter("username", user.getUsername());
-//                query.setParameter("password", user.getPassword());
-//                query.setParameter("email", user.getEmail());
-//                query.executeUpdate();
+                validateUserBeforeSave(user, existsByUsernameResult, existsByEmailResult, existsByPhoneResult);
 
-                entityManager.persist(user);
-                entityManager.flush();
-                entityManager.clear();
+                if (!existsByUsernameResult && !existsByEmailResult && !existsByPhoneResult) {
+                    entityManager.persist(user);
+                    entityManager.flush();
+                    entityManager.clear();
+                }
             }
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
             throw e;
+        }
+    }
+
+    private void validateUserBeforeSave(User user,
+                                        boolean existsByUsernameResult,
+                                        boolean existsByEmailResult,
+                                        boolean existsByPhoneResult) {
+        if (existsByUsernameResult) {
+            log.warn("User with username {} already exists", user.getUsername());
+        } else if (existsByEmailResult) {
+            log.warn("User with email {} already exists", user.getEmail());
+        } else if (existsByPhoneResult) {
+            log.warn("User with phone number {} already exists", user.getPhone());
         }
     }
 }

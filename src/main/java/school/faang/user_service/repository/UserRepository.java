@@ -25,4 +25,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByPhone(String phone);
 }

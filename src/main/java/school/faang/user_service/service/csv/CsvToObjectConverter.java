@@ -23,7 +23,4 @@ public class CsvToObjectConverter {
 
         return objects;
     }
-
-    // Другие методы...
-
 }

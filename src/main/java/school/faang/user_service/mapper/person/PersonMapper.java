@@ -12,25 +12,12 @@ public interface PersonMapper {
     @Mapping(source = "contactInfo.email", target = "email")
     @Mapping(source = "contactInfo.phone", target = "phone")
     @Mapping(source = "contactInfo.address.city", target = "city")
-    @Mapping(source = "contactInfo.address.country", target = "country", qualifiedByName = "toCountry")
-    @Mapping(source = "firstName", target = "username")
+    @Mapping(source = "contactInfo.address.country", target = "country.title")
+    @Mapping(source = "person", target = "username", qualifiedByName = "nameUser")
     User personToUser(Person person);
 
-    @Named("toCountry")
-    default Country toCountry(String countryName) {
-        return Country.builder()
-                .title(countryName)
-                .build();
+    @Named("nameUser")
+    default String nameUser(Person person) {
+        return person.getFirstName() + " " + person.getLastName();
     }
-
-//    @Name("toName")
-//    default String toName(String firstName, String secondName) {
-//        return firstName + " " + secondName;
-//    }
-
-//    @Named("toName")
-//    default String toName(String firstName, @Context MappingContext context) {
-//        String secondName = context.getSource(String.class); // Получаем значение secondName из контекста
-//        return firstName + " " + secondName;
-//    }
 }

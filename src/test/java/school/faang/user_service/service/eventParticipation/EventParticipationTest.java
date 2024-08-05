@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service;
+package school.faang.user_service.service.eventParticipation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.EventParticipationService;
 

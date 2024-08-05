@@ -6,17 +6,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Deactivate User API", description = "API for managing deactivate users")
-@RequiredArgsConstructor
 public class UserController {
     private static final String MESSAGE_INVALID_ID = "userId cannot be less than zero";
     private final UserService service;
@@ -27,6 +26,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User profile deactivated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user ID"),
             @ApiResponse(responseCode = "404", description = "User not found")
+
     })
     public UserDto deactivatesUserProfile(@PathVariable @Parameter(description = "ID of the user to deactivate") Long userId) {
         if (userId < 0) {
@@ -34,4 +34,15 @@ public class UserController {
         }
         return service.deactivatesUserProfile(userId);
     }
+
+    @GetMapping("/user/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        return service.getUser(userId);
+    }
+
+    @PostMapping("/user")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return service.getUsersByIds(ids);
+    }
+
 }

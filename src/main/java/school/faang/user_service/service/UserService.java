@@ -59,6 +59,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public UserDto getUser(long userId) {
         userValidator.validateUserId(userId);
         User user = userRepository.findById(userId).get();
@@ -66,6 +67,7 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUsersByIds(List<Long> ids) {
         ids.forEach(userValidator::validateUserId);
         Stream<User> userStream = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false);
@@ -110,9 +112,5 @@ public class UserService {
         mentee.getGoals().stream()
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
-    }
-
-    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
-        return userMapper.usersToUserDTOs(userRepository.findAllById(ids));
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.valitator.event;
+package school.faang.user_service.validator.event;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.valitator.event.WriteEventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;

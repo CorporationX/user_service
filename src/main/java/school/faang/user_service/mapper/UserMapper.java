@@ -18,5 +18,5 @@ public interface UserMapper {
     User toEntity(UserDto userDto);
 
     @Mapping(source = "active", target = "isActive")
-    List<UserDto> usersToUserDTOs(List<User> users);
+    List<UserDto> toDtoList(List<User> users);
 }

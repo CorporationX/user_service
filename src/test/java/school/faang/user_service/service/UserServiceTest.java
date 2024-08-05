@@ -9,22 +9,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.UserValidator;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.UserValidator;
-
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.UserValidator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +27,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,13 +42,10 @@ class UserServiceTest {
     private UserValidator userValidator;
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private EventRepository eventRepository;
-
     @Mock
     private GoalRepository goalRepository;
-
     @Mock
     private MentorshipService mentorshipService;
 
@@ -90,7 +81,7 @@ class UserServiceTest {
         List<User> menteesList = new ArrayList<>();
         List<Event> ownedEvents = new ArrayList<>();
 
-        id = 1L;
+        id = 10L;
         ids = List.of(id);
 
         userDto = new UserDto();
@@ -197,17 +188,5 @@ class UserServiceTest {
         userService.deactivateUser(user.getId());
         verify(mentorshipService, times(1)).deleteMentor(mentee.getId(), user.getId());
         assertEquals(mentorAssignedGoal.getMentor(), mentee);
-    }
-
-    @Test
-    @DisplayName("invoke findAll method and mapper method")
-    public void testToInvokeRepositoryAndMapperMethodsWhenGetUsersDtoByIds() {
-        List<Long> ids = new ArrayList<>(List.of(1L, 2L));
-
-        when(userRepository.findAllById(anyList())).thenReturn(new ArrayList<>());
-        userService.getUsersDtoByIds(ids);
-
-        verify(userRepository, times(1)).findAllById(anyList());
-        verify(userMapper, times(1)).usersToUserDTOs(anyList());
     }
 }

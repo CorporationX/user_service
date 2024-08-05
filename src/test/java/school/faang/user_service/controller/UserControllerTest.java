@@ -23,12 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-    @Mock
-    private UserService userService;
-
     @InjectMocks
     private UserController userController;
-
+    @Mock
+    private UserService userService;
     @Mock
     private ObjectMapper objectMapper;
 
@@ -66,7 +64,7 @@ class UserControllerTest {
     @Test
     @DisplayName("testing createUser method")
     public void testCreateUser() throws Exception {
-        mockMvc.perform(multipart("/users/new")
+        mockMvc.perform(multipart("/api/v1/user")
                         .file("file", mockMultipartFile.getBytes())
                         .file("userJson", userDtoJson.getBytes())
                         .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -77,7 +75,7 @@ class UserControllerTest {
     @Test
     @DisplayName("testing createUser method")
     public void testUpdateUserAvatar() throws Exception {
-        MockMultipartHttpServletRequestBuilder builder = multipart("/users/{userId}/avatar", userId);
+        MockMultipartHttpServletRequestBuilder builder = multipart("/api/v1/user/{userId}/avatar", userId);
         builder.with(request -> {
             request.setMethod("PUT");
             return request;
@@ -91,7 +89,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("testing deactivateUser userService deactivate deactivateUser method execution")
-    public void testDeactivateUserWithUserServiceExecution(){
+    public void testDeactivateUserWithUserServiceExecution() {
         long userId = 1L;
         userController.deactivateUser(userId);
         verify(userService, times(1)).deactivateUser(userId);

@@ -74,7 +74,7 @@ public class UserServiceTest {
         userService.createUser(userDto);
 
         verify(userMapper, times(1)).toEntity(userDto);
-        verify(userRepository, times(1)).save(user);
+        verify(userRepository, times(2)).save(user);
         verify(userMapper, times(1)).toDto(user);
     }
 }

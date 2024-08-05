@@ -27,6 +27,14 @@ public class AvatarService {
     @Setter
     private String fullPostfix;
 
+    @Value("${services.diceBear.avatarUrl.avatarPattern}")
+    @Setter
+    private String avatarPattern;
+
+    @Value("${services.diceBear.avatarUrl.smallAvatarPattern}")
+    @Setter
+    private String smallAvatarPattern;
+
     private final StyleAvatarConfig styleAvatarConfig;
     private final AmazonS3Service amazonS3Service;
     private final RestTemplateService restTemplateService;
@@ -39,8 +47,11 @@ public class AvatarService {
         String originalAvatarUrl = randomStyleUrl + fullPostfix + user.hashCode();
         String miniAvatarUrl = randomStyleUrl + smallPostfix + user.hashCode();
 
-        String keyForOriginalAvatar = amazonS3Service.uploadFile(originalAvatarUrl, restTemplateService.getImageBytes(originalAvatarUrl));
-        String keyForSmallAvatar = amazonS3Service.uploadFile(miniAvatarUrl, restTemplateService.getImageBytes(miniAvatarUrl));
+        String fullAvatarKey = String.format(avatarPattern, user.getId());
+        String smallAvatarKey = String.format(smallAvatarPattern, user.getId());
+
+        String keyForOriginalAvatar = amazonS3Service.uploadFile(fullAvatarKey, restTemplateService.getImageBytes(originalAvatarUrl));
+        String keyForSmallAvatar = amazonS3Service.uploadFile(smallAvatarKey, restTemplateService.getImageBytes(miniAvatarUrl));
 
         user.setUserProfilePic(UserProfilePic.builder()
                 .fileId(keyForOriginalAvatar)

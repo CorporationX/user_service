@@ -52,9 +52,12 @@ services:
   diceBear:
     avatarUrl:
       url: https://api.dicebear.com/9.x/
-      fullPostfix: /svg?seed=
-      smallPostfix: /svg?size=${services.diceBear.avatarUrl.size}&seed=
+      fullPostfix: /${services.diceBear.avatarUrl.extension}?seed=
+      smallPostfix: /${services.diceBear.avatarUrl.extension}?size=${services.diceBear.avatarUrl.size}&seed=
       size: 32
+      avatarPattern: avatar_%d.${services.diceBear.avatarUrl.extension}
+      smallAvatarPattern: small_avatar_%d.${services.diceBear.avatarUrl.extension}
+      extension: jpeg
     styles:
       - adventurer
       - adventurer-neutral

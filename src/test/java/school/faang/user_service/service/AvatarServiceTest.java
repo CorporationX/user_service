@@ -24,8 +24,11 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor
 public class AvatarServiceTest {
 
-    private final String fullAvatarUrl = "https://api.dicebear.com/9.x/avataaars/svg?seed=";
-    private final String smallAvatarUrl = "https://api.dicebear.com/9.x/avataaars/svg?size=32&seed=";
+    private final String fullPostfix = "/svg?seed=";
+    private final String smallPostfix = "/svg?size=32&seed=";
+    private final String url = "https://api.dicebear.com/9.x/";
+    private final String avatarPattern = "avatar_%d.jpeg";
+    private final String smallAvatarPattern = "small_avatar_%d.jpeg";
 
 
     @Mock
@@ -52,6 +55,7 @@ public class AvatarServiceTest {
                 .build();
 
         user = User.builder()
+                .id(1L)
                 .username("test user")
                 .email("user@email.com")
                 .phone("+79211234567")
@@ -59,23 +63,28 @@ public class AvatarServiceTest {
                 .password("abracadabra")
                 .build();
 
-        avatarService.setFullPostfix("/svg?seed=");
-        avatarService.setSmallPostfix("/svg?size=32&seed=");
-        avatarService.setUrl("https://api.dicebear.com/9.x/");
+        avatarService.setFullPostfix(fullPostfix);
+        avatarService.setSmallPostfix(smallPostfix);
+        avatarService.setUrl(url);
+        avatarService.setAvatarPattern(avatarPattern);
+        avatarService.setSmallAvatarPattern(smallAvatarPattern);
     }
 
     @Test
     @DisplayName("Create true url for avatar")
     public void test() {
 
-        String expectedFullUrl = fullAvatarUrl + user.hashCode();
-        String expectedSmallUrl = smallAvatarUrl + user.hashCode();
+        String expectedFullUrl = "avatar_1.jpeg";
+        String expectedSmallUrl = "small_avatar_1.jpeg";
+
+        String fullAvatarKey = String.format(avatarPattern, user.getId());
+        String smallAvatarKey = String.format(smallAvatarPattern, user.getId());
 
         byte[] file = new byte[1];
         when(restTemplateService.getImageBytes(any())).thenReturn(file);
         when(styleAvatarConfig.getStyles()).thenReturn(List.of("avataaars"));
-        when(amazonS3Service.uploadFile(eq(expectedFullUrl), eq(file))).thenReturn(expectedFullUrl);
-        when(amazonS3Service.uploadFile(eq(expectedSmallUrl), eq(file))).thenReturn(expectedSmallUrl);
+        when(amazonS3Service.uploadFile(eq(fullAvatarKey), eq(file))).thenReturn(fullAvatarKey);
+        when(amazonS3Service.uploadFile(eq(smallAvatarKey), eq(file))).thenReturn(smallAvatarKey);
 
         avatarService.setDefaultUserAvatar(user);
 

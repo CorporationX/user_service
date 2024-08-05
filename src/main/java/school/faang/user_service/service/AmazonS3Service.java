@@ -18,7 +18,7 @@ public class AmazonS3Service {
     private final AmazonS3 amazonS3;
     private final AmazonCredentials amazonCredentials;
 
-    public String uploadFile(String url, byte[] file) {
+    public String uploadFile(String key, byte[] file) {
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.length);
@@ -26,11 +26,11 @@ public class AmazonS3Service {
         PutObjectRequest putObjectRequest =
                 new PutObjectRequest(
                         amazonCredentials.getBucketName(),
-                        url,
+                        key,
                         new ByteArrayInputStream(file),
                         objectMetadata
                 );
         amazonS3.putObject(putObjectRequest);
-        return url;
+        return key;
     }
 }

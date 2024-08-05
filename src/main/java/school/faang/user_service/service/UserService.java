@@ -124,6 +124,7 @@ public class UserService {
         //ToDo Поэтому если у сохраняемого юзера есть совпадение по имени, эл.адресу или номеру телефона с юзерами,
         //ToDo которые содержатся в базе данных, то новый юзер не будет сохранен, а в лог выйдет сообщение.
         //ToDo Но ошибку я не бросаю, так как операция прервется и следующие юзеры не сохранятся
+
         if (existsByUsernameResult) {
             log.warn("User with username {} already exists", studentToUser.getUsername());
         }  else if (existsByEmailResult) {

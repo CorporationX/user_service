@@ -27,6 +27,15 @@ spring:
         profile_view_channel:
           name: profile_view_channel
 
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 10000
+        keep-alive: 60
+        thread-name-prefix: "MyThreadPool"
+
 server:
   port: 8080
 
@@ -58,5 +67,3 @@ premium:
       cron: "0 0 10 * * MON"
     batchSize:
       size: 100
-    threadPool:
-      count: 100

@@ -7,18 +7,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.UserValidator;
-
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.UserValidator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,51 +27,61 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
+
+    @Mock
+    private UserMapper userMapper;
+    @Mock
+    private AvatarService avatarService;
+    @Mock
+    private UserValidator userValidator;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private MentorshipService mentorshipService;
 
     @InjectMocks
     private UserService userService;
 
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private UserValidator userValidator;
-
-    @Mock
-    private UserMapper userMapper;
-
-    @Mock
-    private EventRepository eventRepository;
-
-    @Mock
-    private GoalRepository goalRepository;
-
-    @Mock
-    private MentorshipService mentorshipService;
-
+    private User user;
+    private long userId;
+    private UserDto userDto;
     private User mentee;
     private Goal mentorAssignedGoal;
     private long id;
     private List<Long> ids;
-    private User user;
-    private UserDto userDto;
     private List<UserDto> userDtoList;
 
     @BeforeEach
     public void setUp() {
+        UserMapperImpl userMapperImpl = new UserMapperImpl();
+        userId = 1L;
+
+        userDto = UserDto.builder()
+                .id(userId)
+                .username("username")
+                .password("password")
+                .country(1L)
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
+
+        user = userMapperImpl.toEntity(userDto);
         List<Goal> goalList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
         List<User> menteesList = new ArrayList<>();
         List<Event> ownedEvents = new ArrayList<>();
 
-        id = 1L;
+        id = 10L;
         ids = List.of(id);
 
         userDto = new UserDto();
@@ -95,6 +106,26 @@ public class UserServiceTest {
         goalList.add(goal);
         userList.add(user);
         ownedEvents.add(event);
+    }
+
+    @Test
+    @DisplayName("testing createUser method with null multipartFile")
+    public void testCreateUser() {
+        when(userMapper.toEntity(userDto)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+        userService.createUser(userDto, null);
+        verify(userRepository, times(2)).save(user);
+        verify(avatarService, times(1)).setRandomAvatar(user);
+        verify(userMapper, times(1)).toDto(user);
+    }
+
+    @Test
+    @DisplayName("testing updateUserAvatar method with null multipartFile")
+    public void testUpdateUser() {
+        when(userValidator.validateUserExistence(user.getId())).thenReturn(user);
+        userService.updateUserAvatar(userId, null);
+        verify(avatarService, times(1)).setRandomAvatar(user);
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
@@ -157,17 +188,5 @@ public class UserServiceTest {
         userService.deactivateUser(user.getId());
         verify(mentorshipService, times(1)).deleteMentor(mentee.getId(), user.getId());
         assertEquals(mentorAssignedGoal.getMentor(), mentee);
-    }
-
-    @Test
-    @DisplayName("invoke findAll method and mapper method")
-    public void testToInvokeRepositoryAndMapperMethodsWhenGetUsersDtoByIds() {
-        List<Long> ids = new ArrayList<>(List.of(1L, 2L));
-
-        when(userRepository.findAllById(anyList())).thenReturn(new ArrayList<>());
-        userService.getUsersDtoByIds(ids);
-
-        verify(userRepository, times(1)).findAllById(anyList());
-        verify(userMapper, times(1)).usersToUserDTOs(anyList());
     }
 }

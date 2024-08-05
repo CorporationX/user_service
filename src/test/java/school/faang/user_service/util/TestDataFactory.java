@@ -1,9 +1,13 @@
 package school.faang.user_service.util;
 
+import com.json.student.Address;
+import com.json.student.ContactInfo;
+import com.json.student.Person;
 import lombok.experimental.UtilityClass;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -22,7 +26,7 @@ public final class TestDataFactory {
     public static UserDto createUserDto() {
         return UserDto.builder()
                 .id(1L)
-                .username("Incognito1")
+                .username("John_Smith")
                 .email("incognito1@gmail.com")
                 .build();
     }
@@ -30,7 +34,7 @@ public final class TestDataFactory {
     public static User createUser() {
         return User.builder()
                 .id(1L)
-                .username("Incognito")
+                .username("John_Smith")
                 .email("Incognito@gmail.com")
                 .build();
     }
@@ -107,6 +111,30 @@ public final class TestDataFactory {
                 .receiverId(1002L)
                 .createdAt(LocalDateTime.of(2020, JANUARY, 18, 0, 0))
                 .updatedAt(LocalDateTime.of(2021, JANUARY, 18, 0, 0))
+                .build();
+    }
+
+    public static Person createPerson() {
+        var address = new Address();
+        address.setCity("New York");
+        address.setCountry("USA");
+
+        var contactInfo = new ContactInfo();
+        contactInfo.setAddress(address);
+        contactInfo.setEmail("incognito1@gmail.com");
+
+        var person = new Person();
+        person.setFirstName("John");
+        person.setLastName("Smith");
+        person.setContactInfo(contactInfo);
+
+        return person;
+    }
+
+    public static Country createCounty(){
+        return Country.builder()
+                .id(23L)
+                .title("USA")
                 .build();
     }
 }

@@ -1,15 +1,14 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.UserValidator;

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -13,11 +13,11 @@ public class UserMapperTest {
     @InjectMocks
     private UserMapperImpl userMapper;
     private final long id = 1L;
-    private final String userName = "Username";
+    private final String username = "Username";
     private final String email = "email@gmail.com";
     private final User user = User.builder()
             .id(id)
-            .username(userName)
+            .username(username)
             .email(email)
             .build();
 
@@ -26,15 +26,18 @@ public class UserMapperTest {
         UserDto userDto = userMapper.toDto(user);
         Assertions.assertEquals(userDto.getId(), id);
         Assertions.assertEquals(userDto.getEmail(), email);
-        Assertions.assertEquals(userDto.getUsername(), userName);
+        Assertions.assertEquals(userDto.getUsername(), username);
     }
 
     @Test
     public void toEntity() {
-        UserDto userDto = UserDto.builder().id(id).username(userName).email(email).build();
+        UserDto userDto = new UserDto();
+        userDto.setId(id);
+        userDto.setUsername(username);
+        userDto.setEmail(email);
         User resultUser = userMapper.toEntity(userDto);
         Assertions.assertEquals(resultUser.getId(), id);
         Assertions.assertEquals(resultUser.getEmail(), email);
-        Assertions.assertEquals(resultUser.getUsername(), userName);
+        Assertions.assertEquals(resultUser.getUsername(), username);
     }
 }

@@ -5,7 +5,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.service.recommendation.request.filter.Filter;
 
-@Component("goalStatusFilter")
+@Component("recommendationStatusFilter")
 public class StatusFilter implements Filter<RecommendationRequestFilter, RecommendationRequestDto> {
     @Override
     public boolean applyFilter(RecommendationRequestDto data, RecommendationRequestFilter filter) {

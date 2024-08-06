@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.UserValidator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -39,18 +40,30 @@ class S3ServiceTest {
     @Mock
     private MultipartFile file;
 
+    @Mock
+    private UserValidator userValidator;
+
+    @Mock
+    StringHelper stringHelper;
+
     @InjectMocks
     private S3Service s3Service;
+
+    private Long userId;
+    private User user;
+
 
     @BeforeEach
     public void setUp() {
         s3Service.bucketName = "test-bucket";
+        userId = 1L;
+        user = new User();
     }
 
     @Test
-     void testUploadAvatar_Success() throws IOException {
-        User user = new User();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    void testUploadAvatar_Success() throws IOException {
+
+        when(userValidator.findUserById(userId)).thenReturn(Optional.of(user));
 
         BufferedImage sampleImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -68,8 +81,7 @@ class S3ServiceTest {
 
     @Test
     void testUploadAvatar_UserNotFound() {
-        Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userValidator.findUserById(userId)).thenThrow(new IllegalArgumentException("User not found"));
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             s3Service.uploadAvatar(userId, file);
         });
@@ -77,29 +89,28 @@ class S3ServiceTest {
     }
 
     @Test
-    void testDownloadAvatar(){
-        Long userId = 1L;
+    void testDownloadAvatar() {
         S3Object s3Object = mock(S3Object.class);
 
         byte[] sampleAvatarData = new byte[]{1, 2, 3, 4, 5};
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(sampleAvatarData);
         S3ObjectInputStream s3ObjectInputStream = new S3ObjectInputStream(byteArrayInputStream, null);
 
-        when(s3Client.getObject(eq(s3Service.bucketName), eq("avatars/" + userId + "/large.jpg"))).thenReturn(s3Object);
+        String avatarKey = stringHelper.createAvatarKey(userId, "large");
+
+        when(s3Client.getObject(eq(s3Service.bucketName), eq(avatarKey))).thenReturn(s3Object);
         when(s3Object.getObjectContent()).thenReturn(s3ObjectInputStream);
 
         byte[] result = s3Service.downloadAvatar(userId);
 
         assertNotNull(result);
         assertArrayEquals(sampleAvatarData, result);
-        verify(s3Client).getObject(eq(s3Service.bucketName), eq("avatars/" + userId + "/large.jpg"));
+        verify(s3Client).getObject(eq(s3Service.bucketName), eq(avatarKey));
     }
 
     @Test
     void testDeleteAvatar() {
-        Long userId = 1L;
-        User user = new User();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userValidator.findUserById(userId)).thenReturn(Optional.of(user));
 
         String result = s3Service.deleteAvatar(userId);
 
@@ -109,12 +120,10 @@ class S3ServiceTest {
 
     @Test
     void testDeleteAvatar_UserNotFound() {
-        Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userValidator.findUserById(userId)).thenThrow(new IllegalArgumentException("User not found"));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            s3Service.deleteAvatar(userId);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> s3Service.deleteAvatar(userId));
+
         assertEquals("User not found", exception.getMessage());
 
         verify(s3Client, never()).deleteObject(anyString(), anyString());

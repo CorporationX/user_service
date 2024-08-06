@@ -6,7 +6,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
-@Service("User_Service")
+@Service("userServiceNumberTwo")
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;

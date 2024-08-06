@@ -18,6 +18,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
@@ -32,17 +33,17 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userMapper.toDto(userService.findUserById(userId));
     }
 
-    @PostMapping("/users/{userId}/avatar")
+    @PostMapping("/{userId}/avatar")
     public ResponseEntity<String> uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException {
         return new ResponseEntity<>(s3Service.uploadAvatar(userId, file), HttpStatus.OK);
     }
 
-    @GetMapping("/users/{userId}/avatar")
+    @GetMapping("/{userId}/avatar")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Long userId) {
         byte[] data = s3Service.downloadAvatar(userId);
 
@@ -53,7 +54,7 @@ public class UserController {
 
     }
 
-    @DeleteMapping("/users/{userId}/avatar")
+    @DeleteMapping("/{userId}/avatar")
     public ResponseEntity<String> deleteAvatar(@PathVariable Long userId) {
         return new ResponseEntity<>(s3Service.deleteAvatar(userId), HttpStatus.OK);
     }

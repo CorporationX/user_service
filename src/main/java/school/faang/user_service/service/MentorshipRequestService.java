@@ -35,7 +35,7 @@ public class MentorshipRequestService {
     private final UserService userService;
 
     @Getter
-    @Value("${variables.interval}")
+    @Value("${user.mentorship_interval}")
     private long interval;
 
     @Transactional

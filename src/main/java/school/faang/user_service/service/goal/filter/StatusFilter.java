@@ -6,7 +6,7 @@ import school.faang.user_service.entity.goal.Goal;
 
 import java.util.stream.Stream;
 
-@Component
+@Component("goalStatusFilter")
 public class StatusFilter implements GoalFilter{
     @Override
     public boolean isApplicable(GoalFilterDto filters) {

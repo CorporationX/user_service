@@ -1,7 +1,6 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.batik.transcoder.TranscoderException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
@@ -16,9 +15,10 @@ import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.IOException;
 
-@Service
+@Service("userServiceNumberTwo")
 @RequiredArgsConstructor
 public class UserService {
+    private final UserRepository userRepository;
     private final UserRepository userRepository;
     private final AvatarService avatarService;
     private final CountryService countryService;

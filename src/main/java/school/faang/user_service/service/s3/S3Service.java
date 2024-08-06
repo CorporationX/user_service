@@ -6,8 +6,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,43 +13,49 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.repository.UserRepository;
-
+import school.faang.user_service.validator.UserValidator;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Optional;
 
 
 @Service
 public class S3Service {
-    private static final Logger log = LoggerFactory.getLogger(S3Service.class);
-
     @Value("${services.s3.bucket-name}")
     String bucketName;
+
+    private static final int LARGE_IMAGE_SIZE = 1080;
+    private static final int SMALL_IMAGE_SIZE = 170;
 
 
     private final AmazonS3 s3Client;
     private final UserRepository userRepository;
+    private final UserValidator userValidator;
+    private final StringHelper stringHelper;
 
     @Autowired
-    public S3Service(AmazonS3 s3Client, UserRepository userRepository) {
+    public S3Service(AmazonS3 s3Client, UserRepository userRepository, UserValidator userValidator, StringHelper stringHelper) {
         this.s3Client = s3Client;
         this.userRepository = userRepository;
+        this.userValidator = userValidator;
+        this.stringHelper = stringHelper;
     }
 
     public String uploadAvatar(Long userId, MultipartFile file) throws IOException {
-        User user = findUserById(userId).get();
+        User user = userValidator.findUserById(userId).get();
         UserProfilePic userProfilePic = new UserProfilePic();
 
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        BufferedImage largeImage = resizeImage(originalImage, 1080);
-        BufferedImage smallImage = resizeImage(originalImage, 170);
+        BufferedImage largeImage = resizeImage(originalImage, LARGE_IMAGE_SIZE);
+        BufferedImage smallImage = resizeImage(originalImage, SMALL_IMAGE_SIZE);
 
-        String largeAvatarKey = "avatars/" + userId + "/large.jpg";
-        String smallAvatarKey = "avatars/" + userId + "/small.jpg";
+
+        String largeAvatarKey = stringHelper.createAvatarKey(userId, "large");
+        String smallAvatarKey = stringHelper.createAvatarKey(userId, "small");
+
 
         userProfilePic.setFileId(largeAvatarKey);
         userProfilePic.setSmallFileId(smallAvatarKey);
@@ -66,7 +70,7 @@ public class S3Service {
     }
 
     public byte[] downloadAvatar(Long userId) {
-        S3Object s3Object = s3Client.getObject(bucketName, "avatars/" + userId + "/large.jpg");
+        S3Object s3Object = s3Client.getObject(bucketName, stringHelper.createAvatarKey(userId, "large"));
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
         try {
             return IOUtils.toByteArray(inputStream);
@@ -76,31 +80,26 @@ public class S3Service {
         return null;
     }
 
+
     public String deleteAvatar(Long userId) {
-        if (findUserById(userId).isPresent()) {
-            s3Client.deleteObject(bucketName, "avatars/" + userId + "/large.jpg");
-            s3Client.deleteObject(bucketName, "avatars/" + userId + "/small.jpg");
-            return "Avatar removed";
-        } else {
+        if (userValidator.findUserById(userId).isEmpty()) {
             return "User not found!";
         }
+
+        s3Client.deleteObject(bucketName, "avatars/" + userId + "/large.jpg");
+        s3Client.deleteObject(bucketName, "avatars/" + userId + "/small.jpg");
+        return "Avatar removed";
     }
 
 
     private BufferedImage resizeImage(BufferedImage originalImage, int targetSize) {
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
-
         int newWidth;
         int newHeight;
 
-        if (width > height) {
-            newWidth = targetSize;
-            newHeight = (newWidth * height) / width;
-        } else {
-            newHeight = targetSize;
-            newWidth = (newHeight * width) / height;
-        }
+        newWidth = (width > height) ? targetSize : (targetSize * width) / height;
+        newHeight = (width > height) ? (targetSize * height) / width : targetSize;
 
         BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = resizedImage.createGraphics();
@@ -119,12 +118,5 @@ public class S3Service {
         meta.setContentLength(buffer.length);
         s3Client.putObject(new PutObjectRequest(bucketName, key, is, meta));
     }
-
-    private Optional<User> findUserById(Long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User not found");
-        }
-        return userOptional;
-    }
 }
+

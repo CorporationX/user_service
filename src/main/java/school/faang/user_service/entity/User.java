@@ -17,10 +17,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -41,6 +38,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"goals", "participatedEvents", "mentees"})
 public class User {
 
     @Id

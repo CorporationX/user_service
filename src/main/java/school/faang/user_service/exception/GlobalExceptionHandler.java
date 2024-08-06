@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.exception;
 
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.dto.ErrorResponse;
-import school.faang.user_service.exception.DataValidationException;
 
 import java.util.HashMap;
 import java.util.Map;

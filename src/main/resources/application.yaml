@@ -25,9 +25,11 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
 
 server:
+  servlet:
+    context-path: /api
   port: 8080
 
 logging:
@@ -54,3 +56,5 @@ services:
 
 goal:
   max_active_goals: 2
+user:
+  mentorship_interval: 3

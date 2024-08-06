@@ -32,7 +32,6 @@ class SubscriptionControllerTest {
         followeeId = 1L;
     }
 
-
     @Test
     void testFollowUserSuccessfullyFollowed() {
         subscriptionController.follow(followerId, followeeId);

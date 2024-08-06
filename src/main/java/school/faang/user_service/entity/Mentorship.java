@@ -15,30 +15,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "mentorship_request")
-public class MentorshipRequest {
-
+@Table(name = "mentorship")
+public class Mentorship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "description", nullable = false, length = 4096)
-    private String description;
+    @OneToOne
+    @JoinColumn(name ="mentor_id",nullable = false)
+    private User mentor;
 
-    @ManyToOne
-    @JoinColumn(name = "requester_id", nullable = false)
-    private User requester;
-
-    @ManyToOne
-    @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver;
-
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
-    private RequestStatus status;
-
-    @Column(name = "rejection_reason", length = 4096)
-    private String rejectionReason;
+    @OneToOne
+    @JoinColumn(name ="mentee_id",nullable = false)
+    private User mentee;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

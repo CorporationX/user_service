@@ -54,5 +54,7 @@ services:
     bucket-name: user_backet
     isMocked: true
 
-variables:
-  interval: 3
+goal:
+  max_active_goals: 2
+user:
+  mentorship_interval: 3

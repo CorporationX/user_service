@@ -9,6 +9,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -20,6 +22,16 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.toDto(user);
     }
+
+    public List<User> findAllById(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public boolean existsById(Long userId) { return userRepository.existsById(userId); }
 
     public boolean existsById(Long id) {
         return userRepository.existsById(id);

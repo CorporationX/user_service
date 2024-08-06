@@ -3,6 +3,7 @@ package school.faang.user_service.controller.subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;

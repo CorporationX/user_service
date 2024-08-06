@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
@@ -18,5 +19,9 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.toDto(user);
+    }
+
+    public boolean existsById(Long id) {
+        return userRepository.existsById(id);
     }
 }

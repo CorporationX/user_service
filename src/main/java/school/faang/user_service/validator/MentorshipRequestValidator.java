@@ -3,17 +3,17 @@ package school.faang.user_service.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.UserService;
 
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
-    private final UserRepository userRepository;
+    private final UserService userService;
 
 
-    public void existsById(Long id, String message) {
-        if (!userRepository.existsById(id)) {
-            throw new DataValidationException(message);
+    public void userExists(Long id) {
+        if (!userService.existsById(id)) {
+            throw new DataValidationException("User {} does not exist!" + id);
         }
     }
 

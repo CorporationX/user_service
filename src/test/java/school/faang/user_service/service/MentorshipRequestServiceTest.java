@@ -1,15 +1,14 @@
 package school.faang.user_service.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.mentorship.AcceptMentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
@@ -22,22 +21,19 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -45,9 +41,6 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private MentorshipRepository mentorshipRepository;
-    @Mock
-    private UserRepository userRepository;
-
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
@@ -57,11 +50,9 @@ public class MentorshipRequestServiceTest {
     private AcceptMentorshipRequestDto acceptMentorshipRequestDto;
     private RejectRequestDto rejectRequestDto;
     private MentorshipRequestDto mentorshipRequestDto;
-    private Long userId;
     private MentorshipRequest mentorshipRequest;
     private Mentorship mentorship;
     private List<MentorshipRequest> resultQuery;
-    private List<MentorshipRequestDto> resultList;
     private MentorshipRequestFilterDto filterDto;
     @Value("${variables.interval}")
     private long interval;
@@ -81,10 +72,8 @@ public class MentorshipRequestServiceTest {
                 .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now())
                 .build();
         resultQuery = List.of(firstRequest, secondRequest);
-        resultList = resultQuery.stream().map(mentorshipRequestMapper::toDto).toList();
 
         mentorship = Mentorship.builder().id(1L).mentee(new User()).mentor(new User()).build();
-
 
         mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setDescription("Description");
@@ -96,7 +85,6 @@ public class MentorshipRequestServiceTest {
         acceptMentorshipRequestDto.setId(1L);
         acceptMentorshipRequestDto.setRequesterId(1L);
         acceptMentorshipRequestDto.setReceiverId(2L);
-        userId = 1L;
 
         rejectRequestDto = new RejectRequestDto();
         rejectRequestDto.setId(1L);
@@ -141,7 +129,6 @@ public class MentorshipRequestServiceTest {
         assertEquals("Mentorship request not found!", exception.getMessage());
     }
 
-
     @Test
     @DisplayName("test accept request with already accepted request")
     public void testAcceptRequestWithAlreadyAcceptedRequest() {
@@ -161,7 +148,6 @@ public class MentorshipRequestServiceTest {
     public void testRejectRequest() {
         when(mentorshipRequestRepository.findById(rejectRequestDto.getId()))
                 .thenReturn(Optional.of(mentorshipRequest));
-        when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(mentorshipRequest);
 
         mentorshipRequestService.rejectRequest(rejectRequestDto);
 
@@ -189,11 +175,8 @@ public class MentorshipRequestServiceTest {
         assertNotEquals(result.size(), resultQuery.size());
     }
 
-
     @Test
     public void testRequestMentorship() {
-        when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(false);
-        when(userRepository.existsById(mentorshipRequestDto.getReceiverId())).thenReturn(false);
         when(mentorshipRequestRepository
                 .findFirstByRequesterIdAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(
                         mentorshipRequestDto.getRequesterId(),

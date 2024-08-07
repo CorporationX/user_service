@@ -42,10 +42,14 @@ public class RecommendationService {
         recommendationValidator.validateDateOfLastRecommendation(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
         recommendationValidator.validateSkillOffers(recommendationDto);
 
-        Recommendation savedRecommendation = recommendationRepository.save(recommendationMapper.toEntity(recommendationDto));
+        Recommendation recommendationReadyToSave = recommendationMapper.toEntity(recommendationDto);
+        Recommendation savedRecommendation = recommendationRepository.save(recommendationReadyToSave);
+
         updateSkillGuarantee(recommendationDto.getSkillOffers(), recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
+
         List<SkillOffer> savedSkillOffers = saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
+
         log.info("New recommendation was created");
         return recommendationMapper.toDto(savedRecommendation);
     }
@@ -107,7 +111,7 @@ public class RecommendationService {
         recommendationRepository.deleteById(id);
     }
 
-    private List<SkillOffer> saveSkillOffers(List<SkillOfferDto> skillOfferDtoList, long recommendationId) {
+    public List<SkillOffer> saveSkillOffers(List<SkillOfferDto> skillOfferDtoList, long recommendationId) {
         if (skillOfferDtoList == null || skillOfferDtoList.isEmpty()) {
             return null;
         }

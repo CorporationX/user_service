@@ -35,7 +35,7 @@ public class RecommendationValidator {
             LocalDateTime dateOfLastRecommendation = lastRecommendation.get().getUpdatedAt();
 
             if (ChronoUnit.MONTHS.between(dateOfLastRecommendation, currentDate) < lastRecommendationLimit) {
-                String errorMessage = String.format("The author (ID : %d) cannot give a recommendation to a user (ID : %d)because it hasn't been %d months or more."
+                String errorMessage = String.format("The author (ID : %d) cannot give a recommendation to a user (ID : %d) because it hasn't been %d months or more."
                         , authorId, receiverId, lastRecommendationLimit);
                 log.error(errorMessage);
                 throw new DataValidationException(errorMessage);

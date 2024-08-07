@@ -7,10 +7,10 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.validator.user.filter.UserFilterValidation;
+import school.faang.user_service.validator.user.UserFilterValidation;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -33,7 +33,7 @@ public class UserService {
         List<User> premiumUsers = userRepository.findPremiumUsers().toList();
 
         if (!userFilterValidation.isAnyFilterApplicable(userFilters, userFilterDto)) {
-            return userMapper.toUserDtoList(premiumUsers);
+            return userMapper.toDtoList(premiumUsers);
         }
 
         return filterUsers(userFilterDto, premiumUsers);
@@ -48,7 +48,7 @@ public class UserService {
         List<User> regularUsers = userRepository.findRegularUsers().toList();
 
         if (!userFilterValidation.isAnyFilterApplicable(userFilters, userFilterDto)) {
-            return userMapper.toUserDtoList(regularUsers);
+            return userMapper.toDtoList(regularUsers);
         }
 
         return filterUsers(userFilterDto, regularUsers);
@@ -60,7 +60,7 @@ public class UserService {
                 .reduce(users.stream(),
                         (stream, filter) -> filter.apply(stream, userFilterDto),
                         Stream::concat)
-                .map(userMapper::toUserDto)
+                .map(userMapper::toDto)
                 .toList();
 
     }

@@ -3,12 +3,14 @@ package school.faang.user_service.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.List;
 
 @Data
+@Builder
 public class GoalDto {
     private Long id;
 

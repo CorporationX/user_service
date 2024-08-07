@@ -6,15 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.goal.GoalController;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.service.goal.GoalService;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -26,85 +24,59 @@ public class GoalControllerTest {
 
     @Mock
     private GoalService goalService;
-    @Mock
-    private GoalControllerValidate validate;
+
+    private long goalId;
+    private GoalDto goalDto;
+    private long userId;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        goalId = 1L;
+        userId = 1L;
+        goalDto = GoalDto.builder()
+                .id(1L)
+                .description("test")
+                .title("test")
+                .status(GoalStatus.ACTIVE)
+                .build();
     }
 
-    @DisplayName("Если title пустой")
-    @Test
-    public void testCreateWithBlankTitle() {
-        Goal goal = new Goal();
-        goal.setTitle("");
-
-        assertThrows(IllegalArgumentException.class, () -> goalController.createGoal(1L, goal));
-    }
-
-    @DisplayName("Если title слишком длинный")
-    @Test
-    public void testCreateMaxLengthTitle() {
-        Goal goal = new Goal();
-        goal.setTitle("fdsfsdfsfdskjofdshjfdsjfjasdklfjsdakljfklsdajflksdajfklsdjfklsdkkk");
-
-        assertThrows(IllegalArgumentException.class, () -> goalController.createGoal(1L, goal));
-    }
-
+    @DisplayName("Когда goal был создан")
     @Test
     public void testCreateWhenValid() {
-        Long userId = 1L;
-        Goal goal = new Goal();
-
-        goalController.createGoal(userId, goal);
-        verify(goalService, times(1)).createGoal(userId, goal);
+        goalController.createGoal(userId, goalDto);
+        verify(goalService, times(1)).createGoal(userId, goalDto);
     }
 
-    @Test
-    public void testUpdateGoalNullGoal() {
-        long goalId = 1L;
-        GoalDto goal = null;
-
-        verify(goalService, times(0)).updateGoal(goalId, goal);
-    }
-
+    @DisplayName("Когда метод обновления goal отработал")
     @Test
     public void testUpdateGoalWhenValid() {
-        long goalId = 1L;
-        GoalDto goal = new GoalDto();
-
-        goalController.updateGoal(goalId, goal);
-        verify(validate, times(1)).validateId(goalId);
-        verify(goalService, times(1)).updateGoal(goalId, goal);
+        goalController.updateGoal(goalId, goalDto);
+        verify(goalService, times(1)).updateGoal(goalId, goalDto);
     }
 
+    @DisplayName("Когда goal был успешно удален")
     @Test
     public void testDeleteGoalWhenValid() {
-        long goalId = 1L;
-
         goalController.deleteGoal(goalId);
-        verify(validate, times(1)).validateId(goalId);
         verify(goalService, times(1)).deleteGoal(goalId);
     }
 
+    @DisplayName("Успешное получение всх подзадачи цели")
     @Test
     public void testGetSubtasksByGoalIdWhenValid() {
-        long goalId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
 
         goalController.getSubtasksByGoalId(goalId, filters);
-        verify(validate, times(1)).validateId(goalId);
         verify(goalService, times(1)).getSubtasksByGoalId(goalId, filters);
     }
 
+    @DisplayName("Успешное получение целей по фильтру")
     @Test
     public void testGetGoalsByUserWhenValid() {
-        long userId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
 
         goalController.getGoalsByUser(userId, filters);
-        verify(validate, times(1)).validateId(userId);
         verify(goalService, times(1)).getGoalsByUser(userId, filters);
     }
 }

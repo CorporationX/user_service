@@ -18,35 +18,30 @@ public class GoalServiceValidate {
     private final SkillService skillService;
     private final static int MAX_NUMBERS_GOAL_USER = 3;
 
-    public void validateCreateGoal(long userId, GoalDto goal, int countUserActive, List<String> allGoalTitles) {
+    public void checkDuplicateTitleGoal(GoalDto goal, List<String> allGoalTitles) {
         if (allGoalTitles.contains(goal.getTitle())) {
             throw new IllegalArgumentException("A goal with the same name already exists");
-        } else if (countUserActive >= MAX_NUMBERS_GOAL_USER) {
-            throw new IllegalStateException("This user " + userId + " has exceeded goal limit");
-        } else if (!existByTitle(goal.getSkillsToAchieve())) {
-            throw new IllegalArgumentException("There is no skill with this name");
         }
     }
 
-    public void validateUpdateGoal(Goal goal, String status) {
-        if (status.equals("COMPLETED")) {
-            throw new IllegalStateException("Goal has already been achieved");
-        } else if (!existByTitle(goal.getSkillsToAchieve())) {
-            throw new IllegalArgumentException("There is no skill with this name");
+    public void checkLimitCountUser(int countUserActive) {
+        if (countUserActive >= MAX_NUMBERS_GOAL_USER) {
+            throw new IllegalStateException("This user has exceeded goal limit");
         }
     }
 
-    public void validateDeleteGoal(Stream<Goal> goal) {
+    public void checkExistenceGoal(Stream<Goal> goal) {
         goal.findFirst().orElseThrow(() -> new NoSuchElementException("A goal with this ID does not exist"));
     }
 
-    // Сменить название метода
-    public void validUpdate(Goal goal) {
+    public void checkStatusGoal(Goal goal) {
         if(goal.getStatus() == GoalStatus.COMPLETED)
             throw new IllegalStateException("The goal cannot be updated because it is already completed");
     }
 
-    private boolean existByTitle(List<Skill> skills) {
-        return skillService.existsByTitle(skills);
+    public void existByTitle(List<Skill> skills) {
+        if (!skillService.existsByTitle(skills)) {
+            throw new IllegalArgumentException("There is no skill with this name");
+        }
     }
 }

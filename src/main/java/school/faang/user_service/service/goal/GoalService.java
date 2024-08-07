@@ -3,6 +3,7 @@ package school.faang.user_service.service.goal;
 import com.amazonaws.services.kms.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.filter.GoalFilters;
@@ -23,63 +24,53 @@ public class GoalService {
     private final List<GoalFilters> goalFilters;
     private final GoalServiceValidate goalServiceValidate;
 
-
-    // Поправить валидацию(передавать меньше значений и проверить мб как то можно упроситить)
+    @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         List<String> allGoalTitles = goalRepository.findAllGoalTitles();
         int countActiveUser = goalRepository.countActiveGoalsPerUser(userId);
 
-
-
-        goalServiceValidate.validateCreateGoal(userId, goalDto, countActiveUser, allGoalTitles);
+        goalServiceValidate.checkLimitCountUser(countActiveUser);
+        goalServiceValidate.checkDuplicateTitleGoal(goalDto, allGoalTitles);
 
         goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
-        skillService.create(goalDto.getSkillsToAchieve(), userId);
-        return
+        skillService.create(goalMapper.toGoal(goalDto).getSkillsToAchieve(), userId);
+        return goalDto;
     }
 
-
-    // Надо брать goal из базы в нем менять поле которые пришли в dto и кидать обратно в базу
-
-    /**
-     Также проверить, что цель содержит только существующие скиллы.
-     Для этого нужно использовать SkillService и SkillRepository с их методами.
-     */
+    @Transactional
     public GoalDto updateGoal(long goalId, GoalDto goalDto) {
-    Goal goal = goalRepository.findById(goalId)
-            .orElseThrow(() -> new NotFoundException("Goal with this id does not exist in the database"));
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new NotFoundException("Goal with this id does not exist in the database"));
+        Goal updateGoal = goalMapper.toGoal(goalDto);
 
-    goalServiceValidate.validUpdate(goal);
+        goalServiceValidate.checkStatusGoal(goal);
+        goalServiceValidate.existByTitle(updateGoal.getSkillsToAchieve());
 
+        goal.setStatus(updateGoal.getStatus());
+        goal.setTitle(updateGoal.getTitle());
+        goal.setSkillsToAchieve(updateGoal.getSkillsToAchieve());
+        goal.setDescription(updateGoal.getDescription());
 
-
-
-
-
-//        String status = goalRepository.findByParent(goalId)
-//                .map(Goal::getStatus)
-//                .toString();
-//        Goal goal = goalMapper.toGoal(goalDto);
-//        goalServiceValidate.validateUpdateGoal(goal, status);
-
+        goalRepository.save(goal);
         skillService.addSkillToUsers(goalRepository.findUsersByGoalId(goalId), goalId);
-        return
+        return goalMapper.toGoalDto(goal);
     }
 
-
-    // надо что-то вернуть
+    @Transactional
     public void deleteGoal(long goalId) {
         Stream<Goal> goal = goalRepository.findByParent(goalId);
-        goalServiceValidate.validateDeleteGoal(goal);
+        goalServiceValidate.checkExistenceGoal(goal);
 
-        goalRepository.deleteByGoalId(goalId);
+        goalRepository.deleteById(goalId);
     }
 
+    @Transactional
     public List<GoalDto> getSubtasksByGoalId(long goalId, GoalFilterDto filterGoals) {
         Stream<Goal> goal = goalRepository.findByParent(goalId);
         return filters(goal, filterGoals);
     }
 
+    @Transactional
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filterGoals) {
         Stream<Goal> goal = goalRepository.findGoalsByUserId(userId);
         return filters(goal, filterGoals);

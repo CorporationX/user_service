@@ -64,4 +64,9 @@ public class UserService {
                 .toList();
 
     }
+
+    @Transactional
+    public boolean existsById(Long id) {
+        return userRepository.existsById(id);
+    }
 }

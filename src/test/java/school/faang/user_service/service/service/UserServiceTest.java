@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -22,12 +24,17 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
+    @Mock
     private UserRepository userRepository;
 
     private UserFilterValidation userFilterValidation;
@@ -36,6 +43,7 @@ public class UserServiceTest {
 
     private UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
 
+    @InjectMocks
     private UserService userService;
 
     private List<UserFilter> filters;
@@ -106,13 +114,16 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName(value = "Getting regular users throws exception cause userFilter is null")
-    public void testGetRegularUsersWithNullableUserFilter() {
-        UserFilterDto userFilterDto = null;
+    public void testExistsByIdReturnsTrue() {
+        Long userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(true);
 
         when(userFilterValidation.isNullable(userFilterDto)).thenReturn(true);
+        boolean exists = userService.existsById(userId);
 
         assertThrows(DataValidationException.class, () -> userService.getRegularUsers(userFilterDto));
+        assertTrue(exists);
+        verify(userRepository, times(1)).existsById(userId);
     }
 
     @Test
@@ -152,4 +163,14 @@ public class UserServiceTest {
         assertIterableEquals(expected, actual);
     }
 
+        @Test
+        public void testExistsByIdReturnsFalse() {
+            Long userId = 2L;
+            when(userRepository.existsById(userId)).thenReturn(false);
+
+            boolean exists = userService.existsById(userId);
+
+            assertFalse(exists);
+            verify(userRepository, times(1)).existsById(userId);
+        }
 }

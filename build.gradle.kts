@@ -73,6 +73,27 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    /**
+     * Swagger
+     */
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+
+    /**
+     * MockMultipartFile for AvatarService
+     */
+    implementation("org.springframework:spring-test:5.3.20")
+
+    /**
+     * batik for AvatarService
+     */
+    implementation("org.apache.xmlgraphics:batik-transcoder:1.14")
+    implementation("org.apache.xmlgraphics:batik-codec:1.14")
+    implementation("org.apache.xmlgraphics:batik-dom:1.14")
+    implementation("org.apache.xmlgraphics:batik-anim:1.14")
+    implementation("org.apache.xmlgraphics:batik-svggen:1.14")
+    implementation("org.apache.xmlgraphics:batik-util:1.14")
+    implementation("org.apache.xmlgraphics:batik-bridge:1.14")
 }
 
 jsonSchema2Pojo {

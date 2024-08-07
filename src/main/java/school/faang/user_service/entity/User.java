@@ -1,6 +1,8 @@
 package school.faang.user_service.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,9 +33,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "Field cannot be blank")
     @Column(name = "username", length = 64, nullable = false, unique = true)
     private String username;
 
+    @NotBlank(message = "Field cannot be blank")
+    @Email(message = "It must be in the email format")
     @Column(name = "email", length = 64, nullable = false, unique = true)
     private String email;
 

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
@@ -8,6 +9,7 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.exception.NotFoundEntityException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserFilterValidation;
@@ -15,6 +17,7 @@ import school.faang.user_service.validator.user.UserFilterValidation;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -68,5 +71,13 @@ public class UserService {
     @Transactional
     public boolean existsById(Long id) {
         return userRepository.existsById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public void existUserById(long id) {
+        if (!userRepository.existsById(id)) {
+            log.error("User with id :{} doesn't exist!", id);
+            throw new NotFoundEntityException("User with id :" + id + " doesn't exist!");
+        }
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.validation.user.filter;
+package school.faang.user_service.validator.user.filter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.user.UserFilterDto;

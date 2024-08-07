@@ -6,11 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.user.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.validation.user.filter.UserFilterValidation;
+import school.faang.user_service.validator.user.filter.UserFilterValidation;
 
 import java.util.List;
 import java.util.stream.Stream;

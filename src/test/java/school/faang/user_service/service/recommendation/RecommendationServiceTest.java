@@ -12,6 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
@@ -29,17 +30,16 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validation.recommendation.RecommendationValidator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationServiceTest {
@@ -73,26 +73,35 @@ public class RecommendationServiceTest {
     RecommendationDto recommendationDto;
     Recommendation recommendation;
 
-    Recommendation recommendationTest;
     SkillOfferDto skillOfferDto;
     SkillOffer skillOffer;
 
+    ArrayList<SkillOfferDto> skillOfferDtos = new ArrayList<>();
+
     @BeforeEach
     void init() {
+        skillOffer = SkillOffer.builder()
+                .id(SKILL_OFFER_ID)
+                .skill(Skill.builder().id(FIRST_SKILL_ID).build())
+                .recommendation(Recommendation.builder().id(RECOMMENDATION_ID).build())
+                .build();
+
         skillOfferDto = SkillOfferDto.builder()
                 .id(SKILL_OFFER_ID)
                 .skillId(FIRST_SKILL_ID)
                 .recommendationId(RECOMMENDATION_ID)
                 .build();
 
+        skillOfferDtos.add(skillOfferDto);
         recommendationDto = RecommendationDto.builder()
                 .id(RECOMMENDATION_ID)
                 .authorId(AUTHOR_ID)
                 .receiverId(RECEIVER_ID)
                 .content("TEST CONTENT")
+                .skillOffers(skillOfferDtos)
                 .build();
 
-        recommendationTest = Recommendation.builder()
+        recommendation = Recommendation.builder()
                 .id(RECOMMENDATION_ID)
                 .author(User.builder().id(AUTHOR_ID).build())
                 .receiver(User.builder().id(RECEIVER_ID).build())
@@ -135,12 +144,24 @@ public class RecommendationServiceTest {
 
         //skillOffer = skillOfferMapper.toEntity(skillOfferDto);
 
-        when(recommendationRepository.save(any())).thenReturn(recommendationTest);
+        //when(recommendationRepository.save(any())).thenReturn(recommendationTest);
 
-        when(recommendationService.saveSkillOffers(Arrays.asList(skillOfferDto), RECOMMENDATION_ID)).thenReturn(Arrays.asList(skillOffer));
+        when(recommendationService.saveSkillOffers(Collections.singletonList(skillOfferDto), RECOMMENDATION_ID)).thenReturn(Collections.singletonList(skillOffer));
 
         RecommendationDto result = recommendationService.createRecommendation(recommendationDto);
 
         assertNotNull(result);
+    }
+
+    @Test
+    void testCreateRecommendationFillsSkillOffers() {
+        ArrayList<SkillOffer> offers = new ArrayList<>();
+        offers.add(skillOffer);
+        when(recommendationRepository.save(any(Recommendation.class))).thenReturn(recommendation);
+        when(skillOfferRepository.saveAll(any())).thenReturn(offers);
+        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
+
+        RecommendationDto result = recommendationService.createRecommendation(recommendationDto);
+        assertEquals(skillOfferDtos, result.getSkillOffers());
     }
 }

@@ -118,7 +118,7 @@ public class RecommendationService {
         skillOfferDtoList.forEach(skillOfferDto -> skillOfferDto.setRecommendationId(recommendationId));
         List<SkillOffer> skillOffers = skillOfferMapper.toListOffersEntity(skillOfferDtoList);
 
-        return Lists.newArrayList(skillOfferRepository.saveAll(skillOffers));
+        return skillOfferRepository.saveAll(skillOffers);
     }
 
     private void updateSkillGuarantee(List<SkillOfferDto> skillOfferDtoList, long authorId, long receiverId) {

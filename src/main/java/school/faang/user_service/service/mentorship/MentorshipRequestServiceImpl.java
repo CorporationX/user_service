@@ -10,9 +10,11 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
@@ -30,6 +32,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestMapper mapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final List<MentorshipValidator> mentorshipValidators;
+    private final MentorshipAcceptedEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -71,6 +74,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             requester.getMentors().add(receiver);
             request.setStatus(RequestStatus.ACCEPTED);
             mentorshipRequestRepository.save(request);
+            eventPublisher.publish(MentorshipAcceptedEvent.builder()
+                    .mentorshipRequestId(id)
+                    .requesterId(requester.getId())
+                    .receiverId(receiver.getId())
+                    .build());
         }
         return mapper.toDto(request);
     }

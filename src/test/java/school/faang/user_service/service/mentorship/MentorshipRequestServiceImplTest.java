@@ -18,9 +18,11 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.validator.mentorship.SelfMentorshipValidator;
@@ -51,18 +53,18 @@ class MentorshipRequestServiceImplTest {
 
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
-
     @Mock
     private MentorshipRequestMapper mapper;
-
     @Mock
     private MentorshipRequestStatusFilter statusFilter;
-
     @Mock
     private SelfMentorshipValidator selfMentorshipValidator;
-
+    @Mock
+    private MentorshipAcceptedEventPublisher eventPublisher;
     @Captor
     private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
+    @Captor
+    private ArgumentCaptor<MentorshipAcceptedEvent> eventCaptor;
 
     @InjectMocks
     private MentorshipRequestServiceImpl sut;
@@ -186,7 +188,7 @@ class MentorshipRequestServiceImplTest {
     }
 
     @Test
-    void acceptRequest_should_successfully_update_entity_state() {
+    void acceptRequest_should_successfully_update_entity_state_and_publish_event() {
         User requester = new User();
         requester.setId(1L);
         requester.setMentors(new ArrayList<>());
@@ -194,17 +196,22 @@ class MentorshipRequestServiceImplTest {
         receiver.setId(2L);
         receiver.setMentees(new ArrayList<>());
         MentorshipRequest request = new MentorshipRequest();
-        request.setId(100L);
+        var mentorshipRequestId = 100L;
+        request.setId(mentorshipRequestId);
         request.setRequester(requester);
         request.setReceiver(receiver);
         request.setStatus(RequestStatus.PENDING);
 
-        when(mentorshipRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(mentorshipRequestRepository.findById(mentorshipRequestId)).thenReturn(Optional.of(request));
         when(mapper.toDto(request)).thenReturn(new MentorshipRequestDto());
 
-        sut.acceptRequest(100L);
+        sut.acceptRequest(mentorshipRequestId);
 
         verify(mentorshipRequestRepository, times(1)).save(request);
+        verify(eventPublisher, times(1)).publish(eventCaptor.capture());
+        assertEquals(requester.getId(), eventCaptor.getValue().getRequesterId());
+        assertEquals(receiver.getId(), eventCaptor.getValue().getReceiverId());
+        assertEquals(mentorshipRequestId, eventCaptor.getValue().getMentorshipRequestId());
         assertEquals(RequestStatus.ACCEPTED, request.getStatus());
     }
 

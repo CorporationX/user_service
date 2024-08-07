@@ -51,3 +51,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+recommendation:
+  last-recommendation-limit-months : 6

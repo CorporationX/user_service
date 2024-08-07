@@ -2,14 +2,14 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.exception.ResourceNotFoundException;
-import school.faang.user_service.filter.EventFilter;
-import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.validator.EventValidator;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +55,7 @@ public class EventService {
         eventValidator.eventValidation(eventId);
         eventValidator.inputDataValidation(eventDto);
         Event eventEntity = eventRepository.findById(eventId)
-                .orElseThrow(() -> new ResourceNotFoundException("Событие id" + eventId + " не найдено"));
+                .orElseThrow(() -> new EntityNotFoundException("Событие id" + eventId + " не найдено"));
         eventEntity = eventMapper.toEntity(eventDto);
         return eventMapper.toDto(eventRepository.save(eventEntity));
     }

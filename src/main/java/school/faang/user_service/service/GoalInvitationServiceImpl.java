@@ -7,11 +7,11 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.filters.InvitationFilter;
+import school.faang.user_service.filter.invitation.InvitationFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.validator.InvintationDtoValidator;
+import school.faang.user_service.validator.InvitationDtoValidator;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,11 +23,11 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final UserRepository userRepository;
     private final GoalInvitationMapper goalInvitationMapper;
-    private final InvintationDtoValidator invintationDtoValidatorImpl;
+    private final InvitationDtoValidator invitationDtoValidator;
     private final List<InvitationFilter> invitationFilters;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
-        invintationDtoValidatorImpl.validate(goalInvitationDto);
+        invitationDtoValidator.validate(goalInvitationDto);
         GoalInvitation savedInvitation = goalInvitationRepository.save(goalInvitationMapper.toEntity(goalInvitationDto));
         return goalInvitationMapper.toDto(savedInvitation);
     }
@@ -64,6 +64,4 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
                 .map(goalInvitationMapper::toDto)
                 .toList();
     }
-
-
 }

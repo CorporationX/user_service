@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static school.faang.user_service.validation.mentorship.mentorshipRequestValidator.*;
+import static school.faang.user_service.validator.MentorshipRequestValidator.*;
 
 @Service
 @RequiredArgsConstructor

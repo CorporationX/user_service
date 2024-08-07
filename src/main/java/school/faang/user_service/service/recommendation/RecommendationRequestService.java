@@ -33,10 +33,12 @@ public class RecommendationRequestService {
     public RecommendationRequestDto create(RecommendationRequestDto requestDto) {
         recommendationRequestValidator.validate(requestDto);
         recommendationRequestValidator.validaRecommendationRequestByIdAndUpdateAt(requestDto);
-        requestDto.getSkillRequestDtos().stream()
-                .filter(skill -> !skillRequestRepository.existsById(skill.getSkillId()))
-                .forEach(skill -> skillRequestRepository.create(requestDto.getId(), skill.getSkillId()));
-        return requestDto;
+        RecommendationRequest request = requestMapper.toEntity(requestDto);
+        request.getSkills().stream()
+                .filter(skill -> !skillRequestRepository.existsById(skill.getId()))
+                .forEach(skill -> skillRequestRepository.create(requestDto.getId(), skill.getId()));
+        RecommendationRequest createRequest = requestRepository.save(request);
+        return requestMapper.toDto(createRequest);
     }
 
     @Transactional(readOnly = true)
@@ -51,9 +53,10 @@ public class RecommendationRequestService {
         RecommendationRequestDto requestDto = getRequest(id);
         recommendationRequestValidator.validaRecommendationRequestByIdAndUpdateAt(requestDto);
         if (requestDto.getStatus() == RequestStatus.PENDING) {
-            requestDto.setStatus(RequestStatus.REJECTED);
-            requestDto.setRejectionReason(reason);
-            return requestDto;
+            RecommendationRequest request = requestMapper.toEntity(requestDto);
+            request.setStatus(RequestStatus.REJECTED);
+            request.setRejectionReason(reason);
+            return requestMapper.toDto(request);
         } else {
             String messageError = "It is impossible to refuse a request that is not in a pending state";
             log.info(messageError);

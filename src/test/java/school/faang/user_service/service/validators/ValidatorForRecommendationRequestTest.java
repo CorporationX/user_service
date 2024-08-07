@@ -2,97 +2,108 @@ package school.faang.user_service.service.validators;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundEntityException;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.ValidatorForRecommendationRequest;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ValidatorForRecommendationRequestTest {
-
-    @Mock
-    private UserRepository userRepository;
+@ExtendWith(MockitoExtension.class)
+public class ValidatorForRecommendationRequestTest {
 
     @Mock
     private RecommendationRequestRepository requestRepository;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private ValidatorForRecommendationRequest validator;
 
-    private RecommendationRequestDto validRequestDto;
-    private RecommendationRequestDto invalidRequestDto;
-
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        validRequestDto = new RecommendationRequestDto();
-        validRequestDto.setRequesterId(1L);
-        validRequestDto.setRecieverId(2L);
-        validRequestDto.setId(1L);
-        validRequestDto.setUpdatedAt(LocalDateTime.now().minusMonths(7));
-
-        invalidRequestDto = new RecommendationRequestDto();
-        invalidRequestDto.setRequesterId(1L);
-        invalidRequestDto.setRecieverId(1L);
-        invalidRequestDto.setId(1L);
-        invalidRequestDto.setUpdatedAt(LocalDateTime.now().minusMonths(5));
+    public void setup() {
+        ReflectionTestUtils.setField(validator, "MONTH_FOR_SEARCH_REQUEST", 3L);
     }
 
     @Test
-    void shouldThrowExceptionWhenRequesterIsReciever() {
-        RecommendationRequestDto dto = new RecommendationRequestDto();
-        dto.setRequesterId(1L);
-        dto.setRecieverId(1L);
+    public void testValidate_RequesterEqualsReceiver_ShouldThrowException() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setRecieverId(1L);
 
-        assertThrows(DataValidationException.class, () -> validator.validate(dto));
+        assertThrows(DataValidationException.class, () -> validator.validate(requestDto));
     }
 
     @Test
-    void shouldThrowExceptionWhenRequesterDoesNotExist() {
-        when(userRepository.existsById(1L)).thenReturn(false);
+    public void testValidate_RequesterDoesNotExist_ShouldThrowException() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setRecieverId(2L);
 
-        assertThrows(NotFoundEntityException.class, () -> validator.validate(validRequestDto));
+        doThrow(new DataValidationException("User not found")).when(userService).existUserById(1L);
+
+        assertThrows(DataValidationException.class, () -> validator.validate(requestDto));
     }
 
     @Test
-    void shouldThrowExceptionWhenRecieverDoesNotExist() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.existsById(2L)).thenReturn(false);
+    public void testValidate_ReceiverDoesNotExist_ShouldThrowException() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setRecieverId(2L);
 
-        assertThrows(NotFoundEntityException.class, () -> validator.validate(validRequestDto));
+        doNothing().when(userService).existUserById(1L);
+        doThrow(new DataValidationException("User not found")).when(userService).existUserById(2L);
+
+        assertThrows(DataValidationException.class, () -> validator.validate(requestDto));
     }
 
     @Test
-    void shouldThrowExceptionWhenRequestExistsAndLessThan6Months() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.existsById(2L)).thenReturn(true);
+    public void testValidaRecommendationRequestByIdAndUpdateAt_RequestExistsAndTimeNotPassed_ShouldThrowException() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setId(1L);
+        requestDto.setUpdatedAt(LocalDateTime.now().minusMonths(1));
+
         when(requestRepository.existsById(1L)).thenReturn(true);
 
-        assertThrows(DataValidationException.class, () -> validator.validate(invalidRequestDto));
+        assertThrows(DataValidationException.class, () -> validator.validaRecommendationRequestByIdAndUpdateAt(requestDto));
     }
 
     @Test
-    void shouldPassValidationWhenAllConditionsAreMet() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.existsById(2L)).thenReturn(true);
+    public void testValidaRecommendationRequestByIdAndUpdateAt_RequestExistsAndTimePassed_ShouldNotThrowException() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setId(1L);
+        requestDto.setUpdatedAt(LocalDateTime.now().minusMonths(4));
+
+        when(requestRepository.existsById(1L)).thenReturn(true);
+
+        validator.validaRecommendationRequestByIdAndUpdateAt(requestDto);
+
+        verify(requestRepository, times(1)).existsById(1L);
+    }
+
+    @Test
+    public void testValidaRecommendationRequestByIdAndUpdateAt_RequestDoesNotExist_ShouldNotThrowException() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setId(1L);
+
         when(requestRepository.existsById(1L)).thenReturn(false);
 
-        validator.validate(validRequestDto);
+        validator.validaRecommendationRequestByIdAndUpdateAt(requestDto);
 
-        verify(userRepository, times(1)).existsById(1L);
-        verify(userRepository, times(1)).existsById(2L);
         verify(requestRepository, times(1)).existsById(1L);
     }
 }

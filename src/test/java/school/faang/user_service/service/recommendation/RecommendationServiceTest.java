@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,6 +48,7 @@ public class RecommendationServiceTest {
     private final long AUTHOR_ID = 1L;
     private final long RECEIVER_ID = 3L;
     private final long SKILL_OFFER_ID = 1L;
+    private final long SECOND_SKILL_OFFER_ID = 1L;
     private final long FIRST_SKILL_ID = 1L;
     private final long SECOND_SKILL_ID = 2L;
 
@@ -71,12 +73,21 @@ public class RecommendationServiceTest {
     RecommendationService recommendationService;
 
     RecommendationDto recommendationDto;
+    RecommendationDto updatedRecommendationDto;
     Recommendation recommendation;
 
+    Recommendation updateRecommendation;
+
     SkillOfferDto skillOfferDto;
+    SkillOfferDto updateSkillOfferDto;
     SkillOffer skillOffer;
+    SkillOffer updateSkillOfffer;
 
     ArrayList<SkillOfferDto> skillOfferDtos = new ArrayList<>();
+
+    ArrayList<SkillOffer> skillOffers = new ArrayList<>();
+    ArrayList<SkillOffer> updateSkillOffers = new ArrayList<>();
+    ArrayList<SkillOfferDto> updateSkillOfferDtos = new ArrayList<>();
 
     @BeforeEach
     void init() {
@@ -86,13 +97,30 @@ public class RecommendationServiceTest {
                 .recommendation(Recommendation.builder().id(RECOMMENDATION_ID).build())
                 .build();
 
+        skillOffers.add(skillOffer);
+        updateSkillOfffer = SkillOffer.builder()
+                .id(SECOND_SKILL_OFFER_ID)
+                .skill(Skill.builder().id(SECOND_SKILL_ID).build())
+                .recommendation(Recommendation.builder().id(RECOMMENDATION_ID).build())
+                .build();
+
+        updateSkillOffers.add(updateSkillOfffer);
+
+
         skillOfferDto = SkillOfferDto.builder()
                 .id(SKILL_OFFER_ID)
                 .skillId(FIRST_SKILL_ID)
                 .recommendationId(RECOMMENDATION_ID)
                 .build();
 
+        updateSkillOfferDto = SkillOfferDto.builder()
+                .id(SECOND_SKILL_OFFER_ID)
+                .skillId(SECOND_SKILL_ID)
+                .build();
+
         skillOfferDtos.add(skillOfferDto);
+        updateSkillOfferDtos.add(updateSkillOfferDto);
+
         recommendationDto = RecommendationDto.builder()
                 .id(RECOMMENDATION_ID)
                 .authorId(AUTHOR_ID)
@@ -107,6 +135,24 @@ public class RecommendationServiceTest {
                 .receiver(User.builder().id(RECEIVER_ID).build())
                 .content("TEST CONTENT")
                 .build();
+
+        updatedRecommendationDto = RecommendationDto.builder()
+                .content("Update Recommendation")
+                .authorId(AUTHOR_ID)
+                .receiverId(RECEIVER_ID)
+                .skillOffers(updateSkillOfferDtos)
+                .build();
+
+
+        updateRecommendation = Recommendation.builder()
+                .id(RECOMMENDATION_ID)
+                .author(User.builder().id(AUTHOR_ID).build())
+                .receiver(User.builder().id(RECEIVER_ID).build())
+                .skillOffers(skillOffers)
+                .content("Update Recommendation")
+                .build();
+
+
     }
 
     @Test
@@ -140,28 +186,42 @@ public class RecommendationServiceTest {
     public void testAddRecommendationAllOk() {
         doNothing().when(recommendationValidator).validateDateOfLastRecommendation(AUTHOR_ID, RECEIVER_ID);
         doNothing().when(recommendationValidator).validateSkillOffers(recommendationDto);
-        //recommendation = recommendationMapper.toEntity(recommendationDto);
 
-        //skillOffer = skillOfferMapper.toEntity(skillOfferDto);
-
-        //when(recommendationRepository.save(any())).thenReturn(recommendationTest);
-
-        when(recommendationService.saveSkillOffers(Collections.singletonList(skillOfferDto), RECOMMENDATION_ID)).thenReturn(Collections.singletonList(skillOffer));
+        when(recommendationRepository.save(any(Recommendation.class))).thenReturn(recommendation);
+        when(skillOfferRepository.saveAll(any())).thenReturn(skillOffers);
+        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
 
         RecommendationDto result = recommendationService.createRecommendation(recommendationDto);
 
         assertNotNull(result);
+        assertEquals(1, result.getSkillOffers().size());
     }
 
     @Test
-    void testCreateRecommendationFillsSkillOffers() {
-        ArrayList<SkillOffer> offers = new ArrayList<>();
-        offers.add(skillOffer);
-        when(recommendationRepository.save(any(Recommendation.class))).thenReturn(recommendation);
-        when(skillOfferRepository.saveAll(any())).thenReturn(offers);
-        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
+    @DisplayName("Test update recommendation : Wrong recommendation ID")
+    public void testUpdateRecommendationWrongId() {
+        String errorMessage = String.format("The recommendation (ID : %d) doesn't exists in the system", RECOMMENDATION_ID);
+        when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.empty());
 
-        RecommendationDto result = recommendationService.createRecommendation(recommendationDto);
-        assertEquals(skillOfferDtos, result.getSkillOffers());
+        Exception exception = assertThrows(EntityNotFoundException.class, ()-> recommendationService.updateRecommendation(RECOMMENDATION_ID, recommendationDto));
+
+        verifyNoMoreInteractions(recommendationValidator, recommendationRepository, skillOfferRepository);
+        assertEquals(errorMessage, exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test update recommendation : Successfully update")
+    public void testUpdateRecommendationAllOk() {
+        recommendation.setSkillOffers(skillOffers);
+        when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.of(recommendation));
+
+        doNothing().when(recommendationValidator).validateDateOfLastRecommendation(AUTHOR_ID, RECEIVER_ID);
+        doNothing().when(recommendationValidator).validateSkillOffers(any());
+
+        when(recommendationRepository.save(any(Recommendation.class))).thenReturn(updateRecommendation);
+        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(updatedRecommendationDto);
+        RecommendationDto result = recommendationService.updateRecommendation(RECOMMENDATION_ID, updatedRecommendationDto);
+
+        assertEquals(1,result.getSkillOffers().size());
     }
 }

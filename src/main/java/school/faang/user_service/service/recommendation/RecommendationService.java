@@ -21,6 +21,7 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validation.recommendation.RecommendationValidator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -57,14 +58,17 @@ public class RecommendationService {
     @Transactional
     public RecommendationDto updateRecommendation(long recommendationId, RecommendationDto updateRecommendationDto) {
         log.info("Start update the recommendation ID = {}", recommendationId);
+
         Recommendation recommendation = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> {
                     String errorMessage = String.format("The recommendation (ID : %d) doesn't exists in the system", recommendationId);
                     log.error(errorMessage);
                     return new EntityNotFoundException(errorMessage);
                 });
+
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
         RecommendationDto recommendationDto = recommendationMapper.toDto(recommendation);
+
         recommendationValidator.validateDateOfLastRecommendation(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
         recommendationValidator.validateSkillOffers(updateRecommendationDto);
 
@@ -78,7 +82,7 @@ public class RecommendationService {
         skillOffers.addAll(savedSkillOffersToUpdate);
         updatedRecommendation.setSkillOffers(skillOffers);
         log.info("Recommendation ID = {} was updated", recommendationId);
-        return recommendationMapper.toDto(recommendationRepository.save(updatedRecommendation));
+        return recommendationMapper.toDto(updatedRecommendation);
     }
 
     @Transactional
@@ -113,7 +117,7 @@ public class RecommendationService {
 
     public List<SkillOffer> saveSkillOffers(List<SkillOfferDto> skillOfferDtoList, long recommendationId) {
         if (skillOfferDtoList == null || skillOfferDtoList.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
         skillOfferDtoList.forEach(skillOfferDto -> skillOfferDto.setRecommendationId(recommendationId));
         List<SkillOffer> skillOffers = skillOfferMapper.toListOffersEntity(skillOfferDtoList);

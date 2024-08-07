@@ -114,9 +114,6 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName(value = "Getting regular users throws exception cause userFilter is null")
-    public void testGetRegularUsersWithNullableUserFilter() {
-        UserFilterDto userFilterDto = null;
     public void testExistsByIdReturnsTrue() {
         Long userId = 1L;
         when(userRepository.existsById(userId)).thenReturn(true);
@@ -176,5 +173,4 @@ public class UserServiceTest {
             assertFalse(exists);
             verify(userRepository, times(1)).existsById(userId);
         }
-
 }

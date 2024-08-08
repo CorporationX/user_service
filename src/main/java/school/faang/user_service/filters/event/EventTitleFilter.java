@@ -1,4 +1,4 @@
-package school.faang.user_service.filters.Event;
+package school.faang.user_service.filters.event;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -7,18 +7,14 @@ import school.faang.user_service.entity.event.Event;
 import java.util.stream.Stream;
 
 @Component
-public class EventByOwnerFilter implements EventFilter {
+public class EventTitleFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getOwnerIdPattern() != null;
+        return filters.getTitlePattern() != null && !filters.getTitlePattern().isEmpty();
     }
 
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
-        {
-            events.filter(event ->
-                            (event.getOwner().getId()) == (filters.getOwnerIdPattern()));
-            return events;
-        }
+        return events.filter(event -> event.getTitle().contains(filters.getTitlePattern()));
     }
 }

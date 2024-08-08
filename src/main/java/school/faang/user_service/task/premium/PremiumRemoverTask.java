@@ -16,7 +16,7 @@ public class PremiumRemoverTask {
     private final PremiumService premiumService;
 
     @Scheduled(cron = "${task.expired-premium-remove.remove-premium-interval}")
-    public void removePremium(){
+    public void removePremium() {
         log.info("Start task : delete expired premiums {}", Thread.currentThread().getName());
         List<List<Long>> expiredPremiumIds = premiumService.findExpiredPremiumIds();
         expiredPremiumIds.forEach(premiumService::deleteAsyncPremiumByIds);

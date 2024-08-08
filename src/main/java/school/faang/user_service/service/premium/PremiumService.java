@@ -23,7 +23,7 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
 
     @Transactional
-    public List<List<Long>>  findExpiredPremiumIds(){
+    public List<List<Long>> findExpiredPremiumIds() {
         LocalDateTime now = LocalDateTime.now();
         List<Long> premiumIDList = premiumRepository.findAllByEndDateBefore(now).stream()
                 .map(Premium::getId).toList();

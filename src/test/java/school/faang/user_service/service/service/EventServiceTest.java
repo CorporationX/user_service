@@ -13,7 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.filters.Event.EventFilter;
+import school.faang.user_service.filters.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.event.EventRepository;

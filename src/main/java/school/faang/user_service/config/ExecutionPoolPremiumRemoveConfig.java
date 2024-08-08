@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @Slf4j
-public class ExecutionPoolPremiumRemove {
+public class ExecutionPoolPremiumRemoveConfig {
     @Value("${task.expired-premium-remove.thread-pool.core-pool-size}")
     private int corePoolSize;
     @Value("${task.expired-premium-remove.thread-pool.max-pool-capacity}")

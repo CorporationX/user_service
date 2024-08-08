@@ -11,7 +11,7 @@ public class UserBanedService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void banedUser(long userId) {
-       userRepository.banUserById(userId);
+    public void banedUser(long authorId) {
+        userRepository.banUserById(authorId);
     }
 }

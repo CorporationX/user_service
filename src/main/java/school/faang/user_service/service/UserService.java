@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
@@ -17,6 +19,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Setter
@@ -67,8 +70,45 @@ public class UserService {
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
     }
+
+    public UserDto getUserDtoById(long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            throw new EntityNotFoundException("there is no user with id: " + userId);
+        }
+
+        return userMapper.toDto(userOptional.get());
+    }
   
     public List<UserDto> getUsersDtoByIds(List<Long> ids) {
-          return userMapper.usersToUserDTOs(userRepository.findAllById(ids));
-      }
+        return userMapper.usersToUserDTOs(userRepository.findAllById(ids));
+    }
+
+    public void uploadAvatar(long userId, String fileId, String smallFileId) {
+        User user = userRepository.findById(userId).get();
+
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId(fileId);
+        userProfilePic.setSmallFileId(smallFileId);
+        user.setUserProfilePic(userProfilePic);
+
+        userRepository.save(user);
+    }
+
+    public void deleteAvatar(long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            throw new EntityNotFoundException("there is no user with id: " + userId);
+        }
+
+        User user = userOptional.get();
+        UserProfilePic userProfilePic = user.getUserProfilePic();
+        userProfilePic.setSmallFileId(null);
+        userProfilePic.setFileId(null);
+        user.setUserProfilePic(userProfilePic);
+
+        userRepository.save(user);
+    }
 }

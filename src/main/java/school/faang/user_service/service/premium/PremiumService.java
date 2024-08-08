@@ -3,6 +3,9 @@ package school.faang.user_service.service.premium;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,10 +24,16 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PremiumService {
 
     private final UserRepository userRepository;
@@ -79,6 +88,48 @@ public class PremiumService {
 
         if (!isValidResponse(response)) {
             throw new RuntimeException("Payment failed");
+        }
+    }
+
+    @Transactional
+    public void removePremiums(final int batch) {
+        List<Premium> premiumsForDelete = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
+        if (!premiumsForDelete.isEmpty()) {
+            List<List<Long>> premiumIdsSubList = new ArrayList<>();
+            int batchCount = (int) Math.ceil((double) premiumsForDelete.size() / batch);
+            Stream.iterate(0, n -> n + 1).limit(batchCount).forEach(i -> premiumIdsSubList.add(new ArrayList<>()));
+            int indexBatch = 0;
+            int counter = 0;
+            for (Premium premium : premiumsForDelete) {
+                premiumIdsSubList.get(indexBatch).add(premium.getId());
+                counter++;
+                if (counter == batch) {
+                    counter = 0;
+                    indexBatch++;
+                }
+            }
+
+            ExecutorService executor = Executors.newFixedThreadPool(batchCount);
+            premiumIdsSubList.forEach(ids -> {
+                executor.execute(() -> {
+                    ids.forEach(premiumRepository::deleteById);
+                });
+            });
+            executor.shutdown();
+            try {
+                executor.awaitTermination(5, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (!executor.isTerminated()) {
+                var errorMessage = "Не удалось удалить истёкшие премиумы - время ожидания истекло";
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage);
+            }
+            log.info(LocalDateTime.now() + " Удалены премиумы\n" + premiumsForDelete);
+        } else {
+            log.info(LocalDateTime.now() + " Премиумы для удаления отсутствуют");
         }
     }
 }

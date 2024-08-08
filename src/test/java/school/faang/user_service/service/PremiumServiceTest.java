@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -27,8 +29,14 @@ import school.faang.user_service.service.premium.PremiumService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PremiumServiceTest {
@@ -39,6 +47,8 @@ public class PremiumServiceTest {
     private PremiumRepository premiumRepository;
     @Mock
     private PaymentServiceClient paymentServiceClient;
+    @Captor
+    ArgumentCaptor<Long> captorDeleteById;
     @Spy
     private PremiumMapper premiumMapper = Mappers.getMapper(PremiumMapper.class);
 
@@ -84,36 +94,36 @@ public class PremiumServiceTest {
 
     @Test
     public void testBuyPremiumValidation() {
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
         Assert.assertThrows("User not found", DataValidationException.class, () -> service.buyPremium(userId, days));
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(generateUser()));
-        Mockito.when(premiumRepository.existsByUserId(userId)).thenReturn(true);
+        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(generateUser()));
+        when(premiumRepository.existsByUserId(userId)).thenReturn(true);
         Assert.assertThrows("User already has premium", DataValidationException.class, () -> service.buyPremium(userId, days));
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(generateUser()));
-        Mockito.when(premiumRepository.existsByUserId(userId)).thenReturn(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(generateUser()));
+        when(premiumRepository.existsByUserId(userId)).thenReturn(false);
         Assert.assertThrows("No premium period found for 1000 days", IllegalArgumentException.class, () -> service.buyPremium(userId, 1000));
 
-        Mockito.when(paymentServiceClient.pay(getPostPaymentRequestDto())).thenReturn(ResponseEntity.badRequest().build());
+        when(paymentServiceClient.pay(getPostPaymentRequestDto())).thenReturn(ResponseEntity.badRequest().build());
         Assert.assertThrows("Payment failed", RuntimeException.class, () -> service.buyPremium(userId, days));
     }
 
     @Test
     public void testBuyPremium() {
         // given
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(generateUser()));
-        Mockito.when(premiumRepository.existsByUserId(userId)).thenReturn(false);
-        Mockito.when(premiumRepository.save(Mockito.any(Premium.class))).thenReturn(getPremium());
-        Mockito.when(paymentServiceClient.pay(getPostPaymentRequestDto())).thenReturn(getPostPaymentResponseDto());
+        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(generateUser()));
+        when(premiumRepository.existsByUserId(userId)).thenReturn(false);
+        when(premiumRepository.save(Mockito.any(Premium.class))).thenReturn(getPremium());
+        when(paymentServiceClient.pay(getPostPaymentRequestDto())).thenReturn(getPostPaymentResponseDto());
         PremiumDto expectedPremiumDto = getExpectedPremiumDto();
 
         // when
         PremiumDto actualPremiumDto = service.buyPremium(userId, days);
 
         // then
-        Mockito.verify(paymentServiceClient, Mockito.times(1)).pay(getPostPaymentRequestDto());
-        Mockito.verify(premiumRepository, Mockito.times(1)).save(Mockito.any(Premium.class));
+        verify(paymentServiceClient, times(1)).pay(getPostPaymentRequestDto());
+        verify(premiumRepository, times(1)).save(Mockito.any(Premium.class));
         Assertions.assertEquals(expectedPremiumDto, actualPremiumDto);
     }
 
@@ -121,30 +131,59 @@ public class PremiumServiceTest {
     public void testRemovePremium() {
         service.removePremium(userId);
 
-        Mockito.verify(premiumRepository, Mockito.times(1)).deleteByUserId(userId);
+        verify(premiumRepository, times(1)).deleteByUserId(userId);
     }
 
     @Test
     public void testRemoveExpiredPremium() {
         // given
-        Mockito.when(premiumRepository.findAllByEndDateBefore(Mockito.any())).thenReturn(List.of(getPremium()));
+        when(premiumRepository.findAllByEndDateBefore(Mockito.any())).thenReturn(List.of(getPremium()));
 
         // when
         service.removeExpiredUsers();
 
         // then
-        Mockito.verify(premiumRepository, Mockito.times(1)).deleteByUserId(userId);
+        verify(premiumRepository, times(1)).deleteByUserId(userId);
     }
 
     @Test
     public void testDontRemoveExpiredPremiumIfNoUsers() {
         // given
-        Mockito.when(premiumRepository.findAllByEndDateBefore(Mockito.any())).thenReturn(List.of());
+        when(premiumRepository.findAllByEndDateBefore(Mockito.any())).thenReturn(List.of());
 
         // when
         service.removeExpiredUsers();
 
         // then
-        Mockito.verify(premiumRepository, Mockito.times(0)).deleteByUserId(userId);
+        verify(premiumRepository, times(0)).deleteByUserId(userId);
+    }
+
+    @Test
+    public void testRemovePremiums_NoPremiumsForRemove() {
+        // arrange
+        when(premiumRepository.findAllByEndDateBefore(any())).thenReturn(new ArrayList<>());
+
+        // act
+        service.removePremiums(10);
+
+        // assert
+        verify(premiumRepository, times(0)).deleteById(captorDeleteById.capture());
+    }
+
+    @Test
+    public void testRemovePremiums() {
+        // arrange
+        List<Premium> premiums = new ArrayList<>(List.of(
+                Premium.builder().id(1).build(),
+                Premium.builder().id(2).build(),
+                Premium.builder().id(3).build(),
+                Premium.builder().id(4).build(),
+                Premium.builder().id(5).build()
+        ));
+        when(premiumRepository.findAllByEndDateBefore(any())).thenReturn(premiums);
+
+        // act
+        service.removePremiums(10);
+        verify(premiumRepository, times(premiums.size())).deleteById(captorDeleteById.capture());
     }
 }

@@ -74,7 +74,7 @@ public class UserService {
     public UserDto getUserDtoById(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
-        if (userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             throw new EntityNotFoundException("there is no user with id: " + userId);
         }
 
@@ -99,7 +99,7 @@ public class UserService {
     public void deleteAvatar(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
-        if (userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             throw new EntityNotFoundException("there is no user with id: " + userId);
         }
 

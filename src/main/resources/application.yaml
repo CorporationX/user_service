@@ -5,6 +5,9 @@ spring:
     username: user
     password: password
 
+  config:
+    import: optional:classpath:application-secrets.yaml
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -34,6 +37,9 @@ logging:
   level:
     root: info
 
+api:
+  version: v1
+
 project-service:
   host: localhost
   port: 8082
@@ -47,7 +53,29 @@ aws:
   secretKey: secret_key
   region: bucket_region
 
+avatar:
+  small-pattern: small_avatar_%d.${services.dicebear.file-type}
+  small-size: 50
+  normal-pattern: avatar_%d.${services.dicebear.file-type}
+  normal-size: 200
+
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    bucketName: projectx3
+    region: eu-north-1
+    avatar-content-type: image/jpeg
+
+  dicebear:
+    url: https://api.dicebear.com
+    version: 9.x
+    styles:
+      - adventurer-neutral
+      - avataaars-neutral
+      - big-ears-neutral
+      - bottts-neutral
+      - croodles-neutral
+      - lorelei-neutral
+      - notionists-neutral
+      - pixel-art-neutral
+    file-type: jpeg
+    url-pattern: ${services.dicebear.url}/${services.dicebear.version}/%s/${services.dicebear.file-type}?seed=%d

@@ -21,10 +21,17 @@ public class UserDto {
     private String username;
 
     @NotBlank
+    @Size(min = 8, max = 128)
+    private String password;
+
+    @NotBlank
     @Email
     private String email;
 
     @NotBlank
     private String phone;
+
+    private long countryId;
+
     private boolean isActive;
 }

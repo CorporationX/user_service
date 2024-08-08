@@ -49,4 +49,10 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT title FROM goal
+            """)
+    List<String> findAllGoalTitles();
+
 }

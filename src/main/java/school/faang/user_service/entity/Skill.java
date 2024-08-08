@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.event.Event;
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "skill")
+@ToString(of = {"id", "title"})
 public class Skill {
 
     @Id

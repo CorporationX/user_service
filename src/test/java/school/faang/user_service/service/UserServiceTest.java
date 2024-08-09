@@ -191,7 +191,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void getUserProfilePic_successfulTest() throws IOException {
+    public void getUserProfilePic_successfulTest() {
         // Arrange
         var user = TestDataFactory.createUser();
         UserProfilePic userProfilePic = new UserProfilePic();
@@ -209,7 +209,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void deleteUserPic_successfulTest() throws IOException {
+    public void deleteUserPic_successfulTest() {
         // Arrange
         var user = TestDataFactory.createUser();
         UserProfilePic userProfilePic = new UserProfilePic();
@@ -229,7 +229,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void getUserPicById_throwTest() throws IOException {
+    public void getUserPicById_throwTest() {
         // Arrange
         var user = TestDataFactory.createUser();
 
@@ -238,7 +238,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void deleteUserPicById_throwTest() throws IOException {
+    public void deleteUserPicById_throwTest() {
         var user = TestDataFactory.createUser();
         user.setId(0L);
 

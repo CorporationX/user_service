@@ -40,7 +40,7 @@ public class S3ServiceImpl implements S3Service {
             s3Client.putObject(putObjectRequest);
             log.info(bucketName, key, file.getOriginalFilename(), objectMetadata);
         } catch (IOException e) {
-            log.error("S3Service" + e.getMessage(), e);
+            log.error("S3Service {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
@@ -57,7 +57,7 @@ public class S3ServiceImpl implements S3Service {
         try {
             return s3Client.getObject(bucketName, key).getObjectContent();
         } catch (Exception e) {
-            log.error("S3Service downloadFile" + e.getMessage(), e);
+            log.error("S3Service downloadFile {}", e.getMessage(), e);
             throw new SdkClientException(e);
         }
     }

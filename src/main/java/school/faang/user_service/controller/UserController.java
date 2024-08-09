@@ -51,12 +51,10 @@ public class UserController {
 
     @GetMapping("/profilePic/{userId}")
     public ResponseEntity<byte[]> getUserPic(@PathVariable long userId) throws IOException {
-        byte[] imageBytes = null;
-        try {
-            imageBytes = userService.getUserPic(userId).readAllBytes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        byte[] imageBytes;
+
+        imageBytes = userService.getUserPic(userId).readAllBytes();
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);

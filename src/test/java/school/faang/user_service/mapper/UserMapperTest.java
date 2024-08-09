@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
@@ -13,11 +15,9 @@ import school.faang.user_service.entity.person.Education;
 import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.entity.person.Address;
 
-@ExtendWith(MockitoExtension.class)
 public class UserMapperTest {
 
-    @InjectMocks
-    private UserMapperImpl userMapper;
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     private final long id = 1L;
     private final String userName = "Username";

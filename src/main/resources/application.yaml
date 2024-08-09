@@ -5,6 +5,14 @@ spring:
     username: user
     password: password
 
+  task:
+    execution:
+      pool:
+        core-size: 10
+        max-size: 50
+        queue-capacity: 100
+      thread-name-prefix: Async-
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

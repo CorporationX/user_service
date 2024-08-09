@@ -9,14 +9,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.UserController;
+import school.faang.user_service.controller.user.UserController;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.UserService;
-import school.faang.user_service.validator.UserValidator;
+import school.faang.user_service.service.user.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {

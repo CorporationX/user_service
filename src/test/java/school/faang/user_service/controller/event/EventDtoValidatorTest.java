@@ -6,9 +6,7 @@ import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EventDtoValidatorTest {
     private EventDtoValidator validator = new EventDtoValidator();

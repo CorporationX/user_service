@@ -10,14 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.dto.PremiumDto;
+import school.faang.user_service.controller.premium.PremiumController;
+import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.enums.PremiumPeriod;
 import school.faang.user_service.service.premium.PremiumService;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

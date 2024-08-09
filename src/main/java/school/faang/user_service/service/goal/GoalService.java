@@ -3,14 +3,13 @@ package school.faang.user_service.service.goal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.dto.filter.GoalFilterDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.skill.SkillServiceTwo;
 import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
@@ -19,15 +18,15 @@ import java.util.stream.Stream;
 @Service
 public class GoalService {
     private final GoalRepository goalRepository;
-    private final SkillService skillService;
+    private final SkillServiceTwo skillServiceTwo;
     private final GoalValidator goalValidator;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
 
     @Autowired
-    public GoalService(GoalRepository goalRepository, SkillService skillService, GoalValidator goalValidator, GoalMapper goalMapper, List<GoalFilter> goalFilters) {
+    public GoalService(GoalRepository goalRepository, SkillServiceTwo skillServiceTwo, GoalValidator goalValidator, GoalMapper goalMapper, List<GoalFilter> goalFilters) {
         this.goalRepository = goalRepository;
-        this.skillService = skillService;
+        this.skillServiceTwo = skillServiceTwo;
         this.goalValidator = goalValidator;
         this.goalMapper = goalMapper;
         this.goalFilters = goalFilters;
@@ -55,7 +54,7 @@ public class GoalService {
         goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(savedGoal.getId(), skillId));
 
         if (goalDto.getStatus().equals("completed")) {
-            goalRepository.findUsersByGoalId(goalId).forEach(user -> goalDto.getSkillIds().forEach(skillId -> skillService.assignSkillToUser(skillId, user.getId())));
+            goalRepository.findUsersByGoalId(goalId).forEach(user -> goalDto.getSkillIds().forEach(skillId -> skillServiceTwo.assignSkillToUser(skillId, user.getId())));
         }
 
         return goalMapper.toDto(savedGoal);

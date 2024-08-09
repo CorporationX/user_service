@@ -1,4 +1,6 @@
-package school.faang.user_service.service.recommendation.request;import org.junit.jupiter.api.DisplayName;
+package school.faang.user_service.service.recommendation.request;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,9 +18,9 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

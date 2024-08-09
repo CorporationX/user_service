@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.UserValidator;
 
 @ExtendWith(MockitoExtension.class)
 public class UserValidatorTest {

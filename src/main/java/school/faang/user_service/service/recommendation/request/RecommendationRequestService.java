@@ -6,12 +6,12 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.recommendation.request.filter.Filter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator.CreateRequestDtoValidator;
-import school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator.RejectRequestValidator;
+import school.faang.user_service.service.recommendation.request.filter.Filter;
+import school.faang.user_service.validator.requestvalidator.CreateRequestDtoValidator;
+import school.faang.user_service.validator.requestvalidator.RejectRequestValidator;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

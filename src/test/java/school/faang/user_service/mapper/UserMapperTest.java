@@ -3,11 +3,7 @@ package school.faang.user_service.mapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.person.ContactInfo;
@@ -22,18 +18,13 @@ public class UserMapperTest {
     private final long id = 1L;
     private final String username = "Username";
     private final String email = "email@gmail.com";
-    private final User user = User.builder()
-            .id(id)
-            .username(username)
-            .email(email)
-            .build();
     private User user;
 
     @BeforeEach
     public void setUp() {
         user = User.builder()
                 .id(id)
-                .username(userName)
+                .username(username)
                 .email(email)
                 .build();
     }
@@ -97,13 +88,13 @@ public class UserMapperTest {
     private void assertUserDto(UserDto userDto) {
         Assertions.assertEquals(userDto.getId(), id);
         Assertions.assertEquals(userDto.getEmail(), email);
-        Assertions.assertEquals(userDto.getUsername(), userName);
+        Assertions.assertEquals(userDto.getUsername(), username);
     }
 
     private void assertUser(User user) {
         Assertions.assertEquals(user.getId(), id);
         Assertions.assertEquals(user.getEmail(), email);
-        Assertions.assertEquals(user.getUsername(), userName);
+        Assertions.assertEquals(user.getUsername(), username);
     }
 
     private void assertPersonToUser(Person person, User user) {

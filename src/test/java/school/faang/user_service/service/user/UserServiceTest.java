@@ -2,7 +2,6 @@ package school.faang.user_service.service.user;
 
 import org.apache.batik.transcoder.TranscoderException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import org.springframework.beans.factory.annotation.Qualifier;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.person.Address;
 import school.faang.user_service.entity.person.ContactInfo;
@@ -23,9 +21,7 @@ import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.user.UserValidator;
-import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.password.PasswordService;
-import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -36,10 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -57,23 +51,13 @@ public class UserServiceTest {
     private PasswordService passwordService;
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private AvatarService avatarService;
 
     @Mock
-    private CountryService countryService;
-
-    @Mock
     private UserValidator userValidator;
-
-    @Mock
-    private UserMapper userMapper;
 
     @Mock
     private S3Service s3Service;
-    private UserValidator userValidator;
 
     @Mock
     @Qualifier("taskExecutor")
@@ -84,6 +68,8 @@ public class UserServiceTest {
 
     private UserDto userDto;
     private User user;
+
+    private Person person;
 
     @BeforeEach
     void setUp() {
@@ -99,13 +85,7 @@ public class UserServiceTest {
         Country country = new Country();
         country.setTitle("Belarus");
         user.setCountry(country);
-    }
-    private UserService userService;
 
-    private Person person;
-
-    @BeforeEach
-    void setUp() {
         Address address = new Address();
         address.setCountry("CountryName");
 
@@ -116,13 +96,7 @@ public class UserServiceTest {
 
         person = new Person();
         person.setContactInfo(contactInfo);
-
     }
-
-    private long userId = 1L;
-    private User user = User.builder()
-            .id(userId)
-            .build();
 
     @Test
     public void testFindNotExistingUserById() {

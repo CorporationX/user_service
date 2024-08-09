@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.batik.transcoder.TranscoderException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,8 @@ import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.user.UserValidator;
-import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.password.PasswordService;
-import school.faang.user_service.validator.user.UserValidator;
+import school.faang.user_service.dto.user.UserDto;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,24 +31,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-import java.io.IOException;
-
 @Service("userServiceNumberTwo")
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final UserRepository userRepository;
     private final UserRepository userRepository;
     private final AvatarService avatarService;
     private final CountryService countryService;
     private final UserValidator userValidator;
     private final UserMapper userMapper;
     private final S3Service s3Service;
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final CountryService countryService;
     private final PasswordService passwordService;
-    private final UserValidator userValidator;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
 

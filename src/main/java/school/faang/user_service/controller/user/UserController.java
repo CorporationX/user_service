@@ -7,16 +7,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.user.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.file.FileValidator;
 
 import java.io.IOException;
@@ -27,12 +22,12 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
+    private final FileValidator fileValidator;
 
     @PostMapping
     public UserDto createUser(@RequestBody @Valid UserDto userDto) throws IOException, TranscoderException {
         return userService.createUser(userDto);
-    private final UserService userService;
-    private final FileValidator fileValidator;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadCSV(@RequestParam("file") MultipartFile file) throws IOException {

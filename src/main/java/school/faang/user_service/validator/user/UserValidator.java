@@ -33,6 +33,8 @@ public class UserValidator {
         if (user.isPresent()) {
             throw new IllegalArgumentException("Phone already exists!");
         }
+    }
+
     public boolean findUserByEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }

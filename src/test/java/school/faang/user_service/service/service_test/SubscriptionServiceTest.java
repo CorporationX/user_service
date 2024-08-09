@@ -130,7 +130,7 @@ public class SubscriptionServiceTest {
         when(aboutFilter.apply(users, filter)).thenReturn(Stream.of());
 
         //expect
-        UserDto fuserDto = new UserDto(0L, "John", null, null);
+        UserDto fuserDto = UserDto.builder().id(0L).username("John").build();
         List<UserDto> userDtos = List.of(fuserDto);
 
         //assert

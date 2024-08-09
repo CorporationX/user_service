@@ -3,14 +3,18 @@ package school.faang.user_service.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.image.ImageMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;
@@ -21,6 +25,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final EventRepository eventRepository;
+    private final GoalRepository goalRepository;
+    private final MentorshipService mentorshipService;
+
     private final UserMapper userMapper;
     private final S3Service s3Service;
     private final ImageMapper imageMapper;
@@ -38,6 +47,39 @@ public class UserService {
         return userRepository.findAllById(userIds).stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public UserDto deactivateUserById(Long userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+
+        stopUserGoals(user);
+        deleteUserEvents(user);
+        user.setActive(false);
+        mentorshipService.stopUserMentorship(user.getId());
+
+        userRepository.save(user);
+
+        return userMapper.toDto(user);
+    }
+
+    private void stopUserGoals(User user) {
+        for (Goal goal : user.getGoals()) {
+            var userList = goal.getUsers();
+            if (userList != null) {
+                if (userList.size() == 1 && userList.get(0).getId() == user.getId()) {
+                    goalRepository.delete(goal);
+                } else {
+                    userList.remove(user);
+                    goalRepository.save(goal);
+                }
+            }
+        }
+    }
+
+    private void deleteUserEvents(User user) {
+        eventRepository.deleteAll(user.getParticipatedEvents());
     }
 
     public UserProfilePicDto addUserPic(Long userId, MultipartFile file) throws IOException {

@@ -18,20 +18,26 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
     @Value("${services.s3.fileLimit}")
     private int FILE_LIMIT;
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.findUserById(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> userIds) {
         return userService.findUsersByIds(userIds);
+    }
+
+    @PatchMapping("/{userId}/deactivate")
+    public UserDto deactivateUserById(@PathVariable Long userId) {
+        return userService.deactivateUserById(userId);
     }
 
     @PostMapping("usersPic/{userId}")

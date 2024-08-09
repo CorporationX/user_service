@@ -53,5 +53,8 @@ services:
     accessKey: user
     secretKey: password
     bucketName: corpbucket
-    fileLimit: 5000000
     isMocked: false
+  frofilePic:
+    fileLimit: 5000000
+    maxImagePicture: 1080
+    minImagePicture: 170

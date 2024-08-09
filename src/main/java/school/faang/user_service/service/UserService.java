@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,11 +31,12 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
 
-    private final UserMapper userMapper;
     private final S3Service s3Service;
     private final ImageMapper imageMapper;
 
+    @Value("${services.frofilePic.maxImagePicture}")
     private final static int MAX_IMAGE_PIC = 1080;
+    @Value("${services.frofilePic.minImagePicture}")
     private final static int MIN_IMAGE_PIC = 170;
 
     public UserDto findUserById(long userId) {

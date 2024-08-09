@@ -22,7 +22,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    @Value("${services.s3.fileLimit}")
+    @Value("${services.frofilePic.fileLimit}")
     private int FILE_LIMIT;
 
     @GetMapping("/{userId}")
@@ -40,7 +40,7 @@ public class UserController {
         return userService.deactivateUserById(userId);
     }
 
-    @PostMapping("usersPic/{userId}")
+    @PostMapping("/profilePic/{userId}")
     public UserProfilePicDto addUsersPic(@PathVariable long userId, @RequestBody MultipartFile file) throws IOException {
 
         if (file.getSize() > FILE_LIMIT) {
@@ -49,7 +49,7 @@ public class UserController {
         return userService.addUserPic(userId, file);
     }
 
-    @GetMapping("usersPic/{userId}")
+    @GetMapping("/profilePic/{userId}")
     public ResponseEntity<byte[]> getUserPic(@PathVariable long userId) throws IOException {
         byte[] imageBytes = null;
         try {
@@ -62,7 +62,7 @@ public class UserController {
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 
-    @DeleteMapping("usersPic/{userId}")
+    @DeleteMapping("/profilePic/{userId}")
     public void deleteUserPic(@PathVariable long userId) {
         userService.deleteUserPic(userId);
     }

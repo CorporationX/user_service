@@ -3,9 +3,10 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -25,6 +26,7 @@ public class UserService {
     private final MentorshipService mentorshipService;
     private final UserMapper userMapper;
     private final UserValidator userValidator;
+
 
     public UserDto deactivate(Long userId) {
         User user = userRepository.findById(userId).get();
@@ -70,4 +72,8 @@ public class UserService {
         }
     }
 
+    public User findUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("User not found"));
+    }
 }

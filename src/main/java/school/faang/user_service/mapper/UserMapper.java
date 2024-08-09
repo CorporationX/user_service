@@ -4,15 +4,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.UserDto;
+import org.mapstruct.Mapping;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.person.*;
 import school.faang.user_service.service.user.extractor.SafeExtractor;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-
+    @Mapping(source = "country.title", target = "countryTitle")
     UserDto toDto(User user);
-
+    @Mapping(source = "countryTitle", target = "country.title")
     User toEntity(UserDto userDto);
 
     @Mapping(target = "username", expression = "java(person.getFirstName() + ' ' + person.getLastName())")

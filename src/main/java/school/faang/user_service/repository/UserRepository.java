@@ -27,6 +27,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
+    Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     Optional<User> findByPhone(String phone);
 }

@@ -36,7 +36,7 @@ public class UserController {
 
     @PostMapping("usersPic/{userId}")
     public UserProfilePicDto addUsersPic(@PathVariable long userId, @RequestBody MultipartFile file) throws IOException {
-        System.out.println(file.getSize());
+
         if (file.getSize() > FILE_LIMIT) {
             throw new FileSizeLimitExceededException("File Size Limit ", file.getSize(), FILE_LIMIT);
         }

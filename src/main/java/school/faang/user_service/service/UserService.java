@@ -91,10 +91,6 @@ public class UserService {
     }
 
     @Transactional
-    public void banedUser(long userId) {
-        userRepository.banUserById(userId);
-    }
-
     public void createBanEvent(Message message) {
         try {
             BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);
@@ -102,6 +98,10 @@ public class UserService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void banedUser(long userId) {
+        userRepository.banUserById(userId);
     }
 
     private void stopUserGoalActivities(User user) {

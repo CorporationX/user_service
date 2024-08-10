@@ -2,7 +2,7 @@ import java.math.RoundingMode
 
 plugins {
     java
-    //id("jacoco")
+    id("jacoco")
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
@@ -101,18 +101,15 @@ tasks.bootJar {
     archiveFileName.set("service.jar")
 }
 
-
 /**
  * JaCoCo settings
  */
-
-//val jacocoInclude = listOf(
-//    "**/controller/**",
-//    "**/service/**",
-//    "**/validator/**",
-//    "**/mapper/**"
-//)
-/*
+val jacocoInclude = listOf(
+    "**/controller/**",
+    "**/service/**",
+    "**/validator/**",
+    "**/mapper/**"
+)
 jacoco {
     toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
@@ -151,4 +148,3 @@ tasks.jacocoTestCoverageVerification {
         }
     }
 }
-*/

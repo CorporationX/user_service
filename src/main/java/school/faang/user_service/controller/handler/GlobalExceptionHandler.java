@@ -27,10 +27,9 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.add(fieldName + " - " + errorMessage);
         });
-        ErrorDto errorDto = new ErrorDto(errors.toString());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(errorDto);
+                .body(new ErrorDto(errors.toString()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -39,10 +38,9 @@ public class GlobalExceptionHandler {
         List<String> errors = new ArrayList<>();
         e.getConstraintViolations()
                 .forEach(error -> errors.add(error.getPropertyPath().toString() + " - " + error.getMessage()));
-        ErrorDto errorDto = new ErrorDto(errors.toString());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(errorDto);
+                .body(new ErrorDto(errors.toString()));
     }
 
     @ExceptionHandler(DataValidationException.class)

@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling
 @EnableFeignClients("school.faang.user_service.client")
+@EnableScheduling
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",

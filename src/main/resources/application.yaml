@@ -66,4 +66,4 @@ springdoc:
 scheduler:
   clear-events:
     cron: "0 0 0 * * SUN"
-    chunk-size: 100 # –азмер подсписка дл€ удалени€ событий
+    chunk-size: 10

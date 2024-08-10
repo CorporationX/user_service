@@ -14,7 +14,7 @@ public class Scheduler {
     }
 
     @Scheduled(cron = "${scheduler.clear-events.cron}")
-    public void clearEvents(){
+    public void clearEvents() {
         eventService.clearPastEvents();
     }
 }

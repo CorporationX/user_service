@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.redis.connection.Message;
+import school.faang.user_service.dto.BanEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -16,6 +19,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
+import java.io.IOException;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,6 +38,7 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public UserDto createUser(UserDto userDto, MultipartFile userAvatar) {
@@ -83,6 +88,20 @@ public class UserService {
         user.setActive(false);
         stopMentorship(user);
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public void banedUser(long userId) {
+        userRepository.banUserById(userId);
+    }
+
+    public void createBanEvent(Message message) {
+        try {
+            BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);
+            banedUser(banEvent.getAuthorId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void stopUserGoalActivities(User user) {

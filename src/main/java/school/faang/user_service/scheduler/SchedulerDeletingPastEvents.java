@@ -7,7 +7,7 @@ import school.faang.user_service.service.EventService;
 
 @Configuration
 @RequiredArgsConstructor
-public class Scheduler {
+public class SchedulerDeletingPastEvents {
     final EventService eventService;
 
     @Scheduled(cron = "${scheduler.cron.expression}")

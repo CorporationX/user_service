@@ -3,11 +3,7 @@ package school.faang.user_service.service.thread;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 public class ThreadPoolDistributor {
@@ -21,8 +17,13 @@ public class ThreadPoolDistributor {
     private int maxNumberQueuesForThread;
 
     @Bean
-    public ExecutorService getThreadPool() {
-        return new ThreadPoolExecutor(quantityPollSize, maxQuantityPollSize, keepAliveTime,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(maxNumberQueuesForThread));
+    public ThreadPoolTaskExecutor getThreadPool() {
+        var executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(quantityPollSize);
+        executor.setMaxPoolSize(maxQuantityPollSize);
+        executor.setQueueCapacity(maxQuantityPollSize);
+        executor.initialize();
+        return executor;
+
     }
 }

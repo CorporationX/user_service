@@ -1,44 +1,36 @@
 package school.faang.user_service.controller;
 
-import org.assertj.core.api.Assert;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.TestDataFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static java.util.List.of;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -97,15 +89,20 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[2].id").value(userDtoList.get(2).getId()));
     }
     @Test
-    void uploadFile() throws Exception {
+    void testUploadFileSuccessfully() throws Exception {
         // given - precondition
         MultipartFile multipartFile = new MockMultipartFile(
                 "students.csv", "students.csv", "text/csv", "test data".getBytes()
         );
 
         String schemaFilePath = "src/main/resources/json/person-schema.json";
-        String schemaJson = new String(Files.readAllBytes(Paths.get(schemaFilePath)));
-
+        String schema = Files.readString(Paths.get(schemaFilePath));
+        MultipartFile schemaJson = new MockMultipartFile(
+                "person-schema.json",
+                "person-schema.json",
+                "application/json",
+                schema.getBytes()
+        );
         var userDtosList = TestDataFactory.createUserDtosList();
 
         when(userService.saveStudents(any(InputStream.class)))
@@ -114,7 +111,7 @@ class UserControllerTest {
         // when - action
         var response = mockMvc.perform(multipart("/upload")
                 .file("students.csv", multipartFile.getBytes())
-                .param("person-schema.json", schemaJson));
+                .file("person-schema.json", schemaJson.getBytes()));
 
         // then - verify the output
         response.andExpect(status().isOk())

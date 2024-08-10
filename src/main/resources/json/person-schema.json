@@ -49,20 +49,10 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "street",
-                "city",
-                "state",
-                "country",
-                "postalCode"
-              ]
+              "required": ["street", "city", "state", "country", "postalCode"]
             }
           },
-          "required": [
-            "email",
-            "phone",
-            "address"
-          ]
+          "required": ["email", "phone", "address"]
         },
         "education": {
           "type": "object",
@@ -80,12 +70,7 @@
               "type": "number"
             }
           },
-          "required": [
-            "faculty",
-            "yearOfStudy",
-            "major",
-            "GPA"
-          ]
+          "required": ["faculty", "yearOfStudy", "major", "GPA"]
         },
         "status": {
           "type": "string"
@@ -113,11 +98,7 @@
                 "type": "integer"
               }
             },
-            "required": [
-              "degree",
-              "institution",
-              "completionYear"
-            ]
+            "required": ["degree", "institution", "completionYear"]
           }
         },
         "scholarship": {
@@ -144,7 +125,5 @@
       ]
     }
   },
-  "required": [
-    "person"
-  ]
+  "required": ["person"]
 }

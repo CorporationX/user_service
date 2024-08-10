@@ -12,12 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,9 +43,11 @@ public class UserController {
 
     @PostMapping("/upload")
     public List<UserDto> uploadFile(@RequestParam("students.csv") MultipartFile file,
-                                                       @RequestParam("person-schema.json") String schemaJson) throws IOException {
+                                                       @RequestParam("person-schema.json") MultipartFile schemaJson) throws IOException {
         log.info("Received request to upload files: students.csv and person-schema.json");
-        writeSchemaToFileAsJson(schemaJson);
+
+        String schemaContent = new String(schemaJson.getBytes(), UTF_8);
+        writeSchemaToFile(schemaContent);
 
         try (InputStream inputStream = file.getInputStream()) {
             log.info("Processing students.csv");
@@ -53,17 +60,18 @@ public class UserController {
             throw new RuntimeException(e);
         }
     }
-    private void writeSchemaToFileAsJson(String schemaJson) throws IOException {
-        File schemaDir = new File("src/main/resources/json");
-        if (!schemaDir.exists()) {
-            schemaDir.mkdirs();
-            log.info("Created directory: {}", schemaDir.getPath());
+    private void writeSchemaToFile(String schemaJson) throws IOException {
+        Path schemaDir = Paths.get("src/main/resources/json");
+        if (Files.notExists(schemaDir)) {
+            Files.createDirectories(schemaDir);
+            log.info("Created directory: {}", schemaDir.toAbsolutePath());
         }
-        File schemaFile = new File(schemaDir, "person-schema.json");
-        try(FileWriter fileWriter = new FileWriter(schemaFile)) {
-            fileWriter.write(schemaJson);
-            log.info("Saved person-schema.json to {}", schemaFile.getPath());
-        }catch (IOException e) {
+
+        Path schemaFile = schemaDir.resolve("person-schema.json");
+        try {
+            Files.writeString(schemaFile, schemaJson, CREATE, TRUNCATE_EXISTING);
+            log.info("Saved person-schema.json to {}", schemaFile.toAbsolutePath());
+        } catch (IOException e) {
             log.error("Error saving person-schema.json", e);
             throw e;
         }

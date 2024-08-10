@@ -48,7 +48,7 @@ public class PremiumServiceTest {
     @Mock
     private PaymentServiceClient paymentServiceClient;
     @Captor
-    ArgumentCaptor<Long> captorDeleteById;
+    ArgumentCaptor<List<Long>> captorDeleteByIds;
     @Spy
     private PremiumMapper premiumMapper = Mappers.getMapper(PremiumMapper.class);
 
@@ -164,10 +164,10 @@ public class PremiumServiceTest {
         when(premiumRepository.findAllByEndDateBefore(any())).thenReturn(new ArrayList<>());
 
         // act
-        service.removePremiums(10);
+        service.removePremiums();
 
         // assert
-        verify(premiumRepository, times(0)).deleteById(captorDeleteById.capture());
+        verify(premiumRepository, times(0)).deleteByIds(captorDeleteByIds.capture());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class PremiumServiceTest {
         when(premiumRepository.findAllByEndDateBefore(any())).thenReturn(premiums);
 
         // act
-        service.removePremiums(10);
-        verify(premiumRepository, times(premiums.size())).deleteById(captorDeleteById.capture());
+        service.removePremiums();
+        verify(premiumRepository, times(1)).deleteByIds(captorDeleteByIds.capture());
     }
 }

@@ -40,7 +40,6 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumMapper premiumMapper;
-    private final ExecutorService executor;
 
     private static boolean isValidResponse(ResponseEntity<PaymentPostPayResponseDto> response) {
         return response.getStatusCode() == HttpStatus.OK &&
@@ -93,14 +92,15 @@ public class PremiumService {
     }
 
     @Transactional
-    public void removePremiums(final int batch) {
+    public void removePremiums() {
         List<Premium> premiumsForDelete = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
         if (!premiumsForDelete.isEmpty()) {
             List<Long> premiumIds = premiumsForDelete.stream()
                             .map(Premium::getId)
                             .toList();
             premiumRepository.deleteByIds(premiumIds);
-            log.info(LocalDateTime.now() + " Удалены премиумы\n" + premiumsForDelete);
+            List<PremiumDto> PremiumDtos = premiumMapper.toDto(premiumsForDelete);
+            log.info(LocalDateTime.now() + " Удалены премиумы\n" + PremiumDtos);
         } else {
             log.info(LocalDateTime.now() + " Премиумы для удаления отсутствуют");
         }

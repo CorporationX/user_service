@@ -19,6 +19,7 @@ import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,4 +43,5 @@ public class Premium {
     @Column(name = "end_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endDate;
+
 }

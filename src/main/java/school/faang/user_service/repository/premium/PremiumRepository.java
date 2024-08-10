@@ -23,5 +23,5 @@ public interface PremiumRepository extends CrudRepository<Premium, Long> {
     delete from user_premium
     where id in (?1)
     """)
-    int deleteByIds(List<Long> ids);
+    void deleteByIds(List<Long> ids);
 }

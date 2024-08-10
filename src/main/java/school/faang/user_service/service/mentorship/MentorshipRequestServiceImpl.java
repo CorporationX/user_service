@@ -10,13 +10,16 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.event.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorship.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.StreamSupport;
@@ -30,10 +33,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestMapper mapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final List<MentorshipValidator> mentorshipValidators;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Override
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        mentorshipRequestedEventPublisher.publish(toEvent(mentorshipRequestDto));
         mentorshipValidators.forEach(validator -> validator.validate(mentorshipRequestDto));
         mentorshipRequestDto.setRequestStatus(RequestStatus.PENDING);
         MentorshipRequest savedRequest;
@@ -98,5 +103,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private MentorshipRequest findMentorshipRequest(long id) {
         return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionMessages.MENTORSHIP_REQUEST_NOT_FOUND));
+    }
+    private MentorshipRequestedEvent toEvent(MentorshipRequestDto mentorshipRequestDto){
+        return MentorshipRequestedEvent.builder()
+                .requesterId(mentorshipRequestDto.getRequesterId())
+                .receiverId(mentorshipRequestDto.getReceiverId())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }

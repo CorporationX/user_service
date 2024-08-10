@@ -56,3 +56,4 @@ premium-remover:
   #cron: * * * * * 0
   cron: 0/10 * * * * *
   batch-delete: 10
+  amount-thread-executor: 10

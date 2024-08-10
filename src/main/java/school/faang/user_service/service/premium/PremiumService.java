@@ -40,6 +40,7 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumMapper premiumMapper;
+    private final ExecutorService executor;
 
     private static boolean isValidResponse(ResponseEntity<PaymentPostPayResponseDto> response) {
         return response.getStatusCode() == HttpStatus.OK &&
@@ -109,7 +110,7 @@ public class PremiumService {
                 }
             }
 
-            ExecutorService executor = Executors.newFixedThreadPool(batchCount);
+
             premiumIdsSubList.forEach(ids -> {
                 executor.execute(() -> {
                     ids.forEach(premiumRepository::deleteById);

@@ -96,38 +96,10 @@ public class PremiumService {
     public void removePremiums(final int batch) {
         List<Premium> premiumsForDelete = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
         if (!premiumsForDelete.isEmpty()) {
-            List<List<Long>> premiumIdsSubList = new ArrayList<>();
-            int batchCount = (int) Math.ceil((double) premiumsForDelete.size() / batch);
-            Stream.iterate(0, n -> n + 1).limit(batchCount).forEach(i -> premiumIdsSubList.add(new ArrayList<>()));
-            int indexBatch = 0;
-            int counter = 0;
-            for (Premium premium : premiumsForDelete) {
-                premiumIdsSubList.get(indexBatch).add(premium.getId());
-                counter++;
-                if (counter == batch) {
-                    counter = 0;
-                    indexBatch++;
-                }
-            }
-
-
-            premiumIdsSubList.forEach(ids -> {
-                executor.execute(() -> {
-                    ids.forEach(premiumRepository::deleteById);
-                });
-            });
-            executor.shutdown();
-            try {
-                executor.awaitTermination(5, TimeUnit.MINUTES);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-            if (!executor.isTerminated()) {
-                var errorMessage = "Не удалось удалить истёкшие премиумы - время ожидания истекло";
-                log.error(errorMessage);
-                throw new RuntimeException(errorMessage);
-            }
+            List<Long> premiumIds = premiumsForDelete.stream()
+                            .map(Premium::getId)
+                            .toList();
+            premiumRepository.deleteByIds(premiumIds);
             log.info(LocalDateTime.now() + " Удалены премиумы\n" + premiumsForDelete);
         } else {
             log.info(LocalDateTime.now() + " Премиумы для удаления отсутствуют");

@@ -51,3 +51,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+app:
+  password-length: 12

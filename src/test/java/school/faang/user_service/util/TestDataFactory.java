@@ -1,9 +1,13 @@
 package school.faang.user_service.util;
 
+import com.json.student.Address;
+import com.json.student.ContactInfo;
+import com.json.student.Person;
 import lombok.experimental.UtilityClass;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -31,7 +35,7 @@ public final class TestDataFactory {
     public static UserDto createUserDto() {
         return UserDto.builder()
                 .id(1L)
-                .username("Incognito1")
+                .username("John_Smith")
                 .email("incognito1@gmail.com")
                 .active(true)
                 .goalIds(of(12L))
@@ -50,16 +54,16 @@ public final class TestDataFactory {
         user.setParticipatedEvents(new ArrayList<>(of(createEvent())));
         user.setMentees(new ArrayList<>(createUsersList().subList(1, 3)));
         user.getMentees().forEach(mentee -> {
-                            mentee.setMentors(new ArrayList<>());
-                            mentee.getMentors().add(user);
-                        });
+            mentee.setMentors(new ArrayList<>());
+            mentee.getMentors().add(user);
+        });
 
         return user;
     }
     private static User createUserWithoutGoalsAndEvents() {
         return User.builder()
                 .id(1L)
-                .username("Incognito")
+                .username("John_Smith")
                 .email("Incognito@gmail.com")
                 .active(true)
                 .mentees(new ArrayList<>())
@@ -157,17 +161,39 @@ public final class TestDataFactory {
                 .users(new ArrayList<>())
                 .build();
     }
-
     public static Event createEvent(){
         return Event.builder()
                 .id(123L)
                 .build();
     }
-
     public static Goal createNewGoal() {
         Goal goal = createGoalWithoutUsers();
         goal.setId(13L);
         goal.setUsers(new ArrayList<>(Arrays.asList(createUser(), User.builder().id(123L).build())));
         return goal;
+    }
+
+    public static Person createPerson() {
+        var address = new Address();
+        address.setCity("New York");
+        address.setCountry("USA");
+
+        var contactInfo = new ContactInfo();
+        contactInfo.setAddress(address);
+        contactInfo.setEmail("incognito1@gmail.com");
+
+        var person = new Person();
+        person.setFirstName("John");
+        person.setLastName("Smith");
+        person.setContactInfo(contactInfo);
+
+        return person;
+    }
+
+    public static Country createCounty(){
+        return Country.builder()
+                .id(23L)
+                .title("USA")
+                .build();
     }
 }

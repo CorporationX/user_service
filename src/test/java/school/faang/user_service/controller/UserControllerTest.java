@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,14 +27,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static school.faang.user_service.util.TestDataFactory.*;
+import static school.faang.user_service.util.TestDataFactory.USER_ID;
+import static school.faang.user_service.util.TestDataFactory.createUserDto;
+import static school.faang.user_service.util.TestDataFactory.createUserDtosList;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -53,7 +54,7 @@ class UserControllerTest {
     @Test
     void getUser() throws Exception {
         // given - precondition
-        var userDto = TestDataFactory.createUserDto();
+        var userDto = createUserDto();
         var userId = userDto.getId();
 
         when(userService.findUserById(userId))
@@ -107,7 +108,7 @@ class UserControllerTest {
                 "application/json",
                 schema.getBytes()
         );
-        var userDtosList = TestDataFactory.createUserDtosList();
+        var userDtosList = createUserDtosList();
 
         when(userService.saveStudents(any(InputStream.class)))
                 .thenReturn(CompletableFuture.completedFuture(userDtosList));

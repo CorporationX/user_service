@@ -1,4 +1,4 @@
-package school.faang.user_service.service.thread;
+package school.faang.user_service.thread;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +17,7 @@ public class ThreadPoolDistributor {
     private int maxNumberQueuesForThread;
 
     @Bean
-    public ThreadPoolTaskExecutor getThreadPool() {
+    public ThreadPoolTaskExecutor customThreadPool() {
         var executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(quantityPollSize);
         executor.setMaxPoolSize(maxQuantityPollSize);

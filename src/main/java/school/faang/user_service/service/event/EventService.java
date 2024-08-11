@@ -1,29 +1,34 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.thread.ThreadPoolDistributor;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Component
+@Service
 @RequiredArgsConstructor
-
 public class EventService {
-
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters; //= List.of(new EventByOwnerFilter(), new EventTitleFilter());
     private final EventValidator eventValidator;
+    private final ThreadPoolDistributor threadPoolDistributor;
+    @Value("${thread.pool.coreSize}")
+    private final int quantityThreadPollSize;
 
     public EventDto create(EventDto eventDto) {
         eventValidator.inputDataValidation(eventDto);
@@ -66,5 +71,23 @@ public class EventService {
 
     public List<EventDto> getParticipatedEvents(Long userId) {
         return eventMapper.toDtoList(eventRepository.findParticipatedEventsByUserId(userId));
+    }
+
+    @Transactional
+    public void deletingAllPastEvents() {
+        List<Event> allEvents = eventRepository.findByStatus(EventStatus.COMPLETED);
+        int sizeFullListEvent = allEvents.size();
+        int baseSize = sizeFullListEvent / quantityThreadPollSize;
+        int remainder = sizeFullListEvent % quantityThreadPollSize;
+        int startIndex = 0;
+        for (int i = 0; i < quantityThreadPollSize; i++) {
+            int currentSize = baseSize + (i < remainder ? 1 : 0);
+            int endIndex = startIndex + currentSize;
+            List<Event> partListEvent = allEvents.subList(startIndex, Math.min(endIndex, sizeFullListEvent));
+            threadPoolDistributor.customThreadPool().submit(() -> {
+                eventRepository.deleteAllInBatch(partListEvent);
+            });
+            startIndex = endIndex;
+        }
     }
 }

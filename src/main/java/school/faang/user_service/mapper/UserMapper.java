@@ -17,4 +17,6 @@ public interface UserMapper {
 
     @Mapping(source = "active", target = "isActive")
     List<UserDto> usersToUserDTOs(List<User> users);
+    @Mapping(source = "active", target = "isActive")
+    List<UserDto> toDtoList(List<User> users);
 }

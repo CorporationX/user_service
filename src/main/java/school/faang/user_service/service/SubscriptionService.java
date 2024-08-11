@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.validator.SubscriptionServiceValidator;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class SubscriptionService {
 
         List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
-        return userMapper.usersToUserDTOs(userFilters.stream()
+        return userMapper.toDtoList(userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .flatMap(filter -> filter.apply(followers, filterDto))
                 .toList());
@@ -54,7 +54,7 @@ public class SubscriptionService {
 
         List<User> followings = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
-        return userMapper.usersToUserDTOs(userFilters.stream()
+        return userMapper.toDtoList(userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .flatMap(filter -> filter.apply(followings, filterDto))
                 .toList());

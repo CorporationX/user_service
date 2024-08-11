@@ -17,7 +17,10 @@ DROP TABLE user_event;
 DROP TABLE rating;
 DROP TABLE event;
 DROP TABLE goal;
+DROP TABLE user_skill_guarantee;
 DROP TABLE skill;
+DROP TABLE contact_preferences;
+DROP TABLE user_premium;
 DROP TABLE users;
 DROP TABLE country;
 

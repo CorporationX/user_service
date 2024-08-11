@@ -7,7 +7,10 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.publisher.FollowerMessagePublisher;
+import school.faang.user_service.publisher.MessagePublisher;
 
 @Configuration
 public class RedisConfig {
@@ -16,6 +19,8 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -31,5 +36,15 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    public ChannelTopic followerTopic() {
+        return new ChannelTopic(followerChannelName);
+    }
+
+    @Bean
+    public MessagePublisher followerPublisher(FollowerMessagePublisher followerMessagePublisher) {
+        return followerMessagePublisher;
     }
 }

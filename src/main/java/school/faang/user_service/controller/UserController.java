@@ -45,7 +45,7 @@ public class UserController {
         userService.uploadAvatar(userId, fileId, smallFileId);
     }
 
-    @DeleteMapping("/avatar/delete/{largeFileKey}/{smallFilekey}")
+    @DeleteMapping("/avatar/delete")
     public void deleteAvatar(@RequestHeader(value = "x-user-id") long userId) {
         userService.deleteAvatar(userId);
     }

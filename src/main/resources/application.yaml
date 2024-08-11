@@ -44,46 +44,51 @@ payment-service:
   host: localhost
   port: 9080
 
-aws:
-  accessKey: dummy-access-key
-  secretKey: dummy-secret-key
-  region: eu-north-1
-
 services:
   s3:
-    bucket-name: dummy-bucket-name
-    isMocked: true
-  avatar:
-    pattern: avatar_%d.${dice-bear.file-type}
-    small-pattern: small_avatar_%d.${dice-bear.file-type}
-    small-file-width: 200
-    small-file-height: 200
-    seed-range: 20000
-    content-type: image/jpeg
+    accessKey: accessKey
+    secretKey: secretKey
+    bucketName: caveri-testing-backet
+    region: us-east-1
 
-springfox:
-  documentation:
-    swagger:
-      v2:
-       path: /api-docs
+  diceBear:
+    avatarUrl:
+      url: https://api.dicebear.com/9.x/
+      fullPostfix: /${services.diceBear.avatarUrl.extension}?seed=
+      smallPostfix: /${services.diceBear.avatarUrl.extension}?size=${services.diceBear.avatarUrl.size}&seed=
+      size: 32
+      avatarPattern: avatar_%d.${services.diceBear.avatarUrl.extension}
+      smallAvatarPattern: small_avatar_%d.${services.diceBear.avatarUrl.extension}
+      extension: jpeg
+    styles:
+      - adventurer
+      - adventurer-neutral
+      - avataaars
+      - avataaars-neutral
+      - big-ears
+      - big-ears-neutral
+      - big-smile
+      - bottts
+      - bottts-neutral
+      - croodles
+      - croodles-neutral
+      - dylan
+      - fun-emoji
+      - glass
+      - icons
+      - identicon
+      - initials
+      - lorelei
+      - lorelei-neutral
+      - micah
+      - miniavs
+      - notionists
+      - notionists-neutral
+      - open-peeps
+      - personas
+      - pixel-art
+      - pixel-art-neutral
+      - rings
+      - shapes
+      - thumbs
 
-dice-bear:
-  url: https://api.dicebear.com
-  version: 9.x
-  file-type: jpeg
-  params: seed=%d
-  styles: >
-    adventurer-neutral, 
-    adventurer, 
-    big-ears-neutral, 
-    big-ears, 
-    pixel-art
-
-thread-pool:
-  size:
-    min: 10
-    max: 20
-  keep-alive:
-    time: 60
-    time-unit: SECONDS
-  queue-size: 10000

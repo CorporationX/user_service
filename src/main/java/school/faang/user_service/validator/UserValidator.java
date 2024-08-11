@@ -7,9 +7,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.repository.UserRepository;
 import java.util.Optional;
 
 @Component

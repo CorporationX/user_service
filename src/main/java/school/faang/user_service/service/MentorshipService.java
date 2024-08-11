@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipUserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.mentorship.MentorshipNoSuchElementException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -40,7 +40,7 @@ public class MentorshipService {
         User mentor = getUser(mentorId);
         User mentee = getUser(menteeId);
         if (!mentor.getMentees().contains(mentee)) {
-            throw new MentorshipNoSuchElementException(
+            throw new EntityNotFoundException(
                     String.format("Mentor with id: %s haven't mentee with id: %s", mentorId, menteeId));
         }
         mentor.getMentees().remove(mentee);
@@ -51,7 +51,7 @@ public class MentorshipService {
 
     private User getUser(long userId) {
         return mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new MentorshipNoSuchElementException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Not found user with id: " + userId));
     }
 }

@@ -48,13 +48,11 @@ aws:
   secretKey: password
   bucket-name: corpbucket
   region: us-east-2
+#  accessKey: access_key
+#    secretKey: secret_key
+#    region: bucket_region
 
 services:
   s3:
     bucket-name: user_backet
     isMocked: true
-
-dicebear:
-  url: https://api.dicebear.com/9.x
-  avatars: Adventurer, Adventurer Neutral, Avataaars, Avataaars Neutral, Big Ears, Big Ears Neutral, Big Smile, Bottts, Bottts Neutral, Croodles, Croodles Neutral, Dylan, Fun Emoji, Glass, Icons, Identicon, Initials, Lorelei, Lorelei Neutral, Micah, Miniavs, Notionists, Notionists Neutral, Open Peeps, Personas, Pixel Art, Pixel Art Neutral, Rings, Shapes, Thumbs
-  type: svg

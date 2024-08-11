@@ -1,4 +1,4 @@
-package school.faang.user_service.exception;
+package school.faang.user_service.handler;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -10,14 +10,13 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
-public class ErrorResponse {
-    private int status;
-    private String error;
+public class ErrorMessageDto {
     private String message;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime timesError;
+    private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm: ss")
+    private LocalDateTime timestamp;
 
-    public ErrorResponse(String message) {
+    public ErrorMessageDto(String message) {
         this.message = message;
     }
 }

@@ -51,3 +51,7 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+number-months:
+  new:
+    request: 6

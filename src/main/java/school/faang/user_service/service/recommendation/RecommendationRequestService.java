@@ -9,7 +9,7 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundEntityException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -44,7 +44,7 @@ public class RecommendationRequestService {
     @Transactional(readOnly = true)
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = requestRepository.findById(id).orElseThrow(
-                () -> new NotFoundEntityException(NOT_FOUND_REQUEST_RECOMMENDATIONS + id));
+                () -> new EntityNotFoundException(NOT_FOUND_REQUEST_RECOMMENDATIONS + id));
         return requestMapper.toDto(request);
     }
 

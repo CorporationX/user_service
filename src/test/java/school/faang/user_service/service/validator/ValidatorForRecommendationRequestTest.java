@@ -1,4 +1,4 @@
-package school.faang.user_service.service.validators;
+package school.faang.user_service.service.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

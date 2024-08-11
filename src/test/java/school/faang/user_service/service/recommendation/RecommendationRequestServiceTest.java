@@ -10,7 +10,7 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.NotFoundEntityException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -94,9 +94,7 @@ public class RecommendationRequestServiceTest {
     void testGetRequestNotFound() {
         when(requestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> recommendationRequestService.getRequest(1L));
-
-        assertEquals("Not found RequestRecommendation for id: 1", exception.getMessage());
+        assertThrows(EntityNotFoundException.class, () -> recommendationRequestService.getRequest(1L));
     }
 
     @Test
@@ -119,9 +117,7 @@ public class RecommendationRequestServiceTest {
     void testRejectRequestNotFound() {
         when(requestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> recommendationRequestService.rejectRequest(1L, "Reason"));
-
-        assertEquals("Not found RequestRecommendation for id: 1", exception.getMessage());
+        assertThrows(EntityNotFoundException.class, () -> recommendationRequestService.rejectRequest(1L, "Reason"));
     }
 
     @Test

@@ -8,8 +8,8 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.exception.NotFoundEntityException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserFilterValidation;
@@ -77,7 +77,7 @@ public class UserService {
     public void existUserById(long id) {
         if (!userRepository.existsById(id)) {
             log.error("User with id :{} doesn't exist!", id);
-            throw new NotFoundEntityException("User with id :" + id + " doesn't exist!");
+            throw new EntityNotFoundException("User with id :" + id + " doesn't exist!");
         }
     }
 }

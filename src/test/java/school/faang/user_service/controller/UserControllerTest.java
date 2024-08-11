@@ -7,12 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.util.TestDataFactory;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,6 +31,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static school.faang.user_service.util.TestDataFactory.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -56,7 +60,7 @@ class UserControllerTest {
                 .thenReturn(userDto);
 
         // when - action
-        var response = mockMvc.perform(get("/users/{userId}", userId));
+        var response = mockMvc.perform(get("/users/{userId}", USER_ID));
 
         // then - verify the output
         response.andExpect(status().isOk())
@@ -70,7 +74,7 @@ class UserControllerTest {
     void getUsersByIds() throws Exception {
         // given - precondition
         List<Long> userIds = of(1L, 2L, 3L);
-        var userDtoList = TestDataFactory.createUserDtosList();
+        var userDtoList = createUserDtosList();
 
         when(userService.findUsersByIds(userIds))
                 .thenReturn(userDtoList);
@@ -119,6 +123,25 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].id", is(userDtosList.get(0).getId().intValue())))
                 .andExpect(jsonPath("$[1].id", is(userDtosList.get(1).getId().intValue())))
                 .andExpect(jsonPath("$[2].id", is(userDtosList.get(2).getId().intValue())))
+                .andDo(print());
+    }
+
+    @Test
+    void givenUserIdWhenDeactivateUserByIdThenReturnDeactivatedUser() throws Exception {
+        // given - precondition
+        var userDto = createUserDto();
+
+        when(userService.deactivateUserById(USER_ID))
+                .thenReturn(userDto);
+
+        // when - action
+        var response = mockMvc.perform(patch("/users/{userId}/deactivate", USER_ID)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(userDto.getId()))
                 .andDo(print());
     }
 }

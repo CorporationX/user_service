@@ -26,19 +26,25 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/users")
 @Slf4j
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.findUserById(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> userIds) {
         return userService.findUsersByIds(userIds);
+    }
+
+    @PatchMapping("/{userId}/deactivate")
+    public UserDto deactivateUserById(@PathVariable Long userId) {
+        return userService.deactivateUserById(userId);
     }
 
     @PostMapping("/upload")

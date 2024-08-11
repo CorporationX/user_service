@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import school.faang.user_service.entity.event.Event;
@@ -36,9 +35,10 @@ class EventServiceTest {
     @Mock
     private ThreadPoolDistributor threadPoolDistributor;
     @Mock
-    private List<EventFilter> filter;
-    @Mock
     private ThreadPoolTaskExecutor customThreadPool;
+    @Mock
+    private List<EventFilter> filter;
+
 
     private EventService eventService;
 

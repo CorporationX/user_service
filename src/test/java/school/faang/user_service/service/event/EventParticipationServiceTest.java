@@ -12,6 +12,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.validator.event.EventParticipationValidator;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ import java.util.List;
 public class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;
+    @Mock
+    private EventParticipationValidator eventParticipationValidator;
     @Mock
     private UserMapper userMapper;
     @InjectMocks
@@ -31,26 +34,26 @@ public class EventParticipationServiceTest {
     @Test
     public void testRegisterExistingUser() {
         prepareUserList(eventId, userId);
-        Assert.assertThrows(RuntimeException.class, () -> eventParticipationService.registerParticipant(eventId, userId));
+        Assert.assertThrows(RuntimeException.class, () -> eventParticipationService.addParticipant(eventId, userId));
     }
 
     @Test
     public void testRegister() {
         prepareUserList(eventId, wrongUserId);
-        eventParticipationService.registerParticipant(eventId, userId);
+        eventParticipationService.addParticipant(eventId, userId);
         Mockito.verify(eventParticipationRepository).register(eventId, userId);
     }
 
     @Test
     public void testUnregisterNotExistingUser() {
         prepareUserList(eventId, wrongUserId);
-        Assert.assertThrows(RuntimeException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
+        Assert.assertThrows(RuntimeException.class, () -> eventParticipationService.removeParticipant(eventId, userId));
     }
 
     @Test
     public void testUnregister() {
         prepareUserList(eventId, userId);
-        eventParticipationService.unregisterParticipant(eventId, userId);
+        eventParticipationService.removeParticipant(eventId, userId);
         Mockito.verify(eventParticipationRepository).unregister(eventId, userId);
     }
 

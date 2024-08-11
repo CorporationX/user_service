@@ -8,8 +8,8 @@ import school.faang.user_service.config.StyleAvatarConfig;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -61,8 +61,7 @@ public class AvatarService {
 
     private String getStyle() {
         List<String> styles = styleAvatarConfig.getStyles();
-        Collections.shuffle(styles);
-        String newStyle = styles.get(0);
+        String newStyle = styles.get(ThreadLocalRandom.current().nextInt(styles.size()));
         return url + newStyle;
     }
 }

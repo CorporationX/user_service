@@ -27,6 +27,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import school.faang.user_service.config.StyleAvatarConfig;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,7 +77,7 @@ class UserServiceTest {
                 .id(userId)
                 .username("username")
                 .password("password")
-                .country(1L)
+                .countryId(1L)
                 .email("test@mail.com")
                 .phone("123456")
                 .build();
@@ -109,13 +116,36 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("testing createUser method with null multipartFile")
-    public void testCreateUser() {
+    @DisplayName("save new user")
+    public void saveUserTest() {
+
+        Country country = Country.builder()
+                .title("country")
+                .build();
+
+        user = User.builder()
+                .username("test user")
+                .email("user@email.com")
+                .phone("+79211234567")
+                .country(country)
+                .password("abracadabra")
+                .build();
+        userDto = UserDto.builder()
+                .username("test user")
+                .email("user@email.com")
+                .phone("+79211234567")
+                .countryId(1L)
+                .password("abracadabra")
+                .build();
+
         when(userMapper.toEntity(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
-        userService.createUser(userDto, null);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        userService.createUser(userDto);
+
+        verify(userMapper, times(1)).toEntity(userDto);
         verify(userRepository, times(2)).save(user);
-        verify(avatarService, times(1)).setRandomAvatar(user);
         verify(userMapper, times(1)).toDto(user);
     }
 
@@ -124,7 +154,7 @@ class UserServiceTest {
     public void testUpdateUser() {
         when(userValidator.validateUserExistence(user.getId())).thenReturn(user);
         userService.updateUserAvatar(userId, null);
-        verify(avatarService, times(1)).setRandomAvatar(user);
+        verify(avatarService, times(1)).setDefaultUserAvatar(user);
         verify(userRepository, times(1)).save(user);
     }
 

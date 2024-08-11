@@ -2,55 +2,66 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import school.faang.user_service.config.AvatarConfig;
+import school.faang.user_service.config.StyleAvatarConfig;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
-@Slf4j
-@Setter
 @RequiredArgsConstructor
 public class AvatarService {
 
-    private final AvatarConfig avatarConfig;
-    private final S3Service s3Service;
-    private final UtilsService utilsService;
-    private final RestTemplate restTemplate;
+    @Value("${services.diceBear.avatarUrl.url}")
+    @Setter
+    private String url;
 
-    public void setRandomAvatar(User user) {
-        int styleIndex = ThreadLocalRandom.current().nextInt(0, avatarConfig.getSTYLES().length);
-        int seed = ThreadLocalRandom.current().nextInt(0, avatarConfig.getSEED_RANGE());
+    @Value("${services.diceBear.avatarUrl.smallPostfix}")
+    @Setter
+    private String smallPostfix;
 
-        String avatarUrl = String.format(avatarConfig.getGENERATION_URL_PATTERN(),
-                avatarConfig.getSTYLES()[styleIndex], seed);
-        String fileName = String.format(avatarConfig.getAVATAR_ID_PATTERN(), user.getId(),
-                avatarConfig.getEXTENSION());
-        String smallFileName = String.format(avatarConfig.getSMALL_AVATAR_ID_PATTERN(), user.getId(),
-                avatarConfig.getEXTENSION());
+    @Value("${services.diceBear.avatarUrl.fullPostfix}")
+    @Setter
+    private String fullPostfix;
 
-        byte[] avatar = getImageByUrl(avatarUrl);
-        byte[] smallAvatar = utilsService.resizeImage(avatar, avatarConfig.getSMALL_FILE_WIDTH(),
-                avatarConfig.getSMALL_FILE_HEIGHT(), avatarConfig.getEXTENSION());
+    @Value("${services.diceBear.avatarUrl.avatarPattern}")
+    @Setter
+    private String avatarPattern;
 
-        s3Service.uploadToS3(fileName, avatar, avatarConfig.getCONTENT_TYPE(), avatarConfig.getBUCKET_NAME());
-        s3Service.uploadToS3(smallFileName, smallAvatar, avatarConfig.getCONTENT_TYPE(), avatarConfig.getBUCKET_NAME());
+    @Value("${services.diceBear.avatarUrl.smallAvatarPattern}")
+    @Setter
+    private String smallAvatarPattern;
 
-        user.setUserProfilePic(new UserProfilePic(fileName, smallFileName));
+    private final StyleAvatarConfig styleAvatarConfig;
+    private final AmazonS3Service amazonS3Service;
+    private final RestTemplateService restTemplateService;
+
+
+    public void setDefaultUserAvatar(User user) {
+
+        String randomStyleUrl = getStyle();
+
+        String originalAvatarUrl = randomStyleUrl + fullPostfix + user.hashCode();
+        String miniAvatarUrl = randomStyleUrl + smallPostfix + user.hashCode();
+
+        String fullAvatarKey = String.format(avatarPattern, user.getId());
+        String smallAvatarKey = String.format(smallAvatarPattern, user.getId());
+
+        String keyForOriginalAvatar = amazonS3Service.uploadFile(fullAvatarKey, restTemplateService.getImageBytes(originalAvatarUrl));
+        String keyForSmallAvatar = amazonS3Service.uploadFile(smallAvatarKey, restTemplateService.getImageBytes(miniAvatarUrl));
+
+        user.setUserProfilePic(UserProfilePic.builder()
+                .fileId(keyForOriginalAvatar)
+                .smallFileId(keyForSmallAvatar)
+                .build());
     }
 
-    private byte[] getImageByUrl(String url) {
-        try {
-            return restTemplate.getForObject(url, byte[].class);
-        } catch (RestClientException e) {
-            String errMessage = String.format("Could not get image from URL: %s", url);
-            log.error(errMessage, e);
-            throw new RuntimeException();
-        }
+    private String getStyle() {
+        List<String> styles = styleAvatarConfig.getStyles();
+        String newStyle = styles.get(ThreadLocalRandom.current().nextInt(styles.size()));
+        return url + newStyle;
     }
 }

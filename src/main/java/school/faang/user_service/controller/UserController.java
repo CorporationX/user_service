@@ -29,6 +29,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -98,9 +99,7 @@ public class UserController {
 
     @GetMapping("/profilePic/{userId}")
     public ResponseEntity<byte[]> getUserPic(@PathVariable long userId) throws IOException {
-        byte[] imageBytes;
-
-        imageBytes = userService.getUserPic(userId).readAllBytes();
+        byte[] imageBytes = userService.getUserPic(userId).readAllBytes();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);

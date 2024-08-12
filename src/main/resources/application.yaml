@@ -52,7 +52,7 @@ services:
     endpoint: http://127.0.0.1:9000
     accessKey: user
     secretKey: password
-    bucketName: user_backet
+    bucketName: corpbucket
     isMocked: true
   frofilePic:
     fileLimit: 5000000

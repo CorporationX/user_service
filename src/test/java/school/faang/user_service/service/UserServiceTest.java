@@ -1,5 +1,9 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.json.student.Person;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,19 +13,28 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.image.ImageMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.s3.S3ServiceImpl;
 import school.faang.user_service.util.TestDataFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.util.List.of;
@@ -30,7 +43,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -47,6 +59,16 @@ class UserServiceTest {
     @Mock
     private UserMapper userMapper;
     @Mock
+    private CsvMapper csvMapper;
+    @Mock
+    private CountryRepository countryRepository;
+    @Mock
+    private PersonToUserMapper personToUserMapper;
+    @Mock
+    private ObjectReader objectReader;
+    @Mock
+    private MappingIterator<Person> mappingIterator;
+    @Mock
     private EventRepository eventRepository;
     @Mock
     private S3ServiceImpl s3Service;
@@ -55,7 +77,6 @@ class UserServiceTest {
 
     private static final Long USER_ID = 1L;
     private static final Long INVALID_USER_ID = MAX_VALUE;
-
 
     @Test
     void givenUserIdWhenFindUserByIdThenReturnUser() {
@@ -116,6 +137,44 @@ class UserServiceTest {
 
         verify(userRepository).findAllById(userIds);
         usersList.forEach(user -> verify(userMapper).toDto(user));
+    }
+
+    @Test
+    void givenPersonsInputStreamWhenSavePersonsThenReturnUsers() throws IOException, ExecutionException, InterruptedException {
+        // given - precondition
+        String csvData = "firstName,lastName,email,country\nJohn,Smith,incognito1@gmail.com,USA";
+        InputStream inputStream = new ByteArrayInputStream(csvData.getBytes(StandardCharsets.UTF_8));
+        User user = TestDataFactory.createUser();
+        UserDto userDto = TestDataFactory.createUserDto();
+        List<Country> countryList = of(TestDataFactory.createCounty());
+        List<User> userList = of(user);
+        List<UserDto> expectedResult = of(userDto);
+
+        when(countryRepository.findAll()).thenReturn(Collections.emptyList());
+        when(countryRepository.saveAll(anyList())).thenReturn(countryList);
+        when(userRepository.saveAll(anyList())).thenReturn(userList);
+        when(personToUserMapper.mapToUser(any(Person.class))).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        // when - action
+        var actualResult = userService.saveStudents(inputStream).get();
+
+        // then - verify the output
+        assertThat(actualResult).isNotNull();
+        assertThat(actualResult.size()).isEqualTo(expectedResult.size());
+        assertThat(actualResult.get(0).getEmail()).isEqualTo(expectedResult.get(0).getEmail());
+        assertThat(actualResult.get(0).getUsername()).isEqualTo(expectedResult.get(0).getUsername());
+    }
+
+    @Test
+    void givenEmptyInputStreamWhenSavePersonsThenThrowException() {
+        // given - precondition
+        var emptyInputStream = InputStream.nullInputStream();
+
+        // when - action and
+        // then - verify the output
+        assertThatThrownBy(() -> userService.saveStudents(emptyInputStream))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

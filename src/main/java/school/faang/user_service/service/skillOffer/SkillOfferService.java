@@ -4,46 +4,32 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.ExceptionMessages;
+import school.faang.user_service.mapper.recommendation.SkillOfferMapper;
+import school.faang.user_service.mapper.recommendation.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SkillOfferService {
     private final SkillOfferRepository skillOfferRepository;
+    private final UserService userService;
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
+    private final SkillOfferMapper skillOfferMapper;
 
     public void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
-//        List<Long> skillOfferIds = skillOfferDtos.stream()
-//                .map(SkillOfferDto::getId)
-//                .toList();
-//        log.info(skillOfferIds.toString());
-////        List<SkillOffer> skillOffertest = StreamSupport
-////                .stream(skillOfferRepository.findAll().spliterator(), false)
-////                .toList();
-//        List<SkillOffer> skillOffers = StreamSupport
-//                .stream(skillOfferRepository.findAllById(skillOfferIds).spliterator(), false)
-//                .toList();
-//        log.info(skillOffers.toString());
-//        if (skillOffers.size() != skillOfferIds.size()) {
-//            log.error(ExceptionMessages.SKILL_NOT_FOUND);
-//            throw new NoSuchElementException(ExceptionMessages.SKILL_NOT_FOUND);
-//        }
         if (skillOfferDtos == null || skillOfferDtos.isEmpty()) {
             return;
         }
@@ -57,32 +43,48 @@ public class SkillOfferService {
         }
     }
 
-    public void saveSkillOffers(Recommendation recommendation) {
-        User author = recommendation.getAuthor();
-        User receiver = recommendation.getReceiver();
+    public void updateSkillGuarantee(List<SkillOfferDto> skillOfferDtoList, long authorId, long receiverId) {
+        if (skillOfferDtoList == null || skillOfferDtoList.isEmpty()) {
+            return;
+        }
 
-        List<Skill> existingSkills = skillRepository.findAllByUserId(receiver.getId());
-        List<SkillOffer> skillOffers = recommendation.getSkillOffers();
+        List<Long> skillOfferIds = skillOfferDtoList.stream()
+                .map(SkillOfferDto::getSkillId).toList();
+        List<Long> userSkillIds = userService.getUserSkillsId(receiverId);
+        List<UserSkillGuaranteeDto> skillGuaranteeDtoList = new ArrayList<>();
 
-        boolean isAuthorSkillGuarantee = userSkillGuaranteeRepository.existsById(author.getId());
-
-        List<UserSkillGuarantee> listForGuaranteeRepository = new ArrayList<>();
-        List<SkillOffer> listForOfferRepository = new ArrayList<>();
-
-        for (SkillOffer skillOffer : skillOffers) {
-            if (skillOffer.getSkill() != null
-                    && existingSkills.contains(skillOffer.getSkill())
-                    && !isAuthorSkillGuarantee) {
-                listForGuaranteeRepository.add(UserSkillGuarantee.builder()
-                        .user(receiver)
-                        .skill(skillOffer.getSkill())
-                        .guarantor(author)
-                        .build());
-            } else {
-                listForOfferRepository.add(skillOffer);
+        for (var skillOfferId : skillOfferIds) {
+            if (userSkillIds.contains(skillOfferId) &&
+                    !userSkillGuaranteeRepository.existsUserSkillGuaranteeByUserIdAndGuarantorIdAndSkillId(receiverId, authorId, skillOfferId)) {
+                skillGuaranteeDtoList.add(UserSkillGuaranteeDto.builder()
+                        .userId(receiverId)
+                        .guarantorId(authorId)
+                        .skillId(skillOfferId).build()
+                );
             }
         }
-        userSkillGuaranteeRepository.saveAll(listForGuaranteeRepository);
-        skillOfferRepository.saveAll(listForOfferRepository);
+        userSkillGuaranteeRepository.saveAll(userSkillGuaranteeMapper.toEntityList(skillGuaranteeDtoList));
+    }
+
+    public List<SkillOfferDto> newSkillOffersToUpdate(List<SkillOfferDto> skillOfferDto, List<SkillOfferDto> updateSkillOffer) {
+        List<Long> skillOfferIds = skillOfferDto.stream().map(SkillOfferDto::getSkillId).toList();
+        List<SkillOfferDto> result = new ArrayList<>();
+
+        for (var skillOffer : updateSkillOffer) {
+            if (!skillOfferIds.contains(skillOffer.getSkillId())) {
+                result.add(SkillOfferDto.builder().skillId(skillOffer.getSkillId()).build());
+            }
+        }
+        return result;
+    }
+
+    public List<SkillOffer> saveSkillOffers(List<SkillOfferDto> skillOfferDtoList, long recommendationId) {
+        if (skillOfferDtoList == null || skillOfferDtoList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        skillOfferDtoList.forEach(skillOfferDto -> skillOfferDto.setRecommendationId(recommendationId));
+        List<SkillOffer> skillOffers = skillOfferMapper.toListOffersEntity(skillOfferDtoList);
+
+        return skillOfferRepository.saveAll(skillOffers);
     }
 }

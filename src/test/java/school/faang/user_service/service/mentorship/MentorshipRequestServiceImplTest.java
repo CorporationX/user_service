@@ -53,9 +53,6 @@ class MentorshipRequestServiceImplTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
 
-    // исправить
-    @Mock
-    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     @Mock
     private MentorshipRequestMapper mapper;
 

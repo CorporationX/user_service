@@ -20,4 +20,8 @@ public final class ExceptionMessages {
     public static final String DISCREPANCY_OF_STATUS = "Status does not match condition.";
     public static final String RECOMMENDATION_FREQUENCY ="Recommendation request can only be sent once every 6 months.";
     public static final String REQUEST_SKILL = "One or more requested skills do not exist in the database";
+
+    // publisher
+    public static final String SERIALIZATION_ERROR = "Error in serializing object: ";
+    public static final String UNEXPECTED_ERROR = "Unexpected error occurred: ";
 }

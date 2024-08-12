@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.event.mentorship.MentorshipRequestedEvent;
+import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.publisher.MessagePublisher;
 
 @Slf4j
@@ -25,11 +26,11 @@ public class MentorshipRequestedEventPublisher implements MessagePublisher<Mento
             redisTemplate.convertAndSend(channelTopic.getTopic(), message);
             log.info("Published MentorshipRequested event: {}", message);
         } catch (JsonProcessingException e) {
-            log.error("Ошибка при сериализации объекта", e);
-            throw new IllegalArgumentException("Ошибка при сериализации объекта", e);
+            log.error(ExceptionMessages.SERIALIZATION_ERROR + event, e);
+            throw new IllegalArgumentException(ExceptionMessages.SERIALIZATION_ERROR + event, e);
         } catch (Exception e) {
-            log.error("Ошибка  ", e);
-            throw new IllegalArgumentException("Ошибка ");
+            log.error(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
+            throw new IllegalArgumentException(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
         }
     }
 }

@@ -1,355 +1,307 @@
-//package school.faang.user_service.service.recommendation;
-//
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.Mockito;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageImpl;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Pageable;
-//import school.faang.user_service.dto.recommendation.RecommendationDto;
-//import school.faang.user_service.dto.recommendation.SkillOfferDto;
-//import school.faang.user_service.entity.Skill;
-//import school.faang.user_service.entity.User;
-//import school.faang.user_service.entity.UserSkillGuarantee;
-//import school.faang.user_service.entity.recommendation.Recommendation;
-//import school.faang.user_service.entity.recommendation.SkillOffer;
-//import school.faang.user_service.mapper.recommendation.RecommendationMapper;
-//import school.faang.user_service.repository.SkillRepository;
-//import school.faang.user_service.repository.UserSkillGuaranteeRepository;
-//import school.faang.user_service.repository.recommendation.RecommendationRepository;
-//import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-//import school.faang.user_service.service.skillOffer.SkillOfferService;
-//
-//import java.time.LocalDateTime;
-//import java.time.temporal.ChronoUnit;
-//import java.util.List;
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyLong;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//class RecommendationServiceTest {
-//    @Mock
-//    private RecommendationRepository recommendationRepository;
-//    @Mock
-//    private SkillOfferService skillOfferService;
-//    @Mock
-//    private SkillOfferRepository skillOfferRepository;
-//    @Mock
-//    private SkillRepository skillRepository;
-//    @Mock
-//    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-//    @Mock
-//    private RecommendationMapper recommendationMapper;
-//    @InjectMocks
-//    private RecommendationService recommendationService;
-//    Recommendation recommendation;
-//    Recommendation recommendationFindFirst;
-//    RecommendationDto recommendationDto;
-//    User author;
-//    User receiver;
-//    Skill skill;
-//    SkillOffer skillOffer;
-//    SkillOfferDto skillOfferDto;
-//    long authorId;
-//    long receiverId;
-//    Pageable pageable;
-//
-//    @BeforeEach
-//    void init() {
-//        authorId = 1L;
-//        receiverId = 1L;
-//
-//        pageable = PageRequest.of(0, 10);
-//
-//        skill = new Skill();
-//        skill.setId(1L);
-//
-//        skillOffer = new SkillOffer();
-//        skillOffer.setId(1L);
-//        skillOffer.setSkill(skill);
-//
-//        skillOfferDto = new SkillOfferDto();
-//        skillOfferDto.setId(1L);
-//
-//        author = User.builder()
-//                .id(1L)
-//                .build();
-//        receiver = User.builder()
-//                .id(2L)
-//                .build();
-//        recommendation = Recommendation.builder()
-//                .id(1L) //
-//                .author(author)
-//                .receiver(receiver)
-//                .skillOffers(List.of(skillOffer))
-//                .build();
-//
-//        recommendationFindFirst = Recommendation.builder()
-//                .author(author)
-//                .receiver(receiver)
-//                .skillOffers(List.of(skillOffer))
-//                .updatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS))
-//                .build();
-//
-//        recommendationDto = RecommendationDto.builder()
-//                .authorId(1L)
-//                .receiverId(2L)
-//                .skillOffers(List.of(skillOfferDto))
-//                .build();
-//    }
-//
-//    @Test
-//    @DisplayName("findFirstOrderException")
-//    void testCheckNotRecommendBeforeSixMonthsOrderException() {
-//        when(recommendationRepository
-//                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong()))
-//                .thenThrow(new RuntimeException("exception"));
-//
-//        Exception exception = assertThrows(RuntimeException.class, () ->
-//                recommendationService.create(recommendationDto));
-//
-//        assertEquals("exception", exception.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("BeforeSixMonthsException")
-//    void testCheckNotRecommendBeforeSixMonthsException() {
-//        findFirstOrderValid();
-//        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(5, ChronoUnit.MONTHS));
-//
-//        assertThrows(IllegalStateException.class, () ->
-//                recommendationService.create(recommendationDto));
-//    }
-//
-////    @Test
-////    @DisplayName("checkForSkills")
-////    void testCheckForSkillsException() {
-////        SkillOfferDto skillOfferDto = new SkillOfferDto();
-////        skillOfferDto.setSkillId(1L);
-////
-////        findFirstOrderValid();
-////        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-////
-////        when(skillOfferRepository.findAllById(anyList()).spliterator())
-////                .thenThrow(new NullPointerException("exception"));
-////        Exception exception = assertThrows(NullPointerException.class, () ->
-////                recommendationService.create(recommendationDto));
-////
-////        assertEquals("exception", exception.getMessage());
-////    }
-//
-////    @Test
-////    @DisplayName("saveSkillOffersAddAndSaveGuarantee")
-////    void testAddAndSaveGuarantee() {
-////        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-////                .thenReturn(recommendation);
-////        findFirstOrderValid();
-////        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-////        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
-////        when(userSkillGuaranteeRepository.existsById(anyLong())).thenReturn(false);
-////        when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of(new UserSkillGuarantee()));
-////
-////        recommendation.setUpdatedAt(LocalDateTime.now());
-////
-////        assertDoesNotThrow(() -> recommendationService.create(recommendationDto));
-////
-////        verify(skillOfferRepository, times(1)).findAllById(anyList());
-////        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-////        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-////        verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
-////        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
-////    }
-//
-////    @Test
-////    @DisplayName("saveSkillOffers")
-////    void testSaveSkillOffers() {
-////        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-////                .thenReturn(recommendation);
-////        findFirstOrderValid();
-////        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-////        when(skillRepository.findAllByUserId(Mockito.anyLong()))
-////                .thenReturn(List.of(skill));
-////        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
-////                .thenReturn(true);
-////        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
-////
-////        recommendationService.create(recommendationDto);
-////
-////        verify(skillOfferRepository, times(1)).findAllById(anyList());
-////        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-////        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-////        verify(skillOfferRepository, times(1)).saveAll(anyList());
-////        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
-////    }
-//
-//    @Test
-//    @DisplayName("fullMethodCreate")
-//    void testCreate() {
-//        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-//                .thenReturn(recommendation);
-//        findFirstOrderValid();
-//        doNothing().when(skillOfferService).checkForSkills(anyList());
-//        doNothing().when(skillOfferService).saveSkillOffers(any(Recommendation.class));
-////        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-////        when(skillRepository.findAllByUserId(Mockito.anyLong()))
-////                .thenReturn(List.of(skill));
-////        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
-////                .thenReturn(true);
-////        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
-//        when(recommendationRepository.save(any(Recommendation.class)))
-//                .thenReturn(new Recommendation());
-//        when(recommendationMapper.toDto(any(Recommendation.class)))
-//                .thenReturn(recommendationDto);
-//
-//        recommendationService.create(recommendationDto);
-//
-////        verify(skillOfferRepository, times(1)).findAllById(anyList());
-////        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-////        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-////        verify(skillOfferRepository, times(1)).saveAll(anyList());
-////        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
-//        verify(recommendationRepository, times(1))
-//                .save(any(Recommendation.class));
-//        verify(recommendationMapper, times(1))
-//                .toDto(any(Recommendation.class));
-//    }
-//
-//    @Test
-//    @DisplayName("updateFindFirstOrderException")
-//    void testUpdateCheckNotRecommendBeforeSixMonthsOrderException() {
-//        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
-//                .thenThrow(new RuntimeException("exception"));
-//        Exception exception = assertThrows(RuntimeException.class, () -> recommendationService.update(recommendationDto));
-//
-//        assertEquals("exception", exception.getMessage());
-//
-//    }
-//
-//    @Test
-//    @DisplayName("updateRecommendationMoreThanOneTimeException")
-//    void testUpdateRecommendationMoreThanOneTimeException() {
-//        findFirstOrderValid();
-//        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(5, ChronoUnit.MONTHS));
-//        assertThrows(IllegalStateException.class, () -> recommendationService.update(recommendationDto));
-//    }
-//
-////    @Test
-////    @DisplayName("updateCheckForSkillsException")
-////    void testUpdateCheckForSkillsException() {
-////        findFirstOrderValid();
-////        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-////        when(skillOfferRepository.findAllById(anyList()).spliterator())
-////                .thenThrow(new NullPointerException("exception"));
-////        Exception exception = assertThrows(NullPointerException.class, () ->
-////                recommendationService.create(recommendationDto));
-////
-////        assertEquals("exception", exception.getMessage());
-////    }
-//
-//    @Test
-//    @DisplayName("updateSkillOfferSave")
-//    void testUpdateSkillOfferSave() {
-//        findFirstOrderValid();
-////        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-//        doNothing().when(skillOfferService).checkForSkills(anyList());
-//        when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendation);
-////        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
-////        when(userSkillGuaranteeRepository.existsById(anyLong())).thenReturn(true);
-////        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
-//        doNothing().when(skillOfferService).saveSkillOffers(any(Recommendation.class));
-//        when(recommendationRepository.save(any(Recommendation.class))).thenReturn(recommendation);
-//        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
-//
-//        recommendationService.update(recommendationDto);
-//
-//        verify(skillOfferRepository, times(1)).deleteAllByRecommendationId(anyLong());
-////        verify(skillOfferRepository, times(1)).findAllById(anyList());
-////        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-////        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-////        verify(skillOfferRepository, times(1)).saveAll(anyList());
-//        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
-//        verify(recommendationMapper, times(1)).toDto(any(Recommendation.class));
-//    }
-//
-//    @Test
-//    @DisplayName("delete")
-//    void testDelete() {
-//        long recommendationId = 1L;
-//        Mockito.doNothing().when(recommendationRepository).deleteById(anyLong());
-//        recommendationService.delete(recommendationId);
-//    }
-//
-//    @Test
-//    @DisplayName("getAllUserRecommendationsException")
-//    void testGetAllUserRecommendationsException() {
-//        when(recommendationRepository.findAllByReceiverId(anyLong(), any(Pageable.class)))
-//                .thenThrow(new RuntimeException("exception"));
-//
-//        Exception exception = assertThrows(RuntimeException.class, () ->
-//                recommendationService.getAllUserRecommendations(receiverId, pageable));
-//
-//        assertEquals("exception", exception.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("getAllUserRecommendationsValid")
-//    void testGetAllUserRecommendationsValid() {
-//        List<Recommendation> recommendations = List.of(recommendation);
-//        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
-//        List<RecommendationDto> expectedDtos = List.of(recommendationDto);
-//
-//        when(recommendationRepository.findAllByReceiverId(receiverId, pageable)).thenReturn(recommendationPage);
-//        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
-//
-//        List<RecommendationDto> actualDtos = recommendationService.getAllUserRecommendations(receiverId, pageable);
-//
-//        assertEquals(expectedDtos, actualDtos);
-//        verify(recommendationRepository, times(1)).findAllByReceiverId(receiverId, pageable);
-//        verify(recommendationMapper, times(1)).toDto(recommendation);
-//    }
-//
-//    @Test
-//    @DisplayName("getAllGivenRecommendationsException")
-//    void testGetAllGivenRecommendationsException() {
-//        when(recommendationRepository.findAllByAuthorId(anyLong(), any(Pageable.class)))
-//                .thenThrow(new RuntimeException("exception"));
-//
-//        Exception exception = assertThrows(RuntimeException.class, () ->
-//                recommendationService.getAllGivenRecommendations(authorId, pageable));
-//
-//        assertEquals("exception", exception.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("getAllGivenRecommendationsValid")
-//    void testGetAllGivenRecommendationsValid() {
-//        List<Recommendation> recommendations = List.of(recommendation);
-//        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
-//        List<RecommendationDto> expectedDtos = List.of(recommendationDto);
-//
-//        when(recommendationRepository.findAllByAuthorId(authorId, pageable)).thenReturn(recommendationPage);
-//        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
-//
-//        List<RecommendationDto> actualDtos = recommendationService.getAllGivenRecommendations(authorId, pageable);
-//
-//        assertEquals(expectedDtos, actualDtos);
-//        verify(recommendationRepository, times(1)).findAllByAuthorId(authorId, pageable);
-//        verify(recommendationMapper, times(1)).toDto(recommendation);
-//    }
-//
-//    private void findFirstOrderValid() {
-//        when(recommendationRepository
-//                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(Mockito.anyLong(), Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(recommendationFindFirst));
-//    }
-//}
+package school.faang.user_service.service.recommendation;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.service.skillOffer.SkillOfferService;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.recommendation.RecommendationValidator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class RecommendationServiceTest {
+    @Mock
+    private UserService userService;
+    @Mock
+    private RecommendationValidator recommendationValidator;
+    @Mock
+    private RecommendationRepository recommendationRepository;
+    @Mock
+    private RecommendationMapper recommendationMapper;
+    @Mock
+    private SkillOfferService skillOfferService;
+    @InjectMocks
+    private RecommendationService recommendationService;
+    private RecommendationDto recommendationDto;
+    private Recommendation recommendation;
+    private List<SkillOfferDto> skillOfferDtos;
+    private List<SkillOffer> skillOffers;
+    private long recommendationId = 1L;
+
+    @BeforeEach
+    void init() {
+        skillOfferDtos = new ArrayList<>(List.of(SkillOfferDto.builder()
+                        .id(1L)
+                        .skillId(2L)
+                        .build(),
+                SkillOfferDto.builder()
+                        .id(2L)
+                        .skillId(3L)
+                        .build()));
+        skillOffers = new ArrayList<>(List.of(
+                SkillOffer.builder()
+                        .id(1L)
+                        .skill(Skill.builder()
+                                .id(2L)
+                                .build())
+                        .build(),
+                SkillOffer.builder()
+                        .id(2L)
+                        .skill(Skill.builder()
+                                .id(3L)
+                                .build())
+                        .build()));
+        recommendationDto = RecommendationDto.builder()
+                .id(1L)
+                .authorId(2L)
+                .receiverId(3L)
+                .skillOffers(skillOfferDtos)
+                .build();
+        recommendation = Recommendation.builder()
+                .id(1L)
+                .author(User.builder().id(2L).build())
+                .receiver(User.builder().id(3L).build())
+                .skillOffers(skillOffers)
+                .build();
+    }
+
+    @Test
+    void testCreateToEntity() {
+        doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(anyLong(), anyLong());
+        doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenThrow(new RuntimeException("ошибка"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.create(recommendationDto));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testCreateSave() {
+        Mockito.doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        Mockito.when(recommendationMapper.toEntity(Mockito.any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        Mockito.when(recommendationRepository.save(Mockito.any(Recommendation.class)))
+                .thenThrow(new RuntimeException("ошибка"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.create(recommendationDto));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testCreateSaveSkillOffers() {
+        Mockito.doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        Mockito.when(recommendationMapper.toEntity(Mockito.any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        Mockito.when(recommendationRepository.save(Mockito.any(Recommendation.class)))
+                .thenReturn(recommendation);
+        Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
+                .thenThrow(new RuntimeException("ошибка"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.create(recommendationDto));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testCreateToDto() {
+        Mockito.doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        Mockito.when(recommendationMapper.toEntity(Mockito.any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        Mockito.when(recommendationRepository.save(Mockito.any(Recommendation.class)))
+                .thenReturn(recommendation);
+        Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
+                .thenReturn(List.of(new SkillOffer()));
+        when(recommendationMapper.toDto(any(Recommendation.class)))
+                .thenReturn(recommendationDto);
+
+        recommendationService.create(recommendationDto);
+    }
+
+    @Test
+    void testUpdateSkillOfferService() {
+        when(recommendationRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(recommendation));
+        when(recommendationMapper.toDto(any(Recommendation.class)))
+                .thenReturn(recommendationDto);
+        doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(anyLong(), anyLong());
+        doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        when(skillOfferService.newSkillOffersToUpdate(anyList(), anyList()))
+                .thenReturn(skillOfferDtos);
+        doNothing().when(skillOfferService)
+                .updateSkillGuarantee(anyList(), anyLong(), anyLong());
+        when(skillOfferService.saveSkillOffers(anyList(), anyLong()))
+                .thenThrow(new RuntimeException("ошибка"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.update(recommendationId, recommendationDto));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateSave() {
+        when(recommendationRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(recommendation));
+        when(recommendationMapper.toDto(any(Recommendation.class)))
+                .thenReturn(recommendationDto);
+        doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(anyLong(), anyLong());
+        doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        when(skillOfferService.newSkillOffersToUpdate(anyList(), anyList()))
+                .thenReturn(skillOfferDtos);
+        doNothing().when(skillOfferService)
+                .updateSkillGuarantee(anyList(), anyLong(), anyLong());
+        when(skillOfferService.saveSkillOffers(anyList(), anyLong()))
+                .thenReturn(skillOffers);
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        when(recommendationRepository.save(any(Recommendation.class)))
+                .thenThrow(new RuntimeException("ошибка"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.update(recommendationId, recommendationDto));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateToDto() {
+        when(recommendationRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(recommendation));
+        when(recommendationMapper.toDto(any(Recommendation.class)))
+                .thenReturn(recommendationDto);
+        doNothing().when(recommendationValidator)
+                .checkNotRecommendBeforeSixMonths(anyLong(), anyLong());
+        doNothing().when(recommendationValidator)
+                .validateSkillOffers(recommendationDto);
+        when(skillOfferService.newSkillOffersToUpdate(anyList(), anyList()))
+                .thenReturn(skillOfferDtos);
+        doNothing().when(skillOfferService)
+                .updateSkillGuarantee(anyList(), anyLong(), anyLong());
+        when(skillOfferService.saveSkillOffers(anyList(), anyLong()))
+                .thenReturn(skillOffers);
+        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+                .thenReturn(recommendation);
+        when(recommendationRepository.save(any(Recommendation.class)))
+                .thenReturn(recommendation);
+
+        recommendationService.update(recommendationId, recommendationDto);
+
+        verify(recommendationRepository).findById(1L);
+        verify(recommendationMapper, times(2)).toDto(recommendation); // Проверяем один вызов
+        verify(recommendationValidator).checkNotRecommendBeforeSixMonths(anyLong(), anyLong());
+        verify(recommendationValidator).validateSkillOffers(any(RecommendationDto.class));
+        verify(skillOfferService).newSkillOffersToUpdate(anyList(), anyList());
+        verify(skillOfferService).updateSkillGuarantee(anyList(), anyLong(), anyLong());
+        verify(skillOfferService).saveSkillOffers(anyList(), anyLong());
+        verify(recommendationMapper).toEntity(any(RecommendationDto.class));
+        verify(recommendationRepository).save(any(Recommendation.class));
+    }
+
+    @Test
+    void testDeleteException(){
+        doThrow(new RuntimeException("ошибка")).when(recommendationRepository)
+                .deleteById(anyLong());
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.delete(recommendationId));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteValid(){
+        doNothing().when(recommendationRepository).deleteById(anyLong());
+
+        recommendationService.delete(recommendationId);
+
+        verify(recommendationRepository, times(1))
+                .deleteById(anyLong());
+    }
+
+    @Test
+    void testGetAllUserRecommendationsException(){
+        when(userService.getUserById(recommendationId))
+                .thenReturn(User.builder().recommendationsReceived(List.of(recommendation)).build());
+        when(recommendationMapper.toListDto(anyList()))
+                .thenThrow(new RuntimeException("ошибка"));
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.getAllUserRecommendations(recommendationId));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testGetAllUserRecommendationsValid(){
+        when(userService.getUserById(recommendationId))
+                .thenReturn(User.builder().recommendationsReceived(List.of(recommendation)).build());
+        when(recommendationMapper.toListDto(anyList()))
+                .thenReturn(List.of(recommendationDto));
+
+        recommendationService.getAllUserRecommendations(recommendationId);
+
+        verify(recommendationMapper, times(1))
+                .toListDto(anyList());
+    }
+
+    @Test
+    void testGetAllGivenRecommendationsException(){
+        when(userService.getUserById(recommendationId))
+                .thenReturn(User.builder().recommendationsGiven(List.of(recommendation)).build());
+        when(recommendationMapper.toListDto(anyList()))
+                .thenThrow(new RuntimeException("ошибка"));
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                recommendationService.getAllGivenRecommendations(recommendationId));
+
+        assertEquals("ошибка", exception.getMessage());
+    }
+
+    @Test
+    void testGetAllGivenRecommendationsValid(){
+        when(userService.getUserById(recommendationId))
+                .thenReturn(User.builder().recommendationsGiven(List.of(recommendation)).build());
+        when(recommendationMapper.toListDto(anyList()))
+                .thenReturn(List.of(recommendationDto));
+
+        recommendationService.getAllGivenRecommendations(recommendationId);
+
+        verify(recommendationMapper, times(1))
+                .toListDto(anyList());
+    }
+}

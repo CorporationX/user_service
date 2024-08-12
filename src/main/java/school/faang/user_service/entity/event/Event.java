@@ -78,7 +78,7 @@ public class Event {
     private LocalDateTime updatedAt;
 
     public Event(long id, LocalDateTime endDate) {
-        this.endDate=endDate;
-        this.id=id;
+        this.endDate = endDate;
+        this.id = id;
     }
 }

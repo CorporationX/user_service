@@ -16,6 +16,7 @@ import school.faang.user_service.service.user.UserService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class EventService {
+public class EventService implements ListPartitioner {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
@@ -93,26 +94,24 @@ public class EventService {
 
     public void clearPastEvents() {
         List<Event> events = eventRepository.findAll();
-        List<Event> pastEvents = events.stream()
-                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
-                .toList();
+        Optional<List<Event>> pastEventsOptional = Optional.of(events)
+                .filter(e -> !e.isEmpty())
+                .map(e -> e.stream()
+                        .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                        .toList())
+                .filter(pastEvents -> !pastEvents.isEmpty());
 
-        List<List<Event>> partitions = partitionList(pastEvents, chunkSize);
-        ExecutorService executor = Executors.newFixedThreadPool(partitions.size());
+        pastEventsOptional.ifPresent(pastEvents -> {
+            List<List<Event>> partitions = partitionList(pastEvents, chunkSize);
+            ExecutorService executor = Executors.newFixedThreadPool(partitions.size());
 
-        for (List<Event> partition : partitions) {
-            executor.submit(() -> eventRepository.deleteAllByIdInBatch(
-                    partition.stream().map(Event::getId).toList()
-            ));
-        }
-        executor.shutdown();
+            for (List<Event> partition : partitions) {
+                executor.submit(() -> eventRepository.deleteAllByIdInBatch(
+                        partition.stream().map(Event::getId).toList()
+                ));
+            }
+
+            executor.shutdown();
+        });
     }
-
-    private <T> List<List<T>> partitionList(List<T> list, int size) {
-        int numPartitions = (list.size() + size - 1) / size;
-        return IntStream.range(0, numPartitions)
-                .mapToObj(i -> list.subList(i * size, Math.min((i + 1) * size, list.size())))
-                .toList();
-    }
-
 }

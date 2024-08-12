@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
@@ -16,11 +17,13 @@ public class EventParticipationService {
     private final UserMapper userMapper;
     private final EventParticipationValidator eventParticipationValidator;
 
+    @Transactional
     public void addParticipant(long eventId, long userId) {
         eventParticipationValidator.validateCanUserRegister(eventId, userId);
         eventParticipationRepository.register(eventId, userId);
     }
 
+    @Transactional
     public void removeParticipant(long eventId, long userId) {
         eventParticipationValidator.validateCanUserUnregister(eventId, userId);
         eventParticipationRepository.unregister(eventId, userId);

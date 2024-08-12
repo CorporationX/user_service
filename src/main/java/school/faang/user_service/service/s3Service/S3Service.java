@@ -27,16 +27,9 @@ public class S3Service {
     private String bucketName;
 
     public String uploadFile(File file, String folder) {
-        String key = String.format("%s/%d_%s", folder, System.currentTimeMillis(), file.getName());
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        try {
-            objectMetadata.setContentType(Files.probeContentType(file.toPath()));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new FileUploadException(e.getMessage());
-        }
+        String key = generateBucketKey(folder, file);
 
-        objectMetadata.setContentLength(file.length());
+        ObjectMetadata objectMetadata = generateObjectMetadata(file);
 
         try {
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, new FileInputStream(file), objectMetadata);
@@ -57,5 +50,23 @@ public class S3Service {
             log.error(e.getMessage());
             throw new FileDownloadException(e.getMessage());
         }
+    }
+
+    private String generateBucketKey(String folder, File file) {
+        return String.format("%s/%d_%s", folder, System.currentTimeMillis(), file.getName());
+    }
+
+    private ObjectMetadata generateObjectMetadata(File file) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        try {
+            objectMetadata.setContentType(Files.probeContentType(file.toPath()));
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new FileUploadException(e.getMessage());
+        }
+
+        objectMetadata.setContentLength(file.length());
+
+        return objectMetadata;
     }
 }

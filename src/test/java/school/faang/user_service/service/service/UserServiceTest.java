@@ -1,64 +1,48 @@
 package school.faang.user_service.service.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.validator.user.UserFilterValidation;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.s3.FileDownloadException;
 import school.faang.user_service.exception.s3.FileUploadException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.randomAvatar.RandomAvatarService;
 import school.faang.user_service.service.s3Service.S3Service;
-import school.faang.user_service.service.userService.UserService;
-import school.faang.user_service.validation.user.UserValidator;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.validator.user.UserFilterValidation;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,7 +55,9 @@ public class UserServiceTest {
 
     private UserMapper userMapper;
 
-    private UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
+    private final UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
+
+    @Mock
     private S3Service s3Service;
 
     @Mock
@@ -80,10 +66,6 @@ public class UserServiceTest {
     @Mock
     private UserValidator userValidator;
 
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
     private UserService userService;
 
     private List<UserFilter> filters;
@@ -91,6 +73,9 @@ public class UserServiceTest {
     private User user;
     private UserDto userDto;
     private UserFilterDto userFilterDto;
+    private File randomPhoto;
+
+    private UserProfilePic userProfilePic;
 
     @BeforeEach
     void beforeEachInit() {
@@ -102,8 +87,13 @@ public class UserServiceTest {
         userRepository = Mockito.mock(UserRepository.class);
         userFilterValidation = Mockito.mock(UserFilterValidation.class);
         userMapper = Mockito.mock(UserMapper.class);
+        randomPhoto = new File("randomPhoto.svg");
+        userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId("avatarId");
+        user.setUserProfilePic(userProfilePic);
 
-        userService = new UserService(userRepository, filters, userFilterValidation, userMapper);
+
+        userService = new UserService(userRepository, filters, userFilterValidation, userMapper, s3Service, randomAvatarService, userValidator);
     }
 
     @Test
@@ -203,54 +193,36 @@ public class UserServiceTest {
         assertIterableEquals(expected, actual);
     }
 
-        @Test
-        public void testExistsByIdReturnsFalse() {
-            Long userId = 2L;
-            when(userRepository.existsById(userId)).thenReturn(false);
+    @Test
+    public void testExistsByIdReturnsFalse() {
+        Long userId = 2L;
+        when(userRepository.existsById(userId)).thenReturn(false);
 
-            boolean exists = userService.existsById(userId);
+        boolean exists = userService.existsById(userId);
 
-            assertFalse(exists);
-            verify(userRepository, times(1)).existsById(userId);
-        }
-}
-    private User user;
-    private File randomPhoto;
-
-    private UserProfilePic userProfilePic;
-
-    @BeforeEach
-    public void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setUsername("name");
-
-        randomPhoto = new File("randomPhoto.svg");
-
-        userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId("avatarId");
-
-        user.setUserProfilePic(userProfilePic);
+        assertFalse(exists);
+        verify(userRepository, times(1)).existsById(userId);
     }
 
     @Test
     public void generateRandomAvatarUserNotCurrent() {
-        when(userValidator.isCurrentUser(anyLong())).thenReturn(false);
+        doThrow(DataValidationException.class).when(userValidator).isCurrentUser(anyLong());
 
         Assertions.assertThrows(DataValidationException.class, () -> userService.generateRandomAvatar(1L));
     }
 
     @Test
     public void generateRandomAvatarUserNotFound() {
-        when(userValidator.isCurrentUser(anyLong())).thenReturn(true);
+        doNothing().when(userValidator).isCurrentUser(anyLong());
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
 
         assertThrows(DataValidationException.class, () -> userService.generateRandomAvatar(1L));
     }
 
     @Test
     public void generateRandomAvatarFileUploadFailed() {
-        when(userValidator.isCurrentUser(anyLong())).thenReturn(true);
+        doNothing().when(userValidator).isCurrentUser(anyLong());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(randomAvatarService.getRandomPhoto()).thenReturn(randomPhoto);
         when(s3Service.uploadFile(any(File.class), any(String.class))).thenReturn(null);
@@ -260,7 +232,7 @@ public class UserServiceTest {
 
     @Test
     public void generateRandomAvatarSuccess() {
-        when(userValidator.isCurrentUser(anyLong())).thenReturn(true);
+        doNothing().when(userValidator).isCurrentUser(anyLong());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(randomAvatarService.getRandomPhoto()).thenReturn(randomPhoto);
         when(s3Service.uploadFile(any(File.class), any(String.class))).thenReturn("avatarId");

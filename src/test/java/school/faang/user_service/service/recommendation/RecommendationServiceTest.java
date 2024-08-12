@@ -24,6 +24,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.skillOffer.SkillOfferService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -39,6 +40,8 @@ import static org.mockito.Mockito.*;
 class RecommendationServiceTest {
     @Mock
     private RecommendationRepository recommendationRepository;
+    @Mock
+    private SkillOfferService skillOfferService;
     @Mock
     private SkillOfferRepository skillOfferRepository;
     @Mock
@@ -128,66 +131,66 @@ class RecommendationServiceTest {
                 recommendationService.create(recommendationDto));
     }
 
-    @Test
-    @DisplayName("checkForSkills")
-    void testCheckForSkillsException() {
-        SkillOfferDto skillOfferDto = new SkillOfferDto();
-        skillOfferDto.setSkillId(1L);
+//    @Test
+//    @DisplayName("checkForSkills")
+//    void testCheckForSkillsException() {
+//        SkillOfferDto skillOfferDto = new SkillOfferDto();
+//        skillOfferDto.setSkillId(1L);
+//
+//        findFirstOrderValid();
+//        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
+//
+//        when(skillOfferRepository.findAllById(anyList()).spliterator())
+//                .thenThrow(new NullPointerException("exception"));
+//        Exception exception = assertThrows(NullPointerException.class, () ->
+//                recommendationService.create(recommendationDto));
+//
+//        assertEquals("exception", exception.getMessage());
+//    }
 
-        findFirstOrderValid();
-        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
+//    @Test
+//    @DisplayName("saveSkillOffersAddAndSaveGuarantee")
+//    void testAddAndSaveGuarantee() {
+//        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+//                .thenReturn(recommendation);
+//        findFirstOrderValid();
+//        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
+//        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
+//        when(userSkillGuaranteeRepository.existsById(anyLong())).thenReturn(false);
+//        when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of(new UserSkillGuarantee()));
+//
+//        recommendation.setUpdatedAt(LocalDateTime.now());
+//
+//        assertDoesNotThrow(() -> recommendationService.create(recommendationDto));
+//
+//        verify(skillOfferRepository, times(1)).findAllById(anyList());
+//        verify(skillRepository, times(1)).findAllByUserId(anyLong());
+//        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
+//        verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
+//        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
+//    }
 
-        when(skillOfferRepository.findAllById(anyList()).spliterator())
-                .thenThrow(new NullPointerException("exception"));
-        Exception exception = assertThrows(NullPointerException.class, () ->
-                recommendationService.create(recommendationDto));
-
-        assertEquals("exception", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("saveSkillOffersAddAndSaveGuarantee")
-    void testAddAndSaveGuarantee() {
-        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-                .thenReturn(recommendation);
-        findFirstOrderValid();
-        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
-        when(userSkillGuaranteeRepository.existsById(anyLong())).thenReturn(false);
-        when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of(new UserSkillGuarantee()));
-
-        recommendation.setUpdatedAt(LocalDateTime.now());
-
-        assertDoesNotThrow(() -> recommendationService.create(recommendationDto));
-
-        verify(skillOfferRepository, times(1)).findAllById(anyList());
-        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-        verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
-        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
-    }
-
-    @Test
-    @DisplayName("saveSkillOffers")
-    void testSaveSkillOffers() {
-        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-                .thenReturn(recommendation);
-        findFirstOrderValid();
-        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-        when(skillRepository.findAllByUserId(Mockito.anyLong()))
-                .thenReturn(List.of(skill));
-        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
-                .thenReturn(true);
-        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
-
-        recommendationService.create(recommendationDto);
-
-        verify(skillOfferRepository, times(1)).findAllById(anyList());
-        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-        verify(skillOfferRepository, times(1)).saveAll(anyList());
-        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
-    }
+//    @Test
+//    @DisplayName("saveSkillOffers")
+//    void testSaveSkillOffers() {
+//        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
+//                .thenReturn(recommendation);
+//        findFirstOrderValid();
+//        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
+//        when(skillRepository.findAllByUserId(Mockito.anyLong()))
+//                .thenReturn(List.of(skill));
+//        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
+//                .thenReturn(true);
+//        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
+//
+//        recommendationService.create(recommendationDto);
+//
+//        verify(skillOfferRepository, times(1)).findAllById(anyList());
+//        verify(skillRepository, times(1)).findAllByUserId(anyLong());
+//        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
+//        verify(skillOfferRepository, times(1)).saveAll(anyList());
+//        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
+//    }
 
     @Test
     @DisplayName("fullMethodCreate")
@@ -195,12 +198,14 @@ class RecommendationServiceTest {
         when(recommendationMapper.toEntity(any(RecommendationDto.class)))
                 .thenReturn(recommendation);
         findFirstOrderValid();
-        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-        when(skillRepository.findAllByUserId(Mockito.anyLong()))
-                .thenReturn(List.of(skill));
-        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
-                .thenReturn(true);
-        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
+        doNothing().when(skillOfferService).checkForSkills(anyList());
+        doNothing().when(skillOfferService).saveSkillOffers(any(Recommendation.class));
+//        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
+//        when(skillRepository.findAllByUserId(Mockito.anyLong()))
+//                .thenReturn(List.of(skill));
+//        when(userSkillGuaranteeRepository.existsById(Mockito.anyLong()))
+//                .thenReturn(true);
+//        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
         when(recommendationRepository.save(any(Recommendation.class)))
                 .thenReturn(new Recommendation());
         when(recommendationMapper.toDto(any(Recommendation.class)))
@@ -208,11 +213,11 @@ class RecommendationServiceTest {
 
         recommendationService.create(recommendationDto);
 
-        verify(skillOfferRepository, times(1)).findAllById(anyList());
-        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-        verify(skillOfferRepository, times(1)).saveAll(anyList());
-        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
+//        verify(skillOfferRepository, times(1)).findAllById(anyList());
+//        verify(skillRepository, times(1)).findAllByUserId(anyLong());
+//        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
+//        verify(skillOfferRepository, times(1)).saveAll(anyList());
+//        verify(recommendationRepository, times(1)).save(any(Recommendation.class));
         verify(recommendationRepository, times(1))
                 .save(any(Recommendation.class));
         verify(recommendationMapper, times(1))
@@ -222,8 +227,6 @@ class RecommendationServiceTest {
     @Test
     @DisplayName("updateFindFirstOrderException")
     void testUpdateCheckNotRecommendBeforeSixMonthsOrderException() {
-        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-                .thenReturn(recommendation);
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
                 .thenThrow(new RuntimeException("exception"));
         Exception exception = assertThrows(RuntimeException.class, () -> recommendationService.update(recommendationDto));
@@ -235,47 +238,45 @@ class RecommendationServiceTest {
     @Test
     @DisplayName("updateRecommendationMoreThanOneTimeException")
     void testUpdateRecommendationMoreThanOneTimeException() {
-        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-                .thenReturn(recommendation);
         findFirstOrderValid();
         recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(5, ChronoUnit.MONTHS));
         assertThrows(IllegalStateException.class, () -> recommendationService.update(recommendationDto));
     }
 
-    @Test
-    @DisplayName("updateCheckForSkillsException")
-    void testUpdateCheckForSkillsException() {
-        when(recommendationMapper.toEntity(any(RecommendationDto.class)))
-                .thenReturn(recommendation);
-        findFirstOrderValid();
-        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-        when(skillOfferRepository.findAllById(anyList()).spliterator())
-                .thenThrow(new NullPointerException("exception"));
-        Exception exception = assertThrows(NullPointerException.class, () ->
-                recommendationService.create(recommendationDto));
-
-        assertEquals("exception", exception.getMessage());
-    }
+//    @Test
+//    @DisplayName("updateCheckForSkillsException")
+//    void testUpdateCheckForSkillsException() {
+//        findFirstOrderValid();
+//        recommendationFindFirst.setUpdatedAt(LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
+//        when(skillOfferRepository.findAllById(anyList()).spliterator())
+//                .thenThrow(new NullPointerException("exception"));
+//        Exception exception = assertThrows(NullPointerException.class, () ->
+//                recommendationService.create(recommendationDto));
+//
+//        assertEquals("exception", exception.getMessage());
+//    }
 
     @Test
     @DisplayName("updateSkillOfferSave")
     void testUpdateSkillOfferSave() {
-        when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendation);
         findFirstOrderValid();
-        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
-        when(userSkillGuaranteeRepository.existsById(anyLong())).thenReturn(true);
-        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
+//        when(skillOfferRepository.findAllById(anyList())).thenReturn(List.of(skillOffer));
+        doNothing().when(skillOfferService).checkForSkills(anyList());
+        when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendation);
+//        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
+//        when(userSkillGuaranteeRepository.existsById(anyLong())).thenReturn(true);
+//        when(skillOfferRepository.saveAll(anyList())).thenReturn(List.of(new SkillOffer()));
+        doNothing().when(skillOfferService).saveSkillOffers(any(Recommendation.class));
         when(recommendationRepository.save(any(Recommendation.class))).thenReturn(recommendation);
         when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
 
         recommendationService.update(recommendationDto);
 
         verify(skillOfferRepository, times(1)).deleteAllByRecommendationId(anyLong());
-        verify(skillOfferRepository, times(1)).findAllById(anyList());
-        verify(skillRepository, times(1)).findAllByUserId(anyLong());
-        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
-        verify(skillOfferRepository, times(1)).saveAll(anyList());
+//        verify(skillOfferRepository, times(1)).findAllById(anyList());
+//        verify(skillRepository, times(1)).findAllByUserId(anyLong());
+//        verify(userSkillGuaranteeRepository, times(1)).existsById(anyLong());
+//        verify(skillOfferRepository, times(1)).saveAll(anyList());
         verify(recommendationRepository, times(1)).save(any(Recommendation.class));
         verify(recommendationMapper, times(1)).toDto(any(Recommendation.class));
     }

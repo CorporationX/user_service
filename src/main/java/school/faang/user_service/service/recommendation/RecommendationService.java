@@ -17,6 +17,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.skillOffer.SkillOfferService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -35,13 +36,13 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
+    private final SkillOfferService skillOfferService;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
-
         checkNotRecommendBeforeSixMonths(recommendationDto);
-        checkForSkills(recommendationDto.getSkillOffers());
-        saveSkillOffers(recommendation);
+        skillOfferService.checkForSkills(recommendationDto.getSkillOffers());
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        skillOfferService.saveSkillOffers(recommendation);
 
         recommendationRepository.save(recommendation);
 
@@ -49,12 +50,12 @@ public class RecommendationService {
     }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
-        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
         checkNotRecommendBeforeSixMonths(recommendationDto);
-        checkForSkills(recommendationDto.getSkillOffers());
+        skillOfferService.checkForSkills(recommendationDto.getSkillOffers());
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-        saveSkillOffers(recommendation);
+        skillOfferService.saveSkillOffers(recommendation);
 
         recommendationRepository.save(recommendation);
 
@@ -101,47 +102,47 @@ public class RecommendationService {
         }
     }
 
-    private void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
-        List<Long> skillOfferIds = skillOfferDtos.stream()
-                .map(SkillOfferDto::getId)
-                .toList();
+//    private void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
+//        List<Long> skillOfferIds = skillOfferDtos.stream()
+//                .map(SkillOfferDto::getId)
+//                .toList();
+//
+//        List<SkillOffer> skillOffers = StreamSupport
+//                .stream(skillOfferRepository.findAllById(skillOfferIds).spliterator(), false)
+//                .toList();
+//
+//        if (skillOffers.size() != skillOfferIds.size()) {
+//            log.error(ExceptionMessages.SKILL_NOT_FOUND);
+//            throw new NoSuchElementException(ExceptionMessages.SKILL_NOT_FOUND);
+//        }
+//    }
 
-        List<SkillOffer> skillOffers = StreamSupport
-                .stream(skillOfferRepository.findAllById(skillOfferIds).spliterator(), false)
-                .toList();
-
-        if (skillOffers.size() != skillOfferIds.size()) {
-            log.error(ExceptionMessages.SKILL_NOT_FOUND);
-            throw new NullPointerException(ExceptionMessages.SKILL_NOT_FOUND);
-        }
-    }
-
-    private void saveSkillOffers(Recommendation recommendation) {
-        User author = recommendation.getAuthor();
-        User receiver = recommendation.getReceiver();
-
-        List<Skill> existingSkills = skillRepository.findAllByUserId(receiver.getId());
-        List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-
-        boolean AuthorSkillGuarantee = userSkillGuaranteeRepository.existsById(author.getId());
-
-        List<UserSkillGuarantee> listForGuaranteeRepository = new ArrayList<>();
-        List<SkillOffer> listForOfferRepository = new ArrayList<>();
-
-        for (SkillOffer skillOffer : skillOffers) {
-            if (skillOffer.getSkill() != null
-                    && existingSkills.contains(skillOffer.getSkill())
-                    && !AuthorSkillGuarantee) {
-                listForGuaranteeRepository.add(UserSkillGuarantee.builder()
-                        .user(receiver)
-                        .skill(skillOffer.getSkill())
-                        .guarantor(author)
-                        .build());
-            } else {
-                listForOfferRepository.add(skillOffer);
-            }
-        }
-        userSkillGuaranteeRepository.saveAll(listForGuaranteeRepository);
-        skillOfferRepository.saveAll(listForOfferRepository);
-    }
+//    private void saveSkillOffers(Recommendation recommendation) {
+//        User author = recommendation.getAuthor();
+//        User receiver = recommendation.getReceiver();
+//
+//        List<Skill> existingSkills = skillRepository.findAllByUserId(receiver.getId());
+//        List<SkillOffer> skillOffers = recommendation.getSkillOffers();
+//
+//        boolean isAuthorSkillGuarantee = userSkillGuaranteeRepository.existsById(author.getId());
+//
+//        List<UserSkillGuarantee> listForGuaranteeRepository = new ArrayList<>();
+//        List<SkillOffer> listForOfferRepository = new ArrayList<>();
+//
+//        for (SkillOffer skillOffer : skillOffers) {
+//            if (skillOffer.getSkill() != null
+//                    && existingSkills.contains(skillOffer.getSkill())
+//                    && !isAuthorSkillGuarantee) {
+//                listForGuaranteeRepository.add(UserSkillGuarantee.builder()
+//                        .user(receiver)
+//                        .skill(skillOffer.getSkill())
+//                        .guarantor(author)
+//                        .build());
+//            } else {
+//                listForOfferRepository.add(skillOffer);
+//            }
+//        }
+//        userSkillGuaranteeRepository.saveAll(listForGuaranteeRepository);
+//        skillOfferRepository.saveAll(listForOfferRepository);
+//    }
 }

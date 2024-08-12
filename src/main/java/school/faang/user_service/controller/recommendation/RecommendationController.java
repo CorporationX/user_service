@@ -21,12 +21,12 @@ public class RecommendationController {
     @PostMapping()
     private ResponseEntity<RecommendationDto> giveRecommendation(@Valid @RequestBody RecommendationDto recommendationDto){
         return ResponseEntity.status(HttpStatus.OK).body(recommendationService.create(recommendationDto));
-
     }
 
-    @PutMapping()
-    private ResponseEntity<RecommendationDto> updateRecommendation(@Valid @RequestBody RecommendationDto recommendationDto){
-        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.update(recommendationDto));
+    @PostMapping("/{recommendationId}")
+    private ResponseEntity<RecommendationDto> updateRecommendation(@PathVariable("recommendationId") long recommendationId,
+                                                                   @Valid @RequestBody RecommendationDto recommendationDto){
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.update(recommendationId, recommendationDto));
     }
 
     @DeleteMapping("/{recommendationId}")
@@ -36,12 +36,12 @@ public class RecommendationController {
     }
 
     @GetMapping("/reciever/{recieverId}")
-    private ResponseEntity<List<RecommendationDto>> getAllUserRecommendations(@PathVariable long recieverId, @RequestBody Pageable pageable){
-        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.getAllUserRecommendations(recieverId, pageable));
+    private ResponseEntity<List<RecommendationDto>> getAllUserRecommendations(@PathVariable long recieverId){
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.getAllUserRecommendations(recieverId));
     }
 
     @GetMapping("/author/{authorId}")
-    private ResponseEntity<List<RecommendationDto>> getAllGivenRecommendations(@PathVariable long authorId, @RequestBody Pageable pageable){
-        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.getAllGivenRecommendations(authorId, pageable));
+    private ResponseEntity<List<RecommendationDto>> getAllGivenRecommendations(@PathVariable long authorId){
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.getAllGivenRecommendations(authorId));
     }
 }

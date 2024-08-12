@@ -2,6 +2,9 @@ package school.faang.user_service.validator.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.s3.FileUploadException;
 import school.faang.user_service.repository.UserRepository;
 
 @Component
@@ -16,7 +19,15 @@ public class UserValidator {
         return userRepository.existsById(id);
     }
 
-    public boolean isCurrentUser(Long id) {
-        return userContext.getUserId() == id;
+    public void isCurrentUser(Long id) {
+        if (!(userContext.getUserId() == id)) {
+            throw new DataValidationException("The session belongs to another user");
+        }
+    }
+
+    public void isValidUserAvatarId(String avatarId) {
+        if (avatarId == null) {
+            throw new FileUploadException("Avatar id can't be nullable");
+        }
     }
 }

@@ -51,3 +51,14 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+scheduler:
+  cron:
+    expression: 0 0 0 * * 0
+
+thread:
+  pool:
+    coreSize: 10
+    maxSize: 15
+    keepAliveTimeMillisecond: 500000
+    maxNumberQueues: 50000

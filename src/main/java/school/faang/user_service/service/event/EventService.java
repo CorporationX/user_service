@@ -16,12 +16,11 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepository;
     private final ThreadPoolDistributor threadPoolDistributor;
-    @Value("${thread.pool.coreSize}")
-    private final int quantityThreadPollSize;
 
     @Transactional
     public void deletingAllPastEvents() {
         List<Event> allEvents = eventRepository.findByStatus(EventStatus.COMPLETED);
+        int quantityThreadPollSize = threadPoolDistributor.customThreadPool().getPoolSize();
         int sizeFullListEvent = allEvents.size();
         int baseSize = sizeFullListEvent / quantityThreadPollSize;
         int remainder = sizeFullListEvent % quantityThreadPollSize;

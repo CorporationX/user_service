@@ -3,16 +3,21 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.filter.event.EventTitleFilter;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.thread.ThreadPoolDistributor;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
@@ -24,19 +29,25 @@ import static school.faang.user_service.entity.event.EventStatus.COMPLETED;
 public class EventServiceTest {
 
     @Mock
-    private EventRepository eventRepository;
-
+    private EventMapper eventMapper;
     @Mock
-    private ExecutorService threadPool;
+    private EventValidator eventValidator;
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private ThreadPoolDistributor threadPool;
+    private EventTitleFilter filterTitle = Mockito.mock(EventTitleFilter.class);
+    private List<EventFilter> filter = List.of(filterTitle);
+    private int quantityThreadPollSize = 2;
 
-    private int quantityThreadPollSize;
-
-    @InjectMocks
     private EventService eventService;
 
     @BeforeEach
     public void setUp() {
-        ReflectionTestUtils.setField(eventService, "quantityThreadPollSize", 10);
+        ThreadPoolTaskExecutor executor = Mockito.mock(ThreadPoolTaskExecutor.class);
+        when(threadPool.customThreadPool()).thenReturn(executor);
+        when(executor.submit(any(Runnable.class))).thenReturn(null);
+        eventService = new EventService(eventRepository, eventMapper, filter, eventValidator, threadPool, quantityThreadPollSize);
     }
 
     @Test
@@ -48,7 +59,7 @@ public class EventServiceTest {
         eventService.deletingAllPastEvents();
 
         verify(eventRepository, times(1)).findByStatus(COMPLETED);
-        verify(threadPool, times(10)).submit(any(Runnable.class));
+        verify(threadPool.customThreadPool(), times(quantityThreadPollSize)).submit(any(Runnable.class));
 
     }
 
@@ -59,7 +70,7 @@ public class EventServiceTest {
         eventService.deletingAllPastEvents();
 
         verify(eventRepository, times(1)).findByStatus(COMPLETED);
-        verify(threadPool, times(10)).submit(any(Runnable.class));
+        verify(threadPool.customThreadPool(), times(quantityThreadPollSize)).submit(any(Runnable.class));
     }
 
     @Test
@@ -76,6 +87,6 @@ public class EventServiceTest {
         eventService.deletingAllPastEvents();
 
         verify(eventRepository, times(1)).findByStatus(COMPLETED);
-        verify(threadPool, times(10)).submit(any(Runnable.class));
+        verify(threadPool.customThreadPool(), times(quantityThreadPollSize)).submit(any(Runnable.class));
     }
 }

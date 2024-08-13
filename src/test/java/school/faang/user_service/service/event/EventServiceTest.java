@@ -36,7 +36,8 @@ public class EventServiceTest {
         ThreadPoolTaskExecutor executor = Mockito.mock(ThreadPoolTaskExecutor.class);
         when(threadPool.customThreadPool()).thenReturn(executor);
         when(executor.submit(any(Runnable.class))).thenReturn(null);
-        eventService = new EventService(eventRepository, threadPool, quantityThreadPollSize);
+        when(executor.getPoolSize()).thenReturn(2);
+        eventService = new EventService(eventRepository, threadPool);
     }
 
     @Test

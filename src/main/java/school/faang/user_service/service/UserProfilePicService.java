@@ -57,7 +57,7 @@ public class UserProfilePicService {
         }
 
         InputStream defaultPic = compressPic(new ByteArrayInputStream(image), largeSize);
-        String key = String.format("default_%s_%s", userDto.getUsername(), LocalDateTime.now());
+        String key = String.format("default_%s_%s.jpg", userDto.getUsername(), LocalDateTime.now());
         s3Client.putObject(bucketName, key, defaultPic, null);
 
         UserProfilePicDto userProfilePicDto = new UserProfilePicDto();

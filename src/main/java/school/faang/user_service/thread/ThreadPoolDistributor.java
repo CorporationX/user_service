@@ -24,6 +24,5 @@ public class ThreadPoolDistributor {
         executor.setQueueCapacity(maxQuantityPollSize);
         executor.initialize();
         return executor;
-
     }
 }

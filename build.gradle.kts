@@ -85,14 +85,6 @@ jsonSchema2Pojo {
     setSourceType("jsonschema")
 }
 
-//sourceSets {
-//    main {
-//        java {
-//            srcDirs += "${project.buildDir}/generated-sources/js2p"
-//        }
-//    }
-//}
-
 tasks.withType<Test> {
     useJUnitPlatform()
 }

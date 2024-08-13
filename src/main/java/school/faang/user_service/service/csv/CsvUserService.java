@@ -32,7 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CsvUserService {
-    private CsvToObjectConverter csvToObjectConverter;
     private final PersonMapper personMapper;
     private final CountryRepository countryRepository;
     private final PlatformTransactionManager transactionManager;
@@ -62,12 +61,21 @@ public class CsvUserService {
                 person.setContactInfo(contactInfo);
                 users.add(personMapper.personToUser(person));
             }
+            List<String> titleList = users.stream().map(user -> user.getCountry().getTitle()).toList();
+            List<Country> countryList = countryRepository.findByT(titleList);
 
             for (User user : users) {
                 String countryTitle = user.getCountry().getTitle();
                 user.setPassword("111");
-                Country country = findCountryByTitle(countryTitle);
-                user.setCountry(country);
+                Country countryResult = countryList.stream()
+                        .filter(country -> country.getTitle().contains(countryTitle))
+                        .findFirst()
+                        .orElseGet(() -> {
+                            Country newCountry = new Country();
+                            newCountry.setTitle(countryTitle);
+                            return countryRepository.save(newCountry);
+                        });
+                user.setCountry(countryResult);
             }
 
             batchInsertUsers(users);
@@ -78,27 +86,17 @@ public class CsvUserService {
         }
     }
 
-    private Country findCountryByTitle(@NotNull String title) {
-        return countryRepository.findByTitle(title)
-                .orElseGet(() -> {
-                    Country newCountry = new Country();
-                    newCountry.setTitle(title);
-                    return countryRepository.save(newCountry);
-                });
-    }
-
     private void batchInsertUsers(List<User> users) {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         try {
             for (int i = 0; i < users.size(); i++) {
                 User user = users.get(i);
-                boolean existsByUsernameResult = userRepository.existsByUsername(user.getUsername());
-                boolean existsByEmailResult = userRepository.existsByEmail(user.getEmail());
-                boolean existsByPhoneResult = userRepository.existsByPhone(user.getPhone());
+                boolean existsByResult = userRepository.existsByUsernameOrEmailOrPhone(user.getUsername(),
+                        user.getEmail(), user.getPhone());
 
-                validateUserBeforeSave(user, existsByUsernameResult, existsByEmailResult, existsByPhoneResult);
+                validateUserBeforeSave(user, existsByResult);
 
-                if (!existsByUsernameResult && !existsByEmailResult && !existsByPhoneResult) {
+                if (!existsByResult ) {
                     entityManager.persist(user);
                     entityManager.flush();
                     entityManager.clear();
@@ -111,16 +109,9 @@ public class CsvUserService {
         }
     }
 
-    private void validateUserBeforeSave(User user,
-                                        boolean existsByUsernameResult,
-                                        boolean existsByEmailResult,
-                                        boolean existsByPhoneResult) {
-        if (existsByUsernameResult) {
-            log.warn("User with username {} already exists", user.getUsername());
-        } else if (existsByEmailResult) {
-            log.warn("User with email {} already exists", user.getEmail());
-        } else if (existsByPhoneResult) {
-            log.warn("User with phone number {} already exists", user.getPhone());
+    private void validateUserBeforeSave(User user, boolean existsByResult) {
+        if (existsByResult) {
+            log.warn("User {} already exists", user.getUsername());
         }
     }
 }

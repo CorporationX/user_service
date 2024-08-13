@@ -62,7 +62,7 @@ public class CsvUserService {
                 users.add(personMapper.personToUser(person));
             }
             List<String> titleList = users.stream().map(user -> user.getCountry().getTitle()).toList();
-            List<Country> countryList = countryRepository.findByT(titleList);
+            List<Country> countryList = countryRepository.findByTitle(titleList);
 
             for (User user : users) {
                 String countryTitle = user.getCountry().getTitle();

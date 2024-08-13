@@ -11,8 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface CountryRepository extends CrudRepository<Country, Long> {
-    Optional<Country> findByTitle(String title);
+//    Optional<Country> findByTitle(String title);
 
-    @Query("select a from Country a where a.title IN(:title)")
-    List<Country> findByT(@Param("title") List<String> title);
+    @Query("SELECT a.title FROM Country a WHERE a.title IN :titles")
+    List<Country> findByTitle(@Param("titles") List<String> titles);
 }

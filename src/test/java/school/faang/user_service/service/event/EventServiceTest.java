@@ -23,6 +23,7 @@ import static school.faang.user_service.entity.event.EventStatus.COMPLETED;
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
 
+    @Mock
     private EventRepository eventRepository;
     @Mock
     private ThreadPoolDistributor threadPool;

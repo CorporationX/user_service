@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +30,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
@@ -38,8 +39,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher() {
-        return new MentorshipAcceptedEventPublisher(redisTemplate(redisConnectionFactory()), mentorshipTopic());
+    public MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher(RedisTemplate<String, String> redisTemplate,
+                                                                             ObjectMapper objectMapper) {
+        return new MentorshipAcceptedEventPublisher(redisTemplate, objectMapper, mentorshipTopic());
     }
 
     @Bean

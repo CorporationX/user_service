@@ -11,6 +11,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.mapper.recommendation.SkillOfferMapper;
 import school.faang.user_service.mapper.recommendation.UserSkillGuaranteeMapper;
+import school.faang.user_service.publishers.recommendationReceived.RecommendationPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -30,6 +31,7 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final RecommendationMapper recommendationMapper;
     private final SkillOfferService skillOfferService;
+    private final RecommendationPublisher recommendationPublisher;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         recommendationValidator.checkNotRecommendBeforeSixMonths(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
@@ -43,6 +45,7 @@ public class RecommendationService {
 
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
+        recommendationPublisher.toEventAndPublish(savedRecommendation);
 
         return recommendationMapper.toDto(savedRecommendation);
     }

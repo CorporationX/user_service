@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.event.recommendationReceived.RecommendationReceivedEvent;
+import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.publishers.MessagePublisher;
 
 @Component
@@ -24,7 +26,19 @@ public class RecommendationPublisher implements MessagePublisher<RecommendationR
             String message = objectMapper.writeValueAsString(event);
             redisTemplate.convertAndSend(recommendationReceivedTopic.getTopic(), message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error(ExceptionMessages.SERIALIZATION_ERROR + event, e);
+            throw new IllegalArgumentException(ExceptionMessages.SERIALIZATION_ERROR + event, e);
+        } catch (Exception e) {
+            log.error(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
+            throw new IllegalArgumentException(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
         }
+    }
+
+    public void toEventAndPublish(Recommendation recommendation) {
+        publish(RecommendationReceivedEvent.builder()
+                .recommendationId(recommendation.getId())
+                .authorId(recommendation.getAuthor().getId())
+                .receivedId(recommendation.getReceiver().getId())
+                .build());
     }
 }

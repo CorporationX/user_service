@@ -23,7 +23,7 @@ public class UserController {
     private static final String MESSAGE_INVALID_ID = "userId cannot be less than zero";
     private final UserService service;
 
-    @PutMapping("/user/{userId}")
+    @PutMapping("/user/{userId}/deactivate")
     @Operation(summary = "Deactivate User Profile", description = "Deactivates the profile of a user identified by their user ID.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User profile deactivated successfully"),
@@ -39,10 +39,6 @@ public class UserController {
 
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
-        if (userFilterDto == null) {
-            log.error("Incorrect data entry");
-            throw new RuntimeException("userFilterDto contains nothing");
-        }
         return service.getPremiumUsers(userFilterDto);
     }
 }

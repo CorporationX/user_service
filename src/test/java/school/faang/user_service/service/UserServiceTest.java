@@ -6,13 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.filter.user.*;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -23,8 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,12 +42,18 @@ class UserServiceTest {
     private EventRepository eventRepository;
     @Mock
     private UserMapper mapper;
-    @Mock
-    private List<UserFilter> userFilters;
+    @Spy
+    private UserCityFilter userCityFilter;
+    @Spy
+    private UserEmailFilter userEmailFilter;
+    @Spy
+    private UserNameFilter userNameFilter;
+    @Spy
+    private UserPhoneFilter userPhoneFilter;
     @InjectMocks
     private UserService userService;
     private User user;
-    private UserFilterDto userFilterDto;
+    private List<User> users;
 
     @BeforeEach
     void setUp() {
@@ -60,6 +66,8 @@ class UserServiceTest {
         goal.setUsers(List.of(new User()));
         user.setGoals(List.of(goal));
         user.setOwnedEvents(List.of(new Event(), new Event()));
+        List<UserFilter> userFilters = List.of(userCityFilter, userEmailFilter, userNameFilter, userPhoneFilter);
+        userService = new UserService(userRepository, goalRepository, eventRepository, mentorshipService, mapper, userFilters);
     }
 
     @Test
@@ -129,18 +137,39 @@ class UserServiceTest {
 
     @Test
     public void testGetPremiumUsersMultipleUsers() {
-        Stream<User> users = Stream.of(user, user, user);
-        when(userRepository.findPremiumUsers()).thenReturn( users);
+        User alex = User.builder()
+                .username("Alex")
+                .city("London")
+                .build();
+        User misha = User.builder()
+                .username("Misha")
+                .city("London")
+                .build();
+        UserFilterDto dto = UserFilterDto.builder().name("Alex").build();
+        users = List.of(alex, misha);
+        when(userRepository.findPremiumUsers()).thenReturn(users.stream());
 
-        List<UserDto> premiumUsers = userService.getPremiumUsers(userFilterDto);
-        assertEquals(3, premiumUsers.size());
+        List<UserDto> premiumUsers = userService.getPremiumUsers(dto);
+        assertEquals(1, premiumUsers.size());
+        assertEquals(mapper.toDto(alex), premiumUsers.get(0));
     }
 
     @Test
-    public void testGetPremiumUsersNoUsers() {
-        when(userRepository.findPremiumUsers()).thenReturn(Stream.empty());
+    public void testGetPremiumUsersEmptyList() {
+        User alex = User.builder()
+                .username("Alex")
+                .city("London")
+                .build();
+        UserFilterDto dto = UserFilterDto.builder().name("Misha").build();
+        users = List.of(alex);
+        when(userRepository.findPremiumUsers()).thenReturn(users.stream());
 
-        List<UserDto> premiumUsers = userService.getPremiumUsers(userFilterDto);
+        List<UserDto> premiumUsers = userService.getPremiumUsers(dto);
         assertEquals(0, premiumUsers.size());
+    }
+
+    @Test
+    public void testGetPremiumUsersEmptyFilterDto() {
+        assertThrows(RuntimeException.class, () -> userService.getPremiumUsers(new UserFilterDto()));
     }
 }

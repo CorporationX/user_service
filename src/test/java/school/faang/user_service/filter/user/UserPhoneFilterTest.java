@@ -7,13 +7,13 @@ import school.faang.user_service.entity.User;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestUserPhoneFilter {
+class UserPhoneFilterTest {
     private UserPhoneFilter userPhoneFilter;
     private UserFilterDto userFilterDto;
     private User user;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userPhoneFilter = new UserPhoneFilter();
         userFilterDto = new UserFilterDto();
         user = new User();
@@ -22,26 +22,26 @@ class TestUserPhoneFilter {
     }
 
     @Test
-    void positiveTestCheckingForNull() {
+    public void testPositiveCheckingForNull() {
         boolean result = userPhoneFilter.checkingForNull(userFilterDto);
         assertTrue(result);
     }
 
     @Test
-    void negativeTestCheckingForNull() {
+    public void testNegativeCheckingForNull() {
         userFilterDto.setPhone(null);
         boolean result = userPhoneFilter.checkingForNull(userFilterDto);
         assertFalse(result);
     }
     @Test
-    void positiveTestFilterUsers() {
+    public void testPositiveFilterUsers() {
         boolean result = userPhoneFilter.filterUsers(user, userFilterDto);
         assertTrue(result);
 
     }
 
     @Test
-    void negativeTestFilterUsers() {
+    public void testNegativeFilterUsers() {
         userFilterDto.setPhone("1234567890");
         boolean result = userPhoneFilter.filterUsers(user, userFilterDto);
         assertFalse(result);

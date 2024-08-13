@@ -70,18 +70,22 @@ public class UserService {
     }
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        List<UserFilter> userFiltersActual = userFilters.stream()
+                .filter(u -> u.checkingForNull(userFilterDto)).toList();
+        if (userFiltersActual.size() == 0) {
+            throw new RuntimeException("No user filters found");
+        }
         Stream<User> premiumUsersStream = userRepository.findPremiumUsers();
-        List<User> premiumUsersList = getPremiumUsersList(premiumUsersStream, userFilterDto);
+        List<User> premiumUsersList = getPremiumUsersList(premiumUsersStream, userFilterDto, userFiltersActual);
 
         return premiumUsersList.stream().map(mapper::toDto).toList();
     }
 
-    private List<User> getPremiumUsersList(Stream<User> premiumUsersStream, UserFilterDto userFilterDto) {
-
+    private List<User> getPremiumUsersList(Stream<User> premiumUsersStream,
+                                           UserFilterDto userFilterDto, List<UserFilter> userFiltersActual) {
         return premiumUsersStream
-                .filter(u -> userFilters.stream()
-                        .allMatch(f -> f.checkingForNull(userFilterDto)
-                                && f.filterUsers(u, userFilterDto)))
+                .filter(u -> userFiltersActual.stream()
+                        .allMatch(f -> f.filterUsers(u, userFilterDto)))
                 .toList();
     }
 }

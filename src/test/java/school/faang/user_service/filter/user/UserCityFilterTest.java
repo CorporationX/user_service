@@ -13,7 +13,7 @@ class UserCityFilterTest {
     private User user;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userCityFilter = new UserCityFilter();
         userFilterDto = new UserFilterDto();
         user = new User();
@@ -22,25 +22,26 @@ class UserCityFilterTest {
     }
 
     @Test
-    void positiveTestCheckingForNull() {
+    public void testPositiveCheckingForNull() {
         boolean result = userCityFilter.checkingForNull(userFilterDto);
         assertTrue(result);
     }
 
     @Test
-    void negativeTestCheckingForNull() {
+    public void testNegativeCheckingForNull() {
         userFilterDto.setCity(null);
         boolean result = userCityFilter.checkingForNull(userFilterDto);
         assertFalse(result);
     }
 
     @Test
-    void positiveTestFilterUsers() {
+    public void testPositiveFilterUsers() {
         boolean result = userCityFilter.filterUsers(user, userFilterDto);
         assertTrue(result);
     }
+
     @Test
-    void negativeTestFilterUsers() {
+    public void testNegativeFilterUsers() {
         userFilterDto.setCity("mMoscow");
         boolean result = userCityFilter.filterUsers(user, userFilterDto);
         assertFalse(result);

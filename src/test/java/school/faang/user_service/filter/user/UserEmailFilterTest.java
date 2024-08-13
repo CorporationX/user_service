@@ -13,7 +13,7 @@ class UserEmailFilterTest {
     private User user;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userEmailFilter = new UserEmailFilter();
         userFilterDto = new UserFilterDto();
         user = new User();
@@ -22,26 +22,26 @@ class UserEmailFilterTest {
     }
 
     @Test
-    void positiveTestCheckingForNull() {
+    public void testPositiveCheckingForNull() {
         boolean result = userEmailFilter.checkingForNull(userFilterDto);
         assertTrue(result);
     }
 
     @Test
-    void negativeTestCheckingForNull() {
+    public void testNegativeCheckingForNull() {
         userFilterDto.setEmail(null);
         boolean result = userEmailFilter.checkingForNull(userFilterDto);
         assertFalse(result);
     }
 
     @Test
-    void positiveTestFilterUsers() {
+    public void testPositiveFilterUsers() {
         boolean result = userEmailFilter.filterUsers(user, userFilterDto);
         assertTrue(result);
     }
 
     @Test
-    void negativeTestFilterUsers() {
+    public void testNegativeFilterUsers() {
         userFilterDto.setEmail("Alexander@mail.com");
         boolean result = userEmailFilter.filterUsers(user, userFilterDto);
         assertFalse(result);

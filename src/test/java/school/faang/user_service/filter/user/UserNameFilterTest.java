@@ -13,7 +13,7 @@ class UserNameFilterTest {
     private User user;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userNameFilter = new UserNameFilter();
         userFilterDto = new UserFilterDto();
         user = new User();
@@ -22,26 +22,26 @@ class UserNameFilterTest {
     }
 
     @Test
-    void positiveTestCheckingForNull() {
+    public void testPositiveCheckingForNull() {
         boolean result = userNameFilter.checkingForNull(userFilterDto);
         assertTrue(result);
     }
 
     @Test
-    void negativeTestCheckingForNull() {
+    public void testNegativeCheckingForNull() {
         userFilterDto.setName(null);
         boolean result = userNameFilter.checkingForNull(userFilterDto);
         assertFalse(result);
     }
 
     @Test
-    void positiveTestFilterUsers() {
+    public void testPositiveFilterUsers() {
         boolean result = userNameFilter.filterUsers(user, userFilterDto);
         assertTrue(result);
     }
 
     @Test
-    void negativeTestFilterUsers() {
+    public void testNegativeFilterUsers() {
         userFilterDto.setName("Alexander");
         boolean result = userNameFilter.filterUsers(user, userFilterDto);
         assertFalse(result);

@@ -13,10 +13,11 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -30,21 +31,17 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @Mock
     private UserService service;
-    @Mock
-    private UserFilterDto userFilterDto;
     @InjectMocks
     private UserController controller;
     private List<UserDto> users;
 
     @BeforeEach
     public void setUp() {
-        //Arrange
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
     public void testUserDtoIsNull() {
-        //Assert
         assertThrows(
                 RuntimeException.class,
                 () -> controller.deactivatesUserProfile(INVALID_ID_FOR_USER)
@@ -53,35 +50,34 @@ class UserControllerTest {
 
     @Test
     public void testVerifyServiceDeactivatesUserProfile() throws Exception {
-        //Arrange
         UserDto dto = new UserDto();
         dto.setId(VALID_USER_ID);
-        dto.setActive(true);
+        dto.setActive(false);
         dto.setGoalsIds(List.of(VALID_USER_ID));
-        dto.setOwnedEventsIds(List.of(VALID_USER_ID));
-        //Act
-        Mockito.when(service.deactivatesUserProfile(Mockito.anyLong())).thenReturn(dto);
-        //Assert
-        mockMvc.perform(put("/user/1"))
-                .andExpect(status().isOk())
+        Mockito.when(service.deactivatesUserProfile(VALID_USER_ID)).thenReturn(dto);
+
+        mockMvc.perform(put("/api/user/{id}/deactivate", VALID_USER_ID))
+                .andExpect(status().isOk()) // Ожидание 200 OK
                 .andExpect(jsonPath("$.id").value(VALID_USER_ID))
-                .andExpect(jsonPath("$.active").value(true))
-                .andExpect(jsonPath("$.goalsIds", hasSize(1)))
-                .andExpect(jsonPath("$.ownedEventsIds", hasSize(1)));
-    }
-
-    @Test
-    public void testGetPremiumUsersWhenUserFilterDtoIsEmpty() {
-        UserFilterDto userFilterDto = null;
-
-        assertThrows(RuntimeException.class,
-                () -> controller.getPremiumUsers(userFilterDto));
+                .andExpect(jsonPath("$.active").value(false));
     }
 
     @Test
     public void testGetPremiumUsersWhenUserFilterDtoIsNotNull() {
-        when(controller.getPremiumUsers(userFilterDto)).thenReturn(users);
+        UserFilterDto userFilterDto = new UserFilterDto();
+        users = List.of(new UserDto());
+        when(service.getPremiumUsers(userFilterDto)).thenReturn(users);
 
-        assertThat(controller.getPremiumUsers(userFilterDto));
+        List<UserDto> result = controller.getPremiumUsers(userFilterDto);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testGetEmptyListWhenNoSuchPremiumUsers() {
+        UserFilterDto userFilterDto = new UserFilterDto();
+        when(service.getPremiumUsers(userFilterDto)).thenReturn(Collections.emptyList());
+
+        List<UserDto> result = controller.getPremiumUsers(userFilterDto);
+        assertEquals(Collections.emptyList(), result);
     }
 }

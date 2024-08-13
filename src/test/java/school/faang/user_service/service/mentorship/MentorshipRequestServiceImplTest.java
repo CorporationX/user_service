@@ -49,6 +49,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MentorshipRequestServiceImplTest {
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
@@ -125,6 +127,7 @@ class MentorshipRequestServiceImplTest {
         when(mapper.toEntity(dto)).thenReturn(request);
         when(mentorshipRequestRepository.save(request)).thenReturn(request);
         when(mapper.toDto(request)).thenReturn(dto);
+        doNothing().when(mentorshipRequestedEventPublisher).toEventAndPublish(dto);
 
         var result = sut.requestMentorship(dto);
 

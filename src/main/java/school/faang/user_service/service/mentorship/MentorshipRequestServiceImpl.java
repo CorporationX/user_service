@@ -38,7 +38,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        mentorshipRequestedEventPublisher.publish(toEvent(mentorshipRequestDto));
         mentorshipValidators.forEach(validator -> validator.validate(mentorshipRequestDto));
         mentorshipRequestDto.setRequestStatus(RequestStatus.PENDING);
         MentorshipRequest savedRequest;
@@ -49,6 +48,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             log.error(ExceptionMessages.FAILED_PERSISTENCE, e);
             throw new PersistenceException(ExceptionMessages.FAILED_PERSISTENCE, e);
         }
+        mentorshipRequestedEventPublisher.toEventAndPublish(mentorshipRequestDto);
+
         return mapper.toDto(savedRequest);
     }
 
@@ -103,12 +104,5 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private MentorshipRequest findMentorshipRequest(long id) {
         return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionMessages.MENTORSHIP_REQUEST_NOT_FOUND));
-    }
-    private MentorshipRequestedEvent toEvent(MentorshipRequestDto mentorshipRequestDto){
-        return MentorshipRequestedEvent.builder()
-                .requesterId(mentorshipRequestDto.getRequesterId())
-                .receiverId(mentorshipRequestDto.getReceiverId())
-                .timestamp(LocalDateTime.now())
-                .build();
     }
 }

@@ -34,6 +34,6 @@ public class UserService {
     }
 
     public UserDto getUser(long id){
-        return userMapper.toDto(userRepository.findById(id).orElseThrow());
+        return userMapper.toUserDto(userRepository.findById(id).orElseThrow());
     }
 }

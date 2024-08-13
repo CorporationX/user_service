@@ -6,9 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userDto.UserPremiumDto;
-import school.faang.user_service.dto.userDto.UserFilterDto;
-import school.faang.user_service.service.UserPremiumService;
+import school.faang.user_service.dto.userPremium.UserPremiumDto;
+import school.faang.user_service.dto.userPremium.UserFilterDto;
+import school.faang.user_service.service.userPremium.UserPremiumService;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
     @InjectMocks
-    private UserController userController;
+    private UserPremiumController userController;
     @Mock
     private UserPremiumService userPremiumService;
 

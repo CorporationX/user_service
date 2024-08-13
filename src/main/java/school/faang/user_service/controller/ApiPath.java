@@ -7,7 +7,7 @@ public final class ApiPath {
     public static final String MENTORSHIP = "/mentorship";
     public static final String REQUEST_RECOMMENDATION = "/recommendation/requests";
     public static final String USER_PREMIUM = "/users/premium";
-
+    public static final String RECOMMENDATION = "/recommendation";
     public static final String SUBSCRIPTION = "/subscriptions";
     public static final String FOLLOW = "/subscription";
     public static final String UNFOLLOW = "/unsubscription";

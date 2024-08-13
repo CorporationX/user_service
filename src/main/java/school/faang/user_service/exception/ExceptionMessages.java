@@ -23,8 +23,10 @@ public final class ExceptionMessages {
     // recommendation
     public static final String RECOMMENDATION_REQUEST_NOT_FOUND = "Request cannot be found.";
     public static final String DISCREPANCY_OF_STATUS = "Status does not match condition.";
-    public static final String RECOMMENDATION_FREQUENCY ="Recommendation request can only be sent once every 6 months.";
+    public static final String RECOMMENDATION_FREQUENCY = "Recommendation can be updated only once every 6 months.";
     public static final String REQUEST_SKILL = "One or more requested skills do not exist in the database";
+    public static final String ARGUMENT_NOT_FOUND = "Argument not in database.";
+    public static final String SKILL_NOT_FOUND = "Skill not in database.";
 
     // subscription
     public static final String SELF_SUBSCRIPTION = "You cannot follow yourself!";

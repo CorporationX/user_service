@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userDto.UserDto;
+import school.faang.user_service.dto.userDto.UserPremiumDto;
 import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.service.UserPremiumService;
 
@@ -28,7 +28,7 @@ class UserControllerTest {
 
     @Test
     void testGetListPremiumUsersTrue() {
-        Mockito.when(userPremiumService.getPremiumUsers(Mockito.any())).thenReturn(List.of(new UserDto()));
+        Mockito.when(userPremiumService.getPremiumUsers(Mockito.any())).thenReturn(List.of(new UserPremiumDto()));
 
         userController.getListPremiumUsers(new UserFilterDto());
 

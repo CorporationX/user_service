@@ -4,8 +4,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public User getUserById(long id){
         return userRepository.findById(id).orElseThrow(() -> {
@@ -28,5 +31,9 @@ public class UserService {
             log.error("нет пользователя по id");
             return new EntityNotFoundException("нет пользователя по id");
         }).getSkills().stream().map(Skill::getId).toList();
+    }
+
+    public UserDto getUser(long id){
+        return userMapper.toDto(userRepository.findById(id).orElseThrow());
     }
 }

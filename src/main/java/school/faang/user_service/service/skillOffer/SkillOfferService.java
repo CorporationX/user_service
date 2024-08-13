@@ -5,6 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.recommendation.SkillOfferMapper;
@@ -28,21 +32,6 @@ public class SkillOfferService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
     private final SkillOfferMapper skillOfferMapper;
-
-    public void checkForSkills(List<SkillOfferDto> skillOfferDtos) {
-        if (skillOfferDtos == null || skillOfferDtos.isEmpty()) {
-            return;
-        }
-
-        for (var skillOffer : skillOfferDtos) {
-            if (!skillRepository.existsById(skillOffer.getSkillId())) {
-                String errorMessage = String.format("The skill (ID : %d) doesn't exists in the system", skillOffer.getSkillId());
-                log.error(errorMessage);
-                throw new DataValidationException(errorMessage);
-            }
-        }
-    }
-
     public void updateSkillGuarantee(List<SkillOfferDto> skillOfferDtoList, long authorId, long receiverId) {
         if (skillOfferDtoList == null || skillOfferDtoList.isEmpty()) {
             return;
@@ -51,11 +40,14 @@ public class SkillOfferService {
         List<Long> skillOfferIds = skillOfferDtoList.stream()
                 .map(SkillOfferDto::getSkillId).toList();
         List<Long> userSkillIds = userService.getUserSkillsId(receiverId);
+
         List<UserSkillGuaranteeDto> skillGuaranteeDtoList = new ArrayList<>();
+
+        boolean authorHasGuarantee = userSkillGuaranteeRepository.existsById(authorId);
 
         for (var skillOfferId : skillOfferIds) {
             if (userSkillIds.contains(skillOfferId) &&
-                    !userSkillGuaranteeRepository.existsUserSkillGuaranteeByUserIdAndGuarantorIdAndSkillId(receiverId, authorId, skillOfferId)) {
+                    !authorHasGuarantee) {
                 skillGuaranteeDtoList.add(UserSkillGuaranteeDto.builder()
                         .userId(receiverId)
                         .guarantorId(authorId)

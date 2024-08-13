@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.userDto.UserDto;
+import school.faang.user_service.dto.userDto.UserPremiumDto;
 import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.userPremium.UserPremiumMapper;
@@ -40,7 +40,7 @@ class UserPremiumServiceTest {
         Mockito.when(usernameFilterPattern.apply(Mockito.any(), Mockito.any())).thenReturn(Stream.of(new User()));
         Mockito.when(countryFilterPattern.isApplication(Mockito.any())).thenReturn(true);
         Mockito.when(countryFilterPattern.apply(Mockito.any(), Mockito.any())).thenReturn(Stream.of(new User()));
-        Mockito.when(userPremiumMapper.toDto(Mockito.any())).thenReturn(new UserDto());
+        Mockito.when(userPremiumMapper.toDto(Mockito.any())).thenReturn(new UserPremiumDto());
 
         userPremiumService.getPremiumUsers(new UserFilterDto());
         Mockito.verify(userPremiumMapper, Mockito.times(1)).toDto(Mockito.any());

@@ -22,7 +22,7 @@ public class RecommendationController {
         return ResponseEntity.status(HttpStatus.OK).body(recommendationService.create(recommendationDto));
     }
 
-    @PostMapping("/{recommendationId}")
+    @PutMapping("/{recommendationId}")
     private ResponseEntity<RecommendationDto> updateRecommendation(@PathVariable("recommendationId") long recommendationId,
                                                                    @Valid @RequestBody RecommendationDto recommendationDto) {
         return ResponseEntity.status(HttpStatus.OK).body(recommendationService.update(recommendationId, recommendationDto));

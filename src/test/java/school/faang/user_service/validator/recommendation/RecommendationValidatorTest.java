@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.repository.SkillRepository;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +35,7 @@ class RecommendationValidatorTest {
     private RecommendationValidator recommendationValidator;
     private Recommendation recommendation;
     private RecommendationDto recommendationDto;
+    private Skill skill;
     private long authorId = 1L;
     private long receiverId = 2L;
 
@@ -53,6 +56,10 @@ class RecommendationValidatorTest {
                         .id(1L)
                         .skillId(1L)
                         .build()))
+                .build();
+
+        skill = Skill.builder()
+                .id(1L)
                 .build();
     }
 
@@ -88,7 +95,7 @@ class RecommendationValidatorTest {
 
     @Test
     void validateSkillOffers() {
-        when(skillRepository.existsById(anyLong())).thenReturn(true);
+        when(skillRepository.findAllById(anyList())).thenReturn(List.of(skill));
 
         recommendationValidator.validateSkillOffers(recommendationDto);
     }

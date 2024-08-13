@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ExceptionMessages;
@@ -24,7 +25,7 @@ public class RecommendationValidator {
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
 
-    public void checkNotRecommendBeforeSixMonths(long authorId, long receiverId){
+    public void checkNotRecommendBeforeSixMonths(long authorId, long receiverId) {
         Recommendation recommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                         authorId,
@@ -45,12 +46,12 @@ public class RecommendationValidator {
         if (skillOfferDtos == null || skillOfferDtos.isEmpty()) {
             return;
         }
+        List<Long> skillOfferDtoIds = skillOfferDtos.stream().map(SkillOfferDto::getSkillId).toList(); //
+        List<Skill> skills = skillRepository.findAllById(skillOfferDtoIds); //
 
-        for (var skillOffer : skillOfferDtos) {
-            if (!skillRepository.existsById(skillOffer.getSkillId())) {
-                log.error(ExceptionMessages.SKILL_NOT_FOUND);
-                throw new DataValidationException(ExceptionMessages.SKILL_NOT_FOUND);
-            }
+        if (skills.size() != skillOfferDtoIds.size()) {
+            log.error(ExceptionMessages.SKILL_NOT_FOUND);
+            throw new DataValidationException(ExceptionMessages.SKILL_NOT_FOUND);
         }
     }
 }

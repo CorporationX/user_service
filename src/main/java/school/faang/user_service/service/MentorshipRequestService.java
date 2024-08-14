@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForResponse;
 import school.faang.user_service.dto.mentorship_request.RejectionDto;
@@ -9,7 +9,6 @@ import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.ErrorMessage;
 import school.faang.user_service.exception.RequestException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -21,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
 
@@ -59,12 +58,12 @@ public class MentorshipRequestService {
         mentorshipRequestRepository
                 .findLatestRequest(mentorshipRequestDtoForRequest.getRequesterId(), mentorshipRequestDtoForRequest.getReceiverId())
                 .ifPresent(request -> {
-                            LocalDateTime currentDate = LocalDateTime.now();
-                            LocalDateTime suitLastDate = currentDate.minusMonths(PAUSE_TIME);
-                            if (request.getCreatedAt().isAfter(suitLastDate)) {
-                                throw new RequestException(ErrorMessage.EARLY_REQUEST);
-                            }
-                        });
+                    LocalDateTime currentDate = LocalDateTime.now();
+                    LocalDateTime suitLastDate = currentDate.minusMonths(PAUSE_TIME);
+                    if (request.getCreatedAt().isAfter(suitLastDate)) {
+                        throw new RequestException(ErrorMessage.EARLY_REQUEST);
+                    }
+                });
     }
 
     public List<MentorshipRequestDtoForResponse> getRequests(RequestFilterDto filterDto) {

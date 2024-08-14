@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.entity.person.Person;
+import school.faang.user_service.service.csv.CsvParserService;
+import school.faang.user_service.service.user.ConvertToUserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +24,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final CsvParserService csvParserService;
+    private final ConvertToUserService convertToUserService;
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
@@ -28,12 +33,12 @@ public class UserController {
     }
 
     @PostMapping("/students")
-    public List <UserDto> saveUsers(@RequestParam("students") MultipartFile file) throws IOException {
+    public List<UserDto> saveUsers(@RequestParam("students") MultipartFile file) throws IOException {
 
         InputStream inputStream = file.getInputStream();
 
-        List <UserDto> userDtos = userService.saveUsers(inputStream);
+        List<Person> persons = csvParserService.convertCsvToPerson(inputStream);
         inputStream.close();
-        return userDtos;
+        return convertToUserService.prepareAndSaveUsers(persons);
     }
 }

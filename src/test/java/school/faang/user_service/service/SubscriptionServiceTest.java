@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.ConflictException;
 import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.mapper.UserMapper;
-//import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.util.filter.user.UserAboutFilter;
 import school.faang.user_service.util.filter.user.UserCityFilter;
@@ -104,92 +104,92 @@ class SubscriptionServiceTest {
                 .existsByFollowerIdAndFolloweeId(Mockito.anyLong(), Mockito.anyLong());
     }
 
-//    @Test
-//    void testGetFollowers_valid_noFilters() {
-//        UserMapper userMapper = new UserMapperImpl();
-//        ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
-//        ReflectionTestUtils.setField(subscriptionService, "userFilters",
-//                List.of(
-//                        new UserNameFilter(),
-//                        new UserAboutFilter(),
-//                        new UserEmailFilter(),
-//                        new UserContactFilter(),
-//                        new UserCountryFilter(),
-//                        new UserCityFilter(),
-//                        new UserPhoneFilter(),
-//                        new UserSkillFilter(),
-//                        new UserExpMinFilter(),
-//                        new UserExpMaxFilter()
-//                ));
-//
-//        long followeeId = 1;
-//        UserFilterDto filter = new UserFilterDto();
-//        User user1 = User.builder()
-//                .id(1L)
-//                .username("name1")
-//                .email("mail1.ru")
-//                .build();
-//        User user2 = User.builder()
-//                .id(2L)
-//                .username("name2")
-//                .email("mail2.ru")
-//                .build();
-//        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
-//                .thenReturn(Stream.of(user1, user2));
-//
-//        List<UserDto> resultList = subscriptionService.getFollowers(followeeId, filter);
-//
-//        assertEquals(userMapper.toDto(user1), resultList.get(0));
-//        assertEquals(userMapper.toDto(user2), resultList.get(1));
-//        assertEquals(2, resultList.size());
-//        Mockito.verify(subscriptionRepository, Mockito.times(1))
-//                .findByFolloweeId(followeeId);
-//        Mockito.verifyNoMoreInteractions(subscriptionRepository);
-//    }
-//
-//    @Test
-//    void testGetFollowers_valid_nameFilter() {
-//        UserMapper userMapper = new UserMapperImpl();
-//        ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
-//        ReflectionTestUtils.setField(subscriptionService, "userFilters",
-//                List.of(
-//                        new UserNameFilter(),
-//                        new UserAboutFilter(),
-//                        new UserEmailFilter(),
-//                        new UserContactFilter(),
-//                        new UserCountryFilter(),
-//                        new UserCityFilter(),
-//                        new UserPhoneFilter(),
-//                        new UserSkillFilter(),
-//                        new UserExpMinFilter(),
-//                        new UserExpMaxFilter()
-//                ));
-//
-//        long followeeId = 1;
-//        UserFilterDto filter = UserFilterDto.builder()
-//                .namePattern("1")
-//                .build();
-//        User user1 = User.builder()
-//                .id(1L)
-//                .username("name1")
-//                .email("mail1.ru")
-//                .build();
-//        User user2 = User.builder()
-//                .id(2L)
-//                .username("name2")
-//                .email("mail2.ru")
-//                .build();
-//        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
-//                .thenReturn(Stream.of(user1, user2));
-//
-//        List<UserDto> resultList = subscriptionService.getFollowers(followeeId, filter);
-//
-//        assertEquals(userMapper.toDto(user1), resultList.get(0));
-//        assertEquals(1, resultList.size());
-//        Mockito.verify(subscriptionRepository, Mockito.times(1))
-//                .findByFolloweeId(followeeId);
-//        Mockito.verifyNoMoreInteractions(subscriptionRepository);
-//    }
+    @Test
+    void testGetFollowers_valid_noFilters() {
+        UserMapper userMapper = new UserMapperImpl();
+        ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
+        ReflectionTestUtils.setField(subscriptionService, "userFilters",
+                List.of(
+                        new UserNameFilter(),
+                        new UserAboutFilter(),
+                        new UserEmailFilter(),
+                        new UserContactFilter(),
+                        new UserCountryFilter(),
+                        new UserCityFilter(),
+                        new UserPhoneFilter(),
+                        new UserSkillFilter(),
+                        new UserExpMinFilter(),
+                        new UserExpMaxFilter()
+                ));
+
+        long followeeId = 1;
+        UserFilterDto filter = new UserFilterDto();
+        User user1 = User.builder()
+                .id(1L)
+                .username("name1")
+                .email("mail1.ru")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .username("name2")
+                .email("mail2.ru")
+                .build();
+        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
+                .thenReturn(Stream.of(user1, user2));
+
+        List<UserDto> resultList = subscriptionService.getFollowers(followeeId, filter);
+
+        assertEquals(userMapper.toDto(user1), resultList.get(0));
+        assertEquals(userMapper.toDto(user2), resultList.get(1));
+        assertEquals(2, resultList.size());
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .findByFolloweeId(followeeId);
+        Mockito.verifyNoMoreInteractions(subscriptionRepository);
+    }
+
+    @Test
+    void testGetFollowers_valid_nameFilter() {
+        UserMapper userMapper = new UserMapperImpl();
+        ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
+        ReflectionTestUtils.setField(subscriptionService, "userFilters",
+                List.of(
+                        new UserNameFilter(),
+                        new UserAboutFilter(),
+                        new UserEmailFilter(),
+                        new UserContactFilter(),
+                        new UserCountryFilter(),
+                        new UserCityFilter(),
+                        new UserPhoneFilter(),
+                        new UserSkillFilter(),
+                        new UserExpMinFilter(),
+                        new UserExpMaxFilter()
+                ));
+
+        long followeeId = 1;
+        UserFilterDto filter = UserFilterDto.builder()
+                .namePattern("1")
+                .build();
+        User user1 = User.builder()
+                .id(1L)
+                .username("name1")
+                .email("mail1.ru")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .username("name2")
+                .email("mail2.ru")
+                .build();
+        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
+                .thenReturn(Stream.of(user1, user2));
+
+        List<UserDto> resultList = subscriptionService.getFollowers(followeeId, filter);
+
+        assertEquals(userMapper.toDto(user1), resultList.get(0));
+        assertEquals(1, resultList.size());
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .findByFolloweeId(followeeId);
+        Mockito.verifyNoMoreInteractions(subscriptionRepository);
+    }
 
     @Test
     void testGetFollowersCount() {

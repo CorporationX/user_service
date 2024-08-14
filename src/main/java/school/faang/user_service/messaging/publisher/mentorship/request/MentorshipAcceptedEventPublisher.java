@@ -14,7 +14,6 @@ import school.faang.user_service.messaging.publisher.EventPublisher;
 
 import java.io.IOException;
 
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class MentorshipAcceptedEventPublisher implements EventPublisher<Mentorsh
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-    private final ChannelTopic mentorshipTopic;
+    private final ChannelTopic mentorshipAcceptedTopic;
 
     @Async
     @Override
@@ -31,7 +30,7 @@ public class MentorshipAcceptedEventPublisher implements EventPublisher<Mentorsh
         try {
             message = objectMapper.writeValueAsString(event);
             log.info("Publishing event: {}", event);
-            redisTemplate.convertAndSend(mentorshipTopic.getTopic(), message);
+            redisTemplate.convertAndSend(mentorshipAcceptedTopic.getTopic(), message);
         } catch (IOException e) {
             log.error(ExceptionMessages.FAILED_EVENT, e);
             throw new EventPublishingException(ExceptionMessages.FAILED_EVENT, e);

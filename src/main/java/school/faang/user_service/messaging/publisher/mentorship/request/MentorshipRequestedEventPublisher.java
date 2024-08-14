@@ -20,14 +20,14 @@ import java.time.LocalDateTime;
 public class MentorshipRequestedEventPublisher implements EventPublisher<MentorshipRequestedEvent> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic mentorshipTopic;
+    private final ChannelTopic mentorshipRequestedTopic;
     private final ObjectMapper objectMapper;
 
     @Override
     public void publish(MentorshipRequestedEvent event) {
         try {
             String message = objectMapper.writeValueAsString(event);
-            redisTemplate.convertAndSend(mentorshipTopic.getTopic(), message);
+            redisTemplate.convertAndSend(mentorshipRequestedTopic.getTopic(), message);
             log.info("Published MentorshipRequested event: {}", message);
         } catch (JsonProcessingException e) {
             log.error(ExceptionMessages.SERIALIZATION_ERROR + event, e);

@@ -8,11 +8,18 @@ import org.springframework.data.redis.listener.ChannelTopic;
 @Configuration
 public class MentorshipRedisConfig {
 
-    @Value("${spring.data.redis.channels.mentorship_channel.name}")
-    private String mentorshipChannelName;
+    @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
+    private String mentorshipRequestedChannelName;
+    @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
+    private String mentorshipAcceptedChannelName;
 
     @Bean
-    public ChannelTopic mentorshipTopic() {
-        return new ChannelTopic(mentorshipChannelName);
+    public ChannelTopic mentorshipAcceptedTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannelName);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipRequestedTopic() {
+        return new ChannelTopic(mentorshipRequestedChannelName);
     }
 }

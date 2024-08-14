@@ -9,7 +9,9 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.mentorship.MentorshipStartEvent;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorship.MentorshipStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -30,6 +32,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipStartPublisher mentorshipStartPublisher;
     private final static int MONTHS_COOLDOWN = 3;
 
     @Override
@@ -92,6 +95,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         request.setStatus(RequestStatus.ACCEPTED);
         MentorshipRequest response = mentorshipRequestRepository.save(request);
+        publishMentorshipStartEvent(response.getReceiver().getId(), response.getRequester().getId());
         return mentorshipRequestMapper.toDto(response);
     }
 
@@ -111,5 +115,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     public MentorshipRequest findMembershipById(long id) {
         return mentorshipRequestRepository.findById(id)
                                           .orElseThrow(() -> new NoSuchElementException("Mentorship request with id " + id + " doesnt exist"));
+    }
+
+    private void publishMentorshipStartEvent(long mentorId, long menteeId) {
+        mentorshipStartPublisher.publish(MentorshipStartEvent.builder()
+                .mentorId(mentorId)
+                .menteeId(menteeId).build());
     }
 }

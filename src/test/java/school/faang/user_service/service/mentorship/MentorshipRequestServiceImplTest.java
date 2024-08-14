@@ -23,6 +23,7 @@ import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.publisher.mentorship.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.validator.mentorship.SelfMentorshipValidator;
@@ -50,6 +51,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MentorshipRequestServiceImplTest {
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
@@ -126,6 +129,7 @@ class MentorshipRequestServiceImplTest {
         when(mapper.toEntity(dto)).thenReturn(request);
         when(mentorshipRequestRepository.save(request)).thenReturn(request);
         when(mapper.toDto(request)).thenReturn(dto);
+        doNothing().when(mentorshipRequestedEventPublisher).toEventAndPublish(dto);
 
         var result = sut.requestMentorship(dto);
 

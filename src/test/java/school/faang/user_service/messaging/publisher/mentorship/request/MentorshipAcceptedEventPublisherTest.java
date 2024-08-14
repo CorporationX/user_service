@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.event.RedisEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
 import school.faang.user_service.exception.event.EventPublishingException;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ class MentorshipAcceptedEventPublisherTest {
 
     @Test
     void publishSuccessfully() throws IOException {
-        RedisEvent event = new RedisEvent();
+        MentorshipAcceptedEvent event = new MentorshipAcceptedEvent();
         String serializedEvent = "{\"eventId\":\"123\",\"eventType\":\"MentorshipAccepted\"}";
 
         when(objectMapper.writeValueAsString(event)).thenReturn(serializedEvent);
@@ -48,7 +48,7 @@ class MentorshipAcceptedEventPublisherTest {
 
     @Test
     void publishThrowsEventPublishingException() throws IOException {
-        RedisEvent event = new RedisEvent();
+        MentorshipAcceptedEvent event = new MentorshipAcceptedEvent();
         when(objectMapper.writeValueAsString(event)).thenThrow(new JsonProcessingException("Serialization error") {});
 
         assertThrows(EventPublishingException.class, () -> publisher.publish(event));

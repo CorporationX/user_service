@@ -1,8 +1,6 @@
 package school.faang.user_service.messaging.publisher;
 
-import school.faang.user_service.event.RedisEvent;
+public interface EventPublisher<T> {
 
-public interface EventPublisher {
-
-    void publish(RedisEvent event);
+    void publish(T event);
 }

@@ -76,4 +76,9 @@ public class Event {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public Event(long id, LocalDateTime endDate) {
+        this.endDate = endDate;
+        this.id = id;
+    }
 }

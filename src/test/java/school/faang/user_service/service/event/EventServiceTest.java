@@ -16,6 +16,8 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,13 +25,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -71,6 +68,7 @@ public class EventServiceTest {
         validator = Mockito.mock(EventServiceValidator.class);
         eventFilters = List.of(eventDescriptionFilter, eventOwnerFilter);
         eventService = new EventService(eventRepository, eventMapper, eventFilters, userService, validator);
+        eventService.setChunkSize(2);
     }
 
     private void prepareMocks() {
@@ -216,5 +214,21 @@ public class EventServiceTest {
 
         verify(eventRepository, times(1)).findParticipatedEventsByUserId(ownerId);
         assertEquals(expected, result);
+    }
+
+    @Test
+    void testClearPastEvents() {
+        Event pastEvent1 = new Event(1L, LocalDateTime.now().minusDays(1));
+        Event pastEvent2 = new Event(2L, LocalDateTime.now().minusDays(2));
+        Event futureEvent = new Event(3L, LocalDateTime.now().plusDays(1));
+        List<Event> allEvents = Arrays.asList(pastEvent1, pastEvent2, futureEvent);
+
+        when(eventRepository.findAll()).thenReturn(allEvents);
+
+
+        eventService.clearPastEvents();
+
+        verify(eventRepository, times(1)).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
+        verify(eventRepository, never()).deleteAllByIdInBatch(Arrays.asList(3L));
     }
 }

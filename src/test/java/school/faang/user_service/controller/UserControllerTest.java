@@ -114,7 +114,7 @@ class UserControllerTest {
                 .thenReturn(CompletableFuture.completedFuture(userDtosList));
 
         // when - action
-        var response = mockMvc.perform(multipart("/upload")
+        var response = mockMvc.perform(multipart("/users/upload")
                 .file("students.csv", multipartFile.getBytes())
                 .file("person-schema.json", schemaJson.getBytes()));
 

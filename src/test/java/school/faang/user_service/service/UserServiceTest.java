@@ -10,17 +10,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.PersonToUserMapper;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.image.ImageMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.s3.S3ServiceImpl;
 import school.faang.user_service.util.TestDataFactory;
 
 import java.io.ByteArrayInputStream;
@@ -37,12 +41,10 @@ import static java.util.List.of;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -68,6 +70,10 @@ class UserServiceTest {
     private MappingIterator<Person> mappingIterator;
     @Mock
     private EventRepository eventRepository;
+    @Mock
+    private S3ServiceImpl s3Service;
+    @Mock
+    private ImageMapper imageMapper;
 
     private static final Long USER_ID = 1L;
     private static final Long INVALID_USER_ID = MAX_VALUE;
@@ -83,7 +89,7 @@ class UserServiceTest {
         when(userMapper.toDto(user))
                 .thenReturn(userDto);
 
-            // when - action
+        // when - action
         var actualResult = userService.findUserById(USER_ID);
 
         // then - verify the output
@@ -159,8 +165,9 @@ class UserServiceTest {
         assertThat(actualResult.get(0).getEmail()).isEqualTo(expectedResult.get(0).getEmail());
         assertThat(actualResult.get(0).getUsername()).isEqualTo(expectedResult.get(0).getUsername());
     }
+
     @Test
-    void givenEmptyInputStreamWhenSavePersonsThenThrowException(){
+    void givenEmptyInputStreamWhenSavePersonsThenThrowException() {
         // given - precondition
         var emptyInputStream = InputStream.nullInputStream();
 
@@ -219,4 +226,83 @@ class UserServiceTest {
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("User with id " + INVALID_USER_ID + " not found");
     }
+
+    @Test
+    public void addUserPic_successfulTest() throws IOException {
+        // Arrange
+        var user = TestDataFactory.createUser();
+        MultipartFile mockMultipartFile = mock(MultipartFile.class);
+
+        // When
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(imageMapper.convertFilePermissions(any(), anyInt())).thenReturn(mockMultipartFile);
+
+
+        // Act
+        UserProfilePicDto userProfilePicDto = userService.addUserPic(user.getId(), mockMultipartFile);
+
+        // Assert
+        assertNotNull(userProfilePicDto);
+
+        // Verify
+        verify(userRepository).save(user);
+        verify(s3Service, times(2)).uploadFile(mockMultipartFile);
+    }
+
+    @Test
+    public void getUserProfilePic_successfulTest() {
+        // Arrange
+        var user = TestDataFactory.createUser();
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId("field");
+        user.setUserProfilePic(userProfilePic);
+
+        // When
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // Act
+        userService.getUserPic(user.getId());
+
+        // Verify
+        verify(s3Service).downloadFile(user.getUserProfilePic().getFileId());
+    }
+
+    @Test
+    public void deleteUserPic_successfulTest() {
+        // Arrange
+        var user = TestDataFactory.createUser();
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId("field");
+        userProfilePic.setSmallFileId("small");
+        user.setUserProfilePic(userProfilePic);
+
+        //when
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // Act
+        userService.deleteUserPic(user.getId());
+
+        // Verify
+        verify(s3Service, times(2)).deleteFile(any());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    public void getUserPicById_throwTest() {
+        // Arrange
+        var user = TestDataFactory.createUser();
+
+        // Assert
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserPic(user.getId()));
+    }
+
+    @Test
+    public void deleteUserPicById_throwTest() {
+        var user = TestDataFactory.createUser();
+        user.setId(0L);
+
+        // Assert
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserPic(user.getId()));
+    }
+
 }

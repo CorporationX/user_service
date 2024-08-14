@@ -9,20 +9,26 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.image.ImageMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +53,13 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
 
+    private final S3Service s3Service;
+    private final ImageMapper imageMapper;
+
+    @Value("${services.frofilePic.maxImagePicture}")
+    private final static int MAX_IMAGE_PIC = 1080;
+    @Value("${services.frofilePic.minImagePicture}")
+    private final static int MIN_IMAGE_PIC = 170;
 
     public UserDto findUserById(long userId) {
         return userRepository.findById(userId)
@@ -76,6 +89,7 @@ public class UserService {
                 .toList());
 
     }
+
     private List<Person> readPersonsFromCsv(@NotNull InputStream inputStream) throws IOException {
         if (inputStream.available() == 0) {
             log.warn("InputStream is empty.");
@@ -117,6 +131,7 @@ public class UserService {
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
     }
+
     private List<Country> findNewCountries(List<Person> persons, Set<String> existingCountries) {
         log.info("Finding new countries from persons.");
         return persons.stream()
@@ -163,5 +178,40 @@ public class UserService {
 
     private void deleteUserEvents(User user) {
         eventRepository.deleteAll(user.getParticipatedEvents());
+    }
+
+    public UserProfilePicDto addUserPic(Long userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User " + userId + " not found"));
+
+        UserProfilePic userProfilePic = new UserProfilePic();
+
+        userProfilePic.setFileId(s3Service.uploadFile(imageMapper.convertFilePermissions(file, MAX_IMAGE_PIC)));
+        userProfilePic.setSmallFileId(s3Service.uploadFile(imageMapper.convertFilePermissions(file, MIN_IMAGE_PIC)));
+
+        user.setUserProfilePic(userProfilePic);
+        userRepository.save(user);
+
+        return UserProfilePicDto.fromUserProfilePic(userProfilePic);
+    }
+
+    public InputStream getUserPic(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User " + userId + " not found"));
+
+        if (user.getUserProfilePic() == null) {
+            throw new EntityNotFoundException("User " + userId + " not found");
+        }
+        return s3Service.downloadFile(user.getUserProfilePic().getFileId());
+    }
+
+    public void deleteUserPic(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User " + userId + " not found"));
+
+        s3Service.deleteFile(user.getUserProfilePic().getFileId());
+        s3Service.deleteFile(user.getUserProfilePic().getSmallFileId());
+
+        user.getUserProfilePic().setFileId(null);
+        user.getUserProfilePic().setSmallFileId(null);
+
+        userRepository.save(user);
     }
 }

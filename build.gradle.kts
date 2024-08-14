@@ -69,6 +69,11 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
     /**
+     * Thumbnail generation library for Java.
+     */
+    implementation("net.coobird:thumbnailator:[0.4, 0.5)")
+
+    /**
      * Test containers
      */
     implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))

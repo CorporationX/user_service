@@ -10,16 +10,15 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.event.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.publisher.mentorship.MentorshipRequestedEventPublisher;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.StreamSupport;
@@ -33,7 +32,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestMapper mapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final List<MentorshipValidator> mentorshipValidators;
-    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedPublisher;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedPublisher;
 
     @Override
     @Transactional
@@ -48,7 +48,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             log.error(ExceptionMessages.FAILED_PERSISTENCE, e);
             throw new PersistenceException(ExceptionMessages.FAILED_PERSISTENCE, e);
         }
-        mentorshipRequestedEventPublisher.toEventAndPublish(mentorshipRequestDto);
+        mentorshipRequestedPublisher.toEventAndPublish(mentorshipRequestDto);
 
         return mapper.toDto(savedRequest);
     }
@@ -77,6 +77,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             requester.getMentors().add(receiver);
             request.setStatus(RequestStatus.ACCEPTED);
             mentorshipRequestRepository.save(request);
+            mentorshipAcceptedPublisher.publish(mapper.toMentorshipAcceptedEvent(request));
         }
         return mapper.toDto(request);
     }

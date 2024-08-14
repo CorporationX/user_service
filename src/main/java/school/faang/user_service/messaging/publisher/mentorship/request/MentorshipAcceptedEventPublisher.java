@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.scheduling.annotation.Async;
 import school.faang.user_service.event.RedisEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.event.EventPublishingException;
@@ -16,10 +17,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class MentorshipAcceptedEventPublisher implements EventPublisher {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final ChannelTopic topic;
 
+    @Async
     @Override
     public void publish(RedisEvent event) {
         String message;

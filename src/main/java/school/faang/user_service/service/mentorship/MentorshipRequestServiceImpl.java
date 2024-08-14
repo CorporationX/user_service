@@ -74,11 +74,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             requester.getMentors().add(receiver);
             request.setStatus(RequestStatus.ACCEPTED);
             mentorshipRequestRepository.save(request);
-            eventPublisher.publish(MentorshipAcceptedEvent.builder()
-                    .mentorshipRequestId(id)
-                    .requesterId(requester.getId())
-                    .receiverId(receiver.getId())
-                    .build());
+            eventPublisher.publish(mapper.toMentorshipAcceptedEvent(request));
         }
         return mapper.toDto(request);
     }

@@ -204,6 +204,11 @@ class MentorshipRequestServiceImplTest {
 
         when(mentorshipRequestRepository.findById(mentorshipRequestId)).thenReturn(Optional.of(request));
         when(mapper.toDto(request)).thenReturn(new MentorshipRequestDto());
+        when(mapper.toMentorshipAcceptedEvent(request)).thenReturn(MentorshipAcceptedEvent.builder()
+                .mentorshipRequestId(mentorshipRequestId)
+                .requesterId(requester.getId())
+                .receiverId(receiver.getId())
+                .build());
 
         sut.acceptRequest(mentorshipRequestId);
 

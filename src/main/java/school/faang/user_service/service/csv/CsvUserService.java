@@ -3,11 +3,10 @@ package school.faang.user_service.service.csv;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.json.student.Address;
-import com.json.student.ContactInfo;
-import com.json.student.Person;
+import school.faang.user_service.com.json.student.Address;
+import school.faang.user_service.com.json.student.ContactInfo;
+import school.faang.user_service.com.json.student.Person;
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,20 +62,22 @@ public class CsvUserService {
                 users.add(personMapper.personToUser(person));
             }
             List<String> titleList = users.stream().map(user -> user.getCountry().getTitle()).toList();
-            List<Country> countryList = countryRepository.findByTitle(titleList);
+            List<Country> countryList = countryRepository.findByTitleIn(titleList);
+            List<Country> countryUserList = users.stream()
+                    .filter(user -> !countryList.contains(user))
+                    .map(User::getCountry)
+                    .toList();
+            countryList.addAll(countryUserList);
+
+            countryRepository.saveAll(countryUserList);
 
             for (User user : users) {
                 String countryTitle = user.getCountry().getTitle();
                 user.setPassword("111");
-                Country countryResult = countryList.stream()
+                Optional<Country> countryResult = countryList.stream()
                         .filter(country -> country.getTitle().contains(countryTitle))
-                        .findFirst()
-                        .orElseGet(() -> {
-                            Country newCountry = new Country();
-                            newCountry.setTitle(countryTitle);
-                            return countryRepository.save(newCountry);
-                        });
-                user.setCountry(countryResult);
+                        .findFirst();
+                user.setCountry(countryResult.get());
             }
 
             batchInsertUsers(users);

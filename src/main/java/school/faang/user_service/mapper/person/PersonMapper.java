@@ -1,10 +1,7 @@
 package school.faang.user_service.mapper.person;
 
-import com.json.student.Person;
-import jdk.jfr.Name;
+import school.faang.user_service.com.json.student.Person;
 import org.mapstruct.*;
-import org.springframework.data.mapping.context.MappingContext;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)

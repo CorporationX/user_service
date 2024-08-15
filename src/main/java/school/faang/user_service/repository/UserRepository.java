@@ -27,8 +27,4 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Stream<User> findPremiumUsers();
 
     boolean existsByUsernameOrEmailOrPhone(String username, String email, String phone);
-
-    boolean existsByEmail(String email);
-
-    boolean existsByPhone(String phone);
 }

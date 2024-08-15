@@ -1,6 +1,6 @@
 package school.faang.user_service.service.csv;
 
-import com.json.student.Person;
+import school.faang.user_service.com.json.student.Person;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class csvUserServiceTest {
+public class CsvUserServiceTest {
 
     @Mock
     private PersonMapper personMapper;
@@ -38,6 +38,8 @@ public class csvUserServiceTest {
     private User user1;
     private User user2;
     private MockMultipartFile multipartFile;
+    @Mock
+    private InputStream inputStream;
 
     @BeforeEach
     public void setup() throws IOException {
@@ -79,12 +81,14 @@ public class csvUserServiceTest {
         users.add(user1);
         users.add(user2);
 
+
     }
 
     @Test
     public void testGetStudentsParsing() throws IOException {
         when(personMapper.personToUser(person1)).thenReturn(user1);
         when(personMapper.personToUser(person2)).thenReturn(user2);
+        when(multipartFile.getInputStream()).thenReturn(inputStream);
 
         ResponseEntity<String> response = csvUserService.getStudentsParsing(multipartFile);
 

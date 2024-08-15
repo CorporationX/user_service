@@ -4,6 +4,8 @@ public final class ExceptionMessages {
 
     private ExceptionMessages() {}
 
+    public static final String INSERTION_STAPLES = "{}";
+
     public static final String FAILED_PERSISTENCE = "Unable to persist data into database. Please try again.";
     public static final String FAILED_RETRIEVAL = "Unable to retrieve data from database. Please try again.";
     public static final String FAILED_EVENT = "Unable to send an event to message broker.";
@@ -39,4 +41,7 @@ public final class ExceptionMessages {
     public static final String SELF_SUBSCRIPTION = "You cannot follow yourself!";
     public static final String SELF_UNSUBSCRIPTION = "You cannot unfollow yourself!";
     public static final String EXISTING_SUBSCRIPTION = "You are already following this account";
+
+    public static final String TOPIC_PUBLICATION_EXCEPTION = "An error occurred while publishing the topic: ";
+    public static final String WRITING_TO_JSON_EXCEPTION = "An error occurred while writing to json: ";
 }

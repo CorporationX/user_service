@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.event.mentorship.MentorshipRequestedEvent;
+import school.faang.user_service.publishers.mentorship.MentorshipRequestedEventPublisher;
 
 import java.time.LocalDateTime;
 

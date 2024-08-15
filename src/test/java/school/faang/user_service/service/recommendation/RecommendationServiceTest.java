@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publishers.recommendationReceived.RecommendationPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.*;
 class RecommendationServiceTest {
     @Mock
     private UserService userService;
+    @Mock
+    private RecommendationPublisher recommendationPublisher;
     @Mock
     private RecommendationValidator recommendationValidator;
     @Mock
@@ -145,6 +148,7 @@ class RecommendationServiceTest {
                 .thenReturn(recommendation);
         Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
                 .thenReturn(List.of(new SkillOffer()));
+        Mockito.doNothing().when(recommendationPublisher).toEventAndPublish(recommendation);
         when(recommendationMapper.toDto(any(Recommendation.class)))
                 .thenReturn(recommendationDto);
 

@@ -1,22 +1,6 @@
 package school.faang.user_service.service.recommendationRequest;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.exception.ExceptionMessages;
-import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.filter.recommendationRequest.RecommendationRequestFilter;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -24,6 +8,22 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exception.ExceptionMessages;
+import school.faang.user_service.filter.recommendationRequest.RecommendationRequestFilter;
+import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
+import school.faang.user_service.messaging.publisher.recommendationRequested.RecommendationRequestedEventPublisher;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 @Slf4j
 @Service
@@ -35,9 +35,10 @@ public class RecommendationRequestService {
     private final UserRepository userRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final List<RecommendationRequestFilter> recommendationRequestFilter;
+    private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        checkExistenceObjectByIds(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
+        checkExistenceObjectByIds(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());
         heckForRequestsOfSixMonths(recommendationRequestDto);
         List<SkillRequest> skills = checkSkillRequestInDatabase(recommendationRequestDto);
 
@@ -46,7 +47,11 @@ public class RecommendationRequestService {
 
         skills.forEach(skill -> skillRequestRepository.create(newRequest.getId(), skill.getId()));
 
-        return recommendationRequestMapper.toDto(newRequest);
+        var currentDto = recommendationRequestMapper.toDto(newRequest);
+
+        recommendationRequestedEventPublisher.publish(recommendationRequestMapper.toEvent(currentDto));
+
+        return currentDto;
     }
 
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filter) {
@@ -89,8 +94,8 @@ public class RecommendationRequestService {
                 });
     }
 
-    private void checkExistenceObjectByIds(long requesterId, long recieverId) {
-        if (!userRepository.existsById(requesterId) || !userRepository.existsById(recieverId)) {
+    private void checkExistenceObjectByIds(long requesterId, long receiverId) {
+        if (!userRepository.existsById(requesterId) || !userRepository.existsById(receiverId)) {
             log.error(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
             throw new EntityNotFoundException(ExceptionMessages.RECOMMENDATION_REQUEST_NOT_FOUND);
         }
@@ -98,7 +103,7 @@ public class RecommendationRequestService {
 
     private void heckForRequestsOfSixMonths(RecommendationRequestDto recommendationRequestDto) {
         Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository
-                .findLatestPendingRequest(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
+                .findLatestPendingRequest(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());
         if (recommendationRequest.isPresent()) {
             LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
             if (recommendationRequest.get().getUpdatedAt().isAfter(localDateTime)) {

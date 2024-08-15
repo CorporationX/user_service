@@ -1,26 +1,13 @@
 package school.faang.user_service.service.recommendationRequest;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.filter.recommendationRequest.RecommendationRequestFilter;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -28,9 +15,25 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendationRequest.RecommendationRequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.filter.recommendationRequest.RecommendationRequestFilter;
+import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
@@ -59,7 +62,7 @@ class RecommendationRequestServiceTest {
     void init() {
         requestDto = new RecommendationRequestDto();
         requestDto.setRequesterId(1L);
-        requestDto.setRecieverId(1L);
+        requestDto.setReceiverId(1L);
         requestDto.setSkillsId(Arrays.asList(1L, 2L, 3L));
 
         recommendationRejectionDto = new RecommendationRejectionDto();
@@ -137,7 +140,7 @@ class RecommendationRequestServiceTest {
         recommendationRequest.setUpdatedAt(localDateTime);
 
         when(recommendationRequestRepository
-                .findLatestPendingRequest(requestDto.getRequesterId(), requestDto.getRecieverId()))
+                .findLatestPendingRequest(requestDto.getRequesterId(), requestDto.getReceiverId()))
                 .thenReturn(Optional.of(recommendationRequest));
     }
 

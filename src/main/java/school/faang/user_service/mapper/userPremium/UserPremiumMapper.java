@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.userDto.UserDto;
+import school.faang.user_service.dto.userPremium.UserPremiumDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -18,9 +18,9 @@ public interface UserPremiumMapper {
     @Mapping(source = "goals", target = "goalsId", qualifiedByName = "goalsToId")
     @Mapping(source = "skills", target = "skillsId", qualifiedByName = "skillsToId")
     @Mapping(source = "premium.id", target = "premiumId")
-    UserDto toDto(User user);
+    UserPremiumDto toDto(User user);
 
-    User toEntity(UserDto userDto);
+    User toEntity(UserPremiumDto userPremiumDto);
 
     @Named("listToId")
     default List<Long> listToId(List<User> users) {

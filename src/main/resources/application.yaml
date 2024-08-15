@@ -28,8 +28,6 @@ spring:
           name: profile_view_channel
 
 server:
-  servlet:
-    context-path: /api
   port: 8080
 
 logging:

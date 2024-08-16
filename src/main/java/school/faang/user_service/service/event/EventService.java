@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.event.Event;
@@ -9,6 +8,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.thread.ThreadPoolDistributor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,7 +28,7 @@ public class EventService {
         for (int i = 0; i < quantityThreadPollSize; i++) {
             int currentSize = baseSize + (i < remainder ? 1 : 0);
             int endIndex = startIndex + currentSize;
-            List<Event> partListEvent = allEvents.subList(startIndex, Math.min(endIndex, sizeFullListEvent));
+            List<Event> partListEvent = new ArrayList<>(allEvents.subList(startIndex, Math.min(endIndex, sizeFullListEvent)));
             threadPoolDistributor.customThreadPool().submit(() -> {
                 eventRepository.deleteAllInBatch(partListEvent);
             });

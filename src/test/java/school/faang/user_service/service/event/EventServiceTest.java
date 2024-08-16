@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -41,6 +42,7 @@ public class EventServiceTest {
     }
 
     @Test
+    @DisplayName("Success test method deletingAllPastEvents")
     public void testDeletingAllPastEvents() {
         var event = Event.builder().id(1L).status(COMPLETED).build();
         List<Event> completedEvents = List.of(event);
@@ -54,6 +56,7 @@ public class EventServiceTest {
     }
 
     @Test
+    @DisplayName("Test of the behavior of the method deletingAllPastEvents in case of receiving an incorrect list of completed events")
     public void testDeletingAllPastEventsWithNoEvents() {
         when(eventRepository.findByStatus(COMPLETED)).thenReturn(new ArrayList<>());
 
@@ -64,6 +67,7 @@ public class EventServiceTest {
     }
 
     @Test
+    @DisplayName("Test for obtaining an odd size sheet of past events")
     public void testDeletingAllPastEventsWithUnevenDistribution() {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < 7; i++) {

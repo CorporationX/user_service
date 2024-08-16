@@ -136,7 +136,7 @@ class UserServiceTest {
 
         UserDto result = userService.getUser(id);
 
-        verify(userValidator).validateUserId(id);
+        verify(userValidator).validateUserExistence(id);
         verify(userRepository).findById(id);
         verify(userMapper).toDto(user);
 
@@ -147,13 +147,13 @@ class UserServiceTest {
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
         when(userRepository.findAllById(ids)).thenReturn(List.of(user));
-        when(userMapper.toDto(user)).thenReturn(userDto);
+        when(userMapper.toDtoList(List.of(user))).thenReturn(userDtoList);
 
-        List<UserDto> result = userService.getUsersByIds(ids);
+        List<UserDto> result = userService.getUsersDtoByIds(ids);
 
-        verify(userValidator).validateUserId(id);
+        verify(userValidator).validateUserExistence(id);
         verify(userRepository).findAllById(ids);
-        verify(userMapper).toDto(user);
+        verify(userMapper).toDtoList(List.of(user));
 
         assertEquals(result, userDtoList);
     }

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.dto.BanEvent;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -59,6 +60,26 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    public void createBanEvent(Message message) {
+        try {
+            BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);
+            banedUser(banEvent.getAuthorId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void uploadAvatar(long userId, UserProfilePicDto userProfilePicDto) {
+        User user = userRepository.findById(userId).get();
+
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId(userProfilePicDto.getFileId());
+        userProfilePic.setSmallFileId(userProfilePicDto.getSmallFileId());
+        user.setUserProfilePic(userProfilePic);
+
+        userRepository.save(user);
+    }
+
     @Transactional
     public void updateUserAvatar(long userId, MultipartFile multipartFile) {
         User user = userValidator.validateUserExistence(userId);
@@ -72,18 +93,24 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDto getUser(long userId) {
-        userValidator.validateUserId(userId);
+        userValidator.validateUserExistence(userId);
         User user = userRepository.findById(userId).get();
 
         return userMapper.toDto(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getUsersByIds(List<Long> ids) {
-        ids.forEach(userValidator::validateUserId);
-        Stream<User> userStream = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false);
+    public UserDto getUserDtoById(long userId) {
+        userValidator.validateUserExistence(userId);
 
-        return userStream.map(userMapper::toDto).toList();
+        return userMapper.toDto(userRepository.findById(userId).get());
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
+        ids.forEach(userValidator::validateUserExistence);
+
+        return userMapper.toDtoList(userRepository.findAllById(ids));
     }
 
     @Transactional
@@ -99,15 +126,6 @@ public class UserService {
     @Transactional
     public void banedUser(long userId) {
         userRepository.banUserById(userId);
-    }
-
-    public void createBanEvent(Message message) {
-        try {
-            BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);
-            banedUser(banEvent.getAuthorId());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void stopUserGoalActivities(User user) {
@@ -137,31 +155,6 @@ public class UserService {
         mentee.getGoals().stream()
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
-    }
-
-    public UserDto getUserDtoById(long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if (userOptional.isEmpty()) {
-            throw new EntityNotFoundException("there is no user with id: " + userId);
-        }
-
-        return userMapper.toDto(userOptional.get());
-    }
-  
-    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
-        return userMapper.usersToUserDTOs(userRepository.findAllById(ids));
-    }
-
-    public void uploadAvatar(long userId, String fileId, String smallFileId) {
-        User user = userRepository.findById(userId).get();
-
-        UserProfilePic userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId(fileId);
-        userProfilePic.setSmallFileId(smallFileId);
-        user.setUserProfilePic(userProfilePic);
-
-        userRepository.save(user);
     }
 
     public void deleteAvatar(long userId) {

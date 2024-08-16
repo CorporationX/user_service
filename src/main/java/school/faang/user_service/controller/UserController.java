@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -61,11 +62,10 @@ public class UserController {
         return userService.getUsersDtoByIds(ids);
     }
 
-    @PutMapping("/avatar/{fileId}/{smallFileId}")
+    @PutMapping("/avatar/put")
     public void uploadAvatar(@RequestHeader(value = "x-user-id") long userId,
-                             @PathVariable String fileId,
-                             @PathVariable String smallFileId) {
-        userService.uploadAvatar(userId, fileId, smallFileId);
+                             @RequestBody UserProfilePicDto userProfilePicDto) {
+        userService.uploadAvatar(userId, userProfilePicDto);
     }
 
     @DeleteMapping("/avatar/delete")

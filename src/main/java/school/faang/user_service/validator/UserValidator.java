@@ -27,12 +27,4 @@ public class UserValidator {
         }
         return userOptional.get();
     }
-
-    public void validateUserId(long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException(
-                    "there is no User with id:\n" +
-                            userId);
-        }
-    }
 }

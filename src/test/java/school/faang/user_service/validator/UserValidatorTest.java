@@ -28,12 +28,12 @@ public class UserValidatorTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    @DisplayName("test that validateUserId throws EntityNotFoundException when there is no User with given id in the database")
-    public void testValidateUserId() {
-        when(userRepository.existsById(userId)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class,
-                () -> userValidator.validateUserId(userId));
-    }
+//    @Test
+//    @DisplayName("test that validateUserId throws EntityNotFoundException when there is no User with given id in the database")
+//    public void testValidateUserId() {
+//        when(userRepository.existsById(userId)).thenReturn(false);
+//
+//        assertThrows(EntityNotFoundException.class,
+//                () -> userValidator.validateUserId(userId));
+//    }
 }

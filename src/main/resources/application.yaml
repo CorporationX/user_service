@@ -30,6 +30,8 @@ spring:
           name: mentorship_requested_channel
         mentorship_accepted_channel:
           name: mentorship_accepted_channel
+        recommendation_channel:
+          name: recommendation_channel
 
 server:
   port: 8080

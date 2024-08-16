@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
@@ -38,6 +39,9 @@ class RecommendationServiceTest {
     private RecommendationMapper recommendationMapper;
     @Mock
     private SkillOfferService skillOfferService;
+    @Mock
+    private RecommendationEventPublisher recommendationEventPublisher;
+
     @InjectMocks
     private RecommendationService recommendationService;
     private RecommendationDto recommendationDto;
@@ -149,6 +153,8 @@ class RecommendationServiceTest {
                 .thenReturn(recommendationDto);
 
         recommendationService.create(recommendationDto);
+
+        verify(recommendationEventPublisher).toEventAndPublish(recommendationDto);
     }
 
     @Test
@@ -233,6 +239,7 @@ class RecommendationServiceTest {
         verify(skillOfferService).saveSkillOffers(anyList(), anyLong());
         verify(recommendationMapper).toEntity(any(RecommendationDto.class));
         verify(recommendationRepository).save(any(Recommendation.class));
+        verify(recommendationEventPublisher).toEventAndPublish(recommendationDto);
     }
 
     @Test

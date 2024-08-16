@@ -28,6 +28,8 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        skill_offer_channel:
+          name: skill_offer_channel
 
 server:
   port: 8080

@@ -18,6 +18,7 @@ import school.faang.user_service.enums.PremiumPeriod;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

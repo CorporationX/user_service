@@ -6,18 +6,18 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillServiceTwo;
+import school.faang.user_service.service.skill.SkillService;
 
 @Component
 public class GoalValidator {
 
     private final GoalRepository goalRepository;
-    private final SkillServiceTwo skillServiceTwo;
+    private final SkillService skillService;
 
     @Autowired
-    public GoalValidator(GoalRepository goalRepository, SkillServiceTwo skillServiceTwo) {
+    public GoalValidator(GoalRepository goalRepository, SkillService skillService) {
         this.goalRepository = goalRepository;
-        this.skillServiceTwo = skillServiceTwo;
+        this.skillService = skillService;
     }
 
     public void createGoalValidator(Long userId, GoalDto goalDto) {
@@ -29,7 +29,7 @@ public class GoalValidator {
             throw new IllegalArgumentException("User cannot have more than 3 active goals");
         }
 
-        if (skillServiceTwo.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
+        if (skillService.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
             throw new IllegalArgumentException("One or more skills do not exist.");
         }
     }
@@ -46,7 +46,7 @@ public class GoalValidator {
             throw new IllegalArgumentException("Goal must have a title");
         }
 
-        if (skillServiceTwo.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
+        if (skillService.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
             throw new IllegalArgumentException("One or more skills do not exist");
         }
     }

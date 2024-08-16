@@ -16,6 +16,7 @@ import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.user.UserValidator;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {

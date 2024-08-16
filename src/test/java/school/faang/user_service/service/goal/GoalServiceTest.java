@@ -12,7 +12,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillServiceTwo;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.Arrays;
@@ -29,7 +29,7 @@ class GoalServiceTest {
     private GoalRepository goalRepository;
 
     @Mock
-    private SkillServiceTwo skillServiceTwo;
+    private SkillService skillService;
 
     @Mock
     private GoalMapper goalMapper;
@@ -145,7 +145,7 @@ class GoalServiceTest {
 
     private void setupMocksForUpdateGoal(Goal goal, GoalDto goalDto) {
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
-        when(skillServiceTwo.countExisting(anyList())).thenReturn(2);
+        when(skillService.countExisting(anyList())).thenReturn(2);
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);
         when(goalMapper.toDto(goal)).thenReturn(goalDto);
@@ -259,10 +259,10 @@ class GoalServiceTest {
         verify(goalRepository).removeSkillsFromGoal(1L);
         verify(goalRepository).addSkillToGoal(1L, 1L);
         verify(goalRepository).addSkillToGoal(1L, 2L);
-        verify(skillServiceTwo).assignSkillToUser(1L, 1L);
-        verify(skillServiceTwo).assignSkillToUser(1L, 2L);
-        verify(skillServiceTwo).assignSkillToUser(2L, 1L);
-        verify(skillServiceTwo).assignSkillToUser(2L, 2L);
+        verify(skillService).assignSkillToUser(1L, 1L);
+        verify(skillService).assignSkillToUser(1L, 2L);
+        verify(skillService).assignSkillToUser(2L, 1L);
+        verify(skillService).assignSkillToUser(2L, 2L);
     }
 
     @Test

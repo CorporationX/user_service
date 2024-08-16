@@ -78,4 +78,12 @@ public class SkillService {
         });
     }
 
+    public void assignSkillToUser(long skillId, long userId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
+    public int countExisting(List<Long> ids) {
+        return skillRepository.countExisting(ids);
+    }
+
 }

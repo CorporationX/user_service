@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.user.UserValidator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

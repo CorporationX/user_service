@@ -33,10 +33,14 @@ class UserControllerTest {
     private UserService service;
     @InjectMocks
     private UserController controller;
-    private List<UserDto> users;
+    private UserDto dto;
 
     @BeforeEach
     public void setUp() {
+        dto = new UserDto();
+        dto.setId(VALID_USER_ID);
+        dto.setActive(false);
+        dto.setGoalsIds(List.of(VALID_USER_ID));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -49,23 +53,33 @@ class UserControllerTest {
     }
 
     @Test
-    public void testVerifyServiceDeactivatesUserProfile() throws Exception {
-        UserDto dto = new UserDto();
-        dto.setId(VALID_USER_ID);
-        dto.setActive(false);
-        dto.setGoalsIds(List.of(VALID_USER_ID));
+    public void testShouldDeactivateUserProfileAndReturnStatus200() throws Exception {
         Mockito.when(service.deactivatesUserProfile(VALID_USER_ID)).thenReturn(dto);
 
         mockMvc.perform(put("/api/user/{id}/deactivate", VALID_USER_ID))
-                .andExpect(status().isOk()) // Ожидание 200 OK
-                .andExpect(jsonPath("$.id").value(VALID_USER_ID))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testShouldDeactivateUserProfileWithCorrectID() throws Exception {
+        Mockito.when(service.deactivatesUserProfile(VALID_USER_ID)).thenReturn(dto);
+
+        mockMvc.perform(put("/api/user/{id}/deactivate", VALID_USER_ID))
                 .andExpect(jsonPath("$.active").value(false));
+    }
+
+    @Test
+    public void testShouldUpdateUserProfileStatusUponDeactivation() throws Exception {
+        Mockito.when(service.deactivatesUserProfile(VALID_USER_ID)).thenReturn(dto);
+
+        mockMvc.perform(put("/api/user/{id}/deactivate", VALID_USER_ID))
+                .andExpect(jsonPath("$.id").value(VALID_USER_ID));
     }
 
     @Test
     public void testGetPremiumUsersWhenUserFilterDtoIsNotNull() {
         UserFilterDto userFilterDto = new UserFilterDto();
-        users = List.of(new UserDto());
+        List<UserDto> users = List.of(new UserDto());
         when(service.getPremiumUsers(userFilterDto)).thenReturn(users);
 
         List<UserDto> result = controller.getPremiumUsers(userFilterDto);

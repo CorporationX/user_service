@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.event.recommendation.RecommendationEvent;
+import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -38,6 +39,8 @@ class RecommendationServiceTest {
     private RecommendationRepository recommendationRepository;
     @Mock
     private RecommendationMapper recommendationMapper;
+    @Mock
+    private RecommendationEventMapper recommendationEventMapper;
     @Mock
     private SkillOfferService skillOfferService;
     @Mock
@@ -150,7 +153,7 @@ class RecommendationServiceTest {
                 .thenReturn(recommendation);
         Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
                 .thenReturn(List.of(new SkillOffer()));
-        when(recommendationMapper.toEvent(any(RecommendationDto.class)))
+        when(recommendationEventMapper.toEvent(any(RecommendationDto.class)))
                 .thenReturn(new RecommendationEvent());
 
         recommendationService.create(recommendationDto);
@@ -228,7 +231,7 @@ class RecommendationServiceTest {
                 .thenReturn(recommendation);
         when(recommendationRepository.save(any(Recommendation.class)))
                 .thenReturn(recommendation);
-        when(recommendationMapper.toEvent(any(RecommendationDto.class)))
+        when(recommendationEventMapper.toEvent(any(RecommendationDto.class)))
                 .thenReturn(new RecommendationEvent());
 
         recommendationService.update(recommendationId, recommendationDto);

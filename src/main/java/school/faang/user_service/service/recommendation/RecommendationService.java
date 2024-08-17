@@ -9,6 +9,7 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -26,6 +27,7 @@ public class RecommendationService {
     private final RecommendationValidator recommendationValidator;
     private final RecommendationRepository recommendationRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationEventMapper recommendationEventMapper;
     private final SkillOfferService skillOfferService;
     private final RecommendationEventPublisher recommendationEventPublisher;
 
@@ -43,7 +45,7 @@ public class RecommendationService {
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
 
-        recommendationEventPublisher.publish(recommendationMapper.toEvent(recommendationDto));
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(recommendationDto));
 
         return recommendationMapper.toDto(savedRecommendation);
     }
@@ -73,8 +75,7 @@ public class RecommendationService {
         skillOffers.addAll(savedSkillOffersToUpdate);
         updatedRecommendation.setSkillOffers(skillOffers);
 
-
-        recommendationEventPublisher.publish(recommendationMapper.toEvent(recommendationDto));
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(recommendationDto));
 
         return recommendationMapper.toDto(updatedRecommendation);
     }

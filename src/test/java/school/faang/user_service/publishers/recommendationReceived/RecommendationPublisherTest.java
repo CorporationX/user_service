@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.event.recommendationReceived.RecommendationReceivedEvent;
+import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationPublisher;
 
 import static org.mockito.Mockito.when;
 

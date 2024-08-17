@@ -6,6 +6,7 @@ public final class ExceptionMessages {
 
     public static final String FAILED_PERSISTENCE = "Unable to persist data into database. Please try again.";
     public static final String FAILED_RETRIEVAL = "Unable to retrieve data from database. Please try again.";
+    public static final String FAILED_EVENT = "Unable to send an event to message broker.";
 
     // mentorship
     public static final String SELF_MENTORSHIP = "You cannot mentor yourself.";

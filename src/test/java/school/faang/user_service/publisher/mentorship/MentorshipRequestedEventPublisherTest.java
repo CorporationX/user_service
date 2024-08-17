@@ -11,8 +11,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.event.mentorship.MentorshipRequestedEvent;
-import school.faang.user_service.publishers.mentorship.MentorshipRequestedEventPublisher;
+import school.faang.user_service.event.mentorship.request.MentorshipRequestedEvent;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 
 import java.time.LocalDateTime;
 
@@ -48,7 +48,7 @@ class MentorshipRequestedEventPublisherTest {
 
     @Test
     @DisplayName("writeValueAsString")
-    public void testWriteValueAsString() throws Exception {
+    void testWriteValueAsString() throws Exception {
         when(objectMapper.writeValueAsString(mentorshipRequestedEvent)).thenReturn(message);
 
         mentorshipRequestedEventPublisher.publish(mentorshipRequestedEvent);

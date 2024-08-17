@@ -72,4 +72,9 @@ public class UserController {
     public void deleteAvatar(@RequestHeader(value = "x-user-id") long userId) {
         userService.deleteAvatar(userId);
     }
+
+    @GetMapping("avatar/keys")
+    public UserProfilePicDto getAvatarKeys(@RequestHeader(value = "x-user-id") long userId) {
+        return userService.getAvatarKeys(userId);
+    }
 }

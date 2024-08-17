@@ -113,6 +113,13 @@ public class UserService {
         return userMapper.toDtoList(userRepository.findAllById(ids));
     }
 
+    public UserProfilePicDto getAvatarKeys(long userId) {
+        userValidator.validateUserExistence(userId);
+
+        UserProfilePic userProfilePic = userRepository.findById(userId).get().getUserProfilePic();
+        return new UserProfilePicDto(userProfilePic.getFileId(), userProfilePic.getSmallFileId());
+    }
+
     @Transactional
     public UserDto deactivateUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));

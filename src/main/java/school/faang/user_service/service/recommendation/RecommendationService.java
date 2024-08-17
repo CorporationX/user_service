@@ -9,7 +9,6 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.event.recommendation.RecommendationEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -17,7 +16,6 @@ import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.recommendation.RecommendationValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -45,7 +43,7 @@ public class RecommendationService {
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
 
-        recommendationEventPublisher.publish(toEvent(recommendationDto));
+        recommendationEventPublisher.publish(recommendationMapper.toEvent(recommendationDto));
 
         return recommendationMapper.toDto(savedRecommendation);
     }
@@ -76,7 +74,7 @@ public class RecommendationService {
         updatedRecommendation.setSkillOffers(skillOffers);
 
 
-        recommendationEventPublisher.publish(toEvent(recommendationDto));
+        recommendationEventPublisher.publish(recommendationMapper.toEvent(recommendationDto));
 
         return recommendationMapper.toDto(updatedRecommendation);
     }
@@ -91,14 +89,5 @@ public class RecommendationService {
 
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         return recommendationMapper.toListDto(userService.getUserById(authorId).getRecommendationsGiven());
-    }
-
-    private RecommendationEvent toEvent(RecommendationDto dto) {
-        return RecommendationEvent.builder()
-                .recommendationId(dto.getId())
-                .authorId(dto.getAuthorId())
-                .receiverId(dto.getReceiverId())
-                .timestamp(LocalDateTime.now())
-                .build();
     }
 }

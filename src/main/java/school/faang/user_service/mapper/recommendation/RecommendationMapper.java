@@ -1,12 +1,11 @@
 package school.faang.user_service.mapper.recommendation;
 
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.recommendation.RecommendationEvent;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
@@ -25,5 +24,14 @@ public interface RecommendationMapper {
 
     default List<RecommendationDto> toListDto(List<Recommendation> recommendations){
         return recommendations.stream().map(this::toDto).toList();
+    }
+
+    default RecommendationEvent toEvent(RecommendationDto dto) {
+        return RecommendationEvent.builder()
+                .recommendationId(dto.getId())
+                .authorId(dto.getAuthorId())
+                .receiverId(dto.getReceiverId())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }

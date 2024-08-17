@@ -150,8 +150,8 @@ class RecommendationServiceTest {
                 .thenReturn(recommendation);
         Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
                 .thenReturn(List.of(new SkillOffer()));
-        when(recommendationMapper.toDto(any(Recommendation.class)))
-                .thenReturn(recommendationDto);
+        when(recommendationMapper.toEvent(any(RecommendationDto.class)))
+                .thenReturn(new RecommendationEvent());
 
         recommendationService.create(recommendationDto);
 
@@ -228,6 +228,8 @@ class RecommendationServiceTest {
                 .thenReturn(recommendation);
         when(recommendationRepository.save(any(Recommendation.class)))
                 .thenReturn(recommendation);
+        when(recommendationMapper.toEvent(any(RecommendationDto.class)))
+                .thenReturn(new RecommendationEvent());
 
         recommendationService.update(recommendationId, recommendationDto);
 

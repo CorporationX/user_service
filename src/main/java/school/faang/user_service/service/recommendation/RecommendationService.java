@@ -45,7 +45,8 @@ public class RecommendationService {
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
 
-        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(recommendationDto));
+        RecommendationDto savedRecommendationDto = recommendationMapper.toDto(savedRecommendation);
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(savedRecommendationDto));
 
         return recommendationMapper.toDto(savedRecommendation);
     }
@@ -75,7 +76,8 @@ public class RecommendationService {
         skillOffers.addAll(savedSkillOffersToUpdate);
         updatedRecommendation.setSkillOffers(skillOffers);
 
-        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(recommendationDto));
+        RecommendationDto savedRecommendationDto = recommendationMapper.toDto(updatedRecommendation);
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(savedRecommendationDto));
 
         return recommendationMapper.toDto(updatedRecommendation);
     }

@@ -9,13 +9,16 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.mentorship.MentorshipRequestEvent;
 import school.faang.user_service.entity.mentorship.MentorshipStartEvent;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorship.MentorshipRequestPublisher;
 import school.faang.user_service.publisher.mentorship.MentorshipStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,6 +36,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipStartPublisher mentorshipStartPublisher;
+    private final MentorshipRequestPublisher mentorshipRequestPublisher;
     private final static int MONTHS_COOLDOWN = 3;
 
     @Override
@@ -56,6 +60,9 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         validateLastRequestDate(latestRequest, MONTHS_COOLDOWN);
 
         MentorshipRequest response = mentorshipRequestRepository.save(mentorshipRequest);
+
+        publishMentorshipRequestEvent(response.getReceiver().getId(), response.getRequester().getId());
+
         return mentorshipRequestMapper.toDto(response);
     }
 
@@ -121,5 +128,13 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         mentorshipStartPublisher.publish(MentorshipStartEvent.builder()
                 .mentorId(mentorId)
                 .menteeId(menteeId).build());
+    }
+
+    private void publishMentorshipRequestEvent(long mentorId, long menteeId) {
+        mentorshipRequestPublisher.publish(MentorshipRequestEvent.builder()
+                .mentorId(mentorId)
+                .menteeId(menteeId)
+                .createdDate(LocalDateTime.now())
+                .build());
     }
 }

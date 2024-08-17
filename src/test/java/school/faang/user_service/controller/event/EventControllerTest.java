@@ -19,8 +19,6 @@ import static org.mockito.Mockito.*;
 public class EventControllerTest {
     @Mock
     private EventService eventService;
-    @Mock
-    private EventDtoValidator validator;
     @InjectMocks
     private EventController eventController;
     private EventDto eventDto = new EventDto();
@@ -28,22 +26,9 @@ public class EventControllerTest {
 
 
     @Test
-    public void testCreateUsingWrongData() {
-        String textException = "Wrong data";
-        doThrow(new DataValidationException(textException))
-                .when(validator).validate(eventDto);
-
-        DataValidationException exception =
-                assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-        assertEquals(textException, exception.getMessage());
-        verify(eventService, times(0)).create(eventDto);
-    }
-
-    @Test
     public void testCreateUsingEventService() {
         eventController.create(eventDto);
 
-        verify(validator, times(1)).validate(eventDto);
         verify(eventService, times(1)).create(eventDto);
     }
 
@@ -79,7 +64,6 @@ public class EventControllerTest {
     public void testUpdateEventAfterValidate() {
         eventController.updateEvent(eventDto);
 
-        verify(validator, times(1)).validate(eventDto);
         verify(eventService, times(1)).updateEvent(eventDto);
     }
 

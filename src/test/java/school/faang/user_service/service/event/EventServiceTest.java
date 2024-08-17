@@ -70,7 +70,7 @@ public class EventServiceTest {
 
     private void prepareMocks() {
         lenient().when(userService.findUserById(eventDto.getOwnerId())).thenReturn(user);
-        lenient().when(eventMapper.toEntity(eventDto, userService)).thenReturn(event);
+        lenient().when(eventMapper.toEntity(eventDto)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
         lenient().when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         lenient().when(eventRepository.save(event)).thenReturn(event);
@@ -165,13 +165,13 @@ public class EventServiceTest {
 
         prepareMocks();
         doThrow(new DataValidationException("User hasn't required skills"))
-                .when(validator).validateRequiredSkills(user, event);
+                .when(validator).validateRequiredSkills(any(), any());
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
         assertEquals("User hasn't required skills", exception.getMessage());
-        verify(eventRepository, times(0)).save(event);
-        verify(eventMapper, times(0)).toDto(eventRepository.save(event));
+        verify(eventRepository, times(0)).save(any());
+        verify(eventMapper, times(0)).toDto(eventRepository.save(any()));
     }
 
     @Test

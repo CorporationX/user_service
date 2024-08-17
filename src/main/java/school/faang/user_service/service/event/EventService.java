@@ -26,17 +26,19 @@ public class EventService {
 
     public EventDto create(EventDto eventDto) {
         User owner = userService.findUserById(eventDto.getOwnerId());
-        Event event = eventMapper.toEntity(eventDto, userService);
+        Event event = eventMapper.toEntity(eventDto);
         event.setOwner(owner);
 
         validator.validateRequiredSkills(owner, event);
-
-        return eventMapper.toDto(eventRepository.save(event));
+        event = eventRepository.save(event);
+        return eventMapper.toDto(event);
     }
 
+
     public EventDto getEvent(long eventId) {
-        return eventMapper.toDto(eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataValidationException("Event not found for ID: " + eventId)));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("Event not found for ID: " + eventId));
+        return eventMapper.toDto(event);
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
@@ -59,12 +61,14 @@ public class EventService {
 
     public EventDto updateEvent(EventDto eventDto) {
         User owner = userService.findUserById(eventDto.getOwnerId());
-        Event event = eventMapper.toEntity(eventDto, userService);
+        Event event = eventRepository.findById(eventDto.getId())
+                .orElseThrow(() -> new DataValidationException("event ID is wrong"));
+        eventMapper.updateEntity(eventDto, event);
         event.setOwner(owner);
 
         validator.validateRequiredSkills(owner, event);
-
-        return eventMapper.toDto(eventRepository.save(event));
+        event = eventRepository.save(event);
+        return eventMapper.toDto(event);
     }
 
     public List<EventDto> getOwnedEvents(long userId) {

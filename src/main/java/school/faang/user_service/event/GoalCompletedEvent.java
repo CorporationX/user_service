@@ -14,6 +14,5 @@ import java.time.LocalDateTime;
 public class GoalCompletedEvent {
     private Long userId;
     private Long goalId;
-    private String eventType;
     private LocalDateTime eventTime;
 }

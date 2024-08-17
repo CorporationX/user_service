@@ -9,11 +9,10 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.event.GoalCompletedEvent;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.publisher.GoalMessagePublisher;
+import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;
 
 import java.time.LocalDateTime;
@@ -48,7 +47,6 @@ public class GoalService {
         goal.setId(goalId);
         if (goal.getStatus() != null && goal.getStatus().equals(GoalStatus.COMPLETED)) {
             updateUsersAndSkillsWhenGoalCompleted(goal);
-            sentGoalAnalytic(goalId);
         }
         setUsersAndSkills(goalDto, goal);
         return goalMapper.toDto(goalRepository.save(goal));
@@ -82,6 +80,7 @@ public class GoalService {
         Optional<Goal> entityOpt = goalRepository.findById(goal.getId());
         if (entityOpt.isPresent()) {
             Goal goalEntity = entityOpt.get();
+            sentGoalAnalytic(goalEntity);
             goalEntity.getUsers().forEach(user -> {
                 List<Skill> currentUserSkills;
                 if (user.getSkills() != null) {
@@ -112,17 +111,14 @@ public class GoalService {
                 .toList();
     }
 
-    private void sentGoalAnalytic(Long goalId){
-       Goal entityOpt = goalRepository.findById(goalId)
-               .orElseThrow(() -> new EntityNotFoundException("Goal not found"));
-        entityOpt.getUsers().forEach((user) -> {
+    private void sentGoalAnalytic(Goal goal){
+        goal.getUsers().forEach((user) -> {
             GoalCompletedEvent goalCompletedEvent = GoalCompletedEvent.builder()
-                    .goalId(goalId)
+                    .goalId(goal.getId())
                     .userId(user.getId())
                     .eventTime(LocalDateTime.now())
                     .build();
             goalMessagePublisher.publish(goalCompletedEvent);
         });
-
     }
 }

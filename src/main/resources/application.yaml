@@ -29,10 +29,7 @@ spring:
         goal_channel:
           name: goal_channel
 
-
 server:
-  servlet:
-    context-path: /api
   port: 8080
 
 logging:

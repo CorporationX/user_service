@@ -13,6 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.recommendation.RecommendationEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -154,7 +155,7 @@ class RecommendationServiceTest {
 
         recommendationService.create(recommendationDto);
 
-        verify(recommendationEventPublisher).toEventAndPublish(recommendationDto);
+        verify(recommendationEventPublisher).publish(any(RecommendationEvent.class));
     }
 
     @Test
@@ -239,7 +240,7 @@ class RecommendationServiceTest {
         verify(skillOfferService).saveSkillOffers(anyList(), anyLong());
         verify(recommendationMapper).toEntity(any(RecommendationDto.class));
         verify(recommendationRepository).save(any(Recommendation.class));
-        verify(recommendationEventPublisher).toEventAndPublish(recommendationDto);
+        verify(recommendationEventPublisher).publish(any(RecommendationEvent.class));
     }
 
     @Test

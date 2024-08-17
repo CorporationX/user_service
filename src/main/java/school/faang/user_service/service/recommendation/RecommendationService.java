@@ -9,6 +9,7 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.recommendation.RecommendationEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -16,6 +17,7 @@ import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.recommendation.RecommendationValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -43,7 +45,8 @@ public class RecommendationService {
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
 
-        recommendationEventPublisher.toEventAndPublish(recommendationDto);
+        RecommendationEvent recommendationEvent = toEvent(recommendationDto);
+        recommendationEventPublisher.publish(recommendationEvent);
 
         return recommendationMapper.toDto(savedRecommendation);
     }
@@ -73,7 +76,8 @@ public class RecommendationService {
         skillOffers.addAll(savedSkillOffersToUpdate);
         updatedRecommendation.setSkillOffers(skillOffers);
 
-        recommendationEventPublisher.toEventAndPublish(updateRecommendationDto);
+        RecommendationEvent recommendationEvent = toEvent(recommendationDto);
+        recommendationEventPublisher.publish(recommendationEvent);
 
         return recommendationMapper.toDto(updatedRecommendation);
     }
@@ -88,5 +92,14 @@ public class RecommendationService {
 
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         return recommendationMapper.toListDto(userService.getUserById(authorId).getRecommendationsGiven());
+    }
+
+    private RecommendationEvent toEvent(RecommendationDto dto) {
+        return RecommendationEvent.builder()
+                .recommendationId(dto.getId())
+                .authorId(dto.getAuthorId())
+                .receiverId(dto.getReceiverId())
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }

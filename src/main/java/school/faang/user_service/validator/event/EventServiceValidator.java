@@ -13,7 +13,9 @@ public class EventServiceValidator {
     private final EventRepository eventRepository;
 
     public void validateRequiredSkills(User owner, Event event) {
-        if (owner.getSkills() == null || !owner.getSkills().containsAll(event.getRelatedSkills())) {
+        if (event.getRelatedSkills() != null &&
+                (owner.getSkills() == null || !owner.getSkills().containsAll(event.getRelatedSkills()))
+                ) {
             throw new DataValidationException("User hasn't required skills");
         }
     }

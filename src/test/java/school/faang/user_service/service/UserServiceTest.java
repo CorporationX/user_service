@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.UserValidator;
@@ -15,7 +16,9 @@ import school.faang.user_service.validator.UserValidator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +31,8 @@ class UserServiceTest {
     private UserValidator userValidator;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private EntityHandler entityHandler;
 
     @InjectMocks
     private UserService userService;
@@ -46,9 +51,9 @@ class UserServiceTest {
     @Test
     @DisplayName("testing getUser method")
     public void testGetUser() {
-        when(userValidator.validateUserExistence(userId)).thenReturn(user);
+        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
         userService.getUser(userId);
-        verify(userValidator, times(1)).validateUserExistence(userId);
+        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(userMapper, times(1)).toDto(user);
     }
 
@@ -62,9 +67,9 @@ class UserServiceTest {
     @Test
     @DisplayName("testing getUserFollowers method")
     public void testGetUserFollowers() {
-        when(userValidator.validateUserExistence(userId)).thenReturn(user);
+        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
         userService.getUserFollowers(userId);
-        verify(userValidator, times(1)).validateUserExistence(userId);
+        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
     }
 
     @Test

@@ -6,12 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.Optional;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,10 +22,10 @@ class UserValidatorTest {
     private UserValidator userValidator;
 
     @Test
-    @DisplayName("testing validateUserExistence method with non appropriate value")
-    public void testValidateUserExistence() {
-        long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userValidator.validateUserExistence(userId));
+    @DisplayName("testing checkAllFollowersExist method with non appropriate value")
+    public void testCheckAllFollowersExist() {
+        List<Long> userIds = List.of(1L);
+        when(userRepository.findAllById(userIds)).thenReturn(List.of());
+        assertFalse(() -> userValidator.checkAllFollowersExist(userIds));
     }
 }

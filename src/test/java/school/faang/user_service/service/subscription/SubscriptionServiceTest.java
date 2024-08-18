@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
@@ -24,6 +25,7 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -83,8 +85,10 @@ class SubscriptionServiceTest {
 
     @Test
     void followUserSuccessfully() {
+        Mockito.doNothing().when(followerEventPublisher).publish(Mockito.any(FollowerEvent.class));
         subscriptionService.followUser(1, 2);
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(1, 2);
+        Mockito.verify(followerEventPublisher, Mockito.times(1)).publish(Mockito.any(FollowerEvent.class));
     }
 
     @Test

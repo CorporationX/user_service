@@ -9,11 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.FollowerEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.FollowerMessagePublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -25,11 +28,13 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final FollowerMessagePublisher followerMessagePublisher;
 
     @Transactional
     public void follow(long followerId, long followeeId) {
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             subscriptionRepository.followUser(followerId, followeeId);
+            sendFollowerEvent(followerId, followeeId);
         } else {
             log.info("Method follow get exception");
             throw new DataValidationException("You are already subscribed to this user");
@@ -58,6 +63,16 @@ public class SubscriptionService {
         return filterUsers(filters, followee);
     }
 
+    @Transactional(readOnly = true)
+    public long getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Transactional(readOnly = true)
+    public long getFollowingCount(long followerId) {
+        return subscriptionRepository.findFollowersAmountByFollowerId(followerId);
+    }
+
     @NotNull
     private List<UserDto> filterUsers(UserFilterDto filters, Stream<User> followees) {
         List<UserFilter> applicableFilters = userFilters.stream()
@@ -71,13 +86,11 @@ public class SubscriptionService {
                 .map(userMapper::toDto).toList();
     }
 
-    @Transactional(readOnly = true)
-    public long getFollowersCount(long followeeId) {
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
-    }
-
-    @Transactional(readOnly = true)
-    public long getFollowingCount(long followerId) {
-        return subscriptionRepository.findFollowersAmountByFollowerId(followerId);
+    private void sendFollowerEvent(long followerId, long followeeId) {
+        FollowerEvent followerEvent = FollowerEvent.builder()
+                .followerId(followerId)
+                .followeeId(followeeId)
+                .eventTime(LocalDateTime.now()).build();
+        followerMessagePublisher.publish(followerEvent);
     }
 }

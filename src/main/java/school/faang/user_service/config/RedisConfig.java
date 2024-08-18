@@ -19,6 +19,10 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.goal_channel.name}")
     private String goalTopic;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerChannelName;
+
+
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -38,5 +42,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic goalTopic() {
         return new ChannelTopic(goalTopic);
+    }
+
+    @Bean
+    public ChannelTopic followerTopic() {
+        return new ChannelTopic(followerChannelName);
     }
 }

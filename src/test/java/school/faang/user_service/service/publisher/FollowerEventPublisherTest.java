@@ -2,6 +2,7 @@ package school.faang.user_service.service.publisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,5 +45,11 @@ public class FollowerEventPublisherTest {
         followerEventPublisher.publish(followerEvent);
         Mockito.verify(redisTemplate, Mockito.times(1)).convertAndSend(channel, message);
         Mockito.verify(objectMapper, Mockito.times(1)).writeValueAsString(followerEvent);
+    }
+
+    @Test
+    public void publishTestWithException() throws JsonProcessingException {
+        Mockito.when(objectMapper.writeValueAsString(followerEvent)).thenThrow(RuntimeException.class);
+        Assert.assertThrows(RuntimeException.class, () -> followerEventPublisher.publish(followerEvent));
     }
 }

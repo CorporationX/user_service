@@ -3,7 +3,6 @@ package school.faang.user_service.validator.recommendation;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;

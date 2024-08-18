@@ -3,5 +3,5 @@ package school.faang.user_service.publishers;
 import org.springframework.data.redis.connection.Message;
 
 public interface MessagePublisher {
-    void publish(Message message);
+    void publish(String message);
 }

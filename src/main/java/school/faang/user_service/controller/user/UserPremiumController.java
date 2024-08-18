@@ -10,9 +10,6 @@ import school.faang.user_service.dto.userPremium.UserPremiumDto;
 import school.faang.user_service.dto.userPremium.UserFilterDto;
 import school.faang.user_service.service.userPremium.UserPremiumService;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.userDto.UserDto;
-import school.faang.user_service.dto.userDto.UserFilterDto;
-import school.faang.user_service.service.UserPremiumService;
 import school.faang.user_service.service.csv.CsvUserService;
 
 import java.util.List;
@@ -23,10 +20,10 @@ import java.util.List;
 @RequestMapping(ApiPath.USER_PREMIUM)
 public class UserPremiumController {
     private final UserPremiumService userPremiumService;
-    private final CsvUserService csvUserService;
+
 
     @GetMapping()
-    public ResponseEntity<List<UserDto>> getListPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
+    public ResponseEntity<List<UserPremiumDto>> getListPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         if (userFilterDto == null) {
             log.error("userFilterDto ничего не содержит");
             throw new IllegalArgumentException("userFilterDto ничего не содержит");
@@ -34,13 +31,5 @@ public class UserPremiumController {
         return ResponseEntity.status(HttpStatus.OK).body(userPremiumService.getPremiumUsers(userFilterDto));
     }
 
-    @PostMapping(value = "/parseUser")
-    public void getStudentsParsing(@RequestBody MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            log.error("multipartFile isEmpty");
-            throw new IllegalArgumentException("multipartFile isEmpty");
-        } else {
-            csvUserService.getStudentsParsing(multipartFile);
-        }
-    }
+
 }

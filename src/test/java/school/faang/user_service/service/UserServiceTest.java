@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.PersonToUserMapper;
-import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.io.ByteArrayInputStream;
@@ -34,9 +33,6 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private CountryRepository countryRepository;
 
     @Mock
     private CsvMapper csvMapper;
@@ -70,7 +66,7 @@ public class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
-    private void setupMockBehaviorForValidInput() throws Exception {
+    private void setupMockBehaviorForValidInput(){
         CsvSchema schema = CsvSchema.emptySchema().withHeader();
         when(csvMapper.schemaFor(Person.class)).thenReturn(schema);
 

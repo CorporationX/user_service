@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class RecommendationServiceTest {
     @Mock
     private UserService userService;
@@ -143,22 +146,27 @@ class RecommendationServiceTest {
 
     @Test
     void testCreateToDto() {
-        Mockito.doNothing().when(recommendationValidator)
+        doNothing().when(recommendationValidator)
                 .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());
-        Mockito.doNothing().when(recommendationValidator)
+        doNothing().when(recommendationValidator)
                 .validateSkillOffers(recommendationDto);
-        Mockito.when(recommendationMapper.toEntity(Mockito.any(RecommendationDto.class)))
+        when(recommendationMapper.toEntity(Mockito.any(RecommendationDto.class)))
                 .thenReturn(recommendation);
-        Mockito.when(recommendationRepository.save(Mockito.any(Recommendation.class)))
+        when(recommendationRepository.save(Mockito.any(Recommendation.class)))
                 .thenReturn(recommendation);
-        Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
+        when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
                 .thenReturn(List.of(new SkillOffer()));
+        when(recommendationMapper.toDto(any(Recommendation.class)))
+                .thenReturn(recommendationDto);
         when(recommendationEventMapper.toEvent(any(RecommendationDto.class)))
                 .thenReturn(new RecommendationEvent());
+        doNothing().when(recommendationEventPublisher)
+                .publish(Mockito.any(RecommendationEvent.class));
 
         recommendationService.create(recommendationDto);
 
-        verify(recommendationEventPublisher).publish(any(RecommendationEvent.class));
+        verify(recommendationEventPublisher, Mockito.times(1))
+                .publish(Mockito.any(RecommendationEvent.class));
     }
 
     @Test

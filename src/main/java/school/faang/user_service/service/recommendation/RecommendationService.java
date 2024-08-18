@@ -48,7 +48,7 @@ public class RecommendationService {
         RecommendationDto savedRecommendationDto = recommendationMapper.toDto(savedRecommendation);
         recommendationEventPublisher.publish(recommendationEventMapper.toEvent(savedRecommendationDto));
 
-        return recommendationMapper.toDto(savedRecommendation);
+        return savedRecommendationDto;
     }
 
     @Transactional
@@ -76,10 +76,10 @@ public class RecommendationService {
         skillOffers.addAll(savedSkillOffersToUpdate);
         updatedRecommendation.setSkillOffers(skillOffers);
 
-        RecommendationDto savedRecommendationDto = recommendationMapper.toDto(updatedRecommendation);
-        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(savedRecommendationDto));
+        RecommendationDto updatedRecommendationDto = recommendationMapper.toDto(updatedRecommendation);
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(updatedRecommendationDto));
 
-        return recommendationMapper.toDto(updatedRecommendation);
+        return updatedRecommendationDto;
     }
 
     public void delete(long recommendationId) {

@@ -2,6 +2,9 @@ package school.faang.user_service.controller.subscription;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
@@ -9,6 +12,7 @@ import school.faang.user_service.service.subscription.SubscriptionService;
 import java.util.List;
 
 @Controller
+@RequestMapping("/subscription")
 public class SubscriptionController {
     private SubscriptionService subscriptionService;
     private SubscriptionControllerValidator validator;
@@ -18,7 +22,9 @@ public class SubscriptionController {
         this.subscriptionService = subscriptionService;
     }
 
-    public void followUser(long followerId, long followeeId) {
+    @PostMapping("/follow")
+    public void followUser(@RequestParam("followerId") long followerId,
+                           @RequestParam("followeeId") long followeeId) {
         validator.validate(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }

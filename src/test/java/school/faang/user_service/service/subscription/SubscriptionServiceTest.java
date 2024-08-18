@@ -16,6 +16,8 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.FollowerRepository;
+import school.faang.user_service.service.publisher.FollowerEventPublisher;
 import school.faang.user_service.service.user.filters.UserFilter;
 import school.faang.user_service.service.user.filters.UserNameFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
@@ -38,6 +40,9 @@ class SubscriptionServiceTest {
 
     @Spy
     private UserMapperImpl mapper;
+
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
 
     List<UserFilter<UserFilterDto, User>> userFilters;
 
@@ -73,7 +78,7 @@ class SubscriptionServiceTest {
                 1,
                 5
         );
-        subscriptionService = new SubscriptionService(subscriptionRepository, mapper, userFilters, validator);
+        subscriptionService = new SubscriptionService(subscriptionRepository, mapper, validator, userFilters, followerEventPublisher);
     }
 
     @Test

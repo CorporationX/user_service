@@ -40,8 +40,7 @@ public class RecommendationService {
 
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
-        recommendationPublisher.toEventAndPublish(savedRecommendation);
-
+        recommendationPublisher.publish(recommendationMapper.toRecommendationReceivedEvent(savedRecommendation));
         return recommendationMapper.toDto(savedRecommendation);
     }
 

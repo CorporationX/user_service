@@ -13,6 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.recommendationReceived.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -138,6 +139,12 @@ class RecommendationServiceTest {
 
     @Test
     void testCreateToDto() {
+        RecommendationReceivedEvent recommendationReceivedEvent = RecommendationReceivedEvent.builder()
+                .recommendationId(1L)
+                .receivedId(3L)
+                .authorId(2L)
+                .build();
+
         Mockito.doNothing().when(recommendationValidator)
                 .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());
         Mockito.doNothing().when(recommendationValidator)
@@ -148,7 +155,10 @@ class RecommendationServiceTest {
                 .thenReturn(recommendation);
         Mockito.when(skillOfferService.saveSkillOffers(Mockito.anyList(), Mockito.anyLong()))
                 .thenReturn(List.of(new SkillOffer()));
-        Mockito.doNothing().when(recommendationPublisher).toEventAndPublish(recommendation);
+        when(recommendationMapper.toRecommendationReceivedEvent(any(Recommendation.class)))
+                .thenReturn(recommendationReceivedEvent);
+        Mockito.doNothing().when(recommendationPublisher)
+                .publish(any(RecommendationReceivedEvent.class));
         when(recommendationMapper.toDto(any(Recommendation.class)))
                 .thenReturn(recommendationDto);
 

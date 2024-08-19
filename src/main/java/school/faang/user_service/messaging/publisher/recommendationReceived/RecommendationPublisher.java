@@ -33,12 +33,4 @@ public class RecommendationPublisher implements EventPublisher<RecommendationRec
             throw new IllegalArgumentException(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
         }
     }
-
-    public void toEventAndPublish(Recommendation recommendation) {
-        publish(RecommendationReceivedEvent.builder()
-                .recommendationId(recommendation.getId())
-                .authorId(recommendation.getAuthor().getId())
-                .receivedId(recommendation.getReceiver().getId())
-                .build());
-    }
 }

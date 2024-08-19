@@ -48,7 +48,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             log.error(ExceptionMessages.FAILED_PERSISTENCE, e);
             throw new PersistenceException(ExceptionMessages.FAILED_PERSISTENCE, e);
         }
-        mentorshipRequestedPublisher.toEventAndPublish(mentorshipRequestDto);
+        mentorshipRequestedPublisher.publish(mapper.toMentorshipRequestedEvent(savedRequest));
 
         return mapper.toDto(savedRequest);
     }

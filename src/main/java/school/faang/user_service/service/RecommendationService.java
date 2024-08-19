@@ -17,6 +17,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.recommendation.DataValidationException;
 import school.faang.user_service.exception.recommendation.EntityException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationSentPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -41,24 +42,25 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final RecommendationMapper recommendationMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final RecommendationSentPublisher recommendationSentPublisher;
     private final static int INTERVAL_DATE = 6;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        public RecommendationDto create(RecommendationDto recommendationDto) {
-            Long userId = recommendationDto.getAuthorId();
-            Long receiver = recommendationDto.getReceiverId();
+    public RecommendationDto create(RecommendationDto recommendationDto) {
+        Long userId = recommendationDto.getAuthorId();
+        Long receiver = recommendationDto.getReceiverId();
 
-            validateInterval(userId, receiver);
-            validateSkill(recommendationDto.getSkillOffers());
+        validateInterval(userId, receiver);
+        validateSkill(recommendationDto.getSkillOffers());
 
-            Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
-            processSkillAndGuarantees(recommendation);
-            recommendationRepository.save(recommendation);
+        processSkillAndGuarantees(recommendation);
+        recommendationRepository.save(recommendation);
 
-
-            return recommendationMapper.toDto(recommendation);
-        }
+        recommendationSentPublisher.publish(recommendationMapper.toRecommendationEventPublisher(recommendation));
+        return recommendationMapper.toDto(recommendation);
+    }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
         Long userId = recommendationDto.getAuthorId();
@@ -220,4 +222,5 @@ public class RecommendationService {
 
         userSkillGuaranteeRepository.saveAll(guarantees);
     }
+
 }

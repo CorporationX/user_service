@@ -27,7 +27,6 @@ public class RecommendationEventPublisher implements EventPublisher<Recommendati
             redisTemplate.convertAndSend(recommendationTopic.getTopic(), message);
         } catch (JsonProcessingException e) {
             log.error(ExceptionMessages.SERIALIZATION_ERROR + event, e);
-            throw new IllegalArgumentException(ExceptionMessages.SERIALIZATION_ERROR + event, e);
         } catch (Exception e) {
             log.error(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
             throw new IllegalArgumentException(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());

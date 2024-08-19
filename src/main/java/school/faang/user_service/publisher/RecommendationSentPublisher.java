@@ -25,7 +25,6 @@ public class RecommendationSentPublisher implements MessagePublisher<Recommendat
             log.info("Published recommendation: {}", event);
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize recommendation: {}", event, e);
-            throw new IllegalArgumentException("Failed to serialize recommendation: " + event);
         }
     }
 }

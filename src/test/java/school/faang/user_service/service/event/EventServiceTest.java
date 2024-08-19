@@ -15,6 +15,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.event.EventServiceValidator;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -72,7 +73,7 @@ public class EventServiceTest {
 
     private void prepareMocks() {
         lenient().when(userService.findUserById(eventDto.getOwnerId())).thenReturn(user);
-        lenient().when(eventMapper.toEntity(eventDto, userService)).thenReturn(event);
+        lenient().when(eventMapper.toEntity(eventDto)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
         lenient().when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         lenient().when(eventRepository.save(event)).thenReturn(event);

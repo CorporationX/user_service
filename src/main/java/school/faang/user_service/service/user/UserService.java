@@ -5,18 +5,23 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderException;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.s3.S3Service;
@@ -25,25 +30,77 @@ import school.faang.user_service.service.password.PasswordService;
 import school.faang.user_service.dto.user.UserDto;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.stream.StreamSupport;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-@Service("userServiceNumberTwo")
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final GoalRepository goalRepository;
+    private final MentorshipService mentorshipService;
+    private final UserMapper userMapper;
+    private final UserValidator userValidator;
     private final AvatarService avatarService;
     private final CountryService countryService;
-    private final UserValidator userValidator;
-    private final UserMapper userMapper;
     private final S3Service s3Service;
     private final PasswordService passwordService;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
+
+
+
+    public UserDto deactivate(Long userId) {
+        User user = userRepository.findById(userId).get();
+        removeEvents(userId);
+        removeGoals(userId);
+        user.setActive(false);
+        return userMapper.toDto(userRepository.save(user));
+    }
+
+    public void removeMenteeAndGoals(Long userId) {
+        mentorshipService.removeMenteeGoals(userId);
+        mentorshipService.removeMenteeFromUser(userId);
+    }
+
+    @Scheduled(cron = "@daily")
+    public void deleteInactiveUsers() {
+        StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .filter(user -> !user.isActive()).filter(user ->user.getUpdatedAt().plusDays(90).isBefore(LocalDateTime.now()))
+                .forEach(userRepository::delete);
+    }
+
+    private void removeGoals(Long userId) {
+        userValidator.validateThatUserIdExist(userId);
+        User user = userRepository.findById(userId).get();
+        if (!user.getGoals().isEmpty()) {
+            user.getGoals().forEach(goal -> {
+                goal.getUsers().remove(user);
+                if (goal.getUsers().isEmpty()) {
+                    goalRepository.delete(goal);
+                }
+            });
+        }
+    }
+
+    private void removeEvents(Long userId) {
+        userValidator.validateThatUserIdExist(userId);
+        User user = userRepository.findById(userId).get();
+        if (!user.getOwnedEvents().isEmpty()) {
+            user.getOwnedEvents().forEach(event -> {
+                event.setStatus(EventStatus.CANCELED);
+                eventRepository.save(event);
+            });
+        }
+    }
 
     public User findUserById(long id) {
         return userRepository.findById(id)

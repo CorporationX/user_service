@@ -17,9 +17,9 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.service.UserService;
-import school.faang.user_service.validator.UserValidator;
+import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,8 +3,8 @@ package school.faang.user_service.controller.goal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.dto.filter.GoalFilterDto;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;

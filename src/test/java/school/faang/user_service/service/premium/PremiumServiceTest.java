@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.PremiumDto;
+import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.dto.client.Currency;
 import school.faang.user_service.dto.client.PaymentRequest;
 import school.faang.user_service.dto.client.PaymentResponse;
@@ -26,7 +26,6 @@ import java.util.Random;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)

@@ -2,17 +2,16 @@ package school.faang.user_service.filters;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.service.user.filters.UserCountryFilter;
+import school.faang.user_service.service.user.filters.UserFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 class UserCountryFilterTest {
     private UserFilter filter;

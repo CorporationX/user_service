@@ -1,14 +1,15 @@
 package school.faang.user_service.service.subscription;
 
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filters.UserFilter;
+import school.faang.user_service.service.user.filters.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import org.springframework.data.domain.PageRequest;
+import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;

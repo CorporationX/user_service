@@ -4,22 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.PremiumDto;
+import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.dto.client.Currency;
 import school.faang.user_service.dto.client.PaymentRequest;
 import school.faang.user_service.dto.client.PaymentResponse;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.enums.PremiumPeriod;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Random;
 
 @Service

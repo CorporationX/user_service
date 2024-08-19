@@ -21,30 +21,30 @@ public class EventParticipationControllerTest {
 
     @Test
     public void testRegister() {
-        long eventId = 0L;
-        long userId = 0L;
-        eventParticipationController.registerParticipant(eventId, userId);
-        Mockito.verify(eventParticipationService).registerParticipant(eventId, userId);
+        long eventId = 1L;
+        long userId = 1L;
+        eventParticipationController.addParticipant(eventId, userId);
+        Mockito.verify(eventParticipationService).addParticipant(eventId, userId);
     }
 
     @Test
     public void testUnregister() {
-        long eventId = 0L;
-        long userId = 0L;
-        eventParticipationController.unregisterParticipant(eventId, userId);
-        Mockito.verify(eventParticipationService).unregisterParticipant(eventId, userId);
+        long eventId = 1L;
+        long userId = 1L;
+        eventParticipationController.removeParticipant(eventId, userId);
+        Mockito.verify(eventParticipationService).removeParticipant(eventId, userId);
     }
 
     @Test
     public void testGetParticipant() {
-        long eventId = 0L;
+        long eventId = 1L;
         Mockito.when(eventParticipationService.getParticipant(eventId)).thenReturn(new ArrayList<>());
         Assertions.assertEquals(eventParticipationController.getParticipant(eventId), new ArrayList<>());
     }
 
     @Test
     public void testGetParticipantsCount() {
-        long eventId = 0L;
+        long eventId = 1L;
         int result = 11;
         Mockito.when(eventParticipationService.getParticipantsCount(eventId)).thenReturn(result);
         Assertions.assertEquals(eventParticipationController.getParticipantsCount(eventId), result);

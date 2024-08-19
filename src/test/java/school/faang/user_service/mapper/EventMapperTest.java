@@ -3,54 +3,62 @@ package school.faang.user_service.mapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.service.user.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 public class EventMapperTest {
     @InjectMocks
     private EventMapperImpl eventMapper;
-    @Mock
-    private UserService userService;
     private long eventId = 1L;
     private long ownerId = 2L;
-    User user = User.builder()
-            .id(ownerId)
+
+    Event event = Event.builder()
+            .id(eventId)
+            .title("event title")
+            .maxAttendees(5)
+            .build();
+
+    EventDto eventDto = EventDto.builder()
+            .id(eventId)
+            .title("event title")
+            .ownerId(ownerId)
+            .maxAttendees(5)
             .build();
 
     @Test
-    public void testToEntityCreateEntity() {
-        EventDto eventDto = new EventDto();
-        eventDto.setOwnerId(ownerId);
+    public void testToEntity() {
+        Event result = eventMapper.toEntity(eventDto);
 
-        when(userService.findUserById(ownerId)).thenReturn(user);
-
-        Event event = eventMapper.toEntity(eventDto, userService);
-
-        assertNotNull(event.getOwner());
-        assertEquals(ownerId, event.getOwner().getId());
-        verify(userService).findUserById(ownerId);
+        assertEquals(event, result);
     }
 
     @Test
     public void testToDto() {
-        Event event = new Event();
-        event.setId(eventId);
+        User user = User.builder()
+                .id(ownerId)
+                .build();
         event.setOwner(user);
 
-        EventDto eventDto = eventMapper.toDto(event);
+        EventDto result = eventMapper.toDto(event);
 
-        assertNotNull(eventDto);
-        assertEquals(eventId, eventDto.getId());
-        assertEquals(ownerId, eventDto.getOwnerId());
+        assertEquals(eventDto, result);
+    }
+
+    @Test
+    public void testUpdateEntity() {
+        String description = "new description";
+        EventDto updateDto = EventDto.builder()
+                .description(description)
+                .build();
+
+        eventMapper.updateEntity(updateDto, event);
+
+        assertEquals(description, event.getDescription());
+        assertEquals(eventId, event.getId());
     }
 }

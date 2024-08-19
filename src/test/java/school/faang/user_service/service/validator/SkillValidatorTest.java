@@ -12,10 +12,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.validator.SkillValidator;
-
-import java.util.ArrayList;
-import java.util.List;
+import school.faang.user_service.validator.skill.SkillValidator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 

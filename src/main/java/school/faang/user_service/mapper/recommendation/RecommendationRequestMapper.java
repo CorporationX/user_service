@@ -1,6 +1,9 @@
 package school.faang.user_service.mapper.recommendation;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -9,7 +12,7 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedSourcePolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface RecommendationRequestMapper {
 
     @Mapping(target = "requesterId", source = "requester.id")

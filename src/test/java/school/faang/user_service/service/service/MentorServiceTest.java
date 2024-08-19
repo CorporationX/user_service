@@ -13,7 +13,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;

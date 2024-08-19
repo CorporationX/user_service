@@ -15,6 +15,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.event.EventServiceValidator;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -22,10 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +73,7 @@ public class EventServiceTest {
 
     private void prepareMocks() {
         lenient().when(userService.findUserById(eventDto.getOwnerId())).thenReturn(user);
-        lenient().when(eventMapper.toEntity(eventDto, userService)).thenReturn(event);
+        lenient().when(eventMapper.toEntity(eventDto)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
         lenient().when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         lenient().when(eventRepository.save(event)).thenReturn(event);
@@ -168,13 +168,13 @@ public class EventServiceTest {
 
         prepareMocks();
         doThrow(new DataValidationException("User hasn't required skills"))
-                .when(validator).validateRequiredSkills(user, event);
+                .when(validator).validateRequiredSkills(any(), any());
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
         assertEquals("User hasn't required skills", exception.getMessage());
-        verify(eventRepository, times(0)).save(event);
-        verify(eventMapper, times(0)).toDto(eventRepository.save(event));
+        verify(eventRepository, times(0)).save(any());
+        verify(eventMapper, times(0)).toDto(eventRepository.save(any()));
     }
 
     @Test

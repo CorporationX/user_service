@@ -2,6 +2,8 @@ package school.faang.user_service.validator.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.repository.UserRepository;
+
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.UserValidationException;
 import school.faang.user_service.repository.UserRepository;
@@ -52,5 +54,13 @@ public class UserValidator {
             throw new IllegalArgumentException("User not found");
         }
         return userOptional;
+    }
+
+    public boolean findUserByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public boolean findUserByPhone(String phone) {
+        return userRepository.findByPhone(phone).isPresent();
     }
 }

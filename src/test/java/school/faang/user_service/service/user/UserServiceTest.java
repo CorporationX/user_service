@@ -9,7 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
+import org.springframework.beans.factory.annotation.Qualifier;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.person.Address;
+import school.faang.user_service.entity.person.ContactInfo;
+import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -17,39 +21,55 @@ import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.user.UserValidator;
+import school.faang.user_service.service.password.PasswordService;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
+
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private AvatarService avatarService;
-
-    @Mock
-    private CountryService countryService;
-
-    @Mock
-    private UserValidator userValidator;
 
     @Mock
     private UserMapper userMapper;
 
     @Mock
+    private CountryService countryService;
+
+    @Mock
+    private PasswordService passwordService;
+
+    @Mock
+    private AvatarService avatarService;
+
+    @Mock
+    private UserValidator userValidator;
+
+    @Mock
     private S3Service s3Service;
+
+    @Mock
+    @Qualifier("taskExecutor")
+    private Executor taskExecutor;
+
     @InjectMocks
     UserService userService;
 
     private UserDto userDto;
     private User user;
+
+    private Person person;
 
     @BeforeEach
     void setUp() {
@@ -65,6 +85,17 @@ public class UserServiceTest {
         Country country = new Country();
         country.setTitle("Belarus");
         user.setCountry(country);
+
+        Address address = new Address();
+        address.setCountry("CountryName");
+
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setEmail("test@example.com");
+        contactInfo.setPhone("123456789");
+        contactInfo.setAddress(address);
+
+        person = new Person();
+        person.setContactInfo(contactInfo);
     }
 
     @Test
@@ -121,5 +152,27 @@ public class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
         verify(s3Service, never()).uploadAvatar(anyLong(), any());
         verify(userMapper, never()).toDto(any(User.class));
+    }
+
+    @Test
+    void testProcessPerson() throws Exception {
+        // Mock the user mapping and saving
+        User user = new User();
+        when(userMapper.personToUser(any(Person.class))).thenReturn(user);
+        when(passwordService.generatePassword()).thenReturn("password");
+        when(countryService.getCountryOrCreate(anyString())).thenReturn(new Country());
+
+        // Use reflection to access private method
+        Method processPersonMethod = UserService.class.getDeclaredMethod("processPerson", Person.class);
+        processPersonMethod.setAccessible(true);
+
+        // Call the method
+        processPersonMethod.invoke(userService, person);
+
+        // Verify interactions
+        verify(userMapper, times(1)).personToUser(person);
+        verify(passwordService, times(1)).generatePassword();
+        verify(countryService, times(1)).getCountryOrCreate(anyString());
+        verify(userRepository, times(1)).save(user);
     }
 }

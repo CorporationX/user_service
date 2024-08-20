@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,22 +53,14 @@ public class CsvUserService {
 
             List<User> users = new ArrayList<>();
             for (Person person : persons) {
-                ContactInfo contactInfo = new ContactInfo();
-                Address address = new Address();
-                contactInfo.setEmail((String) person.getAdditionalProperties().get("email"));
-                contactInfo.setPhone((String) person.getAdditionalProperties().get("phone"));
-                address.setCountry((String) person.getAdditionalProperties().get("city"));
-                address.setCity((String) person.getAdditionalProperties().get("country"));
-                contactInfo.setAddress(address);
-                person.setContactInfo(contactInfo);
                 users.add(personMapper.personToUser(person));
             }
             List<String> titleList = users.stream().map(user -> user.getCountry().getTitle()).toList();
             List<Country> countryList = countryRepository.findByTitleIn(titleList);
-            List<Country> countryUserList = users.stream()
+            Set<Country> countryUserList = users.stream()
                     .filter(user -> !countryList.contains(user))
                     .map(User::getCountry)
-                    .toList();
+                    .collect(Collectors.toSet());
             countryList.addAll(countryUserList);
 
             countryRepository.saveAll(countryUserList);

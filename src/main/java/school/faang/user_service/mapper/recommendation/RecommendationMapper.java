@@ -1,11 +1,8 @@
 package school.faang.user_service.mapper.recommendation;
 
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.List;
 

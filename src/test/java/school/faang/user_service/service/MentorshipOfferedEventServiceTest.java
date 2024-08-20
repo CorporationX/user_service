@@ -9,7 +9,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.events.MentorshipOfferedEvent;
 import school.faang.user_service.publishers.EventJsonConverter;
-import school.faang.user_service.publishers.RedisPublisher;
+import school.faang.user_service.publishers.MentorshipOfferedPublisher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MentorshipOfferedEventServiceTest {
     @Mock
-    private RedisPublisher publisher;
+    private MentorshipOfferedPublisher publisher;
     @Mock
     private EventJsonConverter<MentorshipOfferedEvent> converter;
     @InjectMocks

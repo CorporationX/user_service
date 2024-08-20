@@ -17,13 +17,6 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channels.mentorship_offered}")
-    private String mentorshipOfferedChannel;
-
-    @Bean (name = "mentorshipOfferedChannel")
-    public ChannelTopic MentorshipOfferedChannel(){
-        return new ChannelTopic(mentorshipOfferedChannel);
-    }
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {

@@ -37,8 +37,8 @@ public class CsvUserServiceTest {
 
     private User user1;
     private User user2;
-    private MockMultipartFile multipartFile;
     @Mock
+    private MockMultipartFile multipartFile;
     private InputStream inputStream;
 
     @BeforeEach
@@ -80,15 +80,15 @@ public class CsvUserServiceTest {
         List<User> users = new ArrayList<>();
         users.add(user1);
         users.add(user2);
-
-
+        inputStream = new ByteArrayInputStream(csvData.getBytes());
+        multipartFile = new MockMultipartFile("file.csv", inputStream);
     }
 
     @Test
     public void testGetStudentsParsing() throws IOException {
         when(personMapper.personToUser(person1)).thenReturn(user1);
         when(personMapper.personToUser(person2)).thenReturn(user2);
-        when(multipartFile.getInputStream()).thenReturn(inputStream);
+        when(multipartFile.getInputStream()).thenReturn(multipartFile.getInputStream());
 
         ResponseEntity<String> response = csvUserService.getStudentsParsing(multipartFile);
 

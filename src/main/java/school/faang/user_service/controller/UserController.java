@@ -45,7 +45,7 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return service.getUsersByIds(ids);
     }
-
+  
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         return service.getPremiumUsers(userFilterDto);

@@ -80,7 +80,7 @@ class UserControllerTest {
         dto.setGoalsIds(List.of(VALID_USER_ID));
         dto.setOwnedEventsIds(List.of(VALID_USER_ID));
         //Act
-        when(service.deactivatesUserProfile(anyLong())).thenReturn(dto);
+        Mockito.when(service.deactivatesUserProfile(anyLong())).thenReturn(dto);
         //Assert
         mockMvc.perform(put("/api/user/1"))
                 .andExpect(status().isOk())
@@ -92,7 +92,7 @@ class UserControllerTest {
 
     @Test
     public void testGetUser() throws Exception {
-        when(service.getUser(anyLong())).thenReturn(firstUser);
+        Mockito.when(service.getUser(anyLong())).thenReturn(firstUser);
         mockMvc.perform(get("/api/user/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
@@ -103,7 +103,7 @@ class UserControllerTest {
     @Test
     public void testGetUsersByIds() throws Exception {
         List<UserDto> dtoList = Arrays.asList(firstUser, secondUser);
-        when(service.getUsersByIds(ids)).thenReturn(dtoList);
+        Mockito.when(service.getUsersByIds(ids)).thenReturn(dtoList);
         mockMvc.perform(post("/api/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ids)))

@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
     private static final String MESSAGE_USER_NOT_EXIST = "User does not exist";
@@ -63,6 +64,7 @@ class UserServiceTest {
     private List<UserDto> dtoList;
     private List<User> users;
 
+
     @BeforeEach
     void setUp() {
         //Arrange
@@ -76,6 +78,7 @@ class UserServiceTest {
         user.setOwnedEvents(List.of(new Event(), new Event()));
         List<UserFilter> userFilters = List.of(userCityFilter, userEmailFilter, userNameFilter, userPhoneFilter);
         userService = new UserService(userRepository, goalRepository, eventRepository, mentorshipService, mapper, userFilters);
+
         dtoUser = new UserDto();
         ids = List.of(1L);
         dtoList = new ArrayList<>();
@@ -84,7 +87,7 @@ class UserServiceTest {
     @Test
     public void testUserIsNotInDb() {
         //Act
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         //Assert
         assertEquals(
                 MESSAGE_USER_NOT_EXIST,
@@ -98,7 +101,7 @@ class UserServiceTest {
         //Arrange
         user.setActive(false);
         //Act
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         //Assert
         assertEquals(
                 MESSAGE_USER_ALREADY_DEACTIVATED,
@@ -110,7 +113,7 @@ class UserServiceTest {
     @Test
     public void testGoalDeletedById() {
         //Act
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(goalRepository).deleteById(anyLong());
@@ -119,7 +122,7 @@ class UserServiceTest {
     @Test
     public void testEventDeletedById() {
         //Act
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(eventRepository, Mockito.times(user.getOwnedEvents().size())).deleteById(anyLong());
@@ -128,8 +131,8 @@ class UserServiceTest {
     @Test
     public void testUserSave() {
         //Act
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(mentorshipService.stopMentorship(any())).thenReturn(user);
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mentorshipService.stopMentorship(any())).thenReturn(user);
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(userRepository).save(user);
@@ -138,9 +141,9 @@ class UserServiceTest {
     @Test
     public void testUserToUserDto() {
         //Act
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(mentorshipService.stopMentorship(any())).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mentorshipService.stopMentorship(any())).thenReturn(user);
+        Mockito.when(userRepository.save(user)).thenReturn(user);
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(mapper).toDto(user);
@@ -149,15 +152,17 @@ class UserServiceTest {
     @Test
     @DisplayName("Тест получаем пользователя")
     public void testGetUser() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(mapper.toDto(any())).thenReturn(dtoUser);
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mapper.toDto(any())).thenReturn(dtoUser);
+
         assertEquals(dtoUser, userService.getUser(1L));
     }
 
     @Test
     @DisplayName("Тест получение пользователя на исключение")
     public void testGetUser_whenException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         assertThrows(RuntimeException.class, () ->
                 userService.getUser(1L));
     }
@@ -165,17 +170,19 @@ class UserServiceTest {
     @Test
     @DisplayName("Тест получаем список всех пользователей")
     public void testGetUsersByIds() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(mapper.toDto(any())).thenReturn(dtoUser);
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mapper.toDto(any())).thenReturn(dtoUser);
         dtoUser = mapper.toDto(user);
         dtoList = List.of(dtoUser);
+      
         assertEquals(dtoList, userService.getUsersByIds(ids));
     }
 
     @Test
     @DisplayName("Тест исключение при получении списка пользователей")
     public void testGetUsersByIds_whenException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         assertThrows(RuntimeException.class, () ->
                 userService.getUsersByIds(ids));
     }

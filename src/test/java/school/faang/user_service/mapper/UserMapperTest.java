@@ -119,7 +119,7 @@ public class UserMapperTest {
         .premium("")
         .build();
 
-    UserDto actualResult = userMapper.userDtoFromUser(user);
+    UserDto actualResult = userMapper.toUserDto(user);
 
     assertThat(userDto).isEqualTo(actualResult);
   }
@@ -129,7 +129,7 @@ public class UserMapperTest {
   public void convertUserForUserDtoWithActualPremium() {
     User user = createUserDtoWitchPremium(Month.SEPTEMBER);
 
-    UserDto actualResult = userMapper.userDtoFromUser(user);
+    UserDto actualResult = userMapper.toUserDto(user);
 
     assertThat(actualResult.getPremium()).isEqualTo("Имеется премиум подписка, которая действует до 01.09.2024 года.");
   }
@@ -139,7 +139,7 @@ public class UserMapperTest {
   public void convertUserForUserDtoWithNotActualPremium() {
     User user = createUserDtoWitchPremium(Month.JANUARY);
 
-    UserDto actualResult = userMapper.userDtoFromUser(user);
+    UserDto actualResult = userMapper.toUserDto(user);
 
     assertThat(actualResult.getPremium()).isEqualTo("");
   }

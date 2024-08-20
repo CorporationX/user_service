@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.controller.ApiPath;
 import school.faang.user_service.dto.MentorshipDto;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 /**
  * Контроллер отвечающий за обработку запросов пользователя для управления наставничеством.

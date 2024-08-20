@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.userPremium.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.userPremium.UsernameFilterPattern;
 
 import java.util.List;
 import java.util.stream.Stream;

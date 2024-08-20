@@ -14,35 +14,41 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.userSubscriptionDto.UserSubscriptionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = true))
 public abstract class UserMapper {
 
-    private String PREMIUM_STATUS_ACTION = "Имеется премиум подписка, которая действует до %s года.";
+  private String PREMIUM_STATUS_ACTION = "Имеется премиум подписка, которая действует до %s года.";
 
-    public abstract List<UserDto> toDtoList(List<User> users);
+  public abstract List<UserDto> toDtoList(List<User> users);
 
-    @Mapping(target = "premium", ignore = true)
-    public abstract UserDto userDtoFromUser(User user);
+  public abstract UserSubscriptionDto toDto(User user);
 
-    @AfterMapping
-    protected void updateFields(User user, @MappingTarget UserDto target) {
-        target.setPremium(checkPremium(user));
-    }
+  public abstract User toEntity(UserSubscriptionDto userDto);
 
-    /**
-     * Метод для проверки наличия активного Премиум статуса.
-     * @param user пользователь.
-     * @return результат об активном премиум статусе и его сроке действия при его наличии.
-     */
-    private String checkPremium(User user) {
-        return Optional.ofNullable(user.getPremium())
-            .map(Premium::getEndDate)
-            .filter(endDate -> endDate.isAfter(LocalDateTime.now()))
-            .map(date -> String.format(PREMIUM_STATUS_ACTION,
-                date.format(DateTimeFormatter.ofPattern(PATTERN_OF_DATE))))
-            .orElse(EMPTY_VALUE);
-    }
+  @Mapping(target = "premium", ignore = true)
+  public abstract UserDto toUserDto(User user);
+
+  @AfterMapping
+  protected void updateFields(User user, @MappingTarget UserDto target) {
+    target.setPremium(checkPremium(user));
+  }
+
+  /**
+   * Метод для проверки наличия активного Премиум статуса.
+   *
+   * @param user пользователь.
+   * @return результат об активном премиум статусе и его сроке действия при его наличии.
+   */
+  private String checkPremium(User user) {
+    return Optional.ofNullable(user.getPremium())
+        .map(Premium::getEndDate)
+        .filter(endDate -> endDate.isAfter(LocalDateTime.now()))
+        .map(date -> String.format(PREMIUM_STATUS_ACTION,
+            date.format(DateTimeFormatter.ofPattern(PATTERN_OF_DATE))))
+        .orElse(EMPTY_VALUE);
+  }
 }

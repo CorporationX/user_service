@@ -1,64 +1,69 @@
 package school.faang.user_service.service.user;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
-import java.time.Month;
+import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.exception.user.UserNotFoundException;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
-import school.faang.user_service.repository.DeactivateUserFacade;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.MentorshipService;
 
-@TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+public class UserServiceTest {
 
   @Mock
-  private DeactivateUserFacade deactivateUserFacade;
-
+  private UserRepository userRepository;
   @InjectMocks
   private UserService userService;
+  private long id = 1L;
 
-  private UserDto createUserDto() {
-    return UserDto.builder()
-        .id(2L)
-        .username("JaneSmith")
-        .email("janesmith@example.com")
-        .phone("0987654321")
-        .aboutMe("About Jane Smith")
-        .city("London")
-        .active(false)
-        .premium("")
-        .build();
+  @Test
+  void testGetUserByIdException() {
+    when(userRepository.findById(anyLong()))
+        .thenThrow(new RuntimeException("ошибка"));
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        userService.getUserById(id));
+
+    assertEquals("ошибка", exception.getMessage());
   }
 
   @Test
-  @DisplayName("Проверка деактивации пользователя по его id.")
-  void testDeactivateUserForService() {
-    when(deactivateUserFacade.deactivateUser(2L)).thenReturn(createUserDto());
-    final var userDto = userService.deactivateUser(2L);
-    assertThat(userDto.isActive()).isEqualTo(Boolean.FALSE);
+  void testGetUserByIdValid() {
+    when(userRepository.findById(anyLong()))
+        .thenReturn(Optional.ofNullable(User.builder().id(1L).build()));
+
+    userService.getUserById(id);
+  }
+
+  @Test
+  void testGetUserSkillsIdException() {
+    when(userRepository.findById(anyLong()))
+        .thenThrow(new RuntimeException("ошибка"));
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        userService.getUserSkillsId(id));
+
+    assertEquals("ошибка", exception.getMessage());
+  }
+
+  @Test
+  void testGetUserSkillsIdValid() {
+    when(userRepository.findById(anyLong()))
+        .thenReturn(Optional.ofNullable(User.builder()
+            .id(1L)
+            .skills(List.of(Skill.builder().id(1L).build()))
+            .build()));
+
+    userService.getUserSkillsId(id);
   }
 
 }

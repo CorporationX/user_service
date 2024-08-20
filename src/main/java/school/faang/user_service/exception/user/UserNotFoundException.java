@@ -6,9 +6,8 @@ import school.faang.user_service.exception.ExceptionMessages;
 @Slf4j
 public class UserNotFoundException extends RuntimeException {
 
-  public UserNotFoundException(String userId) {
+  public UserNotFoundException(long userId) {
     super(String.format(ExceptionMessages.USER_IS_NULL, userId));
-    log.error(String.format(ExceptionMessages.USER_IS_NULL, userId));
   }
 
 }

@@ -12,7 +12,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.userPremium.UserPremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.filter.userPremium.UserPremiumFilter;
-import school.faang.user_service.service.userPremium.UserPremiumService;
 
 import java.util.List;
 import java.util.stream.Stream;

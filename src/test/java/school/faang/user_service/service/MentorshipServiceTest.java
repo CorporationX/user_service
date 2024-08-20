@@ -21,6 +21,7 @@ import school.faang.user_service.dto.MentorshipDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class MentorshipServiceTest {

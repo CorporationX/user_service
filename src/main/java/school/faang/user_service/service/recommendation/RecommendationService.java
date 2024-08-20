@@ -4,17 +4,15 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
-import school.faang.user_service.mapper.recommendation.SkillOfferMapper;
-import school.faang.user_service.mapper.recommendation.UserSkillGuaranteeMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.recommendation.RecommendationValidator;
@@ -29,8 +27,11 @@ public class RecommendationService {
     private final RecommendationValidator recommendationValidator;
     private final RecommendationRepository recommendationRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationEventMapper recommendationEventMapper;
     private final SkillOfferService skillOfferService;
+    private final RecommendationEventPublisher recommendationEventPublisher;
 
+    @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
         recommendationValidator.checkNotRecommendBeforeSixMonths(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
         recommendationValidator.validateSkillOffers(recommendationDto);
@@ -44,9 +45,13 @@ public class RecommendationService {
         List<SkillOffer> savedSkillOffers = skillOfferService.saveSkillOffers(recommendationDto.getSkillOffers(), savedRecommendation.getId());
         savedRecommendation.setSkillOffers(savedSkillOffers);
 
-        return recommendationMapper.toDto(savedRecommendation);
+        RecommendationDto savedRecommendationDto = recommendationMapper.toDto(savedRecommendation);
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(savedRecommendationDto));
+
+        return savedRecommendationDto;
     }
 
+    @Transactional
     public RecommendationDto update(long recommendationId, RecommendationDto updateRecommendationDto) {
         Recommendation recommendation = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> {
@@ -71,7 +76,10 @@ public class RecommendationService {
         skillOffers.addAll(savedSkillOffersToUpdate);
         updatedRecommendation.setSkillOffers(skillOffers);
 
-        return recommendationMapper.toDto(updatedRecommendation);
+        RecommendationDto updatedRecommendationDto = recommendationMapper.toDto(updatedRecommendation);
+        recommendationEventPublisher.publish(recommendationEventMapper.toEvent(updatedRecommendationDto));
+
+        return updatedRecommendationDto;
     }
 
     public void delete(long recommendationId) {

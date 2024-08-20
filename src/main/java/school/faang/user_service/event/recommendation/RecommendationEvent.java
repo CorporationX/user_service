@@ -1,4 +1,4 @@
-package school.faang.user_service.event.mentorship.request;
+package school.faang.user_service.event.recommendation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,12 +10,12 @@ import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class MentorshipRequestedEvent {
-
+@NoArgsConstructor
+public class RecommendationEvent {
     private final UUID eventId = UUID.randomUUID();
-    private long requesterId;
+    private long recommendationId;
+    private long authorId;
     private long receiverId;
     private LocalDateTime timestamp;
 }

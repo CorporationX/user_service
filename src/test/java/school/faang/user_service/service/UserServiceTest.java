@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,11 +21,15 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +58,9 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
     private User user;
+    private UserDto dtoUser;
+    private List<Long> ids;
+    private List<UserDto> dtoList;
     private List<User> users;
 
     @BeforeEach
@@ -68,12 +76,15 @@ class UserServiceTest {
         user.setOwnedEvents(List.of(new Event(), new Event()));
         List<UserFilter> userFilters = List.of(userCityFilter, userEmailFilter, userNameFilter, userPhoneFilter);
         userService = new UserService(userRepository, goalRepository, eventRepository, mentorshipService, mapper, userFilters);
+        dtoUser = new UserDto();
+        ids = List.of(1L);
+        dtoList = new ArrayList<>();
     }
 
     @Test
     public void testUserIsNotInDb() {
         //Act
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         //Assert
         assertEquals(
                 MESSAGE_USER_NOT_EXIST,
@@ -87,7 +98,7 @@ class UserServiceTest {
         //Arrange
         user.setActive(false);
         //Act
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         //Assert
         assertEquals(
                 MESSAGE_USER_ALREADY_DEACTIVATED,
@@ -99,26 +110,26 @@ class UserServiceTest {
     @Test
     public void testGoalDeletedById() {
         //Act
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         //Assert
         userService.deactivatesUserProfile(user.getId());
-        Mockito.verify(goalRepository).deleteById(Mockito.anyLong());
+        Mockito.verify(goalRepository).deleteById(anyLong());
     }
 
     @Test
     public void testEventDeletedById() {
         //Act
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         //Assert
         userService.deactivatesUserProfile(user.getId());
-        Mockito.verify(eventRepository, Mockito.times(user.getOwnedEvents().size())).deleteById(Mockito.anyLong());
+        Mockito.verify(eventRepository, Mockito.times(user.getOwnedEvents().size())).deleteById(anyLong());
     }
 
     @Test
     public void testUserSave() {
         //Act
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
-        Mockito.when(mentorshipService.stopMentorship(Mockito.any())).thenReturn(user);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(mentorshipService.stopMentorship(any())).thenReturn(user);
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(userRepository).save(user);
@@ -127,12 +138,46 @@ class UserServiceTest {
     @Test
     public void testUserToUserDto() {
         //Act
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
-        Mockito.when(mentorshipService.stopMentorship(Mockito.any())).thenReturn(user);
-        Mockito.when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(mentorshipService.stopMentorship(any())).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
         //Assert
         userService.deactivatesUserProfile(user.getId());
         Mockito.verify(mapper).toDto(user);
+    }
+
+    @Test
+    @DisplayName("Тест получаем пользователя")
+    public void testGetUser() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(mapper.toDto(any())).thenReturn(dtoUser);
+        assertEquals(dtoUser, userService.getUser(1L));
+    }
+
+    @Test
+    @DisplayName("Тест получение пользователя на исключение")
+    public void testGetUser_whenException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () ->
+                userService.getUser(1L));
+    }
+
+    @Test
+    @DisplayName("Тест получаем список всех пользователей")
+    public void testGetUsersByIds() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(mapper.toDto(any())).thenReturn(dtoUser);
+        dtoUser = mapper.toDto(user);
+        dtoList = List.of(dtoUser);
+        assertEquals(dtoList, userService.getUsersByIds(ids));
+    }
+
+    @Test
+    @DisplayName("Тест исключение при получении списка пользователей")
+    public void testGetUsersByIds_whenException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () ->
+                userService.getUsersByIds(ids));
     }
 
     @Test
@@ -152,6 +197,15 @@ class UserServiceTest {
         List<UserDto> premiumUsers = userService.getPremiumUsers(dto);
         assertEquals(1, premiumUsers.size());
         assertEquals(mapper.toDto(alex), premiumUsers.get(0));
+    }
+
+    @Test
+    public void testGetPremiumUsersNoMatch() {
+        UserFilterDto dto = UserFilterDto.builder().name("Misha").build();
+        when(userRepository.findPremiumUsers()).thenReturn(Stream.empty());
+
+        List<UserDto> premiumUsers = userService.getPremiumUsers(dto);
+        assertEquals(0, premiumUsers.size());
     }
 
     @Test

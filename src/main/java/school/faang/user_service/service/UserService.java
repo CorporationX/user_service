@@ -16,6 +16,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -40,6 +41,21 @@ public class UserService {
         events.forEach(event -> eventRepository.deleteById(event.getId()));
         user.setActive(false);
         return mapper.toDto(userRepository.save(mentorshipService.stopMentorship(user)));
+    }
+
+    public UserDto getUser(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        UserDto dto = mapper.toDto(user.orElseThrow(() ->
+                new RuntimeException("userId is not Found")));
+        return dto;
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return ids.stream()
+                .map(num -> userRepository.findById(num))
+                .map(user -> mapper.toDto(user.orElseThrow(() ->
+                        new RuntimeException("userId is not Found"))))
+                .toList();
     }
 
     private void deleteGoalFromDbIfPresent(List<Goal> goalsForDeleteFromDB) {

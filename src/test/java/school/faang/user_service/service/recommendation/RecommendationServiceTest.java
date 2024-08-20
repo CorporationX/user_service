@@ -123,6 +123,8 @@ class RecommendationServiceTest {
                 recommendationService.create(recommendationDto));
 
         assertEquals("ошибка", exception.getMessage());
+
+        verify(recommendationEventPublisher, never()).publish(any(RecommendationEvent.class));
     }
 
     @Test
@@ -142,6 +144,8 @@ class RecommendationServiceTest {
                 recommendationService.create(recommendationDto));
 
         assertEquals("ошибка", exception.getMessage());
+
+        verify(recommendationEventPublisher, never()).publish(any(RecommendationEvent.class));
     }
 
     @Test
@@ -190,6 +194,8 @@ class RecommendationServiceTest {
                 recommendationService.update(recommendationId, recommendationDto));
 
         assertEquals("ошибка", exception.getMessage());
+
+        verify(recommendationEventPublisher, never()).publish(any(RecommendationEvent.class));
     }
 
     @Test
@@ -217,6 +223,9 @@ class RecommendationServiceTest {
                 recommendationService.update(recommendationId, recommendationDto));
 
         assertEquals("ошибка", exception.getMessage());
+
+        verify(recommendationEventPublisher, never()).publish(any(RecommendationEvent.class));
+
     }
 
     @Test

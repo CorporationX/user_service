@@ -150,12 +150,12 @@ class RecommendationServiceTest {
 
     @Test
     void testCreateToDto() {
-        doNothing().when(recommendationValidator)
-        RecommendationReceivedEvent recommendationReceivedEvent = RecommendationReceivedEvent.builder()
-                .recommendationId(1L)
-                .receivedId(3L)
-                .authorId(2L)
-                .build();
+//        doNothing().when(recommendationValidator)
+//        RecommendationReceivedEvent recommendationReceivedEvent = RecommendationReceivedEvent.builder()
+//                .recommendationId(1L)
+//                .receivedId(3L)
+//                .authorId(2L)
+//                .build();
 
         Mockito.doNothing().when(recommendationValidator)
                 .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());

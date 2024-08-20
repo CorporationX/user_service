@@ -22,11 +22,6 @@ public interface RecommendationMapper {
     @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "toListSkillOffersEntity", ignore = true)
     Recommendation toEntity(RecommendationDto recommendationDto);
 
-    @Mapping(source = "author.id", target = "authorId")
-    @Mapping(source = "receiver.id", target = "receivedId")
-    @Mapping(source = "id", target = "recommendationId")
-    RecommendationReceivedEvent toRecommendationReceivedEvent(Recommendation recommendation);
-
     default List<RecommendationDto> toListDto(List<Recommendation> recommendations){
         return recommendations.stream().map(this::toDto).toList();
     }

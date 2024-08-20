@@ -22,7 +22,7 @@ public class RecommendationController {
 
     @PutMapping
     public RecommendationDto updateRecommendation(@RequestBody
-                                                      @Valid RecommendationDto recommendationDto) {
+                                                  @Valid RecommendationDto recommendationDto) {
         return recommendationService.update(recommendationDto);
     }
 

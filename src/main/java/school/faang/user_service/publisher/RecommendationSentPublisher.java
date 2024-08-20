@@ -13,7 +13,7 @@ import school.faang.user_service.event.RecommendationEventPublisher;
 @Slf4j
 @RequiredArgsConstructor
 public class RecommendationSentPublisher implements MessagePublisher<RecommendationEventPublisher> {
-    private final ChannelTopic topic;
+    private final ChannelTopic recommendationChannelTopic;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -21,7 +21,7 @@ public class RecommendationSentPublisher implements MessagePublisher<Recommendat
     public void publish(RecommendationEventPublisher event) {
         try {
             String message = objectMapper.writeValueAsString(event);
-            redisTemplate.convertAndSend(topic.getTopic(), message);
+            redisTemplate.convertAndSend(recommendationChannelTopic.getTopic(), message);
             log.info("Published recommendation: {}", event);
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize recommendation: {}", event, e);

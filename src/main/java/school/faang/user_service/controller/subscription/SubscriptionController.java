@@ -1,26 +1,25 @@
 package school.faang.user_service.controller.subscription;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/subscription")
+@RequiredArgsConstructor
 public class SubscriptionController {
-    private SubscriptionService subscriptionService;
-    private SubscriptionControllerValidator validator;
+    private final SubscriptionService subscriptionService;
+    private final SubscriptionControllerValidator validator;
 
-    @Autowired
-    public SubscriptionController(SubscriptionService subscriptionService) {
-        this.subscriptionService = subscriptionService;
-    }
 
     @PostMapping("/follow")
     public void followUser(@RequestParam("followerId") long followerId,

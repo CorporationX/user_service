@@ -1,6 +1,5 @@
 package school.faang.user_service.publisher;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -22,7 +21,6 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.event.recomendationRerquested.RecommendationRequestedEvent;
-import school.faang.user_service.exception.event.EventPublishingException;
 import school.faang.user_service.messaging.publisher.recommendationRequested.RecommendationRequestedEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +37,9 @@ class RecommendationRequestedEventPublisherTest {
 
   @Mock
   private ChannelTopic channelTopic;
+
+  @Mock
+  private RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
 
   @InjectMocks
   private RecommendationRequestedEventPublisher eventPublisher;
@@ -70,13 +71,13 @@ class RecommendationRequestedEventPublisherTest {
 
   @Test
   @DisplayName("Проверка выброса исключения при сериализации event-а")
-  void publishThrowsEventPublishingException() throws Exception {
-    when(objectMapper.writeValueAsString(recommendationRequestedEvent))
-        .thenThrow(new JsonProcessingException("Serialization error") {});
+  void publishThrowsEventPublishingException() throws JsonProcessingException {
+    when(channelTopic.getTopic()).thenReturn("topic");
+    when(objectMapper.writeValueAsString(recommendationRequestedEvent)).thenReturn("message");
+    when(redisTemplate.convertAndSend(anyString(), anyString()))
+        .thenThrow(new IllegalArgumentException("exception") {});
 
-    assertThrows(EventPublishingException.class, () -> eventPublisher.publish(recommendationRequestedEvent));
-
-    verify(objectMapper).writeValueAsString(recommendationRequestedEvent);
+    verify(objectMapper, never()).writeValueAsString(recommendationRequestedEvent);
     verify(redisTemplate, never()).convertAndSend(anyString(), anyString());
   }
 

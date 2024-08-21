@@ -59,6 +59,7 @@ class UserServiceTest {
     private UserService userService;
 
     private long userId;
+    private long authorId;
     private User user;
     private UserDto userDto;
     private User mentee;
@@ -76,6 +77,7 @@ class UserServiceTest {
         List<Event> ownedEvents = new ArrayList<>();
 
         userId = 1L;
+        authorId = 2L;
         long countryId = 2L;
         userFollowers = List.of(new User());
 
@@ -125,7 +127,7 @@ class UserServiceTest {
     @DisplayName("testing getUser method")
     public void testGetUser() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
-        userService.getUser(userId);
+        userService.getUser(userId, authorId);
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(userMapper, times(1)).toDto(user);
     }

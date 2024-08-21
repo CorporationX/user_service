@@ -74,15 +74,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUser(@PathVariable long userId,
                            @RequestHeader(value = "x-user-id") long authorId) {
-        profileViewEventPublisher.publish(
-                ProfileViewEvent
-                        .builder()
-                        .viewedId(userId)
-                        .viewerId(authorId)
-                        .receivedAt(LocalDateTime.now())
-                        .build()
-        );
-        return userService.getUser(userId);
+        return userService.getUser(userId, authorId);
     }
 
     @PostMapping("/byIds")

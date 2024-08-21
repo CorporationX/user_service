@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
+import school.faang.user_service.dto.ProfileViewEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -15,12 +16,14 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -36,10 +39,12 @@ public class UserService {
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
     private final ObjectMapper objectMapper;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Transactional(readOnly = true)
-    public UserDto getUser(long userId) {
+    public UserDto getUser(long userId, long authorId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
+        profileViewEventPublisher.publish(new ProfileViewEvent(authorId, userId, LocalDateTime.now()));
         return userMapper.toDto(user);
     }
 

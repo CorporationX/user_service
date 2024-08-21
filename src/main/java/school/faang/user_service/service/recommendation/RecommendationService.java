@@ -12,7 +12,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
-import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationPublisher;
+import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
@@ -31,6 +31,7 @@ public class RecommendationService {
     private final RecommendationEventMapper recommendationEventMapper;
     private final SkillOfferService skillOfferService;
     private final RecommendationEventPublisher recommendationEventPublisher;
+    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -48,6 +49,7 @@ public class RecommendationService {
 
         RecommendationDto savedRecommendationDto = recommendationMapper.toDto(savedRecommendation);
         recommendationEventPublisher.publish(recommendationEventMapper.toEvent(savedRecommendationDto));
+        recommendationReceivedEventPublisher.publish(recommendationMapper.toRecommendationReceivedEvent(savedRecommendationDto));
 
         return savedRecommendationDto;
     }

@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.event.recommendationReceived.RecommendationReceivedEvent;
-import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationPublisher;
+import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationReceivedEventPublisher;
 
 import static org.mockito.Mockito.when;
 
@@ -25,7 +25,7 @@ class RecommendationPublisherTest {
     @Mock
     private ObjectMapper objectMapper;
     @InjectMocks
-    private RecommendationPublisher recommendationPublisher;
+    private RecommendationReceivedEventPublisher recommendationPublisher;
     private RecommendationReceivedEvent recommendationReceivedEvent;
     String jsonString;
 

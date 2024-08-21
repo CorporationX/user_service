@@ -90,10 +90,4 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
-
-    @PutMapping("/deactivate/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto deactivateUser(@PathVariable Long userId) {
-        return userService.deactivateUser(userId);
-    }
 }

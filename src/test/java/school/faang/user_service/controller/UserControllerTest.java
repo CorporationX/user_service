@@ -25,9 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +38,6 @@ class UserControllerTest {
     private UserService service;
     @InjectMocks
     private UserController controller;
-
     private ObjectMapper objectMapper = new ObjectMapper();
     private UserDto firstUser, secondUser;
     private List<Long> ids;
@@ -49,7 +46,6 @@ class UserControllerTest {
     public void setUp() {
         //Arrange
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-
         firstUser = new UserDto();
         secondUser = new UserDto();
         firstUser.setId(1);
@@ -58,7 +54,6 @@ class UserControllerTest {
         secondUser.setUsername("Danilla");
         firstUser.setEmail("sasha@yandex.ru");
         secondUser.setEmail("Danilla@yandex.ru");
-
         ids = List.of(firstUser.getId(), secondUser.getId());
     }
 

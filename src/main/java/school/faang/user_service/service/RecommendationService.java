@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,8 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final RecommendationMapper recommendationMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final MessagePublisherService messagePublisherService;
+    private final ObjectMapper objectMapper;
     private final static int INTERVAL_DATE = 6;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -55,7 +58,7 @@ public class RecommendationService {
 
             processSkillAndGuarantees(recommendation);
             recommendationRepository.save(recommendation);
-
+            messagePublisherService.publishRecommendationEvent(recommendation, objectMapper);
 
             return recommendationMapper.toDto(recommendation);
         }
@@ -72,7 +75,6 @@ public class RecommendationService {
 
         processSkillAndGuarantees(recommendation);
         recommendationRepository.save(recommendation);
-
 
         return recommendationMapper.toDto(recommendation);
     }

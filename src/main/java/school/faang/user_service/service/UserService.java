@@ -1,12 +1,11 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.dto.BanEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -14,31 +13,35 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
-import java.io.IOException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserMapper userMapper;
     private final AvatarService avatarService;
+    private final EntityHandler entityHandler;
     private final UserValidator userValidator;
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
     private final ObjectMapper objectMapper;
+
+    @Transactional(readOnly = true)
+    public UserDto getUser(long userId) {
+        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
+        return userMapper.toDto(user);
+    }
 
     @Transactional
     public UserDto createUser(UserDto userDto, MultipartFile userAvatar) {
@@ -55,7 +58,7 @@ public class UserService {
 
     @Transactional
     public void updateUserAvatar(long userId, MultipartFile multipartFile) {
-        User user = userValidator.validateUserExistence(userId);
+        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
         if (multipartFile == null) {
             avatarService.setRandomAvatar(user);
         } else {
@@ -65,18 +68,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto getUser(long userId) {
-        userValidator.validateUserId(userId);
-        User user = userRepository.findById(userId).get();
-
-        return userMapper.toDto(user);
-    }
-
-    @Transactional(readOnly = true)
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        ids.forEach(userValidator::validateUserId);
-        Stream<User> userStream = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false);
-
+        Stream<User> userStream = userRepository.findAllById(ids).stream();
         return userStream.map(userMapper::toDto).toList();
     }
 
@@ -90,11 +83,25 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    public boolean checkUserExistence(long userId) {
+        return userRepository.existsById(userId);
+    }
+
+    public List<UserDto> getUserFollowers(long userId) {
+        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
+        return user.getFollowers().stream().map(userMapper::toDto).toList();
+    }
+
+    public boolean checkAllFollowersExist(List<Long> followerIds) {
+        return userValidator.doAllUsersExist(followerIds);
+    }
+
     @Transactional
     public void banedUser(long userId) {
         userRepository.banUserById(userId);
     }
 
+    @Transactional
     public void createBanEvent(Message message) {
         try {
             BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);

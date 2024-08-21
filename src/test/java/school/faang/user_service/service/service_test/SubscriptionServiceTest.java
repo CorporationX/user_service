@@ -14,6 +14,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.service.user.UserFilter;
@@ -36,6 +37,9 @@ public class SubscriptionServiceTest {
     @Mock
     private UserFilter nameFilter;
 
+    @Mock
+    private FollowerEventPublisher eventPublisher;
+
     @Spy
     private UserMapperImpl userMapper;
 
@@ -45,7 +49,7 @@ public class SubscriptionServiceTest {
     @BeforeEach
     public void setUp() {
         List<UserFilter> userFilters = List.of(nameFilter, aboutFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters, userMapper);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters, userMapper, eventPublisher);
     }
 
     //Positive test

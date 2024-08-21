@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +12,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.validator.MentorshipValidator;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class MentorshipServiceTest {
     @DisplayName("testGetMentees")
     public void testGetMentees() {
         when(mentorshipRepository.findById(mentor.getId())).thenReturn(mentorOptional);
-        when(userMapper.usersToUserDTOs(mentor.getMentees())).thenReturn(menteesDto);
+        when(userMapper.toDtoList(mentor.getMentees())).thenReturn(menteesDto);
 
         List<UserDto> result = mentorshipService.getMentees(mentor.getId());
 
@@ -80,7 +81,7 @@ public class MentorshipServiceTest {
     @DisplayName("testGetMentors")
     public void testGetMentors() {
         when(mentorshipRepository.findById(mentee.getId())).thenReturn(menteeOptional);
-        when(userMapper.usersToUserDTOs(mentee.getMentors())).thenReturn(mentorsDto);
+        when(userMapper.toDtoList(mentee.getMentors())).thenReturn(mentorsDto);
 
         List<UserDto> result = mentorshipService.getMentors(mentee.getId());
 

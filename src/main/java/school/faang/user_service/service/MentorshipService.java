@@ -24,29 +24,29 @@ public class MentorshipService {
     public List<UserDto> getMentees(long mentorId) {
         Optional<User> mentorOptional = mentorshipRepository.findById(mentorId);
         User mentor = mentorOptional.orElseThrow(() -> new UserNotFoundException(mentorId));
-        return userMapper.usersToUserDTOs(mentor.getMentees());
+        return userMapper.toDtoList(mentor.getMentees());
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentors(long menteeId) {
         Optional<User> menteeOptional = mentorshipRepository.findById(menteeId);
         User mentee = menteeOptional.orElseThrow(() -> new UserNotFoundException(menteeId));
-        return userMapper.usersToUserDTOs(mentee.getMentors());
+        return userMapper.toDtoList(mentee.getMentors());
     }
 
     @Transactional
     public void deleteMentee(long menteeId, long mentorId) {
         mentorshipValidator.validateMenteeAndMentorIds(menteeId, mentorId);
         mentorshipRepository.findById(mentorId)
-            .orElseThrow(() -> new UserNotFoundException(mentorId))
-            .getMentees().removeIf(mentee -> mentee.getId() == menteeId);
+                .orElseThrow(() -> new UserNotFoundException(mentorId))
+                .getMentees().removeIf(mentee -> mentee.getId() == menteeId);
     }
 
     @Transactional
     public void deleteMentor(long menteeId, long mentorId) {
         mentorshipValidator.validateMenteeAndMentorIds(menteeId, mentorId);
         mentorshipRepository.findById(menteeId)
-            .orElseThrow(() -> new UserNotFoundException(menteeId))
-            .getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+                .orElseThrow(() -> new UserNotFoundException(menteeId))
+                .getMentors().removeIf(mentor -> mentor.getId() == mentorId);
     }
 }

@@ -9,10 +9,10 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public class ProfileViewEventConfig {
 
     @Value("${spring.data.redis.channels.profileView.name}")
-    private String ProfileViewEventChannel;
+    private String profileViewEventChannel;
 
     @Bean
     public ChannelTopic profileViewChannelTopic() {
-        return new ChannelTopic(ProfileViewEventChannel);
+        return new ChannelTopic(profileViewEventChannel);
     }
 }

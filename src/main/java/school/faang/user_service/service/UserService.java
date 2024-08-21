@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.event.ProfileViewEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -24,6 +25,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.image.ImageMapper;
+import school.faang.user_service.publisher.ProfileViewMessagePublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -52,6 +54,7 @@ public class UserService {
     private final EventRepository eventRepository;
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
+    private final ProfileViewMessagePublisher profileViewMessagePublisher;
 
     private final S3Service s3Service;
     private final ImageMapper imageMapper;
@@ -60,6 +63,7 @@ public class UserService {
     private final static int MAX_IMAGE_PIC = 1080;
     @Value("${services.frofilePic.minImagePicture}")
     private final static int MIN_IMAGE_PIC = 170;
+
 
     public UserDto findUserById(long userId) {
         return userRepository.findById(userId)
@@ -213,5 +217,16 @@ public class UserService {
         user.getUserProfilePic().setSmallFileId(null);
 
         userRepository.save(user);
+    }
+
+    public UserDto getUserProfile(ProfileViewEventDto profileViewEventDto) {
+        if (profileViewEventDto.getViewerId() == profileViewEventDto.getAuthorId()) {
+            throw new IllegalArgumentException("coincidence of the id of the author and the viewer");
+        }
+
+        UserDto userDto = findUserById(profileViewEventDto.getAuthorId());
+        profileViewMessagePublisher.publish(profileViewEventDto);
+
+        return userDto;
     }
 }

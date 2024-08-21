@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.event.ProfileViewEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
@@ -110,4 +111,10 @@ public class UserController {
     public void deleteUserPic(@PathVariable long userId) {
         userService.deleteUserPic(userId);
     }
+
+    @PostMapping("/profileView")
+    public UserDto getUserProfile(@RequestBody ProfileViewEventDto profileViewEventDto) {
+        return userService.getUserProfile(profileViewEventDto);
+    }
+
 }

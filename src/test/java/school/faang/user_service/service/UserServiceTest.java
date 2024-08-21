@@ -16,6 +16,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,6 +56,8 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private MentorshipService mentorshipService;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -127,6 +131,7 @@ class UserServiceTest {
     @DisplayName("testing getUser method")
     public void testGetUser() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
+        doNothing().when(profileViewEventPublisher).publish(any());
         userService.getUser(userId, authorId);
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(userMapper, times(1)).toDto(user);

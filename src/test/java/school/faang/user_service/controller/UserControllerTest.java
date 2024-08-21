@@ -75,7 +75,8 @@ class UserControllerTest {
     @Test
     @DisplayName("testing getUser method")
     void testGetUser() throws Exception {
-        mockMvc.perform(get("/api/v1/user/{userId}", userId))
+        mockMvc.perform(get("/api/v1/user/{userId}", userId)
+                .header("x-user-id", authorId))
                 .andExpect(status().isOk());
         verify(userService, times(1)).getUser(userId, authorId);
     }

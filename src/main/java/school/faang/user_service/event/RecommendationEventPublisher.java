@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class RecommendationEventPublisher {
+public class RecommendationEventPublisher extends Event {
     private Long id;
     private Long authorId;
     private Long receiverId;

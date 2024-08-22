@@ -1,5 +1,5 @@
 [ {
-  "firstName" : null,
+  "firstName" : "John",
   "lastName" : "Doe",
   "yearOfBirth" : 1998,
   "group" : "A",
@@ -14,19 +14,19 @@
   "faculty" : "Computer Science",
   "yearOfStudy" : 3,
   "major" : "Software Engineering",
-  "gpa" : null,
+  "GPA" : 3.8,
   "status" : "Active",
   "admissionDate" : "2016-09-01",
   "graduationDate" : "2020-05-30",
-  "scholarship" : true,
-  "employer" : "XYZ Technologies",
   "previousEducation" : [ {
     "degree" : "High School Diploma",
     "institution" : "XYZ High School",
     "completionYear" : 2016
-  } ]
+  } ],
+  "scholarship" : true,
+  "employer" : "XYZ Technologies"
 }, {
-  "firstName" : null,
+  "firstName" : "Michael",
   "lastName" : "Johnson",
   "yearOfBirth" : 1988,
   "group" : "Group A",
@@ -41,19 +41,19 @@
   "faculty" : "Law",
   "yearOfStudy" : 2021,
   "major" : "Corporate Law",
-  "gpa" : null,
+  "GPA" : 3.7,
   "status" : "Graduated",
   "admissionDate" : "2019-01-01",
   "graduationDate" : "2021-12-31",
-  "scholarship" : true,
-  "employer" : "ABC Law Firm",
   "previousEducation" : [ {
     "degree" : "Bachelor",
     "institution" : "DEF University",
     "completionYear" : 2019
-  } ]
+  } ],
+  "scholarship" : true,
+  "employer" : "ABC Law Firm"
 }, {
-  "firstName" : null,
+  "firstName" : "Jennifer",
   "lastName" : "Lee",
   "yearOfBirth" : 1994,
   "group" : "Group A",
@@ -68,19 +68,19 @@
   "faculty" : "Engineering",
   "yearOfStudy" : 2021,
   "major" : "Electrical Engineering",
-  "gpa" : null,
+  "GPA" : 3.8,
   "status" : "Graduated",
   "admissionDate" : "2019-01-01",
   "graduationDate" : "2021-12-31",
-  "scholarship" : true,
-  "employer" : "PQR Company",
   "previousEducation" : [ {
     "degree" : "Bachelor",
     "institution" : "MNO University",
     "completionYear" : 2019
-  } ]
+  } ],
+  "scholarship" : true,
+  "employer" : "PQR Company"
 }, {
-  "firstName" : null,
+  "firstName" : "Christopher",
   "lastName" : "Clark",
   "yearOfBirth" : 1989,
   "group" : "Group C",
@@ -95,15 +95,15 @@
   "faculty" : "Business",
   "yearOfStudy" : 2022,
   "major" : "Marketing",
-  "gpa" : null,
+  "GPA" : 3.4,
   "status" : "Graduated",
   "admissionDate" : "2020-01-01",
   "graduationDate" : "2022-12-31",
-  "scholarship" : true,
-  "employer" : "XYZ Marketing Agency",
   "previousEducation" : [ {
     "degree" : "Bachelor",
     "institution" : "STU University",
     "completionYear" : 2020
-  } ]
+  } ],
+  "scholarship" : true,
+  "employer" : "XYZ Marketing Agency"
 } ]

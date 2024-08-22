@@ -4,64 +4,35 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.person.Person;
 
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CsvParserService {
 
     public List<Person> convertCsvToPerson(InputStream inputStream) throws IOException {
 
-        FileOutputStream fileOutputStream = new FileOutputStream("src/main/resources/files/students-copy.csv");
-        fileOutputStream.write(inputStream.readAllBytes());
+        CsvMapper csvMapper = new CsvMapper();
 
-//        inputStream.close();
-//        fileOutputStream.close();
-
-        Reader myReader = new FileReader("students-copy.csv");
-        //Reader myReader = new InputStreamReader(inputStream);
-
-        CsvMapper mapper = new CsvMapper();
-
-        CsvSchema schema = CsvSchema
-                .emptySchema()
-                .withHeader()
-                .withColumnSeparator(',')
-                ;
-//        String message = Arrays.toString(inputStream.readAllBytes());
-//        System.out.println("message: " + message);
-
-//        CsvSchema schema = mapper
-//                .schemaFor(Person.class)
-//                .withColumnSeparator(',')
-//                .withSkipFirstDataRow(true)
-//                ;
-
-//        MappingIterator<Person> personMappingIterator = mapper
-//                .readerFor(Person.class)
-//                .with(schema)
-//                .readValues(inputStream);
-        //.readValues(message);
-
-        MappingIterator<Person> personMappingIterator = mapper
+        MappingIterator<Person> personMappingIterator = csvMapper
                 .readerFor(Person.class)
-                .with(schema)
-                .readValues(myReader);
+                .with(CsvSchema.emptySchema().withHeader())
+                .readValues(inputStream);
+
+//        new ObjectMapper()
+//                .configure(SerializationFeature.INDENT_OUTPUT, true)
+//                .writeValue(new File("src/main/resources/json/person.json"), personMappingIterator.readAll());
 
         List<Person> persons = personMappingIterator.readAll();
-        System.out.println(persons);
+        log.info(persons.toString());
         inputStream.close();
-        fileOutputStream.close();
         return persons;
     }
 }

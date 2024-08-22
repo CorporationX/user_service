@@ -9,15 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class ContactInfo {
+public class PersonSchema {
 
-    @JsonProperty("email")
-    private String email;
-
-    @JsonProperty("phone")
-    private String phone;
-
-    @JsonProperty("address")
-    @JsonUnwrapped
-    private Address address;
+    @JsonProperty("person")
+    private Person person;
 }

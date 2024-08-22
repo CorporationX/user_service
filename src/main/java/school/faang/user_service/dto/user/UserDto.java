@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class UserDto {
     private Long id;
 
-    @NotBlank
-    @Size(min = 3, max = 64)
+    @NotBlank(message = "username should not be blank", groups = {CreateGroup.class, UpDateGroup.class})
+    @Size(min = 3, max = 64, message = "username length must be between 3 and 64 characters", groups = CreateGroup.class)
     private String username;
 
     @NotBlank
@@ -27,11 +27,12 @@ public class UserDto {
     @NotNull
     private Long country;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "email should not be blank", groups = {CreateGroup.class, UpDateGroup.class})
+    @Email(groups = CreateGroup.class)
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "phone should not be blank", groups = {CreateGroup.class, UpDateGroup.class})
+    @Size(max = 32, message = "phone length max 32 characters", groups = CreateGroup.class)
     private String phone;
     private PreferredContact preference;
 }

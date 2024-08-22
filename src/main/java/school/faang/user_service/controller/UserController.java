@@ -42,7 +42,13 @@ public class UserController {
         userService.updateUserAvatar(userId, multipartFile);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/exists/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean checkUserExistence(@PathVariable Long userId) {
+        return userService.checkUserExistence(userId);
+    }
+
+    @GetMapping("/{userId}/followers")
     @ResponseStatus(HttpStatus.OK)
     public UserTransportDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
@@ -52,6 +58,18 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    @GetMapping("/{userId}/followers")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getUserFollowers(@PathVariable Long userId) {
+        return userService.getUserFollowers(userId);
+    }
+
+    @PostMapping("/exists/followers")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean doesFollowersExist(@RequestBody List<Long> followerIds) {
+        return userService.checkAllFollowersExist(followerIds);
     }
 
     @PutMapping("/deactivate/{userId}")

@@ -16,7 +16,6 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.recommendation.RecommendationRequestDtoValidator;
 import school.faang.user_service.validator.recommendation.RecommendationRequestIdValidator;
-import school.faang.user_service.validator.recommendation.RecommendationRequestIdValidatorTest;
 
 import java.util.ArrayList;
 import java.util.List;

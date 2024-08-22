@@ -57,7 +57,7 @@ public class SubscriptionServiceValidatorTest {
     public void testValidateFollowUnfollowUser_UserAlreadyFollowed() {
         when(subscriptionRepository.existsById(followerId)).thenReturn(true);
         when(subscriptionRepository.existsById(followeeId)).thenReturn(true);
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionServiceValidator.validateFollowUnfollowUser(followerId, followeeId);

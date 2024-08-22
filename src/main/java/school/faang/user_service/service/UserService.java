@@ -3,10 +3,12 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -15,6 +17,7 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class UserService {
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
     private final UserMapper mapper;
+    private final List<UserFilter> userFilters;
 
     public UserDto deactivatesUserProfile(long userId) {
         User user = getValidationUser(userId);
@@ -78,6 +82,26 @@ public class UserService {
     private List<Goal> getGoalsForDelete(User user) {
         return user.getGoals().stream()
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
+                .toList();
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        List<UserFilter> userFiltersActual = userFilters.stream()
+                .filter(u -> u.checkingForNull(userFilterDto)).toList();
+        if (userFiltersActual.size() == 0) {
+            throw new RuntimeException("No user filters found");
+        }
+        Stream<User> premiumUsersStream = userRepository.findPremiumUsers();
+        List<User> premiumUsersList = getPremiumUsersList(premiumUsersStream, userFilterDto, userFiltersActual);
+
+        return premiumUsersList.stream().map(mapper::toDto).toList();
+    }
+
+    private List<User> getPremiumUsersList(Stream<User> premiumUsersStream,
+                                           UserFilterDto userFilterDto, List<UserFilter> userFiltersActual) {
+        return premiumUsersStream
+                .filter(u -> userFiltersActual.stream()
+                        .allMatch(f -> f.filterUsers(u, userFilterDto)))
                 .toList();
     }
 }

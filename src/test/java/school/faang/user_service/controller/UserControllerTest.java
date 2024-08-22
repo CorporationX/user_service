@@ -12,18 +12,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,7 +39,6 @@ class UserControllerTest {
     private UserService service;
     @InjectMocks
     private UserController controller;
-
     private ObjectMapper objectMapper = new ObjectMapper();
     private UserDto firstUser, secondUser;
     private List<Long> ids;
@@ -45,7 +47,6 @@ class UserControllerTest {
     public void setUp() {
         //Arrange
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-
         firstUser = new UserDto();
         secondUser = new UserDto();
         firstUser.setId(1);
@@ -54,7 +55,6 @@ class UserControllerTest {
         secondUser.setUsername("Danilla");
         firstUser.setEmail("sasha@yandex.ru");
         secondUser.setEmail("Danilla@yandex.ru");
-
         ids = List.of(firstUser.getId(), secondUser.getId());
     }
 
@@ -108,6 +108,23 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[1].id", is(2)));
     }
+
+    @Test
+    public void testGetPremiumUsersWhenUserFilterDtoIsNotNull() {
+        UserFilterDto userFilterDto = new UserFilterDto();
+        List<UserDto> users = List.of(new UserDto());
+        when(service.getPremiumUsers(userFilterDto)).thenReturn(users);
+
+        List<UserDto> result = controller.getPremiumUsers(userFilterDto);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testGetEmptyListWhenNoSuchPremiumUsers() {
+        UserFilterDto userFilterDto = new UserFilterDto();
+        when(service.getPremiumUsers(userFilterDto)).thenReturn(Collections.emptyList());
+
+        List<UserDto> result = controller.getPremiumUsers(userFilterDto);
+        assertEquals(Collections.emptyList(), result);
+    }
 }
-
-

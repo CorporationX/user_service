@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -44,5 +45,9 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return service.getUsersByIds(ids);
     }
-
+  
+    @GetMapping("/premium")
+    public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
+        return service.getPremiumUsers(userFilterDto);
+    }
 }

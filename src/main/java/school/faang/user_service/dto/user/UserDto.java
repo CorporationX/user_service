@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,14 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserDto {
-
     private Long id;
 
     @NotBlank
@@ -35,6 +33,6 @@ public class UserDto {
 
     @NotBlank
     private String phone;
-    private boolean isActive;
-    private MultipartFile multipartFile;
+    private PreferredContact preference;
 }
+

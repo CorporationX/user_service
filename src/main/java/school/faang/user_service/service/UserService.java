@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -60,19 +61,19 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto getUser(long userId) {
+    public UserTransportDto getUser(long userId) {
         userValidator.validateUserId(userId);
         User user = userRepository.findById(userId).get();
 
-        return userMapper.toDto(user);
+        return userMapper.toTransportDto(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserTransportDto> getUsersByIds(List<Long> ids) {
         ids.forEach(userValidator::validateUserId);
         Stream<User> userStream = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false);
 
-        return userStream.map(userMapper::toDto).toList();
+        return userStream.map(userMapper::toTransportDto).toList();
     }
 
     @Transactional

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -19,8 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @ExtendWith(MockitoExtension.class)

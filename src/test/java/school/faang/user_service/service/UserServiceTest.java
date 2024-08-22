@@ -7,7 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -55,11 +56,12 @@ class UserServiceTest {
     private User user;
     private long userId;
     private UserDto userDto;
+    private UserTransportDto userTransportDto;
     private User mentee;
     private Goal mentorAssignedGoal;
     private long id;
     private List<Long> ids;
-    private List<UserDto> userDtoList;
+    private List<UserTransportDto> userTransportDtoList;
 
     @BeforeEach
     public void setUp() {
@@ -69,11 +71,18 @@ class UserServiceTest {
         userDto = UserDto.builder()
                 .id(userId)
                 .username("username")
-                .password("password")
                 .country(1L)
                 .email("test@mail.com")
                 .phone("123456")
                 .build();
+
+        userTransportDto = UserTransportDto.builder()
+                .id(userId)
+                .username("username")
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
+
 
         user = userMapperImpl.toEntity(userDto);
         List<Goal> goalList = new ArrayList<>();
@@ -86,7 +95,7 @@ class UserServiceTest {
 
         userDto = new UserDto();
 
-        userDtoList = List.of(userDto);
+        userTransportDtoList = List.of(userTransportDto);
         user = User.builder()
                 .id(1L)
                 .goals(goalList)
@@ -132,30 +141,30 @@ class UserServiceTest {
     @DisplayName("test that getUser calls all methods correctly + return test")
     public void testGetUser() {
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userDto);
+        when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        UserDto result = userService.getUser(id);
+        UserTransportDto result = userService.getUser(id);
 
         verify(userValidator).validateUserId(id);
         verify(userRepository).findById(id);
-        verify(userMapper).toDto(user);
+        verify(userMapper).toTransportDto(user);
 
-        assertEquals(result, userDto);
+        assertEquals(result, userTransportDto);
     }
 
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
         when(userRepository.findAllById(ids)).thenReturn(List.of(user));
-        when(userMapper.toDto(user)).thenReturn(userDto);
+        when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        List<UserDto> result = userService.getUsersByIds(ids);
+        List<UserTransportDto> result = userService.getUsersByIds(ids);
 
         verify(userValidator).validateUserId(id);
         verify(userRepository).findAllById(ids);
-        verify(userMapper).toDto(user);
+        verify(userMapper).toTransportDto(user);
 
-        assertEquals(result, userDtoList);
+        assertEquals(result, userTransportDtoList);
     }
 
     @Test

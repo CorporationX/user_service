@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.EventDto;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.eventService.EventParticipationService;
 
 import java.util.List;

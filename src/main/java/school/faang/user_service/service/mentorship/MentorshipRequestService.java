@@ -9,8 +9,11 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.MentorshipOfferedEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -23,9 +26,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -37,6 +42,9 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId,
                 mentorshipCreationDate);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
+        MentorshipOfferedEvent mentorshipOfferedEvent = mentorshipOfferedEventMapper.toEvent(mentorshipRequest);
+        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEvent);
+
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

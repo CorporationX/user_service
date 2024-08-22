@@ -8,17 +8,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.validator.SubscriptionServiceValidator;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {

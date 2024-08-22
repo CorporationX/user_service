@@ -15,13 +15,16 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.MentorshipOfferedEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
+import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -52,47 +55,59 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    @Mock
+    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    @Mock
+    private MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestMapperImpl mentorshipRequestMapperImpl;
+    private MentorshipOfferedEvent mentorshipOfferedEvent;
+    private MentorshipRequest mentorshipRequest;
+    private MentorshipRequestDto mentorshipRequestDto;
+    private long requesterId;
+    private long receiverId;
+    private String description;
 
     @BeforeEach
     public void setUp() {
         mentorshipRequestMapperImpl = new MentorshipRequestMapperImpl();
+        mentorshipOfferedEvent = new MentorshipOfferedEvent();
+        mentorshipRequest = new MentorshipRequest();
+
+        requesterId = 1L;
+        receiverId = 2L;
+        description = "description";
+
+        mentorshipRequestDto = MentorshipRequestDto.builder()
+                .requesterId(requesterId)
+                .receiverId(receiverId)
+                .createdAt(LocalDateTime.now())
+                .description(description)
+                .build();
     }
 
     @Test
-    @DisplayName("testing requestMentorship validator validateParticipantsAndRequestFrequency() method execution")
+    @DisplayName("testing requestMentorship methods execution")
     public void testRequestMentorshipValidatorExecution() {
-        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .requesterId(1L)
-                .receiverId(2L)
-                .createdAt(LocalDateTime.now())
-                .description("description").build();
+        when(mentorshipRequestRepository.create(requesterId, receiverId, description)).thenReturn(mentorshipRequest);
+        when(mentorshipOfferedEventMapper.toEvent(mentorshipRequest)).thenReturn(mentorshipOfferedEvent);
 
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+
         verify(mentorshipRequestValidator, times(1))
                 .validateParticipantsAndRequestFrequency(
                         mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
                         mentorshipRequestDto.getCreatedAt());
-    }
-
-    @Test
-    @DisplayName("testing requestMentorship repository create() method execution")
-    public void testRequestMentorshipRepositoryCreateExecution() {
-        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .requesterId(1L)
-                .receiverId(2L)
-                .description("description").build();
-
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         verify(mentorshipRequestRepository, times(1))
                 .create(mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
                         mentorshipRequestDto.getDescription()
                 );
+        verify(mentorshipOfferedEventMapper, times(1)).toEvent(mentorshipRequest);
+        verify(mentorshipOfferedEventPublisher, times(1)).publish(mentorshipOfferedEvent);
     }
 
     @Test

@@ -13,7 +13,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
 import static org.mockito.Mockito.times;
@@ -32,7 +32,7 @@ class UserControllerTest {
 
     private long userId;
     private MockMvc mockMvc;
-    private String userDtoJson;
+    private String userCreationDtoJson;
     private MockMultipartFile mockMultipartFile;
 
     @BeforeEach
@@ -41,14 +41,19 @@ class UserControllerTest {
 
         userId = 1L;
 
-        UserDto userDto = UserDto.builder()
-                .username("username")
-                .password("password")
-                .country(1L)
-                .email("test@mail.com")
-                .phone("123456")
-                .build();
+        String username = "username";
+        String password = "password";
+        long country = 1L;
+        String email = "email";
+        String phone = "123456";
 
+        UserDto userCreationDto = UserDto.builder()
+                .username(username)
+                .password(password)
+                .country(country)
+                .email(email)
+                .phone(phone)
+                .build();
 
         mockMultipartFile = new MockMultipartFile(
                 "file",
@@ -58,7 +63,7 @@ class UserControllerTest {
         );
 
         ObjectMapper objectMapperImpl = new ObjectMapper();
-        userDtoJson = objectMapperImpl.writeValueAsString(userDto);
+        userCreationDtoJson = objectMapperImpl.writeValueAsString(userCreationDto);
     }
 
     @Test
@@ -66,10 +71,10 @@ class UserControllerTest {
     public void testCreateUser() throws Exception {
         mockMvc.perform(multipart("/api/v1/user")
                         .file("file", mockMultipartFile.getBytes())
-                        .file("userJson", userDtoJson.getBytes())
+                        .file("userJson", userCreationDtoJson.getBytes())
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isCreated());
-        verify(objectMapper, times(1)).readValue(userDtoJson, UserDto.class);
+        verify(objectMapper, times(1)).readValue(userCreationDtoJson, UserDto.class);
     }
 
     @Test

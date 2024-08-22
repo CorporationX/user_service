@@ -26,7 +26,6 @@ public class ConvertToUserService {
 
 
     public List<UserDto> prepareAndSaveUsers(List<Person> persons) {
-        List<User> studentsToUsers = new ArrayList<>();  //нужен только для контроля
         List<User> saveStudentsToUsers = new ArrayList<>();
 
         persons.forEach(person -> {
@@ -55,11 +54,8 @@ public class ConvertToUserService {
                 }
                 saveStudentsToUsers.add(studentToUser);
             }
-            studentsToUsers.add(studentToUser);   //только для контроля
         });
-        System.out.println("studentsToUsers" + studentsToUsers);                //только для контроля
-        System.out.println("saveStudentsToUsers" + saveStudentsToUsers);        //только для контроля
-
+        log.info("saveStudentsToUsers: {}", saveStudentsToUsers);
         return userService.saveUsers(saveStudentsToUsers);
     }
 

@@ -26,10 +26,6 @@ public class CsvParserService {
                 .with(CsvSchema.emptySchema().withHeader())
                 .readValues(inputStream);
 
-//        new ObjectMapper()
-//                .configure(SerializationFeature.INDENT_OUTPUT, true)
-//                .writeValue(new File("src/main/resources/json/person.json"), personMappingIterator.readAll());
-
         List<Person> persons = personMappingIterator.readAll();
         log.info(persons.toString());
         inputStream.close();

@@ -53,7 +53,7 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket-name: my-user-avatars-bucket
     isMocked: true
 
 number-months:

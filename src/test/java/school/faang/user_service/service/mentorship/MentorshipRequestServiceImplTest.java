@@ -19,9 +19,11 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipRequestedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -129,7 +131,7 @@ class MentorshipRequestServiceImplTest {
         when(mapper.toEntity(dto)).thenReturn(request);
         when(mentorshipRequestRepository.save(request)).thenReturn(request);
         when(mapper.toDto(request)).thenReturn(dto);
-        doNothing().when(mentorshipRequestedEventPublisher).toEventAndPublish(dto);
+        doNothing().when(mentorshipRequestedEventPublisher).publish(any(MentorshipRequestedEvent.class));
 
         var result = sut.requestMentorship(dto);
 

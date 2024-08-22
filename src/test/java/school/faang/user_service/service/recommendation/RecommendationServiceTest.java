@@ -16,9 +16,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.event.recommendation.RecommendationEvent;
+import school.faang.user_service.event.recommendationReceived.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.messaging.publisher.recommendation.RecommendationEventPublisher;
+import school.faang.user_service.messaging.publisher.recommendationReceived.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.skillOffer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
@@ -48,6 +50,8 @@ class RecommendationServiceTest {
     private SkillOfferService skillOfferService;
     @Mock
     private RecommendationEventPublisher recommendationEventPublisher;
+    @Mock
+    private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @InjectMocks
     private RecommendationService recommendationService;
@@ -150,7 +154,7 @@ class RecommendationServiceTest {
 
     @Test
     void testCreateToDto() {
-        doNothing().when(recommendationValidator)
+        Mockito.doNothing().when(recommendationValidator)
                 .checkNotRecommendBeforeSixMonths(Mockito.anyLong(), Mockito.anyLong());
         doNothing().when(recommendationValidator)
                 .validateSkillOffers(recommendationDto);
@@ -166,6 +170,9 @@ class RecommendationServiceTest {
                 .thenReturn(new RecommendationEvent());
         doNothing().when(recommendationEventPublisher)
                 .publish(Mockito.any(RecommendationEvent.class));
+        when(recommendationMapper.toRecommendationReceivedEvent(any(RecommendationDto.class)))
+                .thenReturn(new RecommendationReceivedEvent());
+        doNothing().when(recommendationReceivedEventPublisher).publish(any(RecommendationReceivedEvent.class));
 
         recommendationService.create(recommendationDto);
 

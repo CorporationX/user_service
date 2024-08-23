@@ -1,7 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.SubscriptionService;
@@ -9,13 +9,14 @@ import school.faang.user_service.service.SubscriptionService;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
-@Component
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/subscribe")
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
-
-    public void followUser(long followerId, long followeeId) throws DataFormatException {
+    @PostMapping("/{followerId}")
+    public void followUser(@PathVariable long followerId, @RequestParam long followeeId) throws DataFormatException {
         subscriptionService.followUser(followerId, followeeId);
     }
 

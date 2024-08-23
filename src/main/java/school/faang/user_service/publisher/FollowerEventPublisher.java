@@ -21,6 +21,7 @@ public class FollowerEventPublisher implements MessagePublisher<FollowerEvent> {
     public void publish(FollowerEvent message) {
         try {
             redisTemplate.convertAndSend(channelTopic, message);
+            log.info("send follower event: {}", message);
         } catch (Exception e) {
             log.error("Error sending follower event", e);
             throw new RuntimeException("Error sending follower event", e);

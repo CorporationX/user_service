@@ -1,7 +1,8 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.zip.DataFormatException;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class SubscriptionService {
 
@@ -24,9 +25,11 @@ public class SubscriptionService {
     private final UserMapper userMapper;
     private final FollowerEventPublisher publisher;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) throws DataFormatException {
-        validateUsersSubs(followerId, followeeId);
+        //validateUsersSubs(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+
         publisher.publish(new FollowerEvent(followerId, followeeId));
     }
 

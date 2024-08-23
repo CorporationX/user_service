@@ -17,13 +17,19 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerChannel;
+
+    @Bean(name = "followerChannelTopic")
+    public ChannelTopic followerChannelTopic() {
+        return new ChannelTopic(followerChannel);
+    }
 
     @Value("${spring.data.redis.channels.profile_picture_channel.name}")
     private String profilePicture;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }

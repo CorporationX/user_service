@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -25,4 +26,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Query(nativeQuery = true, value = """
+            SELECT cp.preference FROM users u 
+                JOIN contact_preferences cp ON cp.user_id = u.id
+            WHERE u.id =:userId
+            """)
+    Optional<Long> getPreferredContact(long userId);
 }

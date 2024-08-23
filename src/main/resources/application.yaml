@@ -29,7 +29,10 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        recommendation_view_channel:
+          name: recommendation_view_channel
+        mentorship_offered: mentorship_offered_channel
 
 server:
   port: 8080

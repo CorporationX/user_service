@@ -10,6 +10,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +35,14 @@ public class UserService {
         userDto.setPreference(contact);
 
         return userDto;
+    }
+
+    public UserDto getUserById(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return userMapper.toDto(user.get());
+        } else {
+            throw new RuntimeException("user not found");
+        }
     }
 }

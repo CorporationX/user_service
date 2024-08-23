@@ -1,48 +1,46 @@
 
 package school.faang.user_service.entity.person;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 
-import javax.annotation.processing.Generated;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class Person {
 
-    //@JsonProperty("firstName")
+    @JsonProperty("firstName")
     private String firstName;
 
-    //@JsonProperty("lastName")
+    @JsonProperty("lastName")
     private String lastName;
 
-    //@JsonProperty("yearOfBirth")
+    @JsonProperty("yearOfBirth")
     private Integer yearOfBirth;
 
-    //@JsonProperty("group")
+    @JsonProperty("group")
     private String group;
 
-    //@JsonProperty("studentID")
+    @JsonProperty("studentID")
     private String studentID;
 
     @JsonUnwrapped
-    //@JsonProperty("contactInfo")
+    @JsonProperty("contactInfo")
     private ContactInfo contactInfo;
 
     @JsonUnwrapped
-    //@JsonProperty("education")
+    @JsonProperty("education")
     private Education education;
 
-    //@JsonProperty("status")
+    @JsonProperty("status")
     private String status;
 
-    //@JsonProperty("admissionDate")
+    @JsonProperty("admissionDate")
     private String admissionDate;
 
-    //@JsonProperty("graduationDate")
+    @JsonProperty("graduationDate")
     private String graduationDate;
 
     @JsonProperty("previousEducation")

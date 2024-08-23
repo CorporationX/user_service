@@ -1,12 +1,9 @@
 
 package school.faang.user_service.entity.person;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
-
-import javax.annotation.processing.Generated;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Data
 public class ContactInfo {

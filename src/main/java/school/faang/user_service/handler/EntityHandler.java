@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 @Slf4j
 public class EntityHandler {
 
-    public <T> T getOrThrowException(Class<T> entityClass, long entityId, Supplier<Optional<T>> finder) {
+    public <T> T getOrThrowException(Class<T> entityClass, Object identifier, Supplier<Optional<T>> finder) {
         return finder.get().orElseThrow(() -> {
-            String errMessage = String.format("Could not find %s with ID: %d", entityClass.getName(), entityId);
+            String errMessage = String.format("Could not find %s with ID: %s", entityClass.getName(), identifier);
             EntityNotFoundException exception = new EntityNotFoundException(errMessage);
             log.error(errMessage, exception);
             return exception;

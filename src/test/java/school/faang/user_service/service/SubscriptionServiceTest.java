@@ -8,15 +8,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.redisPublisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.validator.SubscriptionServiceValidator;
 
 import java.util.List;

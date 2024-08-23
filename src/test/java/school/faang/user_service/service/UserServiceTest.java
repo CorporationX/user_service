@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
@@ -66,13 +65,9 @@ class UserServiceTest {
     private UserTransportDto userTransportDto;
     private User mentee;
     private Goal mentorAssignedGoal;
-    private long id;
-    private List<Long> ids;
-    private List<UserTransportDto> userTransportDtoList;
-    private List<User> users;
-    private List<Long> userIds;
     private List<UserTransportDto> userTransportDtoList;
     private List<User> userFollowers;
+    private List<Long> userIds;
 
     @BeforeEach
     public void setUp() {
@@ -82,37 +77,10 @@ class UserServiceTest {
         List<Event> ownedEvents = new ArrayList<>();
 
         userId = 1L;
+        userIds = List.of(userId);
         long countryId = 2L;
         userFollowers = List.of(new User());
 
-        userDto = UserDto.builder()
-                .id(userId)
-                .username("username")
-                .country(1L)
-                .email("test@mail.com")
-                .phone("123456")
-                .build();
-
-        userTransportDto = UserTransportDto.builder()
-                .id(userId)
-                .username("username")
-                .email("test@mail.com")
-                .phone("123456")
-                .build();
-
-
-        user = userMapperImpl.toEntity(userDto);
-        List<Goal> goalList = new ArrayList<>();
-        List<User> userList = new ArrayList<>();
-        List<User> menteesList = new ArrayList<>();
-        List<Event> ownedEvents = new ArrayList<>();
-
-        id = 10L;
-        ids = List.of(id);
-
-        userDto = new UserDto();
-
-        userTransportDtoList = List.of(userTransportDto);
         user = User.builder()
                 .id(userId)
                 .username("username")
@@ -125,11 +93,22 @@ class UserServiceTest {
                 .goals(goalList)
                 .ownedEvents(ownedEvents)
                 .mentees(menteesList).build();
+        userDto = UserDto.builder()
+                .id(userId)
+                .username("username")
+                .country(1L)
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
+        userTransportDto = UserTransportDto.builder()
+                .id(userId)
+                .username("username")
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
 
-        userIds = List.of(userId);
-        users = List.of(user);
+        userTransportDtoList = List.of(userTransportDto);
 
-        userDtoList = List.of(userDto);
         Goal goal = Goal.builder()
                 .id(1L)
                 .users(userList).build();
@@ -151,7 +130,9 @@ class UserServiceTest {
     public void testCreateUser() {
         when(userMapper.toEntity(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
+
         userService.createUser(userDto, null);
+
         verify(userMapper, times(1)).toEntity(userDto);
         verify(userRepository, times(2)).save(user);
         verify(avatarService, times(1)).setRandomAvatar(user);
@@ -162,7 +143,9 @@ class UserServiceTest {
     @DisplayName("testing updateUserAvatar method with null multipartFile")
     public void testUpdateUserAvatar() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
+
         userService.updateUserAvatar(userId, null);
+
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(avatarService, times(1)).setRandomAvatar(user);
         verify(userRepository, times(1)).save(user);
@@ -171,13 +154,12 @@ class UserServiceTest {
     @Test
     @DisplayName("test that getUser calls all methods correctly + return test")
     public void testGetUser() {
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
         when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        UserTransportDto result = userService.getUser(id);
+        UserTransportDto result = userService.getUser(userId);
 
-        verify(userValidator).validateUserId(id);
-        verify(userRepository).findById(id);
+        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(userMapper).toTransportDto(user);
 
         assertEquals(result, userTransportDto);
@@ -186,13 +168,12 @@ class UserServiceTest {
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
-        when(userRepository.findAllById(ids)).thenReturn(List.of(user));
+        when(userRepository.findAllById(userIds)).thenReturn(List.of(user));
         when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        List<UserTransportDto> result = userService.getUsersByIds(ids);
+        List<UserTransportDto> result = userService.getUsersByIds(userIds);
 
-        verify(userValidator).validateUserId(id);
-        verify(userRepository).findAllById(ids);
+        verify(userRepository).findAllById(userIds);
         verify(userMapper).toTransportDto(user);
 
         assertEquals(result, userTransportDtoList);

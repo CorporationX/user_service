@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
@@ -25,10 +24,8 @@ import school.faang.user_service.validator.UserValidator;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -69,16 +66,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserTransportDto getUser(long userId) {
-        userValidator.validateUserId(userId);
-        User user = userRepository.findById(userId).get();
-
+        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
         return userMapper.toTransportDto(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserTransportDto> getUsersByIds(List<Long> ids) {
         Stream<User> userStream = userRepository.findAllById(ids).stream();
-        return userStream.map(userMapper::toDto).toList();
+        return userStream.map(userMapper::toTransportDto).toList();
     }
 
     @Transactional
@@ -91,15 +86,18 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
     public boolean checkUserExistence(long userId) {
         return userRepository.existsById(userId);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUserFollowers(long userId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
         return user.getFollowers().stream().map(userMapper::toDto).toList();
     }
 
+    @Transactional(readOnly = true)
     public boolean checkAllFollowersExist(List<Long> followerIds) {
         return userValidator.doAllUsersExist(followerIds);
     }

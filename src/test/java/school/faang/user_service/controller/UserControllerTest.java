@@ -39,7 +39,6 @@ class UserControllerTest {
 
     private long userId;
     private String userDtoJson;
-    private String userCreationDtoJson;
     private MockMultipartFile mockMultipartFile;
 
     private String followerIdsJson;
@@ -49,7 +48,6 @@ class UserControllerTest {
     public void setUp() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         userId = 1L;
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
         followersIds = List.of(1L, 2L);
         followerIdsJson = objectMapper.writeValueAsString(followersIds);
 
@@ -59,7 +57,7 @@ class UserControllerTest {
         String email = "email";
         String phone = "123456";
 
-        UserDto userCreationDto = UserDto.builder()
+        UserDto userDto = UserDto.builder()
                 .username(username)
                 .password(password)
                 .country(country)
@@ -75,6 +73,7 @@ class UserControllerTest {
         );
 
         userDtoJson = objectMapper.writeValueAsString(userDto);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
@@ -99,8 +98,6 @@ class UserControllerTest {
         mockMvc.perform(get("/api/v1/user/{userId}/followers", userId))
                 .andExpect(status().isOk());
         verify(userService, times(1)).getUserFollowers(userId);
-        ObjectMapper objectMapperImpl = new ObjectMapper();
-        userCreationDtoJson = objectMapperImpl.writeValueAsString(userCreationDto);
     }
 
     @Test

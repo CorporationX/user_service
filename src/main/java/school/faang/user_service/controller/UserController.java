@@ -48,7 +48,7 @@ public class UserController {
         return userService.checkUserExistence(userId);
     }
 
-    @GetMapping("/{userId}/followers")
+    @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserTransportDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);

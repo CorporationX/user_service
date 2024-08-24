@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.FollowerMessagePublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -41,6 +43,8 @@ class SubscriptionServiceTest {
     @Mock
     private UserFilter cityFilter;
 
+    @Mock
+    private FollowerMessagePublisher followerMessagePublisher;
 
     private long follower;
     private long followee;
@@ -62,7 +66,8 @@ class SubscriptionServiceTest {
         followee = 2;
         userStream = Stream.of(userFirst, userSecond);
         userFilter = List.of(nameFilter, cityFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilter);
+        subscriptionService = new SubscriptionService(subscriptionRepository,
+                userMapper, userFilter, followerMessagePublisher);
     }
 
 

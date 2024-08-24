@@ -21,7 +21,7 @@ import school.faang.user_service.filter.event.EventTitleFieldFilter;
 import school.faang.user_service.mapper.event.EventToReadEventDtoMapper;
 import school.faang.user_service.mapper.event.WriteEventDtoToEventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.valitator.event.WriteEventValidator;
+import school.faang.user_service.validator.WriteEventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;

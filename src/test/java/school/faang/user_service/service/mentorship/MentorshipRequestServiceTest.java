@@ -15,6 +15,7 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.MentorshipStartEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
@@ -22,6 +23,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFil
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -51,15 +53,21 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
+    @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilterList;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
-    private MentorshipRequestMapperImpl mentorshipRequestMapperImpl;
+    private MentorshipRequestMapper mentorshipRequestMapperImpl;
+
+    private MentorshipStartEvent mentorshipStartEvent;
+
 
     @BeforeEach
     public void setUp() {
         mentorshipRequestMapperImpl = new MentorshipRequestMapperImpl();
+        mentorshipStartEvent = new MentorshipStartEvent();
     }
 
     @Test
@@ -140,7 +148,7 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    @DisplayName("test acceptRequest validator validateRequestStatusIsPending() method execution")
+    @DisplayName("test acceptRequest methods execution")
     public void testAcceptRequestValidatorExecution() {
         long requestId = 1L;
         User requester = User.builder().mentors(new ArrayList<>()).build();
@@ -153,47 +161,19 @@ class MentorshipRequestServiceTest {
 
         when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
                 .thenReturn(Optional.of(mentorshipRequest));
+        when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(mentorshipRequest);
+        when(mentorshipRequestMapper.toMentorshipStartEvent(mentorshipRequest)).thenReturn(mentorshipStartEvent);
 
         mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
+
         verify(mentorshipRequestValidator, times(1))
                 .validateRequestStatusIsPending(requestStatusCaptor.capture());
-    }
-
-    @Test
-    @DisplayName("test acceptRequest validator validateReceiverIsNotMentorOfRequester() method execution")
-    public void testAcceptRequestValidatorReceiverIsNotMentorExecution() {
-        long requestId = 1L;
-        User requester = User.builder().mentors(new ArrayList<>()).build();
-        User receiver = User.builder().mentees(new ArrayList<>()).build();
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(requestId)
-                .requester(requester)
-                .receiver(receiver)
-                .status(RequestStatus.PENDING).build();
-
-        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
-        mentorshipRequestService.acceptRequest(requestId);
         verify(mentorshipRequestValidator, times(1))
                 .validateReceiverIsNotMentorOfRequester(requester, receiver);
-    }
-
-    @Test
-    @DisplayName("testing acceptRequest repository save() method execution")
-    public void testAcceptRequestRepositorySaveExecution() {
-        long requestId = 1L;
-        User requester = User.builder().mentors(new ArrayList<>()).build();
-        User receiver = User.builder().mentees(new ArrayList<>()).build();
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(requestId)
-                .requester(requester)
-                .receiver(receiver)
-                .status(RequestStatus.PENDING).build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-
-        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
         verify(mentorshipRequestRepository, times(1)).save(mentorshipRequest);
+        verify(mentorshipRequestMapper, times(1)).toMentorshipStartEvent(mentorshipRequest);
+        verify(mentorshipStartEventPublisher, times(1)).publish(mentorshipStartEvent);
+        verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequest);
     }
 
     @Test

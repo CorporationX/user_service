@@ -11,25 +11,41 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.exception.ExceptionMessages;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.module.FindException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class S3Service {
+
     private final AmazonS3 s3Client;
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
     public String uploadFile(MultipartFile multipartFile, String folder) {
-        ObjectMetadata objectMetadataOne = collectMetadata(multipartFile);
-        String keyOne = String.format("Origin%s%d%s",
-                folder, System.currentTimeMillis(), multipartFile.getOriginalFilename());
-        sendingRequestToTheCloud(bucketName, keyOne, multipartFile, objectMetadataOne);
+        ObjectMetadata objectMetadata = collectMetadata(multipartFile);
+        String key = String.format("Origin-%s-%d-%s", folder, System.currentTimeMillis(), multipartFile.getOriginalFilename());
+        try {
+            sendRequestToTheCloud(bucketName, key, multipartFile.getInputStream(), objectMetadata);
+        } catch (IOException e) {
+            log.error("Error while preparing the file {} to upload", key, e);
+        }
+        return key;
+    }
 
-        return keyOne;
+    public String uploadFileAsByteArray(byte[] bytes, String folder, String fileName) {
+        if (bytes == null || bytes.length == 0) {
+            log.error(ExceptionMessages.IMAGE_BYTES_EMPTY);
+            throw new IllegalArgumentException(ExceptionMessages.IMAGE_BYTES_EMPTY);
+        }
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(bytes.length);
+        objectMetadata.setContentType("image/svg+xml");
+        String key = String.format("%s/%s", folder, fileName);
+        sendRequestToTheCloud(bucketName, key, new ByteArrayInputStream(bytes), objectMetadata);
+        return key;
     }
 
     public InputStream downloadingByteImage(String key) {
@@ -46,24 +62,18 @@ public class S3Service {
     }
 
     private ObjectMetadata collectMetadata(MultipartFile multipartFile) {
-        long fileSize = multipartFile.getSize();
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(fileSize);
+        objectMetadata.setContentLength(multipartFile.getSize());
         objectMetadata.setContentType(multipartFile.getContentType());
         return objectMetadata;
     }
 
-    private void sendingRequestToTheCloud(String bucketName,
-                                          String key,
-                                          MultipartFile multipartFile,
-                                          ObjectMetadata objectMetadata) {
-        try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(
-                    bucketName, key, multipartFile.getInputStream(), objectMetadata);
-            s3Client.putObject(putObjectRequest);
-        } catch (IOException e) {
-            log.error(ExceptionMessages.CLOUD_SENDING, e);
-            throw new FindException(ExceptionMessages.CLOUD_SENDING, e);
-        }
+    private void sendRequestToTheCloud(String bucketName,
+                                       String key,
+                                       InputStream inputStream,
+                                       ObjectMetadata objectMetadata) {
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, objectMetadata);
+        s3Client.putObject(putObjectRequest);
+        log.info("Successfully uploaded the picture {} at {}.", key, bucketName);
     }
 }

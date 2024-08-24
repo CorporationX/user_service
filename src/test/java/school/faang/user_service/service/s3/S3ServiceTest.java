@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -20,7 +21,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -65,7 +65,7 @@ class S3ServiceTest {
 
     @Test
     @DisplayName("sendingRequestToTheCloudValid")
-    void testSendingRequestToTheCloudValid() {
+    void testSendRequestToTheCloudValid() {
         when(multipartFile.getContentType())
                 .thenReturn(contentType);
         when(s3Client.putObject(any(PutObjectRequest.class)))
@@ -112,5 +112,44 @@ class S3ServiceTest {
         s3Service.deleteImage(fileId);
 
         verify(s3Client, times(1)).deleteObject(eq(bucketName), eq(fileId));
+    }
+
+    @Test
+    void testUploadFileAsByteArray() {
+        byte[] bytes = "test content".getBytes();
+        String fileName = "testFile.svg";
+
+        String result = s3Service.uploadFileAsByteArray(bytes, folder, fileName);
+
+        assertEquals("folder/testFile.svg", result);
+
+        ArgumentCaptor<PutObjectRequest> requestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        verify(s3Client).putObject(requestCaptor.capture());
+
+        PutObjectRequest capturedRequest = requestCaptor.getValue();
+        assertEquals(bucketName, capturedRequest.getBucketName());
+        assertEquals("folder/testFile.svg", capturedRequest.getKey());
+
+        ObjectMetadata metadata = capturedRequest.getMetadata();
+        assertEquals(bytes.length, metadata.getContentLength());
+        assertEquals("image/svg+xml", metadata.getContentType());
+    }
+
+    @Test
+    void testUploadFileAsByteArray_NullBytes() {
+        byte[] bytes = null;
+        String fileName = "testFile.svg";
+
+        assertThrows(IllegalArgumentException.class,
+                () -> s3Service.uploadFileAsByteArray(bytes, folder, fileName));
+    }
+
+    @Test
+    void testUploadFileAsByteArray_EmptyBytes() {
+        byte[] bytes = new byte[0];
+        String fileName = "testFile.svg";
+
+        assertThrows(IllegalArgumentException.class,
+                () -> s3Service.uploadFileAsByteArray(bytes, folder, fileName));
     }
 }

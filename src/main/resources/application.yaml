@@ -58,3 +58,14 @@ services:
     secretKey: password
     bucketName: corpbucket
     isMocked: true
+
+async:
+  core-pool-size: 5
+  max-pool-size: 50
+  queue-capacity: 100
+
+dicebear:
+  avatar:
+    styles: "adventurer,adventurer-neutral,avataaars,avataaars-neutral,big-ears,big-ears-neutral,big-smile,bottts,bottts-neutral,croodles,croodles-neutral,dylan,micah,fun-emoji,lorelei,lorelei-neutral,notionists,notionists-neutral,micah,miniavs,open-peeps,personas,pixel-art,pixel-art-neutral"
+    base-url: "https://api.dicebear.com/9.x/"
+    style-path: "/{style}/svg"

@@ -39,4 +39,7 @@ public final class ExceptionMessages {
     public static final String SELF_SUBSCRIPTION = "You cannot follow yourself!";
     public static final String SELF_UNSUBSCRIPTION = "You cannot unfollow yourself!";
     public static final String EXISTING_SUBSCRIPTION = "You are already following this account";
+
+    // avatars
+    public static final String IMAGE_BYTES_EMPTY = "Image bytes cannot be empty.";
 }

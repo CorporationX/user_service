@@ -13,7 +13,7 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.publisher.GoalMessagePublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validation.GoalValidator;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

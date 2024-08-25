@@ -16,10 +16,10 @@ public abstract class GenericMessagePublisher<T> implements MessagePublisher<T>{
     protected final ObjectMapper objectMapper;
 
     @Override
-    public void publish(T t) {
+    public void publish(T eventMessage) {
         String message;
         try {
-            message = objectMapper.writeValueAsString(t);
+            message = objectMapper.writeValueAsString(eventMessage);
         } catch (JsonProcessingException e) {
             log.info("Method: publish {}", e.getMessage());
             throw new RuntimeException(e);

@@ -7,14 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.redis.event.RecommendationEvent;
-import school.faang.user_service.redis.publisher.RecommendationPublisher;
+import school.faang.user_service.redis.publisher.RecommendationEventPublisher;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MessagePublisherService {
 
-    private final RecommendationPublisher recommendationPublisher;
+    private final RecommendationEventPublisher recommendationEventPublisher;
 
     public void publishRecommendationEvent(Recommendation recommendation, ObjectMapper objectMapper) {
         RecommendationEvent recommendationEvent = new RecommendationEvent();
@@ -30,6 +30,6 @@ public class MessagePublisherService {
             log.warn("There was an exception during conversion RecommendationEvent for recommendation " +
                     "with ID = {} to String", recommendation.getId());
         }
-        recommendationPublisher.publishMessage(message);
+        recommendationEventPublisher.publishMessage(message);
     }
 }

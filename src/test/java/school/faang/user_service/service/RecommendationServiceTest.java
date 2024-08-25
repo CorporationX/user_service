@@ -54,6 +54,8 @@ public class RecommendationServiceTest {
     SkillRepository skillRepository;
     @Mock
     UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    @Mock
+    MessagePublisherService messagePublisherService;
 
     private RecommendationDto recommendationDto;
     private Recommendation recommendation;

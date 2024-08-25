@@ -145,9 +145,9 @@ public class RecommendationService {
 
         skillOffersDto.removeAll(existingSkillIds);
 
-        if (!skillOffersDto.isEmpty()) {
-            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillOffersDto.toString());
-        }
+//        if (!skillOffersDto.isEmpty()) {
+//            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillOffersDto.toString());
+//        }
     }
 
     private void validateAvailabilityRecommendation(long id) {

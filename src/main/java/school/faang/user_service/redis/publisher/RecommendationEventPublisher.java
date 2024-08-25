@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RecommendationPublisher implements MessagePublisher{
+public class RecommendationEventPublisher implements MessagePublisher{
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic recommendationChannel;

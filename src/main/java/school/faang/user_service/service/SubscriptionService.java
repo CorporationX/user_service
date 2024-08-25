@@ -2,14 +2,18 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.redisPublisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.SubscriptionServiceValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,13 +23,18 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
     private final SubscriptionServiceValidator subscriptionServiceValidator;
+    private final FollowerEventPublisher followerEventPublisher;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) {
         subscriptionServiceValidator.validateFollowUnfollowUser(followerId, followeeId);
 
         subscriptionRepository.followUser(followerId, followeeId);
+
+        sendToRedisPublisher(followerId, followeeId);
     }
 
+    @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionServiceValidator.validateFollowUnfollowUser(followerId, followeeId);
 
@@ -64,5 +73,14 @@ public class SubscriptionService {
         subscriptionServiceValidator.validateExistsById(followerId);
 
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    private void sendToRedisPublisher(Long followerId, Long followeeId) {
+        FollowerEventDto followerEventDto = FollowerEventDto.builder()
+                .subscribedDateTime(LocalDateTime.now())
+                .visitorId(followerId)
+                .visitedId(followeeId).build();
+
+        followerEventPublisher.publish(followerEventDto);
     }
 }

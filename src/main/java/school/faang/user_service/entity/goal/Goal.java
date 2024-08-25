@@ -1,5 +1,7 @@
 package school.faang.user_service.entity.goal;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,6 +48,8 @@ public class Goal {
     private Goal parent;
 
     @Column(name = "title", length = 64, nullable = false, unique = true)
+    @NotBlank(message = "Goal title cannot be blank")
+    @Size(max = 64, message = "The length of the goal name is longer than allowed")
     private String title;
 
     @Column(name = "description", length = 128, nullable = false, unique = true)

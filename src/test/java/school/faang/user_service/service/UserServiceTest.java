@@ -318,7 +318,7 @@ class UserServiceTest {
 
         ProfileViewEventDto profileViewEventDto = new ProfileViewEventDto();
         profileViewEventDto.setViewerId(viewer);
-        profileViewEventDto.setAuthorId(USER_ID);
+        profileViewEventDto.setProfileId(USER_ID);
 
         // When
         when(userRepository.findById(USER_ID))
@@ -343,7 +343,7 @@ class UserServiceTest {
         // Arrange
         ProfileViewEventDto profileViewEventDto = new ProfileViewEventDto();
         profileViewEventDto.setViewerId(USER_ID);
-        profileViewEventDto.setAuthorId(USER_ID);
+        profileViewEventDto.setProfileId(USER_ID);
 
         // Assert
         assertThrows(IllegalArgumentException.class, () -> userService.getUserProfile(profileViewEventDto));

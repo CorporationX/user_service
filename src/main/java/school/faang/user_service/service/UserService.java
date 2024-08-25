@@ -220,11 +220,11 @@ public class UserService {
     }
 
     public UserDto getUserProfile(ProfileViewEventDto profileViewEventDto) {
-        if (profileViewEventDto.getViewerId() == profileViewEventDto.getAuthorId()) {
+        if (profileViewEventDto.getViewerId() == profileViewEventDto.getProfileId()) {
             throw new IllegalArgumentException("coincidence of the id of the author and the viewer");
         }
 
-        UserDto userDto = findUserById(profileViewEventDto.getAuthorId());
+        UserDto userDto = findUserById(profileViewEventDto.getProfileId());
         profileViewMessagePublisher.publish(profileViewEventDto);
 
         return userDto;

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AvatarServiceTest {
+class RandomAvatarServiceTest {
 
     @Mock
     private S3Service s3Service;
@@ -34,11 +34,11 @@ class AvatarServiceTest {
     @Mock
     private UserRepository userRepository;
     @InjectMocks
-    private AvatarService avatarService;
+    private RandomAvatarService randomAvatarService;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(avatarService, "avatarStyles", Arrays.asList("style1", "style2", "style3"));
+        ReflectionTestUtils.setField(randomAvatarService, "avatarStyles", Arrays.asList("style1", "style2", "style3"));
     }
 
     @Test
@@ -53,7 +53,7 @@ class AvatarServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        avatarService.generateAndStoreAvatar(userId);
+        randomAvatarService.generateAndStoreAvatar(userId);
 
         verify(dicebearClient).getAvatar(anyString());
         verify(s3Service).uploadFileAsByteArray(eq(svgBytes), eq("default-avatars"), anyString());
@@ -70,7 +70,7 @@ class AvatarServiceTest {
         long userId = 1L;
         when(dicebearClient.getAvatar(anyString())).thenThrow(new RuntimeException("Test exception"));
 
-        avatarService.generateAndStoreAvatar(userId);
+        randomAvatarService.generateAndStoreAvatar(userId);
 
         verify(dicebearClient).getAvatar(anyString());
         verify(s3Service, never()).uploadFileAsByteArray(any(), anyString(), anyString());

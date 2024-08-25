@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AvatarService {
+public class RandomAvatarService {
 
     private static final String DEFAULT_AVATARS_FOLDER = "default-avatars";
 

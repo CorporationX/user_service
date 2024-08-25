@@ -33,7 +33,9 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        project_follower_channel:
+          name: project_follower_channel
 
   mvc:
     servlet:

@@ -3,6 +3,8 @@ package school.faang.user_service.mapper.recommendation;
 import org.mapstruct.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.recommendationReceived.RecommendationReceivedEvent;
 
 import java.util.List;
 
@@ -19,6 +21,9 @@ public interface RecommendationMapper {
     @Mapping(source = "receiverId", target = "receiver.id")
     @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "toListSkillOffersEntity", ignore = true)
     Recommendation toEntity(RecommendationDto recommendationDto);
+
+    @Mapping(source = "id", target = "recommendationId")
+    RecommendationReceivedEvent toRecommendationReceivedEvent(RecommendationDto recommendationDto);
 
     default List<RecommendationDto> toListDto(List<Recommendation> recommendations){
         return recommendations.stream().map(this::toDto).toList();

@@ -28,6 +28,10 @@ spring:
           name: profile_view_channel
         mentorship_requested_channel:
           name: mentorship_requested_channel
+
+        recommendation_received:
+          name: recommendation_received_channel
+
         mentorship_accepted_channel:
           name: mentorship_accepted_channel
         recommendation_channel:

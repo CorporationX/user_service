@@ -37,12 +37,4 @@ public class MentorshipRequestedEventPublisher implements EventPublisher<Mentors
             throw new IllegalArgumentException(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
         }
     }
-
-    public void toEventAndPublish(MentorshipRequestDto mentorshipRequestDto) {
-        publish(MentorshipRequestedEvent.builder()
-                .requesterId(mentorshipRequestDto.getRequesterId())
-                .receiverId(mentorshipRequestDto.getReceiverId())
-                .timestamp(LocalDateTime.now())
-                .build());
-    }
 }

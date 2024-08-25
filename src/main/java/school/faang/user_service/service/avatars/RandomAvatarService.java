@@ -34,7 +34,10 @@ public class RandomAvatarService {
         try {
             var randomStyle = getRandomStyle();
             byte[] svgBytes = dicebearClient.getAvatar(randomStyle);
-            var fileKey = s3Service.uploadFileAsByteArray(svgBytes, DEFAULT_AVATARS_FOLDER, String.format("%d-%s.svg", System.currentTimeMillis(), randomStyle));
+            var fileKey = s3Service.uploadFileAsByteArray(svgBytes,
+                    "image/svg+xml",
+                    DEFAULT_AVATARS_FOLDER,
+                    String.format("%d-%s.svg", System.currentTimeMillis(), randomStyle));
             updateUserAvatarLink(userId, fileKey);
         } catch (Exception e) {
             log.error("Error while generating avatar for user with id: {}", userId, e);

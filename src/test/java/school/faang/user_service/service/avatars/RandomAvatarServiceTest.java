@@ -49,14 +49,14 @@ class RandomAvatarServiceTest {
         User user = new User();
 
         when(dicebearClient.getAvatar(anyString())).thenReturn(svgBytes);
-        when(s3Service.uploadFileAsByteArray(any(), anyString(), anyString())).thenReturn(fileKey);
+        when(s3Service.uploadFileAsByteArray(any(), anyString(), anyString(), anyString())).thenReturn(fileKey);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         randomAvatarService.generateAndStoreAvatar(userId);
 
         verify(dicebearClient).getAvatar(anyString());
-        verify(s3Service).uploadFileAsByteArray(eq(svgBytes), eq("default-avatars"), anyString());
+        verify(s3Service).uploadFileAsByteArray(eq(svgBytes), anyString(), eq("default-avatars"), anyString());
         verify(userRepository).findById(userId);
         verify(userRepository).save(user);
 
@@ -73,7 +73,7 @@ class RandomAvatarServiceTest {
         randomAvatarService.generateAndStoreAvatar(userId);
 
         verify(dicebearClient).getAvatar(anyString());
-        verify(s3Service, never()).uploadFileAsByteArray(any(), anyString(), anyString());
+        verify(s3Service, never()).uploadFileAsByteArray(any(), anyString(), anyString(), anyString());
         verify(userRepository, never()).findById(anyLong());
         verify(userRepository, never()).save(any(User.class));
     }

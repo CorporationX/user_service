@@ -119,7 +119,7 @@ class S3ServiceTest {
         byte[] bytes = "test content".getBytes();
         String fileName = "testFile.svg";
 
-        String result = s3Service.uploadFileAsByteArray(bytes, folder, fileName);
+        String result = s3Service.uploadFileAsByteArray(bytes, contentType, folder, fileName);
 
         assertEquals("folder/testFile.svg", result);
 
@@ -132,7 +132,7 @@ class S3ServiceTest {
 
         ObjectMetadata metadata = capturedRequest.getMetadata();
         assertEquals(bytes.length, metadata.getContentLength());
-        assertEquals("image/svg+xml", metadata.getContentType());
+        assertEquals(contentType, metadata.getContentType());
     }
 
     @Test
@@ -141,7 +141,7 @@ class S3ServiceTest {
         String fileName = "testFile.svg";
 
         assertThrows(IllegalArgumentException.class,
-                () -> s3Service.uploadFileAsByteArray(bytes, folder, fileName));
+                () -> s3Service.uploadFileAsByteArray(bytes, contentType, folder, fileName));
     }
 
     @Test
@@ -150,6 +150,6 @@ class S3ServiceTest {
         String fileName = "testFile.svg";
 
         assertThrows(IllegalArgumentException.class,
-                () -> s3Service.uploadFileAsByteArray(bytes, folder, fileName));
+                () -> s3Service.uploadFileAsByteArray(bytes, contentType, folder, fileName));
     }
 }

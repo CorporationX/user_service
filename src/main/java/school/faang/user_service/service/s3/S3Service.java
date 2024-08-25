@@ -35,14 +35,14 @@ public class S3Service {
         return key;
     }
 
-    public String uploadFileAsByteArray(byte[] bytes, String folder, String fileName) {
+    public String uploadFileAsByteArray(byte[] bytes, String contentType, String folder, String fileName) {
         if (bytes == null || bytes.length == 0) {
             log.error(ExceptionMessages.IMAGE_BYTES_EMPTY);
             throw new IllegalArgumentException(ExceptionMessages.IMAGE_BYTES_EMPTY);
         }
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(bytes.length);
-        objectMetadata.setContentType("image/svg+xml");
+        objectMetadata.setContentType(contentType);
         String key = String.format("%s/%s", folder, fileName);
         sendRequestToTheCloud(bucketName, key, new ByteArrayInputStream(bytes), objectMetadata);
         return key;

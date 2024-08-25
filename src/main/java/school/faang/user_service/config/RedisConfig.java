@@ -19,6 +19,8 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
+    @Value("${spring.data.redis.channels.mentorship-accepted-channel}")
+    private String mentorshipAcceptedChannel;
 
     @Bean(name = "followerChannelTopic")
     public ChannelTopic followerChannelTopic() {
@@ -29,6 +31,11 @@ public class RedisConfig {
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipAcceptedChannelTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
     }
 
     @Bean

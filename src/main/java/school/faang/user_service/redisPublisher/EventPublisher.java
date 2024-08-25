@@ -12,12 +12,12 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public abstract class EventPublisher<T> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic followerChannelTopic;
+    private final ChannelTopic channelTopic;
     private final ObjectMapper objectMapper;
 
     public void publish(T message) {
         try {
-            redisTemplate.convertAndSend(followerChannelTopic.getTopic(), objectMapper.writeValueAsString(message));
+            redisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(message));
         } catch (JsonProcessingException e) {
             log.error("Error while publishing event to redis message: " + message, e);
             throw new RuntimeException(e);

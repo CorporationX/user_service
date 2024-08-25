@@ -70,7 +70,7 @@ public class UserService {
         try(Stream<User> userStream = userRepository.findPremiumUsers()) {
             return userStream
                     .filter(u -> userFiltersActual.stream()
-                            .allMatch(f -> f.filter(u, userFilterDto)))
+                            .allMatch(f -> f.filterUsers(u, userFilterDto)))
                     .map(mapper::toDto)
                     .toList();
         }

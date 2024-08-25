@@ -19,7 +19,7 @@ public abstract class EventPublisher<T> {
         try {
             redisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            String errorMessage = "Could not parse event: " + event;
+            String errorMessage = "Could not parse event: %s".formatted(event);
             log.error(errorMessage, e);
             throw new RuntimeException(errorMessage, e);
         }

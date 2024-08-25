@@ -13,7 +13,7 @@ import school.faang.user_service.filter.event.EventFilterDto;
 import school.faang.user_service.mapper.event.EventToReadEventDtoMapper;
 import school.faang.user_service.mapper.event.WriteEventDtoToEventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.valitator.event.WriteEventValidator;
+import school.faang.user_service.validator.event.WriteEventValidator;
 
 import java.util.List;
 import java.util.stream.Stream;

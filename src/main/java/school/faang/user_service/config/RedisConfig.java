@@ -17,13 +17,10 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.mentorship_request_channel.name}")
+    private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
-
-    @Bean(name = "followerChannelTopic")
-    public ChannelTopic followerChannelTopic() {
-        return new ChannelTopic(followerChannel);
-    }
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -38,5 +35,15 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean(name = "followerChannelTopic")
+    public ChannelTopic followerChannelTopic() {
+        return new ChannelTopic(followerChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipRequestTopic() {
+        return new ChannelTopic(mentorshipRequestTopicName);
     }
 }

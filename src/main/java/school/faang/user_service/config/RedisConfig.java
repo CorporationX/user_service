@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.dto.event.MentorshipAcceptedEvent;
 
 @Configuration
 public class RedisConfig {
@@ -22,7 +23,7 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.mentorship-accepted-channel}")
     private String mentorshipAcceptedChannel;
 
-    @Bean(name = "followerChannelTopic")
+    @Bean
     public ChannelTopic followerChannelTopic() {
         return new ChannelTopic(followerChannel);
     }

@@ -147,4 +147,6 @@ public class User {
 
     @Column(name = "banned", nullable = false)
     private boolean banned;
+
+    private Long telegramId;
 }

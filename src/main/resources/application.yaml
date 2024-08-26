@@ -28,6 +28,8 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        event-start-channel:
+          name: event-start-channel
 
 server:
   port: 8080
@@ -35,6 +37,7 @@ server:
 logging:
   level:
     root: info
+    org.hibernate.orm.jdbc.bind: trace
 
 project-service:
   host: localhost
@@ -65,7 +68,7 @@ springfox:
   documentation:
     swagger:
       v2:
-       path: /api-docs
+        path: /api-docs
 
 dice-bear:
   url: https://api.dicebear.com
@@ -87,3 +90,7 @@ thread-pool:
     time: 60
     time-unit: SECONDS
   queue-size: 10000
+
+scheduler:
+  event-start:
+    interval-seconds: 60

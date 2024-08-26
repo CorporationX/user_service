@@ -15,3 +15,7 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
       file: db/changelog/changeset/user_V008__banned_column.sql
+  - include:
+      file: db/changelog/changeset/user_v009__cr_index_event_start_date.sql
+  - include:
+      file: db/changelog/changeset/user_v010__al_users_telegramId.sql

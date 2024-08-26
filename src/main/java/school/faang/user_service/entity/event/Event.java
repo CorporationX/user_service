@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class Event {
     private String description;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime startDate;
+    private Instant startDate;
 
     @Column(name = "end_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime endDate;

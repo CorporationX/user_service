@@ -1,0 +1,1 @@
+CREATE INDEX idx_event_start_date ON event(start_date);

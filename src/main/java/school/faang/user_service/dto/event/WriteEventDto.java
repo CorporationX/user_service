@@ -4,6 +4,7 @@ import lombok.Value;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public class WriteEventDto {
 
     String title;
-    LocalDateTime startDate;
+    Instant startDate;
     LocalDateTime endDate;
     Long ownerId;
     String description;

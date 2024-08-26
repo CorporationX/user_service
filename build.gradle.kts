@@ -60,6 +60,11 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
     /**
+     * Quartz
+     */
+    implementation("org.springframework.boot:spring-boot-starter-quartz:3.3.2")
+
+    /**
      * Test containers
      */
     implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))

@@ -1,26 +1,28 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.dto.BanEvent;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserReadDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.event.UserToReadUserDtoMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
-import java.io.IOException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -39,6 +41,7 @@ public class UserService {
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
     private final ObjectMapper objectMapper;
+    private final UserToReadUserDtoMapper userToReadUserDtoMapper;
 
     @Transactional
     public UserDto createUser(UserDto userDto, MultipartFile userAvatar) {
@@ -131,5 +134,13 @@ public class UserService {
         mentee.getGoals().stream()
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
+    }
+
+    @Transactional
+    public List<UserReadDto> findAllByEventId(long eventId) {
+        return userRepository.findAllByEventId(eventId)
+                .stream()
+                .map(userToReadUserDtoMapper::map)
+                .toList();
     }
 }

@@ -30,4 +30,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.banned = true WHERE u.id = :id")
     void banUserById(Long id);
+
+
+    @Query(value = """
+            SELECT u FROM User u
+            JOIN u.participatedEvents events
+            WHERE events.id = :eventId
+            """)
+    List<User> findAllByEventId(long eventId);
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.service.avatars;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.client.dicebear.DicebearClient;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.util.multipart.MultipartFileFactory;
@@ -32,9 +30,7 @@ public class RandomAvatarService {
     private final UserRepository userRepository;
 
     @Async("taskExecutor")
-    public void generateAndStoreAvatar(long userId) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ExceptionMessages.USER_NOT_FOUND, userId)));
+    public void generateAndStoreAvatar(User user) {
         try {
             var randomStyle = getRandomStyle();
             byte[] svgBytes = dicebearClient.getAvatar(randomStyle);
@@ -43,7 +39,7 @@ public class RandomAvatarService {
             var fileKey = s3Service.uploadFile(multipartFile, DEFAULT_AVATARS_FOLDER);
             updateUserAvatarLink(user, fileKey);
         } catch (Exception e) {
-            log.error("Error while generating avatar for user with id: {}", userId, e);
+            log.error("Error while generating avatar for user with id: {}", user.getId(), e);
         }
     }
 

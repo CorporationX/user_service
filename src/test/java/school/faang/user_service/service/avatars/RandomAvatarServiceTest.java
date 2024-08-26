@@ -1,6 +1,5 @@
 package school.faang.user_service.service.avatars;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +35,8 @@ class RandomAvatarServiceTest {
     @InjectMocks
     private RandomAvatarService randomAvatarService;
 
+    private final User user = new User();
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(randomAvatarService, "avatarStyles", Arrays.asList("style1", "style2", "style3"));
@@ -44,21 +44,17 @@ class RandomAvatarServiceTest {
 
     @Test
     void testGenerateAndStoreAvatar_Success() {
-        long userId = 1L;
         byte[] svgBytes = "testSvg".getBytes();
         String fileKey = "testFileKey";
-        User user = new User();
 
         when(dicebearClient.getAvatar(anyString())).thenReturn(svgBytes);
         when(s3Service.uploadFile(any(MultipartFile.class), eq("default-avatars"))).thenReturn(fileKey);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        randomAvatarService.generateAndStoreAvatar(userId);
+        randomAvatarService.generateAndStoreAvatar(user);
 
         verify(dicebearClient).getAvatar(anyString());
         verify(s3Service).uploadFile(any(MultipartFile.class), eq("default-avatars"));
-        verify(userRepository).findById(userId);
         verify(userRepository).save(user);
 
         assertNotNull(user.getUserProfilePic());
@@ -67,25 +63,10 @@ class RandomAvatarServiceTest {
     }
 
     @Test
-    void testGenerateAndStoreAvatar_userNotFound() {
-        long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> randomAvatarService.generateAndStoreAvatar(userId));
-
-        verify(dicebearClient, never()).getAvatar(anyString());
-        verify(s3Service, never()).uploadFile(any(MultipartFile.class), eq("default-avatars"));
-        verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
     void testGenerateAndStoreAvatar_ExceptionHandling() {
-        long userId = 1L;
-        User user = new User();
         when(dicebearClient.getAvatar(anyString())).thenThrow(new RuntimeException("Test exception"));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        randomAvatarService.generateAndStoreAvatar(userId);
+        randomAvatarService.generateAndStoreAvatar(user);
 
         verify(dicebearClient).getAvatar(anyString());
         verify(s3Service, never()).uploadFile(any(MultipartFile.class), eq("default-avatars"));

@@ -10,7 +10,7 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.s3.MultipartFileCopyUtil;
+import school.faang.user_service.util.multipart.MultipartFileCopyUtil;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;

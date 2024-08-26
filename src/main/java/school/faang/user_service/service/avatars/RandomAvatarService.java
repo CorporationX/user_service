@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.dicebear.DicebearClient;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
+import school.faang.user_service.util.multipart.MultipartFileFactory;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,14 +33,15 @@ public class RandomAvatarService {
 
     @Async("taskExecutor")
     public void generateAndStoreAvatar(long userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ExceptionMessages.USER_NOT_FOUND, userId)));
         try {
             var randomStyle = getRandomStyle();
             byte[] svgBytes = dicebearClient.getAvatar(randomStyle);
-            var fileKey = s3Service.uploadFileAsByteArray(svgBytes,
-                    "image/svg+xml",
-                    DEFAULT_AVATARS_FOLDER,
-                    String.format("%d-%s.svg", System.currentTimeMillis(), randomStyle));
-            updateUserAvatarLink(userId, fileKey);
+            var filename = String.format("%d-%s.svg", System.currentTimeMillis(), randomStyle);
+            var multipartFile = MultipartFileFactory.create(svgBytes, filename, filename, "image/svg+xml");
+            var fileKey = s3Service.uploadFile(multipartFile, DEFAULT_AVATARS_FOLDER);
+            updateUserAvatarLink(user, fileKey);
         } catch (Exception e) {
             log.error("Error while generating avatar for user with id: {}", userId, e);
         }
@@ -49,9 +52,7 @@ public class RandomAvatarService {
         return avatarStyles.get(randomIndex);
     }
 
-    private void updateUserAvatarLink(long userId, String imageUrl) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ExceptionMessages.USER_NOT_FOUND, userId)));
+    private void updateUserAvatarLink(User user, String imageUrl) {
         var profilePicData = UserProfilePic.builder()
                 .fileId(imageUrl)
                 .smallFileId(imageUrl)

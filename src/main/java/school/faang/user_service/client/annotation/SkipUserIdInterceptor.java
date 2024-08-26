@@ -1,4 +1,4 @@
-package school.faang.user_service.client.dicebear;
+package school.faang.user_service.client.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

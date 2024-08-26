@@ -3,7 +3,7 @@ package school.faang.user_service.client;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
-import school.faang.user_service.client.dicebear.SkipUserIdInterceptor;
+import school.faang.user_service.client.annotation.SkipUserIdInterceptor;
 import school.faang.user_service.config.context.UserContext;
 
 @RequiredArgsConstructor

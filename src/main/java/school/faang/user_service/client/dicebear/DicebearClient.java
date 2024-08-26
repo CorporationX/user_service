@@ -3,6 +3,7 @@ package school.faang.user_service.client.dicebear;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import school.faang.user_service.client.annotation.SkipUserIdInterceptor;
 
 @SkipUserIdInterceptor
 @FeignClient(name = "dicebearClient", url = "${dicebear.avatar.base-url}")

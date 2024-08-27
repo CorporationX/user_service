@@ -35,6 +35,8 @@ spring:
         queue-capacity: 10000
         keep-alive: 60
         thread-name-prefix: "MyThreadPool"
+        wait-for-tasks-to-complete-on-shutdown: true
+        await-termination-seconds: 30
 
 server:
   port: 8080

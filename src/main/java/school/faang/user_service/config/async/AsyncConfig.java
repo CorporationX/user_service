@@ -19,6 +19,10 @@ public class AsyncConfig {
     private int keepAlive;
     @Value("${spring.task.execution.pool.thread-name-prefix}")
     private String threadName;
+    @Value("${spring.task.execution.pool.wait-for-tasks-to-complete-on-shutdown}")
+    private boolean waitForTasksToCompleteOnShutdown;
+    @Value("${spring.task.execution.pool.await-termination-seconds}")
+    private int awaitTerminationSeconds;
 
     @Bean(name = "asyncExecutor")
     public Executor taskExecutor(){
@@ -29,8 +33,8 @@ public class AsyncConfig {
         executor.setKeepAliveSeconds(keepAlive);
         executor.setThreadNamePrefix(threadName);
 
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(30);
+        executor.setWaitForTasksToCompleteOnShutdown(waitForTasksToCompleteOnShutdown);
+        executor.setAwaitTerminationSeconds(awaitTerminationSeconds);
 
         return executor;
     }

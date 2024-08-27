@@ -1,5 +1,6 @@
 package school.faang.user_service.service.premium;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -25,10 +25,21 @@ class PremiumServiceTest {
     @InjectMocks
     private PremiumService premiumService;
     int batchSize = 10;
+    List<Premium> premiumList;
+
+    @BeforeEach
+    void init() {
+        Premium premium = Premium.builder()
+                .id(1L)
+                .endDate(LocalDateTime.now().minusDays(1))
+                .build();
+
+        premiumList = List.of(premium);
+    }
 
     @Test
     @DisplayName("blankListTest")
-    void testRemovingExpiredPremiumAccessEmpty(){
+    void testRemovingExpiredPremiumAccessEmpty() {
         when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -36,25 +47,29 @@ class PremiumServiceTest {
 
         verify(premiumRepository, Mockito.times(1))
                 .findAllByEndDateBefore(any(LocalDateTime.class));
-        verifyNoMoreInteractions(premiumRepository);
+    }
+
+    @Test
+    @DisplayName("PremiumListTest")
+    void testRemovingExpiredPremiumAccessValid() {
+        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
+                .thenReturn(premiumList);
+
+        premiumService.removingExpiredPremiumAccess(batchSize);
+
+        verify(premiumRepository, Mockito.times(1))
+                .findAllByEndDateBefore(any(LocalDateTime.class));
     }
 
     @Test
     @DisplayName("RemovingExpiredPremiumAccessValid")
-    void testRemovingExpiredPremiumAccessValid(){
-        Premium premium = Premium.builder()
-                .id(1L)
-                .endDate(LocalDateTime.now().minusDays(1))
-                .build();
+    void testExecuteAsyncBatchDelete() {
         List<Long> premiumId = List.of(1L);
-        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
-                .thenReturn(List.of(premium));
+
         doNothing().when(premiumRepository).deleteAllById(premiumId);
 
-        premiumService.removingExpiredPremiumAccess(10);
+        premiumService.executeAsyncBatchDelete(premiumList);
 
-        verify(premiumRepository, times(1))
-                .findAllByEndDateBefore(any(LocalDateTime.class));
         verify(premiumRepository, times(1))
                 .deleteAllById(anyList());
     }

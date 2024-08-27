@@ -1,5 +1,6 @@
 package school.faang.user_service.service.userProfilePic;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,8 @@ import school.faang.user_service.mapper.userProfilePic.ProfilePicEventMapper;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
 import school.faang.user_service.messaging.publisher.profilepic.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.s3.MultipartFileCopyUtil;
+import school.faang.user_service.service.avatars.RandomAvatarService;
+import school.faang.user_service.util.multipart.MultipartFileCopyUtil;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;
@@ -46,6 +48,9 @@ class UserProfilePicServiceTest {
     private ProfilePicEventPublisher profilePicEventPublisher;
     @Mock
     private ProfilePicEventMapper profilePicEventMapper;
+    @Mock
+    private RandomAvatarService randomAvatarService;
+
     private MultipartFile multipartFile;
     private InputStream inputStream;
     private User user;
@@ -78,7 +83,7 @@ class UserProfilePicServiceTest {
     @DisplayName("checkTheUserInTheDatabaseException")
     void testCheckTheUserInTheDatabaseFalse() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(NullPointerException.class, () -> userProfilePicService.addImageInProfile(userId, multipartFile));
+        assertThrows(EntityNotFoundException.class, () -> userProfilePicService.addImageInProfile(userId, multipartFile));
     }
 
     @Test
@@ -103,6 +108,18 @@ class UserProfilePicServiceTest {
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
         verify(profilePicEventMapper, times(1)).toProfilePicEvent(any(User.class));
         verify(profilePicEventPublisher, times(1)).publish(any(ProfilePicEvent.class));
+    }
+
+    @Test
+    void testAddImageInProfileToDtoWithoutFileUpload() throws IOException {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+        when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
+
+        userProfilePicService.addImageInProfile(userId, null);
+
+        verify(randomAvatarService, times(1)).generateAndStoreAvatar(any(User.class));
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(userProfilePicMapper, times(1)).toDto(any(User.class));
     }
 
     @Test

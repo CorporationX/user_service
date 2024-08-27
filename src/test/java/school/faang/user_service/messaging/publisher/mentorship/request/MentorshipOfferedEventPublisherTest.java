@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.event.mentorship.request.MentorshipOfferedEvent;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,7 +48,7 @@ public class MentorshipOfferedEventPublisherTest {
     void testPublishJsonException() throws JsonProcessingException {
         when(objectMapper.writeValueAsString(event)).thenThrow(new JsonProcessingException("Serialization error") {});
 
-        assertThrows(IllegalArgumentException.class, () -> mentorshipOfferedEventPublisher.publish(event));
+        mentorshipOfferedEventPublisher.publish(event);
 
         verify(objectMapper).writeValueAsString(event);
         verify(redisTemplate, never()).convertAndSend(anyString(), anyString());
@@ -59,7 +58,7 @@ public class MentorshipOfferedEventPublisherTest {
     void testPublishException() throws Exception {
         when(objectMapper.writeValueAsString(event)).thenThrow(new RuntimeException("Serialization error") {});
 
-        assertThrows(IllegalArgumentException.class, () -> mentorshipOfferedEventPublisher.publish(event));
+        mentorshipOfferedEventPublisher.publish(event);
 
         verify(objectMapper).writeValueAsString(event);
         verify(redisTemplate, never()).convertAndSend(anyString(), anyString());

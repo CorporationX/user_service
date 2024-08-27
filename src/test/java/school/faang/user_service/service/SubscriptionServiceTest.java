@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,10 +46,6 @@ class SubscriptionServiceTest {
     @Mock
     private FollowerMessagePublisher followerMessagePublisher;
 
-    @Mock
-    private ObjectMapper objectMapper;
-
-
     private long follower;
     private long followee;
     private UserFilterDto filterDto;
@@ -72,7 +67,7 @@ class SubscriptionServiceTest {
         userStream = Stream.of(userFirst, userSecond);
         userFilter = List.of(nameFilter, cityFilter);
         subscriptionService = new SubscriptionService(subscriptionRepository,
-                userMapper, userFilter, followerMessagePublisher, objectMapper);
+                userMapper, userFilter, followerMessagePublisher);
     }
 
 

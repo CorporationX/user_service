@@ -1,19 +1,24 @@
 package school.faang.user_service.publisher;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.event.FollowerEvent;
 
 @Service
-@RequiredArgsConstructor
-public class FollowerMessagePublisher implements MessagePublisher {
+public class FollowerMessagePublisher extends GenericMessagePublisher<FollowerEvent> {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic channelTopic;
+    private final ChannelTopic followerTopic;
+
+    public FollowerMessagePublisher(RedisTemplate<String, Object> redisTemplate,
+                                    ObjectMapper objectMapper, ChannelTopic followerTopic) {
+        super(redisTemplate, objectMapper);
+        this.followerTopic = followerTopic;
+    }
 
     @Override
-    public void publish(String message) {
-        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
+    public ChannelTopic getTopic() {
+        return followerTopic;
     }
 }

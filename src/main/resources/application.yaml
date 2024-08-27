@@ -9,7 +9,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -26,6 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        goal_channel:
+          name: goal_channel
 
 server:
   port: 8080

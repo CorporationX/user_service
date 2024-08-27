@@ -8,11 +8,14 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.event.GoalCompletedEvent;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.publisher.GoalMessagePublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +29,7 @@ public class GoalService {
     private final GoalValidator goalValidator;
     private final SkillService skillService;
     private final UserService userService;
+    private final GoalMessagePublisher goalMessagePublisher;
 
     @Transactional
     public GoalDto createGoal(long userId, GoalDto goalDto) {
@@ -76,6 +80,7 @@ public class GoalService {
         Optional<Goal> entityOpt = goalRepository.findById(goal.getId());
         if (entityOpt.isPresent()) {
             Goal goalEntity = entityOpt.get();
+            sentGoalAnalytic(goalEntity);
             goalEntity.getUsers().forEach(user -> {
                 List<Skill> currentUserSkills;
                 if (user.getSkills() != null) {
@@ -104,5 +109,16 @@ public class GoalService {
         return filters.stream()
                 .filter(f -> f.isApplicable(filter))
                 .toList();
+    }
+
+    private void sentGoalAnalytic(Goal goal){
+        goal.getUsers().forEach((user) -> {
+            GoalCompletedEvent goalCompletedEvent = GoalCompletedEvent.builder()
+                    .goalId(goal.getId())
+                    .userId(user.getId())
+                    .eventTime(LocalDateTime.now())
+                    .build();
+            goalMessagePublisher.publish(goalCompletedEvent);
+        });
     }
 }

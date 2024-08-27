@@ -12,7 +12,4 @@ public interface MentorshipMapper {
     @Mapping(source="mentor.id",target = "mentorId")
     @Mapping(source="mentee.id",target = "menteeId")
     MentorshipDto toDto(Mentorship mentorship);
-
-    Mentorship toEntity(MentorshipDto mentorshipDto);
-
 }

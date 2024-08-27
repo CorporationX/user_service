@@ -30,9 +30,12 @@ public class MessagePublishService {
         try {
             message = objectMapper.writeValueAsString(mentorshipAcceptedEvent);
         } catch (JsonProcessingException e) {
-            log.warn("There was an exception during conversion CommentEvent with ID = {} to String",
+            log.warn("There was an exception during conversion MentorshipAcceptedEvent " +
+                            "for MentorshipRequest with ID = {} to String",
                     mentorshipRequest.getId());
         }
         mentorshipAcceptedEventPublisher.publishMessage(message);
+        log.info("Message about MentorshipAcceptedEvent for MentorshipRequest with ID = {} was published",
+                mentorshipRequest.getId());
     }
 }

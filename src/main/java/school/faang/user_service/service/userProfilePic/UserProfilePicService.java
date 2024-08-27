@@ -8,8 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.userProfile.UserProfileDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.event.profilepic.ProfilePicEvent;
 import school.faang.user_service.exception.ExceptionMessages;
+import school.faang.user_service.mapper.userProfilePic.ProfilePicEventMapper;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
+import school.faang.user_service.messaging.publisher.profilepic.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.avatars.RandomAvatarService;
 import school.faang.user_service.util.multipart.MultipartFileCopyUtil;
@@ -30,6 +33,8 @@ public class UserProfilePicService {
     private final RandomAvatarService randomAvatarService;
     private final UserProfilePicMapper userProfilePicMapper;
     private final MultipartFileCopyUtil multipartFileCopyUtil;
+    private final ProfilePicEventPublisher profilePicEventPublisher;
+    private final ProfilePicEventMapper profilePicEventMapper;
 
     public UserProfileDto addImageInProfile(Long userId, MultipartFile multipartFile) throws IOException {
         User user = checkTheUserInTheDatabase(userId);
@@ -51,6 +56,9 @@ public class UserProfilePicService {
 
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
+
+        ProfilePicEvent profilePicEvent = profilePicEventMapper.toProfilePicEvent(user);
+        profilePicEventPublisher.publish(profilePicEvent);
 
         return userProfilePicMapper.toDto(user);
     }

@@ -8,8 +8,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.event.profilepic.ProfilePicEvent;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)public interface ProfilePicEventMapper {
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface ProfilePicEventMapper {
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.userProfilePic.fileId", target = "authorId")
+    @Mapping(source = "user.userProfilePic.fileId", target = "avatarUrl")
     ProfilePicEvent toProfilePicEvent(User user);
 }

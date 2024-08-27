@@ -12,7 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.userProfile.UserProfileDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.event.profilepic.ProfilePicEvent;
+import school.faang.user_service.mapper.userProfilePic.ProfilePicEventMapper;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
+import school.faang.user_service.messaging.publisher.profilepic.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.MultipartFileCopyUtil;
 import school.faang.user_service.service.s3.S3Service;
@@ -39,6 +42,10 @@ class UserProfilePicServiceTest {
     private UserProfilePicMapper userProfilePicMapper;
     @Mock
     private MultipartFileCopyUtil multipartFileCopyUtil;
+    @Mock
+    private ProfilePicEventPublisher profilePicEventPublisher;
+    @Mock
+    private ProfilePicEventMapper profilePicEventMapper;
     private MultipartFile multipartFile;
     private InputStream inputStream;
     private User user;
@@ -83,6 +90,9 @@ class UserProfilePicServiceTest {
         when(s3Service.uploadFile(any(MultipartFile.class), anyString())).thenReturn("");
         when(userRepository.save(any(User.class))).thenReturn(new User());
         when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
+        when(profilePicEventMapper.toProfilePicEvent(any(User.class))).thenReturn(new ProfilePicEvent());
+        doNothing().when(profilePicEventPublisher)
+                        .publish(any(ProfilePicEvent.class));
 
         userProfilePicService.addImageInProfile(userId, multipartFile);
 
@@ -91,6 +101,8 @@ class UserProfilePicServiceTest {
         verify(s3Service, times(2)).uploadFile(any(MultipartFile.class), anyString());
         verify(userRepository, times(1)).save(any(User.class));
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
+        verify(profilePicEventMapper, times(1)).toProfilePicEvent(any(User.class));
+        verify(profilePicEventPublisher, times(1)).publish(any(ProfilePicEvent.class));
     }
 
     @Test

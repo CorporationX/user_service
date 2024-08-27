@@ -29,7 +29,6 @@ public class ProfilePicEventPublisher implements EventPublisher<ProfilePicEvent>
             log.error(ExceptionMessages.SERIALIZATION_ERROR + event, e);
         } catch (Exception e) {
             log.error(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
-            throw new IllegalArgumentException(ExceptionMessages.UNEXPECTED_ERROR + e.getMessage());
         }
     }
 }

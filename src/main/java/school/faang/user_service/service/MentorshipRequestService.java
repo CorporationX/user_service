@@ -9,7 +9,6 @@ import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.ErrorMessage;
 import school.faang.user_service.exception.RequestException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -29,6 +28,7 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<Filter<RequestFilterDto, MentorshipRequest>> filters;
+    private final MessagePublishService messagePublishService;
     private static final int PAUSE_TIME = 3;
 
     public MentorshipRequestDtoForResponse requestMentorship(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
@@ -81,13 +81,22 @@ public class MentorshipRequestService {
     public MentorshipRequestDtoForResponse acceptRequest(long id) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));
+
         List<User> mentors = request.getRequester().getMentors();
         if (mentors.contains(request.getReceiver())) {
             throw new RequestException(ErrorMessage.ALREADY_MENTOR);
         }
         mentors.add(request.getReceiver());
+
+        List<User> mentees = request.getReceiver().getMentees();
+        if (mentees.contains(request.getRequester())) {
+            throw new RequestException(ErrorMessage.ALREADY_MENTEE);
+        }
+        mentees.add(request.getRequester());
+
         request.setStatus(RequestStatus.ACCEPTED);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(request);
+        messagePublishService.publishMentorshipAcceptedEvent(mentorshipRequest);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

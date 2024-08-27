@@ -39,12 +39,14 @@ public class MentorshipRequestServiceTest {
     MentorshipRequestMapper mapperMock = Mockito.mock(MentorshipRequestMapper.class);
     Filter filterMock = Mockito.mock(Filter.class);
     List<Filter<RequestFilterDto, MentorshipRequest>> filters = List.of(filterMock);
+    MessagePublishService messagePublishService = Mockito.mock(MessagePublishService.class);
 
     MentorshipRequestService mentorshipRequestService =
             new MentorshipRequestService(mentorshipRequestRepository,
                     userRepository,
                     mapperMock,
-                    filters);
+                    filters,
+                    messagePublishService);
 
     private final MentorshipRequestDtoForRequest requestDto = new MentorshipRequestDtoForRequest();
     private final MentorshipRequestDtoForResponse responseDto = new MentorshipRequestDtoForResponse();
@@ -54,6 +56,7 @@ public class MentorshipRequestServiceTest {
     private final User testRequester = new User();
     private final User testReceiver = new User();
     private final List<User> resultMentors = new ArrayList<>();
+    private final List<User> resultMentees = new ArrayList<>();
     private final LocalDateTime lastRequestTime = LocalDateTime.now().minusDays(85);
 
     private MentorshipRequestDtoForRequest prepareTestingRequestDtoForRequest() {
@@ -87,6 +90,7 @@ public class MentorshipRequestServiceTest {
 
     private User prepareTestingReceiver() {
         testReceiver.setId(prepareTestingRequestDtoForRequest().getReceiverId());
+        testReceiver.setMentees(resultMentees);
         return testReceiver;
     }
 
@@ -175,6 +179,17 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    public void testAcceptRequestIfMenteeAlreadyExist() {
+        MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
+        MentorshipRequest mr = prepareTestingRequest();
+        User requester = prepareTestingRequester();
+        resultMentees.add(requester);
+        when(mentorshipRequestRepository.findById(dto.getId())).thenReturn(Optional.of(mr));
+
+        assertThrows(RequestException.class, () -> mentorshipRequestService.acceptRequest(dto.getId()));
+    }
+
+    @Test
     public void testAcceptRequestSuccessful() {
         MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         MentorshipRequest mr = prepareTestingRequest();
@@ -183,6 +198,7 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.acceptRequest(dto.getId());
 
         assertEquals(mr.getRequester().getMentors(), resultMentors);
+        assertEquals(mr.getReceiver().getMentees(), resultMentees);
         assertEquals(mr.getStatus(), RequestStatus.ACCEPTED);
     }
 

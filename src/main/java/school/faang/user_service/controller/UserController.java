@@ -9,13 +9,12 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
 
 @RestController
+@RequestMapping("/users")
 @RequiredArgsConstructor
-@RequestMapping("users")
 public class UserController {
     private final UserService userService;
-
     @GetMapping("/{userId}")
-    UserDto getUser(@PathVariable long userId) {
+    public UserDto getUser(@PathVariable long userId) {
         return userService.getUserById(userId);
     }
 }

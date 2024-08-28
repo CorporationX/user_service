@@ -67,6 +67,12 @@ services:
     bucketName: corpbucket
     isMocked: true
 
+premium:
+  removal:
+    scheduled:
+      cron: "0 0 10 * * MON"
+    batchSize:
+      size: 100
 async:
   core-pool-size: 5
   max-pool-size: 50

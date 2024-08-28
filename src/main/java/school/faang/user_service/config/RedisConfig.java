@@ -46,7 +46,7 @@ public class RedisConfig {
     }
 
 
-        @Bean
+    @Bean
     public ChannelTopic eventStartTopic() {
         return new ChannelTopic(eventStartTopicName);
     }

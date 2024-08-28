@@ -39,17 +39,6 @@ spring:
         profile_pic_channel:
           name: profile_pic_channel
 
-  task:
-    execution:
-      pool:
-        core-size: 5
-        max-size: 10
-        queue-capacity: 10000
-        keep-alive: 60S
-        thread-name-prefix: "MyThreadPool"
-        wait-for-tasks-to-complete-on-shutdown: true
-        await-termination-seconds: 30
-
 server:
   port: 8080
 

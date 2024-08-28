@@ -31,7 +31,7 @@ public class PremiumService {
         return ListUtils.partition(premiumList, batchSize);
     }
 
-    @Async("asyncExecutor")
+    @Async("taskExecutor")
     public void executeAsyncBatchDelete(List<Premium> batch) {
         premiumRepository.deleteAllById(batch.stream()
                 .map(Premium::getId)

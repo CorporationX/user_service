@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 @Configuration
-public class AsyncConfig {
+public class AsyncConfigTt {
     @Value("${spring.task.execution.pool.core-size}")
     private int coreSize;
     @Value("${spring.task.execution.pool.max-size}")

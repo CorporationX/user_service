@@ -19,12 +19,14 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipOfferedEvent;
 import school.faang.user_service.event.mentorship.request.MentorshipRequestedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipOfferedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
@@ -66,6 +68,8 @@ class MentorshipRequestServiceImplTest {
     private SelfMentorshipValidator selfMentorshipValidator;
     @Mock
     private MentorshipAcceptedEventPublisher eventPublisher;
+    @Mock
+    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
     @Captor
     private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
     @Captor
@@ -132,7 +136,7 @@ class MentorshipRequestServiceImplTest {
         when(mentorshipRequestRepository.save(request)).thenReturn(request);
         when(mapper.toDto(request)).thenReturn(dto);
         doNothing().when(mentorshipRequestedEventPublisher).publish(any(MentorshipRequestedEvent.class));
-
+        doNothing().when(mentorshipOfferedEventPublisher).publish(any(MentorshipOfferedEvent.class));
         var result = sut.requestMentorship(dto);
 
         verify(mapper, times(1)).toEntity(dtoCaptor.capture());

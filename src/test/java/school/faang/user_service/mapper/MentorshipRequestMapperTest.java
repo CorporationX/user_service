@@ -7,6 +7,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipOfferedEvent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,6 +73,32 @@ class MentorshipRequestMapperTest {
     @Test
     void toMentorshipAcceptedEvent_handlesNullRequest() {
         MentorshipAcceptedEvent event = mapper.toMentorshipAcceptedEvent(null);
+
+        assertThat(event).isNull();
+    }
+
+    @Test
+    void toMentorshipOfferedEvent_mapsFieldsCorrectly() {
+        MentorshipRequest request = new MentorshipRequest();
+        User requester = new User();
+        requester.setId(1L);
+        request.setRequester(requester);
+        User receiver = new User();
+        receiver.setId(2L);
+        request.setReceiver(receiver);
+        request.setId(100L);
+
+        MentorshipOfferedEvent event = mapper.toMentorshipOfferedEvent(request);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getRequesterId()).isEqualTo(1L);
+        assertThat(event.getReceiverId()).isEqualTo(2L);
+        assertThat(event.getMentorshipOfferId()).isEqualTo(100L);
+    }
+
+    @Test
+    void toMentorshipOfferedEvent_handlesNullRequest() {
+        MentorshipOfferedEvent event = mapper.toMentorshipOfferedEvent(null);
 
         assertThat(event).isNull();
     }

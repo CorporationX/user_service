@@ -8,6 +8,6 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class FollowerEvent {
-    Long subscriberId;
-    Long followerId;
+    private Long subscriberId;
+    private Long followerId;
 }

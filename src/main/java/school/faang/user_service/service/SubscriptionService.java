@@ -27,9 +27,8 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) throws DataFormatException {
-        //validateUsersSubs(followerId, followeeId);
+        validateUsersSubs(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
-
         publisher.publish(new FollowerEvent(followerId, followeeId));
     }
 

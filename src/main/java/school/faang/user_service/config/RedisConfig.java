@@ -21,12 +21,6 @@ public class RedisConfig {
     private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
-
-    @Bean(name = "followerChannelTopic")
-    public ChannelTopic followerChannelTopic() {
-        return new ChannelTopic(followerChannel);
-    }
-
     @Value("${spring.data.redis.channels.profile_picture_channel.name}")
     private String profilePicture;
 

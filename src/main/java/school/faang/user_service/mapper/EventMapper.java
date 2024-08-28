@@ -14,6 +14,7 @@ import school.faang.user_service.entity.event.Event;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface EventMapper {
     @Mapping(source = "owner.id", target = "ownerId")
+    @Mapping(target = "relatedSkills", ignore = true)
     EventDto toDto(Event event);
 
     Event toEntity(EventDto eventDto);

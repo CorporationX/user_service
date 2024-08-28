@@ -8,7 +8,6 @@ public class Scheduler {
 
     private final EventService eventService;
 
-    @Autowired
     public Scheduler(EventService eventService) {
         this.eventService = eventService;
     }

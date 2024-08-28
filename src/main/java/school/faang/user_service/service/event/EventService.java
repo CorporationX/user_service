@@ -14,14 +14,13 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.event.EventServiceValidator;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
@@ -50,6 +49,12 @@ public class EventService implements ListPartitioner {
 
     public EventDto getEvent(long eventId) {
         Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("Event not found for ID: " + eventId));
+        return eventMapper.toDto(event);
+    }
+
+    public EventDto getEventWithRelatedSkills(long eventId) {
+        Event event = eventRepository.findByIdWithRelatedSkills(eventId)
                 .orElseThrow(() -> new DataValidationException("Event not found for ID: " + eventId));
         return eventMapper.toDto(event);
     }
@@ -119,4 +124,38 @@ public class EventService implements ListPartitioner {
             executor.shutdown();
         });
     }
+
+    public List<EventDto> findEventsStartingIn(Duration duration) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime targetTime = now.plus(duration);
+        List<Event> events = eventRepository.findEventByStartDate(targetTime);
+        return events.stream()
+                .map(eventMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<EventDto> findEventsStartingInOneDay() {
+        return findEventsStartingIn(Duration.ofDays(1));
+    }
+
+    public List<EventDto> findEventsStartingInFiveHours() {
+        return findEventsStartingIn(Duration.ofHours(5));
+    }
+
+    public List<EventDto> findEventsStartingInOneHour() {
+        return findEventsStartingIn(Duration.ofHours(1));
+    }
+
+    public List<EventDto> findEventsStartingInTenMinutes() {
+        return findEventsStartingIn(Duration.ofMinutes(10));
+    }
+
+    public List<EventDto> findEventsAlreadyStarted() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> events = eventRepository.findEventByStartDate(now);
+        return events.stream()
+                .map(eventMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 }

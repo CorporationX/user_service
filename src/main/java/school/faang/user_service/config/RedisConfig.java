@@ -21,6 +21,8 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.mentorship_request_channel.name}")
+    private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
     @Value("${spring.data.redis.topic.userView}")
@@ -33,14 +35,8 @@ public class RedisConfig {
         void publish(ProfileViewEvent profileViewEvent);
     }
 
-    @Bean(name = "followerChannelTopic")
-    public ChannelTopic followerChannelTopic() {
-        return new ChannelTopic(followerChannel);
-    }
-
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -63,5 +59,15 @@ public class RedisConfig {
     @Bean
     ChannelTopic userViewTopic() {
         return new ChannelTopic(userView);
+    }
+
+    @Bean(name = "followerChannelTopic")
+    public ChannelTopic followerChannelTopic() {
+        return new ChannelTopic(followerChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipRequestTopic() {
+        return new ChannelTopic(mentorshipRequestTopicName);
     }
 }

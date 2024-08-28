@@ -30,10 +30,10 @@ spring:
       port: 6379
       host: localhost
       channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-            name: profile_view_channel
+        follower_view:
+          name: follower_view_channel
+        profile_view:
+          name: profile_view_channel
         event-start:
             name: event_start_channel
 
@@ -80,5 +80,3 @@ scheduler:
   clear-events:
     cron: "0 0 0 * * SUN"
     chunk-size: 10
-  check-events:
-    cron: "0 0/1 * 1/1 * ?"

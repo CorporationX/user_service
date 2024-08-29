@@ -29,6 +29,7 @@ public class UserDto {
     @NotNull(message = "Country title cannot be blank")
     private String countryTitle;
     private String contactPreference;
+    private Long telegramId;
 }
 
 

@@ -80,3 +80,5 @@ scheduler:
   clear-events:
     cron: "0 0 0 * * SUN"
     chunk-size: 10
+  check-events:
+    cron: "0 0/1 * 1/1 * ?"

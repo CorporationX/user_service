@@ -1,5 +1,6 @@
 package school.faang.user_service.service.userProfilePic;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.userProfile.UserProfileDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.event.profilepic.ProfilePicEvent;
+import school.faang.user_service.mapper.userProfilePic.ProfilePicEventMapper;
 import school.faang.user_service.mapper.userProfilePic.UserProfilePicMapper;
+import school.faang.user_service.messaging.publisher.profilepic.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.s3.MultipartFileCopyUtil;
+import school.faang.user_service.service.avatars.RandomAvatarService;
+import school.faang.user_service.util.multipart.MultipartFileCopyUtil;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.io.IOException;
@@ -39,6 +44,13 @@ class UserProfilePicServiceTest {
     private UserProfilePicMapper userProfilePicMapper;
     @Mock
     private MultipartFileCopyUtil multipartFileCopyUtil;
+    @Mock
+    private ProfilePicEventPublisher profilePicEventPublisher;
+    @Mock
+    private ProfilePicEventMapper profilePicEventMapper;
+    @Mock
+    private RandomAvatarService randomAvatarService;
+
     private MultipartFile multipartFile;
     private InputStream inputStream;
     private User user;
@@ -71,7 +83,7 @@ class UserProfilePicServiceTest {
     @DisplayName("checkTheUserInTheDatabaseException")
     void testCheckTheUserInTheDatabaseFalse() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(NullPointerException.class, () -> userProfilePicService.addImageInProfile(userId, multipartFile));
+        assertThrows(EntityNotFoundException.class, () -> userProfilePicService.addImageInProfile(userId, multipartFile));
     }
 
     @Test
@@ -83,6 +95,9 @@ class UserProfilePicServiceTest {
         when(s3Service.uploadFile(any(MultipartFile.class), anyString())).thenReturn("");
         when(userRepository.save(any(User.class))).thenReturn(new User());
         when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
+        when(profilePicEventMapper.toProfilePicEvent(any(User.class))).thenReturn(new ProfilePicEvent());
+        doNothing().when(profilePicEventPublisher)
+                        .publish(any(ProfilePicEvent.class));
 
         userProfilePicService.addImageInProfile(userId, multipartFile);
 
@@ -90,6 +105,20 @@ class UserProfilePicServiceTest {
         verify(multipartFileCopyUtil, times(2)).compressionMultipartFile(any(MultipartFile.class), anyInt());
         verify(s3Service, times(2)).uploadFile(any(MultipartFile.class), anyString());
         verify(userRepository, times(1)).save(any(User.class));
+        verify(userProfilePicMapper, times(1)).toDto(any(User.class));
+        verify(profilePicEventMapper, times(1)).toProfilePicEvent(any(User.class));
+        verify(profilePicEventPublisher, times(1)).publish(any(ProfilePicEvent.class));
+    }
+
+    @Test
+    void testAddImageInProfileToDtoWithoutFileUpload() throws IOException {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+        when(userProfilePicMapper.toDto(any(User.class))).thenReturn(userProfileDto);
+
+        userProfilePicService.addImageInProfile(userId, null);
+
+        verify(randomAvatarService, times(1)).generateAndStoreAvatar(any(User.class));
+        verify(userRepository, times(1)).findById(anyLong());
         verify(userProfilePicMapper, times(1)).toDto(any(User.class));
     }
 

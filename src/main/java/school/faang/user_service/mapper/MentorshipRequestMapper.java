@@ -6,6 +6,8 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipOfferedEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipRequestedEvent;
 
 @Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
@@ -24,4 +26,14 @@ public interface MentorshipRequestMapper {
     @Mapping(source = "receiver.id", target = "receiverId")
     @Mapping(source = "id", target = "mentorshipRequestId")
     MentorshipAcceptedEvent toMentorshipAcceptedEvent(MentorshipRequest mentorshipRequest);
+
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    @Mapping(target = "timestamp", expression = "java(java.time.LocalDateTime.now())")
+    MentorshipRequestedEvent toMentorshipRequestedEvent(MentorshipRequest mentorshipRequest);
+
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    @Mapping(source = "id", target = "mentorshipOfferId")
+    MentorshipOfferedEvent toMentorshipOfferedEvent(MentorshipRequest mentorshipRequest);
 }

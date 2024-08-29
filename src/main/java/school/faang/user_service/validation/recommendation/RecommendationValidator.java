@@ -11,7 +11,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

@@ -1,9 +1,11 @@
 package school.faang.user_service.service.goal;
 
+import static school.faang.user_service.exception.ExceptionMessages.DELETION_ERROR_MESSAGE;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.component.DeletionDataComponent;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 /**
@@ -18,15 +20,18 @@ public class GoalInvitationService {
       = "Все приглашения для целей были удалены.";
 
   private final GoalRepository goalRepository;
-  private final DeletionDataComponent deletionDataComponent;
 
   /**
    * Метод для удаления отправленных или полученных целей пользователя.
    * @param userId id пользователя, чей аккаунт деактивируется.
    */
   public void deleteGoalInvitations(long userId) {
-    deletionDataComponent.deleteData(() -> goalRepository.deleteAllGoalInvitationById(userId));
-    log.info(MESSAGE_ABOUT_DELETE_GOAL_INVITATIONS);
+    try {
+      goalRepository.deleteAllGoalInvitationById(userId);
+      log.info(MESSAGE_ABOUT_DELETE_GOAL_INVITATIONS);
+    } catch (AopInvocationException e) {
+      log.error(DELETION_ERROR_MESSAGE, e);
+    }
   }
 
 }

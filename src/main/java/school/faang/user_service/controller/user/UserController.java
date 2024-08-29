@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.controller.ApiPath;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.user.DeactivateUserService;
+import school.faang.user_service.service.user.DeactivateUserFacade;
 import school.faang.user_service.service.user.UserService;
 
 /**
@@ -25,7 +25,7 @@ import school.faang.user_service.service.user.UserService;
 @RequestMapping(ApiPath.USERS)
 public class UserController {
 
-  private final DeactivateUserService deactivateUserService;
+  private final DeactivateUserFacade deactivateUserFacade;
   private final UserService userService;
 
   @GetMapping("/user/{userId}/deactivate")
@@ -36,7 +36,7 @@ public class UserController {
   public ResponseEntity<UserDto> deactivateUser(@PathVariable("userId") long userId) {
     return ResponseEntity.status(HttpStatus.OK)
         .contentType(MediaType.APPLICATION_JSON)
-        .body(deactivateUserService.deactivateUser(userId));
+        .body(deactivateUserFacade.deactivateUser(userId));
   }
 
   @GetMapping("/users/{id}")

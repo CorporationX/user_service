@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.userPremium.UserFilterDto;
 import school.faang.user_service.dto.userPremium.UserPremiumDto;
-import school.faang.user_service.service.user.DeactivateUserService;
+import school.faang.user_service.service.user.DeactivateUserFacade;
 import school.faang.user_service.service.userPremium.UserPremiumService;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +37,7 @@ class UserControllerTest {
   @InjectMocks
   private UserController userController;
   @Mock
-  private DeactivateUserService userService;
+  private DeactivateUserFacade userService;
 
   private UserDto createUserDto() {
     return UserDto.builder()

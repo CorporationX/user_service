@@ -1,8 +1,8 @@
-package school.faang.user_service.repository;
+package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -11,13 +11,12 @@ import school.faang.user_service.service.goal.GoalInvitationService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.user.UserService;
 
 /**
  * Класс реализации логики по деактивации пользователя.
  */
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class DeactivateUserFacade {
 

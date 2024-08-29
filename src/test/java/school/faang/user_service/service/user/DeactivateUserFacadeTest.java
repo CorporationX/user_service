@@ -1,4 +1,4 @@
-package school.faang.user_service.repository;
+package school.faang.user_service.service.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,7 +21,6 @@ import school.faang.user_service.service.goal.GoalInvitationService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.user.UserService;
 
 @ExtendWith(MockitoExtension.class)
 class DeactivateUserFacadeTest {

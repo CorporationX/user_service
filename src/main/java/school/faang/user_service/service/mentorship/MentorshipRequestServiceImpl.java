@@ -1,14 +1,16 @@
 package school.faang.user_service.service.mentorship;
 
+import static school.faang.user_service.exception.ExceptionMessages.DELETION_ERROR_MESSAGE;
+
 import jakarta.persistence.PersistenceException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.component.DeletionDataComponent;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -38,7 +40,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final List<MentorshipValidator> mentorshipValidators;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedPublisher;
     private final MentorshipRequestedEventPublisher mentorshipRequestedPublisher;
-    private final DeletionDataComponent deletionDataComponent;
     private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Override
@@ -119,7 +120,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
      * @param userId  id пользователя, чей аккаунт деактивируется.
      */
     public void deleteMentorshipRequests(long userId) {
-        deletionDataComponent.deleteData(() -> mentorshipRequestRepository.deleteAllMentorshipRequestById(userId));
-        log.info(MESSAGE_ABOUT_DELETE_MENTORSHIP_REQUESTS);
+        try {
+            mentorshipRequestRepository.deleteAllMentorshipRequestById(userId);
+            log.info(MESSAGE_ABOUT_DELETE_MENTORSHIP_REQUESTS);
+        } catch (AopInvocationException e) {
+            log.error(DELETION_ERROR_MESSAGE, e);
+        }
     }
 }

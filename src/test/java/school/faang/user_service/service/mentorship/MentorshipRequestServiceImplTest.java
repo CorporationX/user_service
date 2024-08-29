@@ -34,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
-import school.faang.user_service.component.DeletionDataComponent;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -48,7 +47,6 @@ import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipOfferedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
@@ -71,8 +69,6 @@ class MentorshipRequestServiceImplTest {
     private SelfMentorshipValidator selfMentorshipValidator;
     @Mock
     private MentorshipAcceptedEventPublisher eventPublisher;
-    @Mock
-    private DeletionDataComponent deletionDataComponent;
     @Mock
     private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
     @Captor

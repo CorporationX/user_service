@@ -32,7 +32,7 @@ spring:
           name: mentorship_request_channel
 
 server:
-  port: 8080
+  port: 8081
 
 logging:
   level:
@@ -59,3 +59,12 @@ services:
 number-months:
   new:
     request: 6
+
+task:
+  expired-premium-remove:
+    remove-premium-interval : "@weekly"
+    batch-size : 10
+    thread-pool:
+      core-pool-size : 10
+      max-pool-capacity : 20
+      queue-capacity : 500

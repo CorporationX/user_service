@@ -9,6 +9,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.filters.InvitationInviterNameFilter;
 
+
 import java.util.List;
 import java.util.stream.Stream;
 

@@ -19,6 +19,7 @@ import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedE
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipOfferedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
@@ -38,6 +39,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedPublisher;
     private final MentorshipRequestedEventPublisher mentorshipRequestedPublisher;
     private final DeletionDataComponent deletionDataComponent;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Override
     @Transactional
@@ -52,7 +54,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             log.error(ExceptionMessages.FAILED_PERSISTENCE, e);
             throw new PersistenceException(ExceptionMessages.FAILED_PERSISTENCE, e);
         }
-        mentorshipRequestedPublisher.toEventAndPublish(mentorshipRequestDto);
+        mentorshipRequestedPublisher.publish(mapper.toMentorshipRequestedEvent(savedRequest));
+        mentorshipOfferedEventPublisher.publish(mapper.toMentorshipOfferedEvent(savedRequest));
 
         return mapper.toDto(savedRequest);
     }

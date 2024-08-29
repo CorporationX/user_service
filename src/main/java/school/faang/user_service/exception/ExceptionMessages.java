@@ -44,4 +44,7 @@ public final class ExceptionMessages {
   public static final String USER_IS_NULL = "Пользователь c id - %s не был найден.";
 
   public static final String DELETION_ERROR_MESSAGE = "Произошла ошибка при удалении записи.";
+
+  // avatars
+  public static final String IMAGE_BYTES_EMPTY = "Image bytes cannot be empty.";
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.controller.ApiPath;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.DeactivateUserService;
+import school.faang.user_service.service.user.UserService;
 
 /**
  * Контроллер отвечающий за обработку запросов пользователя для управления пользователями.
@@ -25,6 +26,7 @@ import school.faang.user_service.service.user.DeactivateUserService;
 public class UserController {
 
   private final DeactivateUserService deactivateUserService;
+  private final UserService userService;
 
   @GetMapping("/user/{userId}/deactivate")
   @ApiResponses(value = {
@@ -35,6 +37,11 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK)
         .contentType(MediaType.APPLICATION_JSON)
         .body(deactivateUserService.deactivateUser(userId));
+  }
+
+  @GetMapping("/users/{id}")
+  public UserDto getUser(@PathVariable long id){
+    return userService.getUser(id);
   }
 
 }

@@ -7,7 +7,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.publisher.goal.GoalEventPublisher;
 
 @Configuration
 public class RedisConfig {
@@ -16,6 +20,9 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+
+    @Value("${spring.data.redis.channels.goal_channel.name}")
+    private String goalTopicName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -27,9 +34,20 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(serializer);
         return redisTemplate;
+    }
+
+    @Bean
+    EventPublisher goalPublisher() {
+        return new GoalEventPublisher(redisTemplate(redisConnectionFactory()),goalTopic());
+    }
+
+    @Bean
+    ChannelTopic goalTopic(){
+        return new ChannelTopic(goalTopicName);
     }
 }

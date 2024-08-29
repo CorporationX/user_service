@@ -49,8 +49,18 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
     isMocked: true
+  frofilePic:
+    fileLimit: 5000000
+    maxImagePicture: 1080
+    minImagePicture: 170
+
+app:
+  password-length: 12
 
 premium-remover:
   cron: * * * * * 0

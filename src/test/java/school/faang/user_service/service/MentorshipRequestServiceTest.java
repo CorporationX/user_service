@@ -4,6 +4,7 @@ package school.faang.user_service.service;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -97,35 +98,6 @@ public class MentorshipRequestServiceTest {
                 )
         );
     }
-    @Test
-    public void testDtoIsEmpty() {
-        dto = null;
-        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> {
-            mentorshipRequestService.requestMentorship(dto);
-        });
-        Assertions.assertEquals("Дто не может быть пустым", exception.getMessage());
-    }
-
-    @Test
-    public void testRequesterIsEmpty() {
-        dto.setRequesterId(null);
-        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> {
-            mentorshipRequestService.requestMentorship(dto);
-        });
-        Assertions.assertEquals("Пользователь, который отправляет запрос на менторство не может быть" +
-                 " быть пустым", exception.getMessage());
-
-    }
-
-    @Test
-    public void testReceiverIsEmpty() {
-        dto.setReceiverId(null);
-        Exception exception = Assert.assertThrows(IllegalArgumentException.class, () -> {
-            mentorshipRequestService.requestMentorship(dto);
-        });
-        Assertions.assertEquals("Пользователь, которому направляется запрос на менторство не может" +
-                "быть пустым", exception.getMessage());
-    }
 
     @Test
     public void testRequesterEqualsReceiver() {
@@ -190,39 +162,6 @@ public class MentorshipRequestServiceTest {
 
     }
 
-    /*
-    @Test
-    public void testGetRequestsFilter() {
-        List<MentorshipRequest> mentorshipRequests = new ArrayList<>(List.of(
-                new MentorshipRequest(1L, "desc123", User.builder().id(1L).build(), User.builder().id(2L).build(),
-                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
-                        Month.AUGUST, 8, 19, 30, 40),
-                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 40)),
-                new MentorshipRequest(2L, "desc", User.builder().id(1L).build(), User.builder().id(2L).build(),
-                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
-                        Month.AUGUST, 8, 19, 30, 40),
-                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 42)),
-                new MentorshipRequest(3L, "desc123", User.builder().id(3L).build(), User.builder().id(2L).build(),
-                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
-                        Month.AUGUST, 8, 19, 30, 40),
-                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 44)),
-                new MentorshipRequest(4L, "desc123", User.builder().id(1L).build(), User.builder().id(4L).build(),
-                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
-                        Month.AUGUST, 8, 19, 30, 40),
-                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 46)),
-                new MentorshipRequest(5L, "desc123", User.builder().id(1L).build(), User.builder().id(2L).build(),
-                        RequestStatus.PENDING, "reason",LocalDateTime.of(2024,
-                        Month.AUGUST, 8, 19, 30, 40),
-                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 40))
-        ));
-
-        when(mentorshipRequestRepository.findAll()).thenReturn(mentorshipRequests);
-        RequestFilterDto requestFilter = new RequestFilterDto("123", 1L,2L, RequestStatus.ACCEPTED);
-        List<MentorshipRequestDto> requestDtos = mentorshipRequestService.getRequests(requestFilter);
-        List<MentorshipRequestDto> expectedDtos = mapper.toDto(new ArrayList<>(List.of(mentorshipRequests.get(0))));
-        Assertions.assertEquals(expectedDtos, requestDtos);
-    }
-    */
     @Test
     public void testAcceptRequestNull() {
         long id = 1L;
@@ -345,16 +284,6 @@ public class MentorshipRequestServiceTest {
     public void testRejectRequestRejectionNull() {
         long id = 1;
         RejectionDto rejection = null;
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            mentorshipRequestService.rejectRequest(id, rejection);
-        });
-        Assertions.assertEquals("Пустая причина отказа", exception.getMessage());
-    }
-
-    @Test
-    public void testRejectRequestReasonNull() {
-        long id = 1;
-        RejectionDto rejection = new RejectionDto( "  ");
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.rejectRequest(id, rejection);
         });

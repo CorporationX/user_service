@@ -1,7 +1,7 @@
 package school.faang.user_service.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import jakarta.validation.constraints.Max;
+import lombok.*;
 
 @Data
 @Builder
@@ -10,5 +10,6 @@ public class RequestFilterDto {
     private String status;
     private Long requesterId;
     private Long receiverId;
+    @Max(value = 255, message = "Длина фильтра не может быть больше 255 символов")
     private String descriptionPattern;
 }

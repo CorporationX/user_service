@@ -1,19 +1,21 @@
 package school.faang.user_service.repository.goal;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-
 import java.util.List;
 import java.util.stream.Stream;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 
 @Repository
 public interface GoalRepository extends CrudRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
-            SELECT * FROM goal g
+            SELECT g.* FROM goal g
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)
@@ -49,4 +51,14 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        delete
+        from goal_invitation gi
+        where gi.inviter_id = :id or gi.invited_id = :id
+        """, nativeQuery = true)
+    int deleteAllGoalInvitationById(@Param("id") long id);
+
 }

@@ -3,6 +3,9 @@ package school.faang.user_service.service.premium;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,10 +24,16 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PremiumService {
 
     private final UserRepository userRepository;
@@ -79,6 +88,21 @@ public class PremiumService {
 
         if (!isValidResponse(response)) {
             throw new RuntimeException("Payment failed");
+        }
+    }
+
+    @Transactional
+    public void removePremiums() {
+        List<Premium> premiumsForDelete = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
+        if (!premiumsForDelete.isEmpty()) {
+            List<Long> premiumIds = premiumsForDelete.stream()
+                            .map(Premium::getId)
+                            .toList();
+            premiumRepository.deleteByIds(premiumIds);
+            List<PremiumDto> PremiumDtos = premiumMapper.toDto(premiumsForDelete);
+            log.info(LocalDateTime.now() + " Удалены премиумы\n" + PremiumDtos);
+        } else {
+            log.info(LocalDateTime.now() + " Премиумы для удаления отсутствуют");
         }
     }
 }

@@ -61,3 +61,7 @@ services:
 
 app:
   password-length: 12
+
+premium-remover:
+  cron: * * * * * 0
+  amount-thread-executor: 10

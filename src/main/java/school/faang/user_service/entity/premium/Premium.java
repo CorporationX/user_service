@@ -2,6 +2,7 @@ package school.faang.user_service.entity.premium;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,6 +19,7 @@ import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +32,7 @@ public class Premium {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -41,4 +43,5 @@ public class Premium {
     @Column(name = "end_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endDate;
+
 }

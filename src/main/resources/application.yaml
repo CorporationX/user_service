@@ -25,11 +25,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-          name: profile_view_channel
-        mentorship_channel:
-          name: mentorship_check_channel
-        mentorship_request_channel:
-          name: mentorship_request_channel
+            name: profile_view_channel
 
 server:
   port: 8080
@@ -56,6 +52,5 @@ services:
     bucket-name: user_backet
     isMocked: true
 
-number-months:
-  new:
-    request: 6
+recommendation:
+  last-recommendation-limit-months : 6

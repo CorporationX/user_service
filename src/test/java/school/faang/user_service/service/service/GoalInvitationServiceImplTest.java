@@ -12,12 +12,12 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.filter.invitation.InvitationFilter;
+import school.faang.user_service.filters.InvitationFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.service.GoalInvitationServiceImpl;
-import school.faang.user_service.validator.InvitationDtoValidator;
+import school.faang.user_service.validator.InvintationDtoValidatorImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class GoalInvitationServiceImplTest {
     @Mock
     private List<InvitationFilter> invitationFilters;
     @Mock
-    private InvitationDtoValidator invitationDtoValidatorImpl;
+    private InvintationDtoValidatorImpl invintationDtoValidatorImpl;
 
     @Mock
     private GoalInvitationMapper goalInvitationMapper;
@@ -122,7 +122,7 @@ public class GoalInvitationServiceImplTest {
 
         assertEquals(savedDto, result);
 
-        verify(invitationDtoValidatorImpl, times(1)).validate(goalInvitationDto);
+        verify(invintationDtoValidatorImpl, times(1)).validate(goalInvitationDto);
         verify(goalInvitationMapper, times(1)).toEntity(goalInvitationDto);
         verify(goalInvitationRepository, times(1)).save(goalInvitation);
         verify(goalInvitationMapper, times(1)).toDto(savedInvitation);

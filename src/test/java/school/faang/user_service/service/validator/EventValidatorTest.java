@@ -14,7 +14,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.event.EventValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.ArrayList;
 import java.util.Optional;

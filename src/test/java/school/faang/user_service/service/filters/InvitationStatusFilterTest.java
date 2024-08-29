@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.filter.invitation.InvitationStatusFilter;
+import school.faang.user_service.filters.InvitationStatusFilter;
+
 
 import java.util.List;
 import java.util.stream.Stream;

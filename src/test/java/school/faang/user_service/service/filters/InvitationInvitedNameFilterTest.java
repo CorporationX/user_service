@@ -7,7 +7,8 @@ import org.mockito.Mockito;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.filter.invitation.InvitationInvitedNameFilter;
+import school.faang.user_service.filters.InvitationInvitedNameFilter;
+
 
 import java.util.List;
 import java.util.stream.Stream;

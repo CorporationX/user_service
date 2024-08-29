@@ -8,7 +8,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipUserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.mentorship.MentorshipNoSuchElementException;
 import school.faang.user_service.mapper.mentorship.MentorshipMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
@@ -84,7 +84,7 @@ class MentorshipServiceTest {
     @DisplayName("Get mentees failure")
     public void testGetMenteesFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(MentorshipNoSuchElementException.class,
                 () -> mentorshipService.getMentees(anyLong()));
     }
 
@@ -92,7 +92,7 @@ class MentorshipServiceTest {
     @DisplayName("Get mentors successful")
     public void testGetMentorsFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(MentorshipNoSuchElementException.class,
                 () -> mentorshipService.getMentors(anyLong()));
     }
 
@@ -123,7 +123,7 @@ class MentorshipServiceTest {
     public void testDeleteMentorshipRelationsFailure() {
         when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(mentorshipRepository.findById(MENTOR_ID)).thenReturn(Optional.of(userMentee));
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(MentorshipNoSuchElementException.class,
                 () -> mentorshipService.deleteMentorshipRelations(MENTOR_ID, anyLong()));
     }
 }

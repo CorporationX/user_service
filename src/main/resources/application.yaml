@@ -28,12 +28,20 @@ spring:
           name: profile_view_channel
         mentorship_requested_channel:
           name: mentorship_requested_channel
+
+        recommendation_received:
+          name: recommendation_received_channel
+
         mentorship_accepted_channel:
           name: mentorship_accepted_channel
         recommendation_channel:
           name: recommendation_channel
         recommendation_requested:
           name: recommendation_requested_channel
+        mentorship_offered_channel:
+          name: mentorship_offered_channel
+        profile_pic_channel:
+          name: profile_pic_channel
 
 server:
   port: 8080
@@ -62,3 +70,20 @@ services:
     secretKey: password
     bucketName: corpbucket
     isMocked: true
+
+premium:
+  removal:
+    scheduled:
+      cron: "0 0 10 * * MON"
+    batchSize:
+      size: 100
+async:
+  core-pool-size: 5
+  max-pool-size: 50
+  queue-capacity: 100
+
+dicebear:
+  avatar:
+    styles: "adventurer,adventurer-neutral,avataaars,avataaars-neutral,big-ears,big-ears-neutral,big-smile,bottts,bottts-neutral,croodles,croodles-neutral,dylan,micah,fun-emoji,lorelei,lorelei-neutral,notionists,notionists-neutral,micah,miniavs,open-peeps,personas,pixel-art,pixel-art-neutral"
+    base-url: "https://api.dicebear.com/9.x/"
+    style-path: "/{style}/svg"

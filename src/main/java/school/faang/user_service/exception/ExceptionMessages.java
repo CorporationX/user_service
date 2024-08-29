@@ -44,4 +44,7 @@ public final class ExceptionMessages {
 
     public static final String TOPIC_PUBLICATION_EXCEPTION = "An error occurred while publishing the topic: ";
     public static final String WRITING_TO_JSON_EXCEPTION = "An error occurred while writing to json: ";
+
+    // avatars
+    public static final String IMAGE_BYTES_EMPTY = "Image bytes cannot be empty.";
 }

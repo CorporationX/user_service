@@ -12,6 +12,8 @@ public class MentorshipRedisConfig {
     private String mentorshipRequestedChannelName;
     @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
     private String mentorshipAcceptedChannelName;
+    @Value("${spring.data.redis.channels.mentorship_offered_channel.name}")
+    private String mentorshipOfferedChannelName;
 
     @Bean
     public ChannelTopic mentorshipAcceptedTopic() {
@@ -21,5 +23,10 @@ public class MentorshipRedisConfig {
     @Bean
     public ChannelTopic mentorshipRequestedTopic() {
         return new ChannelTopic(mentorshipRequestedChannelName);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipOfferedTopic() {
+        return new ChannelTopic(mentorshipOfferedChannelName);
     }
 }

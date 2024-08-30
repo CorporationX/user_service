@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
@@ -13,6 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RequestException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.filter.Filter;
@@ -40,12 +42,15 @@ public class MentorshipRequestServiceTest {
     Filter filterMock = Mockito.mock(Filter.class);
     List<Filter<RequestFilterDto, MentorshipRequest>> filters = List.of(filterMock);
     private final MentorshipOfferedEventService mentorshipOfferedEventService = Mockito.mock(MentorshipOfferedEventService.class);
-
+    @Mock
+    MentorshipEventPublisher mentorshipEventPublisher;
     MentorshipRequestService mentorshipRequestService =
             new MentorshipRequestService(mentorshipRequestRepository,
                     userRepository,
                     mapperMock,
-                    filters, mentorshipOfferedEventService);
+                    filters,
+                    mentorshipOfferedEventService,
+                    mentorshipEventPublisher);
 
     private final MentorshipRequestDtoForRequest requestDto = new MentorshipRequestDtoForRequest();
     private final MentorshipRequestDtoForResponse responseDto = new MentorshipRequestDtoForResponse();

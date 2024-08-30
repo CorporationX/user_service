@@ -21,6 +21,8 @@ public class RedisConfig {
     private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopicName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -45,5 +47,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic mentorshipRequestTopic() {
         return new ChannelTopic(mentorshipRequestTopicName);
+    }
+
+    @Bean(name = "profileViewTopic")
+    private ChannelTopic profileViewChannel() {
+        return new ChannelTopic(profileViewTopicName);
     }
 }

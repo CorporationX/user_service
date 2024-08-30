@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service;
+package school.faang.user_service.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;

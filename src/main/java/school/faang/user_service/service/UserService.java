@@ -12,9 +12,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -36,10 +38,14 @@ public class UserService {
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
     private final ObjectMapper objectMapper;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Transactional(readOnly = true)
-    public UserDto getUser(long userId) {
+    public UserDto getUser(long userId, long viewId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
+
+        publishViewProfile(userId, viewId);
+
         return userMapper.toDto(user);
     }
 
@@ -138,5 +144,12 @@ public class UserService {
         mentee.getGoals().stream()
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
+    }
+
+    private void publishViewProfile(long userOwnerId, long viewId) {
+        profileViewEventPublisher.publish(ProfileViewEvent.builder()
+                .userOwnerId(userOwnerId)
+                .viewId(viewId)
+                .build());
     }
 }

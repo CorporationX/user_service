@@ -13,9 +13,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -54,15 +56,19 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private MentorshipService mentorshipService;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     @InjectMocks
     private UserService userService;
 
     private long userId;
+    private long viewId;
     private User user;
     private UserDto userDto;
     private User mentee;
     private Goal mentorAssignedGoal;
+    private ProfileViewEvent profileViewEvent;
     private List<User> users;
     private List<Long> userIds;
     private List<UserDto> userDtoList;
@@ -76,6 +82,7 @@ class UserServiceTest {
         List<Event> ownedEvents = new ArrayList<>();
 
         userId = 1L;
+        viewId = 2L;
         long countryId = 2L;
         userFollowers = List.of(new User());
 
@@ -119,14 +126,20 @@ class UserServiceTest {
         goalList.add(goal);
         userList.add(user);
         ownedEvents.add(event);
+
+        profileViewEvent = ProfileViewEvent.builder()
+                .userOwnerId(userId)
+                .viewId(viewId)
+                .build();
     }
 
     @Test
     @DisplayName("testing getUser method")
     public void testGetUser() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
-        userService.getUser(userId);
+        userService.getUser(userId, viewId);
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
+        verify(profileViewEventPublisher, times(1)).publish(profileViewEvent);
         verify(userMapper, times(1)).toDto(user);
     }
 

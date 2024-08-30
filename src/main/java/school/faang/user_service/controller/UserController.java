@@ -34,10 +34,10 @@ public class UserController {
         return userService.createUser(userDto, multipartFile);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/view/{viewId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto getUser(@PathVariable Long userId) {
-        return userService.getUser(userId);
+    public UserDto getUser(@PathVariable Long userId, @PathVariable Long viewId) {
+        return userService.getUser(userId, viewId);
     }
 
     @PutMapping("/{userId}/avatar")

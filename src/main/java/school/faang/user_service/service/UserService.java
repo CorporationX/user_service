@@ -28,11 +28,6 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(()-> new DataValidationException(String.format("Not found user with id: %d", id)));
 
-        PreferredContact contact = user.getContactPreference().getPreference();
-
-        UserDto userDto = userMapper.toDto(user);
-        userDto.setPreference(contact);
-
-        return userDto;
+        return userMapper.toDto(user);
     }
 }

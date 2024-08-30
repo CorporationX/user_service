@@ -28,21 +28,11 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(()-> new DataValidationException(String.format("Not found user with id: %d", id)));
 
-        long preferredContactId = userRepository.getPreferredContact(id).orElse(0L);
-        PreferredContact contact = PreferredContact.fromOrdinal(preferredContactId);
+        PreferredContact contact = user.getContactPreference().getPreference();
 
         UserDto userDto = userMapper.toDto(user);
         userDto.setPreference(contact);
 
         return userDto;
-    }
-
-    public UserDto getUserById(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return userMapper.toDto(user.get());
-        } else {
-            throw new RuntimeException("user not found");
-        }
     }
 }

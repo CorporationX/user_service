@@ -26,11 +26,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
-
-    @Query(nativeQuery = true, value = """
-            SELECT cp.preference FROM users u 
-                JOIN contact_preferences cp ON cp.user_id = u.id
-            WHERE u.id =:userId
-            """)
-    Optional<Long> getPreferredContact(long userId);
 }

@@ -14,14 +14,4 @@ public enum PreferredContact {
         }
         throw new IllegalArgumentException("No contact preference with name " + preference + " found");
     }
-
-    public static PreferredContact fromOrdinal(long preferenceId) {
-        for (PreferredContact contact : PreferredContact.values()) {
-            if (contact.ordinal() == preferenceId) {
-                return contact;
-            }
-        }
-        log.error("Ordinal is not exist: {}", preferenceId);
-        throw new IllegalArgumentException("Not found contact preference with ordinal " + preferenceId);
-    }
 }

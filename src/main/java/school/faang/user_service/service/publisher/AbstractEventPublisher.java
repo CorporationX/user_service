@@ -20,8 +20,7 @@ public class AbstractEventPublisher<T> {
 
     protected String convertToMessage(T event) {
         try {
-            String message = objectMapper.writeValueAsString(event);
-            return message;
+            return objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
             log.error("Error serializing event", e);
             throw new RuntimeException("Error serializing event", e);

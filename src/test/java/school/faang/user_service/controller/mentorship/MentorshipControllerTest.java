@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.dto.MentorshipDto;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class MentorshipControllerTest {

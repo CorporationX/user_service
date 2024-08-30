@@ -1,5 +1,12 @@
 package school.faang.user_service.service.user;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,60 +16,54 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
-    @Mock
-    private UserRepository userRepository;
-    @InjectMocks
-    private UserService userService;
-    private long id = 1L;
+public class UserServiceTest {
 
-    @Test
-    void testGetUserByIdException() {
-        when(userRepository.findById(anyLong()))
-                .thenThrow(new RuntimeException("ошибка"));
+  @Mock
+  private UserRepository userRepository;
+  @InjectMocks
+  private UserService userService;
+  private long id = 1L;
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                userService.getUserById(id));
+  @Test
+  void testGetUserByIdException() {
+    when(userRepository.findById(anyLong()))
+        .thenThrow(new RuntimeException("ошибка"));
 
-        assertEquals("ошибка", exception.getMessage());
-    }
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        userService.getUserById(id));
 
-    @Test
-    void testGetUserByIdValid() {
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.ofNullable(User.builder().id(1L).build()));
+    assertEquals("ошибка", exception.getMessage());
+  }
 
-        userService.getUserById(id);
-    }
+  @Test
+  void testGetUserByIdValid() {
+    when(userRepository.findById(anyLong()))
+        .thenReturn(Optional.ofNullable(User.builder().id(1L).build()));
 
-    @Test
-    void testGetUserSkillsIdException() {
-        when(userRepository.findById(anyLong()))
-                .thenThrow(new RuntimeException("ошибка"));
+    userService.getUserById(id);
+  }
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                userService.getUserSkillsId(id));
+  @Test
+  void testGetUserSkillsIdException() {
+    when(userRepository.findById(anyLong()))
+        .thenThrow(new RuntimeException("ошибка"));
 
-        assertEquals("ошибка", exception.getMessage());
-    }
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        userService.getUserSkillsId(id));
 
-    @Test
-    void testGetUserSkillsIdValid() {
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.ofNullable(User.builder()
-                        .id(1L)
-                        .skills(List.of(Skill.builder().id(1L).build()))
-                        .build()));
+    assertEquals("ошибка", exception.getMessage());
+  }
 
-        userService.getUserSkillsId(id);
-    }
+  @Test
+  void testGetUserSkillsIdValid() {
+    when(userRepository.findById(anyLong()))
+        .thenReturn(Optional.ofNullable(User.builder()
+            .id(1L)
+            .skills(List.of(Skill.builder().id(1L).build()))
+            .build()));
+
+    userService.getUserSkillsId(id);
+  }
+
 }

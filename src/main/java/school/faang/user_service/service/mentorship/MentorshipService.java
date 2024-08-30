@@ -1,31 +1,36 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
+
+import static school.faang.user_service.exception.ExceptionMessages.DELETION_ERROR_MESSAGE;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 /**
  * Класс-сервис, который отвечает за бизнес-логику управления наставничеством.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MentorshipService {
 
   private static final int MIN_VALUE_DELETED_ROWS = 0;
-  private static final String DELETION_ERROR_MESSAGE = "Произошла ошибка при удалении записи.";
-  private static final Logger LOG = LoggerFactory.getLogger(MentorshipService.class);
+  private static final String MESSAGE_ABOUT_REMOVE_MENTOR_FROM_MENTEE_LIST
+      = "Пользователь был удален из целей, которые он создал.";
 
   private final MentorshipRepository mentorshipRepository;
   private final MentorshipMapper mentorshipMapper;
 
   /**
    * Метод для получения всех менти одного пользователя.
+   *
    * @param userId id пользователя.
    * @return список всех доступных менти для пользователя.
    */
@@ -37,6 +42,7 @@ public class MentorshipService {
 
   /**
    * Метод для получения всех менторов одного пользователя
+   *
    * @param userId id пользователя.
    * @return список всех доступных менторов для пользователя.
    */
@@ -56,11 +62,23 @@ public class MentorshipService {
     int result = MIN_VALUE_DELETED_ROWS;
     try {
       result = mentorshipRepository.deleteMentorshipById(
-            mentorshipRepository.getMentorshipIdByMentorIdAndMenteeId(mentorId, menteeId));
+          mentorshipRepository.getMentorshipIdByMentorIdAndMenteeId(mentorId, menteeId));
     } catch (AopInvocationException e) {
-      LOG.error(DELETION_ERROR_MESSAGE, e);
+      log.error(DELETION_ERROR_MESSAGE, e);
     }
     return result > MIN_VALUE_DELETED_ROWS ? Boolean.TRUE : Boolean.FALSE;
+  }
+
+  /**
+   * Метод для удаления пользователя из списка менти, где он был ментором.
+   * @param user пользователь, чей аккаунт деактивируется.
+   */
+  public void removeMentorFromMenteeList(User user) {
+    Optional.ofNullable(user.getMentees())
+        .ifPresent(mentee -> {
+          mentee.forEach(currentMentee -> currentMentee.getMentors().remove(user));
+          log.info(MESSAGE_ABOUT_REMOVE_MENTOR_FROM_MENTEE_LIST);
+        });
   }
 
 }

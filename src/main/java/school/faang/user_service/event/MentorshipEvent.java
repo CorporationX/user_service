@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class MentorshipEvent extends Event {
+    private long requesterId;
     private long userId;
-    private long mentorId;
 }

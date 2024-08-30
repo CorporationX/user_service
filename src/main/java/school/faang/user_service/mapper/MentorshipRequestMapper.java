@@ -19,7 +19,7 @@ public interface MentorshipRequestMapper {
     @Mapping(source = "receiverId", target = "receiver.id")
     MentorshipRequest toEntity(MentorshipRequestDtoForRequest mentorshipRequestDto);
 
-    @Mapping(source = "requester.id", target = "userId")
-    @Mapping(source = "receiver.id", target = "mentorId")
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "userId")
     MentorshipEvent toEvent(MentorshipRequest mentorshipRequest);
 }

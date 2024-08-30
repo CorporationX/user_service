@@ -66,7 +66,7 @@ public class MentorshipRequestService {
                 .findLatestRequest(mentorshipRequestDtoForRequest.getRequesterId(), mentorshipRequestDtoForRequest.getReceiverId())
                 .ifPresent(request -> {
                             LocalDateTime currentDate = LocalDateTime.now();
-                            LocalDateTime suitLastDate = currentDate.minusSeconds(PAUSE_TIME);
+                            LocalDateTime suitLastDate = currentDate.minusMonths(PAUSE_TIME);
                             if (request.getCreatedAt().isAfter(suitLastDate)) {
                                 throw new RequestException(ErrorMessage.EARLY_REQUEST);
                             }

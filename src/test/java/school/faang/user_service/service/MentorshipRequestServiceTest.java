@@ -12,6 +12,7 @@ import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.MentorshipEvent;
 import school.faang.user_service.exception.RequestException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipEventPublisher;
@@ -29,9 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
@@ -42,8 +42,7 @@ public class MentorshipRequestServiceTest {
     Filter filterMock = Mockito.mock(Filter.class);
     List<Filter<RequestFilterDto, MentorshipRequest>> filters = List.of(filterMock);
     private final MentorshipOfferedEventService mentorshipOfferedEventService = Mockito.mock(MentorshipOfferedEventService.class);
-    @Mock
-    MentorshipEventPublisher mentorshipEventPublisher;
+    MentorshipEventPublisher mentorshipEventPublisher = Mockito.mock(MentorshipEventPublisher.class);
     MentorshipRequestService mentorshipRequestService =
             new MentorshipRequestService(mentorshipRequestRepository,
                     userRepository,
@@ -60,7 +59,7 @@ public class MentorshipRequestServiceTest {
     private final User testRequester = new User();
     private final User testReceiver = new User();
     private final List<User> resultMentors = new ArrayList<>();
-    private final LocalDateTime lastRequestTime = LocalDateTime.now().minusDays(85);
+    private final LocalDateTime lastRequestTime = LocalDateTime.now().minusDays(20);
 
 
     private MentorshipRequestDtoForRequest prepareTestingRequestDtoForRequest() {
@@ -136,9 +135,17 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorshipSuccessful() {
+        MentorshipEvent event = MentorshipEvent.builder()
+                .requesterId(1L)
+                .userId(2L)
+                .build();
+
+        MentorshipRequest request = prepareTestingRequest();
         MentorshipRequestDtoForRequest dto = prepareTestingRequestDtoForRequest();
         when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
         when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
+        when(mapperMock.toEvent(request)).thenReturn(event);
+        when(mentorshipRequestRepository.create(dto.getRequesterId(), dto.getReceiverId(), dto.getDescription())).thenReturn(request);
 
         mentorshipRequestService.requestMentorship(dto);
 
@@ -146,6 +153,7 @@ public class MentorshipRequestServiceTest {
                 .create(dto.getRequesterId(),
                         dto.getReceiverId(),
                         dto.getDescription());
+        verify(mentorshipEventPublisher).publish(event);
     }
 
     @Test

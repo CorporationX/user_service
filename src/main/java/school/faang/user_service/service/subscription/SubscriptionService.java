@@ -1,39 +1,40 @@
 package school.faang.user_service.service.subscription;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.service.publisher.FollowerEventPublisher;
 import school.faang.user_service.service.user.filters.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class SubscriptionService {
-    private SubscriptionRepository subscriptionRepository;
-    private UserMapper mapper;
+    private final SubscriptionRepository subscriptionRepository;
+    private final UserMapper mapper;
+    private final SubscriptionValidator validator;
+    private final List<UserFilter<UserFilterDto, User>> userFilters;
+    private final FollowerEventPublisher followerEventPublisher;
 
-    private SubscriptionValidator validator;
-    private List<UserFilter<UserFilterDto, User>> userFilters;
-
-    public SubscriptionService(SubscriptionRepository subscriptionRepository,
-                               UserMapper mapper, List<UserFilter<UserFilterDto, User>> userFilters,
-                               SubscriptionValidator validator) {
-        this.subscriptionRepository = subscriptionRepository;
-        this.mapper = mapper;
-        this.userFilters = userFilters;
-        this.validator = validator;
-    }
-
+    @Transactional
     public void followUser(long followerId, long followeeId) {
         validator.validateExistingSubscription(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        FollowerEvent followerEvent = FollowerEvent.builder().followerId(followerId).followeeId(followeeId).
+        subscriptionTime(LocalDateTime.now()).build();
+        followerEventPublisher.publish(followerEvent);
     }
 
     public void unfollowUser(long followerId, long followeeId) {

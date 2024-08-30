@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +9,11 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.publisher.ProjectFollowerEventPublisher;
 
+@Slf4j
 @Configuration
 public class RedisConfig {
 
@@ -20,13 +21,15 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.follower_view.name}")
+    private String followerViewChannelName;
 
     @Value("${spring.data.redis.channels.project_follower_channel.name}")
     private String projectFollowerTopicName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
+        log.info("Redis host:{}, port:{}", host, port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -42,6 +45,11 @@ public class RedisConfig {
     }
 
     @Bean
+    ChannelTopic followerTopic() {
+        return new ChannelTopic(followerViewChannelName);
+    }
+
+    @Bean
     EventPublisher projectFollowerPublisher() {
         return new ProjectFollowerEventPublisher(redisTemplate(redisConnectionFactory()), projectFollowerTopic());
     }
@@ -50,4 +58,5 @@ public class RedisConfig {
     ChannelTopic projectFollowerTopic(){
         return new ChannelTopic(projectFollowerTopicName);
     }
+
 }

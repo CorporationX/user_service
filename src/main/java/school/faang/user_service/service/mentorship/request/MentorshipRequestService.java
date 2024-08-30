@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
-import school.faang.user_service.dto.publishable.MentorshipRequestedEvent;
+import school.faang.user_service.dto.publishable.MentorshipRequestEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -45,7 +45,7 @@ public class MentorshipRequestService {
         });
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
 
-        MentorshipRequestedEvent event = new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now());
+        MentorshipRequestEvent event = new MentorshipRequestEvent(requesterId, receiverId, LocalDateTime.now());
         eventPublisher.publish(event);
     }
 

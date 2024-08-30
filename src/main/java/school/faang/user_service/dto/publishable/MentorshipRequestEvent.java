@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MentorshipRequestedEvent {
+public class MentorshipRequestEvent {
     private Long requesterId;
     private Long receiverId;
     private LocalDateTime timestamp;

@@ -92,7 +92,7 @@ public class CsvUserService {
 
                 validateUserBeforeSave(user, existsByResult);
 
-                if (existsByResult ) {
+                if (!existsByResult) {
                     entityManager.persist(user);
                     entityManager.flush();
                     entityManager.clear();

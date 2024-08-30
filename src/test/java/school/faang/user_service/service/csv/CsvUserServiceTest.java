@@ -79,7 +79,7 @@ public class CsvUserServiceTest {
     }
 
     @Test
-    public void testGetStudentsParsing() throws IOException {
+    public void testGetStudentsParsing() {
         when(countryRepository.findByTitleIn(anyList())).thenReturn(countryList);
         when(userRepository.existsByUsernameOrEmailOrPhone(any(), any(), any())).thenReturn(false);
 

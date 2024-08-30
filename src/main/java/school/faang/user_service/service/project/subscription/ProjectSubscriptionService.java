@@ -14,12 +14,7 @@ public class ProjectSubscriptionService {
     private final ProjectFollowerEventPublisher projectFollowerEventPublisher;
 
     public void followProject(Long id, @NotNull ProjectDto projectDto) {
-
-        ProjectFollowerEvent projectFollowerEvent = new ProjectFollowerEvent();
-        projectFollowerEvent.setProjectId(projectDto.getProjectId());
-        projectFollowerEvent.setFollowerId(id);
-        projectFollowerEvent.setAuthorId(projectDto.getOwnerId());
-
+        ProjectFollowerEvent projectFollowerEvent = new ProjectFollowerEvent(projectDto.getProjectId(),id,projectDto.getOwnerId());
         projectFollowerEventPublisher.sendEvent(projectFollowerEvent);
     }
 }

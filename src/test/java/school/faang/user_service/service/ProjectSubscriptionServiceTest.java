@@ -14,7 +14,7 @@ import school.faang.user_service.service.project.subscription.ProjectSubscriptio
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectSubscriptionTest {
+public class ProjectSubscriptionServiceTest {
 
     @Mock
     private ProjectFollowerEventPublisher projectFollowerEventPublisher;

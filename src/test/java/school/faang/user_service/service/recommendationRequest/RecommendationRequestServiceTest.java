@@ -53,6 +53,8 @@ class RecommendationRequestServiceTest {
     private RecommendationRequestFilter statusPatternFilter;
     @Mock
     private List<RecommendationRequestFilter> recommendationRequestFilter;
+    @Mock
+    private RecommendationRequestedPublishService recommendationRequestedPublishService;
     RecommendationRequestDto requestDto;
     RecommendationRejectionDto recommendationRejectionDto;
     RecommendationRequest recommendationRequest;
@@ -134,6 +136,8 @@ class RecommendationRequestServiceTest {
                 .toEntity(requestDto);
         verify(recommendationRequestRepository, times(1))
                 .save(recommendationRequest);
+        verify(recommendationRequestedPublishService)
+            .eventPublish(recommendationRequest);
     }
 
     private void checkLastRequest(RecommendationRequestDto requestDto, LocalDateTime localDateTime) {

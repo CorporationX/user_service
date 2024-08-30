@@ -47,7 +47,7 @@ public class RecommendationRequestService {
         skills.forEach(skill -> skillRequestRepository.create(newRequest.getId(), skill.getId()));
 
         recommendationRequestedPublishService.eventPublish(newRequest);
-        return recommendationRequestedPublishService.getDto(newRequest);
+        return recommendationRequestMapper.toDto(newRequest);
     }
 
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filter) {

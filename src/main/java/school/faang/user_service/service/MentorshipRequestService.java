@@ -29,6 +29,7 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<Filter<RequestFilterDto, MentorshipRequest>> filters;
+    private final MentorshipOfferedEventService mentorshipOfferedEventService;
     private static final int PAUSE_TIME = 3;
 
     public MentorshipRequestDtoForResponse requestMentorship(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
@@ -40,7 +41,7 @@ public class MentorshipRequestService {
                 mentorshipRequestDtoForRequest.getRequesterId(),
                 mentorshipRequestDtoForRequest.getReceiverId(),
                 mentorshipRequestDtoForRequest.getDescription());
-
+        mentorshipOfferedEventService.publishEvent(mentorshipRequest);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

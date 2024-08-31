@@ -5,6 +5,8 @@ public final class ExceptionMessages {
   private ExceptionMessages() {
   }
 
+  public static final String INSERTION_STAPLES = "{}";
+
   public static final String FAILED_PERSISTENCE = "Unable to persist data into database. Please try again.";
   public static final String FAILED_RETRIEVAL = "Unable to retrieve data from database. Please try again.";
   public static final String FAILED_EVENT = "Unable to send an event to message broker.";
@@ -28,6 +30,7 @@ public final class ExceptionMessages {
   public static final String RECOMMENDATION_FREQUENCY = "Recommendation can be updated only once every 6 months.";
   public static final String REQUEST_SKILL = "One or more requested skills do not exist in the database";
 
+
   // publisher
   public static final String SERIALIZATION_ERROR = "Error in serializing object: ";
   public static final String UNEXPECTED_ERROR = "Unexpected error occurred: ";
@@ -44,6 +47,9 @@ public final class ExceptionMessages {
   public static final String USER_IS_NULL = "Пользователь c id - %s не был найден.";
 
   public static final String DELETION_ERROR_MESSAGE = "Произошла ошибка при удалении записи.";
+
+  public static final String TOPIC_PUBLICATION_EXCEPTION = "An error occurred while publishing the topic: ";
+  public static final String WRITING_TO_JSON_EXCEPTION = "An error occurred while writing to json: ";
 
   // avatars
   public static final String IMAGE_BYTES_EMPTY = "Image bytes cannot be empty.";

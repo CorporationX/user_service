@@ -36,6 +36,8 @@ spring:
           name: mentorship_accepted_channel
         recommendation_channel:
           name: recommendation_channel
+        recommendation_requested:
+          name: recommendation_requested_channel
         mentorship_offered_channel:
           name: mentorship_offered_channel
         profile_pic_channel:

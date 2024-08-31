@@ -2,8 +2,6 @@ package school.faang.user_service.service.recommendationRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.event.recomendationRerquested.RecommendationRequestedEvent;
-import school.faang.user_service.dto.recommendationRequest.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendationRequest.RecommendationRequestMapper;
 import school.faang.user_service.messaging.publisher.recommendationRequested.RecommendationRequestedEventPublisher;
@@ -16,15 +14,7 @@ public class RecommendationRequestedPublishService {
   private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
 
   public void eventPublish(RecommendationRequest entity) {
-    recommendationRequestedEventPublisher.publish(getEvent(getDto(entity)));
-  }
-
-  public RecommendationRequestDto getDto(RecommendationRequest entity) {
-    return recommendationRequestMapper.toDto(entity);
-  }
-
-  private RecommendationRequestedEvent getEvent(RecommendationRequestDto dto) {
-    return recommendationRequestMapper.toEvent(dto);
+    recommendationRequestedEventPublisher.publish(recommendationRequestMapper.toEvent(entity));
   }
 
 }

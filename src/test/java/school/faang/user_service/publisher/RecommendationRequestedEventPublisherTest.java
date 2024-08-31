@@ -52,7 +52,7 @@ class RecommendationRequestedEventPublisherTest {
         .message(UUID.randomUUID().toString())
         .requesterId(1L)
         .receiverId(2L)
-        .localDateTime(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now())
         .build();
   }
 

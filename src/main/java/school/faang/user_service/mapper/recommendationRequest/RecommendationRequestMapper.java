@@ -24,5 +24,7 @@ public interface RecommendationRequestMapper {
         return skillRequests.stream().map(SkillRequest::getId).toList();
     }
 
-    RecommendationRequestedEvent toEvent(RecommendationRequestDto recommendationRequestDto);
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    RecommendationRequestedEvent toEvent(RecommendationRequest recommendationRequest);
 }

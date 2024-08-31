@@ -41,7 +41,7 @@ public class SubscriptionServiceValidator {
     }
 
     private void validateExistsByFollowerIdAndFolloweeId(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("User id: " + followerId
                     + " already followed to the user id: " + followeeId);
         }

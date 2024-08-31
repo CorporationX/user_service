@@ -1,39 +1,51 @@
 package school.faang.user_service.validator;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
-import static org.junit.Assert.assertThrows;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class UserValidatorTest {
-    @InjectMocks
-    UserValidator userValidator;
-
+@ExtendWith(MockitoExtension.class)
+class UserValidatorTest {
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserValidator userValidator;
 
     private long userId;
+    private User user;
 
     @BeforeEach
     public void setUp() {
         userId = 1L;
-
-        MockitoAnnotations.openMocks(this);
+        user = User.builder()
+                .id(userId)
+                .build();
     }
 
-//    @Test
-//    @DisplayName("test that validateUserId throws EntityNotFoundException when there is no User with given id in the database")
-//    public void testValidateUserId() {
-//        when(userRepository.existsById(userId)).thenReturn(false);
-//
-//        assertThrows(EntityNotFoundException.class,
-//                () -> userValidator.validateUserId(userId));
-//    }
+    @Test
+    @DisplayName("testing doAllUsersExist method with non appropriate value")
+    public void testDoAllUsersExistWithNonAppropriateValue() {
+        when(userRepository.findAllById(List.of(userId))).thenReturn(List.of());
+        assertFalse(() -> userValidator.doAllUsersExist(List.of(userId)));
+    }
+
+    @Test
+    @DisplayName("testing doAllUsersExist method with appropriate value")
+    public void testDoAllUsersExistWithAppropriateValue() {
+        when(userRepository.findAllById(List.of(userId))).thenReturn(List.of(user));
+        assertTrue(() -> userValidator.doAllUsersExist(List.of(userId)));
+    }
 }

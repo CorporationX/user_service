@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,30 +17,40 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.List;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
+
     @InjectMocks
     private UserController userController;
     @Mock
     private UserService userService;
     @Mock
     private ObjectMapper objectMapper;
+    private MockMvc mockMvc;
 
     private long userId;
-    private MockMvc mockMvc;
     private String userDtoJson;
     private MockMultipartFile mockMultipartFile;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+    private String followerIdsJson;
+    private List<Long> followersIds;
 
+    @BeforeEach
+    public void setUp() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
         userId = 1L;
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        followersIds = List.of(1L, 2L);
+        followerIdsJson = objectMapper.writeValueAsString(followersIds);
 
         UserDto userDto = UserDto.builder()
                 .username("username")
@@ -49,7 +60,6 @@ class UserControllerTest {
                 .phone("123456")
                 .build();
 
-
         mockMultipartFile = new MockMultipartFile(
                 "file",
                 "test.txt",
@@ -57,9 +67,43 @@ class UserControllerTest {
                 "Mock file content".getBytes()
         );
 
-        ObjectMapper objectMapperImpl = new ObjectMapper();
-        userDtoJson = objectMapperImpl.writeValueAsString(userDto);
+        userDtoJson = objectMapper.writeValueAsString(userDto);
     }
+
+    @Test
+    @DisplayName("testing getUser method")
+    void testGetUser() throws Exception {
+        mockMvc.perform(get("/api/v1/user/{userId}", userId))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).getUser(userId);
+    }
+
+    @Test
+    @DisplayName("testing checkUserExistence method")
+    void testCheckUserExistence() throws Exception {
+        mockMvc.perform(get("/api/v1/user/exists/{userId}", userId))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).checkUserExistence(userId);
+    }
+
+    @Test
+    @DisplayName("testing getUserFollowers method")
+    void testGetUserFollowers() throws Exception {
+        mockMvc.perform(get("/api/v1/user/{userId}/followers", userId))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).getUserFollowers(userId);
+    }
+
+    @Test
+    @DisplayName("testing doesFollowersExist method")
+    void testDoesFollowersExist() throws Exception {
+        mockMvc.perform(post("/api/v1/user/exists/followers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(followerIdsJson))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).checkAllFollowersExist(followersIds);
+    }
+
 
     @Test
     @DisplayName("testing createUser method")

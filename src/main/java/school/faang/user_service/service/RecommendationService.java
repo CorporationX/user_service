@@ -18,6 +18,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.recommendation.DataValidationException;
 import school.faang.user_service.exception.recommendation.EntityException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationSentPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -56,12 +57,11 @@ public class RecommendationService {
 
             Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
-            processSkillAndGuarantees(recommendation);
-            recommendationRepository.save(recommendation);
-            messagePublisherService.publishRecommendationEvent(recommendation, objectMapper);
-
-            return recommendationMapper.toDto(recommendation);
-        }
+        processSkillAndGuarantees(recommendation);
+        recommendationRepository.save(recommendation);
+        messagePublisherService.publishRecommendationEvent(recommendation, objectMapper);
+        return recommendationMapper.toDto(recommendation);
+    }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
         Long userId = recommendationDto.getAuthorId();
@@ -75,6 +75,7 @@ public class RecommendationService {
 
         processSkillAndGuarantees(recommendation);
         recommendationRepository.save(recommendation);
+
 
         return recommendationMapper.toDto(recommendation);
     }
@@ -145,9 +146,9 @@ public class RecommendationService {
 
         skillOffersDto.removeAll(existingSkillIds);
 
-//        if (!skillOffersDto.isEmpty()) {
-//            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillOffersDto.toString());
-//        }
+        if (!skillOffersDto.isEmpty()) {
+            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillOffersDto.toString());
+        }
     }
 
     private void validateAvailabilityRecommendation(long id) {

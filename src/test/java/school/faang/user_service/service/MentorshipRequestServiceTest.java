@@ -39,12 +39,13 @@ public class MentorshipRequestServiceTest {
     MentorshipRequestMapper mapperMock = Mockito.mock(MentorshipRequestMapper.class);
     Filter filterMock = Mockito.mock(Filter.class);
     List<Filter<RequestFilterDto, MentorshipRequest>> filters = List.of(filterMock);
+    private final MentorshipOfferedEventService mentorshipOfferedEventService = Mockito.mock(MentorshipOfferedEventService.class);
 
     MentorshipRequestService mentorshipRequestService =
             new MentorshipRequestService(mentorshipRequestRepository,
                     userRepository,
                     mapperMock,
-                    filters);
+                    filters, mentorshipOfferedEventService);
 
     private final MentorshipRequestDtoForRequest requestDto = new MentorshipRequestDtoForRequest();
     private final MentorshipRequestDtoForResponse responseDto = new MentorshipRequestDtoForResponse();
@@ -55,6 +56,7 @@ public class MentorshipRequestServiceTest {
     private final User testReceiver = new User();
     private final List<User> resultMentors = new ArrayList<>();
     private final LocalDateTime lastRequestTime = LocalDateTime.now().minusDays(85);
+
 
     private MentorshipRequestDtoForRequest prepareTestingRequestDtoForRequest() {
         requestDto.setId(1L);

@@ -16,6 +16,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.RecommendationEventPublisher;
 import school.faang.user_service.exception.recommendation.DataValidationException;
 import school.faang.user_service.exception.recommendation.EntityException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
@@ -54,8 +55,6 @@ public class RecommendationServiceTest {
     SkillRepository skillRepository;
     @Mock
     UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    @Mock
-    MessagePublisherService messagePublisherService;
 
     private RecommendationDto recommendationDto;
     private Recommendation recommendation;
@@ -69,6 +68,7 @@ public class RecommendationServiceTest {
     private final static int INTERVAL_DATE = 6;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private List<UserSkillGuarantee> guarantees;
+    private RecommendationEventPublisher recommendationEvent;
 
     @BeforeEach
     void setUp() {
@@ -102,6 +102,13 @@ public class RecommendationServiceTest {
         recommendation.setReceiver(receiver);
         recommendation.setId(1L);
         recommendation.setSkillOffers(List.of(skillOffer));
+
+        recommendationEvent = RecommendationEventPublisher.builder()
+                .id(author.getId())
+                .receiverId(receiver.getId())
+                .receivedAt(LocalDateTime.now())
+                .build();
+
 
         skillOffers = List.of(skillOffer);
 
@@ -254,6 +261,7 @@ public class RecommendationServiceTest {
         when(skillRepository.findAllById(skillOfferIds)).thenReturn(skills);
         when(userSkillGuaranteeRepository.saveAll(guarantees)).thenReturn(guarantees);
         when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+        when(recommendationMapper.toRecommendationEventPublisher(recommendation)).thenReturn(recommendationEvent);
 
         recommendationService.create(recommendationDto);
 
@@ -263,6 +271,7 @@ public class RecommendationServiceTest {
         verify(skillRepository).findAllById(skillOfferIds);
         verify(userSkillGuaranteeRepository).saveAll(guarantees);
         verify(recommendationMapper).toDto(recommendation);
+        verify(recommendationSentPublisher).publish(recommendationEvent);
     }
 
     private void withoutAddGuarantee(List<Skill> receiverSkills, boolean hasGuarantee) {
@@ -271,6 +280,7 @@ public class RecommendationServiceTest {
         when(userSkillGuaranteeRepository.existsById(author.getId())).thenReturn(hasGuarantee);
         when(skillOfferRepository.saveAll(skillOffers)).thenReturn(skillOffers);
         when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+        when(recommendationMapper.toRecommendationEventPublisher(recommendation)).thenReturn(recommendationEvent);
 
         recommendationService.create(recommendationDto);
 

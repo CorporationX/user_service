@@ -16,8 +16,7 @@ public class RecommendationRequestedPublishService {
   private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
 
   public void eventPublish(RecommendationRequest entity) {
-    var resultDto = getDto(entity);
-    recommendationRequestedEventPublisher.publish(getEvent(resultDto));
+    recommendationRequestedEventPublisher.publish(getEvent(getDto(entity)));
   }
 
   public RecommendationRequestDto getDto(RecommendationRequest entity) {

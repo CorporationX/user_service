@@ -54,12 +54,6 @@ public class UserService {
     private final ObjectMapper objectMapper;
     private final ProfilePicEventPublisher profilePicEventPublisher;
 
-//    @Transactional(readOnly = true)
-//    public UserDto getUser(long userId) {
-//        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
-//        return userMapper.toDto(user);
-//    }
-
     @Transactional
     public UserDto createUser(UserDto userDto, MultipartFile userAvatar) {
         User user = userMapper.toEntity(userDto);

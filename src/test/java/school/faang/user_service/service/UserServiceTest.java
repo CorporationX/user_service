@@ -93,12 +93,6 @@ class UserServiceTest {
                 .phone("123456")
                 .build();
 
-//        user = userMapperImpl.toEntity(userDto);
-//        List<Goal> goalList = new ArrayList<>();
-//        List<User> userList = new ArrayList<>();
-//        List<User> menteesList = new ArrayList<>();
-//        List<Event> ownedEvents = new ArrayList<>();
-
         id = 10L;
         ids = List.of(id);
 
@@ -137,15 +131,6 @@ class UserServiceTest {
         userList.add(user);
         ownedEvents.add(event);
     }
-
-//    @Test
-//    @DisplayName("testing getUser method")
-//    public void testGetUser() {
-//        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
-//        userService.getUser(userId);
-//        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
-//        verify(userMapper, times(1)).toDto(user);
-//    }
 
     @Test
     @DisplayName("testing createUser method with null multipartFile")

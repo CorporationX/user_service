@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.Setter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.dto.BanEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -52,11 +54,11 @@ public class UserService {
     private final ObjectMapper objectMapper;
     private final ProfilePicEventPublisher profilePicEventPublisher;
 
-    @Transactional(readOnly = true)
-    public UserDto getUser(long userId) {
-        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
-        return userMapper.toDto(user);
-    }
+//    @Transactional(readOnly = true)
+//    public UserDto getUser(long userId) {
+//        User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
+//        return userMapper.toDto(user);
+//    }
 
     @Transactional
     public UserDto createUser(UserDto userDto, MultipartFile userAvatar) {
@@ -108,6 +110,8 @@ public class UserService {
 
         return userMapper.toDtoList(userRepository.findAllById(ids));
     }
+
+    @Transactional(readOnly = true)
 
     public UserProfilePicDto getAvatarKeys(long userId) {
         userValidator.validateUserExistence(userId);

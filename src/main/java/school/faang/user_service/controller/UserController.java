@@ -21,6 +21,7 @@ import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")

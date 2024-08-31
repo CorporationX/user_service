@@ -117,6 +117,9 @@ public class UserService {
         userValidator.validateUserExistence(userId);
 
         UserProfilePic userProfilePic = userRepository.findById(userId).get().getUserProfilePic();
+        if (userProfilePic == null) {
+            return new UserProfilePicDto("", "");
+        }
         return new UserProfilePicDto(userProfilePic.getFileId(), userProfilePic.getSmallFileId());
     }
 

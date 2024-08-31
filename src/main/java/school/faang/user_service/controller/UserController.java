@@ -53,13 +53,13 @@ public class UserController {
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUserById(@PathVariable long userId) {
-        return userService.getUserDtoById(userId);
+        return userService.getUserById(userId);
     }
 
     @GetMapping("/byList")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersDtoByIds(ids);
+        return userService.getUsersByIds(ids);
     }
 
     @PutMapping("/avatar/put")

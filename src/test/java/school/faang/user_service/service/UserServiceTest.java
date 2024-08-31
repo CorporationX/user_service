@@ -134,7 +134,7 @@ class UserServiceTest {
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
 
-        UserDto result = userService.getUser(id);
+        UserDto result = userService.getUserById(id);
 
         verify(userValidator).validateUserExistence(id);
         verify(userRepository).findById(id);
@@ -149,7 +149,7 @@ class UserServiceTest {
         when(userRepository.findAllById(ids)).thenReturn(List.of(user));
         when(userMapper.toDtoList(List.of(user))).thenReturn(userDtoList);
 
-        List<UserDto> result = userService.getUsersDtoByIds(ids);
+        List<UserDto> result = userService.getUsersByIds(ids);
 
         verify(userValidator).validateUserExistence(id);
         verify(userRepository).findAllById(ids);

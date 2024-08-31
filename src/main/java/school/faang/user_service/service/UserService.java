@@ -28,8 +28,6 @@ import java.io.IOException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 @Slf4j
@@ -92,22 +90,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto getUser(long userId) {
-        userValidator.validateUserExistence(userId);
-        User user = userRepository.findById(userId).get();
-
-        return userMapper.toDto(user);
-    }
-
-    @Transactional(readOnly = true)
-    public UserDto getUserDtoById(long userId) {
+    public UserDto getUserById(long userId) {
         userValidator.validateUserExistence(userId);
 
         return userMapper.toDto(userRepository.findById(userId).get());
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
+    public List<UserDto> getUsersByIds(List<Long> ids) {
         ids.forEach(userValidator::validateUserExistence);
 
         return userMapper.toDtoList(userRepository.findAllById(ids));

@@ -45,22 +45,40 @@ public class UserController {
         userService.updateUserAvatar(userId, multipartFile);
     }
 
-    @PutMapping("/deactivate/{userId}")
+    @GetMapping("/exists/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto deactivateUser(@PathVariable Long userId) {
-        return userService.deactivateUser(userId);
+    public boolean checkUserExistence(@PathVariable Long userId) {
+        return userService.checkUserExistence(userId);
     }
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUserById(@PathVariable long userId) {
-        return userService.getUserDtoById(userId);
+        return userService.getUserById(userId);
+    }
+
+    @GetMapping("/{userId}/followers")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getUserFollowers(@PathVariable Long userId) {
+        return userService.getUserFollowers(userId);
+    }
+
+    @PostMapping("/exists/followers")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean doesFollowersExist(@RequestBody List<Long> followerIds) {
+        return userService.checkAllFollowersExist(followerIds);
     }
 
     @GetMapping("/byList")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersDtoByIds(ids);
+        return userService.getUsersByIds(ids);
+    }
+
+    @PutMapping("/deactivate/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto deactivateUser(@PathVariable Long userId) {
+        return userService.deactivateUser(userId);
     }
 
     @PutMapping("/avatar/put")

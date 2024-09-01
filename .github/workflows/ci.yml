@@ -3,7 +3,7 @@ name: Java CI with Gradle
 on:
   pull_request:
     branches:
-      - manticore-master-bc5
+      - forh_rus-BJS2-16721
 
 jobs:
   build:

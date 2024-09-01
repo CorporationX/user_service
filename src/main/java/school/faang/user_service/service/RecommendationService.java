@@ -141,19 +141,19 @@ public class RecommendationService {
     }
 
     private void validateSkill(List<SkillOfferDto> skillOffersFromDto) {
-        Set<Long> skillOffersDto = skillOffersFromDto.stream()
+        Set<Long> skillIds = skillOffersFromDto.stream()
                 .map(SkillOfferDto::getSkillId)
                 .collect(Collectors.toSet());
-        List<Skill> skills = skillRepository.findAllById(skillOffersDto);
+        List<Skill> skills = skillRepository.findAllById(skillIds);
 
         Set<Long> existingSkillIds = skills.stream()
                 .map(Skill::getId)
                 .collect(Collectors.toSet());
 
-        skillOffersDto.removeAll(existingSkillIds);
+        skillIds.removeAll(existingSkillIds);
 
-        if (!skillOffersDto.isEmpty()) {
-            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillOffersDto.toString());
+        if (!skillIds.isEmpty()) {
+            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillIds.toString());
         }
     }
 

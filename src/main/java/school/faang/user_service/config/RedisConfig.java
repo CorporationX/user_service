@@ -1,7 +1,7 @@
 package school.faang.user_service.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +12,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.ProfileViewEvent;
-import school.faang.user_service.publisher.ProfileViewEventPublisher;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -25,11 +25,10 @@ public class RedisConfig {
     private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
-    @Value("${spring.data.redis.topic.userView}")
-    private String userView;
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopicName;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public interface MessagePublisher {
         void publish(ProfileViewEvent profileViewEvent);
@@ -52,13 +51,8 @@ public class RedisConfig {
     }
 
     @Bean
-    MessagePublisher redisPublisher() {
-        return new ProfileViewEventPublisher();
-    }
-
-    @Bean
-    ChannelTopic userViewTopic() {
-        return new ChannelTopic(userView);
+    public ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewTopicName);
     }
 
     @Bean(name = "followerChannelTopic")

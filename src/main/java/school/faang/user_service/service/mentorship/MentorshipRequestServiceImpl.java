@@ -1,8 +1,14 @@
 package school.faang.user_service.service.mentorship;
 
+import static school.faang.user_service.exception.ExceptionMessages.DELETION_ERROR_MESSAGE;
+
 import jakarta.persistence.PersistenceException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.filter.RequestFilterDto;
@@ -12,21 +18,21 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipOfferedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
+
+    private static final String MESSAGE_ABOUT_DELETE_MENTORSHIP_REQUESTS
+        = "Все запросы на менторство/менти были удалены.";
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mapper;
@@ -34,6 +40,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final List<MentorshipValidator> mentorshipValidators;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedPublisher;
     private final MentorshipRequestedEventPublisher mentorshipRequestedPublisher;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Override
     @Transactional
@@ -49,6 +56,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             throw new PersistenceException(ExceptionMessages.FAILED_PERSISTENCE, e);
         }
         mentorshipRequestedPublisher.publish(mapper.toMentorshipRequestedEvent(savedRequest));
+        mentorshipOfferedEventPublisher.publish(mapper.toMentorshipOfferedEvent(savedRequest));
 
         return mapper.toDto(savedRequest);
     }
@@ -105,5 +113,18 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private MentorshipRequest findMentorshipRequest(long id) {
         return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ExceptionMessages.MENTORSHIP_REQUEST_NOT_FOUND));
+    }
+
+    /**
+     * Метод для удаления отправленных или полученных заявок на менторство/менти пользователя.
+     * @param userId  id пользователя, чей аккаунт деактивируется.
+     */
+    public void deleteMentorshipRequests(long userId) {
+        try {
+            mentorshipRequestRepository.deleteAllMentorshipRequestById(userId);
+            log.info(MESSAGE_ABOUT_DELETE_MENTORSHIP_REQUESTS);
+        } catch (AopInvocationException e) {
+            log.error(DELETION_ERROR_MESSAGE, e);
+        }
     }
 }

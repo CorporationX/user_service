@@ -1,7 +1,29 @@
 package school.faang.user_service.service.mentorship;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import jakarta.persistence.PersistenceException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,36 +41,17 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.event.mentorship.request.MentorshipAcceptedEvent;
+import school.faang.user_service.event.mentorship.request.MentorshipOfferedEvent;
 import school.faang.user_service.event.mentorship.request.MentorshipRequestedEvent;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
+import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipOfferedEventPublisher;
 import school.faang.user_service.messaging.publisher.mentorship.request.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.validator.mentorship.SelfMentorshipValidator;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -66,6 +69,8 @@ class MentorshipRequestServiceImplTest {
     private SelfMentorshipValidator selfMentorshipValidator;
     @Mock
     private MentorshipAcceptedEventPublisher eventPublisher;
+    @Mock
+    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
     @Captor
     private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
     @Captor
@@ -132,7 +137,7 @@ class MentorshipRequestServiceImplTest {
         when(mentorshipRequestRepository.save(request)).thenReturn(request);
         when(mapper.toDto(request)).thenReturn(dto);
         doNothing().when(mentorshipRequestedEventPublisher).publish(any(MentorshipRequestedEvent.class));
-
+        doNothing().when(mentorshipOfferedEventPublisher).publish(any(MentorshipOfferedEvent.class));
         var result = sut.requestMentorship(dto);
 
         verify(mapper, times(1)).toEntity(dtoCaptor.capture());
@@ -283,5 +288,12 @@ class MentorshipRequestServiceImplTest {
         when(mentorshipRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> sut.rejectRequest(100L, rejectionDto));
+    }
+
+    @Test
+    @DisplayName("Проверка выброса исключения при удалении отправленных или полученных заявок на менторство/менти пользователя.")
+    public void testDeleteMentorshipRequests() {
+        when(mentorshipRequestRepository.deleteAllMentorshipRequestById(1L)).thenThrow();
+        assertThrows(Exception.class, () -> sut.deleteMentorshipRequests(1L));
     }
 }

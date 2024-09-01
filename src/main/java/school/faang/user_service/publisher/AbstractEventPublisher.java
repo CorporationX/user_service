@@ -14,13 +14,21 @@ public class AbstractEventPublisher<T> {
     protected final String topic;
 
     public void publish(T event) {
+        String message = convertToMessage(event);
+        sendMessage(message);
+        log.info("Successfully published event: {}", event);
+    }
+
+    protected String convertToMessage(T event) {
         try {
-            String message = objectMapper.writeValueAsString(event);
-            redisTemplate.convertAndSend(topic, message);
-            log.info("Successfully published event: {}", event);
+            return objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
             log.error("Error serializing event", e);
             throw new RuntimeException("Error serializing event", e);
         }
+    }
+
+    protected void sendMessage(String message) {
+        redisTemplate.convertAndSend(topic, message);
     }
 }

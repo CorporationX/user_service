@@ -232,12 +232,21 @@ public class EventServiceTest {
 
     @Test
     void testFindEventsStartingIn() {
+        LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.ofDays(1);
-        lenient().when(eventRepository.findEventByStartDate(any(LocalDateTime.class))).thenReturn(new ArrayList<>());
-        lenient().when(eventMapper.toDto(any(Event.class))).thenReturn(new EventDto());
+        Event eventOne = new Event();
+        eventOne.setId(1L);
+        eventOne.setTitle("event one!");
+        eventOne.setStartDate(now);
+        Event eventTwo = new Event();
+        eventOne.setId(2L);
+        eventOne.setTitle("event two!");
+        eventOne.setStartDate(now.plusDays(1));
+
+        lenient().when(eventRepository.findEventByStartDate(any(LocalDateTime.class))).thenReturn(List.of(eventTwo));
 
         List<EventDto> events = eventService.findEventsStartingIn(duration);
 
-        assertEquals(0, events.size());
+        assertEquals(1, events.size());
     }
 }

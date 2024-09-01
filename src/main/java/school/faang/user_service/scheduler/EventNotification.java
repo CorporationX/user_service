@@ -54,6 +54,7 @@ public class EventNotification {
                 publisher.publish(event);
             } catch (Exception e) {
                 log.error("Failed to notify participants for event ID: {}", eventDto.getId(), e);
+                throw new RuntimeException("Failed to notify participants for event ID:" + eventDto.getId(), e);
             }
         }
     }

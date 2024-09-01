@@ -38,4 +38,10 @@ public class UserDto {
     private String phone;
     private boolean isActive;
     private MultipartFile multipartFile;
+    private PreferredContact preference;
+
+    public enum PreferredContact {
+        EMAIL, SMS, TELEGRAM
+    }
+
 }

@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Constants {
 
+  public static final String PREMIUM_STATUS_ACTION = "Имеется премиум подписка, которая действует до %s года.";
   public static final String PATTERN_OF_DATE = "dd.MM.uuuu";
   public static final String EMPTY_VALUE = "";
 

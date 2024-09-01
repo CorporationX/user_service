@@ -39,7 +39,7 @@ public class UserController {
                 .body(deactivateUserFacade.deactivateUser(userId));
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public UserDto getUser(@PathVariable long id) {
         return userService.getUser(id);
     }

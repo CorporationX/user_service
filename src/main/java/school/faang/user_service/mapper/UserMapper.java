@@ -29,7 +29,12 @@ public abstract class UserMapper {
   public abstract User toEntity(UserSubscriptionDto userDto);
 
   @Mapping(target = "premium", ignore = true)
+  @Mapping(source = "contactPreference.preference", target = "preference")
   public abstract UserDto toUserDto(User user);
+
+  @Mapping(source = "preference", target = "contactPreference.preference")
+  @Mapping(target = "premium", ignore = true)
+  public abstract User toEntity(UserDto userDto);
 
   @AfterMapping
   protected void updateFields(User user, @MappingTarget UserDto target) {

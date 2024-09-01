@@ -1,6 +1,5 @@
 package school.faang.user_service.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +28,6 @@ public class RedisConfig {
     private String profilePicture;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewTopicName;
-
-    private final ObjectMapper objectMapper;
 
     public interface MessagePublisher {
         void publish(ProfileViewEvent profileViewEvent);

@@ -18,9 +18,9 @@ import java.io.IOException;
 public class UserProfilePicController {
     private final UserProfilePicService userProfilePicService;
 
-    @PostMapping("/{id}")
-    public UserProfilePicDto saveProfilePic(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return userProfilePicService.saveUserProfilePic(id, file);
+    @PostMapping
+    public UserProfilePicDto saveProfilePic(@RequestParam("file") MultipartFile file) {
+        return userProfilePicService.saveUserProfilePic(file);
     }
 
     @GetMapping("/{id}")
@@ -33,8 +33,8 @@ public class UserProfilePicController {
         return new ResponseEntity<>(image, headers, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public UserProfilePicDto deleteProfilePic(@PathVariable Long id) {
-        return userProfilePicService.deleteUserProfilePic(id);
+    @DeleteMapping
+    public UserProfilePicDto deleteProfilePic() {
+        return userProfilePicService.deleteUserProfilePic();
     }
 }

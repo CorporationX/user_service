@@ -17,7 +17,7 @@ public class UserController {
     private final UserProfilePicService userProfilePicService;
     @PostMapping
     public UserCreateDto createUser(@RequestBody UserCreateDto userDto) {
-        userProfilePicService.putDefaultPicWhileCreating(userDto);
+        userProfilePicService.putDefaultPicWhileCreating();
         return userService.createUser(userDto);
     }
 }

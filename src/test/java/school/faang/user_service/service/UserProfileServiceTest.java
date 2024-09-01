@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserCreateDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.entity.User;
@@ -48,17 +49,17 @@ public class UserProfileServiceTest {
     private RestTemplate restTemplate;
     @Mock
     MultipartFile multipartFile;
+    @Mock
+    private UserContext userContext;
     @InjectMocks
     private UserProfilePicService userProfilePicService;
 
-    private String url;
     private String bucketName;
     private User user;
 
     @BeforeEach
     void setUp() {
         bucketName = "test_bucket";
-        url = "http://example.com/default_avatar.jpg";
         multipartFile = Mockito.mock(MultipartFile.class);
         user = User.builder()
                 .id(1L)
@@ -102,23 +103,25 @@ public class UserProfileServiceTest {
         ImageIO.write(bufferedImage, "jpg", outputStream);
         byte[] imageBytes = outputStream.toByteArray();
 
-        when(restTemplate.getForObject(url, byte[].class)).thenReturn(imageBytes);
+        when(userContext.getUserId()).thenReturn(user.getId());
+        when(userService.findUserById(user.getId())).thenReturn(user);
+        when(restTemplate.getForObject(anyString(), eq(byte[].class))).thenReturn(imageBytes);
 
-        assertDoesNotThrow(() -> userProfilePicService.putDefaultPicWhileCreating(userDto));
+        assertDoesNotThrow(() -> userProfilePicService.putDefaultPicWhileCreating());
 
-        assertNotNull(userDto.getUserProfilePicDto());
-        assertNotNull(userDto.getUserProfilePicDto().getFileId());
-        verify(s3Client, times(1)).putObject(eq(bucketName), anyString(), any(InputStream.class), isNull());
+        assertNotNull(user.getUserProfilePic());
+        assertNotNull(user.getUserProfilePic().getFileId());
+        verify(s3Client, times(2)).putObject(eq(bucketName), anyString(), any(InputStream.class), isNull());
     }
 
     @Test
-    void testPutDefaultPicWhileCreating_nullImage() throws IOException {
+    void testPutDefaultPicWhileCreating_nullImage() {
         UserCreateDto userDto = new UserCreateDto();
         userDto.setUsername("testName");
 
-        when(restTemplate.getForObject(url, byte[].class)).thenReturn(null);
+        when(restTemplate.getForObject(anyString(), eq(byte[].class))).thenReturn(null);
         DataValidationException ex = assertThrows(DataValidationException.class,
-                () -> userProfilePicService.putDefaultPicWhileCreating(userDto));
+                () -> userProfilePicService.putDefaultPicWhileCreating());
 
         assertEquals(GENERATION_EXCEPTION.getMessage(), ex.getMessage());
         verify(s3Client, never()).putObject(eq(bucketName), anyString(), any(InputStream.class), isNull());
@@ -127,9 +130,9 @@ public class UserProfileServiceTest {
     @Test
     void testSaveUserProfilePic_success() {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "test-image.jpg", "image/jpeg", getImageBytes());
-
+        when(userContext.getUserId()).thenReturn(user.getId());
         when(userService.findUserById(user.getId())).thenReturn(user);
-        UserProfilePicDto res = userProfilePicService.saveUserProfilePic(user.getId(), multipartFile);
+        UserProfilePicDto res = userProfilePicService.saveUserProfilePic(multipartFile);
 
         ArgumentCaptor<String> named = ArgumentCaptor.forClass(String.class);
 
@@ -159,12 +162,12 @@ public class UserProfileServiceTest {
 
     @Test
     void testDeleteProfilePic() {
+        when(userContext.getUserId()).thenReturn(user.getId());
         when(userService.findUserById(user.getId())).thenReturn(user);
 
-        userProfilePicService.deleteUserProfilePic(user.getId());
+        userProfilePicService.deleteUserProfilePic();
 
         verify(s3Client, times(2)).deleteObject(eq(bucketName), anyString());
-        assertNull(user.getUserProfilePic().getFileId());
-        assertNull(user.getUserProfilePic().getSmallFileId());
+        assertNull(user.getUserProfilePic());
     }
 }

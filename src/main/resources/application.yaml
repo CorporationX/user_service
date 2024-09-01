@@ -29,7 +29,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
   servlet:
     multipart:
       max-file-size: 5MB
@@ -66,4 +66,4 @@ services:
     largeSize: 1080
     isMocked: true
 defaultAvatar:
-  url: https://api.dicebear.com/9.x/adventurer/jpg?seed=Cuddles
+  url: https://api.dicebear.com/9.x/adventurer/jpg?seed=

@@ -48,6 +48,7 @@ dependencies {
      * Amazon S3
      */
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+    implementation("org.springframework:spring-mock:2.0.8")
 
     /**
      * Thumbnails
@@ -85,6 +86,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework:spring-mock:2.0.8")
+
+
 }
 
 jsonSchema2Pojo {

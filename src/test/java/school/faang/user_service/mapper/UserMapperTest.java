@@ -1,9 +1,11 @@
 package school.faang.user_service.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static school.faang.user_service.constants.Constants.PATTERN_OF_DATE;
+import static school.faang.user_service.constants.Constants.PREMIUM_STATUS_ACTION;
 
 import java.time.LocalDateTime;
-import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +19,12 @@ import school.faang.user_service.entity.premium.Premium;
 @ExtendWith(MockitoExtension.class)
 public class UserMapperTest {
 
+  private static final int NUMBER_OF_POSITIVE_DAY = 1;
+  private static final int NUMBER_OF_NEGATIVE_DAY = -1;
+
   private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-  private User createUserDtoWitchPremium(Month month) {
+  private User createUserDtoWitchPremium(LocalDateTime date) {
     return User.builder()
         .id(1L)
         .username("Alex")
@@ -33,7 +38,7 @@ public class UserMapperTest {
             .user(User.builder()
                 .id(1L)
                 .build())
-            .endDate(LocalDateTime.of(2024, month, 01, 00, 00))
+            .endDate(date)
             .build())
         .build();
   }
@@ -127,21 +132,27 @@ public class UserMapperTest {
   @Test
   @DisplayName("Проверка актуального премиума у пользователя при конвертации")
   public void convertUserForUserDtoWithActualPremium() {
-    User user = createUserDtoWitchPremium(Month.SEPTEMBER);
+    LocalDateTime date = getDate(NUMBER_OF_POSITIVE_DAY);
+    User user = createUserDtoWitchPremium(date);
 
     UserDto actualResult = userMapper.toUserDto(user);
 
-    assertThat(actualResult.getPremium()).isEqualTo("Имеется премиум подписка, которая действует до 01.09.2024 года.");
+    assertThat(actualResult.getPremium()).isEqualTo(String.format(PREMIUM_STATUS_ACTION,
+        date.format(DateTimeFormatter.ofPattern(PATTERN_OF_DATE))));
   }
 
   @Test
   @DisplayName("Проверка неактуального премиума у пользователя при конвертации")
   public void convertUserForUserDtoWithNotActualPremium() {
-    User user = createUserDtoWitchPremium(Month.JANUARY);
+    User user = createUserDtoWitchPremium(getDate(NUMBER_OF_NEGATIVE_DAY));
 
     UserDto actualResult = userMapper.toUserDto(user);
 
     assertThat(actualResult.getPremium()).isEqualTo("");
+  }
+
+  private LocalDateTime getDate(int day) {
+    return LocalDateTime.now().plusDays(day);
   }
 
 }

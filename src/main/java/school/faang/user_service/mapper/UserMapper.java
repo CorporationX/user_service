@@ -2,6 +2,7 @@ package school.faang.user_service.mapper;
 
 import static school.faang.user_service.constants.Constants.EMPTY_VALUE;
 import static school.faang.user_service.constants.Constants.PATTERN_OF_DATE;
+import static school.faang.user_service.constants.Constants.PREMIUM_STATUS_ACTION;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,8 +21,6 @@ import school.faang.user_service.entity.premium.Premium;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = true))
 public abstract class UserMapper {
-
-  private String PREMIUM_STATUS_ACTION = "Имеется премиум подписка, которая действует до %s года.";
 
   public abstract List<UserDto> toDtoList(List<User> users);
 

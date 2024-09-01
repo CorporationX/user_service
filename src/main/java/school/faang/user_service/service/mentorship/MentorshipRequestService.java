@@ -10,8 +10,11 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.MentorshipRequestEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.redisPublisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
@@ -25,9 +28,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestEventMapper mentorshipRequestEventMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    private final MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @Transactional
@@ -40,6 +45,9 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId,
                 mentorshipCreationDate);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
+
+        MentorshipRequestEvent mentorshipRequestEvent = mentorshipRequestEventMapper.toEvent(mentorshipRequest);
+        mentorshipRequestEventPublisher.publish(mentorshipRequestEvent);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

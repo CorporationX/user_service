@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.redis.event.RecommendationEvent;
+import school.faang.user_service.event.RecommendationEvent;
 import school.faang.user_service.publisher.redis.RecommendationEventPublisher;
 
 @Service

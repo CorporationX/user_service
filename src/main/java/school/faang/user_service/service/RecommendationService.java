@@ -18,7 +18,6 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.recommendation.DataValidationException;
 import school.faang.user_service.exception.recommendation.EntityException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
-import school.faang.user_service.publisher.RecommendationSentPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -27,10 +26,17 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static school.faang.user_service.exception.recommendation.RecommendationError.*;
+import static school.faang.user_service.exception.recommendation.RecommendationError.ENTITY_IS_NOT_FOUND;
+import static school.faang.user_service.exception.recommendation.RecommendationError.RECOMMENDATION_EXPIRATION_TIME_NOT_PASSED;
+import static school.faang.user_service.exception.recommendation.RecommendationError.RECOMMENDATION_IS_NOT_FOUND;
+import static school.faang.user_service.exception.recommendation.RecommendationError.SKILL_IS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -48,14 +54,14 @@ public class RecommendationService {
     private final static int INTERVAL_DATE = 6;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        public RecommendationDto create(RecommendationDto recommendationDto) {
-            Long userId = recommendationDto.getAuthorId();
-            Long receiver = recommendationDto.getReceiverId();
+    public RecommendationDto create(RecommendationDto recommendationDto) {
+        Long userId = recommendationDto.getAuthorId();
+        Long receiver = recommendationDto.getReceiverId();
 
-            validateInterval(userId, receiver);
-            validateSkill(recommendationDto.getSkillOffers());
+        validateInterval(userId, receiver);
+        validateSkill(recommendationDto.getSkillOffers());
 
-            Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
         processSkillAndGuarantees(recommendation);
         recommendationRepository.save(recommendation);
@@ -138,10 +144,10 @@ public class RecommendationService {
         Set<Long> skillOffersDto = skillOffersFromDto.stream()
                 .map(SkillOfferDto::getSkillId)
                 .collect(Collectors.toSet());
-        List<SkillOffer> skillOffers = skillOfferRepository.findAllById(skillOffersDto);
+        List<Skill> skills = skillRepository.findAllById(skillOffersDto);
 
-        Set<Long> existingSkillIds = skillOffers.stream()
-                .map(skill -> skill.getSkill().getId())
+        Set<Long> existingSkillIds = skills.stream()
+                .map(Skill::getId)
                 .collect(Collectors.toSet());
 
         skillOffersDto.removeAll(existingSkillIds);

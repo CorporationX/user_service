@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.topic;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.listener.ChannelTopic;
 
 @Configuration
-public class TopicConfig {
+public class RecommendationConfig {
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String channelTopic;
 

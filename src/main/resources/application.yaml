@@ -36,6 +36,8 @@ spring:
           name: profile_view_channel
         event-start:
             name: event_start_channel
+        mentorship_requests:
+          name: mentorship_requests
 
   mvc:
     servlet:

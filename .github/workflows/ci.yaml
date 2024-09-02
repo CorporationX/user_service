@@ -1,0 +1,31 @@
+name: Build and Test on Pull Request
+
+# Триггер на событие pull_request в ветку forh_rus-BJS2-16721
+on:
+  pull_request:
+    branches:
+      - forh_rus-BJS2-16721
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Проверка кода из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Шаг 2: Установка JDK
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Шаг 3: Сборка проекта с использованием Gradle
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # Шаг 4: Запуск тестов
+      - name: Run tests
+        run: ./gradlew test

@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.mentorship.config_mentorship_request;
+package school.faang.user_service.controller_mentorship;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

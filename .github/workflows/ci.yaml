@@ -1,10 +1,10 @@
 name: Build and Test on Pull Request
 
-# Триггер на событие pull_request в ветку forh_rus-BJS2-16721
+# Триггер на событие pull_request в ветку manticore-master-bc5
 on:
   pull_request:
     branches:
-      - forh_rus-BJS2-16721
+      - manticore-master-bc5
 
 jobs:
   build-and-test:

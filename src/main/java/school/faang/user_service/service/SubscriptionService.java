@@ -60,4 +60,8 @@ public class SubscriptionService {
         return users.filter(user ->
                 user.getUsername().matches(filter.getNamePattern()) && user.getEmail().matches(filter.getEmailPattern()));
     }
+
+    public int getFollowersCount(long followerId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followerId);
+    }
 }

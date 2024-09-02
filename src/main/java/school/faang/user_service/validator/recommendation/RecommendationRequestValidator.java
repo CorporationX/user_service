@@ -25,7 +25,7 @@ public class RecommendationRequestValidator {
         validateSkills(recommendationRequestDto);
     }
 
-    public void validateSkills(RecommendationRequestDto recommendationRequestDto) {
+    private void validateSkills(RecommendationRequestDto recommendationRequestDto) {
         boolean allSkillRequestsExist = recommendationRequestDto.getSkillsId()
                 .stream()
                 .allMatch(skillRequestRepository::existsById);
@@ -35,7 +35,7 @@ public class RecommendationRequestValidator {
         }
     }
 
-    public void validateUsers(RecommendationRequestDto recommendationRequestDto) {
+    private void validateUsers(RecommendationRequestDto recommendationRequestDto) {
         if (!userRepository.existsById(recommendationRequestDto.getRequesterId())) {
             throw new IllegalArgumentException("Requester was not found");
         }
@@ -45,7 +45,7 @@ public class RecommendationRequestValidator {
         }
     }
 
-    public void validateRequestPeriod(RecommendationRequestDto recommendationRequestDto) {
+    private void validateRequestPeriod(RecommendationRequestDto recommendationRequestDto) {
         Optional<RecommendationRequest> latestPendingRequest = requestRepository.
                 findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
                         recommendationRequestDto.getReceiverId());

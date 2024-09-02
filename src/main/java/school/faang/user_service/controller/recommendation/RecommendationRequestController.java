@@ -13,7 +13,7 @@ public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
     @PostMapping
-    RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
+    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
         if (recommendationRequestDto == null) {
             throw new IllegalArgumentException("Recommendation request can not be null");
         }

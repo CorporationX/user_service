@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationRequestMapper {
 
-    @Mapping(source = "skillsId", target = "skills", qualifiedByName = "mapSkillRequests")
+    @Mapping(source = "skills", target = "skillsId", qualifiedByName = "mapSkillRequests")
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);

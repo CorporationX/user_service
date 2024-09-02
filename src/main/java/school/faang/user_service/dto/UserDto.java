@@ -17,5 +17,7 @@ public class UserDto {
 
     private String email;
 
+    private Long tgChatId;
+
     private PreferredContact preference;
 }

@@ -1,0 +1,1 @@
+alter TABLE users add tg_chat_id bigint;

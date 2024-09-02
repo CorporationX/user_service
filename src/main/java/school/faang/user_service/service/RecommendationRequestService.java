@@ -3,55 +3,39 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
-    private static final int SIX_MONTH_IN_DAYS = 180;
-    private final RecommendationRequestRepository requestRepository;
-    private final UserRepository userRepository;
     private final RecommendationRequestMapper requestMapper;
+    private final RecommendationRequestValidator requestValidator;
+    private final SkillRequestRepository skillRequestRepository;
+    private final RecommendationRequestRepository recommendationRequestRepository;
 
-    public void create(RecommendationRequestDto recommendationRequestDto) {
+    public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        requestValidator.validateRecommendationRequest(recommendationRequestDto);
+
         RecommendationRequest recommendationRequest = requestMapper.toEntity(recommendationRequestDto);
-        validateRecommendationRequest(recommendationRequest);
-//        checkRequestPeriod(recommendationRequest);
+        RecommendationRequest savedRecommendationRequest = recommendationRequestRepository.save(recommendationRequest);
+
+        saveSkillRequestsByNewRecommendation(recommendationRequestDto, savedRecommendationRequest);
+
+        return requestMapper.toDto(savedRecommendationRequest);
     }
 
-    private void validateRecommendationRequest(RecommendationRequest recommendationRequest) {
-        validateUsers(recommendationRequest);
-        validateRequestPeriod(recommendationRequest);
-        //to be continued
-    }
+    private void saveSkillRequestsByNewRecommendation(RecommendationRequestDto recommendationRequestDto, RecommendationRequest savedRecommendationRequest) {
+        List<Long> skillRequests = recommendationRequestDto.getSkillsId();
 
-    private void validateUsers(RecommendationRequest recommendationRequest) {
-        if (!userRepository.existsById(recommendationRequest.getRequester().getId())) {
-            throw new IllegalArgumentException("Requester was not found");
-        }
-
-        if (!userRepository.existsById(recommendationRequest.getReceiver().getId())) {
-            throw new IllegalArgumentException("Receiver was not found");
-        }
-    }
-
-    private void validateRequestPeriod(RecommendationRequest recommendationRequest) {
-        Optional<RecommendationRequest> latestPendingRequest = requestRepository.
-                findLatestPendingRequest(recommendationRequest.getRequester().getId(),
-                        recommendationRequest.getReceiver().getId());
-
-        if (latestPendingRequest.isPresent()) {
-            if(ChronoUnit.DAYS.between(latestPendingRequest.get().getCreatedAt(), recommendationRequest.getCreatedAt()) <
-                    SIX_MONTH_IN_DAYS){
-                throw new IllegalArgumentException("60 days must pass for a new request");
-            }
-        }
+        skillRequests
+                .forEach(skillRequestId -> skillRequestRepository
+                        .create(savedRecommendationRequest.getId(), skillRequestId));
     }
 }

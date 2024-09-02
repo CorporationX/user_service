@@ -4,8 +4,12 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
+
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -18,7 +22,7 @@ public class SubscriptionController {
             subscriptionService.followUser(followerId, followeeId);
             log.info("Follower {} followed user with id {}.", followerId, followeeId);
         } catch (DataValidationException exception) {
-            log.error(exception.getMessage());
+            log.warn(exception.getMessage());
         }
     }
 
@@ -27,7 +31,15 @@ public class SubscriptionController {
             subscriptionService.unfollowUser(followerId, followeeId);
             log.info("Follower {} unfollowed user with id {}.", followerId, followeeId);
         } catch (DataValidationException exception) {
-            log.error(exception.getMessage());
+            log.warn(exception.getMessage());
         }
+    }
+
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
+        return subscriptionService.getFollowers(followeeId, filter);
+    }
+
+    public int getFollowersCount(long followerId) {
+        return subscriptionService.getFollowersCount(followerId);
     }
 }

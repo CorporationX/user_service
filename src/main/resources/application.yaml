@@ -28,6 +28,8 @@ spring:
           name: follower_view_channel
         profile_view_channel:
           name: profile_view_channel
+        profile_picture_channel:
+          name: profile_pic_channel
         mentorship_request_channel:
           name: mentorship_request_channel
 

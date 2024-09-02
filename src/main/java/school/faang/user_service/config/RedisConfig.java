@@ -21,6 +21,8 @@ public class RedisConfig {
     private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
+    @Value("${spring.data.redis.channels.profile_picture_channel.name}")
+    private String profilePicture;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewTopicName;
 
@@ -37,6 +39,11 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    public ChannelTopic profilePictureTopic() {
+        return new ChannelTopic(profilePicture);
     }
 
     @Bean(name = "followerChannelTopic")

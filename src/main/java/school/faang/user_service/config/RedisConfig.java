@@ -50,7 +50,7 @@ public class RedisConfig {
     }
 
     @Bean(name = "profileViewTopic")
-    private ChannelTopic profileViewChannel() {
+    public ChannelTopic profileViewChannel() {
         return new ChannelTopic(profileViewTopicName);
     }
 }

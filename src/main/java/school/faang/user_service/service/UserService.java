@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
@@ -58,6 +59,23 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        List<UserFilter> userFiltersActual = userFilters.stream()
+                .filter(u -> u.checkingForNull(userFilterDto)).toList();
+        if (userFiltersActual.isEmpty()) {
+            throw new RuntimeException("No user filters found");
+        }
+
+        try(Stream<User> userStream = userRepository.findPremiumUsers()) {
+            return userStream
+                    .filter(u -> userFiltersActual.stream()
+                            .allMatch(f -> f.filterUsers(u, userFilterDto)))
+                    .map(mapper::toDto)
+                    .toList();
+        }
+    }
+
     private void deleteGoalFromDbIfPresent(List<Goal> goalsForDeleteFromDB) {
         if (!goalsForDeleteFromDB.isEmpty()) {
             goalsForDeleteFromDB.forEach(goal -> goalRepository
@@ -82,26 +100,6 @@ public class UserService {
     private List<Goal> getGoalsForDelete(User user) {
         return user.getGoals().stream()
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
-                .toList();
-    }
-
-    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
-        List<UserFilter> userFiltersActual = userFilters.stream()
-                .filter(u -> u.checkingForNull(userFilterDto)).toList();
-        if (userFiltersActual.size() == 0) {
-            throw new RuntimeException("No user filters found");
-        }
-        Stream<User> premiumUsersStream = userRepository.findPremiumUsers();
-        List<User> premiumUsersList = getPremiumUsersList(premiumUsersStream, userFilterDto, userFiltersActual);
-
-        return premiumUsersList.stream().map(mapper::toDto).toList();
-    }
-
-    private List<User> getPremiumUsersList(Stream<User> premiumUsersStream,
-                                           UserFilterDto userFilterDto, List<UserFilter> userFiltersActual) {
-        return premiumUsersStream
-                .filter(u -> userFiltersActual.stream()
-                        .allMatch(f -> f.filterUsers(u, userFilterDto)))
                 .toList();
     }
 }

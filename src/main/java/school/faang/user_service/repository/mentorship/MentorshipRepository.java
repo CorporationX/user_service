@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.goal.mentorship;
+package school.faang.user_service.repository.mentorship;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

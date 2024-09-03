@@ -1,9 +1,9 @@
 package school.faang.user_service.dto;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 public class UserFilterDto {
     private String namePattern;

@@ -3,12 +3,14 @@ package school.faang.user_service.service;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.validation.UserValidation;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,9 +22,17 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final UserValidation userValidation;
 
     public void followUser(long followerId, long followeeId) throws ValidationException {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+        validateUser(followerId);
+        validateUser(followeeId);
+
+        if (checkIfFolloweeAndFollowerIsEquals(followerId, followeeId)) {
+            throw new ValidationException("User can't subscribe to himself");
+        }
+
+        if (checkIfSubscriptionExists(followerId, followeeId)) {
             throw new ValidationException("Already subscribed");
         }
 
@@ -30,22 +40,36 @@ public class SubscriptionService {
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+        validateUser(followerId);
+        validateUser(followeeId);
+
+        if (checkIfFolloweeAndFollowerIsEquals(followerId, followeeId)) {
+            throw new ValidationException("User can't unsubscribe to himself");
+        }
+
+        if (!checkIfSubscriptionExists(followerId, followeeId)) {
             throw new ValidationException("Already unsubscribed");
         }
 
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
+    @Transactional
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
+        validateUser(followeeId);
+
         return userMapper.toDto(filterUsers(subscriptionRepository.findByFolloweeId(followeeId), filter).toList());
     }
 
     public int getFollowersCount(long followeeId) {
+        validateUser(followeeId);
+
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
     public int getFollowingCount(long followerId) {
+        validateUser(followerId);
+
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
@@ -54,11 +78,26 @@ public class SubscriptionService {
     }
 
     private Stream<User> filterUsers(Stream<User> userStream, UserFilterDto filterDto) {
-        for (UserFilter userFilter : userFilters) {
-            if (userFilter.isApplicable(filterDto)) {
-                userStream = userFilter.apply(userStream, filterDto);
+        if (filterDto != null) {
+            for (UserFilter userFilter : userFilters) {
+                if (userFilter.isApplicable(filterDto)) {
+                    userStream = userFilter.apply(userStream, filterDto);
+                }
             }
         }
         return userStream;
+    }
+
+    private boolean checkIfSubscriptionExists(long followerId, long followeeId) {
+        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+    }
+
+    private boolean checkIfFolloweeAndFollowerIsEquals(long followerId, long followeeId) {
+        return followerId == followeeId;
+    }
+
+    private void validateUser(long userId) {
+        userValidation.validateUserId(userId);
+        userValidation.validateUserExists(userId);
     }
 }

@@ -50,4 +50,11 @@ public class RecommendationRequestService {
 
         return requestMapper.toDto(allRecommendationRequests.toList());
     }
+
+    public RecommendationRequestDto getRequest(long id) {
+        return recommendationRequestRepository
+                .findById(id)
+                .map(requestMapper::toDto)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Request with id %s not found in database", id)));
+    }
 }

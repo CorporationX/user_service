@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,6 +52,13 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void testGetRecommendationRequestsOk() {
+        recommendationRequestService.getRequests(Mockito.any());
+
+        verify(recommendationRequestService, times(1)).getRequests(Mockito.any());
+    }
+
+    @Test
+    void testGetRecommendationRequestsByIdOk() {
         recommendationRequestService.getRequests(Mockito.any());
 
         verify(recommendationRequestService, times(1)).getRequests(Mockito.any());

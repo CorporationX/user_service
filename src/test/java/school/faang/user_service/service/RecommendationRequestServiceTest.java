@@ -21,6 +21,7 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.verify;
@@ -46,13 +47,13 @@ public class RecommendationRequestServiceTest {
     @Mock
     private List<RecommendationRequestFilter> recommendationsFilters;
 
+    @InjectMocks
+    private RecommendationRequestService requestService;
+
     private RecommendationRequestDto recommendationRequestDto;
     private RecommendationRequest recommendationRequest;
     private RequestFilterDto filter;
 
-
-    @InjectMocks
-    private RecommendationRequestService requestService;
 
     @BeforeEach
     public void setup() {
@@ -109,4 +110,18 @@ public class RecommendationRequestServiceTest {
         verify(requestMapper, times(1)).toDto(requestList);
     }
 
+    @Test
+    void testGetRequestWithWrongId() {
+        when(recommendationRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> requestService.getRequest(Mockito.anyLong()));
+    }
+
+    @Test
+    void testGetRequestWithOk() {
+        when(recommendationRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(recommendationRequest));
+        when(requestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
+
+        assertEquals(recommendationRequestDto, requestService.getRequest(Mockito.anyLong()));
+    }
 }

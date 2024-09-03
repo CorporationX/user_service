@@ -34,4 +34,8 @@ public class RecommendationRequestController {
 
         return recommendationRequestService.getRequests(filter);
     }
+    
+    public RecommendationRequestDto getRecommendationRequest(long id){
+        return recommendationRequestService.getRequest(id);
+    }
 }

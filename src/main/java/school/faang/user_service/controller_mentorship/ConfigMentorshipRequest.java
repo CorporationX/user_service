@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service_mentorship.MentorshipRequestService;
 
 import java.util.List;
 import java.util.Optional;

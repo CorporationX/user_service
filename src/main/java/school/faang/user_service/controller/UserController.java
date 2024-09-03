@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,22 +43,16 @@ public class UserController {
         userService.updateUserAvatar(userId, multipartFile);
     }
 
+    @PutMapping("/deactivate/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto deactivateUser(@PathVariable Long userId) {
+        return userService.deactivateUser(userId);
+    }
+
     @GetMapping("/exists/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public boolean checkUserExistence(@PathVariable Long userId) {
         return userService.checkUserExistence(userId);
-    }
-
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserTransportDto getUser(@PathVariable long userId) {
-        return userService.getUser(userId);
-    }
-
-    @PostMapping("/byIds")
-    @ResponseStatus(HttpStatus.OK)
-    public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersByIds(ids);
     }
 
     @GetMapping("/{userId}/followers")
@@ -72,9 +67,16 @@ public class UserController {
         return userService.checkAllFollowersExist(followerIds);
     }
 
-    @PutMapping("/deactivate/{userId}")
+    @PostMapping("/byIds")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto deactivateUser(@PathVariable Long userId) {
-        return userService.deactivateUser(userId);
+    public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return userService.getUsersByIds(ids);
+    }
+
+    @GetMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUser(@PathVariable long userId,
+                           @RequestHeader(value = "x-user-id") long authorId) {
+        return userService.getUser(userId, authorId);
     }
 }

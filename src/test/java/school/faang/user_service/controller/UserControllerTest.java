@@ -38,6 +38,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     private long userId;
+    private long authorId;
     private String userDtoJson;
     private MockMultipartFile mockMultipartFile;
 
@@ -48,6 +49,7 @@ class UserControllerTest {
     public void setUp() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         userId = 1L;
+        authorId = 2L;
         followersIds = List.of(1L, 2L);
         followerIdsJson = objectMapper.writeValueAsString(followersIds);
 
@@ -79,9 +81,10 @@ class UserControllerTest {
     @Test
     @DisplayName("testing getUser method")
     void testGetUser() throws Exception {
-        mockMvc.perform(get("/api/v1/user/{userId}", userId))
+        mockMvc.perform(get("/api/v1/user/{userId}", userId)
+                .header("x-user-id", authorId))
                 .andExpect(status().isOk());
-        verify(userService, times(1)).getUser(userId);
+        verify(userService, times(1)).getUser(userId, authorId);
     }
 
     @Test

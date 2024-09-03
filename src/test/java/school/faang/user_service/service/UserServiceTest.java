@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
@@ -17,6 +18,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -33,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,19 +58,24 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private MentorshipService mentorshipService;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     @InjectMocks
     private UserService userService;
 
     private long userId;
+    private long authorId;
     private User user;
     private UserDto userDto;
     private UserTransportDto userTransportDto;
     private User mentee;
     private Goal mentorAssignedGoal;
+    private List<User> users;
+    private List<Long> userIds;
+    private List<UserDto> userDtoList;
     private List<UserTransportDto> userTransportDtoList;
     private List<User> userFollowers;
-    private List<Long> userIds;
 
     @BeforeEach
     public void setUp() {
@@ -77,9 +85,19 @@ class UserServiceTest {
         List<Event> ownedEvents = new ArrayList<>();
 
         userId = 1L;
+        authorId = 2L;
         userIds = List.of(userId);
         long countryId = 2L;
         userFollowers = List.of(new User());
+
+        userDto = UserDto.builder()
+                .id(userId)
+                .username("username")
+                .password("password")
+                .country(1L)
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
 
         user = User.builder()
                 .id(userId)
@@ -107,8 +125,11 @@ class UserServiceTest {
                 .phone("123456")
                 .build();
 
+        userIds = List.of(userId);
+        users = List.of(user);
         userTransportDtoList = List.of(userTransportDto);
 
+        userDtoList = List.of(userDto);
         Goal goal = Goal.builder()
                 .id(1L)
                 .users(userList).build();
@@ -123,6 +144,16 @@ class UserServiceTest {
         goalList.add(goal);
         userList.add(user);
         ownedEvents.add(event);
+    }
+
+    @Test
+    @DisplayName("testing getUser method")
+    public void testGetUser() {
+        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
+        doNothing().when(profileViewEventPublisher).publish(any());
+        userService.getUser(userId, authorId);
+        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
+        verify(userMapper, times(1)).toDto(user);
     }
 
     @Test

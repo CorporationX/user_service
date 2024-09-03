@@ -41,7 +41,6 @@ public class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
-
         mentor = new User();
         mentor.setId(10L);
 
@@ -54,7 +53,6 @@ public class MentorshipServiceTest {
 
         mentor.setMentees(List.of(mentee));
         mentee.setMentors(List.of(mentor));
-
     }
 
     @Test
@@ -76,7 +74,6 @@ public class MentorshipServiceTest {
         List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
         assertEquals(1, mentees.size());
         verify(userMapper, times(1)).toDto(mentee);
-
     }
 
     @Test
@@ -86,7 +83,6 @@ public class MentorshipServiceTest {
         mentor.setMentees(Collections.emptyList());
         List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
         assertEquals(0, mentees.size());
-
     }
 
     @Test
@@ -107,7 +103,6 @@ public class MentorshipServiceTest {
 
         List<UserDto> mentors = mentorshipService.getMentors(mentee.getId());
         assertEquals(0, mentors.size());
-
     }
 
     @Test
@@ -124,7 +119,6 @@ public class MentorshipServiceTest {
 
         mentorshipService.deleteMentor(mentee.getId(), mentor.getId());
         verify(mentorshipRepository, times(1)).delete(mentor);
-
     }
 
     @Test
@@ -133,7 +127,6 @@ public class MentorshipServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(mentee.getId(), 999L));
         verify(mentorshipRepository, never()).delete(any());
-
     }
 
     @Test

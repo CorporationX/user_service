@@ -11,6 +11,6 @@ public class MentorshipStartEventPublisher extends EventPublisher<MentorshipStar
     public MentorshipStartEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                          ChannelTopic mentorshipChannelTopic,
                                          ObjectMapper objectMapper) {
-        super(redisTemplate, mentorshipChannelTopic, objectMapper);
+        super(redisTemplate, objectMapper, mentorshipChannelTopic);
     }
 }

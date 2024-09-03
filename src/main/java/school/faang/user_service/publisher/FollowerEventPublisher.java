@@ -12,6 +12,6 @@ public class FollowerEventPublisher extends EventPublisher<FollowerEventDto> {
     public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                   @Qualifier("followerChannelTopic") ChannelTopic followerChannelTopic,
                                   ObjectMapper objectMapper) {
-        super(redisTemplate, followerChannelTopic, objectMapper);
+        super(redisTemplate, objectMapper, followerChannelTopic);
     }
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,20 +13,32 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanListener;
+import school.faang.user_service.dto.ProfileViewEvent;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.mentorship_request_channel.name}")
+    private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
     @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipChannel;
     @Value("${spring.data.redis.topic.userBan}")
     private String userBanChannel;
+    @Value("${spring.data.redis.channels.profile_picture_channel.name}")
+    private String profilePicture;
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopicName;
+
+    public interface MessagePublisher {
+        void publish(ProfileViewEvent profileViewEvent);
+    }
 
     @Bean(name = "followerChannelTopic")
     public ChannelTopic followerChannelTopic() {
@@ -58,15 +71,22 @@ public class RedisConfig {
     }
 
     @Bean
-    MessageListenerAdapter messageListener(UserBanListener userBanListener) {
-        return new MessageListenerAdapter(userBanListener);
+    public ChannelTopic profilePictureTopic() {
+        return new ChannelTopic(profilePicture);
     }
 
     @Bean
-    public RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, userBanTopic());
-        return container;
+    public ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewTopicName);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipRequestTopic() {
+        return new ChannelTopic(mentorshipRequestTopicName);
+    }
+
+    @Bean
+    MessageListenerAdapter messageListener(UserBanListener userBanListener) {
+        return new MessageListenerAdapter(userBanListener);
     }
 }

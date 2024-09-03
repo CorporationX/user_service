@@ -7,20 +7,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public abstract class EventPublisher<T> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic channelTopic;
     private final ObjectMapper objectMapper;
+    private final ChannelTopic channelTopic;
 
-    public void publish(T message) {
+    public void publish(T event) {
         try {
-            redisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(message));
+            redisTemplate.convertAndSend(channelTopic.getTopic(), objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            log.error("Error while publishing event to redis message: " + message, e);
-            throw new RuntimeException(e);
+            String errorMessage = "Could not parse event: %s".formatted(event);
+            log.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
         }
     }
 }

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
@@ -34,8 +34,18 @@ public class RecommendationRequestController {
 
         return recommendationRequestService.getRequests(filter);
     }
-    
+
+    @GetMapping
     public RecommendationRequestDto getRecommendationRequest(long id){
         return recommendationRequestService.getRequest(id);
+    }
+
+    @PostMapping
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection){
+        if(rejection == null || rejection.getReason().isBlank()){
+            throw new IllegalArgumentException("Rejection information is incorrect");
+        }
+
+        return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

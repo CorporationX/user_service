@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -22,7 +23,6 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,7 +53,8 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestDto recommendationRequestDto;
     private RecommendationRequest recommendationRequest;
     private RequestFilterDto filter;
-
+    private long id;
+    private RejectionDto rejectionDto;
 
     @BeforeEach
     public void setup() {
@@ -73,12 +74,16 @@ public class RecommendationRequestServiceTest {
                 .receiver(new User())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .status(RequestStatus.ACCEPTED)
                 .build();
 
         filter = RequestFilterDto.builder()
                 .status(RequestStatus.ACCEPTED)
                 .id(5L)
                 .build();
+
+        id = 1;
+        rejectionDto = new RejectionDto("some reason");
     }
 
     @Test
@@ -123,5 +128,25 @@ public class RecommendationRequestServiceTest {
         when(requestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
 
         assertEquals(recommendationRequestDto, requestService.getRequest(Mockito.anyLong()));
+    }
+
+    @Test
+    void testRejectRequestWithWrongId() {
+        when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> requestService.rejectRequest(id, rejectionDto));
+    }
+
+    @Test
+    void testRejectRequestOk() {
+        when(recommendationRequestRepository.findById(id)).thenReturn(Optional.of(recommendationRequest));
+        when(recommendationRequestRepository.save(recommendationRequest)).thenReturn(recommendationRequest);
+        when(requestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
+
+        requestService.rejectRequest(id, rejectionDto);
+
+        verify(recommendationRequestRepository, times(1)).findById(id);
+        verify(recommendationRequestRepository, times(1)).save(recommendationRequest);
+        verify(requestMapper, times(1)).toDto(recommendationRequest);
     }
 }

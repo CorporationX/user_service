@@ -3,7 +3,9 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
@@ -56,5 +58,19 @@ public class RecommendationRequestService {
                 .findById(id)
                 .map(requestMapper::toDto)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Request with id %s not found in database", id)));
+    }
+
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+        RecommendationRequest requestToModify = recommendationRequestRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No such recommendation request with id " + id));
+
+        if (requestToModify.getStatus() != RequestStatus.REJECTED) {
+            requestToModify.setStatus(RequestStatus.REJECTED);
+            requestToModify.setRejectionReason(rejection.getReason());
+            recommendationRequestRepository.save(requestToModify);
+        }
+
+        return requestMapper.toDto(requestToModify);
     }
 }

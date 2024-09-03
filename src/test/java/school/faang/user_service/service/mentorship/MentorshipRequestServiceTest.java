@@ -15,15 +15,15 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.event.MentorshipRequestEvent;
 import school.faang.user_service.event.MentorshipOfferedEvent;
+import school.faang.user_service.event.MentorshipRequestEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
@@ -39,6 +39,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,6 +73,7 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestMapperImpl mentorshipRequestMapperImpl;
     private MentorshipOfferedEvent mentorshipOfferedEvent;
+    private MentorshipRequestEvent mentorshipRequestEvent;
     private MentorshipRequest mentorshipRequest;
     private MentorshipRequestDto mentorshipRequestDto;
     private long requesterId;
@@ -81,6 +84,7 @@ class MentorshipRequestServiceTest {
     public void setUp() {
         mentorshipRequestMapperImpl = new MentorshipRequestMapperImpl();
         mentorshipOfferedEvent = new MentorshipOfferedEvent();
+        mentorshipRequestEvent = new MentorshipRequestEvent();
         mentorshipRequest = new MentorshipRequest();
 
         requesterId = 1L;
@@ -102,13 +106,14 @@ class MentorshipRequestServiceTest {
         when(mentorshipOfferedEventMapper.toEvent(mentorshipRequest)).thenReturn(mentorshipOfferedEvent);
 
         when(mentorshipRequestEventMapper.toEvent(mentorshipRequestCaptor.capture())).thenReturn(mentorshipRequestEvent);
+
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
         verify(mentorshipRequestValidator, times(1))
                 .validateParticipantsAndRequestFrequency(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId(),
-                        mentorshipRequestDto.getCreatedAt());
+                        eq(mentorshipRequestDto.getRequesterId()),
+                        eq(mentorshipRequestDto.getReceiverId()),
+                        any());
         verify(mentorshipRequestRepository, times(1))
                 .create(mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),

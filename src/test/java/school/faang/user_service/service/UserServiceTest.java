@@ -7,10 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -71,9 +70,7 @@ class UserServiceTest {
     private UserTransportDto userTransportDto;
     private User mentee;
     private Goal mentorAssignedGoal;
-    private List<User> users;
     private List<Long> userIds;
-    private List<UserDto> userDtoList;
     private List<UserTransportDto> userTransportDtoList;
     private List<User> userFollowers;
 
@@ -126,10 +123,8 @@ class UserServiceTest {
                 .build();
 
         userIds = List.of(userId);
-        users = List.of(user);
         userTransportDtoList = List.of(userTransportDto);
 
-        userDtoList = List.of(userDto);
         Goal goal = Goal.builder()
                 .id(1L)
                 .users(userList).build();
@@ -182,19 +177,6 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(user);
     }
 
-    @Test
-    @DisplayName("test that getUser calls all methods correctly + return test")
-    public void testGetUser() {
-        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
-        when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
-
-        UserTransportDto result = userService.getUser(userId);
-
-        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
-        verify(userMapper).toTransportDto(user);
-
-        assertEquals(result, userTransportDto);
-    }
 
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")

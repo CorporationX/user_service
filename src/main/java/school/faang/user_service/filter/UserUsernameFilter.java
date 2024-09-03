@@ -12,6 +12,7 @@ public class UserUsernameFilter implements UserFilter {
 
     @Override
     public boolean apply(User user, UserFilterDto filter) {
-        return user.getUsername().matches(filter.getNamePattern());
+        return user != null && user.getUsername() != null &&
+                user.getUsername().matches(filter.getNamePattern());
     }
 }

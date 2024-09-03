@@ -30,4 +30,6 @@ public interface RecommendationRequestMapper {
                 .map(SkillRequest::getId)
                 .toList();
     }
+
+    List<RecommendationRequestDto> toDto(List<RecommendationRequest> recommendationRequests);
 }

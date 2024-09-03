@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -42,5 +43,18 @@ public class RecommendationRequestControllerTest {
         verify(recommendationRequestService, times(1)).create(recommendationRequestDto);
 
         assertEquals(recommendationRequestDto, responseDto);
+    }
+
+    @Test
+    void testGetRecommendationRequestsWithEmptyFilter() {
+        assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestController.getRecommendationRequests(null));
+    }
+
+    @Test
+    void testGetRecommendationRequestsOk() {
+        recommendationRequestService.getRequests(Mockito.any());
+
+        verify(recommendationRequestService, times(1)).getRequests(Mockito.any());
     }
 }

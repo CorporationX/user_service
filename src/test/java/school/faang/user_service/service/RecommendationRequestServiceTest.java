@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -17,10 +21,13 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
@@ -36,8 +43,13 @@ public class RecommendationRequestServiceTest {
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
 
+    @Mock
+    private List<RecommendationRequestFilter> recommendationsFilters;
+
     private RecommendationRequestDto recommendationRequestDto;
     private RecommendationRequest recommendationRequest;
+    private RequestFilterDto filter;
+
 
     @InjectMocks
     private RecommendationRequestService requestService;
@@ -61,10 +73,15 @@ public class RecommendationRequestServiceTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+
+        filter = RequestFilterDto.builder()
+                .status(RequestStatus.ACCEPTED)
+                .id(5L)
+                .build();
     }
 
     @Test
-    void testCreate(){
+    void testCreate() {
         when(requestMapper.toEntity(recommendationRequestDto)).thenReturn(recommendationRequest);
         when(recommendationRequestRepository.save(recommendationRequest)).thenReturn(recommendationRequest);
         when(requestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
@@ -77,4 +94,19 @@ public class RecommendationRequestServiceTest {
         verify(skillRequestRepository, times(1))
                 .create(recommendationRequestDto.getId(), recommendationRequest.getId());
     }
+
+    @Test
+    void testGetResult() {
+        List<RecommendationRequest> requestList = List.of(recommendationRequest);
+        List<RecommendationRequestDto> requestDtosList = List.of(recommendationRequestDto);
+
+        when(recommendationRequestRepository.findAll()).thenReturn(requestList);
+        when(requestMapper.toDto(requestList)).thenReturn(requestDtosList);
+
+        requestService.getRequests(filter);
+
+        verify(recommendationRequestRepository, times(1)).findAll();
+        verify(requestMapper, times(1)).toDto(requestList);
+    }
+
 }

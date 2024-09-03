@@ -1,8 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -12,9 +11,9 @@ import school.faang.user_service.service.SubscriptionService;
 import java.util.List;
 
 @Component
+@Slf4j
 @AllArgsConstructor
 public class SubscriptionController {
-    private static final Logger log = LoggerFactory.getLogger(SubscriptionController.class);
     private SubscriptionService subscriptionService;
 
     public void followUser(long followerId, long followeeId) {

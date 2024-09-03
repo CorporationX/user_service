@@ -15,6 +15,5 @@ public class UserTransportDto {
     private String username;
     private String email;
     private String phone;
-    private boolean isActive;
     private PreferredContact preference;
 }

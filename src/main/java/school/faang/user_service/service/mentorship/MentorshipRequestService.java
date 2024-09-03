@@ -37,10 +37,8 @@ public class MentorshipRequestService {
         long requesterId = mentorshipRequestDto.getRequesterId();
         long receiverId = mentorshipRequestDto.getReceiverId();
         String description = mentorshipRequestDto.getDescription();
-        LocalDateTime mentorshipCreationDate = mentorshipRequestDto.getCreatedAt();
 
-        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId,
-                mentorshipCreationDate);
+        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId, LocalDateTime.now());
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
         MentorshipOfferedEvent mentorshipOfferedEvent = mentorshipOfferedEventMapper.toEvent(mentorshipRequest);
         mentorshipOfferedEventPublisher.publish(mentorshipOfferedEvent);

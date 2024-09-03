@@ -13,8 +13,12 @@ public class CountryService {
 
     CountryRepository countryRepository;
 
-    public Country createCountry(Country country) {
-        return countryRepository.save(country);
+//    public Country createCountry(Country country) {
+//        return countryRepository.save(country);
+//    }
+
+    public List<Country> createCountries(List<Country> countries) {
+        return countryRepository.saveAll(countries);
     }
 
     public boolean existsCountryByTitle(String title) {

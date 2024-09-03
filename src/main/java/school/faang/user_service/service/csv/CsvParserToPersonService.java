@@ -3,33 +3,33 @@ package school.faang.user_service.service.csv;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.entity.person.Person;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
-public abstract class CsvParserService<T> {
+public class CsvParserToPersonService extends CsvParserService<Person> {
 
-    public List<T> convertCsv(InputStream inputStream) throws IOException {
+    @Override
+    public List<Person> convertCsv(InputStream inputStream) throws IOException {
 
         CsvMapper csvMapper = new CsvMapper();
 
-        MappingIterator<T> mappingIterator = csvMapper
-                .readerFor(getInstance())
+        MappingIterator<Person> personMappingIterator = csvMapper
+                .readerFor(Person.class)
                 .with(CsvSchema.emptySchema().withHeader())
                 .readValues(inputStream);
 
-        List<T> list = mappingIterator.readAll();
-        log.info(list.toString());
+        List<Person> persons = personMappingIterator.readAll();
+        log.info(persons.toString());
         inputStream.close();
-        return list;
-    }
-
-    Class<?> getInstance() {
-        return this.getClass();
+        return persons;
     }
 }

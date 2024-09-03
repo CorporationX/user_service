@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.person.Person;
@@ -38,7 +37,6 @@ public class ConvertToUserServiceTest {
 
     private final Person testPerson = new Person();
     private final User testUser = new User();
-    private final UserDto testUserDto = new UserDto();
     private final Country testCountry = new Country();
 
     private User prepareTestingUser() {
@@ -99,11 +97,10 @@ public class ConvertToUserServiceTest {
         when(countryService.existsCountryByTitle(any())).thenReturn(true);
         when(countryService.findAllCountries()).thenReturn(List.of(country));
 
-
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
         verify(countryService, times(0))
-                .createCountry(country);
+                .createCountries(List.of(country));
     }
 
     @Test
@@ -117,7 +114,7 @@ public class ConvertToUserServiceTest {
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
         verify(countryService, times(1))
-                .createCountry(country);
+                .createCountries(List.of(country));
     }
 
     @Test

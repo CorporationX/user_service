@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.person.Person;
-import school.faang.user_service.service.csv.CsvParserService;
+import school.faang.user_service.service.csv.CsvParserToPersonService;
 import school.faang.user_service.service.user.ConvertToUserService;
 import school.faang.user_service.service.user.UserService;
 
@@ -24,7 +24,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final CsvParserService csvParserService;
+    private final CsvParserToPersonService csvParserToPersonService;
     private final ConvertToUserService convertToUserService;
 
     @GetMapping("/{userId}")
@@ -37,7 +37,7 @@ public class UserController {
 
         InputStream inputStream = file.getInputStream();
 
-        List<Person> persons = csvParserService.convertCsvToPerson(inputStream);
+        List<Person> persons = csvParserToPersonService.convertCsv(inputStream);
         inputStream.close();
         return convertToUserService.prepareAndSaveUsers(persons);
     }

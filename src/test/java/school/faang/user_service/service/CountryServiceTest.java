@@ -23,11 +23,11 @@ public class CountryServiceTest {
     CountryService countryService;
 
     @Test
-    void testCreateCountryIsSuccessful(){
+    void testCreateCountriesIsSuccessful(){
 
-        countryService.createCountry(Mockito.any());
+        countryService.createCountries(Mockito.any());
 
-        verify(countryRepository, times(1)).save(Mockito.any());
+        verify(countryRepository, times(1)).saveAll(Mockito.any());
     }
 
     @Test

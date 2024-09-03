@@ -27,54 +27,75 @@ public class ConvertToUserService {
 
     public List<UserDto> prepareAndSaveUsers(List<Person> persons) {
         List<User> saveStudentsToUsers = new ArrayList<>();
+        List<Country> userCountries = new ArrayList<>();
+        List<Country> countriesForSave = new ArrayList<>();
 
         persons.forEach(person -> {
             User studentToUser = personMapper.toUser(person);
-            boolean existsByUsernameResult = userRepository.existsByUsername(studentToUser.getUsername());
-            boolean existsByEmailResult = userRepository.existsByEmail(studentToUser.getEmail());
-            boolean existsByPhoneResult = userRepository.existsByPhone(studentToUser.getPhone());
-            validateUserBeforeSave(studentToUser, existsByUsernameResult, existsByEmailResult, existsByPhoneResult);
+            validateUserBeforeSave(studentToUser);
 
-            if (!existsByUsernameResult && !existsByEmailResult && !existsByPhoneResult) {
+            if (!userRepository.existsByUsername(studentToUser.getUsername())
+                    && !userRepository.existsByEmail(studentToUser.getEmail())
+                    && !userRepository.existsByPhone(studentToUser.getPhone())) {
                 studentToUser.setPassword(generatePassword());
                 Country userCountry = studentToUser.getCountry();
 
                 if (userCountry != null) {
-                    String userCountryTitle = userCountry.getTitle();
-
-                    boolean existsCountryByTitleResult = countryService.existsCountryByTitle(userCountryTitle);
-                    if (!existsCountryByTitleResult) {
-                        Country saveCountry = countryService.createCountry(userCountry);
-                        studentToUser.setCountry(saveCountry);
-                    }
-                    List<Country> equalsCountries = countryService.findAllCountries().stream().filter(
-                            country -> country.getTitle().equals(userCountryTitle)).limit(1).toList();
-                    Country equalsCountry = equalsCountries.get(0);
-                    studentToUser.setCountry(equalsCountry);
+                    userCountries.add(userCountry);
                 }
                 saveStudentsToUsers.add(studentToUser);
             }
         });
+
+        if (!userCountries.isEmpty()) {
+            userCountries.stream()
+                    .distinct()
+                    .forEach(userCountry -> {
+                                boolean existsCountryByTitleResult =
+                                        countryService.existsCountryByTitle(userCountry.getTitle());
+                                if (!existsCountryByTitleResult) {
+                                    countriesForSave.add(userCountry);
+                                }
+                            }
+                    );
+            if(!countriesForSave.isEmpty()) {
+                countryService.createCountries(countriesForSave);
+            }
+            List<Country> allCountry = countryService.findAllCountries();
+
+            saveStudentsToUsers.forEach(user -> {
+                String userCountryTitle = user.getCountry().getTitle();
+                Country userCountry = allCountry.stream().
+                        filter(country -> country
+                                        .getTitle()
+                                        .equals(userCountryTitle))
+                        .findFirst()
+                        .orElseThrow();
+                user.setCountry(userCountry);
+            });
+        }
         log.info("saveStudentsToUsers: {}", saveStudentsToUsers);
         return userService.saveUsers(saveStudentsToUsers);
     }
 
-    private void validateUserBeforeSave(User studentToUser,
-                                        boolean existsByUsernameResult,
-                                        boolean existsByEmailResult,
-                                        boolean existsByPhoneResult) {
+    private void validateUserBeforeSave(User studentToUser) {
 
         //ToDo В таблице user поля Username, Email, Phone имеют тип unique key.
         //ToDo Поэтому если у сохраняемого юзера есть совпадение по имени, эл.адресу или номеру телефона с юзерами,
         //ToDo которые содержатся в базе данных, то новый юзер не будет сохранен, а в лог выйдет сообщение.
         //ToDo Но ошибку я не бросаю, так как операция прервется и следующие юзеры не сохранятся
 
-        if (existsByUsernameResult) {
-            log.warn("User with username {} already exists", studentToUser.getUsername());
-        } else if (existsByEmailResult) {
-            log.warn("User with email {} already exists", studentToUser.getEmail());
-        } else if (existsByPhoneResult) {
-            log.warn("User with phone number {} already exists", studentToUser.getPhone());
+        if (userRepository.existsByUsername(studentToUser.getUsername())
+                || userRepository.existsByEmail(studentToUser.getEmail())
+                || userRepository.existsByPhone(studentToUser.getPhone())) {
+
+            if (userRepository.existsByUsername(studentToUser.getUsername())) {
+                log.warn("User with username {} already exists", studentToUser.getUsername());
+            } else if (userRepository.existsByEmail(studentToUser.getEmail())) {
+                log.warn("User with email {} already exists", studentToUser.getEmail());
+            } else if (userRepository.existsByPhone(studentToUser.getPhone())) {
+                log.warn("User with phone number {} already exists", studentToUser.getPhone());
+            }
         }
     }
 

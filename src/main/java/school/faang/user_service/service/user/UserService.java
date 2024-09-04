@@ -100,4 +100,13 @@ public class UserService {
     return userMapper.toUserDto(userRepository.findById(id).orElseThrow());
   }
 
+    public void putChatIdInUser(long userId, long chatId){
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.error(String.format(ExceptionMessages.USER_IS_NULL, userId));
+            return new UserNotFoundException(userId);
+        });
+        user.setChatId(chatId);
+
+        userRepository.save(user);
+    }
 }

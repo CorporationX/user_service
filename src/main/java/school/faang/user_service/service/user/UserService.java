@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -79,5 +80,23 @@ public class UserService {
             log.error("User with id :{} doesn't exist!", id);
             throw new EntityNotFoundException("User with id :" + id + " doesn't exist!");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> {
+            String errorMessage = String.format("User (ID : %d) doesn't exist in the system");
+            log.error(errorMessage);
+            return new EntityNotFoundException(errorMessage);
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getUserSkillsId(long id) {
+        return userRepository.findById(id).orElseThrow(()-> {
+            String errorMessage = String.format("User (ID : %d) doesn't exist in the system");
+            log.error(errorMessage);
+            return new EntityNotFoundException(errorMessage);
+        }).getSkills().stream().map(Skill::getId).toList();
     }
 }

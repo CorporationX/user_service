@@ -91,14 +91,14 @@ public class RecommendationRequestServiceTest {
         when(requestMapper.toEntity(recommendationRequestDto)).thenReturn(recommendationRequest);
         when(recommendationRequestRepository.save(recommendationRequest)).thenReturn(recommendationRequest);
         when(requestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
-        when(skillRequestRepository.create(recommendationRequestDto.getId(), recommendationRequest.getId())).thenReturn(new SkillRequest());
+        when(skillRequestRepository.create(recommendationRequestDto.id(), recommendationRequest.getId())).thenReturn(new SkillRequest());
 
         RecommendationRequestDto savedRecommendationRequestDto = requestService.create(recommendationRequestDto);
 
         verify(requestValidator, times(1)).validateRecommendationRequest(recommendationRequestDto);
         verify(recommendationRequestRepository, times(1)).save(recommendationRequest);
         verify(skillRequestRepository, times(1))
-                .create(recommendationRequestDto.getId(), recommendationRequest.getId());
+                .create(recommendationRequestDto.id(), recommendationRequest.getId());
     }
 
     @Test

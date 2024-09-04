@@ -67,15 +67,15 @@ public class RecommendationRequestValidatorTest {
 
     @Test
     void testRequesterUserDoesNotExist() {
-        when(userRepository.existsById(recommendationRequestDto.getRequesterId())).thenReturn(false);
+        when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
     }
 
     @Test
     void testReceiverUserDoesNotExist() {
-        when(userRepository.existsById(recommendationRequestDto.getRequesterId())).thenReturn(true);
-        when(userRepository.existsById(recommendationRequestDto.getReceiverId())).thenReturn(false);
+        when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(true);
+        when(userRepository.existsById(recommendationRequestDto.receiverId())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class,
                 () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
@@ -83,10 +83,10 @@ public class RecommendationRequestValidatorTest {
 
     @Test
     void test180DaysForNewRequestNotPassed() {
-        when(userRepository.existsById(recommendationRequestDto.getRequesterId())).thenReturn(true);
-        when(userRepository.existsById(recommendationRequestDto.getReceiverId())).thenReturn(true);
-        when(requestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId()))
+        when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(true);
+        when(userRepository.existsById(recommendationRequestDto.receiverId())).thenReturn(true);
+        when(requestRepository.findLatestPendingRequest(recommendationRequestDto.requesterId(),
+                recommendationRequestDto.receiverId()))
                 .thenReturn(Optional.of(foundRecommendationRequest));
 
         assertThrows(IllegalArgumentException.class,
@@ -95,10 +95,10 @@ public class RecommendationRequestValidatorTest {
 
     @Test
     void testCheckIFNotAllSkillRequestsExistInDB() {
-        when(userRepository.existsById(recommendationRequestDto.getRequesterId())).thenReturn(true);
-        when(userRepository.existsById(recommendationRequestDto.getReceiverId())).thenReturn(true);
-        when(requestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId()))
+        when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(true);
+        when(userRepository.existsById(recommendationRequestDto.receiverId())).thenReturn(true);
+        when(requestRepository.findLatestPendingRequest(recommendationRequestDto.requesterId(),
+                recommendationRequestDto.receiverId()))
                 .thenReturn(Optional.empty());
         when(skillRequestRepository.existsById(Mockito.anyLong())).thenReturn(false);
 
@@ -108,20 +108,20 @@ public class RecommendationRequestValidatorTest {
 
     @Test
     void testValidateRecommendationRequest() {
-        when(userRepository.existsById(recommendationRequestDto.getRequesterId())).thenReturn(true);
-        when(userRepository.existsById(recommendationRequestDto.getReceiverId())).thenReturn(true);
-        when(requestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId()))
+        when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(true);
+        when(userRepository.existsById(recommendationRequestDto.receiverId())).thenReturn(true);
+        when(requestRepository.findLatestPendingRequest(recommendationRequestDto.requesterId(),
+                recommendationRequestDto.receiverId()))
                 .thenReturn(Optional.empty());
         when(skillRequestRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
         requestValidator.validateRecommendationRequest(recommendationRequestDto);
 
-        verify(userRepository, times(1)).existsById(recommendationRequestDto.getRequesterId());
-        verify(userRepository, times(1)).existsById(recommendationRequestDto.getReceiverId());
+        verify(userRepository, times(1)).existsById(recommendationRequestDto.requesterId());
+        verify(userRepository, times(1)).existsById(recommendationRequestDto.receiverId());
         verify(requestRepository, times(1))
-                .findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
-                        recommendationRequestDto.getReceiverId());
+                .findLatestPendingRequest(recommendationRequestDto.requesterId(),
+                        recommendationRequestDto.receiverId());
         verify(skillRequestRepository, times(3)).existsById(Mockito.anyLong());
     }
 }

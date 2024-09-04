@@ -26,7 +26,7 @@ public class RecommendationRequestValidator {
     }
 
     private void validateSkills(RecommendationRequestDto recommendationRequestDto) {
-        boolean allSkillRequestsExist = recommendationRequestDto.getSkillsId()
+        boolean allSkillRequestsExist = recommendationRequestDto.skillsId()
                 .stream()
                 .allMatch(skillRequestRepository::existsById);
 
@@ -36,22 +36,22 @@ public class RecommendationRequestValidator {
     }
 
     private void validateUsers(RecommendationRequestDto recommendationRequestDto) {
-        if (!userRepository.existsById(recommendationRequestDto.getRequesterId())) {
+        if (!userRepository.existsById(recommendationRequestDto.requesterId())) {
             throw new IllegalArgumentException("Requester was not found");
         }
 
-        if (!userRepository.existsById(recommendationRequestDto.getReceiverId())) {
+        if (!userRepository.existsById(recommendationRequestDto.receiverId())) {
             throw new IllegalArgumentException("Receiver was not found");
         }
     }
 
     private void validateRequestPeriod(RecommendationRequestDto recommendationRequestDto) {
         Optional<RecommendationRequest> latestPendingRequest = requestRepository.
-                findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
-                        recommendationRequestDto.getReceiverId());
+                findLatestPendingRequest(recommendationRequestDto.requesterId(),
+                        recommendationRequestDto.receiverId());
 
         if (latestPendingRequest.isPresent()) {
-            if (ChronoUnit.DAYS.between(latestPendingRequest.get().getCreatedAt(), recommendationRequestDto.getCreatedAt()) <
+            if (ChronoUnit.DAYS.between(latestPendingRequest.get().getCreatedAt(), recommendationRequestDto.createdAt()) <
                     SIX_MONTH_IN_DAYS) {
                 throw new IllegalArgumentException("60 days must pass for a new request");
             }

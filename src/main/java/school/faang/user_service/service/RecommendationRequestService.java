@@ -37,7 +37,7 @@ public class RecommendationRequestService {
     }
 
     private void saveSkillRequestsByNewRecommendation(RecommendationRequestDto recommendationRequestDto, RecommendationRequest savedRecommendationRequest) {
-        List<Long> skillRequests = recommendationRequestDto.getSkillsId();
+        List<Long> skillRequests = recommendationRequestDto.skillsId();
 
         skillRequests
                 .forEach(skillRequestId -> skillRequestRepository

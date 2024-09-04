@@ -7,15 +7,14 @@ import school.faang.user_service.entity.RequestStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
 @Builder
-public class RecommendationRequestDto {
-    private Long id;
-    private String message;
-    private RequestStatus status;
-    private List<Long> skillsId;
-    private long requesterId;
-    private long receiverId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+public record RecommendationRequestDto(
+        Long id,
+        String message,
+        RequestStatus status,
+        List<Long> skillsId,
+        long requesterId,
+        long receiverId,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt) {
 }

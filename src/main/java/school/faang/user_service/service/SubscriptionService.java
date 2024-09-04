@@ -9,7 +9,7 @@ import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.redisPublisher.FollowerEventPublisher;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.SubscriptionServiceValidator;
 

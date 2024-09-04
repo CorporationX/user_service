@@ -5,10 +5,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.ProfilePicEvent;
+import school.faang.user_service.publisher.EventPublisher;
 
 @Component
 public class ProfilePicEventPublisher extends EventPublisher<ProfilePicEvent> {
-    public ProfilePicEventPublisher(RedisTemplate redisTemplate, ChannelTopic profilePictureTopic, ObjectMapper objectMapper) {
-        super(redisTemplate, profilePictureTopic, objectMapper);
+    public ProfilePicEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                    ObjectMapper objectMapper,
+                                    ChannelTopic profilePictureTopic) {
+        super(redisTemplate, objectMapper, profilePictureTopic);
     }
 }

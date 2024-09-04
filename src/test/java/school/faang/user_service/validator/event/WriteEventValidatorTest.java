@@ -14,6 +14,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.validator.WriteEventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;

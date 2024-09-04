@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,20 +40,14 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
 
     @Bean
     ChannelTopic followerTopic() {
         return new ChannelTopic(followerViewChannelName);
-    }
-
-    @Bean
-    EventPublisher projectFollowerPublisher() {
-        return new ProjectFollowerEventPublisher(redisTemplate(redisConnectionFactory()), projectFollowerTopic());
     }
 
     @Bean

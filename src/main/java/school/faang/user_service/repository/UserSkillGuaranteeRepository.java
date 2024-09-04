@@ -6,4 +6,5 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 
 @Repository
 public interface UserSkillGuaranteeRepository extends CrudRepository<UserSkillGuarantee, Long> {
+    boolean existsUserSkillGuaranteeByUserIdAndGuarantorIdAndSkillId(long userId, long guarantorId, long skillId);
 }

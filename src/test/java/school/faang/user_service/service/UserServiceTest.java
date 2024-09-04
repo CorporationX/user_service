@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,7 +64,7 @@ class UserServiceTest {
     private UserService userService;
 
     private long userId;
-    private long viewId;
+    private long authorId;
     private User user;
     private UserDto userDto;
     private User mentee;
@@ -82,7 +83,7 @@ class UserServiceTest {
         List<Event> ownedEvents = new ArrayList<>();
 
         userId = 1L;
-        viewId = 2L;
+        authorId = 2L;
         long countryId = 2L;
         userFollowers = List.of(new User());
 
@@ -129,7 +130,7 @@ class UserServiceTest {
 
         profileViewEvent = ProfileViewEvent.builder()
                 .userOwnerId(userId)
-                .viewId(viewId)
+                .viewId(authorId)
                 .build();
     }
 
@@ -137,7 +138,8 @@ class UserServiceTest {
     @DisplayName("testing getUser method")
     public void testGetUser() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
-        userService.getUser(userId, viewId);
+        doNothing().when(profileViewEventPublisher).publish(any());
+        userService.getUser(userId, authorId);
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(profileViewEventPublisher, times(1)).publish(profileViewEvent);
         verify(userMapper, times(1)).toDto(user);

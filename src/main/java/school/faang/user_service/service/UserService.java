@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
+import school.faang.user_service.dto.ProfileViewEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.entity.User;
@@ -25,6 +26,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -44,11 +46,10 @@ public class UserService {
     private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Transactional(readOnly = true)
-    public UserDto getUser(long userId, long viewId) {
+    public UserDto getUser(long userId, long authorId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
-
-        publishViewProfile(userId, viewId);
-
+        profileViewEventPublisher.publish(new ProfileViewEvent(authorId, userId, LocalDateTime.now()));
+        publishViewProfile(userId, authorId);
         return userMapper.toDto(user);
     }
 
@@ -151,10 +152,10 @@ public class UserService {
                 .forEach(goal -> goal.setMentor(mentee));
     }
 
-    private void publishViewProfile(long userOwnerId, long viewId) {
+    private void publishViewProfile(long userId, long authorId) {
         profileViewEventPublisher.publish(ProfileViewEvent.builder()
-                .userOwnerId(userOwnerId)
-                .viewId(viewId)
+                .userOwnerId(userId)
+                .viewId(authorId)
                 .build());
     }
 }

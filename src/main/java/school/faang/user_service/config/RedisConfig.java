@@ -9,7 +9,10 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.listener.UserBanListener;
 import school.faang.user_service.dto.ProfileViewEvent;
 
 @Configuration
@@ -24,6 +27,10 @@ public class RedisConfig {
     private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
+    @Value("${spring.data.redis.channels.mentorship_channel.name}")
+    private String mentorshipChannel;
+    @Value("${spring.data.redis.topic.userBan}")
+    private String userBanChannel;
     @Value("${spring.data.redis.channels.profile_picture_channel.name}")
     private String profilePicture;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
@@ -31,6 +38,21 @@ public class RedisConfig {
 
     public interface MessagePublisher {
         void publish(ProfileViewEvent profileViewEvent);
+    }
+
+    @Bean(name = "followerChannelTopic")
+    public ChannelTopic followerChannelTopic() {
+        return new ChannelTopic(followerChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipChannelTopic() {
+        return new ChannelTopic(mentorshipChannel);
+    }
+
+    @Bean
+    public ChannelTopic userBanTopic() {
+        return new ChannelTopic(userBanChannel);
     }
 
     @Bean
@@ -42,7 +64,6 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
@@ -59,13 +80,13 @@ public class RedisConfig {
         return new ChannelTopic(profileViewTopicName);
     }
 
-    @Bean(name = "followerChannelTopic")
-    public ChannelTopic followerChannelTopic() {
-        return new ChannelTopic(followerChannel);
-    }
-
     @Bean
     public ChannelTopic mentorshipRequestTopic() {
         return new ChannelTopic(mentorshipRequestTopicName);
+    }
+
+    @Bean
+    MessageListenerAdapter messageListener(UserBanListener userBanListener) {
+        return new MessageListenerAdapter(userBanListener);
     }
 }

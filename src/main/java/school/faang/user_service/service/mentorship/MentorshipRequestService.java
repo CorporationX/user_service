@@ -10,10 +10,12 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.event.MentorshipRequestEvent;
+import school.faang.user_service.event.MentorshipStartEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -29,6 +31,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestEventMapper mentorshipRequestEventMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
     private final MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
 
@@ -71,7 +74,9 @@ public class MentorshipRequestService {
             receiver.getMentees().add(requester);
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         });
-
+        MentorshipStartEvent mentorshipStartEvent = mentorshipRequestMapper
+                .toMentorshipStartEvent(processedMentorshipRequest);
+        mentorshipStartEventPublisher.publish(mentorshipStartEvent);
         return mentorshipRequestMapper.toDto(processedMentorshipRequest);
     }
 

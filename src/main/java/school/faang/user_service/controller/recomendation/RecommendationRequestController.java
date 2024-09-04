@@ -21,6 +21,5 @@ public class RecommendationRequestController {
             throw new IllegalArgumentException("Message or message is empty");
         }
         return recommendationRequestService.create(recommendationRequestDto);
-
     }
 }

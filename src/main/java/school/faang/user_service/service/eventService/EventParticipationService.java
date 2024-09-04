@@ -6,7 +6,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.validator.event.EventParticipantValidator;
+import school.faang.user_service.validator.EventParticipantValidator;
 
 import java.util.List;
 

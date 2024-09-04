@@ -9,7 +9,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.validator.event.EventParticipantValidator;
+import school.faang.user_service.validator.EventParticipantValidator;
 
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.times;

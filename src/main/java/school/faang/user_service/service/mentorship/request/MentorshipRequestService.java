@@ -1,15 +1,16 @@
 package school.faang.user_service.service.mentorship.request;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
+import school.faang.user_service.dto.publishable.MentorshipRequestEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
@@ -18,23 +19,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
+    private final MentorshipRequestedEventPublisher eventPublisher;
 
-
-    @Autowired
-    public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository, UserRepository userRepository,
-                                    MentorshipRequestMapper mentorshipRequestMapper, MentorshipRequestValidator mentorshipRequestValidator) {
-
-        this.mentorshipRequestRepository = mentorshipRequestRepository;
-        this.userRepository = userRepository;
-        this.mentorshipRequestMapper = mentorshipRequestMapper;
-        this.mentorshipRequestValidator = mentorshipRequestValidator;
-    }
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) throws Exception {
         Long requesterId = mentorshipRequestDto.getRequesterId();
@@ -52,6 +44,9 @@ public class MentorshipRequestService {
             }
         });
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
+
+        MentorshipRequestEvent event = new MentorshipRequestEvent(requesterId, receiverId, LocalDateTime.now());
+        eventPublisher.publish(event);
     }
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filterDto) {

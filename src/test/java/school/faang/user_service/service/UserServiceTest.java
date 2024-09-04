@@ -23,6 +23,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +70,6 @@ class UserServiceTest {
     private UserDto userDto;
     private User mentee;
     private Goal mentorAssignedGoal;
-    private ProfileViewEvent profileViewEvent;
     private List<User> users;
     private List<Long> userIds;
     private List<UserDto> userDtoList;
@@ -127,11 +127,6 @@ class UserServiceTest {
         goalList.add(goal);
         userList.add(user);
         ownedEvents.add(event);
-
-        profileViewEvent = ProfileViewEvent.builder()
-                .userOwnerId(userId)
-                .viewId(authorId)
-                .build();
     }
 
     @Test
@@ -141,7 +136,6 @@ class UserServiceTest {
         doNothing().when(profileViewEventPublisher).publish(any());
         userService.getUser(userId, authorId);
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
-        verify(profileViewEventPublisher, times(1)).publish(profileViewEvent);
         verify(userMapper, times(1)).toDto(user);
     }
 

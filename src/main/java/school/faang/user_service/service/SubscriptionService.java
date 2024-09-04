@@ -10,6 +10,7 @@ import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,39 +20,22 @@ import java.util.stream.Stream;
 public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final SubscriptionValidator subscriptionValidator;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
 
     @Transactional
     public void followUser(long followerId, long followeeId) throws DataValidationException {
-        validateUserIds(followerId, followeeId);
-        validateFollowSubscription(followerId, followeeId);
+        subscriptionValidator.validateUserIds(followerId, followeeId);
+        subscriptionValidator.validateFollowSubscription(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
-    }
-
-    private void validateFollowSubscription(long followerId, long followeeId) throws DataValidationException {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("User %d is already subscribed to user %d.".formatted(followerId, followeeId));
-        }
     }
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
-        validateUserIds(followerId, followeeId);
-        validateUnfollowSubscription(followerId, followeeId);
+        subscriptionValidator.validateUserIds(followerId, followeeId);
+        subscriptionValidator.validateUnfollowSubscription(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
-    }
-
-    private void validateUnfollowSubscription(long followerId, long followeeId) throws DataValidationException {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("User %d is already unsubscribe to user %d.".formatted(followerId, followeeId));
-        }
-    }
-
-    private void validateUserIds(long followerId, long followeeId) throws DataValidationException {
-        if (followerId == followeeId) {
-            throw new DataValidationException("User %s is trying to unsubscribe to himself".formatted(followerId));
-        }
     }
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {

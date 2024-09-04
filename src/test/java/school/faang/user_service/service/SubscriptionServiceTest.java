@@ -11,16 +11,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -31,6 +30,9 @@ class SubscriptionServiceTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
+    @Mock
+    private SubscriptionValidator subscriptionValidator;
 
     @Mock
     private UserFilter userFilter1;
@@ -91,34 +93,6 @@ class SubscriptionServiceTest {
         verify(subscriptionRepository).followUser(followerId, followeeId);
     }
 
-    @Test
-    void followUser_IdenticalIds() {
-        long followerId = 1L, followeeId = 1L;
-        String correctMessage = "User 1 is trying to unsubscribe to himself";
-
-        Exception exception = assertThrows(DataValidationException.class,
-                () -> subscriptionService.followUser(followerId, followeeId));
-
-        assertEquals(correctMessage, exception.getMessage());
-        verify(subscriptionRepository, never())
-                .followUser(followerId, followeeId);
-    }
-
-    @Test
-    void followUser_ExistsFollow() {
-        long followerId = 1L, followeeId = 2L;
-        String correctMessage = "User 1 is already subscribed to user 2.";
-
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
-                .thenReturn(true);
-        Exception exception = assertThrows(DataValidationException.class,
-                () -> subscriptionService.followUser(followerId, followeeId));
-
-        assertEquals(correctMessage, exception.getMessage());
-        verify(subscriptionRepository, never())
-                .followUser(followerId, followeeId);
-    }
-
     @ParameterizedTest
     @CsvSource({
             "1, 2",
@@ -128,34 +102,6 @@ class SubscriptionServiceTest {
         subscriptionRepository.unfollowUser(followerId, followeeId);
 
         verify(subscriptionRepository).unfollowUser(followerId, followeeId);
-    }
-
-    @Test
-    void unfollowUser_IdenticalIds() {
-        long followerId = 1L, followeeId = 1L;
-        String correctMessage = "User 1 is trying to unsubscribe to himself";
-
-        Exception exception = assertThrows(DataValidationException.class,
-                () -> subscriptionService.unfollowUser(followerId, followeeId));
-
-        assertEquals(correctMessage, exception.getMessage());
-        verify(subscriptionRepository, never())
-                .unfollowUser(followerId, followeeId);
-    }
-
-    @Test
-    void unfollowUser_ExistsFollow() {
-        long followerId = 1L, followeeId = 2L;
-        String correctMessage = "User 1 is already unsubscribe to user 2.";
-
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
-                .thenReturn(false);
-        Exception exception = assertThrows(DataValidationException.class,
-                () -> subscriptionService.unfollowUser(followerId, followeeId));
-
-        assertEquals(correctMessage, exception.getMessage());
-        verify(subscriptionRepository, never())
-                .unfollowUser(followerId, followeeId);
     }
 
     @Test

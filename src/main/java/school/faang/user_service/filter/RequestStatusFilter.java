@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 public class RequestStatusFilter implements RecommendationRequestFilter{
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getStatus() != null;
+        return filters.status() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequests, RequestFilterDto filters) {
         return recommendationRequests
-                .filter(recommendationRequest -> recommendationRequest.getStatus() == filters.getStatus());
+                .filter(recommendationRequest -> recommendationRequest.getStatus() == filters.status());
     }
 }

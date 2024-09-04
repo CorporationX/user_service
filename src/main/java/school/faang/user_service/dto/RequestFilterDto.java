@@ -4,9 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;
 
-@Data
 @Builder
-public class RequestFilterDto {
-    private Long id;
-    private RequestStatus status;
+public record RequestFilterDto(Long id, RequestStatus status) {
+
 }

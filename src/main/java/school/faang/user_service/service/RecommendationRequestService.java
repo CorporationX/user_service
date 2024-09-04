@@ -36,7 +36,8 @@ public class RecommendationRequestService {
         return requestMapper.toDto(savedRecommendationRequest);
     }
 
-    private void saveSkillRequestsByNewRecommendation(RecommendationRequestDto recommendationRequestDto, RecommendationRequest savedRecommendationRequest) {
+    private void saveSkillRequestsByNewRecommendation(RecommendationRequestDto recommendationRequestDto,
+                                                      RecommendationRequest savedRecommendationRequest) {
         List<Long> skillRequests = recommendationRequestDto.skillsId();
 
         skillRequests

@@ -25,7 +25,9 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        premium_bought_channel:
+          name: premium_bought_channel
 
 server:
   port: 8080

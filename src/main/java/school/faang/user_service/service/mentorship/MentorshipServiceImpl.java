@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipUserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.MentorNotFoundException;
+import school.faang.user_service.exception.MentorshipNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -44,8 +44,7 @@ public class MentorshipServiceImpl implements MentorshipService {
         List<User> mentors = mentee.getMentors();
         boolean isRemoved = mentors.removeIf(mentor -> mentor.getId().equals(mentorId));
         if (!isRemoved) {
-            throw new MentorNotFoundException("У менти с id %d не найден ментор с id %d"
-                    .formatted(menteeId, mentorId));
+            throw new MentorshipNotFoundException("Не найдена пара менти/ментор с такими идентификаторами");
         }
         mentorshipRepository.save(mentee);
     }

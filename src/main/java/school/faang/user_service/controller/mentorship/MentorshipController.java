@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.MentorshipUserDto;
-import school.faang.user_service.exception.MenteeNotFoundException;
-import school.faang.user_service.exception.MentorNotFoundException;
+import school.faang.user_service.exception.MentorshipNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
@@ -59,8 +58,7 @@ public class MentorshipController {
 
     @ExceptionHandler({
             UserNotFoundException.class,
-            MenteeNotFoundException.class,
-            MentorNotFoundException.class})
+            MentorshipNotFoundException.class})
     public ResponseEntity<?> handleException(UserNotFoundException e) {
         return ResponseEntity.ok(
                 Map.of(

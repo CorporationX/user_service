@@ -1,8 +1,13 @@
 package school.faang.user_service.dto.event;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.joda.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class EventDto {
     private Long id;

@@ -44,6 +44,11 @@ public class UserController {
         return userService.getUser(id);
     }
 
+    @PutMapping("/{id}")
+    void putChatIdInUser(@PathVariable long id, @RequestParam("chatId") long chatId){
+        userService.putChatIdInUser(id, chatId);
+    }
+
     @PostMapping(value = "/parseUser")
     public void getStudentsParsing(@RequestBody MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {

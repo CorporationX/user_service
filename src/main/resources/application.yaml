@@ -33,12 +33,11 @@ spring:
         mentorship_request_channel:
           name: mentorship_request_channel
 
+  profiles:
+    active: dev
+
 server:
   port: 8080
-
-logging:
-  level:
-    root: info
 
 project-service:
   host: localhost

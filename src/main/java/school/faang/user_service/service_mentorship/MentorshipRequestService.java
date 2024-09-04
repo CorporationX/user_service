@@ -24,7 +24,7 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().trim().isEmpty()) {
-            // добавить исключение
+            throw new NoSuchElementException("Need request description");
         }
 
         // проверить что receiver и requester разные id!
@@ -32,12 +32,20 @@ public class MentorshipRequestService {
         MentorshipRequest requestEntity = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
 
         requestEntity.setRequester(userRepository.findById(mentorshipRequestDto.getRequesterId())
-                .orElseThrow(() -> new NoSuchElementException("User %s not found".formatted(mentorshipRequestDto.getRequesterId()))));
+                .orElseThrow(() -> new NoSuchElementException("User %s not found".formatted(mentorshipRequestDto
+                        .getRequesterId()))));
 
-        requestEntity.setReceiver(userRepository.findById(mentorshipRequestDto.getRequesterId())
-                .orElseThrow(() -> new NoSuchElementException("User %s not found".formatted(mentorshipRequestDto.getRequesterId()))));
+        requestEntity.setReceiver(userRepository.findById(mentorshipRequestDto.getReceiverId())
+                .orElseThrow(() -> new NoSuchElementException("User %s not found".formatted(mentorshipRequestDto
+                        .getRequesterId()))));
 
-        List<MentorshipRequest> mentorshipRequestList = mentorshipRequestRepository.findAllByRequesterId(mentorshipRequestDto.getRequesterId());
+        if (userRepository.findById(mentorshipRequestDto.getReceiverId())
+                .equals(userRepository.findById(mentorshipRequestDto.getRequesterId()))) {
+            throw new NoSuchElementException("Your request cannot be accepted");
+        }
+
+        List<MentorshipRequest> mentorshipRequestList = mentorshipRequestRepository
+                .findAllByRequesterId(mentorshipRequestDto.getRequesterId());
 
         MentorshipRequest lastMentorshipRequest = mentorshipRequestList.stream()
                 .sorted(Comparator.comparing(MentorshipRequest::getCreatedAt)).findFirst().get();

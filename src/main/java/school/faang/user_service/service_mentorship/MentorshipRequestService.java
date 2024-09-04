@@ -5,7 +5,13 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto_mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper_mentorship.MentorshipRequestMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Component
 @RequiredArgsConstructor
@@ -13,9 +19,35 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
 
-    public MentorshipRequest requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        return mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(mentorshipRequestDto));
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().trim().isEmpty()) {
+            // добавить исключение
+        }
+
+        // проверить что receiver и requester разные id!
+
+        MentorshipRequest requestEntity = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
+
+        requestEntity.setRequester(userRepository.findById(mentorshipRequestDto.getRequesterId())
+                .orElseThrow(() -> new NoSuchElementException("User %s not found".formatted(mentorshipRequestDto.getRequesterId()))));
+
+        requestEntity.setReceiver(userRepository.findById(mentorshipRequestDto.getRequesterId())
+                .orElseThrow(() -> new NoSuchElementException("User %s not found".formatted(mentorshipRequestDto.getRequesterId()))));
+
+        List<MentorshipRequest> mentorshipRequestList = mentorshipRequestRepository.findAllByRequesterId(mentorshipRequestDto.getRequesterId());
+
+        MentorshipRequest lastMentorshipRequest = mentorshipRequestList.stream()
+                .sorted(Comparator.comparing(MentorshipRequest::getCreatedAt)).findFirst().get();
+
+        LocalDateTime lastRequestDate = lastMentorshipRequest.getCreatedAt();
+
+        if (!LocalDateTime.now().isAfter(lastRequestDate.plusMonths(3))) {
+            throw new RuntimeException("Request limit exceeded");
+        }
+
+        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(requestEntity));
     }
 }

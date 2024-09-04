@@ -10,17 +10,11 @@ import school.faang.user_service.entity.User;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
 
-    @Mapping(source = "requester", target = "requesterId", qualifiedByName = "mapRequester")
-    @Mapping(source = "receiver", target = "receiverId", qualifiedByName = "mapReceiver")
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
     MentorshipRequestDto toDto(MentorshipRequest mentorshipRequest);
 
+    @Mapping(target = "receiver", ignore = true)
+    @Mapping(target = "requester", ignore = true)
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
-
-    default Long mapRequester(User requester) {
-        return requester.getId();
-    }
-
-    default Long mapReceiver(User receiver) {
-        return receiver.getId();
-    }
 }

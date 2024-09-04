@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -12,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class ProfileViewEvent {
     private long viewId;
     private long userOwnerId;
+    private LocalDateTime receivedAt;
 }

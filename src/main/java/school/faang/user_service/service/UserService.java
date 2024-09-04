@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
-import school.faang.user_service.dto.ProfileViewEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.entity.User;
@@ -48,8 +47,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDto getUser(long userId, long authorId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
-        profileViewEventPublisher.publish(new ProfileViewEvent(authorId, userId, LocalDateTime.now()));
-        publishViewProfile(userId, authorId);
+        publishViewEventProfile(userId, authorId);
         return userMapper.toDto(user);
     }
 
@@ -152,10 +150,11 @@ public class UserService {
                 .forEach(goal -> goal.setMentor(mentee));
     }
 
-    private void publishViewProfile(long userId, long authorId) {
+    private void publishViewEventProfile(long userId, long authorId) {
         profileViewEventPublisher.publish(ProfileViewEvent.builder()
                 .userOwnerId(userId)
                 .viewId(authorId)
+                .receivedAt(LocalDateTime.now())
                 .build());
     }
 }

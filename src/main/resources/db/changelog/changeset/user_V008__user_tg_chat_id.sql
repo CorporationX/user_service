@@ -1,1 +1,1 @@
-alter TABLE users add tg_chat_id bigint;
+ALTER TABLE users ADD tg_chat_id BIGINT;

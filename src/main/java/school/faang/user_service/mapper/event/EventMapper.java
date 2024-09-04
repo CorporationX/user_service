@@ -8,6 +8,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventWithSubscribersDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 
 import java.util.List;
 
@@ -15,10 +17,14 @@ import java.util.List;
 public interface EventMapper {
     @Mapping(source = "relatedSkills", target = "relatedSkillsIds", qualifiedByName = "mapIdsSkills")
     @Mapping(source = "owner.id", target = "ownerId")
+    @Mapping(source = "type", target = "type", qualifiedByName = "eventTypeToString")
+    @Mapping(source = "status", target = "status", qualifiedByName = "eventStatusToString")
     EventDto toDto(Event event);
 
     @Mapping(target = "relatedSkills", ignore = true)
     @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "status", ignore = true)
     Event toEvent(EventDto eventDto);
 
     @Mapping(source = "relatedSkills", target = "relatedSkillsIds", qualifiedByName = "mapIdsSkills")
@@ -36,5 +42,14 @@ public interface EventMapper {
     @Named("mapIdsSkills")
     default List<Long> mapIdsSkills(List<Skill> skills) {
         return skills.stream().map(Skill::getId).toList();
+    }
+    @Named("eventTypeToString")
+    default String eventTypeToString(EventType type) {
+        return type != null ? type.name() : null;
+    }
+
+    @Named("eventStatusToString")
+    default String eventStatusToString(EventStatus status) {
+        return status != null ? status.name() : null;
     }
 }

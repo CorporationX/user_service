@@ -9,6 +9,8 @@ import school.faang.user_service.dto.event.EventWithSubscribersDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.event.exceptions.InsufficientSkillsException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -38,6 +40,8 @@ public class EventService {
         List<Skill> relatedSkills = loadSkillsByIds(eventDto.getRelatedSkillsIds());
 
         User user = loadUserByIds(eventDto.getOwnerId());
+        EventType eventType = EventType.valueOf(eventDto.getType().toUpperCase());
+        EventStatus eventStatus = EventStatus.valueOf(eventDto.getStatus().toUpperCase());
 
         if (!checkUserSkills(user, relatedSkills)) {
             throw new InsufficientSkillsException(
@@ -47,6 +51,8 @@ public class EventService {
         Event event = eventMapper.toEvent(eventDto);
         event.setRelatedSkills(relatedSkills);
         event.setOwner(user);
+        event.setType(eventType);
+        event.setStatus(eventStatus);
 
         return eventMapper.toDto(eventRepository.save(event));
     }
@@ -59,11 +65,13 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
-        Stream<Event> events = eventRepository.findAll().stream();
-        eventFilters.stream()
+        Stream<Event> eventStream = eventRepository.findAll().stream();
+
+        eventStream = eventFilters.stream()
                 .filter(filter -> filter.isApplicable(eventFilterDto))
-                .forEach(filter -> filter.apply(events, eventFilterDto));
-        return eventMapper.toFilterDto(events.toList());
+                .reduce(eventStream, (stream, filter) -> filter.apply(stream, eventFilterDto), (s1, s2) -> s1);
+
+        return eventMapper.toFilterDto(eventStream.toList());
     }
 
     public EventWithSubscribersDto updateEvent(EventDto eventDto) {

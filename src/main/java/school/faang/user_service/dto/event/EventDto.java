@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,5 +24,9 @@ public class EventDto {
     private String description;
     private List<Long> relatedSkillsIds;
     private String location;
+    @NotEmpty(message = "Тип события не может быть пустым.")
+    private String type;
+    @NotEmpty(message = "Статус события не может быть пустым.")
+    private String status;
     private int maxAttendees;
 }

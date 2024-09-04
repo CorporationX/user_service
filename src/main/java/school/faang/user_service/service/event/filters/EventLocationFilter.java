@@ -14,7 +14,7 @@ public class EventLocationFilter implements EventFilter {
     }
 
     @Override
-    public void apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
-        eventStream.filter(event -> event.getLocation().equalsIgnoreCase(eventFilterDto.getLocation()));
+    public Stream<Event> apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
+        return eventStream.filter(event -> event.getLocation().equalsIgnoreCase(eventFilterDto.getLocation()));
     }
 }

@@ -14,7 +14,7 @@ public class EventUsernameFilter implements EventFilter {
     }
 
     @Override
-    public void apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
-        eventStream.filter(event -> event.getOwner().getUsername().equals(eventFilterDto.getOwnerUsername()));
+    public Stream<Event> apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
+        return eventStream.filter(event -> event.getOwner().getUsername().equals(eventFilterDto.getOwnerUsername()));
     }
 }

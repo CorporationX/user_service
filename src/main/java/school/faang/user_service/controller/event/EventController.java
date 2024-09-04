@@ -51,12 +51,12 @@ public class EventController {
         return eventService.getEventsByFilter(new EventFilterDto(title, startDate, location, ownerUsername));
     }
 
-    @GetMapping("/user/{userId}/owned")
+    @GetMapping("/ownedEvents/{userId}")
     public List<EventDto> getOwnedEvents(@PathVariable("userId") Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    @GetMapping("/user/{userId}/participated")
+    @GetMapping("/participatedEvents/{userId}")
     public List<EventDto> getParticipatedEvents(@PathVariable("userId") Long userId) {
         return eventService.getParticipatedEvents(userId);
     }

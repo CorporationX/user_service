@@ -12,6 +12,8 @@ import school.faang.user_service.dto.event.EventWithSubscribersDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -22,15 +24,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
@@ -38,7 +44,6 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
-
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -47,10 +52,12 @@ public class EventServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private EventMapper eventMapper;
-    @Mock
-    private List<EventFilter> eventFilters;
     @InjectMocks
     private EventService eventService;
+    @Mock
+    private EventFilter eventFilter1;
+    @Mock
+    private EventFilter eventFilter2;
     @Mock
     private User user;
     private EventDto eventDto;
@@ -79,13 +86,13 @@ public class EventServiceTest {
         event.setId(1L);
         event.setOwner(user);
         event.setRelatedSkills(relatedSkills);
-        EventFilter mockFilter = mock(EventFilter.class);
 
-        lenient().when(mockFilter.isApplicable(any(EventFilterDto.class))).thenReturn(true);
-        lenient().doNothing().when(mockFilter).apply(any(), any());
+        List<EventFilter> filters = new ArrayList<>();
+        filters.add(eventFilter1);
+        filters.add(eventFilter2);
 
-        eventFilters = new ArrayList<>();
-        eventFilters.add(mockFilter);
+        eventService = new EventService(eventRepository, userRepository, skillRepository, eventMapper, filters);
+
 
         lenient().when(eventMapper.toEvent(eventDto)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
@@ -93,11 +100,17 @@ public class EventServiceTest {
 
     @Test
     void create_ShouldCreateEvent() {
+        eventDto.setType("WEBINAR");
+        eventDto.setStatus("PLANNED");
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         when(user.getSkills()).thenReturn(relatedSkills);
         when(skillRepository.findAllById(eventDto.getRelatedSkillsIds())).thenReturn(relatedSkills);
 
         when(eventRepository.save(any(Event.class))).thenReturn(event);
+        EventType eventType = EventType.WEBINAR;
+        EventStatus eventStatus = EventStatus.PLANNED;
+        eventDto.setType(eventType.name());
+        eventDto.setStatus(eventStatus.name());
 
         EventDto result = eventService.create(eventDto);
 
@@ -106,6 +119,8 @@ public class EventServiceTest {
         verify(eventRepository).save(event);
 
         assertEquals(eventDto, result);
+        assertEquals(eventType.name(), result.getType());
+        assertEquals(eventStatus.name(), result.getStatus());
     }
 
     @Test
@@ -120,16 +135,27 @@ public class EventServiceTest {
     }
 
     @Test
-    void getEventsByFilter_ShouldReturnFilteredEvents() {
+    public void testGetEventsByFilter() {
+        EventFilterDto eventFilterDto = new EventFilterDto();
         List<Event> events = List.of(new Event(), new Event());
+        List<EventDto> expectedEventDtos = List.of(new EventDto(), new EventDto());
+
         when(eventRepository.findAll()).thenReturn(events);
+        when(eventFilter1.isApplicable(eventFilterDto)).thenReturn(true);
+        when(eventFilter2.isApplicable(eventFilterDto)).thenReturn(false);
+        when(eventFilter1.apply(any(Stream.class), eq(eventFilterDto))).thenAnswer(invocation -> {
+            Stream<Event> stream = invocation.getArgument(0);
+            return stream;
+        });
+        when(eventMapper.toFilterDto(anyList())).thenReturn(expectedEventDtos);
 
-        when(eventMapper.toFilterDto(anyList())).thenReturn(List.of(new EventDto(), new EventDto()));
+        List<EventDto> actualEventDtos = eventService.getEventsByFilter(eventFilterDto);
 
-        List<EventDto> result = eventService.getEventsByFilter(new EventFilterDto());
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(expectedEventDtos.size(), actualEventDtos.size());
+        verify(eventRepository, times(1)).findAll();
+        verify(eventFilter1, times(1)).isApplicable(eventFilterDto);
+        verify(eventFilter2, times(1)).isApplicable(eventFilterDto);
+        verify(eventMapper, times(1)).toFilterDto(anyList());
     }
 
     @Test

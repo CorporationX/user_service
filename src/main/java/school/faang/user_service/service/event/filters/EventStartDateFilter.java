@@ -14,7 +14,7 @@ public class EventStartDateFilter implements EventFilter {
     }
 
     @Override
-    public void apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
-        eventStream.filter(event -> event.getStartDate().isAfter(eventFilterDto.getStartDate()) || event.getStartDate().isEqual(eventFilterDto.getStartDate()));
+    public Stream<Event> apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
+        return eventStream.filter(event -> event.getStartDate().isAfter(eventFilterDto.getStartDate()) || event.getStartDate().isEqual(eventFilterDto.getStartDate()));
     }
 }

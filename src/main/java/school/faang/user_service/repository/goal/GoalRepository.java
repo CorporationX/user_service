@@ -56,5 +56,6 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     void addSkillToGoal(long skillId, long goalId);
 
     @Query(nativeQuery = true, value = "INSERT INTO user_goal (user_id, goal_id) VALUES (:userId, :goalId)")
+    @Modifying
     void addGoalTuUser(long userId, long goalId);
 }

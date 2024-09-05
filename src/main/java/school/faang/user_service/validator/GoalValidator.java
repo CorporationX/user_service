@@ -12,6 +12,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class GoalValidator {
+    private static final int GOALS_PER_USER = 3;
+
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
 
@@ -22,7 +24,7 @@ public class GoalValidator {
     }
 
     public void validateGoalsPerUser(Long userId) throws ValidationException {
-        if (goalRepository.countActiveGoalsPerUser(userId) > 3) {
+        if (goalRepository.countActiveGoalsPerUser(userId) > GOALS_PER_USER) {
             throw new ValidationException("There cannot be more than 3 active goals per user");
         }
     }

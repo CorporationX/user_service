@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.controller.goal;
 
 
 import org.junit.Assert;
@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.goal.GoalController;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.service.goal.GoalService;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalControllerTest {

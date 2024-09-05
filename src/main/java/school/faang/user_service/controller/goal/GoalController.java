@@ -10,7 +10,14 @@ import school.faang.user_service.service.goal.GoalService;
 public class GoalController {
     private final GoalService goalService;
 
-    public void createGoal(Long userId, GoalDto goalDto) {
-            goalService.createGoal(userId, goalDto);
+    public void createGoal(Long userId, GoalDto goal) {
+        validateGoalTitle(goal);
+        goalService.createGoal(userId, goal);
+    }
+
+    private void validateGoalTitle(GoalDto goal) {
+        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Goal title is empty or null");
         }
     }
+}

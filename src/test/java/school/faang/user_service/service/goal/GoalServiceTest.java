@@ -27,25 +27,6 @@ public class GoalServiceTest {
     @InjectMocks
     private GoalService goalService;
 
-    @Test
-    @DisplayName("Empty and null goal title")
-    public void testNullAndEmptyTitleIsInvalid() {
-        GoalDto nullTitleGoal = new GoalDto();
-        nullTitleGoal.setTitle(null);
-
-        GoalDto emptyTitleGoal = new GoalDto();
-        emptyTitleGoal.setTitle("    ");
-
-        Long userId = 1L;
-
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> goalService.createGoal(userId, nullTitleGoal));
-
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> goalService.createGoal(userId, emptyTitleGoal));
-    }
 
     @Test
     @DisplayName("Incorrect amount active goals")
@@ -83,8 +64,8 @@ public class GoalServiceTest {
     }
 
     @Test
-    @DisplayName("Succsess create new goal")
-    public void testCreateNewGoal() {
+    @DisplayName("Success create new goal in service")
+    public void testCreateNewGoalIsSuccess() {
         Long userId = 1L;
 
         GoalDto goal = new GoalDto();

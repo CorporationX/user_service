@@ -15,18 +15,11 @@ public class GoalService {
     private final SkillService skillService;
 
     public void createGoal(Long userId, GoalDto goal) {
-        validateGoalTitle(goal);
         validateUserActiveGoalCount(userId);
         validateGoalSkills(goal);
 
         goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent());
         addSkillsToGoal(goal);
-    }
-
-    private void validateGoalTitle(GoalDto goal) {
-        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
-            throw new IllegalArgumentException("Goal title is empty or null");
-        }
     }
 
     private void validateUserActiveGoalCount(Long userId) {

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.List;
 
 @Getter
-@ResponseStatus(HttpStatus.BAD_REQUEST)
 public class DataValidationException extends RuntimeException {
     private final List<String> validationErrors;
 

@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -9,8 +10,6 @@ import school.faang.user_service.dto.event.EventWithSubscribersDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.event.exceptions.InsufficientSkillsException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -19,10 +18,8 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 import school.faang.user_service.service.event.util.EventUpdater;
 
-
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -35,33 +32,21 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
 
-
     public EventDto create(EventDto eventDto) {
-        List<Skill> relatedSkills = loadSkillsByIds(eventDto.getRelatedSkillsIds());
+        List<Skill> relatedSkills = getEventSkillsFromDbByIds(eventDto.getRelatedSkillsIds());
+        User user = loadUserById(eventDto.getOwnerId());
 
-        User user = loadUserByIds(eventDto.getOwnerId());
-        EventType eventType = EventType.valueOf(eventDto.getType().toUpperCase());
-        EventStatus eventStatus = EventStatus.valueOf(eventDto.getStatus().toUpperCase());
-
-        if (!checkUserSkills(user, relatedSkills)) {
-            throw new InsufficientSkillsException(
-                    "Пользователь не обладает необходимыми навыками для проведения этого события.");
-        }
+        validateUserSkills(user, relatedSkills);
 
         Event event = eventMapper.toEvent(eventDto);
         event.setRelatedSkills(relatedSkills);
         event.setOwner(user);
-        event.setType(eventType);
-        event.setStatus(eventStatus);
 
         return eventMapper.toDto(eventRepository.save(event));
     }
 
     public EventDto getEvent(Long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Событие с ID " + eventId + " не найдено."));
-        return eventMapper.toDto(event);
+        return eventMapper.toDto(findById(eventId));
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
@@ -75,29 +60,19 @@ public class EventService {
     }
 
     public EventWithSubscribersDto updateEvent(EventDto eventDto) {
-        Event existingEvent = eventRepository.findById(eventDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Событие с ID " + eventDto.getId() + " не найдено."));
+        Event existingEvent = findById(eventDto.getId());
 
-        if (existingEvent == null) {
-            throw new EntityNotFoundException("Событие с ID " + eventDto.getId() + " не найдено.");
-        }
+        List<Skill> relatedSkills = getEventSkillsFromDbByIds(eventDto.getRelatedSkillsIds());
+        User user = loadUserById(eventDto.getOwnerId());
 
-        List<Skill> relatedSkills = loadSkillsByIds(eventDto.getRelatedSkillsIds());
-        User user = loadUserByIds(eventDto.getOwnerId());
-
-        if (!checkUserSkills(user, relatedSkills)) {
-            throw new InsufficientSkillsException(
-                    "Пользователь не обладает необходимыми навыками для проведения этого события.");
-        }
+        validateUserSkills(user, relatedSkills);
 
         updateEventFields(existingEvent, eventDto, relatedSkills, user);
-
-        int subscribersCount = user.getFollowers().size();
 
         Event updatedEvent = eventRepository.save(existingEvent);
 
         EventWithSubscribersDto updatedEventDto = eventMapper.toEventWithSubscribersDto(updatedEvent);
-        updatedEventDto.setSubscribersCount(subscribersCount);
+        updatedEventDto.setSubscribersCount(getFollowersCount(user));
         return updatedEventDto;
     }
 
@@ -111,15 +86,15 @@ public class EventService {
 
 
     public void deleteEvent(Long eventId) {
-        if (eventRepository.existsById(eventId)) {
+        try {
             eventRepository.deleteById(eventId);
-        } else {
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Событие с ID " + eventId + " не найдено.");
         }
-
     }
 
-    private void updateEventFields(Event existingEvent, EventDto eventDto, List<Skill> relatedSkills, User user) {
+    private void updateEventFields(Event existingEvent, EventDto eventDto, List<Skill> relatedSkills,
+                                   User user) {
         EventUpdater eventUpdater = new EventUpdater(existingEvent)
                 .withTitle(eventDto.getTitle())
                 .withDescription(eventDto.getDescription())
@@ -128,6 +103,8 @@ public class EventService {
                 .withLocation(eventDto.getLocation())
                 .withMaxAttendees(eventDto.getMaxAttendees())
                 .withRelatedSkills(relatedSkills)
+                .withEventType(eventDto.getType())
+                .withEventStatus(eventDto.getStatus())
                 .withOwner(user);
 
         eventUpdater.build();
@@ -138,11 +115,28 @@ public class EventService {
         return userSkills.containsAll(requiredSkills);
     }
 
-    private List<Skill> loadSkillsByIds(List<Long> skillIds) {
+    private List<Skill> getEventSkillsFromDbByIds(List<Long> skillIds) {
         return skillRepository.findAllById(skillIds);
     }
 
-    private User loadUserByIds(Long id) {
+    private User loadUserById(Long id) {
         return userRepository.findById(id).orElseThrow();
+    }
+
+    private int getFollowersCount(User user) {
+        return user.getFollowers().size();
+    }
+
+    private Event findById(Long id) {
+        return eventRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Событие с ID " + id + " не найдено."));
+    }
+
+    private void validateUserSkills(User user, List<Skill> requiredSkills) {
+        if (!checkUserSkills(user, requiredSkills)) {
+            throw new InsufficientSkillsException(
+                    "Пользователь не обладает необходимыми навыками для проведения этого события.");
+        }
     }
 }

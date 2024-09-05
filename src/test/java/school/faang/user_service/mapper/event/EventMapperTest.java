@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 class EventMapperTest {
-
     private EventMapper eventMapper;
 
     @BeforeEach
@@ -148,7 +147,6 @@ class EventMapperTest {
 
         assertNotNull(eventDtos);
         assertEquals(2, eventDtos.size());
-
         assertEquals(event1.getId(), eventDtos.get(0).getId());
         assertEquals(event1.getTitle(), eventDtos.get(0).getTitle());
         assertEquals(event2.getId(), eventDtos.get(1).getId());

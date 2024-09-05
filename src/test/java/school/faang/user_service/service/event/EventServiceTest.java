@@ -26,21 +26,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
-
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -52,20 +50,19 @@ public class EventServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private EventMapper eventMapper;
-    @InjectMocks
-    private EventService eventService;
     @Mock
     private EventFilter eventFilter1;
     @Mock
     private EventFilter eventFilter2;
-    @Mock
+    @InjectMocks
+    private EventService eventService;
     private User user;
     private EventDto eventDto;
     private Event event;
     private List<Skill> relatedSkills;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         eventDto = new EventDto();
         eventDto.setId(1L);
         eventDto.setOwnerId(1L);
@@ -80,6 +77,9 @@ public class EventServiceTest {
         skill2.setId(2L);
         skill2.setTitle("C++");
 
+        eventDto.setType(EventType.WEBINAR);
+        eventDto.setStatus(EventStatus.PLANNED);
+
         relatedSkills = Arrays.asList(skill1, skill2);
 
         event = new Event();
@@ -93,24 +93,17 @@ public class EventServiceTest {
 
         eventService = new EventService(eventRepository, userRepository, skillRepository, eventMapper, filters);
 
-
         lenient().when(eventMapper.toEvent(eventDto)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
     }
 
     @Test
-    void create_ShouldCreateEvent() {
-        eventDto.setType("WEBINAR");
-        eventDto.setStatus("PLANNED");
+    public void create_ShouldCreateEvent() {
+
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         when(user.getSkills()).thenReturn(relatedSkills);
         when(skillRepository.findAllById(eventDto.getRelatedSkillsIds())).thenReturn(relatedSkills);
-
         when(eventRepository.save(any(Event.class))).thenReturn(event);
-        EventType eventType = EventType.WEBINAR;
-        EventStatus eventStatus = EventStatus.PLANNED;
-        eventDto.setType(eventType.name());
-        eventDto.setStatus(eventStatus.name());
 
         EventDto result = eventService.create(eventDto);
 
@@ -119,12 +112,10 @@ public class EventServiceTest {
         verify(eventRepository).save(event);
 
         assertEquals(eventDto, result);
-        assertEquals(eventType.name(), result.getType());
-        assertEquals(eventStatus.name(), result.getStatus());
     }
 
     @Test
-    void getEvent_ShouldReturnEventDto() {
+    public void getEvent_ShouldReturnEventDto() {
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
 
         EventDto result = eventService.getEvent(1L);
@@ -159,13 +150,12 @@ public class EventServiceTest {
     }
 
     @Test
-    void updateEvent_ShouldUpdateEvent() {
+    public void updateEvent_ShouldUpdateEvent() {
         doReturn(Optional.of(event)).when(eventRepository).findById(anyLong());
         doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
         doReturn(relatedSkills).when(skillRepository).findAllById(anyList());
         doReturn(relatedSkills).when(user).getSkills();
         doReturn(event).when(eventRepository).save(any(Event.class));
-
         EventWithSubscribersDto eventWithSubscribersDto = new EventWithSubscribersDto();
         doReturn(eventWithSubscribersDto).when(eventMapper).toEventWithSubscribersDto(any(Event.class));
 
@@ -179,16 +169,16 @@ public class EventServiceTest {
 
 
     @Test
-    void deleteEvent_ShouldDeleteEvent() {
-        when(eventRepository.existsById(anyLong())).thenReturn(true);
+    public void deleteEvent_ShouldDeleteEvent() {
+        doNothing().when(eventRepository).deleteById(anyLong());
 
         eventService.deleteEvent(1L);
 
-        verify(eventRepository).deleteById(1L);
+        verify(eventRepository, times(1)).deleteById(1L);
     }
 
     @Test
-    void getOwnedEvents_ShouldReturnOwnedEvents() {
+    public void getOwnedEvents_ShouldReturnOwnedEvents() {
         List<Event> events = List.of(new Event(), new Event());
         when(eventRepository.findAllByUserId(anyLong())).thenReturn(events);
         when(eventMapper.toDto(anyList())).thenReturn(List.of(new EventDto(), new EventDto()));
@@ -200,7 +190,7 @@ public class EventServiceTest {
     }
 
     @Test
-    void getParticipatedEvents_ShouldReturnParticipatedEvents() {
+    public void getParticipatedEvents_ShouldReturnParticipatedEvents() {
         List<Event> events = List.of(new Event(), new Event());
         when(eventRepository.findParticipatedEventsByUserId(anyLong())).thenReturn(events);
         when(eventMapper.toDto(anyList())).thenReturn(List.of(new EventDto(), new EventDto()));

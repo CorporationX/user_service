@@ -1,10 +1,13 @@
 package school.faang.user_service.service.event.util;
 
+import jakarta.persistence.EnumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +54,14 @@ public class EventUpdater {
 
     public EventUpdater withOwner(User owner) {
         event.setOwner(owner);
+        return this;
+    }
+    public EventUpdater withEventType(EventType eventType) {
+        event.setType(eventType);
+        return this;
+    }
+    public EventUpdater withEventStatus(EventStatus eventStatus) {
+        event.setStatus(eventStatus);
         return this;
     }
 

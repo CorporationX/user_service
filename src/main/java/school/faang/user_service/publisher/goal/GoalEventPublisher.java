@@ -1,6 +1,7 @@
 package school.faang.user_service.publisher.goal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import school.faang.user_service.publisher.AbstractEventPublisher;
 @Service
 public class GoalEventPublisher extends AbstractEventPublisher<GoalSetEvent> {
 
-    public GoalEventPublisher(RedisTemplate<String, Object> redisTemplate, ChannelTopic topic, ObjectMapper objectMapper) {
+    public GoalEventPublisher(RedisTemplate<String, Object> redisTemplate, @Qualifier("goalTopic") ChannelTopic topic, ObjectMapper objectMapper) {
         super(redisTemplate, topic, objectMapper);
     }
 

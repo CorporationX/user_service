@@ -10,8 +10,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.publisher.EventPublisher;
-import school.faang.user_service.publisher.goal.GoalEventPublisher;
+
 
 @Slf4j
 @Configuration
@@ -46,12 +45,6 @@ public class RedisConfig {
     @Bean
     ChannelTopic followerTopic() {
         return new ChannelTopic(followerViewChannelName);
-    }
-
-
-    @Bean
-    EventPublisher goalPublisher() {
-        return new GoalEventPublisher(redisTemplate(redisConnectionFactory()),goalTopic(), new ObjectMapper());
     }
 
     @Bean

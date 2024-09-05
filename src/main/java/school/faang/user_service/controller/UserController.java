@@ -24,6 +24,9 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final CsvParserToPersonService csvParserToPersonService;
+    private final ConvertToUserService convertToUserService;
+
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.getUserById(userId);

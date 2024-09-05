@@ -25,9 +25,10 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto getUser(Long id) {
+    public UserDto getUserById(long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("User with ID = " + id + " does not exist"));
+                .orElseThrow(()-> new DataValidationException(String.format("Not found user with id: %d", id)));
+
         return userMapper.toDto(user);
     }
 

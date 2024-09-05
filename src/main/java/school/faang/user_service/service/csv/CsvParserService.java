@@ -29,7 +29,5 @@ public abstract class CsvParserService<T> {
         return list;
     }
 
-    Class<?> getInstance() {
-        return this.getClass();
-    }
+    public abstract Class<?> getInstance();
 }

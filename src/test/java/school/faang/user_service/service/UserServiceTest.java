@@ -57,14 +57,14 @@ class UserServiceTest {
     void testGetUserIfUserDoesNotExist() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> userService.getUser(anyLong()));
+        assertThrows(DataValidationException.class, () -> userService.getUserById(anyLong()));
     }
 
     @Test
     void testGetUserIsSuccessful() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
-        userService.getUser(anyLong());
+        userService.getUserById(anyLong());
 
         verify(userRepository, times(1)).findById(anyLong());
     }

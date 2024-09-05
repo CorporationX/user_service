@@ -14,7 +14,7 @@ public class MapperTest {
 
     private final UserMapper userMapper = new UserMapperImpl();
 
-    private User user = User.builder().id(1L).active(true).build();
+    private User user = User.builder().id(1L).country(null).active(true).build();
     private UserDto userDto = UserDto.builder().id(1L).active(true).build();
 
     @Test

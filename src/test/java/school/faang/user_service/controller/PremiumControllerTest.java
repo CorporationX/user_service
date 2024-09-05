@@ -45,7 +45,7 @@ class PremiumControllerTest {
         controller.buyPremium(userId, days);
         Mockito.when(service.buyPremium(userId, PremiumPeriod.fromDays(days))).thenReturn(resultOfService);
         Mockito.verify(service, Mockito.times(1)).buyPremium(userId, PremiumPeriod.fromDays(days));
-        MvcResult requestResult = mockMvc.perform(post("/premium/buyPremium?days={days}", days).header("x-user-id", userId))
+        MvcResult requestResult = mockMvc.perform(post("/premium/buy?days={days}", days).header("x-user-id", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json")).andReturn();
     }

@@ -17,6 +17,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,6 @@ import java.util.stream.Stream;
 public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final UserMapper userMapper;
     private final List<EventFilter> eventFilters;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
@@ -41,14 +41,14 @@ public class EventService {
        return eventMapper.toDto(event);
     }
 
-    //проверить на опшинал
+    //готово, написать тесты
     public EventDto getEvent(long eventId) {
         try {
          Optional<Event> event = eventRepository.findById(eventId);
+         return eventMapper.toDto(event.get());
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Событие не найдено!");
         }
-        return null;
     }
 
     //доделать
@@ -60,47 +60,35 @@ public class EventService {
         return Collections.singletonList(eventMapper.toDto((Event) events.toList()));
     }
 
-    //готово, но проверить
+    //готово, написать тесты
     public void deleteEvent(long eventId) {
         eventRepository.deleteById(eventId);
     }
 
-    //доделать
+    //готово, написать тесты
     public void updateEvent(EventDto eventDto) {
-        Event event = new Event();
-        event.setId(eventDto.getId());
-        eventRepository.save(event);
+       skillCheck(eventDto);
+       eventRepository.save(eventMapper.toEntity(eventDto));
     }
 
-    //проверить
-    public List<Event> getOwnedEvents(long userId) {
+    //готово, проверить
+    public List<EventDto> getOwnedEvents(long userId) {
         List<Event> eventList = eventRepository.findAllByUserId(userId);
-        return eventList;
+        return eventList.stream().map(eventMapper::toDto).toList();
     }
 
     //проверить, похож на предыдущий, надо исправить что-то
-    public List<Event> getParticipatedEvents(long userId) {
-        List<Event> events = eventRepository.findAllByUserId(userId);
-        return events;
+    public List<EventDto> getParticipatedEvents(long userId) {
+        List<Event> events = eventRepository.findParticipatedEventsByUserId(userId);
+        return events.stream().map(eventMapper::toDto).toList();
     }
 
-
-    private EventDto validate(EventDto event) {
-        try {
-            if (event.getRelatedSkills().isEmpty()) {
-                return event;
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Вы не можете провести событие с такими навыками");
-        }
-        return null;
-    }
-
+    //можно написать тест и проверить эту махину
     private EventDto skillCheck(EventDto eventDto) {
         Optional<User> userOptional = userRepository.findById(eventDto.getOwnerId());
-        UserDto userDto = userMapper.toDto(userOptional.get());
-        Stream<Long> userSkills = userDto.getSkills().stream()
-                .map(SkillDto::getId);
+        User user = userOptional.get();
+        Stream<Long> userSkills = user.getSkills().stream()
+                .map(Skill::getId);
         Stream<Long> eventSkills = eventDto.getRelatedSkills().stream()
                 .map(SkillDto::getId);
 

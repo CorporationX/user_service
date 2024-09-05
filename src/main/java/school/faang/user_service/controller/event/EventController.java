@@ -1,11 +1,13 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,8 +21,8 @@ public class EventController {
         return event;
     }
 
-    public void getEvent(long id) {
-        eventService.getEvent(id);
+    public EventDto getEvent(long id) {
+        return eventService.getEvent(id);
     }
 
     public void getEventsByFilter(EventFilterDto filter) {
@@ -36,17 +38,17 @@ public class EventController {
         eventService.updateEvent(event);
     }
 
-    public void getOwnedEvents(long userId) {
-        eventService.getOwnedEvents(userId);
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventService.getOwnedEvents(userId);
     }
 
-    public void getParticipatedEvents(long userId) {
-        eventService.getParticipatedEvents(userId);
+    public List<EventDto> getParticipatedEvents(long userId) {
+       return eventService.getParticipatedEvents(userId);
     }
 
 
 
-    private EventDto validateForUpdate(EventDto event) throws DataValidationException {
+    private EventDto validateForUpdate(EventDto event) {
         if (event.getTitle() != null || event.getOwnerId() != null || event.getStartDate() != null) {
             return event;
         } else {

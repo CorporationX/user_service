@@ -13,9 +13,9 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.request.MentorshipRequestService;
+import school.faang.user_service.service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.util.Collections;
@@ -26,28 +26,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
-
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
-
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
-
+    @Mock
+    private MentorshipRequestedEventPublisher eventPublisher;
 
     MentorshipRequest mentorshipRequest;
     MentorshipRequestDto requestDto;
-
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -61,11 +60,8 @@ public class MentorshipRequestServiceTest {
         requestDto.setDescription("I need guidance on my project");
     }
 
-
     @Test
     public void testRequestMentorship_Success() throws Exception {
-
-
         when(mentorshipRequestRepository.create(requestDto.getRequesterId(), requestDto.getReceiverId(), requestDto.getDescription())).thenReturn(new MentorshipRequest());
         mentorshipRequestService.requestMentorship(requestDto);
         verify(mentorshipRequestRepository, times(1)).create(anyLong(), anyLong(), anyString());
@@ -73,7 +69,6 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorship_UserNotFound() throws Exception {
-
         doThrow(new Exception("Пользователь не найден")).when(mentorshipRequestValidator).validateRequestMentorship(any(MentorshipRequestDto.class));
         assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto));
 

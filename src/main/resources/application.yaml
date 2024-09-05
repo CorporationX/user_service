@@ -30,10 +30,12 @@ spring:
       port: 6379
       host: localhost
       channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-            name: profile_view_channel
+        follower_view:
+          name: follower_view_channel
+        profile_view:
+          name: profile_view_channel
+        mentorship_requests:
+          name: mentorship_requests
         goal_channel:
           name: goal_channel
 

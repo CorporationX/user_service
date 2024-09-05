@@ -34,7 +34,7 @@ spring:
           name: recommendation_view_channel
         mentorship_offered: mentorship_offered_channel
         profile_pic_channel: profile_pic_channel
-
+    batch-size: 50
 
 server:
   port: 8080

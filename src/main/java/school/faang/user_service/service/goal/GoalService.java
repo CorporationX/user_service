@@ -6,7 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.goal.GoalSetEvent;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.goal.GoalEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.service.skill.SkillService;
@@ -22,14 +24,16 @@ public class GoalService {
     private final GoalValidator goalValidator;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
+    private final GoalEventPublisher goalEventPublisher;
 
     @Autowired
-    public GoalService(GoalRepository goalRepository, SkillService skillService, GoalValidator goalValidator, GoalMapper goalMapper, List<GoalFilter> goalFilters) {
+    public GoalService(GoalRepository goalRepository, SkillService skillService, GoalValidator goalValidator, GoalMapper goalMapper, List<GoalFilter> goalFilters, GoalEventPublisher goalEventPublisher) {
         this.goalRepository = goalRepository;
         this.skillService = skillService;
         this.goalValidator = goalValidator;
         this.goalMapper = goalMapper;
         this.goalFilters = goalFilters;
+        this.goalEventPublisher = goalEventPublisher;
     }
 
     @Transactional
@@ -39,6 +43,12 @@ public class GoalService {
         Goal saveGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentGoalId());
 
         goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(saveGoal.getId(), skillId));
+
+        GoalSetEvent goalSetEvent = new GoalSetEvent();
+        goalSetEvent.setUserId(userId);
+        goalSetEvent.setGoalId(goalDto.getId());
+
+        goalEventPublisher.sendEvent(goalSetEvent);
         return goalMapper.toDto(saveGoal);
     }
 

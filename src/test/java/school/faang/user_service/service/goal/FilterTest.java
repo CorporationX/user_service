@@ -10,6 +10,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.goal.GoalEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 
@@ -30,6 +31,9 @@ public class FilterTest {
     @Mock
     private GoalFilter goalFilter;
 
+    @Mock
+    private GoalEventPublisher goalEventPublisher;
+
     @InjectMocks
     private GoalService goalService;
 
@@ -38,7 +42,7 @@ public class FilterTest {
         MockitoAnnotations.openMocks(this);
         // Инициализируем goalFilters и передаем в конструктор GoalService
         List<GoalFilter> goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, null, null, goalMapper, goalFilters);
+        goalService = new GoalService(goalRepository, null, null, goalMapper, goalFilters, goalEventPublisher);
     }
 
     private Goal createGoal(Long id, String title, String description, GoalStatus status) {

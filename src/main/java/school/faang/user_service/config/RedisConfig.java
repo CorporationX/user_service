@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+
 @Slf4j
 @Configuration
 public class RedisConfig {
@@ -21,6 +22,9 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.follower_view.name}")
     private String followerViewChannelName;
+
+    @Value("${spring.data.redis.channels.goal_channel.name}")
+    private String goalTopicName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -43,4 +47,8 @@ public class RedisConfig {
         return new ChannelTopic(followerViewChannelName);
     }
 
+    @Bean
+    ChannelTopic goalTopic(){
+        return new ChannelTopic(goalTopicName);
+    }
 }

@@ -37,8 +37,6 @@ public class MentorshipRequestService {
             throw new NoSuchElementException("Need request description");
         }
 
-        // проверить что receiver и requester разные id!
-
         MentorshipRequest requestEntity = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
 
         requestEntity.setRequester(userRepository.findById(mentorshipRequestDto.getRequesterId())
@@ -108,6 +106,8 @@ public class MentorshipRequestService {
         if (entity.getDescription() == null || entity.getDescription().trim().isEmpty()) {
             throw new NoSuchElementException("Need rejection description");
         }
+
+        entity.setRejectionReason(rejectionDto.getRejectionReason());
 
         entity.setStatus(RequestStatus.REJECTED);
 

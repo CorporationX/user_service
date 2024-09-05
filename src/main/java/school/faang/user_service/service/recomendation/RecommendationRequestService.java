@@ -38,12 +38,10 @@ public class RecommendationRequestService {
         Optional<User> requesterId = userRepository.findById(recommendationRequestDto.getRequesterId());
         Optional<User> receiverId = userRepository.findById(recommendationRequestDto.getRequesterId());
         if (requesterId.isPresent() && receiverId.isPresent()) {
-            if (skillRepository.existsAllById(recommendationRequestDto.getSkillsId())) {
+            if (skillRepository.existsAllByIdIn(recommendationRequestDto.getSkillsId())) {
                 RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.mapToEntity(recommendationRequestDto);
-//                if (recommendationRequestDto.getCreatedAt().isBefore(LocalDateTime.now().minusMonths(6))) {
                 List<SkillRequest> skillRequests = StreamSupport.stream(skillRequestRepository.findAllById(recommendationRequestDto.getSkillsId()).spliterator(), false).toList();
                 recommendationRequestEntity.setSkills(skillRequests);
-//                }
                 recommendationRequestEntity = recommendationRequestRepository.save(recommendationRequestEntity);
                 recommendationRequestEntity.getSkills()
                         .forEach(skillRequest -> skillRequestRepository.create(recommendationRequestDto.getRequesterId(), skillRequest.getId()));

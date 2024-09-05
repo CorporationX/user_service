@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.recomendation;
 
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
@@ -8,7 +7,7 @@ import school.faang.user_service.service.recomendation.RecommendationRequestServ
 
 @Component
 public class RecommendationRequestController {
-    private RecommendationRequestService recommendationRequestService;
+    private final RecommendationRequestService recommendationRequestService;
 
     @Autowired
     public RecommendationRequestController(RecommendationRequestService recommendationRequestService) {
@@ -18,7 +17,7 @@ public class RecommendationRequestController {
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
         if (recommendationRequestDto == null || recommendationRequestDto.getMessage().isBlank() ||
                 recommendationRequestDto.getMessage().isEmpty()) {
-            throw new IllegalArgumentException("Message or message is empty");
+            throw new IllegalArgumentException("Message is blank or empty");
         }
         return recommendationRequestService.create(recommendationRequestDto);
     }

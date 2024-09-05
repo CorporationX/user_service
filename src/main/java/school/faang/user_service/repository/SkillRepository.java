@@ -49,5 +49,5 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             """)
     List<Skill> findSkillsByGoalId(long goalId);
 
-    boolean existsAllById(Iterable<Long> ids);
+    boolean existsAllByIdIn(Iterable ids);
 }

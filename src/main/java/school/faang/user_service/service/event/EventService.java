@@ -15,13 +15,10 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.event.EventServiceValidator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
@@ -111,8 +108,9 @@ public class EventService implements ListPartitioner {
             ExecutorService executor = Executors.newFixedThreadPool(partitions.size());
 
             for (List<Event> partition : partitions) {
+                List<Long> deletableIds = partition.stream().map(Event::getId).toList();
                 executor.submit(() -> eventRepository.deleteAllByIdInBatch(
-                        partition.stream().map(Event::getId).toList()
+                        deletableIds
                 ));
             }
 

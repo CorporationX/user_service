@@ -9,7 +9,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.GoalInvitationValidationException;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -29,6 +32,8 @@ class GoalInvitationServiceTest {
     private UserRepository userRepository;
     @Mock
     private GoalRepository goalRepository;
+    @Mock
+    private GoalInvitationMapper mapper;
 
     @InjectMocks
     private GoalInvitationService goalInvitationService;
@@ -39,6 +44,18 @@ class GoalInvitationServiceTest {
     void setUp() {
         goalInvitationDto = GoalInvitationDto.builder()
                 .id(null).inviterId(1L).invitedUserId(2L).goalId(3L).status(null).build();
+    }
+
+    @Test
+    void testCreateInvitation_positive() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(new User()));
+        Mockito.when(goalRepository.findById(3L)).thenReturn(Optional.of(new Goal()));
+        Mockito.when(mapper.toEntity(Mockito.any())).thenReturn(new GoalInvitation());
+
+        goalInvitationService.createInvitation(goalInvitationDto);
+
+        Mockito.verify(goalInvitationRepository).save(Mockito.any(GoalInvitation.class));
     }
 
     @Test

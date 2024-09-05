@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.exception.GoalInvitationValidationException;
@@ -28,6 +29,13 @@ class GoalInvitationControllerTest {
     void setUp() {
         goalInvitationDto = GoalInvitationDto.builder()
                 .id(null).inviterId(1L).invitedUserId(1L).goalId(1L).status(null).build();
+    }
+
+    @Test
+    void testCreateInvitation_positive() {
+        goalInvitationController.createInvitation(goalInvitationDto);
+
+        Mockito.verify(service).createInvitation(goalInvitationDto);
     }
 
     @Test

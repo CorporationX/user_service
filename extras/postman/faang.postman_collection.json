@@ -1,0 +1,230 @@
+{
+	"info": {
+		"_postman_id": "9bb11e6c-826b-4930-8204-475d0391c271",
+		"name": "faang",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4829985"
+	},
+	"item": [
+		{
+			"name": "user_service",
+			"item": [
+				{
+					"name": "goal",
+					"item": [
+						{
+							"name": "Create Goal without Skills",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"title\": \"Java Developer\",\r\n    \"description\": \"Become a Java developer\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Goal with Skills",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"title\": \"Java Developer\",\r\n    \"description\": \"Become a Java developer\",\r\n    \"skillIds\": [\r\n        1,\r\n        2\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Sub-Goal with Skills",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"title\": \"Java Developer\",\r\n    \"description\": \"Become a Java developer\",\r\n    \"skillIds\": [\r\n        1,\r\n        2\r\n    ],\r\n    \"parentGoalId\": 11\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Goal",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"goalId\": 11,\r\n    \"title\": \"Python Developer\",\r\n    \"description\": \"Become a Python developer\",\r\n    \"skillIds\": [\r\n        2,\r\n        3\r\n    ],\r\n    \"status\": \"ACTIVE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Goal and Complete",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"goalId\": 11,\r\n    \"title\": \"Python Developer\",\r\n    \"description\": \"Become a Python developer\",\r\n    \"skillIds\": [\r\n        2,\r\n        3\r\n    ],\r\n    \"status\": \"COMPLETED\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Goal",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/goals/11",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Find Sub-Goals by parent Goal",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Developer\",\r\n    \"description\": \"Java\",\r\n    \"status\": \"ACTIVE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals/sub-goals/11",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals",
+										"sub-goals",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Find Goals by user id",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Developer\",\r\n    \"description\": \"Java\",\r\n    \"status\": \"ACTIVE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/goals/user/1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"goals",
+										"user",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

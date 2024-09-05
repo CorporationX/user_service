@@ -1,16 +1,16 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filters.user.UserFilter;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.validation.UserValidation;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,7 +22,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
-    private final UserValidation userValidation;
+    private final UserValidator userValidator;
 
     public void followUser(long followerId, long followeeId) throws ValidationException {
         validateUser(followerId);
@@ -54,11 +54,10 @@ public class SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         validateUser(followeeId);
-
-        return userMapper.toDto(filterUsers(subscriptionRepository.findByFolloweeId(followeeId), filter).toList());
+        return userMapper.toDto(filterUsers(subscriptionRepository.findByFollowerId(followeeId), filter).toList());
     }
 
     public int getFollowersCount(long followeeId) {
@@ -73,6 +72,7 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
         return userMapper.toDto(filterUsers(subscriptionRepository.findByFolloweeId(followeeId), filter).toList());
     }
@@ -97,7 +97,7 @@ public class SubscriptionService {
     }
 
     private void validateUser(long userId) {
-        userValidation.validateUserId(userId);
-        userValidation.validateUserExists(userId);
+        userValidator.validateUserId(userId);
+        userValidator.validateUserExists(userId);
     }
 }

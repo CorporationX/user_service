@@ -46,27 +46,19 @@ public class EventController {
 
 
 
-    private EventDto validateForUpdate(EventDto event) {
-        try {
-            if (event.getTitle() != null || event.getOwnerId() != null || event.getStartDate() != null) {
-                return event;
-            }
-        } catch (Exception e) {
-            throw new DataValidationException(e.getMessage());
+    private EventDto validateForUpdate(EventDto event) throws DataValidationException {
+        if (event.getTitle() != null || event.getOwnerId() != null || event.getStartDate() != null) {
+            return event;
+        } else {
+            throw new DataValidationException("");
         }
-        return null;
     }
 
     private EventDto validateForCreate(EventDto event) {
-       try {
-           if (event.getTitle() != null || event.getOwnerId() != null || event.getStartDate() != null) {
+           if (event.getTitle() != null && event.getOwnerId() != null && event.getStartDate() != null) {
                return event;
+           } else {
+               throw new IllegalArgumentException("Обязательные поля пустые");
            }
-       } catch (Exception e) {
-           throw new NullPointerException("event null");
-       }
-       return null;
     }
-
-
 }

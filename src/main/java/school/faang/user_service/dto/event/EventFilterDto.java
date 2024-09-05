@@ -5,13 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Data
-@Component
-@RequiredArgsConstructor
 public class EventFilterDto {
-    private String eventName;
+    private String eventTitle;
     private String eventType;
-    private String eventDate;
     private String eventLocation;
-    private String eventDescription;
     private String eventStatus;
 }

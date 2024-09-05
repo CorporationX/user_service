@@ -6,9 +6,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
 @Data
-@RequiredArgsConstructor
 public class EventDto {
     private Long id;
     private String title;
@@ -19,5 +17,4 @@ public class EventDto {
     private List<SkillDto> relatedSkills;
     private String location;
     private int maxAttendees;
-
 }

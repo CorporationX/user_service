@@ -18,7 +18,7 @@ import java.util.List;
 public class MentorshipController {
     public final MentorshipService mentorshipService;
 
-    @GetMapping("mentees/{mentor_id}")
+    @GetMapping("/mentees/{mentor_id}")
     public List<MentorshipDto> getMentees(@PathVariable("mentor_id") long mentorId) {
         return mentorshipService.getMentees(mentorId);
     }
@@ -28,13 +28,13 @@ public class MentorshipController {
         return mentorshipService.getMentors(menteeId);
     }
 
-    @DeleteMapping("/mentee")
+    @DeleteMapping("/mentees")
     public void deleteMentee(@RequestParam("mentee_id") long menteeId,
                              @RequestParam("mentor_id") long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    @DeleteMapping("/mentor")
+    @DeleteMapping("/mentors")
     public void deleteMentor(@RequestParam("mentee_id") long menteeId,
                              @RequestParam("mentor_id") long mentorId) {
         mentorshipService.deleteMentor(menteeId, mentorId);

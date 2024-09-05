@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,21 +38,23 @@ class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
-        var mentorOrMentee = new User();
-        mentorOrMentee.setId(2L);
-        mentorOrMentee.setUsername("JaneSmith");
-        mentorOrMentee.setEmail("janes@smith.com");
-        mentorOrMentee.setPhone("0987654321");
-        mentorOrMentee.setAboutMe("About me");
+        var mentorOrMentee = User.builder()
+                .id(1L)
+                .username("JaneSmith")
+                .email("jane@smith.com")
+                .phone("0987654321")
+                .aboutMe("aboutMe")
+                .build();
 
-        user = new User();
-        user.setId(1L);
-        user.setUsername("John");
-        user.setEmail("john@example.com");
-        user.setPhone("123456789");
-        user.setAboutMe("About John Doe");
-        user.setMentees(new ArrayList<>(List.of(mentorOrMentee)));
-        user.setMentors(new ArrayList<>(List.of(mentorOrMentee)));
+        user = User.builder()
+                .id(2L)
+                .username("John")
+                .email("john@example.com")
+                .phone("123456789")
+                .aboutMe("123456789")
+                .mentees(new ArrayList<>(List.of(mentorOrMentee)))
+                .mentors(new ArrayList<>(List.of(mentorOrMentee)))
+                .build();
 
         mentorshipDto = new MentorshipDto(
                 1L,
@@ -64,33 +67,33 @@ class MentorshipServiceTest {
 
     @Test
     void testGetMentees() {
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(mentorshipMapper.toDto(any(User.class))).thenReturn(mentorshipDto);
 
-        mentorshipService.getMentees(1L);
-        verify(mentorshipRepository, times(1)).findById(1L);
+        mentorshipService.getMentees(anyLong());
+        verify(mentorshipRepository, times(1)).findById(anyLong());
         verify(mentorshipMapper, times(1)).toDto(any(User.class));
     }
 
     @Test
     void testGetMentors() {
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(mentorshipRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(mentorshipMapper.toDto(any(User.class))).thenReturn(mentorshipDto);
 
-        mentorshipService.getMentors(1L);
-        verify(mentorshipRepository, times(1)).findById(1L);
+        mentorshipService.getMentors(anyLong());
+        verify(mentorshipRepository, times(1)).findById(anyLong());
         verify(mentorshipMapper, times(1)).toDto(any(User.class));
     }
 
     @Test
     void deleteMentee() {
         mentorshipService.deleteMentee(1, 2);
-        verify(mentorshipRepository, times(1)).deleteMentorship(1L, 2);
+        verify(mentorshipRepository, times(1)).deleteMentorship(anyLong(), anyLong());
     }
 
     @Test
     void deleteMentor() {
         mentorshipService.deleteMentor(1, 2);
-        verify(mentorshipRepository, times(1)).deleteMentorship(1L, 2);
+        verify(mentorshipRepository, times(1)).deleteMentorship(anyLong(), anyLong());
     }
 }

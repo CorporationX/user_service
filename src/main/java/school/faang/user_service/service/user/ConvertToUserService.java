@@ -32,11 +32,9 @@ public class ConvertToUserService {
 
         persons.forEach(person -> {
             User studentToUser = personMapper.toUser(person);
-            validateUserBeforeSave(studentToUser);
+            boolean resultValidate = validateUserBeforeSave(studentToUser);
 
-            if (!userRepository.existsByUsername(studentToUser.getUsername())
-                    && !userRepository.existsByEmail(studentToUser.getEmail())
-                    && !userRepository.existsByPhone(studentToUser.getPhone())) {
+            if (!resultValidate) {
                 studentToUser.setPassword(generatePassword());
                 Country userCountry = studentToUser.getCountry();
 
@@ -78,16 +76,18 @@ public class ConvertToUserService {
         return userService.saveUsers(saveStudentsToUsers);
     }
 
-    private void validateUserBeforeSave(User studentToUser) {
+    private boolean validateUserBeforeSave(User studentToUser) {
 
         //ToDo В таблице user поля Username, Email, Phone имеют тип unique key.
         //ToDo Поэтому если у сохраняемого юзера есть совпадение по имени, эл.адресу или номеру телефона с юзерами,
         //ToDo которые содержатся в базе данных, то новый юзер не будет сохранен, а в лог выйдет сообщение.
         //ToDo Но ошибку я не бросаю, так как операция прервется и следующие юзеры не сохранятся
 
-        if (userRepository.existsByUsername(studentToUser.getUsername())
+        boolean resultValidate = userRepository.existsByUsername(studentToUser.getUsername())
                 || userRepository.existsByEmail(studentToUser.getEmail())
-                || userRepository.existsByPhone(studentToUser.getPhone())) {
+                || userRepository.existsByPhone(studentToUser.getPhone());
+
+        if (resultValidate) {
 
             if (userRepository.existsByUsername(studentToUser.getUsername())) {
                 log.warn("User with username {} already exists", studentToUser.getUsername());
@@ -97,6 +97,7 @@ public class ConvertToUserService {
                 log.warn("User with phone number {} already exists", studentToUser.getPhone());
             }
         }
+        return resultValidate;
     }
 
     private String generatePassword() {

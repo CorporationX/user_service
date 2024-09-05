@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForResponse;
@@ -12,6 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.ErrorMessage;
 import school.faang.user_service.exception.RequestException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.filter.Filter;
@@ -28,8 +30,11 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<Filter<RequestFilterDto, MentorshipRequest>> filters;
+    private final MentorshipOfferedEventService mentorshipOfferedEventService;
+    private final MentorshipEventPublisher mentorshipEventPublisher;
     private static final int PAUSE_TIME = 3;
 
+    @Transactional
     public MentorshipRequestDtoForResponse requestMentorship(MentorshipRequestDtoForRequest mentorshipRequestDtoForRequest) {
 
         validatedRequesterAndReceiverIds(mentorshipRequestDtoForRequest);
@@ -39,7 +44,8 @@ public class MentorshipRequestService {
                 mentorshipRequestDtoForRequest.getRequesterId(),
                 mentorshipRequestDtoForRequest.getReceiverId(),
                 mentorshipRequestDtoForRequest.getDescription());
-
+        mentorshipOfferedEventService.publishEvent(mentorshipRequest);
+        mentorshipEventPublisher.publish(mentorshipRequestMapper.toEvent(mentorshipRequest));
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
@@ -66,6 +72,7 @@ public class MentorshipRequestService {
                 });
     }
 
+    @Transactional
     public List<MentorshipRequestDtoForResponse> getRequests(RequestFilterDto filterDto) {
         Stream<MentorshipRequest> requests = mentorshipRequestRepository.findAll().stream();
         return filters.stream()
@@ -77,6 +84,7 @@ public class MentorshipRequestService {
                 .toList();
     }
 
+    @Transactional
     public MentorshipRequestDtoForResponse acceptRequest(long id) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));
@@ -90,6 +98,7 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
+    @Transactional
     public MentorshipRequestDtoForResponse rejectRequest(long id, RejectionDto rejection) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new RequestException(ErrorMessage.REQUEST_DOES_NOT_EXIST));

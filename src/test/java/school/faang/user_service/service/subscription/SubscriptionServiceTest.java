@@ -8,13 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.user.UserValidator;
@@ -39,8 +37,8 @@ class SubscriptionServiceTest {
     private List<UserFilter> userFilters;
     @Mock
     private UserValidator userValidator;
-    @Spy
-    private UserNameFilter userNameFilter;
+    @Mock
+    private UserFilter userFilter;
 
     private final long LONG_POSITIVE_USER_ID_IS_ONE = 1L;
     private final long LONG_POSITIVE_USER_ID_IS_TWO = 2L;
@@ -61,7 +59,8 @@ class SubscriptionServiceTest {
         @Test
         @DisplayName("Ошибка валидации при подписке если подписка уже существует")
         void When_SubscriptionAlreadyExists_Then_ThrowValidationException() {
-            when(subscriptionRepository.existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
+            when(subscriptionRepository
+                    .existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
                     .thenReturn(Boolean.TRUE);
 
             assertThrows(ValidationException.class,
@@ -80,7 +79,8 @@ class SubscriptionServiceTest {
         @Test
         @DisplayName("Ошибка валидации при отписке если такой подписки не существует")
         void testUnfollowUserIfSubscriptionNotExists() {
-            when(subscriptionRepository.existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
+            when(subscriptionRepository
+                    .existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
                     .thenReturn(Boolean.FALSE);
 
             assertThrows(ValidationException.class,
@@ -95,7 +95,8 @@ class SubscriptionServiceTest {
         @Test
         @DisplayName("Успех если корректные значения в методе подписки")
         void When_CorrectValuesInFollowUser_Then_Success() {
-            when(subscriptionRepository.existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
+            when(subscriptionRepository
+                    .existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
                     .thenReturn(Boolean.FALSE);
 
             subscriptionService.followUser(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO);
@@ -107,7 +108,8 @@ class SubscriptionServiceTest {
         @Test
         @DisplayName("Успех если корректные значения в методе отписки")
         void When_CorrectValuesInUnfollowUser_Then_Success() {
-            when(subscriptionRepository.existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
+            when(subscriptionRepository
+                    .existsByFollowerIdAndFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO))
                     .thenReturn(Boolean.TRUE);
 
             subscriptionService.unfollowUser(LONG_POSITIVE_USER_ID_IS_ONE, LONG_POSITIVE_USER_ID_IS_TWO);
@@ -161,12 +163,9 @@ class SubscriptionServiceTest {
         @DisplayName("Успех если передано положительное значение id и фильтр по имени" +
                 " в методе просмотра своих подписок")
         void When_CorrectValuesAndFilterIsFilterNameInGetFollowing_Then_Success() {
-            userFilters = List.of(userNameFilter);
-            userMapper = Mappers.getMapper(UserMapper.class);
-            subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, userValidator);
+            customInitSubscriptionService();
 
             UserFilterDto userFilterNameDto = new UserFilterDto();
-            userFilterNameDto.setNamePattern("es");
 
             User user = new User();
             user.setUsername("user");
@@ -177,23 +176,24 @@ class SubscriptionServiceTest {
             List<User> users = List.of(user, testUser);
 
             when(subscriptionRepository.findByFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE)).thenReturn(users.stream());
+            when(userFilter.isApplicable(userFilterNameDto)).thenReturn(true);
+            when(userFilter.apply(any(), eq(userFilterNameDto)))
+                    .thenReturn(users.stream().filter(u -> u.getUsername().contains("es")));
 
             List<UserDto> result = subscriptionService.getFollowing(LONG_POSITIVE_USER_ID_IS_ONE, userFilterNameDto);
 
             assertEquals(INT_POSITIVE_ONE, result.size());
             assertEquals(testUser.getUsername(), result.get(0).getUsername());
 
-            verify(subscriptionRepository, times(1)).findByFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE);
+            verify(subscriptionRepository, times(1))
+                    .findByFolloweeId(LONG_POSITIVE_USER_ID_IS_ONE);
         }
-
 
         @Test
         @DisplayName("Успех если передано положительное значение id и фильтр по имени" +
                 " в методе просмотра своих подписчиков")
         void When_CorrectValuesAndFilterIsFilterNameInGetFollowers_Then_Success() {
-            userFilters = List.of(userNameFilter);
-            userMapper = Mappers.getMapper(UserMapper.class);
-            subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, userValidator);
+            customInitSubscriptionService();
 
             UserFilterDto userFilterNameDto = new UserFilterDto();
             userFilterNameDto.setNamePattern("es");
@@ -207,13 +207,23 @@ class SubscriptionServiceTest {
             List<User> users = List.of(user, testUser);
 
             when(subscriptionRepository.findByFollowerId(LONG_POSITIVE_USER_ID_IS_ONE)).thenReturn(users.stream());
+            when(userFilter.isApplicable(userFilterNameDto)).thenReturn(true);
+            when(userFilter.apply(any(), eq(userFilterNameDto)))
+                    .thenReturn(users.stream().filter(u -> u.getUsername().contains("es")));
 
             List<UserDto> result = subscriptionService.getFollowers(LONG_POSITIVE_USER_ID_IS_ONE, userFilterNameDto);
 
             assertEquals(INT_POSITIVE_ONE, result.size());
             assertEquals(testUser.getUsername(), result.get(0).getUsername());
 
-            verify(subscriptionRepository, times(1)).findByFollowerId(LONG_POSITIVE_USER_ID_IS_ONE);
+            verify(subscriptionRepository, times(1))
+                    .findByFollowerId(LONG_POSITIVE_USER_ID_IS_ONE);
         }
+    }
+
+    private void customInitSubscriptionService() {
+        userFilters = List.of(userFilter);
+        userMapper = Mappers.getMapper(UserMapper.class);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, userValidator);
     }
 }

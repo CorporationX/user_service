@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.subscription;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -15,13 +16,15 @@ public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
 
-    @GetMapping("/followUser")
+    @PostMapping("/followUser")
+    @ResponseStatus(HttpStatus.CREATED)
     public void followUser(@RequestParam("followerId") long followerId,
                            @RequestParam("followeeId") long followeeId) {
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    @GetMapping("/unfollowUser")
+    @PostMapping("/unfollowUser")
+    @ResponseStatus(HttpStatus.OK)
     public void unfollowUser(@RequestParam("followerId") long followerId,
                              @RequestParam("followeeId") long followeeId) {
         subscriptionService.unfollowUser(followerId, followeeId);

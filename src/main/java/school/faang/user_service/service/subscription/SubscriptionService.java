@@ -97,7 +97,7 @@ public class SubscriptionService {
     }
 
     private void validateUser(long userId) {
-        userValidator.validateUserId(userId);
-        userValidator.validateUserExists(userId);
+        userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(userId);
+        userValidator.userIsExistedOrElseThrowValidationException(userId);
     }
 }

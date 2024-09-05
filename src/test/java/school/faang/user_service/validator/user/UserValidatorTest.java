@@ -23,6 +23,7 @@ class UserValidatorTest {
 
     @InjectMocks
     private UserValidator userValidator;
+
     @Mock
     private UserRepository userRepository;
 

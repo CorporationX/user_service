@@ -48,7 +48,8 @@ public class MentorshipService {
     public void deleteMentee(Long menteeId, Long mentorId) {
         User mentor = findUserById(mentorId);
 
-        User mentee = mentor.getMentees()
+        User mentee = Optional.ofNullable(mentor.getMentees())
+                .orElse(Collections.emptyList())
                 .stream()
                 .filter(current -> Objects.equals(current.getId(), menteeId))
                 .findFirst()
@@ -62,7 +63,8 @@ public class MentorshipService {
     public void deleteMentor(Long menteeId, Long mentorId) {
         User mentee = findUserById(menteeId);
 
-        User mentor = mentee.getMentors()
+        User mentor = Optional.ofNullable(mentee.getMentors())
+                .orElse(Collections.emptyList())
                 .stream()
                 .filter(current -> Objects.equals(current.getId(), mentorId))
                 .findFirst()

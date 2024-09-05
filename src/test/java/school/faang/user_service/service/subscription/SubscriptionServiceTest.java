@@ -10,14 +10,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.FollowerEvent;
+import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.FollowerRepository;
 import school.faang.user_service.service.publisher.FollowerEventPublisher;
 import school.faang.user_service.service.user.filters.UserFilter;
 import school.faang.user_service.service.user.filters.UserNameFilter;
@@ -25,7 +24,6 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 

@@ -10,6 +10,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.mapper.EventFilterMapper;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.publisher.ProfileViewMessagePublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -30,6 +31,7 @@ public class EventService {
     private final SkillRepository skillRepository;
     private final List<EventFilter> eventFilter;
     private final Validator validator;
+    private final ProfileViewMessagePublisher profileViewMessagePublisher;
 
     // Создать событие
     public EventDto create(EventDto eventDto) {

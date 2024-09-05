@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.event.ProfileViewEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -20,6 +21,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.image.ImageMapper;
+import school.faang.user_service.publisher.ProfileViewMessagePublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -74,6 +76,8 @@ class UserServiceTest {
     private S3ServiceImpl s3Service;
     @Mock
     private ImageMapper imageMapper;
+    @Mock
+    private ProfileViewMessagePublisher profileViewMessagePublisher;
 
     private static final Long USER_ID = 1L;
     private static final Long INVALID_USER_ID = MAX_VALUE;
@@ -305,4 +309,46 @@ class UserServiceTest {
         assertThrows(EntityNotFoundException.class, () -> userService.getUserPic(user.getId()));
     }
 
+    @Test
+    public void getUserProfile_successfulTest() {
+        // Arrange
+        var user = TestDataFactory.createUser();
+        var userDto = TestDataFactory.createUserDto();
+        var viewer = 2L;
+
+        ProfileViewEventDto profileViewEventDto = new ProfileViewEventDto();
+        profileViewEventDto.setViewerId(viewer);
+        profileViewEventDto.setProfileId(USER_ID);
+
+        // When
+        when(userRepository.findById(USER_ID))
+                .thenReturn(Optional.of(user));
+        when(userMapper.toDto(user))
+                .thenReturn(userDto);
+
+        // Action
+        var actualResult = userService.getUserProfile(profileViewEventDto);
+
+        // Assert
+        assertThat(actualResult).isNotNull();
+        assertThat(actualResult.getId()).isEqualTo(userDto.getId());
+
+        verify(userRepository).findById(USER_ID);
+        verify(userMapper).toDto(user);
+        verify(profileViewMessagePublisher).publish(profileViewEventDto);
+    }
+
+    @Test
+    public void getUserProfile_throwTest() {
+        // Arrange
+        ProfileViewEventDto profileViewEventDto = new ProfileViewEventDto();
+        profileViewEventDto.setViewerId(USER_ID);
+        profileViewEventDto.setProfileId(USER_ID);
+
+        // Assert
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserProfile(profileViewEventDto));
+
+        // Verify
+        verify(profileViewMessagePublisher, times(0)).publish(profileViewEventDto);
+    }
 }

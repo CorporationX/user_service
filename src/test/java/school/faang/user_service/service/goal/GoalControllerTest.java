@@ -2,6 +2,7 @@ package school.faang.user_service.service.goal;
 
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,11 +21,21 @@ public class GoalControllerTest {
     @InjectMocks
     private GoalController goalController;
 
+    private Long userId;
+    private GoalDto goal;
+
+
+    @BeforeEach
+    public void setUp() {
+        userId = 1L;
+        goal = new GoalDto();
+        goal.setTitle("Learning");
+    }
+
+
     @Test
     @DisplayName("Empty or null goal title")
     public void testCreateGoalIsInvalid() {
-        Long userId = 1L;
-
         GoalDto nullTitleGoal = new GoalDto();
         nullTitleGoal.setTitle(null);
 
@@ -43,12 +54,14 @@ public class GoalControllerTest {
     @Test
     @DisplayName("Success create new goal in controller")
     public void testCreateGoalIsSuccess() {
-        Long userId = 1L;
-
-        GoalDto goal = new GoalDto();
-        goal.setTitle("Learning");
-
         goalController.createGoal(userId, goal);
         Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goal);
+    }
+
+    @Test
+    @DisplayName("Success update goal in controller")
+    public void testUpdateGoalIsSuccess() {
+        goalController.updateGoal(userId, goal);
+        Mockito.verify(goalService, Mockito.times(1)).updateGoal(userId, goal);
     }
 }

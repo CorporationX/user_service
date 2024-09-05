@@ -15,6 +15,11 @@ public class GoalController {
         goalService.createGoal(userId, goal);
     }
 
+    public void updateGoal(Long userId, GoalDto goal) {
+        validateGoalTitle(goal);
+        goalService.updateGoal(userId, goal);
+    }
+
     private void validateGoalTitle(GoalDto goal) {
         if (goal.getTitle() == null || goal.getTitle().isBlank()) {
             throw new IllegalArgumentException("Goal title is empty or null");

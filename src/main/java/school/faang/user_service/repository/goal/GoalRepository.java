@@ -51,4 +51,6 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     List<User> findUsersByGoalId(long goalId);
 
     void addSkillToGoal(Long skillId, Long goalId);
+
+    void removeSkillsFromGoal(Long goalId);
 }

@@ -36,6 +36,8 @@ spring:
           name: profile_view_channel
         mentorship_requests:
           name: mentorship_requests
+        recommendation:
+          name: recommendation_channel
 
   mvc:
     servlet:

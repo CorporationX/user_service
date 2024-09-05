@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.premium;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.controller.premium.PremiumController;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.enums.PremiumPeriod;
 import school.faang.user_service.service.premium.PremiumService;

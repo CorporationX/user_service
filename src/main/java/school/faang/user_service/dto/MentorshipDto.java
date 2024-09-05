@@ -1,6 +1,6 @@
 package school.faang.user_service.dto;
 
-public record MenteeReadDto(
+public record MentorshipDto(
         Long id,
         String username,
         String email,

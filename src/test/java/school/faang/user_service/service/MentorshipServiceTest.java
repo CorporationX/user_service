@@ -6,10 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,5 +32,11 @@ class MentorshipServiceTest {
     void testGetAllMentees() {
         when(mentorshipRepository.findMenteesByMentorId(1L)).thenReturn(new ArrayList<>());
         verify(mentorshipRepository, times(1)).findMenteesByMentorId(1L);
+    }
+
+    @Test
+    void testGetMentors() {
+        when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(new User()));
+        verify(mentorshipRepository, times(1)).findById(2L);
     }
 }

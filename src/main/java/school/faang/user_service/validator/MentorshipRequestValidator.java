@@ -42,10 +42,15 @@ public class MentorshipRequestValidator {
     public void lastRequestDateValidation(MentorshipRequestDto mentorshipRequestDto) {
         Optional<MentorshipRequest> lastRequest = mentorshipRequestRepository.findLatestRequest(mentorshipRequestDto.getRequesterId(),
                 mentorshipRequestDto.getReceiverId());
-        LocalDateTime lastRequestDate = lastRequest.get().getUpdatedAt();
-        if (lastRequestDate != null && lastRequestDate.plusMonths(3).isAfter(LocalDateTime.now())) {
-            log.info("Пользователь id{} отправлял запрос на менторство менее 3 месяцев назад", mentorshipRequestDto.getReceiverId());
-            throw new DataValidationException("Пользователь id" + mentorshipRequestDto.getRequesterId() + " отправлял запрос на менторство менее 3 месяцев назад");
+        if (lastRequest.isPresent()) {
+            LocalDateTime lastRequestDate = lastRequest.get().getUpdatedAt();
+            if (lastRequestDate != null && lastRequestDate.plusMonths(3).isAfter(LocalDateTime.now())) {
+                log.info("Пользователь id{} отправлял запрос на менторство менее 3 месяцев назад", mentorshipRequestDto.getReceiverId());
+                throw new DataValidationException("Пользователь id" + mentorshipRequestDto.getRequesterId() + " отправлял запрос на менторство менее 3 месяцев назад");
+            }
+        } else {
+            log.info("Последний запрос не найден, валидация пройдена. Пользователь, который запрашивает менторство {}. " +
+                    "Пользователь, у которого запрашивают менторство {}", mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
         }
     }
 

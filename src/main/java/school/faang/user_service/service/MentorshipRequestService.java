@@ -38,14 +38,15 @@ public class MentorshipRequestService {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
-        //в MentorshipRequestRepository есть метод create
-        //mentorshipRequestRepository.create(mentorshipRequest.getRequester().getId(),
-        //mentorshipRequest.getReceiver().getId(), mentorshipRequest.getDescription());
         log.info("Получен запрос на менторство от пользователя с ID: {}", mentorshipRequestDto.getRequesterId());
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto requestFilter) {
+        if (mentorshipRequestFilterList.isEmpty()) {
+            log.warn("Список фильтров пуст");
+            return List.of();
+        }
         List<MentorshipRequest> requestList = mentorshipRequestRepository.findAll();
         List<MentorshipRequestDto> result = mentorshipRequestFilterList.stream()
                 .filter(filter -> filter.isApplicable(requestFilter))
@@ -58,9 +59,12 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto acceptRequest(Long id) {
         mentorshipRequestValidator.requestValidation(id);
-        MentorshipRequest request = mentorshipRequestRepository.findById(id).get();
-        User requestMentee = userRepository.findById(request.getRequester().getId()).get();
-        User requestMentor = userRepository.findById(request.getReceiver().getId()).get();
+        MentorshipRequest request = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Запрос id" + id + " не найден"));
+        User requestMentee = userRepository.findById(request.getRequester().getId())
+                .orElseThrow(() -> new DataValidationException("Пользователь id" + request.getRequester().getId() + " не найден"));
+        User requestMentor = userRepository.findById(request.getReceiver().getId())
+                .orElseThrow(() -> new DataValidationException("Пользователь id" + request.getReceiver().getId() + " не найден"));
         if (requestMentee.getMentors().stream().noneMatch(mentor -> mentor.equals(requestMentor))) {
             requestMentee.getMentors().add(requestMentor);
             log.info("Запрос на менторство id{} принят", id);
@@ -73,7 +77,8 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
         mentorshipRequestValidator.requestValidation(id);
-        MentorshipRequest request = mentorshipRequestRepository.findById(id).get();
+        MentorshipRequest request = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Запрос id" + id + " не найден"));
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getRejectionReason());
         mentorshipRequestRepository.save(request);

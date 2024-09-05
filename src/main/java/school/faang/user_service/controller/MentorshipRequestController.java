@@ -33,7 +33,7 @@ public class MentorshipRequestController {
 
     @PutMapping("/accept")
     public MentorshipRequestDto acceptRequest(Long id) {
-        return mentorshipRequestService.acceptRequest(id);
+        return mentorshipRequestService.acceptRequest (id);
     }
 
     @PutMapping("/reject")

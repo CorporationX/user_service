@@ -10,6 +10,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +41,17 @@ public class MentorshipServiceImpl implements MentorshipService {
     }
 
     private void deleteMentorship(Long menteeId, Long mentorId) {
+        if (Objects.equals(menteeId, mentorId)) {
+            throw new MentorshipNotFoundException("Ментор и менти не могут иметь одинаковые идентификаторы");
+        }
         User mentee = getUserById(menteeId);
         List<User> mentors = mentee.getMentors();
         boolean isRemoved = mentors.removeIf(mentor -> mentor.getId().equals(mentorId));
-        if (!isRemoved) {
+        if (isRemoved) {
+            mentorshipRepository.save(mentee);
+        } else {
             throw new MentorshipNotFoundException("Не найдена пара менти/ментор с такими идентификаторами");
         }
-        mentorshipRepository.save(mentee);
     }
 
     private User getUserById(Long userId) {

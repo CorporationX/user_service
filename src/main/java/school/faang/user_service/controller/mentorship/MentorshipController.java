@@ -56,15 +56,4 @@ public class MentorshipController {
         );
     }
 
-    @ExceptionHandler({
-            UserNotFoundException.class,
-            MentorshipNotFoundException.class})
-    public ResponseEntity<?> handleException(UserNotFoundException e) {
-        return ResponseEntity.ok(
-                Map.of(
-                        "message",
-                        e.getMessage()
-                )
-        );
-    }
 }

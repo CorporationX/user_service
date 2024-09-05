@@ -3,9 +3,8 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 
 @Component
 @RequiredArgsConstructor
@@ -13,7 +12,7 @@ public class GoalService {
     private static final int MAX_AMOUNT_ACTIVE_GOAL = 3;
 
     private final GoalRepository goalRepository;
-    private final SkillRepository skillRepository;
+    private final SkillService skillService;
 
     public void createGoal(Long userId, GoalDto goal) {
         validateGoalTitle(goal);
@@ -37,18 +36,16 @@ public class GoalService {
     }
 
     private void validateGoalSkills(GoalDto goal) {
-        goal.getSkills().stream()
-                .map(SkillDto::getTitle)
-                .forEach(skillTitle -> {
-                    if (!skillRepository.existsByTitle(skillTitle)) {
-                        throw new IllegalArgumentException(skillTitle + " skill does not exist");
+        goal.getSkillIds()
+                .forEach(skillId -> {
+                    if (!skillService.isExistingSkill(skillId)) {
+                        throw new IllegalArgumentException("Skill does not exist");
                     }
                 });
     }
 
     private void addSkillsToGoal(GoalDto goal) {
-        goal.getSkills().stream()
-                .map(SkillDto::getId)
+        goal.getSkillIds()
                 .forEach(skillId -> goalRepository.addSkillToGoal(skillId, goal.getId()));
     }
 }

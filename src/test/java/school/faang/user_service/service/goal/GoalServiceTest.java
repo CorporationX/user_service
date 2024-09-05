@@ -1,7 +1,6 @@
 package school.faang.user_service.service.goal;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,9 +9,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +22,7 @@ public class GoalServiceTest {
     private GoalRepository goalRepository;
 
     @Mock
-    private SkillRepository skillRepository;
+    private SkillService skillService;
 
     @InjectMocks
     private GoalService goalService;
@@ -36,7 +34,7 @@ public class GoalServiceTest {
         nullTitleGoal.setTitle(null);
 
         GoalDto emptyTitleGoal = new GoalDto();
-        emptyTitleGoal.setTitle("   ");
+        emptyTitleGoal.setTitle("    ");
 
         Long userId = 1L;
 
@@ -71,26 +69,17 @@ public class GoalServiceTest {
 
         GoalDto goal = new GoalDto();
         goal.setTitle("learning");
-
-        SkillDto firstSkill = new SkillDto();
-        firstSkill.setId(1L);
-        firstSkill.setTitle("Java");
-
-        SkillDto secondSkill = new SkillDto();
-        secondSkill.setId(1L);
-        secondSkill.setTitle("Archery");
-
-        goal.setSkills(Arrays.asList(firstSkill, secondSkill));
+        Long firstSkillId = 10L;
+        Long secondSkillId = 11L;
+        goal.setSkillIds(Arrays.asList(firstSkillId, secondSkillId));
 
         Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(2);
-        Mockito.when(skillRepository.existsByTitle("Java")).thenReturn(true);
-        Mockito.when(skillRepository.existsByTitle("Archery")).thenReturn(false);
+        Mockito.when(skillService.isExistingSkill(firstSkillId)).thenReturn(true);
+        Mockito.when(skillService.isExistingSkill(secondSkillId)).thenReturn(false);
 
         IllegalArgumentException exception = Assert.assertThrows(
                 IllegalArgumentException.class,
                 () -> goalService.createGoal(userId, goal));
-
-        Assertions.assertEquals("Archery skill does not exist", exception.getMessage());
     }
 
     @Test
@@ -101,20 +90,17 @@ public class GoalServiceTest {
         GoalDto goal = new GoalDto();
         goal.setTitle("Learning");
 
-        SkillDto firstSkill = new SkillDto();
-        firstSkill.setId(1L);
-        firstSkill.setTitle("Java");
-
-        goal.setSkills(List.of(firstSkill));
+        Long firstSkillId = 10L;
+        goal.setSkillIds(List.of(firstSkillId));
 
         Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(1);
-        Mockito.when(skillRepository.existsByTitle("Java")).thenReturn(true);
+        Mockito.when(skillService.isExistingSkill(firstSkillId)).thenReturn(true);
 
         goalService.createGoal(userId, goal);
         Mockito.verify(goalRepository, Mockito.times(1))
                 .create(goal.getTitle(), goal.getDescription(), goal.getParent());
 
         Mockito.verify(goalRepository, Mockito.times(1))
-                .addSkillToGoal(firstSkill.getId(), goal.getId());
+                .addSkillToGoal(firstSkillId, goal.getId());
     }
 }

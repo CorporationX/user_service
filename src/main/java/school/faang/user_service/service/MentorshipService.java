@@ -34,4 +34,9 @@ public class MentorshipService {
         );
         return mentors;
     }
+
+    @Transactional
+    public void deleteMentee(long menteeId, long mentorId) {
+        mentorshipRepository.deleteMentorsMenteeByIds(menteeId, mentorId);
+    }
 }

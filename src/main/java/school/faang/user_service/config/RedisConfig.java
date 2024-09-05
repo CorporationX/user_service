@@ -19,8 +19,19 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+
+    // channels name
+
     @Value("${spring.data.redis.channels.follower_view.name}")
     private String followerViewChannelName;
+
+    @Value("${spring.data.redis.channels.recommendation.name}")
+    private String recommendationChannelName;
+
+    @Bean
+    public String recommendationChannel() {
+        return recommendationChannelName;
+    }
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {

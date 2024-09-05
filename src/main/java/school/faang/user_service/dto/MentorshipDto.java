@@ -5,8 +5,5 @@ public record MentorshipDto(
         String username,
         String email,
         String phone,
-        String aboutMe,
-        String country,
-        String city,
-        int experience
+        String aboutMe
 ) {}

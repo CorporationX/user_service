@@ -18,11 +18,14 @@ public class MentorshipService {
     private final MentorshipMapper mentorshipMapper;
 
     public List<MentorshipDto> getMentees(long mentorId) {
-        var mentees = mentorshipRepository.findMenteesByMentorId(mentorId);
+        var mentees = new ArrayList<MentorshipDto>();
+        mentorshipRepository.findById(mentorId).ifPresent(mentor ->
+                mentees.addAll(mentor.getMentees().stream()
+                        .map(mentorshipMapper::toDto)
+                        .toList())
+        );
 
-        return mentees.stream()
-                .map(mentorshipMapper::toDto)
-                .toList();
+        return mentees;
     }
 
     public List<MentorshipDto> getMentors(long menteeId) {
@@ -32,11 +35,17 @@ public class MentorshipService {
                         .map(mentorshipMapper::toDto)
                         .toList())
         );
+
         return mentors;
     }
 
     @Transactional
     public void deleteMentee(long menteeId, long mentorId) {
-        mentorshipRepository.deleteMentorsMenteeByIds(menteeId, mentorId);
+        mentorshipRepository.deleteMentorship(menteeId, mentorId);
+    }
+
+    @Transactional
+    public void deleteMentor(long menteeId, long mentorId) {
+        mentorshipRepository.deleteMentorship(menteeId, mentorId);
     }
 }

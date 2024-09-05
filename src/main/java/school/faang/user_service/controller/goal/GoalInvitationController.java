@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.exception.GoalInvitationException;
+import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.service.GoalInvitationService;
 
 @RestController
@@ -29,15 +29,15 @@ public class GoalInvitationController {
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto goalInvitationDto) {
 
         if (goalInvitationDto.getInviterId() == null) {
-            throw new GoalInvitationException("InviterId must not be null");
+            throw new GoalInvitationValidationException("InviterId must not be null");
         }
 
         if (goalInvitationDto.getInvitedUserId() == null) {
-            throw new GoalInvitationException("InvitedUserId must not be null");
+            throw new GoalInvitationValidationException("InvitedUserId must not be null");
         }
 
         if (goalInvitationDto.getGoalId() == null) {
-            throw new GoalInvitationException("GoalId must not be null");
+            throw new GoalInvitationValidationException("GoalId must not be null");
         }
 
         return service.createInvitation(goalInvitationDto);

@@ -7,7 +7,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.GoalInvitationException;
+import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -31,23 +31,23 @@ public class GoalInvitationService {
         Long invitedUserId = goalInvitationDto.getInvitedUserId();
 
         if (inviterId.equals(invitedUserId)) {
-            throw new GoalInvitationException("User invited and user inviter cannot be equals, id " + invitedUserId);
+            throw new GoalInvitationValidationException("User invited and user inviter cannot be equals, id " + invitedUserId);
         }
 
         Optional<User> optionalUserInviter = userRepository.findById(inviterId);
         if (optionalUserInviter.isEmpty()) {
-            throw new GoalInvitationException("User inviter with id " + inviterId + " user does not exist");
+            throw new GoalInvitationValidationException("User inviter with id " + inviterId + " user does not exist");
         }
 
         Optional<User> optionalUserInvited = userRepository.findById(invitedUserId);
         if (optionalUserInvited.isEmpty()) {
-            throw new GoalInvitationException("User invited with id " + invitedUserId + " user does not exist");
+            throw new GoalInvitationValidationException("User invited with id " + invitedUserId + " user does not exist");
         }
 
         Long goalId = goalInvitationDto.getGoalId();
         Optional<Goal> optionalGoal = goalRepository.findById(goalId);
         if (optionalGoal.isEmpty()) {
-            throw new GoalInvitationException("Goal with id " + goalId + " does not exist");
+            throw new GoalInvitationValidationException("Goal with id " + goalId + " does not exist");
         }
 
         // TODO: ??? в маппере нет смысла ? пусть будет на будущее?

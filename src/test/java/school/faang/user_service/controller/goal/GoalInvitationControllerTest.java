@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.exception.GoalInvitationException;
+import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.service.GoalInvitationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +34,7 @@ class GoalInvitationControllerTest {
     void testCreateInvitation_inviterIdIsNull() {
         goalInvitationDto.setInviterId(null);
 
-        GoalInvitationException exception = assertThrows(GoalInvitationException.class,
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
                 () -> goalInvitationController.createInvitation(goalInvitationDto));
         assertEquals("InviterId must not be null", exception.getMessage());
     }
@@ -43,7 +43,7 @@ class GoalInvitationControllerTest {
     void testCreateInvitation_invitedUserIdIsNull() {
         goalInvitationDto.setInvitedUserId(null);
 
-        GoalInvitationException exception = assertThrows(GoalInvitationException.class,
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
                 () -> goalInvitationController.createInvitation(goalInvitationDto));
         assertEquals("InvitedUserId must not be null", exception.getMessage());
     }
@@ -52,7 +52,7 @@ class GoalInvitationControllerTest {
     void testCreateInvitation_goalIdIsNull() {
         goalInvitationDto.setGoalId(null);
 
-        GoalInvitationException exception = assertThrows(GoalInvitationException.class,
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
                 () -> goalInvitationController.createInvitation(goalInvitationDto));
         assertEquals("GoalId must not be null", exception.getMessage());
     }

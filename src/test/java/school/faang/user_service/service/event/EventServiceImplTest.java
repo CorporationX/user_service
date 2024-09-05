@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class EventServiceTest {
+public class EventServiceImplTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -55,7 +55,7 @@ public class EventServiceTest {
     @Mock
     private EventFilter eventFilter2;
     @InjectMocks
-    private EventService eventService;
+    private EventServiceImpl eventServiceImpl;
     private User user;
     private EventDto eventDto;
     private Event event;
@@ -91,7 +91,7 @@ public class EventServiceTest {
         filters.add(eventFilter1);
         filters.add(eventFilter2);
 
-        eventService = new EventService(eventRepository, userRepository, skillRepository, eventMapper, filters);
+        eventServiceImpl = new EventServiceImpl(eventRepository, userRepository, skillRepository, eventMapper, filters);
 
         lenient().when(eventMapper.toEvent(eventDto)).thenReturn(event);
         lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
@@ -105,7 +105,7 @@ public class EventServiceTest {
         when(skillRepository.findAllById(eventDto.getRelatedSkillsIds())).thenReturn(relatedSkills);
         when(eventRepository.save(any(Event.class))).thenReturn(event);
 
-        EventDto result = eventService.create(eventDto);
+        EventDto result = eventServiceImpl.create(eventDto);
 
         verify(skillRepository).findAllById(eventDto.getRelatedSkillsIds());
         verify(userRepository).findById(eventDto.getOwnerId());
@@ -118,7 +118,7 @@ public class EventServiceTest {
     public void getEvent_ShouldReturnEventDto() {
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
 
-        EventDto result = eventService.getEvent(1L);
+        EventDto result = eventServiceImpl.getEvent(1L);
 
         assertNotNull(result);
         assertEquals(eventDto, result);
@@ -140,7 +140,7 @@ public class EventServiceTest {
         });
         when(eventMapper.toFilterDto(anyList())).thenReturn(expectedEventDtos);
 
-        List<EventDto> actualEventDtos = eventService.getEventsByFilter(eventFilterDto);
+        List<EventDto> actualEventDtos = eventServiceImpl.getEventsByFilter(eventFilterDto);
 
         assertEquals(expectedEventDtos.size(), actualEventDtos.size());
         verify(eventRepository, times(1)).findAll();
@@ -159,7 +159,7 @@ public class EventServiceTest {
         EventWithSubscribersDto eventWithSubscribersDto = new EventWithSubscribersDto();
         doReturn(eventWithSubscribersDto).when(eventMapper).toEventWithSubscribersDto(any(Event.class));
 
-        EventWithSubscribersDto result = eventService.updateEvent(eventDto);
+        EventWithSubscribersDto result = eventServiceImpl.updateEvent(eventDto);
         result.setSubscribersCount(3);
 
         assertNotNull(result);
@@ -172,7 +172,7 @@ public class EventServiceTest {
     public void deleteEvent_ShouldDeleteEvent() {
         doNothing().when(eventRepository).deleteById(anyLong());
 
-        eventService.deleteEvent(1L);
+        eventServiceImpl.deleteEvent(1L);
 
         verify(eventRepository, times(1)).deleteById(1L);
     }
@@ -183,7 +183,7 @@ public class EventServiceTest {
         when(eventRepository.findAllByUserId(anyLong())).thenReturn(events);
         when(eventMapper.toDto(anyList())).thenReturn(List.of(new EventDto(), new EventDto()));
 
-        List<EventDto> result = eventService.getOwnedEvents(1L);
+        List<EventDto> result = eventServiceImpl.getOwnedEvents(1L);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -195,7 +195,7 @@ public class EventServiceTest {
         when(eventRepository.findParticipatedEventsByUserId(anyLong())).thenReturn(events);
         when(eventMapper.toDto(anyList())).thenReturn(List.of(new EventDto(), new EventDto()));
 
-        List<EventDto> result = eventService.getParticipatedEvents(1L);
+        List<EventDto> result = eventServiceImpl.getParticipatedEvents(1L);
 
         assertNotNull(result);
         assertEquals(2, result.size());

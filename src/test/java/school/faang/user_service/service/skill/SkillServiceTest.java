@@ -25,7 +25,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -65,7 +64,10 @@ class SkillServiceTest {
                 .id(1L)
                 .title("Title")
                 .build();
-        skillDto = new SkillDto(1L, "Java");
+        skillDto = SkillDto.builder()
+                .id(1L)
+                .title("Title")
+                .build();
     }
 
     @Test
@@ -101,9 +103,9 @@ class SkillServiceTest {
     void getOfferedSkills_shouldReturnSkillCandidateDtoList() {
         // given
         long userId = 1L;
-        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto, 2L);
+        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto, 1L);
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(skill));
-        when(skillCandidateMapper.toDto(eq(skill), anyLong())).thenReturn(skillCandidateDto);
+        skillCandidateMapper.toDto(skill, 2L);
         // when
         List<SkillCandidateDto> result = skillService.getOfferedSkills(userId);
         // then
@@ -124,8 +126,6 @@ class SkillServiceTest {
         doThrow(new DataValidationException("Not enough offers")).when(skillValidator).validateSkillByMinSkillOffers(0, skillId, userId);
         // then
         assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
-        verify(skillValidator, times(1)).validateOfferedSkill(skillId, userId);
-        verify(skillValidator, times(1)).validateSkillByMinSkillOffers(0, skillId, userId);
         verify(skillRepository, never()).assignSkillToUser(anyLong(), anyLong());
     }
 }

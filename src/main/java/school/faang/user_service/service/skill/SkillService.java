@@ -36,9 +36,7 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills(Long userId) {
         List<Skill> allSkillsByUserId = skillRepository.findAllByUserId(userId);
-        return allSkillsByUserId.stream()
-                .map(skillMapper::toDto)
-                .toList();
+        return skillMapper.toDto(allSkillsByUserId);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
@@ -52,11 +50,11 @@ public class SkillService {
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         skillValidator.validateOfferedSkill(skillId, userId);
-        List<SkillOffer> offeredSkills = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-        skillValidator.validateSkillByMinSkillOffers(offeredSkills.size(), skillId, userId);
+        List<SkillOffer> allSkillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+        skillValidator.validateSkillByMinSkillOffers(allSkillOffers.size(), skillId, userId);
         skillRepository.assignSkillToUser(skillId, userId);
-        addUserSkillGuarantee(offeredSkills);
-        return skillMapper.toDto(offeredSkills.get(0).getSkill());
+        addUserSkillGuarantee(allSkillOffers);
+        return skillMapper.toDto(allSkillOffers.get(0).getSkill());
     }
 
     private void addUserSkillGuarantee(List<SkillOffer> offeredSkills) {

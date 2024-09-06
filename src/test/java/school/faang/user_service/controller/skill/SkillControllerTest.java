@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.skill;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,10 +25,16 @@ class SkillControllerTest {
     @Mock
     private SkillService skillService;
 
+    private SkillDto skillDto;
+
+    @BeforeEach
+    void setUp() {
+        skillDto = SkillDto.builder().build();
+    }
+
     @Test
     void create_shouldReturnSkillDto() {
         // given
-        SkillDto skillDto = new SkillDto(1L, "Title");
         when(skillService.create(skillDto)).thenReturn(skillDto);
         // when
         SkillDto result = skillController.create(skillDto);
@@ -40,9 +47,7 @@ class SkillControllerTest {
     void getUserSkills_shouldReturnSkillDtoList() {
         // given
         long userId = 1L;
-        SkillDto skillDto1 = new SkillDto(userId, "Title 1");
-        SkillDto skillDto2 = new SkillDto(userId, "Title 2");
-        List<SkillDto> expectedSkills = List.of(skillDto1, skillDto2);
+        List<SkillDto> expectedSkills = List.of(skillDto);
         when(skillService.getUserSkills(userId)).thenReturn(expectedSkills);
         // when
         List<SkillDto> result = skillController.getUserSkills(userId);
@@ -55,13 +60,9 @@ class SkillControllerTest {
     void getOfferedSkills_shouldReturnSkillCandidateDtoList() {
         // given
         long userId = 1L;
-        long offeredSkillAmount1 = 2L;
-        long offeredSkillAmount2 = 4L;
-        SkillDto skillDto1 = new SkillDto(userId, "Title 1");
-        SkillDto skillDto2 = new SkillDto(userId, "Title 2");
-        SkillCandidateDto skillCandidateDto1 = new SkillCandidateDto(skillDto1, offeredSkillAmount1);
-        SkillCandidateDto skillCandidateDto2 = new SkillCandidateDto(skillDto2, offeredSkillAmount2);
-        List<SkillCandidateDto> offeredSkills = List.of(skillCandidateDto1, skillCandidateDto2);
+        long offeredSkillAmount = 2L;
+        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto, offeredSkillAmount);
+        List<SkillCandidateDto> offeredSkills = List.of(skillCandidateDto);
         when(skillService.getOfferedSkills(userId)).thenReturn(offeredSkills);
         // when
         List<SkillCandidateDto> result = skillController.getOfferedSkills(userId);
@@ -75,7 +76,6 @@ class SkillControllerTest {
         // given
         long userId = 1L;
         long skillId = 1L;
-        SkillDto skillDto = new SkillDto(userId, "Title");
         when(skillService.acquireSkillFromOffers(skillId, userId)).thenReturn(skillDto);
         // when
         SkillDto result = skillController.acquireSkillFromOffers(skillId, userId);

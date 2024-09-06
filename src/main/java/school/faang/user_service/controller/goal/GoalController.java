@@ -53,13 +53,13 @@ public class GoalController {
     }
 
     @GetMapping("/sub-goals/{parentGoalId}")
-    public List<GoalDto> findSubGoalsByParentGoalId(@PathVariable Long parentGoalId, @RequestBody GoalFilterDto filter) {
+    public List<GoalDto> findSubGoalsByParentGoalId(@PathVariable Long parentGoalId, GoalFilterDto filter) {
         List<Goal> foundGoals = goalService.findSubGoalsByParentGoalId(parentGoalId, filter);
         return goalMapper.toDtos(foundGoals);
     }
 
     @GetMapping("/user/{userId}")
-    public List<GoalDto> findGoalsByUser(@PathVariable long userId, @RequestBody GoalFilterDto filter) {
+    public List<GoalDto> findGoalsByUser(@PathVariable long userId, GoalFilterDto filter) {
         List<Goal> foundGoals = goalService.findGoalsByUserId(userId, filter);
         return goalMapper.toDtos(foundGoals);
     }

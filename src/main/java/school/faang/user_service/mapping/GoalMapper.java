@@ -47,17 +47,19 @@ public abstract class GoalMapper {
 
     @Named("mapSkillIdsToSkills")
     protected List<Skill> mapSkillIdsToSkills(List<Long> skillIds) {
-        if (skillIds == null || skillIds.isEmpty()) {
+        if (skillIds == null) {
             return null;
         }
+
         return skillRepository.findByIds(skillIds);
     }
 
     @Named("mapSkillsToIds")
     protected List<Long> mapSkillsToIds(List<Skill> skills) {
-        if (skills == null || skills.isEmpty()) {
+        if (skills == null) {
             return null;
         }
+
         return skills.stream()
             .map(Skill::getId)
             .toList();

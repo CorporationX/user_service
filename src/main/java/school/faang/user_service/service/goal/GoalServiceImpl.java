@@ -71,14 +71,16 @@ public class GoalServiceImpl implements GoalService {
     @Transactional(readOnly = true)
     public List<Goal> findSubGoalsByParentGoalId(Long parentGoalId, GoalFilterDto filterDto) {
         Predicate<Goal> predicate = combinePredicateFromFilter(filterDto);
-        return filterGoalsByPredicate(goalRepository.findByParent(parentGoalId), predicate);
+        Stream<Goal> subGoalsByParentGoal = goalRepository.findByParent(parentGoalId);
+        return filterGoalsByPredicate(subGoalsByParentGoal, predicate);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Goal> findGoalsByUserId(Long userId, GoalFilterDto filterDto) {
         Predicate<Goal> predicate = combinePredicateFromFilter(filterDto);
-        return filterGoalsByPredicate(goalRepository.findGoalsByUserId(userId), predicate);
+        Stream<Goal> goalsByUser = goalRepository.findGoalsByUserId(userId);
+        return filterGoalsByPredicate(goalsByUser, predicate);
     }
 
     private Goal findById(Long goalId) {
@@ -105,9 +107,7 @@ public class GoalServiceImpl implements GoalService {
         List<Skill> skills = skillRepository.findSkillsByGoalId(goal.getId());
         Goal foundGoal = goalRepository.findById(goal.getId()).get();
         foundGoal.getUsers().forEach(user -> {
-            for (Skill skill : skills) {
-                skillRepository.assignSkillToUser(skill.getId(), user.getId());
-            }
+            skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
         });
     }
 

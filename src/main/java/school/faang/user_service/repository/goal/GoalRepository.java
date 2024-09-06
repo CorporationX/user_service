@@ -8,13 +8,12 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
 public interface GoalRepository extends JpaRepository<Goal, Long> {
     @Query(nativeQuery = true, value = """
-            SELECT g.id, g.parent_goal_id, g.title, g.description, g.status, g.deadline, g.created_at, g.updated_at, g.mentor_id FROM goal g
+            SELECT g.* FROM goal g
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)

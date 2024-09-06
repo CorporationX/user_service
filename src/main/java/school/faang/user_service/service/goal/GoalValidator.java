@@ -29,9 +29,11 @@ public class GoalValidator {
     private final SkillRepository skillRepository;
 
     public void validateCreation(GoalDto goalDto) {
-        validate(goalDto);
-
         Long userId = goalDto.getUserId();
+        userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+
+        validateCommonRestrictions(goalDto);
 
         var alreadyExistedActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
         if (alreadyExistedActiveGoals >= maxExistedActiveGoals) {
@@ -40,11 +42,12 @@ public class GoalValidator {
     }
 
     public void validateUpdating(GoalDto goalDto) {
-        validate(goalDto);
+        validateCommonRestrictions(goalDto);
 
         Long goalId = goalDto.getGoalId();
         Goal goalFromDb = goalRepository.findById(goalId)
             .orElseThrow(() -> new ResourceNotFoundException("Goal", goalId));
+
         GoalStatus statusFromDb = goalFromDb.getStatus();
         if (statusFromDb == COMPLETED) {
             throw new BadRequestException("You cannot update Goal %s with the %s status.", goalId, statusFromDb);
@@ -56,11 +59,7 @@ public class GoalValidator {
         }
     }
 
-    private void validate(GoalDto goalDto) {
-        Long userId = goalDto.getUserId();
-        userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User", userId));
-
+    private void validateCommonRestrictions(GoalDto goalDto) {
         List<Long> skillIds = goalDto.getSkillIds();
         if (skillIds != null && skillIds.size() != skillRepository.countExisting(skillIds)) {
             throw new BadRequestException("Skills from request are not presented in DB");

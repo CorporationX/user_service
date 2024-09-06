@@ -1,7 +1,5 @@
 package school.faang.user_service.dto.goal;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoalDto {
-    @NotNull(message = "User id cannot be null", groups = {Create.class, Update.class})
+    @NotNull(message = "User id cannot be null", groups = {Create.class})
     private Long userId;
 
     @NotNull(message = "Status cannot be null", groups = Update.class)
@@ -35,7 +33,7 @@ public class GoalDto {
 
     @NotNull(message = "Description cannot be null", groups = {Create.class, Update.class})
     @NotBlank(message = "Description cannot be blank", groups = {Create.class, Update.class})
-    @Size(max = 128, message = "Description cannot be longer than 64 characters", groups = {Create.class, Update.class})
+    @Size(max = 128, message = "Description cannot be longer than 128 characters", groups = {Create.class, Update.class})
     private String description;
 
     private Long parentGoalId;

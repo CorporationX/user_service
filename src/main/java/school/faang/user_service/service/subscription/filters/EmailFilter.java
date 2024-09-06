@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 public class EmailFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getEmailPattern() != null;
+        return filters.emailPattern() != null;
     }
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
-                .filter(user -> user.getEmail().contains(filters.getEmailPattern()));
+                .filter(user -> user.getEmail().contains(filters.emailPattern()));
     }
 }

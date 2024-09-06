@@ -8,7 +8,7 @@ import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.subscription.ExistingSubscriptionException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.EntityNotFound;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.filters.UserFilter;
@@ -85,7 +85,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private void validateUser(Long userId) {
         if (subscriptionRepository.findById(userId).isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND.getMessage().formatted(userId));
+            throw new EntityNotFound(USER_NOT_FOUND.getMessage().formatted(userId));
         }
     }
 

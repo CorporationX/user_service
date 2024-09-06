@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 public class NameFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getNamePattern() != null;
+        return filters.namePattern() != null;
     }
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
-                .filter(user -> user.getUsername().contains(filters.getNamePattern()));
+                .filter(user -> user.getUsername().contains(filters.namePattern()));
     }
 }

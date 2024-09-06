@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.service.GoalInvitationService;
 
@@ -27,7 +28,7 @@ class GoalInvitationControllerTest {
 
     @BeforeEach
     void setUp() {
-        goalInvitationDto = new GoalInvitationDto (null, 1L, 1L, 1L, null);
+        goalInvitationDto = new GoalInvitationDto(null, 1L, 1L, 1L, null);
     }
 
     @Test
@@ -62,5 +63,30 @@ class GoalInvitationControllerTest {
         GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
                 () -> goalInvitationController.createInvitation(goalInvitationDto));
         assertEquals("GoalId must not be null", exception.getMessage());
+    }
+
+    @Test
+    void testGetInvitations_positive() {
+        InvitationFilterDto filterDto = new InvitationFilterDto();
+        filterDto.setInvitedId(1L);
+
+        goalInvitationController.getInvitations(filterDto);
+
+        Mockito.verify(service).getInvitations(filterDto);
+    }
+
+    @Test
+    void testGetInvitations_InvitationFilterDtoIsNull() {
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
+                () -> goalInvitationController.getInvitations(null));
+        assertEquals("InvitationFilterDto must not be null", exception.getMessage());
+    }
+
+    @Test
+    void testGetInvitations_InvitationFilterDtoWithAllFieldsAreNull() {
+        InvitationFilterDto filterDto = new InvitationFilterDto();
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
+                () -> goalInvitationController.getInvitations(filterDto));
+        assertEquals("At least one of field InvitationFilterDto must not be null", exception.getMessage());
     }
 }

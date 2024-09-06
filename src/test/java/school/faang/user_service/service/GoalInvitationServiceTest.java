@@ -8,12 +8,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.GoalInvitationValidationException;
+import school.faang.user_service.filter.goal.GoalInvitationFilter;
+import school.faang.user_service.filter.goal.GoalInvitationInvitedIdFilter;
+import school.faang.user_service.filter.goal.GoalInvitationInvitedNameFilter;
+import school.faang.user_service.filter.goal.GoalInvitationInviterIdFilter;
+import school.faang.user_service.filter.goal.GoalInvitationInviterNameFilter;
+import school.faang.user_service.filter.goal.GoalInvitationRequestStatusFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -38,6 +45,8 @@ class GoalInvitationServiceTest {
     private UserRepository userRepository;
     @Mock
     private GoalRepository goalRepository;
+    @Mock
+    private List<GoalInvitationFilter> goalInvitationFilters;
     @Mock
     private GoalInvitationMapper mapper;
 
@@ -218,4 +227,40 @@ class GoalInvitationServiceTest {
         assertEquals("Goal with id " + 1L + " is already in REJECTED status", exception.getMessage());
     }
 
+    @Test
+    void testGetInvitations_positive() {
+        InvitationFilterDto filterDto = new InvitationFilterDto(
+                "name", "name", 1L, 2L, RequestStatus.ACCEPTED);
+
+        GoalInvitation goalInvitation = new GoalInvitation();
+
+        User inviterUser = new User();
+        inviterUser.setUsername("name1");
+        inviterUser.setId(1L);
+        User invitedUser = new User();
+        invitedUser.setUsername("name2");
+        invitedUser.setId(2L);
+
+        goalInvitation.setInviter(inviterUser);
+        goalInvitation.setInvited(invitedUser);
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+
+        List<GoalInvitation> goalInvitations = List.of(goalInvitation);
+
+        // TODO: !!! тут не очень красиво, но не придумал как лучше
+        List<GoalInvitationFilter> filters = new ArrayList<>();
+        filters.add(new GoalInvitationInvitedIdFilter());
+        filters.add(new GoalInvitationInvitedNameFilter());
+        filters.add(new GoalInvitationInviterIdFilter());
+        filters.add(new GoalInvitationInviterNameFilter());
+        filters.add(new GoalInvitationRequestStatusFilter());
+
+        Mockito.when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
+        Mockito.when(goalInvitationFilters.stream()).thenReturn(filters.stream());
+
+        List<GoalInvitationDto> invitationDtos = goalInvitationService.getInvitations(filterDto);
+        assertEquals(1, invitationDtos.size());
+
+        Mockito.verify(goalInvitationRepository).findAll();
+    }
 }

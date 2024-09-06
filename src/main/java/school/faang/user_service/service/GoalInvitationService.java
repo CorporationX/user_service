@@ -3,17 +3,20 @@ package school.faang.user_service.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.GoalInvitationValidationException;
+import school.faang.user_service.filter.goal.GoalInvitationFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,7 @@ public class GoalInvitationService {
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
 
+    private final List<GoalInvitationFilter> goalInvitationFilters;
     private final GoalInvitationMapper mapper;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
@@ -114,5 +118,16 @@ public class GoalInvitationService {
         }
 
         goalInvitationRepository.updateStatusById(RequestStatus.REJECTED, id);
+    }
+
+    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
+        // TODO: !!! в лекции походу было не корректный пример со Stream
+        List<GoalInvitation> goalInvitations = new ArrayList<>(goalInvitationRepository.findAll());
+
+        goalInvitationFilters.stream()
+                .filter(f -> f.isApplicable(filter))
+                .forEach(f -> f.apply(goalInvitations, filter));
+
+        return goalInvitations.stream().map(mapper::toDto).toList();
     }
 }

@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.service.GoalInvitationService;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -53,5 +56,27 @@ public class GoalInvitationController {
     @GetMapping(value = "/reject/{goalId}")
     public void rejectGoalInvitation(@PathVariable long goalId) {
         service.rejectGoalInvitation(goalId);
+    }
+
+    @PostMapping(value = "/invitations",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
+
+        if (filter == null) {
+            throw new GoalInvitationValidationException("InvitationFilterDto must not be null");
+        }
+
+        if (filter.getInvitedNamePattern() == null
+                && filter.getInviterNamePattern() == null
+                && filter.getInviterId() == null
+                && filter.getInvitedId() == null
+                && filter.getStatus() == null
+
+        ) {
+            throw new GoalInvitationValidationException("At least one of field InvitationFilterDto must not be null");
+        }
+
+        return service.getInvitations(filter);
     }
 }

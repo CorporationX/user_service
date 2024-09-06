@@ -3,12 +3,18 @@ package school.faang.user_service.service.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recomendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
@@ -20,32 +26,43 @@ public class RecommendationRequestService {
     private final SkillRepository skillRepository;
 
 
-
-
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        if (!userRepository.existsById(recommendationRequestDto.getRequesterId()) || !userRepository.existsById(recommendationRequestDto.getReceiverId())) {
-            throw new IllegalArgumentException("Requester id or receiver id is wrong");
+        if (!isUsersInDb(recommendationRequestDto)) {
+            throw new NoSuchElementException("Requester id or receiver id is wrong");
         }
-//        if (!isSkillsInDb(recommendationRequestDto)) {
-//            throw new NoSuchElementException("No such skills in database");
-//        }
-        System.out.println("Next");
-        RecommendationRequest recommendationRequestEntity = recommendationRequestRepository.save(recommendationRequestMapper.mapToEntity(recommendationRequestDto));
-        System.out.println(recommendationRequestEntity);
-        System.out.println("=================");
-        System.out.println(recommendationRequestMapper.mapToDto(recommendationRequestEntity));
+        if (!isSkillsInDb(recommendationRequestDto)) {
+            throw new NoSuchElementException("No such skills in database");
+        }
+
+        List<SkillRequest> skillRequests = StreamSupport.stream(skillRequestRepository
+                .findAllById(recommendationRequestDto.getSkillsIds()).spliterator(), false).toList();
+
+        RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.mapToEntity(recommendationRequestDto);
+        recommendationRequestEntity.setSkills(skillRequests);
+        recommendationRequestRepository.save(recommendationRequestEntity);
         return recommendationRequestMapper.mapToDto(recommendationRequestEntity);
     }
 
-//    public boolean isSkillsInDb(RecommendationRequestDto recommendationRequestDto) {
-//        List<SkillRequest> skillRequests = (List<SkillRequest>) skillRequestRepository.findAllById(recommendationRequestDto.getSkillsId());
-//        List<Skill> skills = skillRequests.stream()
-//                .map(SkillRequest::getSkill)
-//                .toList();
-//        return skillRepository.existsAllByIdIn(skills);
+    private boolean isSkillsInDb(RecommendationRequestDto recommendationRequestDto) {
+        List<SkillRequest> skillRequests = (List<SkillRequest>) skillRequestRepository.findAllById(recommendationRequestDto.getSkillsIds());
+        List<Long> skillsIds = skillRequests.stream()
+                .map(SkillRequest::getSkill)
+                .map(Skill::getId)
+                .toList();
+        long existingSkillsCount = skillRepository.countExisting(skillsIds);
+        return existingSkillsCount == skillRequests.size();
     }
 
-//}
+    private boolean isUsersInDb(RecommendationRequestDto recommendationRequestDto) {
+        if (!userRepository.existsById(recommendationRequestDto.getRequesterId())) {
+            return false;
+        } else if (!userRepository.existsById(recommendationRequestDto.getReceiverId())) {
+            return false;
+        }
+        return true;
+    }
+
+}
 
 //    public boolean checkUsers(RecommendationRequestDto recommendationRequestDto) {
 //        List<Long> userIds = List.of(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());

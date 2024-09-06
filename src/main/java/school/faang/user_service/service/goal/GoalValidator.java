@@ -28,24 +28,15 @@ public class GoalValidator {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
 
-    private void validate(GoalDto goalDto) {
+    public void validateCreation(GoalDto goalDto) {
+        validate(goalDto);
+
         Long userId = goalDto.getUserId();
-        userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         var alreadyExistedActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
         if (alreadyExistedActiveGoals >= maxExistedActiveGoals) {
             throw new BadRequestException("User %s can have maximum %s goals", userId, maxExistedActiveGoals);
         }
-
-        List<Long> skillIds = goalDto.getSkillIds();
-        if (skillIds != null && skillIds.size() != skillRepository.countExisting(skillIds)) {
-            throw new BadRequestException("Skills from request are not presented in DB");
-        }
-    }
-
-    public void validateCreation(GoalDto goalDto) {
-        validate(goalDto);
     }
 
     public void validateUpdating(GoalDto goalDto) {
@@ -62,6 +53,23 @@ public class GoalValidator {
         GoalStatus statusFromDto = goalDto.getStatus();
         if (statusFromDto == COMPLETED && statusFromDb == ACTIVE && isEmpty(goalDto.getSkillIds())) {
             throw new BadRequestException("You cannot complete Goal %s with empty list of Goals.", goalId);
+        }
+    }
+
+    private void validate(GoalDto goalDto) {
+        Long userId = goalDto.getUserId();
+        userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+
+        List<Long> skillIds = goalDto.getSkillIds();
+        if (skillIds != null && skillIds.size() != skillRepository.countExisting(skillIds)) {
+            throw new BadRequestException("Skills from request are not presented in DB");
+        }
+
+        Long parentGoalId = goalDto.getParentGoalId();
+        if (parentGoalId != null) {
+            goalRepository.findById(parentGoalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Parent Goal", parentGoalId));
         }
     }
 }

@@ -91,7 +91,6 @@ class GoalValidatorTest extends CommonGoalTest {
         goalDto.setSkillIds(List.of(1L, 2L, 3L));
 
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
 
         when(skillRepository.countExisting(List.of(1L, 2L, 3L))).thenReturn(2);
 
@@ -138,13 +137,12 @@ class GoalValidatorTest extends CommonGoalTest {
     @Test
     void testValidateUpdating_activeGoalsForUserMoreThanLimit() {
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS);
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
             goalValidator.validateUpdating(goalDto)
         );
 
-        assertEquals("User 1 can have maximum 3 goals", exception.getMessage());
+        assertEquals("Goal null not found", exception.getMessage());
     }
 
     @Test
@@ -152,7 +150,6 @@ class GoalValidatorTest extends CommonGoalTest {
         goalDto.setSkillIds(List.of(1L, 2L, 3L));
 
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
 
         when(skillRepository.countExisting(List.of(1L, 2L, 3L))).thenReturn(2);
 
@@ -168,7 +165,6 @@ class GoalValidatorTest extends CommonGoalTest {
         goalDto.setGoalId(GOAL_ID);
 
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
         when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.empty());
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
@@ -184,7 +180,6 @@ class GoalValidatorTest extends CommonGoalTest {
         goal.setStatus(COMPLETED);
 
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
         when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
 
         BadRequestException exception = assertThrows(BadRequestException.class, () ->
@@ -200,7 +195,6 @@ class GoalValidatorTest extends CommonGoalTest {
         goalDto.setStatus(COMPLETED);
 
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
         when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
 
         BadRequestException exception = assertThrows(BadRequestException.class, () ->
@@ -217,9 +211,41 @@ class GoalValidatorTest extends CommonGoalTest {
         goalDto.setSkillIds(List.of(SKILL_ID));
 
         when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
-        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
         when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
         when(skillRepository.countExisting(List.of(SKILL_ID))).thenReturn(1);
+
+        assertDoesNotThrow(() -> goalValidator.validateUpdating(goalDto));
+    }
+
+    @Test
+    void testValidateUpdating_parentGoalNotPresentedInDb() {
+        goalDto.setGoalId(GOAL_ID);
+        goalDto.setStatus(COMPLETED);
+        goalDto.setSkillIds(List.of(SKILL_ID));
+        goalDto.setParentGoalId(PARENT_GOAL_ID);
+
+        when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
+        when(skillRepository.countExisting(List.of(SKILL_ID))).thenReturn(1);
+        when(goalRepository.findById(eq(PARENT_GOAL_ID))).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+            goalValidator.validateUpdating(goalDto)
+        );
+
+        assertEquals("Parent Goal " + PARENT_GOAL_ID + " not found", exception.getMessage());
+    }
+
+    @Test
+    void testValidateUpdating_parentGoalPresentedInDb() {
+        goalDto.setGoalId(GOAL_ID);
+        goalDto.setStatus(COMPLETED);
+        goalDto.setSkillIds(List.of(SKILL_ID));
+        goalDto.setParentGoalId(PARENT_GOAL_ID);
+
+        when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(User.builder().build()));
+        when(skillRepository.countExisting(List.of(SKILL_ID))).thenReturn(1);
+        when(goalRepository.findById(eq(PARENT_GOAL_ID))).thenReturn(Optional.of(Goal.builder().id(PARENT_GOAL_ID).build()));
+        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
 
         assertDoesNotThrow(() -> goalValidator.validateUpdating(goalDto));
     }

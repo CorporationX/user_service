@@ -8,6 +8,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository

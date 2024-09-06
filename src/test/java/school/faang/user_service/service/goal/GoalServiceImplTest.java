@@ -8,13 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.ResourceNotFoundException;
-import school.faang.user_service.mapping.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalDescriptionFilter;
@@ -48,15 +46,10 @@ class GoalServiceImplTest extends CommonGoalTest {
     @Mock
     private SkillRepository skillRepository;
 
-    @Mock
-    private GoalMapper goalMapper;
-
     @InjectMocks
     private GoalServiceImpl goalService;
 
     private static List<GoalFilter> goalFilters;
-
-    private GoalDto goalDto;
 
     private Goal goal;
 
@@ -74,44 +67,41 @@ class GoalServiceImplTest extends CommonGoalTest {
     void setUpEach() {
         ReflectionTestUtils.setField(goalService, "goalFilters", goalFilters);
 
-        goalDto = createGoalDto();
         goal = createGoal();
         filterDto = createGoalFilterDto();
     }
 
     @Test
     void testCreateGoal_successfullyCreatedWithEmptySkills() {
-        when(goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentGoalId())).thenReturn(goal);
+        when(goalRepository.create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null))).thenReturn(goal);
 
-        goalService.createGoal(goalDto);
+        goalService.createGoal(goal, USER_ID);
 
-        verify(goalRepository).create(eq(goalDto.getTitle()), eq(goalDto.getDescription()), eq(null));
+        verify(goalRepository).create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null));
         verify(skillRepository, times(0)).addSkillToGoal(anyLong(), anyLong());
-        verify(goalRepository).assignGoalToUser(eq(goal.getId()), eq(goalDto.getUserId()));
+        verify(goalRepository).assignGoalToUser(eq(goal.getId()), eq(USER_ID));
     }
 
     @Test
     void testCreateGoal_successWithSkills() {
-        goalDto.setSkillIds(SKILL_IDS);
+        goal.setSkillsToAchieve(List.of(Skill.builder().id(SKILL_ID).build()));
 
-        when(goalRepository.create(eq(goalDto.getTitle()), eq(goalDto.getDescription()), eq(goalDto.getParentGoalId()))).thenReturn(goal);
+        when(goalRepository.create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null))).thenReturn(goal);
         doNothing().when(skillRepository).addSkillToGoal(eq(SKILL_IDS.get(0)), eq(goal.getId()));
 
-        goalService.createGoal(goalDto);
+        goalService.createGoal(goal, USER_ID);
 
-        verify(goalRepository).create(eq(goalDto.getTitle()), eq(goalDto.getDescription()), eq(null));
+        verify(goalRepository).create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null));
         verify(skillRepository).addSkillToGoal(eq(SKILL_IDS.get(0)), eq(goal.getId()));
-        verify(goalRepository).assignGoalToUser(eq(goal.getId()), eq(goalDto.getUserId()));
+        verify(goalRepository).assignGoalToUser(eq(goal.getId()), eq(USER_ID));
     }
 
     @Test
     void testUpdateGoal_throwGoalNotFoundById() {
-        goalDto.setGoalId(GOAL_ID);
-
-        when(goalRepository.findById(goalDto.getGoalId())).thenReturn(Optional.empty());
+        when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.empty());
 
         ResourceNotFoundException goalNotFoundException = assertThrows(ResourceNotFoundException.class, () ->
-            goalService.updateGoal(goalDto)
+            goalService.updateGoal(goal)
         );
 
         assertEquals("Goal " + GOAL_ID + " not found", goalNotFoundException.getMessage());
@@ -119,16 +109,14 @@ class GoalServiceImplTest extends CommonGoalTest {
 
     @Test
     void deleteGoal_successfullyUpdatedWithoutSkills() {
-        goalDto.setGoalId(GOAL_ID);
-
         when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.of(goal));
         when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(0);
 
-        goalService.updateGoal(goalDto);
+        goalService.updateGoal(goal);
 
         verify(goalRepository).findById(eq(GOAL_ID));
         verify(goalRepository).update(eq(GOAL_ID), eq(GOAL_TITLE), eq(GOAL_DESCRIPTION),
-            eq(null), eq(goalDto.getStatus().ordinal()));
+            eq(null), eq(goal.getStatus().ordinal()));
         verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
         verify(skillRepository, times(0)).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
         verify(skillRepository, times(0)).findSkillsByGoalId(eq(GOAL_ID));
@@ -137,18 +125,17 @@ class GoalServiceImplTest extends CommonGoalTest {
 
     @Test
     void deleteGoal_successfullyUpdatedWithSkills() {
-        goalDto.setGoalId(GOAL_ID);
-        goalDto.setSkillIds(SKILL_IDS);
+        goal.setSkillsToAchieve(List.of(Skill.builder().id(SKILL_ID).build()));
 
         when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
         when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(0);
         doNothing().when(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
 
-        goalService.updateGoal(goalDto);
+        goalService.updateGoal(goal);
 
         verify(goalRepository).findById(eq(GOAL_ID));
         verify(goalRepository).update(eq(GOAL_ID), eq(GOAL_TITLE), eq(GOAL_DESCRIPTION),
-            eq(null), eq(goalDto.getStatus().ordinal()));
+            eq(null), eq(goal.getStatus().ordinal()));
         verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
         verify(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
         verify(skillRepository, times(0)).findSkillsByGoalId(anyLong());
@@ -157,23 +144,26 @@ class GoalServiceImplTest extends CommonGoalTest {
 
     @Test
     void deleteGoal_successfullyUpdatedFromActiveToCompleted() {
-        goalDto.setGoalId(GOAL_ID);
-        goalDto.setSkillIds(SKILL_IDS);
-        goalDto.setStatus(COMPLETED);
+        goal.setSkillsToAchieve(List.of(Skill.builder().id(SKILL_ID).build()));
+        goal.setStatus(COMPLETED);
 
         goal.setUsers(List.of(User.builder().id(USER_ID).build()));
 
         List<Skill> skillsFromDb = List.of(Skill.builder().id(SKILL_ID).build());
 
-        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
+        var goalFromDb = createGoal();
+        goalFromDb.setStatus(ACTIVE);
+        goalFromDb.setUsers(List.of(User.builder().id(USER_ID).build()));
+
+        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goalFromDb));
         when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(0);
         doNothing().when(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
         when(skillRepository.findSkillsByGoalId(eq(GOAL_ID))).thenReturn(skillsFromDb);
         doNothing().when(skillRepository).assignSkillToUser(eq(SKILL_ID), eq(USER_ID));
 
-        goalService.updateGoal(goalDto);
+        goalService.updateGoal(goal);
 
-        verify(goalRepository).findById(eq(GOAL_ID));
+        verify(goalRepository, times(2)).findById(eq(GOAL_ID));
         verify(goalRepository).update(anyLong(), anyString(), anyString(), eq(null), anyInt());
         verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
         verify(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
@@ -201,9 +191,8 @@ class GoalServiceImplTest extends CommonGoalTest {
     @Test
     void testFindSubtasksByGoalId_notFoundSubGoals() {
         when(goalRepository.findByParent(PARENT_GOAL_ID)).thenReturn(Stream.of());
-        when(goalMapper.toDto(List.of())).thenReturn(List.of());
 
-        List<GoalDto> result = goalService.findSubGoalsByParentGoalId(PARENT_GOAL_ID, filterDto);
+        List<Goal> result = goalService.findSubGoalsByParentGoalId(PARENT_GOAL_ID, filterDto);
         assertEquals(0, result.size());
     }
 
@@ -218,22 +207,18 @@ class GoalServiceImplTest extends CommonGoalTest {
         subGoalToNotFound.setUsers(List.of(User.builder().id(USER_ID).build()));
         subGoalToNotFound.setStatus(ACTIVE);
 
-        goalDto.setParentGoalId(PARENT_GOAL_ID);
-
         when(goalRepository.findByParent(eq(PARENT_GOAL_ID))).thenReturn(Stream.of(subGoalToFound, subGoalToNotFound));
-        when(goalMapper.toDto(eq(List.of(subGoalToFound)))).thenReturn(List.of(goalDto));
 
-        List<GoalDto> result = goalService.findSubGoalsByParentGoalId(PARENT_GOAL_ID, filterDto);
+        List<Goal> result = goalService.findSubGoalsByParentGoalId(PARENT_GOAL_ID, filterDto);
         assertEquals(1, result.size());
-        assertEquals(goalDto.getGoalId(), result.get(0).getGoalId());
+        assertEquals(goal.getId(), result.get(0).getId());
     }
 
     @Test
     void testGetGoalsByUser_notFoundSubGoals() {
         when(goalRepository.findGoalsByUserId(USER_ID)).thenReturn(Stream.of());
-        when(goalMapper.toDto(List.of())).thenReturn(List.of());
 
-        List<GoalDto> result = goalService.findGoalsByUserId(USER_ID, filterDto);
+        List<Goal> result = goalService.findGoalsByUserId(USER_ID, filterDto);
         assertEquals(0, result.size());
     }
 
@@ -249,11 +234,10 @@ class GoalServiceImplTest extends CommonGoalTest {
         subGoalToNotFound.setStatus(ACTIVE);
 
         when(goalRepository.findGoalsByUserId(eq(USER_ID))).thenReturn(Stream.of(subGoalToFound, subGoalToNotFound));
-        when(goalMapper.toDto(List.of(subGoalToFound))).thenReturn(List.of(goalDto));
 
-        List<GoalDto> result = goalService.findGoalsByUserId(USER_ID, filterDto);
+        List<Goal> result = goalService.findGoalsByUserId(USER_ID, filterDto);
 
         assertEquals(1, result.size());
-        assertEquals(goalDto.getGoalId(), result.get(0).getGoalId());
+        assertEquals(goal.getId(), result.get(0).getId());
     }
 }

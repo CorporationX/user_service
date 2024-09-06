@@ -3,13 +3,10 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.ResourceNotFoundException;
-import school.faang.user_service.mapping.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
@@ -29,28 +26,26 @@ import static school.faang.user_service.entity.goal.GoalStatus.COMPLETED;
 public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
-    private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
 
     @Override
-    public void createGoal(GoalDto goalDto) {
-        Goal createdGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentGoalId());
+    public void createGoal(Goal goal, Long userId) {
+        Goal createdGoal = goalRepository.create(
+            goal.getTitle(), goal.getDescription(), goal.getParent() == null ? null : goal.getParent().getId());
 
-        goalRepository.assignGoalToUser(createdGoal.getId(), goalDto.getUserId());
-        assignSkillsToGoal(goalDto, createdGoal.getId());
+        goalRepository.assignGoalToUser(createdGoal.getId(), userId);
+        assignSkillsToGoal(goal, createdGoal.getId());
     }
 
     @Override
-    public void updateGoal(GoalDto goalDto) {
-        Goal goalFromDb = findById(goalDto.getGoalId());
+    public void updateGoal(Goal goal) {
+        goalRepository.update(goal.getId(), goal.getTitle(), goal.getDescription(),
+            goal.getParent() == null ? null : goal.getParent().getId(), goal.getStatus().ordinal());
 
-        goalRepository.update(goalDto.getGoalId(), goalDto.getTitle(), goalDto.getDescription(),
-            goalDto.getParentGoalId(), goalDto.getStatus().ordinal());
+        updateSkills(goal);
 
-        updateSkills(goalDto);
-
-        if (isMakeGoalCompleted(goalDto, goalFromDb)) {
-            assignGoalSkillsToUsers(goalFromDb);
+        if (isMakeGoalCompleted(goal)) {
+            assignGoalSkillsToUsers(goal);
         }
     }
 
@@ -74,18 +69,16 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GoalDto> findSubGoalsByParentGoalId(Long parentGoalId, GoalFilterDto filterDto) {
+    public List<Goal> findSubGoalsByParentGoalId(Long parentGoalId, GoalFilterDto filterDto) {
         Predicate<Goal> predicate = combinePredicateFromFilter(filterDto);
-        List<Goal> filteredGoals = filterGoalsByPredicate(goalRepository.findByParent(parentGoalId), predicate);
-        return goalMapper.toDto(filteredGoals);
+        return filterGoalsByPredicate(goalRepository.findByParent(parentGoalId), predicate);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filterDto) {
+    public List<Goal> findGoalsByUserId(Long userId, GoalFilterDto filterDto) {
         Predicate<Goal> predicate = combinePredicateFromFilter(filterDto);
-        List<Goal> goals = filterGoalsByPredicate(goalRepository.findGoalsByUserId(userId), predicate);
-        return goalMapper.toDto(goals);
+        return filterGoalsByPredicate(goalRepository.findGoalsByUserId(userId), predicate);
     }
 
     private Goal findById(Long goalId) {
@@ -93,30 +86,34 @@ public class GoalServiceImpl implements GoalService {
             .orElseThrow(() -> new ResourceNotFoundException("Goal", goalId));
     }
 
-    private void updateSkills(GoalDto goalDto) {
-        skillRepository.deleteSkillsByGoalId(goalDto.getGoalId());
-        assignSkillsToGoal(goalDto, goalDto.getGoalId());
+    private void updateSkills(Goal goal) {
+        skillRepository.deleteSkillsByGoalId(goal.getId());
+        assignSkillsToGoal(goal, goal.getId());
     }
 
-    private void assignSkillsToGoal(GoalDto goalDto, Long goalId) {
-        List<Long> skillIds = goalDto.getSkillIds();
-        if (isNotEmpty(skillIds)) {
+    private void assignSkillsToGoal(Goal goal, Long goalId) {
+        List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
+        if (isNotEmpty(skillsToAchieve)) {
+            List<Long> skillIds = skillsToAchieve.stream()
+                .map(Skill::getId)
+                .toList();
             skillIds.forEach(skillId -> skillRepository.addSkillToGoal(skillId, goalId));
         }
     }
 
     private void assignGoalSkillsToUsers(Goal goal) {
         List<Skill> skills = skillRepository.findSkillsByGoalId(goal.getId());
-        List<User> users = goal.getUsers();
-        for (User user : users) {
+        Goal foundGoal = goalRepository.findById(goal.getId()).get();
+        foundGoal.getUsers().forEach(user -> {
             for (Skill skill : skills) {
                 skillRepository.assignSkillToUser(skill.getId(), user.getId());
             }
-        }
+        });
     }
 
-    private boolean isMakeGoalCompleted(GoalDto dto, Goal goal) {
-        return dto.getStatus() == COMPLETED && goal.getStatus() == ACTIVE;
+    private boolean isMakeGoalCompleted(Goal goal) {
+        Goal goalFromDb = findById(goal.getId());
+        return goal.getStatus() == COMPLETED && goalFromDb.getStatus() == ACTIVE;
     }
 
     private Predicate<Goal> combinePredicateFromFilter(GoalFilterDto filterDto) {

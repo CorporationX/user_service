@@ -1,6 +1,5 @@
 package school.faang.user_service.service.goal;
 
-import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
@@ -18,15 +17,6 @@ public abstract class CommonGoalTest {
     protected static final List<Long> SKILL_IDS = List.of(SKILL_ID);
     protected static final String GOAL_FILTER_TITLE = "Developer";
     protected static final String GOAL_FILTER_DESCRIPTION = "Java";
-
-    protected GoalDto createGoalDto() {
-        return GoalDto.builder()
-            .userId(USER_ID)
-            .title(GOAL_TITLE)
-            .description(GOAL_DESCRIPTION)
-            .status(ACTIVE)
-            .build();
-    }
 
     protected Goal createGoal() {
         return Goal.builder()

@@ -15,6 +15,8 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.validation.group.Create;
 import school.faang.user_service.dto.validation.group.Update;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapping.GoalMapper;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.goal.GoalValidator;
 
@@ -28,18 +30,21 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class GoalController {
     private final GoalValidator goalValidator;
     private final GoalService goalService;
+    private final GoalMapper goalMapper;
 
     @PostMapping
     @ResponseStatus(CREATED)
     public void createGoal(@RequestBody @Validated(Create.class) GoalDto goalDto) {
         goalValidator.validateCreation(goalDto);
-        goalService.createGoal(goalDto);
+        var goal = goalMapper.toEntity(goalDto);
+        goalService.createGoal(goal, goalDto.getUserId());
     }
 
     @PutMapping
     public void updateGoal(@RequestBody @Validated(Update.class) GoalDto goalDto) {
         goalValidator.validateUpdating(goalDto);
-        goalService.updateGoal(goalDto);
+        var goal = goalMapper.toEntity(goalDto);
+        goalService.updateGoal(goal);
     }
 
     @DeleteMapping("/{goalId}")
@@ -49,11 +54,13 @@ public class GoalController {
 
     @GetMapping("/sub-goals/{parentGoalId}")
     public List<GoalDto> findSubGoalsByParentGoalId(@PathVariable Long parentGoalId, @RequestBody GoalFilterDto filter) {
-        return goalService.findSubGoalsByParentGoalId(parentGoalId, filter);
+        List<Goal> foundGoals = goalService.findSubGoalsByParentGoalId(parentGoalId, filter);
+        return goalMapper.toDtos(foundGoals);
     }
 
     @GetMapping("/user/{userId}")
     public List<GoalDto> findGoalsByUser(@PathVariable long userId, @RequestBody GoalFilterDto filter) {
-        return goalService.findGoalsByUserId(userId, filter);
+        List<Goal> foundGoals = goalService.findGoalsByUserId(userId, filter);
+        return goalMapper.toDtos(foundGoals);
     }
 }

@@ -1,15 +1,13 @@
 package school.faang.user_service.dto.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class EventFilterDto {
+@Getter
+@Setter
+public class EventFilters {
     private String title;
     private LocalDateTime startDate;
     private String location;

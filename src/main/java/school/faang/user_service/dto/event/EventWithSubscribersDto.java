@@ -1,13 +1,17 @@
 package school.faang.user_service.dto.event;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class EventWithSubscribersDto {
     private Long id;
     private String title;
@@ -17,8 +21,8 @@ public class EventWithSubscribersDto {
     private String description;
     private List<Long> relatedSkillsIds;
     private String location;
-    private int maxAttendees;
-    private int subscribersCount;
+    private Integer maxAttendees;
+    private Integer subscribersCount;
     private EventType type;
     private EventStatus status;
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper.event;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -8,148 +9,145 @@ import school.faang.user_service.dto.event.EventWithSubscribersDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-
-class EventMapperTest {
-    private EventMapper eventMapper;
+public class EventMapperTest {
+    private final EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
+    private Event event;
+    private User user;
 
     @BeforeEach
-    void setUp() {
-        eventMapper = Mappers.getMapper(EventMapper.class);
+    public void setUp() {
+        user = createUser(1L, "Misha");
+
+        Skill skill1 = createSkill(1L, "Java");
+        Skill skill2 = createSkill(2L, "Spring");
+        List<Skill> relatedSkills = Arrays.asList(skill1, skill2);
+
+        event = createEvent(100L, "Test Event", user, relatedSkills, "New York", 50);
     }
 
     @Test
-    void testEventToEventDtoMapping() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("test_user");
+    public void toDto_ShouldMapEventToEventDto() {
+        EventDto actualDto = eventMapper.toDto(event);
 
-        Skill skill = new Skill();
-        skill.setId(1L);
-        skill.setTitle("Java");
+        EventDto expectedDto = createExpectedEventDto(event);
+        Assertions.assertThat(actualDto)
+                .usingRecursiveComparison()
+                .ignoringFields("relatedSkillsIds")
+                .isEqualTo(expectedDto);
+    }
 
+    @Test
+    public void toDtoList_ShouldMapEventListToEventDtoList() {
+        List<Event> events = Arrays.asList(event);
+
+        List<EventDto> actualDtos = eventMapper.toDto(events);
+
+        List<EventDto> expectedDtos = events.stream()
+                .map(this::createExpectedEventDto)
+                .collect(Collectors.toList());
+
+        Assertions.assertThat(actualDtos)
+                .usingRecursiveComparison()
+                .ignoringFields("relatedSkillsIds")
+                .isEqualTo(expectedDtos);
+    }
+
+    @Test
+    public void toEventWithSubscribersDto_ShouldMapEventToEventWithSubscribersDto() {
+        int subscribersCount = 100;
+
+        EventWithSubscribersDto actualDto = eventMapper.toEventWithSubscribersDto(event, subscribersCount);
+
+        EventWithSubscribersDto expectedDto = createExpectedEventWithSubscribersDto(event, subscribersCount);
+        Assertions.assertThat(actualDto)
+                .usingRecursiveComparison()
+                .ignoringFields("relatedSkillsIds")
+                .isEqualTo(expectedDto);
+    }
+
+    @Test
+    public void toFilteredEventsDto_ShouldMapEventListToFilteredEventsDto() {
+        List<Event> events = Arrays.asList(event);
+
+        List<EventDto> actualDtos = eventMapper.toFilteredEventsDto(events);
+
+        List<EventDto> expectedDtos = events.stream()
+                .map(this::createExpectedEventDto)
+                .collect(Collectors.toList());
+
+        Assertions.assertThat(actualDtos)
+                .usingRecursiveComparison()
+                .ignoringFields("relatedSkillsIds", "ownerUsername")
+                .isEqualTo(expectedDtos);
+    }
+
+    private EventDto createExpectedEventDto(Event event) {
+        EventDto dto = new EventDto();
+        dto.setId(event.getId());
+        dto.setTitle(event.getTitle());
+        dto.setStartDate(event.getStartDate());
+        dto.setEndDate(event.getEndDate());
+        dto.setOwnerId(event.getOwner().getId());
+        dto.setDescription(event.getDescription());
+        dto.setRelatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()));
+        dto.setLocation(event.getLocation());
+        dto.setType(event.getType());
+        dto.setStatus(event.getStatus());
+        dto.setMaxAttendees(event.getMaxAttendees());
+        return dto;
+    }
+
+    private EventWithSubscribersDto createExpectedEventWithSubscribersDto(Event event, int subscribersCount) {
+        EventWithSubscribersDto dto = new EventWithSubscribersDto();
+        dto.setId(event.getId());
+        dto.setTitle(event.getTitle());
+        dto.setStartDate(event.getStartDate());
+        dto.setEndDate(event.getEndDate());
+        dto.setOwnerId(event.getOwner().getId());
+        dto.setDescription(event.getDescription());
+        dto.setRelatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()));
+        dto.setLocation(event.getLocation());
+        dto.setMaxAttendees(event.getMaxAttendees());
+        dto.setSubscribersCount(subscribersCount);
+        dto.setType(event.getType());
+        dto.setStatus(event.getStatus());
+        return dto;
+    }
+
+    private Event createEvent(Long id, String title, User owner, List<Skill> relatedSkills, String location, int maxAttendees) {
         Event event = new Event();
-        event.setId(1L);
-        event.setTitle("Java Conference");
-        event.setDescription("A conference about Java");
+        event.setId(id);
+        event.setTitle(title);
+        event.setOwner(owner);
+        event.setRelatedSkills(relatedSkills);
         event.setStartDate(LocalDateTime.now());
         event.setEndDate(LocalDateTime.now().plusDays(1));
-        event.setLocation("New York");
-        event.setMaxAttendees(100);
-        event.setOwner(user);
-        event.setRelatedSkills(List.of(skill));
-
-        EventDto eventDto = eventMapper.toDto(event);
-
-        assertNotNull(eventDto);
-        assertEquals(event.getId(), eventDto.getId());
-        assertEquals(event.getTitle(), eventDto.getTitle());
-        assertEquals(event.getDescription(), eventDto.getDescription());
-        assertEquals(event.getStartDate(), eventDto.getStartDate());
-        assertEquals(event.getEndDate(), eventDto.getEndDate());
-        assertEquals(event.getLocation(), eventDto.getLocation());
-        assertEquals(event.getMaxAttendees(), eventDto.getMaxAttendees());
-        assertEquals(event.getOwner().getId(), eventDto.getOwnerId());
-        assertEquals(1, eventDto.getRelatedSkillsIds().size());
-        assertEquals(1L, eventDto.getRelatedSkillsIds().get(0));
+        event.setLocation(location);
+        event.setMaxAttendees(maxAttendees);
+        event.setType(EventType.WEBINAR);
+        event.setStatus(EventStatus.PLANNED);
+        return event;
     }
 
-    @Test
-    void testEventDtoToEventMapping() {
-        EventDto eventDto = new EventDto();
-        eventDto.setId(1L);
-        eventDto.setTitle("Java Conference");
-        eventDto.setDescription("A conference about Java");
-        eventDto.setStartDate(LocalDateTime.now());
-        eventDto.setEndDate(LocalDateTime.now().plusDays(1));
-        eventDto.setLocation("New York");
-        eventDto.setMaxAttendees(100);
-        eventDto.setOwnerId(1L);
-        eventDto.setRelatedSkillsIds(List.of(1L));
-
-        Event event = eventMapper.toEvent(eventDto);
-
-        assertNotNull(event);
-        assertEquals(eventDto.getId(), event.getId());
-        assertEquals(eventDto.getTitle(), event.getTitle());
-        assertEquals(eventDto.getDescription(), event.getDescription());
-        assertEquals(eventDto.getStartDate(), event.getStartDate());
-        assertEquals(eventDto.getEndDate(), event.getEndDate());
-        assertEquals(eventDto.getLocation(), event.getLocation());
-        assertEquals(eventDto.getMaxAttendees(), event.getMaxAttendees());
-    }
-
-    @Test
-    void testEventToEventWithSubscribersDtoMapping() {
+    private User createUser(Long id, String username) {
         User user = new User();
-        user.setId(1L);
-        user.setUsername("test_user");
-
-        Skill skill = new Skill();
-        skill.setId(1L);
-        skill.setTitle("Java");
-
-        Event event = new Event();
-        event.setId(1L);
-        event.setTitle("Java Conference");
-        event.setDescription("A conference about Java");
-        event.setStartDate(LocalDateTime.now());
-        event.setEndDate(LocalDateTime.now().plusDays(1));
-        event.setLocation("New York");
-        event.setMaxAttendees(100);
-        event.setOwner(user);
-        event.setRelatedSkills(List.of(skill));
-
-        EventWithSubscribersDto eventWithSubscribersDto = eventMapper.toEventWithSubscribersDto(event);
-
-        assertNotNull(eventWithSubscribersDto);
-        assertEquals(event.getId(), eventWithSubscribersDto.getId());
-        assertEquals(event.getTitle(), eventWithSubscribersDto.getTitle());
-        assertEquals(event.getDescription(), eventWithSubscribersDto.getDescription());
-        assertEquals(event.getStartDate(), eventWithSubscribersDto.getStartDate());
-        assertEquals(event.getEndDate(), eventWithSubscribersDto.getEndDate());
-        assertEquals(event.getLocation(), eventWithSubscribersDto.getLocation());
-        assertEquals(event.getMaxAttendees(), eventWithSubscribersDto.getMaxAttendees());
-        assertEquals(event.getOwner().getId(), eventWithSubscribersDto.getOwnerId());
-        assertEquals(1, eventWithSubscribersDto.getRelatedSkillsIds().size());
-        assertEquals(1L, eventWithSubscribersDto.getRelatedSkillsIds().get(0));
+        user.setId(id);
+        user.setUsername(username);
+        return user;
     }
 
-    @Test
-    void testEventListToEventDtoListMapping() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("test_user");
-
+    private Skill createSkill(Long id, String title) {
         Skill skill = new Skill();
-        skill.setId(1L);
-        skill.setTitle("Java");
-
-        Event event1 = new Event();
-        event1.setId(1L);
-        event1.setTitle("Java Conference");
-        event1.setOwner(user);
-        event1.setRelatedSkills(List.of(skill));
-
-        Event event2 = new Event();
-        event2.setId(2L);
-        event2.setTitle("Spring Boot Workshop");
-        event2.setOwner(user);
-        event2.setRelatedSkills(List.of(skill));
-
-        List<EventDto> eventDtos = eventMapper.toDto(List.of(event1, event2));
-
-        assertNotNull(eventDtos);
-        assertEquals(2, eventDtos.size());
-        assertEquals(event1.getId(), eventDtos.get(0).getId());
-        assertEquals(event1.getTitle(), eventDtos.get(0).getTitle());
-        assertEquals(event2.getId(), eventDtos.get(1).getId());
-        assertEquals(event2.getTitle(), eventDtos.get(1).getTitle());
+        skill.setId(id);
+        skill.setTitle(title);
+        return skill;
     }
 }

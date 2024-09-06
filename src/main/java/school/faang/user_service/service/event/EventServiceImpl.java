@@ -2,147 +2,146 @@ package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.dto.event.EventWithSubscribersDto;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.EventFilters;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.exceptions.InsufficientSkillsException;
 import school.faang.user_service.mapper.event.EventMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
-import school.faang.user_service.service.event.util.EventUpdater;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-@Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional
+@Service
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
 
     @Override
-    public EventDto create(EventDto eventDto) {
-        List<Skill> relatedSkills = getEventSkillsFromDbByIds(eventDto.getRelatedSkillsIds());
-        User user = loadUserById(eventDto.getOwnerId());
+    public Event create(Event event) {
+        log.info("Создание события с title: {}", event.getTitle());
+
+        User user = loadUserById(event.getOwner().getId());
+        List<Skill> relatedSkills = event.getRelatedSkills();
 
         validateUserSkills(user, relatedSkills);
 
-        Event event = eventMapper.toEvent(eventDto);
-        event.setRelatedSkills(relatedSkills);
         event.setOwner(user);
+        event.setRelatedSkills(relatedSkills);
 
-        return eventMapper.toDto(eventRepository.save(event));
+        return eventRepository.save(event);
     }
 
     @Override
-    public EventDto getEvent(Long eventId) {
-        return eventMapper.toDto(findById(eventId));
+    @Transactional(readOnly = true)
+    public Event getEvent(Long eventId) {
+        log.info("Получение события с ID: {}", eventId);
+        return findById(eventId);
     }
 
     @Override
-    public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
-        Stream<Event> eventStream = eventRepository.findAll().stream();
+    @Transactional(readOnly = true)
+    public List<Event> getEventsByFilter(EventFilters eventFilters) {
+        log.info("Фильтрация событий по критериям: {}", eventFilters);
 
-        eventStream = eventFilters.stream()
-                .filter(filter -> filter.isApplicable(eventFilterDto))
-                .reduce(eventStream, (stream, filter) -> filter.apply(stream, eventFilterDto), (s1, s2) -> s1);
+        List<Event> filteredEvents = this.eventFilters.stream()
+                .filter(filter -> filter.isApplicable(eventFilters))
+                .reduce(eventRepository.findAll().stream(),
+                        (stream, filter) -> filter.apply(stream, eventFilters),
+                        (s1, s2) -> s1)
+                .toList();
 
-        return eventMapper.toFilterDto(eventStream.toList());
+        log.info("Найдено {} событий по заданным критериям", filteredEvents.size());
+
+        return filteredEvents;
     }
 
     @Override
-    public EventWithSubscribersDto updateEvent(EventDto eventDto) {
-        Event existingEvent = findById(eventDto.getId());
+    public Event updateEvent(Event event) {
+        log.info("Обновление события с ID: {}", event.getId());
 
-        List<Skill> relatedSkills = getEventSkillsFromDbByIds(eventDto.getRelatedSkillsIds());
-        User user = loadUserById(eventDto.getOwnerId());
+        Event existingEvent = findById(event.getId());
+
+        User user = loadUserById(event.getOwner().getId());
+        List<Skill> relatedSkills = event.getRelatedSkills();
 
         validateUserSkills(user, relatedSkills);
 
-        updateEventFields(existingEvent, eventDto, relatedSkills, user);
+        eventMapper.updateEventFromDto(existingEvent, event);
 
-        Event updatedEvent = eventRepository.save(existingEvent);
-
-        EventWithSubscribersDto updatedEventDto = eventMapper.toEventWithSubscribersDto(updatedEvent);
-        updatedEventDto.setSubscribersCount(getFollowersCount(user));
-        return updatedEventDto;
+        return eventRepository.save(existingEvent);
     }
 
     @Override
-    public List<EventDto> getOwnedEvents(Long userId) {
-        return eventMapper.toDto(eventRepository.findAllByUserId(userId));
+    @Transactional(readOnly = true)
+    public Integer getSubscribersCount(Event event) {
+        log.info("Получение количества подписчиков у пользователя с ID: {}", event.getOwner().getId());
+        return event.getOwner().getFollowers().size();
     }
 
     @Override
-    public List<EventDto> getParticipatedEvents(Long userId) {
-        return eventMapper.toDto(eventRepository.findParticipatedEventsByUserId(userId));
+    @Transactional(readOnly = true)
+    public List<Event> getOwnedEvents(Long userId) {
+        log.info("Получение событий, созданных пользователем с ID: {}", userId);
+        return eventRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Event> getParticipatedEvents(Long userId) {
+        log.info("Получение событий, в которых участвовал пользователь с ID: {}", userId);
+        return eventRepository.findParticipatedEventsByUserId(userId);
     }
 
     @Override
     public void deleteEvent(Long eventId) {
+        log.info("Удаление события с ID: {}", eventId);
         try {
             eventRepository.deleteById(eventId);
+            log.info("Событие с ID {} успешно удалено", eventId);
         } catch (EmptyResultDataAccessException e) {
+            log.error("Ошибка удаления. Событие с ID {} не найдено", eventId);
             throw new EntityNotFoundException("Событие с ID " + eventId + " не найдено.");
         }
     }
 
-    private void updateEventFields(Event existingEvent, EventDto eventDto, List<Skill> relatedSkills,
-                                   User user) {
-        EventUpdater eventUpdater = new EventUpdater(existingEvent)
-                .withTitle(eventDto.getTitle())
-                .withDescription(eventDto.getDescription())
-                .withStartDate(eventDto.getStartDate())
-                .withEndDate(eventDto.getEndDate())
-                .withLocation(eventDto.getLocation())
-                .withMaxAttendees(eventDto.getMaxAttendees())
-                .withRelatedSkills(relatedSkills)
-                .withEventType(eventDto.getType())
-                .withEventStatus(eventDto.getStatus())
-                .withOwner(user);
-
-        eventUpdater.build();
-    }
-
-    private boolean checkUserSkills(User user, List<Skill> requiredSkills) {
+    private void validateUserSkills(User user, List<Skill> relatedSkills) {
+        log.info("Проверка навыков пользователя с ID: {}", user.getId());
         List<Skill> userSkills = Optional.ofNullable(user.getSkills()).orElse(new ArrayList<>());
-        return userSkills.containsAll(requiredSkills);
-    }
-
-    private List<Skill> getEventSkillsFromDbByIds(List<Long> skillIds) {
-        return skillRepository.findAllById(skillIds);
-    }
-
-    private User loadUserById(Long id) {
-        return userRepository.findById(id).orElseThrow();
-    }
-
-    private int getFollowersCount(User user) {
-        return user.getFollowers().size();
-    }
-
-    private Event findById(Long id) {
-        return eventRepository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Событие с ID " + id + " не найдено."));
-    }
-
-    private void validateUserSkills(User user, List<Skill> requiredSkills) {
-        if (!checkUserSkills(user, requiredSkills)) {
+        if (!userSkills.containsAll(relatedSkills)) {
+            log.error("У пользователя с ID {} недостаточно навыков для события", user.getId());
             throw new InsufficientSkillsException(
                     "Пользователь не обладает необходимыми навыками для проведения этого события.");
         }
+    }
+
+    private User loadUserById(Long id) {
+        log.info("Загрузка пользователя с ID: {}", id);
+        return userRepository.findById(id).orElseThrow(() -> {
+            log.error("Пользователь с ID {} не найден", id);
+            return new EntityNotFoundException("Пользователь с ID " + id + " не найден.");
+        });
+    }
+
+    private Event findById(Long id) {
+        log.info("Поиск события с ID: {}", id);
+        return eventRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Событие с ID {} не найдено", id);
+                    return new EntityNotFoundException("Событие с ID " + id + " не найдено.");
+                });
     }
 }

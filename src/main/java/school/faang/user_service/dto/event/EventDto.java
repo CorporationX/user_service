@@ -44,5 +44,5 @@ public class EventDto {
     @NotNull(message = "Статус события не может быть пустым.")
     private EventStatus status;
 
-    private int maxAttendees;
+    private Integer maxAttendees;
 }

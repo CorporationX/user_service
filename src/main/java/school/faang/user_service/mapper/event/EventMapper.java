@@ -2,14 +2,14 @@ package school.faang.user_service.mapper.event;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventWithSubscribersDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.entity.event.EventType;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -31,11 +31,11 @@ public interface EventMapper {
     @Mapping(source = "relatedSkills", target = "relatedSkillsIds", qualifiedByName = "mapIdsSkills")
     @Mapping(source = "owner.id", target = "ownerId")
     @Mapping(source = "owner.username", target = "ownerUsername")
-    List<EventDto> toFilterDto(List<Event> events);
+    List<EventDto> toFilteredEventsDto(List<Event> events);
 
-    @Mapping(source = "relatedSkills", target = "relatedSkillsIds", qualifiedByName = "mapIdsSkills")
-    @Mapping(source = "owner.id", target = "ownerId")
-    EventWithSubscribersDto toEventWithSubscribersDto(Event event);
+    @Mapping(source = "event.relatedSkills", target = "relatedSkillsIds", qualifiedByName = "mapIdsSkills")
+    @Mapping(source = "event.owner.id", target = "ownerId")
+    EventWithSubscribersDto toEventWithSubscribersDto(Event event, Integer subscribersCount);
 
     @Named("mapIdsSkills")
     default List<Long> mapIdsSkills(List<Skill> skills) {
@@ -43,4 +43,5 @@ public interface EventMapper {
                 .map(Skill::getId)
                 .toList();
     }
+    void updateEventFromDto(@MappingTarget Event existingEvent, Event event);
 }

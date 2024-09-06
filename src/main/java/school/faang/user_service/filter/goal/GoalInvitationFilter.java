@@ -9,5 +9,5 @@ public interface GoalInvitationFilter {
 
     boolean isApplicable(InvitationFilterDto filter);
 
-    void apply(Stream<GoalInvitation> goalInvitations, InvitationFilterDto filter);
+    Stream<GoalInvitation> apply(Stream<GoalInvitation> goalInvitations, InvitationFilterDto filter);
 }

@@ -4,5 +4,10 @@ import lombok.Builder;
 import school.faang.user_service.entity.RequestStatus;
 
 @Builder
-public record InvitationFilterDto(String inviterNamePattern, String invitedNamePattern, Long inviterId, Long invitedId, RequestStatus status) {
+public record InvitationFilterDto(
+        String inviterNamePattern,
+        String invitedNamePattern,
+        Long inviterId,
+        Long invitedId,
+        RequestStatus status) {
 }

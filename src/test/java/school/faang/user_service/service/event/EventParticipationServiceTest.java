@@ -1,6 +1,5 @@
 package school.faang.user_service.service.event;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +15,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.sevice.event.EventParticipationService;
+import school.faang.user_service.validator.EventParticipationServiceValidator;
 
 import java.util.List;
 
@@ -25,6 +25,8 @@ class EventParticipationServiceTest {
     private EventParticipationRepository repository;
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
+    @Mock
+    private EventParticipationServiceValidator validator;
     @InjectMocks
     private EventParticipationService service;
 
@@ -37,18 +39,9 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    void testUserAlreadyRegister() {
-        Mockito.when(repository.findAllParticipantsByEventId(1))
-                .thenReturn(List.of(user));
-
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> service.registerParticipant(1, 1));
-    }
-
-    @Test
-    void testUserIsRegister() {
-        Mockito.when(repository.findAllParticipantsByEventId(1))
-                .thenReturn(List.of(user));
+    void testUserRegister() {
+        Mockito.doNothing().when(validator).validateEvent(1L);
+        Mockito.doNothing().when(validator).validateUserRegister(1L, 2L);
 
         service.registerParticipant(1, 2);
         Mockito.verify(repository, Mockito.times(1))
@@ -56,7 +49,19 @@ class EventParticipationServiceTest {
     }
 
     @Test
+    void testUserUnregister() {
+        Mockito.doNothing().when(validator).validateEvent(1L);
+        Mockito.doNothing().when(validator).validateUserUnregister(1L, 2L);
+
+        service.unregisterParticipant(1, 2);
+        Mockito.verify(repository, Mockito.times(1))
+                .unregister(1, 2);
+    }
+
+    @Test
     void testGetParticipant() {
+        Mockito.doNothing().when(validator).validateEvent(1L);
+
         Mockito.when(repository.findAllParticipantsByEventId(1))
                 .thenReturn(List.of(user));
 
@@ -70,10 +75,11 @@ class EventParticipationServiceTest {
 
     @Test
     void testGetParticipantsCount() {
+        Mockito.doNothing().when(validator).validateEvent(1L);
+
         service.getParticipantsCount(1L);
 
         Mockito.verify(repository, Mockito.times(1))
                 .countParticipants(1L);
-
     }
 }

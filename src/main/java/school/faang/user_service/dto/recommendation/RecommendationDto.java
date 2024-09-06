@@ -28,7 +28,6 @@ public class RecommendationDto {
     @Positive(message="receiverId should be positive")
     private Long receiverId;
     private List<@Valid SkillOfferDto> skillOffers;
-    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 }

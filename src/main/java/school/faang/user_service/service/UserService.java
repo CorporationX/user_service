@@ -8,8 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
 import school.faang.user_service.dto.ProfileViewEvent;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.ProfilePicEvent;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -17,8 +18,8 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.redisPublisher.ProfilePicEventPublisher;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.redisPublisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -78,9 +79,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserTransportDto> getUsersByIds(List<Long> ids) {
         Stream<User> userStream = userRepository.findAllById(ids).stream();
-        return userStream.map(userMapper::toDto).toList();
+        return userStream.map(userMapper::toTransportDto).toList();
     }
 
     @Transactional
@@ -93,15 +94,18 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
     public boolean checkUserExistence(long userId) {
         return userRepository.existsById(userId);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUserFollowers(long userId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
         return user.getFollowers().stream().map(userMapper::toDto).toList();
     }
 
+    @Transactional(readOnly = true)
     public boolean checkAllFollowersExist(List<Long> followerIds) {
         return userValidator.doAllUsersExist(followerIds);
     }

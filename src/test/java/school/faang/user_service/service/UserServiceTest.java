@@ -7,7 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -66,11 +67,11 @@ class UserServiceTest {
     private long authorId;
     private User user;
     private UserDto userDto;
+    private UserTransportDto userTransportDto;
     private User mentee;
     private Goal mentorAssignedGoal;
-    private List<User> users;
     private List<Long> userIds;
-    private List<UserDto> userDtoList;
+    private List<UserTransportDto> userTransportDtoList;
     private List<User> userFollowers;
 
     @BeforeEach
@@ -82,6 +83,7 @@ class UserServiceTest {
 
         userId = 1L;
         authorId = 2L;
+        userIds = List.of(userId);
         long countryId = 2L;
         userFollowers = List.of(new User());
 
@@ -106,11 +108,23 @@ class UserServiceTest {
                 .goals(goalList)
                 .ownedEvents(ownedEvents)
                 .mentees(menteesList).build();
+        userDto = UserDto.builder()
+                .id(userId)
+                .username("username")
+                .country(1L)
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
+        userTransportDto = UserTransportDto.builder()
+                .id(userId)
+                .username("username")
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
 
         userIds = List.of(userId);
-        users = List.of(user);
+        userTransportDtoList = List.of(userTransportDto);
 
-        userDtoList = List.of(userDto);
         Goal goal = Goal.builder()
                 .id(1L)
                 .users(userList).build();
@@ -142,7 +156,9 @@ class UserServiceTest {
     public void testCreateUser() {
         when(userMapper.toEntity(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
+
         userService.createUser(userDto, null);
+
         verify(userMapper, times(1)).toEntity(userDto);
         verify(userRepository, times(2)).save(user);
         verify(avatarService, times(1)).setRandomAvatar(user);
@@ -153,24 +169,27 @@ class UserServiceTest {
     @DisplayName("testing updateUserAvatar method with null multipartFile")
     public void testUpdateUserAvatar() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
+
         userService.updateUserAvatar(userId, null);
+
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(avatarService, times(1)).setRandomAvatar(user);
         verify(userRepository, times(1)).save(user);
     }
 
+
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
-        when(userRepository.findAllById(userIds)).thenReturn(users);
-        when(userMapper.toDto(user)).thenReturn(userDto);
+        when(userRepository.findAllById(userIds)).thenReturn(List.of(user));
+        when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        List<UserDto> result = userService.getUsersByIds(userIds);
+        List<UserTransportDto> result = userService.getUsersByIds(userIds);
 
         verify(userRepository).findAllById(userIds);
-        verify(userMapper).toDto(user);
+        verify(userMapper).toTransportDto(user);
 
-        assertEquals(result, userDtoList);
+        assertEquals(result, userTransportDtoList);
     }
 
     @Test

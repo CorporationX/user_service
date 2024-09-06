@@ -31,9 +31,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public Event create(Event event) {
         log.info("Создание события с title: {}", event.getTitle());
-
-        validateEventOwnerAndSkills(event);
-
+        validateUserSkills(event);
         return eventRepository.save(event);
     }
 
@@ -52,7 +50,6 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<Event> getEventsByFilter(EventFilters eventFilters) {
         log.info("Фильтрация событий по критериям: {}", eventFilters);
-
         List<Event> events = eventRepository.findAll();
 
         List<Event> filteredEvents = this.eventFilters.stream()
@@ -71,10 +68,9 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public Event updateEvent(Event event) {
         log.info("Обновление события с ID: {}", event.getId());
+        validateUserSkills(event);
 
         Event existingEvent = getEvent(event.getId());
-
-        validateEventOwnerAndSkills(event);
 
         existingEvent.setTitle(event.getTitle());
         existingEvent.setDescription(event.getDescription());
@@ -93,9 +89,7 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public Integer getSubscribersCount(Event event) {
         Long ownerId = event.getOwner().getId();
-
         log.info("Получение количества подписчиков у пользователя с ID: {}", ownerId);
-
         return userRepository.countFollowersByUserId(ownerId);
     }
 
@@ -126,8 +120,10 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void validateUserSkills(User user, List<Skill> relatedSkills) {
-        log.info("Проверка навыков пользователя с ID: {}", user.getId());
+    private void validateUserSkills(Event event) {
+        log.info("Проверка навыков пользователя с ID: {}", event.getOwner().getId());
+        User user = loadUserById(event.getOwner().getId());
+        List<Skill> relatedSkills = event.getRelatedSkills();
         List<Skill> userSkills = Optional.ofNullable(user.getSkills()).orElse(new ArrayList<>());
         if (!userSkills.containsAll(relatedSkills)) {
             log.error("У пользователя с ID {} недостаточно навыков для события", user.getId());
@@ -143,14 +139,4 @@ public class EventServiceImpl implements EventService {
             return new EntityNotFoundException("Пользователь с ID " + id + " не найден.");
         });
     }
-    private void validateEventOwnerAndSkills(Event event) {
-        User user = loadUserById(event.getOwner().getId());
-        List<Skill> relatedSkills = event.getRelatedSkills();
-
-        validateUserSkills(user, relatedSkills);
-
-        event.setOwner(user);
-        event.setRelatedSkills(relatedSkills);
-    }
-
 }

@@ -26,6 +26,12 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 
     @Query(nativeQuery = true, value = """
             SELECT s.* FROM skill s
+            WHERE s.id IN (?1)
+            """)
+    List<Skill> findByIds(List<Long> skillId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT s.* FROM skill s
             JOIN skill_offer so ON so.skill_id = s.id
             JOIN recommendation r ON r.id = so.recommendation_id
             WHERE r.receiver_id = :userId

@@ -2,7 +2,6 @@ package school.faang.user_service.mapper.event;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.event.EventDto;
@@ -20,8 +19,6 @@ public interface EventMapper {
     @Mapping(source = "owner.id", target = "ownerId")
     EventDto toDto(Event event);
 
-    @Mapping(target = "relatedSkills", ignore = true)
-    @Mapping(target = "owner", ignore = true)
     Event toEvent(EventDto eventDto);
 
     @Mapping(source = "relatedSkills", target = "relatedSkillsIds", qualifiedByName = "mapIdsSkills")
@@ -43,5 +40,4 @@ public interface EventMapper {
                 .map(Skill::getId)
                 .toList();
     }
-    void updateEventFromDto(@MappingTarget Event existingEvent, Event event);
 }

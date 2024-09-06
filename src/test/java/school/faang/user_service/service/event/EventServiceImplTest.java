@@ -36,8 +36,6 @@ public class EventServiceImplTest {
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private EventMapper eventMapper;
     @InjectMocks
     private EventServiceImpl eventServiceImpl;
 
@@ -136,7 +134,7 @@ public class EventServiceImplTest {
         List<EventFilter> realFilters = Arrays.asList(locationFilter, titleFilter);
 
         eventServiceImpl = new EventServiceImpl(
-                eventRepository, userRepository, eventMapper, realFilters);
+                eventRepository, userRepository, realFilters);
 
         EventFilters filters = new EventFilters();
         filters.setTitle("Java");

@@ -2,6 +2,7 @@ package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
@@ -25,4 +26,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(*) FROM followers 
+            WHERE user_id = :userId""")
+    Integer countFollowersByUserId(@Param("userId") Long userId);
 }

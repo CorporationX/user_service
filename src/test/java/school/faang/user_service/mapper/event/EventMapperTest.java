@@ -37,7 +37,20 @@ public class EventMapperTest {
     public void toDto_ShouldMapEventToEventDto() {
         EventDto actualDto = eventMapper.toDto(event);
 
-        EventDto expectedDto = createExpectedEventDto(event);
+        EventDto expectedDto = EventDto.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .ownerId(event.getOwner().getId())
+                .description(event.getDescription())
+                .relatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                .location(event.getLocation())
+                .type(event.getType())
+                .status(event.getStatus())
+                .maxAttendees(event.getMaxAttendees())
+                .build();
+
         Assertions.assertThat(actualDto)
                 .usingRecursiveComparison()
                 .ignoringFields("relatedSkillsIds")
@@ -51,7 +64,19 @@ public class EventMapperTest {
         List<EventDto> actualDtos = eventMapper.toDto(events);
 
         List<EventDto> expectedDtos = events.stream()
-                .map(this::createExpectedEventDto)
+                .map(e -> EventDto.builder()
+                        .id(e.getId())
+                        .title(e.getTitle())
+                        .startDate(e.getStartDate())
+                        .endDate(e.getEndDate())
+                        .ownerId(e.getOwner().getId())
+                        .description(e.getDescription())
+                        .relatedSkillsIds(e.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                        .location(e.getLocation())
+                        .type(e.getType())
+                        .status(e.getStatus())
+                        .maxAttendees(e.getMaxAttendees())
+                        .build())
                 .collect(Collectors.toList());
 
         Assertions.assertThat(actualDtos)
@@ -66,7 +91,21 @@ public class EventMapperTest {
 
         EventWithSubscribersDto actualDto = eventMapper.toEventWithSubscribersDto(event, subscribersCount);
 
-        EventWithSubscribersDto expectedDto = createExpectedEventWithSubscribersDto(event, subscribersCount);
+        EventWithSubscribersDto expectedDto = EventWithSubscribersDto.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .ownerId(event.getOwner().getId())
+                .description(event.getDescription())
+                .relatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                .location(event.getLocation())
+                .maxAttendees(event.getMaxAttendees())
+                .subscribersCount(subscribersCount)
+                .type(event.getType())
+                .status(event.getStatus())
+                .build();
+
         Assertions.assertThat(actualDto)
                 .usingRecursiveComparison()
                 .ignoringFields("relatedSkillsIds")
@@ -80,7 +119,19 @@ public class EventMapperTest {
         List<EventDto> actualDtos = eventMapper.toFilteredEventsDto(events);
 
         List<EventDto> expectedDtos = events.stream()
-                .map(this::createExpectedEventDto)
+                .map(e -> EventDto.builder()
+                        .id(e.getId())
+                        .title(e.getTitle())
+                        .startDate(e.getStartDate())
+                        .endDate(e.getEndDate())
+                        .ownerId(e.getOwner().getId())
+                        .description(e.getDescription())
+                        .relatedSkillsIds(e.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                        .location(e.getLocation())
+                        .type(e.getType())
+                        .status(e.getStatus())
+                        .maxAttendees(e.getMaxAttendees())
+                        .build())
                 .collect(Collectors.toList());
 
         Assertions.assertThat(actualDtos)
@@ -89,65 +140,32 @@ public class EventMapperTest {
                 .isEqualTo(expectedDtos);
     }
 
-    private EventDto createExpectedEventDto(Event event) {
-        EventDto dto = new EventDto();
-        dto.setId(event.getId());
-        dto.setTitle(event.getTitle());
-        dto.setStartDate(event.getStartDate());
-        dto.setEndDate(event.getEndDate());
-        dto.setOwnerId(event.getOwner().getId());
-        dto.setDescription(event.getDescription());
-        dto.setRelatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()));
-        dto.setLocation(event.getLocation());
-        dto.setType(event.getType());
-        dto.setStatus(event.getStatus());
-        dto.setMaxAttendees(event.getMaxAttendees());
-        return dto;
-    }
-
-    private EventWithSubscribersDto createExpectedEventWithSubscribersDto(Event event, int subscribersCount) {
-        EventWithSubscribersDto dto = new EventWithSubscribersDto();
-        dto.setId(event.getId());
-        dto.setTitle(event.getTitle());
-        dto.setStartDate(event.getStartDate());
-        dto.setEndDate(event.getEndDate());
-        dto.setOwnerId(event.getOwner().getId());
-        dto.setDescription(event.getDescription());
-        dto.setRelatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()));
-        dto.setLocation(event.getLocation());
-        dto.setMaxAttendees(event.getMaxAttendees());
-        dto.setSubscribersCount(subscribersCount);
-        dto.setType(event.getType());
-        dto.setStatus(event.getStatus());
-        return dto;
-    }
-
     private Event createEvent(Long id, String title, User owner, List<Skill> relatedSkills, String location, int maxAttendees) {
-        Event event = new Event();
-        event.setId(id);
-        event.setTitle(title);
-        event.setOwner(owner);
-        event.setRelatedSkills(relatedSkills);
-        event.setStartDate(LocalDateTime.now());
-        event.setEndDate(LocalDateTime.now().plusDays(1));
-        event.setLocation(location);
-        event.setMaxAttendees(maxAttendees);
-        event.setType(EventType.WEBINAR);
-        event.setStatus(EventStatus.PLANNED);
-        return event;
+        return Event.builder()
+                .id(id)
+                .title(title)
+                .owner(owner)
+                .relatedSkills(relatedSkills)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(1))
+                .location(location)
+                .maxAttendees(maxAttendees)
+                .type(EventType.WEBINAR)
+                .status(EventStatus.PLANNED)
+                .build();
     }
 
     private User createUser(Long id, String username) {
-        User user = new User();
-        user.setId(id);
-        user.setUsername(username);
-        return user;
+        return User.builder()
+                .id(id)
+                .username(username)
+                .build();
     }
 
     private Skill createSkill(Long id, String title) {
-        Skill skill = new Skill();
-        skill.setId(id);
-        skill.setTitle(title);
-        return skill;
+        return Skill.builder()
+                .id(id)
+                .title(title)
+                .build();
     }
 }

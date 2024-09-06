@@ -3,6 +3,7 @@ package school.faang.user_service.dto.event;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import school.faang.user_service.entity.event.EventStatus;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class EventDto {
     private Long id;
 

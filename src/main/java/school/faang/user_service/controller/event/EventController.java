@@ -28,7 +28,7 @@ public class EventController {
     private final EventServiceImpl eventServiceImpl;
     private final EventMapper eventMapper;
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventDto create(@Valid @RequestBody EventDto eventDto) {
         Event event = eventMapper.toEvent(eventDto);
@@ -36,11 +36,12 @@ public class EventController {
         return eventMapper.toDto(createdEvent);
     }
 
-    @PatchMapping()
+    @PatchMapping
     public EventWithSubscribersDto updateEvent(@Valid @RequestBody EventDto eventDto) {
         Event event = eventMapper.toEvent(eventDto);
         Event updatedEvent = eventServiceImpl.updateEvent(event);
-        return eventMapper.toEventWithSubscribersDto(updatedEvent, eventServiceImpl.getSubscribersCount(updatedEvent));
+        Integer subscribersCount = eventServiceImpl.getSubscribersCount(updatedEvent);
+        return eventMapper.toEventWithSubscribersDto(updatedEvent, subscribersCount);
     }
 
     @GetMapping("/{id}")
@@ -49,7 +50,7 @@ public class EventController {
         return eventMapper.toDto(event);
     }
 
-    @PostMapping("/filter")
+    @PostMapping("/search")
     public List<EventDto> getEventsByFilter(@RequestBody EventFilters eventFilters) {
         List<Event> events = eventServiceImpl.getEventsByFilter(eventFilters);
         return eventMapper.toFilteredEventsDto(events);

@@ -1,8 +1,7 @@
 package school.faang.user_service.dto.event;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
@@ -12,6 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class EventWithSubscribersDto {
     private Long id;
     private String title;

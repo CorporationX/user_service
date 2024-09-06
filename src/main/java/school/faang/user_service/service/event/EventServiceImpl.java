@@ -11,7 +11,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.exceptions.InsufficientSkillsException;
-import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
@@ -22,15 +21,14 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 @Service
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
 
     @Override
+    @Transactional
     public Event create(Event event) {
         log.info("Создание события с title: {}", event.getTitle());
 
@@ -48,8 +46,12 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public Event getEvent(Long eventId) {
-        log.info("Получение события с ID: {}", eventId);
-        return findById(eventId);
+        log.info("Поиск события с ID: {}", eventId);
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    log.error("Событие с ID {} не найдено", eventId);
+                    return new EntityNotFoundException("Событие с ID " + eventId + " не найдено.");
+                });
     }
 
     @Override
@@ -70,26 +72,35 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public Event updateEvent(Event event) {
         log.info("Обновление события с ID: {}", event.getId());
 
-        Event existingEvent = findById(event.getId());
+        Event existingEvent = getEvent(event.getId());
 
         User user = loadUserById(event.getOwner().getId());
         List<Skill> relatedSkills = event.getRelatedSkills();
 
         validateUserSkills(user, relatedSkills);
 
-        eventMapper.updateEventFromDto(existingEvent, event);
+        existingEvent.setTitle(event.getTitle());
+        existingEvent.setDescription(event.getDescription());
+        existingEvent.setStartDate(event.getStartDate());
+        existingEvent.setEndDate(event.getEndDate());
+        existingEvent.setLocation(event.getLocation());
+        existingEvent.setMaxAttendees(event.getMaxAttendees());
+        existingEvent.setRelatedSkills(relatedSkills);
+        existingEvent.setOwner(user);
+        existingEvent.setType(event.getType());
+        existingEvent.setStatus(event.getStatus());
 
         return eventRepository.save(existingEvent);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public Integer getSubscribersCount(Event event) {
         log.info("Получение количества подписчиков у пользователя с ID: {}", event.getOwner().getId());
-        return event.getOwner().getFollowers().size();
+        return userRepository.countFollowersByUserId(event.getOwner().getId());
     }
 
     @Override
@@ -107,6 +118,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public void deleteEvent(Long eventId) {
         log.info("Удаление события с ID: {}", eventId);
         try {
@@ -136,12 +148,4 @@ public class EventServiceImpl implements EventService {
         });
     }
 
-    private Event findById(Long id) {
-        log.info("Поиск события с ID: {}", id);
-        return eventRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Событие с ID {} не найдено", id);
-                    return new EntityNotFoundException("Событие с ID " + id + " не найдено.");
-                });
-    }
 }

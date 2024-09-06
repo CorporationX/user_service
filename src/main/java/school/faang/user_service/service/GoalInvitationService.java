@@ -55,7 +55,6 @@ public class GoalInvitationService {
         }
 
         // TODO: ??? в маппере нет смысла ? пусть будет на будущее?
-        //       GoalInvitationDto.id - при создании передаём null ?
         GoalInvitation entity = mapper.toEntity(goalInvitationDto);
 
         entity.setInviter(optionalUserInviter.get());
@@ -97,13 +96,23 @@ public class GoalInvitationService {
 
         goalInvitationRepository.updateStatusById(RequestStatus.ACCEPTED, id);
 
-        // TODO: ??? в таблицу user_goal ничего не добавляется ((
-        //   invitedUser.getGoals().add(goalInvitation.getGoal());
-        //   userRepository.save(invitedUser);
-        // решение - сохранять в главную сущность в отношениях ManyToMany
-
         Goal goal = goalInvitation.getGoal();
         goal.getUsers().add(invitedUser);
         goalRepository.save(goal);
+    }
+
+    public void rejectGoalInvitation(long id) {
+        Optional<GoalInvitation> optionalGoalInvitation = goalInvitationRepository.findById(id);
+        if (optionalGoalInvitation.isEmpty()) {
+            throw new GoalInvitationValidationException("GoalInvitation with id " + id + " does not exist");
+        }
+
+        GoalInvitation goalInvitation = optionalGoalInvitation.get();
+        RequestStatus invitationStatus = goalInvitation.getStatus();
+        if (invitationStatus == RequestStatus.REJECTED) {
+            throw new GoalInvitationValidationException("Goal with id " + id + " is already in REJECTED status");
+        }
+
+        goalInvitationRepository.updateStatusById(RequestStatus.REJECTED, id);
     }
 }

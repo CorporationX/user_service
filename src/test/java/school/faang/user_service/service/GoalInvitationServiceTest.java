@@ -187,4 +187,35 @@ class GoalInvitationServiceTest {
                 + " active goals (current amount = " + 3 + ")", exception.getMessage());
     }
 
+    @Test
+    void testRejectGoalInvitation_positive() {
+        GoalInvitation goalInvitation = new GoalInvitation();
+        goalInvitation.setStatus(RequestStatus.PENDING);
+        Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+
+        goalInvitationService.rejectGoalInvitation(1L);
+
+        Mockito.verify(goalInvitationRepository).updateStatusById(RequestStatus.REJECTED, 1L);
+    }
+
+    @Test
+    void testRejectGoalInvitation_GoalInvitationNotExist() {
+        Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.empty());
+
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
+                () -> goalInvitationService.rejectGoalInvitation(1L));
+        assertEquals("GoalInvitation with id " + 1L + " does not exist", exception.getMessage());
+    }
+
+    @Test
+    void testRejectGoalInvitation_GoalInvitationAlreadyRejected() {
+        GoalInvitation goalInvitation = new GoalInvitation();
+        goalInvitation.setStatus(RequestStatus.REJECTED);
+        Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+
+        GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
+                () -> goalInvitationService.rejectGoalInvitation(1L));
+        assertEquals("Goal with id " + 1L + " is already in REJECTED status", exception.getMessage());
+    }
+
 }

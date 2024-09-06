@@ -49,4 +49,9 @@ public class GoalInvitationController {
     public void acceptGoalInvitation(@PathVariable long goalId) {
         service.acceptGoalInvitation(goalId);
     }
+
+    @GetMapping(value = "/reject/{goalId}")
+    public void rejectGoalInvitation(@PathVariable long goalId) {
+        service.rejectGoalInvitation(goalId);
+    }
 }

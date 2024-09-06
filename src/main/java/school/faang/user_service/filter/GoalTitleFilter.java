@@ -16,7 +16,7 @@ public class GoalTitleFilter implements GoalFilter {
 
     @Override
     public List<Goal> apply(GoalFilterDto filter, Stream<Goal> goals) {
-        return goals.filter(goal -> goal.getTitle().matches(filter.getTitlePattern()))
+        return goals.filter(goal -> goal.getTitle().contains(filter.getTitlePattern()))
                 .toList();
     }
 }

@@ -36,14 +36,17 @@ public class GoalService {
 
         Goal goalEntity = goalMapper.toEntity(goalDto);
         goalEntity.setParent(goalRepository.getReferenceById(goalDto.getParentId()));
-        goalEntity.setSkillsToAchieve(goalDto.getSkillIds().stream()
-                .map(skillRepository::getReferenceById)
-                .toList());
 
-        Goal createdGoal = goalRepository.save(goalEntity);
+        Goal createdGoal = goalRepository.create(
+                goalEntity.getTitle(),
+                goalEntity.getDescription(),
+                goalEntity.getParent().getId(),
+                goalEntity.getDeadline()
+        );
+
         goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, createdGoal.getId()));
 
-        goalRepository.addGoalTuUser(userId, createdGoal.getId());
+        goalRepository.addGoalToUser(userId, createdGoal.getId());
 
         return goalMapper.toDto(createdGoal);
     }
@@ -66,12 +69,16 @@ public class GoalService {
         goalValidator.validateGoalSkills(goalDto.getSkillIds());
 
         Goal goalToUpdate = goalRepository.findById(goalId).orElseThrow(EntityNotFoundException::new);
+
         goalToUpdate.setTitle(goalDto.getTitle());
-        if (!goalDto.getDescription().isEmpty()) {
+        if (goalDto.getDescription() != null) {
             goalToUpdate.setDescription(goalDto.getDescription());
         }
-        if (!goalDto.getSkillIds().isEmpty()) {
+        if (goalDto.getSkillIds() != null) {
             updateSkillsToAchieve(goalToUpdate, goalDto.getSkillIds());
+        }
+        if (goalDto.getDeadline() != null) {
+            goalToUpdate.setDeadline(goalDto.getDeadline());
         }
 
         if (isToComplete(goalId, goalDto)) {
@@ -88,6 +95,7 @@ public class GoalService {
     }
 
     public void deleteGoal(Long goalId) {
+        goalRepository.findById(goalId).orElseThrow(EntityNotFoundException::new);
         goalRepository.deleteById(goalId);
     }
 

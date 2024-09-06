@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -21,10 +22,10 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     Stream<Goal> findGoalsByUserId(long userId);
 
     @Query(nativeQuery = true, value = """
-            INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
-            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
+            INSERT INTO goal (title, description, parent_goal_id, deadline, status, created_at, updated_at)
+            VALUES (?1, ?2, ?3, ?4, 0, NOW(), NOW()) returning goal
             """)
-    Goal create(String title, String description, Long parent);
+    Goal create(String title, String description, Long parentId, LocalDateTime deadline);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(ug.goal_id) FROM user_goal ug
@@ -57,5 +58,5 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = "INSERT INTO user_goal (user_id, goal_id) VALUES (:userId, :goalId)")
     @Modifying
-    void addGoalTuUser(long userId, long goalId);
+    void addGoalToUser(long userId, long goalId);
 }

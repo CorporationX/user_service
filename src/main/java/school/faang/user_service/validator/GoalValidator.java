@@ -18,13 +18,13 @@ public class GoalValidator {
     private final SkillRepository skillRepository;
 
     public void validateGoalTitle(GoalDto goalDto) throws ValidationException {
-        if (goalDto.getTitle().isEmpty()) {
+        if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
             throw new ValidationException("Title cannot be empty");
         }
     }
 
     public void validateGoalsPerUser(Long userId) throws ValidationException {
-        if (goalRepository.countActiveGoalsPerUser(userId) > GOALS_PER_USER) {
+        if (goalRepository.countActiveGoalsPerUser(userId) >= GOALS_PER_USER) {
             throw new ValidationException("There cannot be more than 3 active goals per user");
         }
     }

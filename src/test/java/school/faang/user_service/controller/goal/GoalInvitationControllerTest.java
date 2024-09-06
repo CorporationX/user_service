@@ -27,8 +27,7 @@ class GoalInvitationControllerTest {
 
     @BeforeEach
     void setUp() {
-        goalInvitationDto = GoalInvitationDto.builder()
-                .id(null).inviterId(1L).invitedUserId(1L).goalId(1L).status(null).build();
+        goalInvitationDto = new GoalInvitationDto (null, 1L, 1L, 1L, null);
     }
 
     @Test

@@ -2,6 +2,8 @@ package school.faang.user_service.controller.goal;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,5 +43,10 @@ public class GoalInvitationController {
         }
 
         return service.createInvitation(goalInvitationDto);
+    }
+
+    @GetMapping(value = "/accept/{goalId}")
+    public void acceptGoalInvitation(@PathVariable long goalId) {
+        service.acceptGoalInvitation(goalId);
     }
 }

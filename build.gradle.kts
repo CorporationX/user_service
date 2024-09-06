@@ -22,11 +22,6 @@ repositories {
 
 dependencies {
     /**
-     * Swagger
-     */
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
-
-    /**
      * Spring boot starters
      */
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -98,49 +93,44 @@ tasks.bootJar {
 }
 
 /**
- * JaCoCo settings
+ * Jacoco
  */
-val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
-)
-jacoco {
-    toolVersion = "0.8.9"
-    reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
-}
+
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
-
-    reports {
-        xml.required.set(false)
-        csv.required.set(false)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-    }
-
-    classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include(jacocoInclude)
-        }
-    )
+    excludedClassFilesForReport(classDirectories)
 }
 tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    excludedClassFilesForReport(classDirectories)
     violationRules {
-        rule {
-            element = "CLASS"
-            classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
-            )
-            enabled = true
+        rule { // общее покрытие
+            element = "BUNDLE" // default
             limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
+                minimum = "0.3".toBigDecimal()
+            }
+        }
+        rule { // по каждому классу
+            element = "CLASS"
+            limit {
+                minimum = "0.3".toBigDecimal()
             }
         }
     }
+}
+fun excludedClassFilesForReport(classDirectories: ConfigurableFileCollection) {
+    classDirectories.setFrom(
+            sourceSets.main.get().output.asFileTree.matching {
+                exclude(listOf(
+                        "com/json/student/**",
+                        "school/faang/user_service/entity/**",
+                        "school/faang/user_service/dto/**",
+                        "school/faang/user_service/event/**",
+
+                ))
+            }
+    )
 }

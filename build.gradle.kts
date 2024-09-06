@@ -1,5 +1,6 @@
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
@@ -89,4 +90,47 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 
 tasks.bootJar {
     archiveFileName.set("service.jar")
+}
+
+/**
+ * Jacoco
+ */
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    excludedClassFilesForReport(classDirectories)
+}
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    excludedClassFilesForReport(classDirectories)
+    violationRules {
+        rule { // общее покрытие
+            element = "BUNDLE" // default
+            limit {
+                minimum = "0.3".toBigDecimal()
+            }
+        }
+        rule { // по каждому классу
+            element = "CLASS"
+            limit {
+                minimum = "0.3".toBigDecimal()
+            }
+        }
+    }
+}
+fun excludedClassFilesForReport(classDirectories: ConfigurableFileCollection) {
+    classDirectories.setFrom(
+            sourceSets.main.get().output.asFileTree.matching {
+                exclude(listOf(
+                        "com/json/student/**",
+                        "school/faang/user_service/entity/**",
+                        "school/faang/user_service/dto/**",
+                        "school/faang/user_service/event/**",
+
+                ))
+            }
+    )
 }

@@ -3,21 +3,15 @@ package school.faang.user_service.validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.repository.SubscriptionRepository;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class SubscriptionValidatorTest {
-
-    @Mock
-    private SubscriptionRepository subscriptionRepository;
 
     @InjectMocks
     private SubscriptionValidator subscriptionValidator;
@@ -43,10 +37,10 @@ class SubscriptionValidatorTest {
     @Test
     void validateFollowSubscription_SubscriptionExists() {
         long followerId = 1L, followeeId = 2L;
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        boolean exists = true;
 
         Exception exception = assertThrows(DataValidationException.class,
-                () -> subscriptionValidator.validateFollowSubscription(followerId, followeeId));
+                () -> subscriptionValidator.validateFollowSubscription(exists, followerId, followeeId));
 
         assertEquals("User 1 is already subscribed to user 2.", exception.getMessage());
     }
@@ -54,18 +48,18 @@ class SubscriptionValidatorTest {
     @Test
     void validateFollowSubscription_SubscriptionDoesNotExists() {
         long followerId = 1L, followeeId = 2L;
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+        boolean exists = false;
 
-        assertDoesNotThrow(() -> subscriptionValidator.validateFollowSubscription(followerId, followeeId));
+        assertDoesNotThrow(() -> subscriptionValidator.validateFollowSubscription(exists, followerId, followeeId));
     }
 
     @Test
     void validateUnfollowSubscription_SubscriptionDoesNotExists() {
         long followerId = 1L, followeeId = 2L;
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+        boolean exists = false;
 
         Exception exception = assertThrows(DataValidationException.class,
-                () -> subscriptionValidator.validateUnfollowSubscription(followerId, followeeId));
+                () -> subscriptionValidator.validateUnfollowSubscription(exists, followerId, followeeId));
 
         assertEquals("User 1 is already unsubscribe to user 2.", exception.getMessage());
     }
@@ -73,8 +67,8 @@ class SubscriptionValidatorTest {
     @Test
     void validateUnfollowSubscription_SubscriptionExists() {
         long followerId = 1L, followeeId = 2L;
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        boolean exists = true;
 
-        assertDoesNotThrow(() -> subscriptionValidator.validateUnfollowSubscription(followerId, followeeId));
+        assertDoesNotThrow(() -> subscriptionValidator.validateUnfollowSubscription(exists, followerId, followeeId));
     }
 }

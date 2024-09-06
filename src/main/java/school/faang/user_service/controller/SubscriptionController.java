@@ -14,14 +14,14 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 public class SubscriptionController {
-    private SubscriptionService subscriptionService;
+    private final SubscriptionService subscriptionService;
 
     public void followUser(long followerId, long followeeId) {
         try {
             subscriptionService.followUser(followerId, followeeId);
             log.info("Follower {} followed user with id {}.", followerId, followeeId);
         } catch (DataValidationException exception) {
-            log.warn(exception.getMessage());
+            // ???
         }
     }
 
@@ -30,7 +30,7 @@ public class SubscriptionController {
             subscriptionService.unfollowUser(followerId, followeeId);
             log.info("Follower {} unfollowed user with id {}.", followerId, followeeId);
         } catch (DataValidationException exception) {
-            log.warn(exception.getMessage());
+            // ???
         }
     }
 

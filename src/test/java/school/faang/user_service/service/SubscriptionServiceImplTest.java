@@ -26,13 +26,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class SubscriptionServiceTest {
+class SubscriptionServiceImplTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
-
-    @Mock
-    private SubscriptionValidator subscriptionValidator;
 
     @Mock
     private UserFilter userFilter1;
@@ -47,7 +44,7 @@ class SubscriptionServiceTest {
     private UserMapper userMapper;
 
     @InjectMocks
-    private SubscriptionService subscriptionService;
+    private SubscriptionServiceImpl subscriptionService;
 
     private User user1;
     private User user2;

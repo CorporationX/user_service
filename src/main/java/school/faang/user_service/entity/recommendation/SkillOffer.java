@@ -1,12 +1,6 @@
 package school.faang.user_service.entity.recommendation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,12 +15,14 @@ import school.faang.user_service.entity.Skill;
 @Table(name = "skill_offer")
 public class SkillOffer {
 
-    @ManyToOne
-    @JoinColumn(name = "skill_id", nullable = false)
-    public Skill skill;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @ManyToOne
+    @JoinColumn(name = "skill_id", nullable = false)
+    public Skill skill;
+
     @ManyToOne
     @JoinColumn(name = "recommendation_id", nullable = false)
     private Recommendation recommendation;

@@ -26,4 +26,6 @@ public interface UserMapper {
     List<User> userDtosToUsers(List<EventUserDto> eventUserDtos);
 
     List<EventUserDto> usersToUserDtos(List<User> users);
+
+    List<SubscriptionUserDto> toSubscriptionUserDtos(List<User> users);
 }

@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 @Component
 public class EmailFilter implements UserFilter {
+
     @Override
     public boolean isApplicable(UserFilterDto filters) {
         return filters.emailPattern() != null;

@@ -11,62 +11,54 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.subscription.EntityCountDto;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
-import school.faang.user_service.dto.subscription.responses.SuccessResponseDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.dto.subscription.responses.SuccessResponse;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
 
-import static school.faang.user_service.exception.ExceptionMessages.SUBSCRIBE_ITSELF_VALIDATION;
-
 @RestController
-@RequestMapping("/users/{userId}/subscriptions")
+@RequestMapping("/users/{followeeId}/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/followers/{followerId}")
-    public SuccessResponseDto followUser(@PathVariable Long followerId,
-                                         @PathVariable("userId") Long followeeId) {
-        subscriptionValidation(followerId, followeeId);
+    public SuccessResponse followUser(@PathVariable Long followerId,
+                                      @PathVariable Long followeeId) {
         subscriptionService.followUser(followerId, followeeId);
-        return new SuccessResponseDto("User with id %d now follows user with id %d"
+        return new SuccessResponse("User with id %d now follows user with id %d"
                 .formatted(followerId, followeeId));
     }
 
     @DeleteMapping("/followers/{followerId}")
-    public SuccessResponseDto unfollowUser(@PathVariable Long followerId,
-                                           @PathVariable("userId") Long followeeId) {
+    public SuccessResponse unfollowUser(@PathVariable Long followerId,
+                                        @PathVariable Long followeeId) {
         subscriptionService.unfollowUser(followerId, followeeId);
-        return new SuccessResponseDto("User with id %d cancel following on user with id %d"
+        return new SuccessResponse("User with id %d cancel following on user with id %d"
                 .formatted(followerId, followeeId));
     }
 
     @GetMapping("/followers")
-    public List<SubscriptionUserDto> getFollowers(@PathVariable("userId") Long followeeId,
+    public List<SubscriptionUserDto> getFollowers(@PathVariable Long followeeId,
                                                   @RequestBody UserFilterDto filters) {
         return subscriptionService.getFollowers(followeeId, filters);
     }
 
     @GetMapping("/followers/count")
-    public EntityCountDto getFollowersCount(@PathVariable("userId") Long followeeId) {
-        return new EntityCountDto(subscriptionService.getFollowersCount(followeeId));
+    public EntityCountDto getFollowersCount(@PathVariable Long followeeId) {
+        int count = subscriptionService.getFollowersCount(followeeId);
+        return new EntityCountDto(count);
     }
 
     @GetMapping("/followings")
-    public List<SubscriptionUserDto> getFollowing(@PathVariable("userId") Long followerId,
+    public List<SubscriptionUserDto> getFollowing(@PathVariable Long followerId,
                                                   @RequestBody UserFilterDto filters) {
         return subscriptionService.getFollowing(followerId, filters);
     }
 
     @GetMapping("/followings/count")
-    public EntityCountDto getFollowingCount(@PathVariable("userId") Long followerId) {
-        return new EntityCountDto(subscriptionService.getFollowingCount(followerId));
-    }
-
-    private void subscriptionValidation(Long followerId, Long followeeId) {
-        if (followerId.equals(followeeId)) {
-            throw new DataValidationException(SUBSCRIBE_ITSELF_VALIDATION.getMessage());
-        }
+    public EntityCountDto getFollowingCount(@PathVariable Long followerId) {
+        int count = subscriptionService.getFollowingCount(followerId);
+        return new EntityCountDto(count);
     }
 }

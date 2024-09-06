@@ -1,22 +1,17 @@
-package school.faang.user_service.service.recomendation;
+package school.faang.user_service.service.recommendation;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recomendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
-import java.util.List;
-import java.util.stream.StreamSupport;
-
 @Component
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final UserRepository userRepository;
@@ -24,14 +19,7 @@ public class RecommendationRequestService {
     private final SkillRequestRepository skillRequestRepository;
     private final SkillRepository skillRepository;
 
-    @Autowired
-    public RecommendationRequestService(RecommendationRequestRepository recommendationRequestRepository, UserRepository userRepository, RecommendationRequestMapper mapper, SkillRequestRepository skillRequestRepository, SkillRepository skillRepository) {
-        this.recommendationRequestRepository = recommendationRequestRepository;
-        this.userRepository = userRepository;
-        this.recommendationRequestMapper = mapper;
-        this.skillRequestRepository = skillRequestRepository;
-        this.skillRepository = skillRepository;
-    }
+
 
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
@@ -42,24 +30,22 @@ public class RecommendationRequestService {
 //            throw new NoSuchElementException("No such skills in database");
 //        }
         System.out.println("Next");
-        RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.mapToEntity(recommendationRequestDto);
-        List<SkillRequest> skillRequests = StreamSupport.stream(skillRequestRepository.findAllById(recommendationRequestDto.getSkillsId()).spliterator(), false).toList();
-        recommendationRequestEntity.setSkills(skillRequests);
-        recommendationRequestEntity = recommendationRequestRepository.save(recommendationRequestEntity);
-        recommendationRequestEntity.getSkills()
-                .forEach(skillRequest -> skillRequestRepository.create(recommendationRequestDto.getRequesterId(), skillRequest.getId()));
+        RecommendationRequest recommendationRequestEntity = recommendationRequestRepository.save(recommendationRequestMapper.mapToEntity(recommendationRequestDto));
+        System.out.println(recommendationRequestEntity);
+        System.out.println("=================");
+        System.out.println(recommendationRequestMapper.mapToDto(recommendationRequestEntity));
         return recommendationRequestMapper.mapToDto(recommendationRequestEntity);
     }
 
-    public boolean isSkillsInDb(RecommendationRequestDto recommendationRequestDto) {
-        List<SkillRequest> skillRequests = (List<SkillRequest>) skillRequestRepository.findAllById(recommendationRequestDto.getSkillsId());
-        List<Skill> skills = skillRequests.stream()
-                .map(SkillRequest::getSkill)
-                .toList();
-        return skillRepository.existsAllByIdIn(skills);
+//    public boolean isSkillsInDb(RecommendationRequestDto recommendationRequestDto) {
+//        List<SkillRequest> skillRequests = (List<SkillRequest>) skillRequestRepository.findAllById(recommendationRequestDto.getSkillsId());
+//        List<Skill> skills = skillRequests.stream()
+//                .map(SkillRequest::getSkill)
+//                .toList();
+//        return skillRepository.existsAllByIdIn(skills);
     }
 
-}
+//}
 
 //    public boolean checkUsers(RecommendationRequestDto recommendationRequestDto) {
 //        List<Long> userIds = List.of(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());

@@ -1,66 +1,62 @@
 package school.faang.user_service.controller.recomendation;
 
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.stereotype.Component;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.recomendation.RecommendationRequestService;
+import school.faang.user_service.service.recommendation.RecommendationRequestService;
+import school.faang.user_service.validator.recommendation.RequestValidator;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@Component
-@RequiredArgsConstructor
-class RecommendationRequestControllerTest {
-    static RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
+@ExtendWith(MockitoExtension.class)
+public class RecommendationRequestControllerTest {
+    RecommendationRequestDto recommendationRequestDto;
+    @Mock
+    RequestValidator requestValidator;
 
-    @BeforeAll
-    public static void setUp() {
+    @Mock
+    private RecommendationRequestService recommendationRequestService;
+
+    @InjectMocks
+    private RecommendationRequestController recommendationRequestController;
+
+    @BeforeEach
+    public void setUp() {
+        recommendationRequestDto = new RecommendationRequestDto();
+        requestValidator = new RequestValidator();
         recommendationRequestDto.setReceiverId(3L);
         recommendationRequestDto.setId(10L);
         recommendationRequestDto.setCreatedAt(LocalDateTime.now());
         recommendationRequestDto.setRequesterId(55L);
         recommendationRequestDto.setMessage("");
         recommendationRequestDto.setStatus(RequestStatus.PENDING);
-        recommendationRequestDto.setSkillsId(List.of(5L, 56L, 53L, 10L));
+//        recommendationRequestDto.setSkillsId(List.of(5L, 56L, 53L, 10L));
     }
 
-    @Mock
-    private RecommendationRequestService recommendationRequestService = Mockito.mock(RecommendationRequestService.class);
-
-
-    @InjectMocks
-    private final RecommendationRequestController recommendationRequestController = new RecommendationRequestController(recommendationRequestService);
+    @Test
+    public void testRequestValidatorUnSuccess() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            requestValidator.validateRecomendationRequest(recommendationRequestDto);
+        });
+    }
 
     @Test
-    public void testCreateRecommendationRequestDto() {
-        recommendationRequestDto.setMessage("testMessage");
-        Mockito.when(recommendationRequestController.requestRecommendation(recommendationRequestDto)).thenReturn(recommendationRequestDto);
+    @DisplayName("Test success requestRecommendation")
+    public void testRequestRecommendationSuccess() {
+        when(recommendationRequestController.requestRecommendation(recommendationRequestDto)).thenReturn(recommendationRequestDto);
         recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        Mockito.verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequestDto);
+        verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequestDto);
     }
 
-    @Test
-    @DisplayName("Test for null dto")
-    public void testNullRecommendationRequestDto() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            recommendationRequestController.requestRecommendation(null);
-        });
-    }
-
-    @Test
-    @DisplayName("Test for empty message")
-    public void testEmptyMessageRecommendationRequestDto() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        });
-    }
 }

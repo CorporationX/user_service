@@ -1,24 +1,23 @@
 package school.faang.user_service.controller.recomendation;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
-import school.faang.user_service.service.recomendation.RecommendationRequestService;
+import school.faang.user_service.service.recommendation.RecommendationRequestService;
+import school.faang.user_service.validator.recommendation.RequestValidator;
 
-@Component
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/requests")
 public class RecommendationRequestController {
+    private final RequestValidator requestValidator;
     private final RecommendationRequestService recommendationRequestService;
 
-    @Autowired
-    public RecommendationRequestController(RecommendationRequestService recommendationRequestService) {
-        this.recommendationRequestService = recommendationRequestService;
-    }
-
+    @PostMapping
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto == null || recommendationRequestDto.getMessage().isBlank() ||
-                recommendationRequestDto.getMessage().isEmpty()) {
-            throw new IllegalArgumentException("Message is blank or empty");
-        }
+        requestValidator.validateRecomendationRequest(recommendationRequestDto);
         return recommendationRequestService.create(recommendationRequestDto);
     }
 }

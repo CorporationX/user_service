@@ -44,7 +44,7 @@ public class EventMapperTest {
                 .endDate(event.getEndDate())
                 .ownerId(event.getOwner().getId())
                 .description(event.getDescription())
-                .relatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                .relatedSkillsIds(getSkillsIds(event.getRelatedSkills()))
                 .location(event.getLocation())
                 .type(event.getType())
                 .status(event.getStatus())
@@ -64,18 +64,18 @@ public class EventMapperTest {
         List<EventDto> actualDtos = eventMapper.toDto(events);
 
         List<EventDto> expectedDtos = events.stream()
-                .map(e -> EventDto.builder()
-                        .id(e.getId())
-                        .title(e.getTitle())
-                        .startDate(e.getStartDate())
-                        .endDate(e.getEndDate())
-                        .ownerId(e.getOwner().getId())
-                        .description(e.getDescription())
-                        .relatedSkillsIds(e.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
-                        .location(e.getLocation())
-                        .type(e.getType())
-                        .status(e.getStatus())
-                        .maxAttendees(e.getMaxAttendees())
+                .map(event -> EventDto.builder()
+                        .id(event.getId())
+                        .title(event.getTitle())
+                        .startDate(event.getStartDate())
+                        .endDate(event.getEndDate())
+                        .ownerId(event.getOwner().getId())
+                        .description(event.getDescription())
+                        .relatedSkillsIds(getSkillsIds(event.getRelatedSkills()))
+                        .location(event.getLocation())
+                        .type(event.getType())
+                        .status(event.getStatus())
+                        .maxAttendees(event.getMaxAttendees())
                         .build())
                 .collect(Collectors.toList());
 
@@ -98,7 +98,7 @@ public class EventMapperTest {
                 .endDate(event.getEndDate())
                 .ownerId(event.getOwner().getId())
                 .description(event.getDescription())
-                .relatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                .relatedSkillsIds(getSkillsIds(event.getRelatedSkills()))
                 .location(event.getLocation())
                 .maxAttendees(event.getMaxAttendees())
                 .subscribersCount(subscribersCount)
@@ -119,18 +119,18 @@ public class EventMapperTest {
         List<EventDto> actualDtos = eventMapper.toFilteredEventsDto(events);
 
         List<EventDto> expectedDtos = events.stream()
-                .map(e -> EventDto.builder()
-                        .id(e.getId())
-                        .title(e.getTitle())
-                        .startDate(e.getStartDate())
-                        .endDate(e.getEndDate())
-                        .ownerId(e.getOwner().getId())
-                        .description(e.getDescription())
-                        .relatedSkillsIds(e.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
-                        .location(e.getLocation())
-                        .type(e.getType())
-                        .status(e.getStatus())
-                        .maxAttendees(e.getMaxAttendees())
+                .map(event -> EventDto.builder()
+                        .id(event.getId())
+                        .title(event.getTitle())
+                        .startDate(event.getStartDate())
+                        .endDate(event.getEndDate())
+                        .ownerId(event.getOwner().getId())
+                        .description(event.getDescription())
+                        .relatedSkillsIds(event.getRelatedSkills().stream().map(Skill::getId).collect(Collectors.toList()))
+                        .location(event.getLocation())
+                        .type(event.getType())
+                        .status(event.getStatus())
+                        .maxAttendees(event.getMaxAttendees())
                         .build())
                 .collect(Collectors.toList());
 
@@ -167,5 +167,10 @@ public class EventMapperTest {
                 .id(id)
                 .title(title)
                 .build();
+    }
+    private List<Long> getSkillsIds(List<Skill> skills) {
+        return skills.stream()
+                .map(Skill::getId)
+                .collect(Collectors.toList());
     }
 }

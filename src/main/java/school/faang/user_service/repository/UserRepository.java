@@ -27,8 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
-    @Query(nativeQuery = true, value = """
-            SELECT COUNT(*) FROM followers 
-            WHERE user_id = :userId""")
+    @Query("SELECT COUNT(f) FROM User u JOIN u.followers f WHERE u.id = :userId")
     Integer countFollowersByUserId(@Param("userId") Long userId);
 }

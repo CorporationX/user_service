@@ -32,13 +32,7 @@ public class EventServiceImpl implements EventService {
     public Event create(Event event) {
         log.info("Создание события с title: {}", event.getTitle());
 
-        User user = loadUserById(event.getOwner().getId());
-        List<Skill> relatedSkills = event.getRelatedSkills();
-
-        validateUserSkills(user, relatedSkills);
-
-        event.setOwner(user);
-        event.setRelatedSkills(relatedSkills);
+        validateEventOwnerAndSkills(event);
 
         return eventRepository.save(event);
     }
@@ -59,9 +53,11 @@ public class EventServiceImpl implements EventService {
     public List<Event> getEventsByFilter(EventFilters eventFilters) {
         log.info("Фильтрация событий по критериям: {}", eventFilters);
 
+        List<Event> events = eventRepository.findAll();
+
         List<Event> filteredEvents = this.eventFilters.stream()
                 .filter(filter -> filter.isApplicable(eventFilters))
-                .reduce(eventRepository.findAll().stream(),
+                .reduce(events.stream(),
                         (stream, filter) -> filter.apply(stream, eventFilters),
                         (s1, s2) -> s1)
                 .toList();
@@ -78,10 +74,7 @@ public class EventServiceImpl implements EventService {
 
         Event existingEvent = getEvent(event.getId());
 
-        User user = loadUserById(event.getOwner().getId());
-        List<Skill> relatedSkills = event.getRelatedSkills();
-
-        validateUserSkills(user, relatedSkills);
+        validateEventOwnerAndSkills(event);
 
         existingEvent.setTitle(event.getTitle());
         existingEvent.setDescription(event.getDescription());
@@ -89,8 +82,8 @@ public class EventServiceImpl implements EventService {
         existingEvent.setEndDate(event.getEndDate());
         existingEvent.setLocation(event.getLocation());
         existingEvent.setMaxAttendees(event.getMaxAttendees());
-        existingEvent.setRelatedSkills(relatedSkills);
-        existingEvent.setOwner(user);
+        existingEvent.setOwner(event.getOwner());
+        existingEvent.setRelatedSkills(event.getRelatedSkills());
         existingEvent.setType(event.getType());
         existingEvent.setStatus(event.getStatus());
 
@@ -99,8 +92,11 @@ public class EventServiceImpl implements EventService {
 
     @Transactional(readOnly = true)
     public Integer getSubscribersCount(Event event) {
-        log.info("Получение количества подписчиков у пользователя с ID: {}", event.getOwner().getId());
-        return userRepository.countFollowersByUserId(event.getOwner().getId());
+        Long ownerId = event.getOwner().getId();
+
+        log.info("Получение количества подписчиков у пользователя с ID: {}", ownerId);
+
+        return userRepository.countFollowersByUserId(ownerId);
     }
 
     @Override
@@ -146,6 +142,15 @@ public class EventServiceImpl implements EventService {
             log.error("Пользователь с ID {} не найден", id);
             return new EntityNotFoundException("Пользователь с ID " + id + " не найден.");
         });
+    }
+    private void validateEventOwnerAndSkills(Event event) {
+        User user = loadUserById(event.getOwner().getId());
+        List<Skill> relatedSkills = event.getRelatedSkills();
+
+        validateUserSkills(user, relatedSkills);
+
+        event.setOwner(user);
+        event.setRelatedSkills(relatedSkills);
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class GoalInvitationStatusFilter implements GoalInvitationFilter {
     @Override
     public boolean isApplicable(InvitationFilterDto filter) {
-        return false;
+        return filter.status() != null;
     }
 
     @Override

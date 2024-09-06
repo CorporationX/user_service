@@ -12,5 +12,5 @@ import java.util.List;
 public interface UserMapper {
     MentorshipUserDto toMentorshipUserDto(User user);
 
-    List<MentorshipUserDto> toMentorshipUserDtoList(List<User> userList);
+    List<MentorshipUserDto> toMentorshipUserDtos(List<User> users);
 }

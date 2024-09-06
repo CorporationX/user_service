@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipUserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.MentorshipNotFoundException;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -21,13 +20,13 @@ public class MentorshipServiceImpl implements MentorshipService {
     @Override
     public List<MentorshipUserDto> getMentees(Long userId) {
         User user = getUserById(userId);
-        return userMapper.toMentorshipUserDtoList(user.getMentees());
+        return userMapper.toMentorshipUserDtos(user.getMentees());
     }
 
     @Override
     public List<MentorshipUserDto> getMentors(Long userId) {
         User user = getUserById(userId);
-        return userMapper.toMentorshipUserDtoList(user.getMentors());
+        return userMapper.toMentorshipUserDtos(user.getMentors());
     }
 
     @Override
@@ -42,7 +41,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     private void deleteMentorship(Long menteeId, Long mentorId) {
         if (Objects.equals(menteeId, mentorId)) {
-            throw new MentorshipNotFoundException("Ментор и менти не могут иметь одинаковые идентификаторы");
+            throw new EntityNotFoundException("Ментор и менти не могут иметь одинаковые идентификаторы");
         }
         User mentee = getUserById(menteeId);
         List<User> mentors = mentee.getMentors();
@@ -50,13 +49,14 @@ public class MentorshipServiceImpl implements MentorshipService {
         if (isRemoved) {
             mentorshipRepository.save(mentee);
         } else {
-            throw new MentorshipNotFoundException("Не найдена пара менти/ментор с такими идентификаторами");
+            throw new EntityNotFoundException("Не найдена пара менти с id %d и ментор с id %d"
+                    .formatted(menteeId, mentorId));
         }
     }
 
     private User getUserById(Long userId) {
         return mentorshipRepository
                 .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Не найден пользователь с id %d".formatted(userId)));
+                .orElseThrow(() -> new EntityNotFoundException("Не найден пользователь с id %d".formatted(userId)));
     }
 }

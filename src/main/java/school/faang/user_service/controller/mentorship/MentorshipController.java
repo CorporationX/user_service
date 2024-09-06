@@ -11,7 +11,6 @@ import school.faang.user_service.dto.MentorshipUserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,23 +29,15 @@ public class MentorshipController {
     }
 
     @DeleteMapping("/{mentorId}/mentees/{menteeId}")
-    public Map<String, String> deleteMentee(@PathVariable @Positive Long mentorId,
-                                            @PathVariable @Positive Long menteeId) {
+    public void deleteMentee(@PathVariable @Positive Long mentorId,
+                             @PathVariable @Positive Long menteeId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
-        return Map.of(
-                "message",
-                "Менти с id %d у ментора с id %d удален успешно".formatted(menteeId, mentorId)
-        );
     }
 
     @DeleteMapping("/{menteeId}/mentors/{mentorId}")
-    public Map<String, String> deleteMentor(@PathVariable @Positive Long menteeId,
-                                            @PathVariable @Positive Long mentorId) {
+    public void deleteMentor(@PathVariable @Positive Long menteeId,
+                             @PathVariable @Positive Long mentorId) {
         mentorshipService.deleteMentor(menteeId, mentorId);
-        return Map.of(
-                "message",
-                "Ментор с id %d удален у пользователя с id %d".formatted(mentorId, menteeId)
-        );
     }
 
 }

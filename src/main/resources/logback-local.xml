@@ -1,0 +1,3 @@
+<included>
+    <logger name="com.example" level="TRACE" />
+</included>

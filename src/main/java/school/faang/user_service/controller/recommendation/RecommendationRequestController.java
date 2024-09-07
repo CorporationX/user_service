@@ -17,7 +17,6 @@ public class RecommendationRequestController {
 
     private final RecommendationRequestService recommendationRequestService;
 
-    @PostMapping
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
         if (recommendationRequestDto == null) {
             throw new IllegalArgumentException("Recommendation request can not be null");
@@ -26,7 +25,6 @@ public class RecommendationRequestController {
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
-    @GetMapping
     public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
         if (filter == null) {
             throw new IllegalArgumentException("No filters were found");
@@ -35,12 +33,10 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRequests(filter);
     }
 
-    @GetMapping
     public RecommendationRequestDto getRecommendationRequest(long id){
         return recommendationRequestService.getRequest(id);
     }
 
-    @PostMapping
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection){
         if(rejection == null || rejection.getReason().isBlank()){
             throw new IllegalArgumentException("Rejection information is incorrect");

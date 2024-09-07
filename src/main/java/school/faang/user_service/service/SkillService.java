@@ -17,6 +17,7 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,9 +53,10 @@ public class SkillService {
         }
         final List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
 
-        return offeredSkills.stream()
-                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
-                .entrySet().stream()
+        Map<Skill, Long> skillAmountMap = offeredSkills.stream()
+                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
+
+        return skillAmountMap.entrySet().stream()
                 .map(entry -> new SkillCandidateDto(mapper.toSkillDto((entry.getKey())), entry.getValue()))
                 .collect(Collectors.toList());
     }
@@ -73,26 +75,21 @@ public class SkillService {
         }
 
         skillRepository.assignSkillToUser(skillId, userId);
-        setGuarantors(skillId, userId);
+        setGuarantors(skillOffers);
 
         Skill assignedSkill = skillRepository.findUserSkill(skillId, userId)
                 .orElseThrow(() -> new RuntimeException("Skill not found after assignment."));
         return mapper.toSkillDto(assignedSkill);
     }
 
-    private void setGuarantors(long skillId, long userId) {
-        List<Long> guarantorIds = skillOfferRepository.findSkillOfferGuarantors(skillId, userId);
-        guarantorIds.stream()
-                .map(guarantorId -> {
-                    UserSkillGuarantee guarantee = new UserSkillGuarantee();
-                    guarantee.setUser(userRepository.findById(userId).orElseThrow(
-                            () -> new RuntimeException("User not found.")));
-                    guarantee.setSkill(skillRepository.findById(skillId).orElseThrow(
-                            () -> new RuntimeException("Skill not found.")));
-                    guarantee.setGuarantor(userRepository.findById(guarantorId).orElseThrow(
-                            () -> new RuntimeException("Guarantor not found.")));
-                    return guarantee;
-                })
-                .forEach(userSkillGuaranteeRepository::save);
+    private void setGuarantors(List<SkillOffer> skillOffers) {
+        userSkillGuaranteeRepository.saveAll(skillOffers.stream()
+                .map(offeredSkill -> UserSkillGuarantee.builder()
+                        .user(offeredSkill.getRecommendation().getReceiver())
+                        .skill(offeredSkill.getSkill())
+                        .guarantor(offeredSkill.getRecommendation().getAuthor())
+                        .build())
+                .distinct()
+                .toList());
     }
 }

@@ -176,8 +176,7 @@ public class SkillControllerTest {
         String requestBody = objectMapper.writeValueAsString(skillDto);
         when(skillService.acquireSkillFromOffers(anyLong(), anyLong())).thenReturn(skillDto);
 
-        mockMvc.perform(post("/skills/{skillId}/beneficiary", skillDto.getId())
-                        .param("userId", String.valueOf(validId))
+        mockMvc.perform(post("/skills/{skillId}/beneficiary/{userId}", skillDto.getId(), validId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(requestBody));
@@ -191,8 +190,7 @@ public class SkillControllerTest {
         when(skillService.acquireSkillFromOffers(anyLong(), anyLong()))
                 .thenThrow(new SkillAssignmentException("Skill already acquired by the user."));
 
-        mockMvc.perform(post("/skills/{skillId}/beneficiary", skillDto.getId())
-                        .param("userId", String.valueOf(validId))
+        mockMvc.perform(post("/skills/{skillId}/beneficiary/{skillId}", skillDto.getId(), validId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
                 .andExpect(content().string("Skill already acquired by the user."));

@@ -12,8 +12,6 @@ import org.mockito.stubbing.Answer;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
@@ -35,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -214,14 +212,9 @@ public class SkillServiceTest {
                         new SkillOffer(2L, skillEntity, new Recommendation()),
                         new SkillOffer(3L, skillEntity, new Recommendation())
                 ));
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
-        when(skillRepository.findById(anyLong())).thenReturn(Optional.of(new Skill()));
         doNothing().when(skillRepository).assignSkillToUser(anyLong(), anyLong());
-        when(userSkillGuaranteeRepository.save(any(UserSkillGuarantee.class)))
-                .thenReturn(new UserSkillGuarantee());
-        when(skillOfferRepository.findSkillOfferGuarantors(anyLong(), anyLong()))
-                .thenReturn(List.of(1L, 2L));
-        when(mapper.toSkillDto(skillEntity)).thenReturn(skillDto);
+        when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of());
+        when(mapper.toSkillDto(any(Skill.class))).thenReturn(skillDto);
 
         SkillDto result = skillService.acquireSkillFromOffers(skillEntity.getId(), id);
 
@@ -230,7 +223,7 @@ public class SkillServiceTest {
                 () -> assertEquals("New Skill", result.getTitle())
         );
 
-        verify(userSkillGuaranteeRepository, atLeastOnce()).save(any(UserSkillGuarantee.class));
+        verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
     }
 
     @Test

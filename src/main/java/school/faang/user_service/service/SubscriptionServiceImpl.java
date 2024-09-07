@@ -22,6 +22,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
 
+    @Override
     @Transactional
     public void followUser(long followerId, long followeeId) throws DataValidationException {
         validator.validateUserIds(followerId, followeeId);
@@ -30,6 +31,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
+    @Override
     @Transactional
     public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
         validator.validateUserIds(followerId, followeeId);
@@ -38,6 +40,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
+    @Override
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         Stream<User> followers = subscriptionRepository.findByFollowerId(followeeId);
         return filterUsers(followers, filters)
@@ -45,11 +48,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .toList();
     }
 
+    @Override
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filters) {
         Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);
         return filterUsers(followers, filters)
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public int getFollowersCount(long followerId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followerId);
+    }
+
+    @Override
+    public int getFollowingCount(long followerId) {
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
     private Stream<User> filterUsers(Stream<User> followers, UserFilterDto filters) {
@@ -58,13 +72,5 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .toList();
         return followers
                 .filter(user -> applicableFilters.stream().allMatch(filter -> filter.apply(user, filters)));
-    }
-
-    public int getFollowersCount(long followerId) {
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followerId);
-    }
-
-    public int getFollowingCount(long followerId) {
-        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 }

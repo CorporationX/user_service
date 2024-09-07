@@ -16,22 +16,14 @@ import java.util.List;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeeId) {
-        try {
+    public void followUser(long followerId, long followeeId) throws DataValidationException {
             subscriptionService.followUser(followerId, followeeId);
             log.info("Follower {} followed user with id {}.", followerId, followeeId);
-        } catch (DataValidationException exception) {
-            // ???
-        }
     }
 
-    public void unfollowUser(long followerId, long followeeId) {
-        try {
+    public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
             subscriptionService.unfollowUser(followerId, followeeId);
             log.info("Follower {} unfollowed user with id {}.", followerId, followeeId);
-        } catch (DataValidationException exception) {
-            // ???
-        }
     }
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {

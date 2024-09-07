@@ -31,4 +31,12 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
     Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
 
     Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(long authorId, long receiverId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT r.*
+              FROM Recommendation u
+              LEFT JOIN FETCH r.skillOffers
+             WHERE r.id = :id 
+            """)
+    Optional<Recommendation> findByIdWithSkills(long id);
 }

@@ -5,16 +5,15 @@ import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
 @Component
-public class EventStatusFilter implements EventFilter {
+public class EventStartDateBeforeFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
-        return filter.getStatusPattern() != null &&
-                !filter.getStatusPattern().isBlank();
+        return filter.getStartDateBeforePattern() != null;
     }
 
     @Override
     public boolean applyFilter(Event event, EventFilterDto filter) {
-        return event.getStatus().getMessage()
-                .equalsIgnoreCase(filter.getStatusPattern());
+        return event.getStartDate().isBefore(filter.getStartDateBeforePattern()) ||
+                event.getStartDate().equals(filter.getStartDateBeforePattern());
     }
 }

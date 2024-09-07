@@ -5,16 +5,14 @@ import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
 @Component
-public class EventStatusFilter implements EventFilter {
+public class EventMaxAttendeesLowerFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
-        return filter.getStatusPattern() != null &&
-                !filter.getStatusPattern().isBlank();
+        return filter.getMaxAttendeesLowerPattern() > 0;
     }
 
     @Override
     public boolean applyFilter(Event event, EventFilterDto filter) {
-        return event.getStatus().getMessage()
-                .equalsIgnoreCase(filter.getStatusPattern());
+        return event.getMaxAttendees() <= filter.getMaxAttendeesLowerPattern();
     }
 }

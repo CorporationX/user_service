@@ -3,7 +3,6 @@ package school.faang.user_service.test_data.event;
 import lombok.Getter;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -87,21 +86,22 @@ public class TestDataEvent {
                 .status(EventStatus.PLANNED)
                 .build();
     }
-    public Event getEvent2() {
-        return Event.builder()
-                .id(1L)
-                .title("title2")
-                .description("desc2")
-                .startDate(LocalDateTime.now().plusDays(3))
-                .endDate(LocalDateTime.now().plusDays(4))
-                .location("location2")
-                .maxAttendees(20)
-                .owner(getUser())
-                .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
-                .type(EventType.GIVEAWAY)
-                .status(EventStatus.CANCELED)
-                .build();
-    }
+
+//    public Event getEvent2() {
+//        return Event.builder()
+//                .id(1L)
+//                .title("title2")
+//                .description("desc2")
+//                .startDate(LocalDateTime.now().plusDays(3))
+//                .endDate(LocalDateTime.now().plusDays(4))
+//                .location("location2")
+//                .maxAttendees(20)
+//                .owner(getUser())
+//                .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
+//                .type(EventType.GIVEAWAY)
+//                .status(EventStatus.CANCELED)
+//                .build();
+//    }
 
     public EventDto getEventDto() {
         return EventDto.builder()
@@ -119,33 +119,32 @@ public class TestDataEvent {
                 .build();
     }
 
-    public EventDto getEventDto2() {
-        return EventDto.builder()
-                .id(2L)
-                .title("title2")
-                .description("desc2")
-                .startDate(LocalDateTime.now().plusDays(3))
-                .endDate(LocalDateTime.now().plusDays(4))
-                .location("location2")
-                .maxAttendees(20)
-                .ownerId(getUser().getId())
-                .relatedSkills(new ArrayList<>(List.of(getSkillDto1(), getSkillDto2())))
-                .type(EventType.GIVEAWAY)
-                .status(EventStatus.CANCELED)
-                .build();
-    }
-
-    public EventFilterDto getEventFilterDto() {
-        return EventFilterDto.builder()
-                .titlePattern("title1")
-                .descriptionPattern("desc1")
-                .startDatePattern(LocalDateTime.now().plusDays(1))
-                .endDatePattern(LocalDateTime.now().plusDays(2))
-                .locationPattern("location1")
-                .maxAttendees(10)
-                .skillPattern(getSkillDto1().toString())
-                .typePattern(EventType.MEETING.getMessage())
-                .statusPattern(EventStatus.PLANNED.getMessage())
-                .build();
-    }
+//    public EventDto getEventDto2() {
+//        return EventDto.builder()
+//                .id(2L)
+//                .title("title2")
+//                .description("desc2")
+//                .startDate(LocalDateTime.now().plusDays(3))
+//                .endDate(LocalDateTime.now().plusDays(4))
+//                .location("location2")
+//                .maxAttendees(20)
+//                .ownerId(getUser().getId())
+//                .relatedSkills(new ArrayList<>(List.of(getSkillDto1(), getSkillDto2())))
+//                .type(EventType.GIVEAWAY)
+//                .status(EventStatus.CANCELED)
+//                .build();
+//    }
+//
+//    public EventFilterDto getEventFilterDto() {
+//        return EventFilterDto.builder()
+//                .titlePattern("title1")
+//                .descriptionPattern("desc1")
+//                .startDatePattern(LocalDateTime.now().plusDays(1))
+//                .endDatePattern(LocalDateTime.now().plusDays(2))
+//                .locationPattern("location1")
+//                .allSkillPattern(List.of(getSkill1()))
+//                .typePattern(EventType.MEETING.getMessage())
+//                .statusPattern(EventStatus.PLANNED.getMessage())
+//                .build();
+//    }
 }

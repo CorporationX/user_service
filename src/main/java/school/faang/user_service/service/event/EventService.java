@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
@@ -22,9 +21,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final UserService userService;
-
-    @Setter
-    private List<EventFilter> eventFilters;
+    private final List<EventFilter> eventFilters;
 
     @Transactional
     public EventDto createEvent(EventDto eventDto) {
@@ -38,11 +35,10 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventDto> getEventsByFilters(EventFilterDto eventFilterDto) {
-        return eventFilters.stream()
-                .filter(eventFilter -> eventFilter.isApplicable(eventFilterDto))
-                .flatMap(eventFilter -> eventFilter.apply(eventRepository.findAll(), eventFilterDto))
-                .distinct()
+    public List<EventDto> getEventsByFilters(EventFilterDto filter) {
+        return eventRepository.findAll()
+                .stream()
+                .filter(events -> isAllMatch(filter, events))
                 .map(eventMapper::toDto)
                 .toList();
     }
@@ -83,5 +79,11 @@ public class EventService {
         return eventRepository.findById(eventId).orElseThrow(() ->
                 new DataValidationException("Event with ID: " + eventId + " not found.")
         );
+    }
+
+    private boolean isAllMatch(EventFilterDto filter, Event events) {
+        return eventFilters.stream()
+                .filter(eventFilter -> eventFilter.isApplicable(filter))
+                .allMatch(eventFilter -> eventFilter.applyFilter(events, filter));
     }
 }

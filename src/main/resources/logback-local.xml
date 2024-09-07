@@ -1,0 +1,3 @@
+<included>
+    <logger name="school.faang.user_service" level="DEBUG" />
+</included>

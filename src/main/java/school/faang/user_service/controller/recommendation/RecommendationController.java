@@ -16,31 +16,26 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @PostMapping
     public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
         validateRecommendation(recommendation);
 
         return recommendationService.create(recommendation);
     }
 
-    @PostMapping
     public RecommendationDto updateRecommendation(RecommendationDto updated) {
         validateRecommendation(updated);
 
         return recommendationService.update(updated);
     }
 
-    @DeleteMapping
     public void deleteRecommendation(long id) {
         recommendationService.delete(id);
     }
 
-    @GetMapping
     public List<RecommendationDto> getAllUserRecommendations(long receiverId){
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    @GetMapping
     public List<RecommendationDto> getAllGivenRecommendations(long receiverId){
         return recommendationService.getAllGivenRecommendations(receiverId);
     }

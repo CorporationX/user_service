@@ -84,7 +84,7 @@ public class User {
     private List<User> mentees;
 
     @ManyToMany
-    @JoinTable(name = "mentorship",
+    @JoinTable(name = "school/faang/user_service/controller/mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
     private List<User> mentors;

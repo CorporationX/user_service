@@ -9,5 +9,4 @@ public class Mentee {
     private long id;
     private String name;
 
-    // Геттеры и сеттеры
 }

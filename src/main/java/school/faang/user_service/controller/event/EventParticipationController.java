@@ -37,4 +37,9 @@ public class EventParticipationController {
         List<User> users = eventParticipationService.getParticipants(request.getEventId());
         return userMapper.toDto(users);
     }
+
+    @PostMapping(path = "/getParticipantsCount")
+    public int getParticipantsCount(@RequestBody GetParticipantsRequest request) {
+        return eventParticipationService.getParticipantsCount(request.getEventId());
+    }
 }

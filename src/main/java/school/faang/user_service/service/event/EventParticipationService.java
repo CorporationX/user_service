@@ -35,4 +35,8 @@ public class EventParticipationService {
     public List<User> getParticipants(long eventId) {
         return eventRepository.findAllParticipantsByEventId(eventId);
     }
+
+    public int getParticipantsCount(long eventId) {
+        return eventRepository.countParticipants(eventId);
+    }
 }

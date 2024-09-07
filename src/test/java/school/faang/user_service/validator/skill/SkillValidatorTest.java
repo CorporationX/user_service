@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SkillValidatorTest {
     @InjectMocks
-    private SkillValidator skillValidator;
+    private SkillServiceValidator skillValidator;
 
     @Mock
     private SkillRepository skillRepository;

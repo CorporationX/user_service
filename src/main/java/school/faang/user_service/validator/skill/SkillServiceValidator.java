@@ -8,15 +8,11 @@ import school.faang.user_service.repository.SkillRepository;
 
 @Component
 @RequiredArgsConstructor
-public class SkillValidator {
+public class SkillServiceValidator {
     private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
 
     public void validateSkill(SkillDto skill) {
-        if (skill.title().isBlank()) {
-            throw new DataValidationException("Skill name must not be empty");
-        }
-
         if (skillRepository.existsByTitle(skill.title())) {
             throw new DataValidationException("Skill with title " + skill.title() + " already exists");
         }

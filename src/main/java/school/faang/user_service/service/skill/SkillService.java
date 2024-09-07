@@ -12,7 +12,7 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.skill.SkillValidator;
+import school.faang.user_service.validator.skill.SkillServiceValidator;
 
 import java.util.List;
 import java.util.function.Function;
@@ -26,10 +26,10 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
-    private final SkillValidator skillValidator;
+    private final SkillServiceValidator skillServiceValidator;
 
     public SkillDto create(SkillDto skill) {
-        skillValidator.validateSkill(skill);
+        skillServiceValidator.validateSkill(skill);
         Skill skillEntity = skillMapper.toEntity(skill);
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }
@@ -49,9 +49,9 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        skillValidator.validateOfferedSkill(skillId, userId);
+        skillServiceValidator.validateOfferedSkill(skillId, userId);
         List<SkillOffer> allSkillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-        skillValidator.validateSkillByMinSkillOffers(allSkillOffers.size(), skillId, userId);
+        skillServiceValidator.validateSkillByMinSkillOffers(allSkillOffers.size(), skillId, userId);
         skillRepository.assignSkillToUser(skillId, userId);
         addUserSkillGuarantee(allSkillOffers);
         return skillMapper.toDto(allSkillOffers.get(0).getSkill());

@@ -18,7 +18,7 @@ import school.faang.user_service.mapper.skill.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.skill.SkillValidator;
+import school.faang.user_service.validator.skill.SkillServiceValidator;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ class SkillServiceTest {
     private SkillCandidateMapperImpl skillCandidateMapper;
 
     @Mock
-    private SkillValidator skillValidator;
+    private SkillServiceValidator skillServiceValidator;
 
     @Captor
     private ArgumentCaptor<Skill> skillCaptor;
@@ -122,8 +122,8 @@ class SkillServiceTest {
         List<SkillOffer> offers = List.of();
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(offers);
         // when
-        doNothing().when(skillValidator).validateOfferedSkill(skillId, userId);
-        doThrow(new DataValidationException("Not enough offers")).when(skillValidator).validateSkillByMinSkillOffers(0, skillId, userId);
+        doNothing().when(skillServiceValidator).validateOfferedSkill(skillId, userId);
+        doThrow(new DataValidationException("Not enough offers")).when(skillServiceValidator).validateSkillByMinSkillOffers(0, skillId, userId);
         // then
         assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
         verify(skillRepository, never()).assignSkillToUser(anyLong(), anyLong());

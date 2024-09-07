@@ -15,7 +15,12 @@ public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
     @PostMapping(path = "/register")
-    public void registerParticipant(@RequestBody RegisterRequest request){
+    public void registerParticipant(@RequestBody RegisterRequest request) {
         eventParticipationService.registerParticipant(request.getEventId(), request.getUserId());
+    }
+
+    @PostMapping(path = "/unregister")
+    public void unregisterParticipant(@RequestBody RegisterRequest request) {
+        eventParticipationService.unregisterParticipant(request.getEventId(), request.getUserId());
     }
 }

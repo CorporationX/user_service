@@ -19,4 +19,14 @@ public class EventParticipationService {
        }
        eventRepository.register(eventId, userId);
     }
+
+    @Transactional
+    public void unregisterParticipant(long eventId, long userId) {
+        var isRegistered =
+                eventRepository.findAllParticipantsByEventId(eventId).stream().anyMatch(e -> userId == e.getId());
+        if (!isRegistered){
+            throw new IllegalArgumentException("user wasn't registered");
+        }
+        eventRepository.unregister(eventId, userId);
+    }
 }

@@ -1,7 +1,10 @@
 package school.faang.user_service.dto;
 
+import lombok.Data;
+
+@Data
 public class UserDto {
-    private  long id;
-    private String username;
-    private String email;
+    private final long id;
+    private final String username;
+    private final String email;
 }

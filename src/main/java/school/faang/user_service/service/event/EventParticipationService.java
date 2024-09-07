@@ -1,8 +1,10 @@
 package school.faang.user_service.service.event;
 
+import java.util.List;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
@@ -28,5 +30,9 @@ public class EventParticipationService {
             throw new IllegalArgumentException("user wasn't registered");
         }
         eventRepository.unregister(eventId, userId);
+    }
+
+    public List<User> getParticipants(long eventId) {
+        return eventRepository.findAllParticipantsByEventId(eventId);
     }
 }

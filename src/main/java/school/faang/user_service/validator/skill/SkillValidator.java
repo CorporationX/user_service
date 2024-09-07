@@ -8,13 +8,13 @@ import school.faang.user_service.repository.SkillRepository;
 
 @Component
 @RequiredArgsConstructor
-public class SkillServiceValidator {
+public class SkillValidator {
     private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
 
-    public void validateSkill(SkillDto skill) {
-        if (skillRepository.existsByTitle(skill.title())) {
-            throw new DataValidationException("Skill with title " + skill.title() + " already exists");
+    public void validateSkillByTitle(SkillDto skillDto) {
+        if (skillRepository.existsByTitle(skillDto.title())) {
+            throw new DataValidationException("Skill with title " + skillDto.title() + " already exists");
         }
     }
 

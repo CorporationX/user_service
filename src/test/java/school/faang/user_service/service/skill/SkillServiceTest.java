@@ -18,7 +18,7 @@ import school.faang.user_service.mapper.skill.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.skill.SkillServiceValidator;
+import school.faang.user_service.validator.skill.SkillValidator;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ class SkillServiceTest {
     private SkillCandidateMapperImpl skillCandidateMapper;
 
     @Mock
-    private SkillServiceValidator skillServiceValidator;
+    private SkillValidator skillServiceValidator;
 
     @Captor
     private ArgumentCaptor<Skill> skillCaptor;

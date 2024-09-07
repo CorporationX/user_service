@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SkillValidatorTest {
     @InjectMocks
-    private SkillServiceValidator skillValidator;
+    private SkillValidator skillValidator;
 
     @Mock
     private SkillRepository skillRepository;
@@ -29,7 +29,7 @@ class SkillValidatorTest {
         // given
         SkillDto skillDto = new SkillDto(1L, " ");
         // when/then
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skillDto));
+        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillByTitle(skillDto));
     }
 
     @Test
@@ -38,7 +38,7 @@ class SkillValidatorTest {
         SkillDto skillDto = new SkillDto(1L, "Title");
         when(skillRepository.existsByTitle("Title")).thenReturn(true);
         // when/then
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skillDto));
+        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillByTitle(skillDto));
     }
 
     @Test
@@ -47,7 +47,7 @@ class SkillValidatorTest {
         SkillDto skillDto = new SkillDto(1L, "Title");
         when(skillRepository.existsByTitle("Title")).thenReturn(false);
         // when/then
-        assertDoesNotThrow(() -> skillValidator.validateSkill(skillDto));
+        assertDoesNotThrow(() -> skillValidator.validateSkillByTitle(skillDto));
     }
 
     @Test

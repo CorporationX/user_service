@@ -12,7 +12,7 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.skill.SkillServiceValidator;
+import school.faang.user_service.validator.skill.SkillValidator;
 
 import java.util.List;
 import java.util.function.Function;
@@ -26,11 +26,11 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
-    private final SkillServiceValidator skillServiceValidator;
+    private final SkillValidator skillServiceValidator;
 
-    public SkillDto create(SkillDto skill) {
-        skillServiceValidator.validateSkill(skill);
-        Skill skillEntity = skillMapper.toEntity(skill);
+    public SkillDto create(SkillDto skillDto) {
+        skillServiceValidator.validateSkillByTitle(skillDto);
+        Skill skillEntity = skillMapper.toEntity(skillDto);
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }
 

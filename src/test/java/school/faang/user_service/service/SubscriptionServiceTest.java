@@ -17,17 +17,17 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
 
-    @InjectMocks
-    private SubscriptionService subscriptionService;
-
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
+    @InjectMocks
+    private SubscriptionService subscriptionService;
 
     private final long followerId = 1L;
     private final long followeeId = 2L;
 
     @Test
-    void followUser_checkDataValidationExceptionTest() {
+    void testFollowUser_checkDataValidationException() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
@@ -35,7 +35,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void followUser_SuccessTest() {
+    void testFollowUser_Success() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
 
         subscriptionService.followUser(followerId, followeeId);

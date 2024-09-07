@@ -15,21 +15,21 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
 
-    @InjectMocks
-    private SubscriptionController subscriptionController;
-
     @Mock
     private SubscriptionService subscriptionService;
+
+    @InjectMocks
+    private SubscriptionController subscriptionController;
 
     private final long followerId = 1L;
 
     @Test
-    void followUser_checkDataValidationExceptionTest() {
+    void testFollowUser_checkDataValidationException() {
         assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followerId));
     }
 
     @Test
-    void followUser_SuccessTest() {
+    void testFollowUser_Success() {
         long followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);

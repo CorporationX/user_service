@@ -13,7 +13,7 @@ public class SubscriptionService {
 
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Вы уже подписаны на данного пользователя");
+            throw new DataValidationException("You are already subscribed to this user");
         }
         subscriptionRepository.followUser(followerId, followeeId);
     }

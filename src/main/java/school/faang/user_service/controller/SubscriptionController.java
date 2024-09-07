@@ -9,7 +9,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class SubscriptionController {
 
@@ -20,7 +20,7 @@ public class SubscriptionController {
                            @RequestParam(name = "followeeId") long followeeId) {
 
         if (followerId == followeeId) {
-            throw new DataValidationException("Нельзя подписаться на самого себя");
+            throw new DataValidationException("You cannot subscribe to yourself");
         }
         subscriptionService.followUser(followerId, followeeId);
     }

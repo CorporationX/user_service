@@ -14,7 +14,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class EventParticipationServiceValidatorTest {
+class EventParticipationServiceValidatorTest {
     @Mock
     EventParticipationRepository repository;
     @InjectMocks
@@ -29,7 +29,7 @@ public class EventParticipationServiceValidatorTest {
     }
 
     @Test
-    void userAlreadyRegister() {
+    void testUserAlreadyRegister() {
         Mockito.when(repository.findAllParticipantsByEventId(1L))
                 .thenReturn(List.of(user));
 
@@ -38,7 +38,7 @@ public class EventParticipationServiceValidatorTest {
     }
 
     @Test
-    void userNotRegistered() {
+    void testUserNotRegistered() {
         Mockito.when(repository.findAllParticipantsByEventId(1L))
                 .thenReturn(List.of(user));
 
@@ -47,7 +47,7 @@ public class EventParticipationServiceValidatorTest {
     }
 
     @Test
-    void eventValidate() {
+    void testEventValidate() {
         Mockito.when(repository.existsById(1L))
                 .thenReturn(false);
 

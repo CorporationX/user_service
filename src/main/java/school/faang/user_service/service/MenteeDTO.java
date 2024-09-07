@@ -4,5 +4,4 @@ public class MenteeDTO {
     private long id;
     private String name;
 
-    // Геттеры и сеттеры
 }

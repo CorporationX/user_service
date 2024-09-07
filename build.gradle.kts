@@ -82,6 +82,8 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation(kotlin("stdlib-jdk8"))
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 jsonSchema2Pojo {
@@ -123,6 +125,7 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(false)
         csv.required.set(false)
+        html.required.set(true)
         //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 

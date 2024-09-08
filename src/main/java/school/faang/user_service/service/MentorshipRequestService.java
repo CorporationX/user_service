@@ -21,7 +21,7 @@ import java.util.Optional;
 public class MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository repository;
-    private final Predicates predicates;
+    private final Predicates predicates = new Predicates();
     private final RequestMapper requestMapper;
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -33,6 +33,32 @@ public class MentorshipRequestService {
         } else {
             repository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
         }
+
+    }
+
+    public void getRequests(RequestFilterDto filter) {
+
+        val requestFilter = requestMapper.toEntity(filter);
+
+        Optional<List<MentorshipRequest>> mentorshipRequestList = repository.getRequests();
+        if (mentorshipRequestList.isPresent()) {
+           val result  = mentorshipRequestList.get().stream()
+                    .filter(predicates.isDescriptionEmptyPredicate)
+                    .filter(request -> {return predicates.areAuthorsMatch.test(request,requestFilter);})
+                    .filter(request->{return predicates.isRecieverMatch.test(request,requestFilter);})
+                    .filter(request->{return predicates.isStatusMatch.test(request,requestFilter);})
+                    .toList();
+           if (!result.isEmpty()){
+               System.out.println("here are the filtered result = " + result);
+           }else {
+               System.out.println("results are empty ");
+           }
+        }else {
+            System.out.println("database is empty");
+        }
+    }
+
+    void acceptRequest(long id) {
 
     }
 }

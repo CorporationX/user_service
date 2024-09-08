@@ -1,5 +1,6 @@
 package school.faang.user_service.validator;
 
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.PredicateResult;
@@ -16,6 +17,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 @Component
+@NoArgsConstructor
 public class Predicates {
     public final String REQUEST_AND_RECEIVER_HAS_SAME_ID = "user can not request mentorschihp to himself";
     public final String USERS_NOT_EXIST_IN_DATABASE = "user are not exists in database";
@@ -64,8 +66,7 @@ public class Predicates {
     };
 
     public final BiPredicate<MentorshipRequest, RequestFilter> isStatusMatch = (request,filter) -> {
-        return request.getReceiver().getId().equals(filter.getReceiverId());
+        return request.getStatus().equals(filter.getStatus());
     };
-
 
 }

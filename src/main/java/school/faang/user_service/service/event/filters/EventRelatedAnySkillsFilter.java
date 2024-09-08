@@ -9,21 +9,19 @@ import school.faang.user_service.entity.event.Event;
 public class EventRelatedAnySkillsFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
-        return filter.getRelatedAnySkillsPattern() != null;
+        return filter.getRelatedAnySkillsPattern() != null &&
+                !filter.getRelatedAnySkillsPattern().isBlank();
     }
 
     @Override
     public boolean applyFilter(Event event, EventFilterDto filter) {
         return event.getRelatedSkills()
                 .stream()
-                .anyMatch(skillEvent -> matchedSkills(filter, skillEvent));
+                .anyMatch(skill -> matchedSkills(filter, skill));
     }
 
-    private boolean matchedSkills(EventFilterDto eventFilterDto, Skill skill) {
-        return eventFilterDto.getRelatedAnySkillsPattern()
-                .stream()
-                .anyMatch(skillFilter -> skill.getTitle().toLowerCase()
-                        .contains(skillFilter.getTitle().toLowerCase())
-                );
+    private boolean matchedSkills(EventFilterDto filter, Skill skill) {
+        return skill.getTitle().toLowerCase()
+                .contains(filter.getRelatedAnySkillsPattern().toLowerCase());
     }
 }

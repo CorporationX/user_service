@@ -5,10 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.Skill;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -37,9 +35,9 @@ public class EventFilterDto {
 
     private int maxAttendeesLargerPattern;
 
-    private List<Skill> relatedAllSkillsPattern;
+    private String relatedAllSkillsPattern;
 
-    private List<Skill> relatedAnySkillsPattern;
+    private String relatedAnySkillsPattern;
 
     private String typePattern;
 

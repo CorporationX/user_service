@@ -9,12 +9,12 @@ public class EventTypeFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
         return filter.getTypePattern() != null &&
-                !filter.getStatusPattern().isBlank();
+                !filter.getTypePattern().isBlank();
     }
 
     @Override
     public boolean applyFilter(Event event, EventFilterDto filter) {
         return event.getType().getMessage()
-                .equalsIgnoreCase(filter.getStatusPattern());
+                .equalsIgnoreCase(filter.getTypePattern());
     }
 }

@@ -2,12 +2,14 @@ package school.faang.user_service.validation.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.SkillService;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,16 +25,16 @@ public class EventValidator {
     }
 
     public void relatedSkillsValidation(EventDto eventDto) {
-        var ownerSkills = skillService.getUserSkillsList(eventDto.getOwnerId());
-
+        List<SkillDto> ownerSkills = skillService.getUserSkillsList(eventDto.getOwnerId());
         if (!new HashSet<>(ownerSkills).containsAll(eventDto.getRelatedSkills())) {
             throw new DataValidationException("Owner must have valid skills.");
         }
     }
 
     public void eventExistValidation(EventDto eventDto) {
-        if (!eventRepository.existsById(eventDto.getId())) {
-            throw new DataValidationException("Event ID cannot be null.");
+        Long id = eventDto.getId();
+        if (!eventRepository.existsById(id)) {
+            throw new DataValidationException("Event ID: " + id + " dont exist");
         }
     }
 }

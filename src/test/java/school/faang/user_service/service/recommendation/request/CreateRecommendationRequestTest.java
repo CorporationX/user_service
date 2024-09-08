@@ -282,11 +282,19 @@ public class CreateRecommendationRequestTest {
         } else {
             recommendationRequestService.create(param.request());
 
-            verify(recommendationRequestRepository, times(1)).create(
-                    param.request().getRequesterId(),
-                    param.request().getReceiverId(),
-                    param.request().getMessage()
+            verify(recommendationRequestRepository, times(1)).saveAndFlush(
+                    RecommendationRequest.builder()
+                            .requester(User.builder().id(
+                                    param.request().getRequesterId()
+                            ).build())
+                            .receiver(User.builder().id(
+                                    param.request().getReceiverId()
+                            ).build())
+                            .message(param.request().getMessage())
+                            .status(RequestStatus.PENDING)
+                            .build()
             );
+
             verify(skillRequestRepository, times(1)).create(
                     param.request().getRequesterId(),
                     param.request().getReceiverId()

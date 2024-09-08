@@ -14,6 +14,5 @@ public interface SkillRequestRepository extends CrudRepository<SkillRequest, Lon
             VALUES (:requestId, :skillId)
             """)
     @Modifying
-    /** @TODO Modifying queries can only use void or int/Integer as return type*/
     int create(long requestId, long skillId);
 }

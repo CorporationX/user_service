@@ -43,7 +43,6 @@ public class RecommendationRequestController {
 
     @GetMapping("search")
     public List<RecommendationRequestDto> findRequestRecommendations(
-        @ModelAttribute
         FilterRecommendationRequestsDto filterRecommendationRequestsDto
     ) {
         var result = this.recommendationRequestService.getRecommendationRequests(filterRecommendationRequestsDto);

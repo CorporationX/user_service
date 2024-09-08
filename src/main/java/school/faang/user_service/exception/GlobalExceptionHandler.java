@@ -13,9 +13,9 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Object> handleValidationException(RuntimeException ex) {
+    public ResponseEntity<Object> handleValidationException(ValidationException exception) {
         Map<String, Object> body = new HashMap<>();
-        body.put("message", ex.getMessage());
+        body.put("message", exception.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }

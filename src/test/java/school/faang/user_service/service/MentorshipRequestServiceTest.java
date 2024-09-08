@@ -30,7 +30,7 @@ class MentorshipRequestServiceTest {
     @Test
     void test_service_method_called_() {
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(dto)).thenReturn(new Validated());
+        when(mentorshipRequestValidator.validate(dto)).thenReturn(new Validated(null));
         service.requestMentorship(dto);
         verify(repository).create(dto.getRequesterId(),dto.getReceiverId(),dto.getDescription());
     }

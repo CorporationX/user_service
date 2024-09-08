@@ -25,6 +25,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.follower_view.name}")
     private String followerViewChannelName;
 
+    @Value("${spring.data.redis.channels.project_follower_channel.name}")
+    private String projectFollowerTopicName;
+
     @Value("${spring.data.redis.channels.recommendation.name}")
     private String recommendationChannelName;
 
@@ -52,6 +55,11 @@ public class RedisConfig {
     @Bean
     ChannelTopic followerTopic() {
         return new ChannelTopic(followerViewChannelName);
+    }
+
+    @Bean
+    ChannelTopic projectFollowerTopic(){
+        return new ChannelTopic(projectFollowerTopicName);
     }
 
 }

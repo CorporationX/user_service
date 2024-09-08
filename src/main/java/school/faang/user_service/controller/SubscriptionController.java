@@ -16,14 +16,12 @@ public class SubscriptionController {
     private final SubscriptionValidator validator;
 
     public void followUser(long followerId, long followeeId) {
-        //Если пользователь захочет подписаться на самого себя, то кинет ошибку
-        validator.subscribeAndUnsubscribeToYourself(followerId, followeeId);
+        validator.checkingSubscription(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        //Если пользователь захочет отписаться из самого себя, то кинет ошибку
-        validator.subscribeAndUnsubscribeToYourself(followerId, followeeId);
+        validator.checkingSubscription(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 

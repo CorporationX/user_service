@@ -49,7 +49,7 @@ public class SubscriptionControllerTest {
 
     @Test
     public void usingMethodGetFollowers() {
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setNamePattern("petr");
         subscriptionController.getFollowers(firstUserId, filter);
         Mockito.verify(subscriptionService, Mockito.times(1))
@@ -65,7 +65,7 @@ public class SubscriptionControllerTest {
 
     @Test
     public void usingMethodGetFollowing() {
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setNamePattern("petr");
         subscriptionController.getFollowing(firstUserId, filter);
         Mockito.verify(subscriptionService, Mockito.times(1))

@@ -22,13 +22,11 @@ public class SubscriptionService {
     private final UserMapper userMapper;
 
     public void followUser(long followerId, long followeeId) {
-        // Если пользователь является уже подписчиком, то кинет ошибку. Нельзя подписаться, если ты уже подписан
         validator.isSubscriber(followerId, followeeId, subscriptionRepository);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        // Если пользователь не является подписчиком, то кинет ошибку. Нельзя отписаться, если ты не подписан был.
         validator.isNotSubscriber(followerId, followeeId, subscriptionRepository);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
@@ -37,7 +35,6 @@ public class SubscriptionService {
         validator.validateId(followeeId);
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
         userFilters.stream()
-
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
 
@@ -51,12 +48,12 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
         validator.validateId(followerId);
-        Stream<User> users = subscriptionRepository.findByFollowerId(followerId);
+        List<User> users = subscriptionRepository.findByFollowerId(followerId).toList();
         userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(users, filters));
+                .forEach(filter -> filter.apply(users.stream(), filters));
 
-        return userMapper.toDto(users.toList());
+        return userMapper.toDto(users);
     }
 
     public int getFollowingCount(long followerId) {

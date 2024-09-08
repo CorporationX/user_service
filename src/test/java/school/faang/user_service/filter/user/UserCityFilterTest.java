@@ -1,7 +1,9 @@
 package school.faang.user_service.filter.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.filters.user.UserCityFilter;
 import school.faang.user_service.util.TestDataFactory;
 
@@ -14,12 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class UserCityFilterTest {
 
     private UserCityFilter cityFilter = new UserCityFilter();
+    private User user;
+
+    @BeforeEach
+    public void setUp() {
+        user = TestDataFactory.createUser();
+    }
 
     @Test
     public void givenValidUserWhenApplyThenReturnUser() {
         // Given
-        var user = TestDataFactory.createUser();
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setCityPattern("Moscow");
 
         // When

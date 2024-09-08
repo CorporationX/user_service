@@ -1,7 +1,11 @@
 package school.faang.user_service.filter.user;
 
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.filters.user.UserAboutFilter;
 import school.faang.user_service.util.TestDataFactory;
 
@@ -14,12 +18,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class UserAboutFilterTest {
 
     private UserAboutFilter aboutFilter = new UserAboutFilter();
+    private User user;
 
+    @BeforeEach
+    public void setUp() {
+        user = TestDataFactory.createUser();
+    }
 
     @Test
     public void givenValidUserWhenApplyThenReturnUser() {
         // Given
-        var user = TestDataFactory.createUser();
         UserFilterDto filter = new UserFilterDto();
         filter.setAboutPattern("Football");
 

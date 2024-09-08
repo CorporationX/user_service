@@ -22,7 +22,7 @@ public class UserPageSIzeFilterTest {
         }
         List<User> actual = List.of(users.get(6), users.get(7), users.get(8));
 
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setPageSize(3);
 
         // When

@@ -63,7 +63,7 @@ public class SubscriptionServiceTest {
     public void givenWrongIdWhenGetFollowersThenThrowException() {
         firstUserId = -1L;
 
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setNamePattern("petr");
 
         assertThrows(DataValidationException.class, () ->
@@ -73,7 +73,7 @@ public class SubscriptionServiceTest {
     @Test
     public void givenValidIdWhenGetFollowersThenReturnList() {
         var user = TestDataFactory.createUser();
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setNamePattern("petr");
 
         Mockito.when(subscriptionRepository.findByFolloweeId(firstUserId))
@@ -95,7 +95,7 @@ public class SubscriptionServiceTest {
     @Test
     public void givenValidIdWhenGetFollowingWhenReturnList() {
         var user = TestDataFactory.createUser();
-        var filter = TestDataFactory.filterDto();
+        var filter = TestDataFactory.createFilterDto();
         filter.setNamePattern("petr");
 
         Mockito.when(subscriptionRepository.findByFollowerId(firstUserId))

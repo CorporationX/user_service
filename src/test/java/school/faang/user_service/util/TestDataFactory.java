@@ -42,7 +42,7 @@ public final class TestDataFactory {
         return 3;
     }
 
-    public static UserFilterDto filterDto () {
+    public static UserFilterDto createFilterDto() {
         return new UserFilterDto();
     }
 }

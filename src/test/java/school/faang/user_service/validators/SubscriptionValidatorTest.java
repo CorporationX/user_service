@@ -53,7 +53,7 @@ public class SubscriptionValidatorTest {
         Long secondUserId = 1L;
 
         assertThrows(DataValidationException.class, () ->
-                validator.subscribeAndUnsubscribeToYourself(firstUserId, secondUserId));
+                validator.checkingSubscription(firstUserId, secondUserId));
     }
 
     @Test

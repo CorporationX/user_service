@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipServiceTest {
+public class MentorshipServiceImplTest {
 
     @Mock
     private MentorshipRepository mentorshipRepository;

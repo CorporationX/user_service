@@ -12,7 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface RecommendationRepository extends CrudRepository<Recommendation, Long> {
-
+//FIXME: а тут не надо добавить чтобы created_at заполнялся при создании now()?
+//FIXME: кстати, по проекту в некоторых репозиториях при создании записи и
+// created_at и updated_at сразу заполняются now()
     @Query(nativeQuery = true, value = """
             INSERT INTO recommendation (author_id, receiver_id, content)
             VALUES (?1, ?2, ?3) returning id

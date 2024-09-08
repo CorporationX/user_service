@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mentorship_request.errorMessages;
+package school.faang.user_service.service.mentorship_request.error_messages;
 
 public class MentorshipRequestErrorMessages {
     public static final String REQUEST_IS_ACCEPTED_BEFORE =

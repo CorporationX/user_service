@@ -13,7 +13,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.util.List;
 import java.util.stream.Stream;
 
-import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
+import static school.faang.user_service.service.mentorship_request.error_messages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
 
 @Slf4j
 @Component

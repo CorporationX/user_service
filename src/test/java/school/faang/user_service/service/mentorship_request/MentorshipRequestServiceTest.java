@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 import static school.faang.user_service.entity.RequestStatus.PENDING;
 import static school.faang.user_service.entity.RequestStatus.REJECTED;
-import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
+import static school.faang.user_service.service.mentorship_request.error_messages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {

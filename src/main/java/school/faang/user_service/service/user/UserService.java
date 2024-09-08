@@ -4,26 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.s3.FileDownloadException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.randomAvatar.RandomAvatarService;
-import school.faang.user_service.service.s3Service.S3Service;
+import school.faang.user_service.service.randomAvatar.AvatarService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserFilterValidation;
 import school.faang.user_service.validator.user.UserValidator;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -35,10 +31,32 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final UserFilterValidation userFilterValidation;
     private final UserMapper userMapper;
-    private final S3Service s3Service;
-    private final RandomAvatarService randomAvatarService;
+    private final AvatarService avatarService;
+    private final CountryRepository countryRepository;
 
     private final UserValidator userValidator;
+
+    @Transactional
+    public UserDto createUser(UserDto userDto, MultipartFile avatar) {
+        Country country = countryRepository.findById(userDto.getCountryId())
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Country with %s id doesn't exist", userDto.getCountryId())));
+
+        User userToSave = userMapper.toEntity(userDto);
+        userToSave.setCountry(country);
+
+        userRepository.save(userToSave);
+
+        if (avatar == null) {
+            avatarService.setAvatar(userDto, null);
+        } else {
+            avatarService.setAvatar(userDto, avatarService.convertMultipartFileToBytes(avatar));
+        }
+
+        userToSave.setUserProfilePic(userDto.getUserProfilePic());
+        User savedUser = userRepository.save(userToSave);
+
+        return userMapper.toDto(savedUser);
+    }
 
     @Transactional(readOnly = true)
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
@@ -94,49 +112,19 @@ public class UserService {
         }
     }
 
-    @Transactional
-    public String generateRandomAvatar(Long userId) {
-        userValidator.isCurrentUser(userId);
+    @Transactional(readOnly = true)
+    public UserDto getById(Long userId) {
+        User foundedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with %s id doesn't exist", userId)));
 
-        Optional<User> user = userRepository.findById(userId);
-        user.orElseThrow(() -> new DataValidationException(String.format("User with %s id doesn't exist", userId)));
-        User userToRandomAvatar = user.get();
-
-        File randomPhoto = randomAvatarService.getRandomPhoto();
-
-        String folder = generateFolder(userToRandomAvatar);
-        String avatarId = s3Service.uploadFile(randomPhoto, folder);
-
-        userValidator.isValidUserAvatarId(avatarId);
-
-        userToRandomAvatar.setUserProfilePic(UserProfilePic.builder().fileId(avatarId).build());
-        userRepository.save(userToRandomAvatar);
-
-        return avatarId;
+        return userMapper.toDto(foundedUser);
     }
 
     @Transactional
-    public byte[] getUserRandomAvatar(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        user.orElseThrow(() -> new DataValidationException(String.format("User with %s id doesn't exist", userId)));
-        User userWithRandomAvatar = user.get();
+    public byte[] getAvatar(Long userId) {
+        UserDto userById = getById(userId);
+        String avatarId = userById.getUserProfilePic().getSmallFileId();
 
-        String avatarId = userWithRandomAvatar.getUserProfilePic().getFileId();
-
-        if (avatarId == null) {
-            throw new FileDownloadException("Avatar id can't be nullable");
-        }
-
-        InputStream file = s3Service.getFile(avatarId);
-
-        try {
-            return file.readAllBytes();
-        } catch (IOException e) {
-            throw new FileDownloadException(e.getMessage());
-        }
-    }
-
-    private String generateFolder(User userToRandomAvatar) {
-        return String.format("users/avatar/%s_%s", userToRandomAvatar.getUsername(), userToRandomAvatar.getId());
+        return avatarService.get(avatarId);
     }
 }

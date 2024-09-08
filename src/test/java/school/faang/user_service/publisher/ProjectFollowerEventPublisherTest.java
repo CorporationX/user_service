@@ -35,7 +35,7 @@ class ProjectFollowerEventPublisherTest {
         channel = "channel";
         projectFollowerEvent = new ProjectFollowerEvent(1L,1L,1L);
         message = projectFollowerEvent.toString();
-        projectFollowerEventPublisher = new ProjectFollowerEventPublisher(redisTemplate, new ChannelTopic(channel), objectMapper);
+        projectFollowerEventPublisher = new ProjectFollowerEventPublisher(redisTemplate, "chanel name", objectMapper);
     }
 
     @Test

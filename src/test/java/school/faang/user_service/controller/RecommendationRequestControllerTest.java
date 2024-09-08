@@ -8,11 +8,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.service.RecommendationRequestService;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.recomendation.RecommendationRequestService;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

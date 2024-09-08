@@ -31,6 +31,7 @@ import school.faang.user_service.dto.user.UserDto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.stream.StreamSupport;
 import java.io.InputStream;
 import java.util.List;
@@ -105,6 +106,18 @@ public class UserService {
     public User findUserById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("User not found"));
+    }
+
+    public List<UserDto> findUserByIds(List<Long> userIds) {
+        List<User> users = new ArrayList<>();
+        for(Long userId : userIds) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new DataValidationException("User not found"));
+            users.add(user);
+        }
+        return users.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional

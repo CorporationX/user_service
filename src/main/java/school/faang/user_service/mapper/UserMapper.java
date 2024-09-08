@@ -1,19 +1,20 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.person.*;
 import school.faang.user_service.service.user.extractor.SafeExtractor;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-    @Mapping(source = "country.title", target = "countryTitle")
+    @Mapping(source = "contactPreference", target = "contactPreference", qualifiedByName = "mappedContactPreference")
     UserDto toDto(User user);
-
-    @Mapping(source = "countryTitle", target = "country.title")
+    @Mapping(target = "contactPreference", ignore = true)
     User toEntity(UserDto userDto);
 
     @Mapping(target = "username", expression = "java(person.getFirstName() + ' ' + person.getLastName())")
@@ -52,5 +53,10 @@ public interface UserMapper {
         }
 
         return aboutMe.toString();
+    }
+
+    @Named("mappedContactPreference")
+    default String mappedContactPreference(ContactPreference contactPreference) {
+        return contactPreference!=null ? contactPreference.getPreference().name() : null;
     }
 }

@@ -64,6 +64,9 @@ public class User {
     @Column(name = "experience")
     private Integer experience;
 
+    @Column(name = "telegram_id", unique = true)
+    private Long telegramId;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")

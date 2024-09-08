@@ -17,11 +17,9 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.event.EventServiceValidator;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -230,5 +228,25 @@ public class EventServiceTest {
 
         verify(eventRepository, times(1)).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
         verify(eventRepository, never()).deleteAllByIdInBatch(Arrays.asList(3L));
+    }
+
+    @Test
+    void testFindEventsStartingIn() {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.ofDays(1);
+        Event eventOne = new Event();
+        eventOne.setId(1L);
+        eventOne.setTitle("event one!");
+        eventOne.setStartDate(now);
+        Event eventTwo = new Event();
+        eventOne.setId(2L);
+        eventOne.setTitle("event two!");
+        eventOne.setStartDate(now.plusDays(1));
+
+        lenient().when(eventRepository.findEventByStartDate(any(LocalDateTime.class))).thenReturn(List.of(eventTwo));
+
+        List<EventDto> events = eventService.findEventsStartingIn(duration);
+
+        assertEquals(1, events.size());
     }
 }

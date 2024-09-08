@@ -8,10 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.SubscriptionController;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.controller.subscription.SubscriptionController;
+import school.faang.user_service.service.subscription.SubscriptionService;
 import school.faang.user_service.util.TestDataFactory;
-import school.faang.user_service.validators.SubscriptionValidator;
+import school.faang.user_service.validator.skill.SubscriptionValidator;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {

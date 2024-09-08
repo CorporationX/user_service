@@ -9,13 +9,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filters.user.UserFilter;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.subscription.SubscriptionService;
 import school.faang.user_service.util.TestDataFactory;
-import school.faang.user_service.validators.SubscriptionValidator;
+import school.faang.user_service.validator.skill.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;

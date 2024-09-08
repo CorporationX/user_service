@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.validator.skill.SubscriptionValidator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,7 +63,7 @@ public class SubscriptionValidatorTest {
 
         DataValidationException exception = assertThrows(DataValidationException.class, () ->
                 validator.isSubscriber(firstUserId, secondUserId, repository));
-        assertEquals(MessageError.SUBSCRIPTION_NOT_AND_ALREADY_EXISTS_EXCEPTION.getMessage(),
+        assertEquals("You are already subscribed/unsubscribed to this user",
                 exception.getMessage());
     }
 
@@ -85,7 +85,7 @@ public class SubscriptionValidatorTest {
 
         DataValidationException exception = assertThrows(DataValidationException.class, () ->
                 validator.isNotSubscriber(firstUserId, secondUserId, repository));
-        assertEquals(MessageError.SUBSCRIPTION_NOT_AND_ALREADY_EXISTS_EXCEPTION.getMessage(),
+        assertEquals("You are already subscribed/unsubscribed to this user",
                 exception.getMessage());
     }
 

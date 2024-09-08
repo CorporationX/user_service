@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -31,17 +32,17 @@ public class RecommendationRequestValidator {
                 .allMatch(skillRequestRepository::existsById);
 
         if(!allSkillRequestsExist){
-            throw new IllegalArgumentException("Not all skill requests exist in database");
+            throw new DataValidationException("Not all skill requests exist in database");
         }
     }
 
     private void validateUsers(RecommendationRequestDto recommendationRequestDto) {
         if (!userRepository.existsById(recommendationRequestDto.requesterId())) {
-            throw new IllegalArgumentException("Requester was not found");
+            throw new DataValidationException("Requester was not found");
         }
 
         if (!userRepository.existsById(recommendationRequestDto.receiverId())) {
-            throw new IllegalArgumentException("Receiver was not found");
+            throw new DataValidationException("Receiver was not found");
         }
     }
 
@@ -53,7 +54,7 @@ public class RecommendationRequestValidator {
         if (latestPendingRequest.isPresent()) {
             if (ChronoUnit.DAYS.between(latestPendingRequest.get().getCreatedAt(), recommendationRequestDto.createdAt()) <
                     SIX_MONTH_IN_DAYS) {
-                throw new IllegalArgumentException("60 days must pass for a new request");
+                throw new DataValidationException("60 days must pass for a new request");
             }
         }
     }

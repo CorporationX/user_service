@@ -7,6 +7,7 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -58,13 +59,13 @@ public class RecommendationRequestService {
         return recommendationRequestRepository
                 .findById(id)
                 .map(requestMapper::toDto)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Request with id %s not found in database", id)));
+                .orElseThrow(() -> new DataValidationException(String.format("Request with id %s not found in database", id)));
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         RecommendationRequest requestToModify = recommendationRequestRepository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No such recommendation request with id " + id));
+                .orElseThrow(() -> new DataValidationException("No such recommendation request with id " + id));
 
         if (requestToModify.getStatus() != RequestStatus.REJECTED) {
             requestToModify.setStatus(RequestStatus.REJECTED);

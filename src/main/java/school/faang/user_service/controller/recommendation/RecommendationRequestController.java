@@ -2,43 +2,48 @@ package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/recommendation-requests")
 public class RecommendationRequestController {
 
     private final RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
+    @PostMapping
+    public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequestDto) {
         if (recommendationRequestDto == null) {
-            throw new IllegalArgumentException("Recommendation request can not be null");
+            throw new DataValidationException("Recommendation request can not be null");
         }
 
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+    @GetMapping
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
         if (filter == null) {
-            throw new IllegalArgumentException("No filters were found");
+            throw new DataValidationException("No filters were found");
         }
 
         return recommendationRequestService.getRequests(filter);
     }
 
-    public RecommendationRequestDto getRecommendationRequest(long id){
+    @GetMapping("/{id}")
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
         return recommendationRequestService.getRequest(id);
     }
 
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection){
-        if(rejection == null || rejection.getReason().isBlank()){
+    @PatchMapping("/{id}")
+    public RecommendationRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+        if (rejection == null || rejection.getReason().isBlank()) {
             throw new IllegalArgumentException("Rejection information is incorrect");
         }
 

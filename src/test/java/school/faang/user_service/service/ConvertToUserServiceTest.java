@@ -15,8 +15,10 @@ import school.faang.user_service.service.user.CountryService;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,38 +57,50 @@ public class ConvertToUserServiceTest {
 
     @Test
     public void testPrepareAndSaveUsersIfUsernameAlreadyExist() {
-        User user = prepareTestingUser();
-        when(personMapperMock.toUser(testPerson)).thenReturn(user);
-        when(userRepository.existsByUsername(any())).thenReturn(true);
+        User savedUser = prepareTestingUser();
+        User userFromDB = User.builder()
+                .username(savedUser.getUsername())
+                .build();
+        when(personMapperMock.toUser(testPerson)).thenReturn(savedUser);
+        when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.of(userFromDB));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
         verify(userService, times(0))
-                .saveUsers(List.of(user));
+                .saveUsers(List.of(savedUser));
     }
 
     @Test
     public void testPrepareAndSaveUsersIfEmailAlreadyExist() {
-        User user = prepareTestingUser();
-        when(personMapperMock.toUser(testPerson)).thenReturn(user);
-        when(userRepository.existsByEmail(any())).thenReturn(true);
+        User savedUser = prepareTestingUser();
+        User userFromDB = User.builder()
+                .email(savedUser.getEmail())
+                .build();
+        when(personMapperMock.toUser(testPerson)).thenReturn(savedUser);
+        when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.of(userFromDB));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
         verify(userService, times(0))
-                .saveUsers(List.of(user));
+                .saveUsers(List.of(savedUser));
     }
 
     @Test
     public void testPrepareAndSaveUsersIfPhoneAlreadyExist() {
-        User user = prepareTestingUser();
-        when(personMapperMock.toUser(testPerson)).thenReturn(user);
-        when(userRepository.existsByPhone(any())).thenReturn(true);
+        User savedUser = prepareTestingUser();
+        User userFromDB = User.builder()
+                .phone(savedUser.getPhone())
+                .build();
+        when(personMapperMock.toUser(testPerson)).thenReturn(savedUser);
+        when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.of(userFromDB));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
         verify(userService, times(0))
-                .saveUsers(List.of(user));
+                .saveUsers(List.of(savedUser));
     }
 
     @Test

@@ -19,7 +19,7 @@ public abstract class CsvParserService<T> {
         CsvMapper csvMapper = new CsvMapper();
 
         MappingIterator<T> mappingIterator = csvMapper
-                .readerFor(getInstance())
+                .readerFor(getClassType())
                 .with(CsvSchema.emptySchema().withHeader())
                 .readValues(inputStream);
 
@@ -29,5 +29,5 @@ public abstract class CsvParserService<T> {
         return list;
     }
 
-    public abstract Class<?> getInstance();
+    public abstract Class<?> getClassType();
 }

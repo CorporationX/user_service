@@ -13,6 +13,7 @@ import school.faang.user_service.repository.UserRepository;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +33,9 @@ public class ConvertToUserService {
 
         persons.forEach(person -> {
             User studentToUser = personMapper.toUser(person);
-            boolean resultValidate = validateUserBeforeSave(studentToUser);
+            boolean userAlreadyExists = validateUserBeforeSave(studentToUser);
 
-            if (!resultValidate) {
+            if (!userAlreadyExists) {
                 studentToUser.setPassword(generatePassword());
                 Country userCountry = studentToUser.getCountry();
 
@@ -83,17 +84,20 @@ public class ConvertToUserService {
         //ToDo которые содержатся в базе данных, то новый юзер не будет сохранен, а в лог выйдет сообщение.
         //ToDo Но ошибку я не бросаю, так как операция прервется и следующие юзеры не сохранятся
 
-        boolean resultValidate = userRepository.existsByUsername(studentToUser.getUsername())
-                || userRepository.existsByEmail(studentToUser.getEmail())
-                || userRepository.existsByPhone(studentToUser.getPhone());
+        Optional<User> resultUser = userRepository.findByUsernameOrEmailOrPhone(
+                studentToUser.getUsername(),
+                studentToUser.getEmail(),
+                studentToUser.getPhone());
 
-        if (resultValidate) {
+        boolean resultValidate = resultUser.isPresent();
 
-            if (userRepository.existsByUsername(studentToUser.getUsername())) {
+        if(resultValidate) {
+
+            if (studentToUser.getUsername().equals(resultUser.get().getUsername())) {
                 log.warn("User with username {} already exists", studentToUser.getUsername());
-            } else if (userRepository.existsByEmail(studentToUser.getEmail())) {
+            } else if (studentToUser.getEmail().equals(resultUser.get().getEmail())) {
                 log.warn("User with email {} already exists", studentToUser.getEmail());
-            } else if (userRepository.existsByPhone(studentToUser.getPhone())) {
+            } else if (studentToUser.getPhone().equals(resultUser.get().getPhone())) {
                 log.warn("User with phone number {} already exists", studentToUser.getPhone());
             }
         }

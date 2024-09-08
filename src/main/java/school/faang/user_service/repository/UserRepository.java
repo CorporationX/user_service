@@ -1,6 +1,5 @@
 package school.faang.user_service.repository;
 
-import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,9 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
-    boolean existsByUsername(String username);
-
-    boolean existsByEmail(String email);
-
-    boolean existsByPhone(String phone);
+    Optional<User> findByUsernameOrEmailOrPhone(String username, String email, String phone);
 }

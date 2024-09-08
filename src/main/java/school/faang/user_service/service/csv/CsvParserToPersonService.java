@@ -10,24 +10,8 @@ import school.faang.user_service.entity.person.Person;
 @Slf4j
 public class CsvParserToPersonService extends CsvParserService<Person> {
 
-//    @Override
-//    public List<Person> convertCsv(InputStream inputStream) throws IOException {
-//
-//        CsvMapper csvMapper = new CsvMapper();
-//
-//        MappingIterator<Person> personMappingIterator = csvMapper
-//                .readerFor(Person.class)
-//                .with(CsvSchema.emptySchema().withHeader())
-//                .readValues(inputStream);
-//
-//        List<Person> persons = personMappingIterator.readAll();
-//        log.info(persons.toString());
-//        inputStream.close();
-//        return persons;
-//    }
-
     @Override
-    public Class<Person> getInstance() {
+    public Class<Person> getClassType() {
         return Person.class;
     }
 }

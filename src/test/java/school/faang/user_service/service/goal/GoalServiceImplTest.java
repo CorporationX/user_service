@@ -54,6 +54,7 @@ class GoalServiceImplTest {
         when(goalRepository.existsById(GOAL_ID)).thenReturn(true);
         goalService.deleteById(GOAL_ID);
         verify(goalRepository).deleteById(GOAL_ID);
+        fail("");
     }
 
     @Test

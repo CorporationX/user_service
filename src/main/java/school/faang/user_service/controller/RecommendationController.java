@@ -51,7 +51,7 @@ public class RecommendationController {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    private static void checkIfContentEmpty(RecommendationDto recommendationDto) {
+    private void checkIfContentEmpty(RecommendationDto recommendationDto) {
         if (recommendationDto.getContent() == null || recommendationDto.getContent().isBlank()) {
             throw new DataValidationException("Recommendation should contain non-empty content");
         }

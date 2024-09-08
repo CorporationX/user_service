@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
@@ -20,7 +21,6 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -88,7 +88,6 @@ public class RecommendationService {
 
         for (SkillOfferDto skillOfferDto : skillOfferDtoList) {
             skillOfferRepository.create(skillOfferDto.getSkillId(), recommendationDto.getId());
-
             skillRepository.findUserSkill(skillOfferDto.getSkillId(), skillOfferDto.getReceiverId())
                     .ifPresent(skill -> {
                         boolean isAuthorAlreadyGuarantor = skill.getGuarantees().stream()
@@ -97,40 +96,43 @@ public class RecommendationService {
                                 .anyMatch(skillOfferDto.getAuthorId()::equals);
 
                         if (!isAuthorAlreadyGuarantor) {
-                            UserSkillGuarantee guarantee = UserSkillGuarantee.builder()
-                                    .user(userRepository.findById(skillOfferDto.getReceiverId())
-                                            .orElseThrow(() -> new DataValidationException(
-                                                    String.format("There is no user receiver with id = %d",
-                                                            skillOfferDto.getReceiverId()))))
-                                    .skill(skill)
-                                    .guarantor(userRepository.findById(skillOfferDto.getAuthorId())
-                                            .orElseThrow(() -> new DataValidationException(
-                                                    String.format("There is no user author of recommendation with id = %d",
-                                                            skillOfferDto.getAuthorId()))))
-                                    .build();
-
-                            skill.getGuarantees().add(guarantee);
-                            skillRepository.save(skill);
+                            addGuaranteeToSkill(skillOfferDto, skill);
                         }
                     });
         }
     }
 
+    private void addGuaranteeToSkill(SkillOfferDto skillOfferDto, Skill skill) {
+        UserSkillGuarantee guarantee = UserSkillGuarantee.builder()
+                .user(userRepository.findById(skillOfferDto.getReceiverId())
+                        .orElseThrow(() -> new DataValidationException(
+                                String.format("There is no user receiver with id = %d",
+                                        skillOfferDto.getReceiverId()))))
+                .skill(skill)
+                .guarantor(userRepository.findById(skillOfferDto.getAuthorId())
+                        .orElseThrow(() -> new DataValidationException(
+                                String.format("There is no user author of recommendation with id = %d",
+                                        skillOfferDto.getAuthorId()))))
+                .build();
+
+        skill.getGuarantees().add(guarantee);
+        skillRepository.save(skill);
+    }
+
     private void checkIfAcceptableTimeForRecommendation(RecommendationDto recommendationDto) {
-        Optional<Recommendation> latestRecommendation = recommendationRepository
+        recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                         recommendationDto.getAuthorId(),
-                        recommendationDto.getReceiverId());
-
-        latestRecommendation
-                .filter(recommendation -> recommendation.getCreatedAt()
-                        .isBefore(LocalDateTime.now().minusMonths(NUMBER_OF_MONTHS_AFTER_PREVIOUS_RECOMMENDATION)))
-                .orElseThrow(() -> new DataValidationException(
-                        String.format("Author id = %s did recommendation for user id = %s less than %d months ago",
-                                recommendationDto.getAuthorId(),
-                                recommendationDto.getReceiverId(),
-                                NUMBER_OF_MONTHS_AFTER_PREVIOUS_RECOMMENDATION)
-                ));
+                        recommendationDto.getReceiverId())
+                .ifPresent(recommendation -> {
+                    if (recommendation.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(NUMBER_OF_MONTHS_AFTER_PREVIOUS_RECOMMENDATION))) {
+                        throw new DataValidationException(
+                                String.format("Author id = %s did recommendation for user id = %s less than %d months ago",
+                                        recommendationDto.getAuthorId(),
+                                        recommendationDto.getReceiverId(),
+                                        NUMBER_OF_MONTHS_AFTER_PREVIOUS_RECOMMENDATION));
+                    }
+                });
     }
 
     private void checkIfOfferedSkillsExist(RecommendationDto recommendationDto) {

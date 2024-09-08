@@ -13,6 +13,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.skill.SkillValidator;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Component
@@ -29,7 +30,7 @@ public class SkillService {
         return skills.stream().map(skill -> skillMapper.skillToSkillDto(skill)).toList();
     }
 
-    public SkillDto create(SkillDto skill) throws IllegalAccessException {
+    public SkillDto create(SkillDto skill) throws IllegalArgumentException {
         skillValidator.validateSkill(skill);
         Skill skillEntity = skillMapper.skillDtoToSkill(skill);
         return skillMapper.skillToSkillDto(skillRepository.save(skillEntity));
@@ -37,12 +38,15 @@ public class SkillService {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> skillCandidate = skillRepository.findSkillsOfferedToUser(userId);
-        List<SkillCandidateDto> skillCandidateDtoList = skillCandidate.stream().map(skill -> skillCandidateMapper.skillToSkillCandidateDto(skill)).toList();
+        List<SkillCandidateDto> skillCandidateDtoList = skillCandidate.stream()
+                .map(skill -> skillCandidateMapper.skillToSkillCandidateDto(skill)).toList();
         return skillCandidateDtoList;
     }
 
-    public SkillDto acquireSkillFromOffers(long skillId, long userId) throws IllegalAccessException {
-        SkillDto skillDto = skillMapper.skillToSkillDto(skillRepository.findById(skillId).get());
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) throws IllegalArgumentException {
+        SkillDto skillDto = skillRepository.findById(skillId)
+                .map(skillMapper::skillToSkillDto)
+                .orElseThrow(() -> new IllegalArgumentException("Skill not found"));
         skillValidator.validateSkill(skillDto);
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         if (skillOffers.size() >= 3) { //не придумал как сообразить здесь валидацию в отдельном методе класса

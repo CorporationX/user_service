@@ -11,10 +11,10 @@ public class SkillCandidateValidator {
     private final SkillRepository skillRepository;
 
     public void validateCandidateSkill(SkillDto skillDto) throws IllegalAccessException {
-        if (skillDto.title().isEmpty()) {
+        if (skillDto.getTitle().isEmpty()) {
             throw new IllegalAccessException("Validation failed. Skill name is blank");
         }
-        if (skillRepository.existsByTitle(skillDto.title())) {
+        if (skillRepository.existsByTitle(skillDto.getTitle())) {
             throw new IllegalAccessException("This skill already exists.");
         }
     }

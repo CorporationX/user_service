@@ -10,14 +10,13 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 @Component
 public class SkillValidator {
     private final SkillRepository skillRepository;
-    private final SkillOfferRepository skillOfferRepository;
 
-    public void validateSkill(SkillDto skill) throws IllegalAccessException {
-        if (skill.title().isEmpty()) {
-            throw new IllegalAccessException("Validation failed. Skill name is blank");
+    public void validateSkill(SkillDto skill) throws IllegalArgumentException {
+        if (skill.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Validation failed. Skill name is blank");
         }
-        if (skillRepository.existsByTitle(skill.title())) {
-            throw new IllegalAccessException("This skill already exists.");
+        if (skillRepository.existsByTitle(skill.getTitle())) {
+            throw new IllegalArgumentException("This skill already exists.");
         }
     }
 }

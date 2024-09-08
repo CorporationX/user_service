@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.exception.ValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 public class GoalController {
     private final GoalService goalService;
 
-    public GoalDto createGoal(Long userId, GoalDto goalDto) throws ValidationException {
+    public GoalDto createGoal(Long userId, GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 
@@ -22,7 +21,7 @@ public class GoalController {
         goalService.deleteGoal(goalId);
     }
 
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) throws ValidationException {
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
     }
 

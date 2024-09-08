@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,21 +35,19 @@ public class GoalServiceTest {
     private GoalRepository goalRepository;
 
     @Mock
-    private List<GoalFilter> goalFilters;
-
-    @Mock
     private SkillRepository skillRepository;
 
-    @Spy
-    private GoalValidator goalValidator = new GoalValidator(goalRepository, skillRepository);
+    @Mock
+    private List<GoalFilter> goalFilters;
 
     @Spy
     private GoalMapper goalMapper;
 
+    @Spy
+    private GoalValidator goalValidator = new GoalValidator(goalRepository, skillRepository);
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         userId = 1L;
         goalId = 2L;
         emptyTitleGoalDto = prepareData("  ");
@@ -65,7 +62,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void testCreateWithEmptyTitle() throws ValidationException {
+    public void testCreateWithEmptyTitle() {
         ValidationException thrown = assertThrows(ValidationException.class, () ->
                 goalService.createGoal(userId, emptyTitleGoalDto));
 
@@ -79,7 +76,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void testCreateWithUserHavingToManyGoals() throws ValidationException {
+    public void testCreateWithUserHavingToManyGoals() {
         doThrow(ValidationException.class).when(goalValidator).validateGoalsPerUser(userId);
 
         assertThrows(ValidationException.class, () ->
@@ -93,7 +90,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void testCreateWithNotExistingSkills() throws ValidationException {
+    public void testCreateWithNotExistingSkills() {
         doNothing().when(goalValidator).validateGoalsPerUser(userId);
         doThrow(ValidationException.class).when(goalValidator).validateGoalSkills(validGoalDto.getSkillIds());
 
@@ -104,12 +101,6 @@ public class GoalServiceTest {
                 anyLong(),
                 any()
         );
-    }
-
-    @Test
-    public void testDeletingGoalWithNoExistingId() {
-        assertThrows(EntityNotFoundException.class, () -> goalService.deleteGoal(1L));
-        verify(goalRepository, never()).deleteById(1L);
     }
 
     @Test

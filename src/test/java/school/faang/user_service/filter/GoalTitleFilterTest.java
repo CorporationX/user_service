@@ -2,8 +2,6 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
@@ -13,7 +11,6 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 public class GoalTitleFilterTest {
     private GoalTitleFilter goalTitleFilter;
     private GoalFilterDto goalFilterDto;
@@ -37,7 +34,7 @@ public class GoalTitleFilterTest {
 
     @Test
     public void testIsApplicableWithValidFilter() {
-        goalFilterDto.setDescriptionPattern("some description");
+        goalFilterDto.setTitlePattern("some title");
 
         boolean result = goalTitleFilter.isApplicable(goalFilterDto);
 

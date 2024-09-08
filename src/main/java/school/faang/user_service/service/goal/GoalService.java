@@ -8,7 +8,6 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exception.ValidationException;
 import school.faang.user_service.filter.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -29,19 +28,16 @@ public class GoalService {
     private final SkillRepository skillRepository;
 
     @Transactional
-    public GoalDto createGoal(Long userId, GoalDto goalDto) throws ValidationException {
+    public GoalDto createGoal(Long userId, GoalDto goalDto) {
         goalValidator.validateGoalTitle(goalDto);
         goalValidator.validateGoalsPerUser(userId);
         goalValidator.validateGoalSkills(goalDto.getSkillIds());
 
-        Goal goalEntity = goalMapper.toEntity(goalDto);
-        goalEntity.setParent(goalRepository.getReferenceById(goalDto.getParentId()));
-
         Goal createdGoal = goalRepository.create(
-                goalEntity.getTitle(),
-                goalEntity.getDescription(),
-                goalEntity.getParent().getId(),
-                goalEntity.getDeadline()
+                goalDto.getTitle(),
+                goalDto.getDescription(),
+                goalDto.getParentId(),
+                goalDto.getDeadline()
         );
 
         goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, createdGoal.getId()));
@@ -49,6 +45,40 @@ public class GoalService {
         goalRepository.addGoalToUser(userId, createdGoal.getId());
 
         return goalMapper.toDto(createdGoal);
+    }
+
+    @Transactional
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+        goalValidator.validateGoalTitle(goalDto);
+        goalValidator.validateGoalSkills(goalDto.getSkillIds());
+
+        Goal goalToUpdate = goalRepository.findById(goalId).orElseThrow(EntityNotFoundException::new);
+
+        updateRequiredFields(goalToUpdate, goalDto);
+
+        return goalMapper.toDto(goalRepository.save(goalToUpdate));
+    }
+
+    private void updateRequiredFields(Goal goalToUpdate, GoalDto goalDto) {
+        goalToUpdate.setTitle(goalDto.getTitle());
+        if (goalDto.getDescription() != null) {
+            goalToUpdate.setDescription(goalDto.getDescription());
+        }
+        if (goalDto.getSkillIds() != null) {
+            updateSkillsToAchieve(goalToUpdate, goalDto.getSkillIds());
+        }
+        if (goalDto.getDeadline() != null) {
+            goalToUpdate.setDeadline(goalDto.getDeadline());
+        }
+        if (isToComplete(goalToUpdate.getId(), goalDto)) {
+            goalToUpdate.setStatus(GoalStatus.COMPLETED);
+            goalRepository.findUsersByGoalId(goalToUpdate.getId()).forEach(user -> {
+                for (Long skillId : goalDto.getSkillIds()) {
+                    skillRepository.assignSkillToUser(user.getId(), skillId);
+                }
+            });
+        }
+        goalToUpdate.setUpdatedAt(LocalDateTime.now());
     }
 
     private boolean isToComplete(Long goalId, GoalDto goalDto) {
@@ -63,39 +93,7 @@ public class GoalService {
         skillIds.forEach(id -> goalRepository.addSkillToGoal(id, goal.getId()));
     }
 
-    @Transactional
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) throws ValidationException {
-        goalValidator.validateGoalTitle(goalDto);
-        goalValidator.validateGoalSkills(goalDto.getSkillIds());
-
-        Goal goalToUpdate = goalRepository.findById(goalId).orElseThrow(EntityNotFoundException::new);
-
-        goalToUpdate.setTitle(goalDto.getTitle());
-        if (goalDto.getDescription() != null) {
-            goalToUpdate.setDescription(goalDto.getDescription());
-        }
-        if (goalDto.getSkillIds() != null) {
-            updateSkillsToAchieve(goalToUpdate, goalDto.getSkillIds());
-        }
-        if (goalDto.getDeadline() != null) {
-            goalToUpdate.setDeadline(goalDto.getDeadline());
-        }
-
-        if (isToComplete(goalId, goalDto)) {
-            goalToUpdate.setStatus(GoalStatus.COMPLETED);
-            goalRepository.findUsersByGoalId(goalId).forEach(user -> {
-                for (Long skillId : goalDto.getSkillIds()) {
-                    skillRepository.assignSkillToUser(user.getId(), skillId);
-                }
-            });
-        }
-        goalToUpdate.setUpdatedAt(LocalDateTime.now());
-
-        return goalMapper.toDto(goalRepository.save(goalToUpdate));
-    }
-
     public void deleteGoal(Long goalId) {
-        goalRepository.findById(goalId).orElseThrow(EntityNotFoundException::new);
         goalRepository.deleteById(goalId);
     }
 

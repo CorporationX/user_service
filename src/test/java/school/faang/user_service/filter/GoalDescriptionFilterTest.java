@@ -2,8 +2,6 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
@@ -12,7 +10,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class GoalDescriptionFilterTest {
     private GoalDescriptionFilter goalDescriptionFilter;
     private GoalFilterDto goalFilterDto;

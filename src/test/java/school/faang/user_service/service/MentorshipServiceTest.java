@@ -34,7 +34,7 @@ public class MentorshipServiceTest {
     private UserMapperImpl userMapper;
 
     @InjectMocks
-    private MentorshipService mentorshipService;
+    private MentorshipServiceImpl mentorshipService;
 
     private User mentor;
     private User mentee;
@@ -56,19 +56,19 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testIfMentorNotExists() {
+    void getMentees_WhenMentorDoesNotExists() {
         when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(mentor.getId()));
     }
 
     @Test
-    void testIfMenteeNotExists() {
+    void getMentors_WhenMenteeNotExists() {
         when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentors(mentee.getId()));
     }
 
     @Test
-    void testGetMenteesIfMentorExists() {
+    void getMentees_WhenMentorExists() {
         when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
 
         List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
@@ -77,26 +77,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testGetMenteesIfNoMenteesFound() {
-        when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
-
-        mentor.setMentees(Collections.emptyList());
-        List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
-        assertEquals(0, mentees.size());
-    }
-
-    @Test
-    void testGetMentorsIfMenteeExists() {
-        when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
-
-        List<UserDto> mentors = mentorshipService.getMentors(mentee.getId());
-        assertEquals(1, mentors.size());
-
-        verify(userMapper, times(1)).toDto(mentor);
-    }
-
-    @Test
-    void testGetMentorsIfNoMentorsFound() {
+    void getMentors_WhenNoMentorsFound() {
         when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
 
         mentee.setMentors(Collections.emptyList());
@@ -106,7 +87,26 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testDeleteMenteeBySuccess() {
+    void getMentors_WhenMenteeExists() {
+        when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
+
+        List<UserDto> mentors = mentorshipService.getMentors(mentee.getId());
+        assertEquals(1, mentors.size());
+
+        verify(userMapper, times(1)).toDto(mentor);
+    }
+
+    @Test
+    void getMentees_WhenNoMenteesFound() {
+        when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
+
+        mentor.setMentees(Collections.emptyList());
+        List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
+        assertEquals(0, mentees.size());
+    }
+
+    @Test
+    void deleteMentee_WhenSuccess() {
         when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
 
         mentorshipService.deleteMentee(mentee.getId(), mentor.getId());
@@ -114,7 +114,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testDeleteMentorBySuccess() {
+    void deleteMentor_WhenSuccess() {
         when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
 
         mentorshipService.deleteMentor(mentee.getId(), mentor.getId());
@@ -122,7 +122,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testDeleteMentorIfMentorNotFound() {
+    void deleteMentor_WhenMentorNotFound() {
         when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(mentee.getId(), 999L));
@@ -130,7 +130,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testDeleteMenteeIfMenteeNotFound() {
+    void deleteMentee_WhenMenteeNotFound() {
         when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(999L, mentor.getId()));

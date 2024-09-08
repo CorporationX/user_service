@@ -14,6 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -119,7 +120,7 @@ public class RecommendationRequestServiceTest {
     void testGetRequestWithWrongId() {
         when(recommendationRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> requestService.getRequest(Mockito.anyLong()));
+        assertThrows(DataValidationException.class, () -> requestService.getRequest(Mockito.anyLong()));
     }
 
     @Test
@@ -134,7 +135,7 @@ public class RecommendationRequestServiceTest {
     void testRejectRequestWithWrongId() {
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> requestService.rejectRequest(id, rejectionDto));
+        assertThrows(DataValidationException.class, () -> requestService.rejectRequest(id, rejectionDto));
     }
 
     @Test

@@ -13,6 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.goal.GoalInvitationValidationException;
+import school.faang.user_service.filter.goal.GoalInvitationFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -53,6 +54,9 @@ class GoalInvitationServiceTest {
 
     @Mock
     private GoalInvitationValidator goalInvitationValidator;
+
+    @Mock
+    private List<GoalInvitationFilter> goalInvitationFilters;
 
     private long id;
     private Goal goal;

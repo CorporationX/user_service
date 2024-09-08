@@ -1,7 +1,6 @@
 package school.faang.user_service.validation.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -20,11 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestValidatorTest {
@@ -69,7 +68,7 @@ public class RecommendationRequestValidatorTest {
     void testRequesterUserDoesNotExist() {
         when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
+        assertThrows(DataValidationException.class, () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class RecommendationRequestValidatorTest {
         when(userRepository.existsById(recommendationRequestDto.requesterId())).thenReturn(true);
         when(userRepository.existsById(recommendationRequestDto.receiverId())).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
     }
 
@@ -89,7 +88,7 @@ public class RecommendationRequestValidatorTest {
                 recommendationRequestDto.receiverId()))
                 .thenReturn(Optional.of(foundRecommendationRequest));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
     }
 
@@ -102,7 +101,7 @@ public class RecommendationRequestValidatorTest {
                 .thenReturn(Optional.empty());
         when(skillRequestRepository.existsById(Mockito.anyLong())).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> requestValidator.validateRecommendationRequest(recommendationRequestDto));
     }
 

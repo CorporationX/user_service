@@ -11,6 +11,7 @@ import school.faang.user_service.controller.recommendation.RecommendationRequest
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import static org.mockito.Mockito.times;
@@ -41,7 +42,7 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void testRequestRecommendationWrongArgument() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> recommendationRequestController.requestRecommendation(null));
     }
 
@@ -60,7 +61,7 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void testGetRecommendationRequestsWithEmptyFilter() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> recommendationRequestController.getRecommendationRequests(null));
     }
 

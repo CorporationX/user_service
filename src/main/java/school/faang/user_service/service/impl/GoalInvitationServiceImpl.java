@@ -77,6 +77,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         return goalInvitationMapper.toDto(goalInvitationRepository.save(goalInvitation));
     }
 
+    @Transactional
     @Override
     public GoalInvitationDto rejectGoalInvitation(Long goalInvitationId, Long invitedId) {
         GoalInvitation goalInvitation = goalInvitationRepository.findById(goalInvitationId)
@@ -91,6 +92,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         return goalInvitationMapper.toDto(goalInvitationRepository.save(goalInvitation));
     }
 
+    @Transactional
     @Override
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter, Integer from, Integer size) {
         BooleanExpression finalCondition = getCondition(filter);

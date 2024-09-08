@@ -1,6 +1,5 @@
 package school.faang.user_service.service.goal;
 
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +48,6 @@ import static school.faang.user_service.util.goal.invitation.InvitationFabric.ge
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getGoals;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitation;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getUser;
-
 
 class GoalInvitationServiceTest {
     private static final long FIRST_USER_ID = 1L;

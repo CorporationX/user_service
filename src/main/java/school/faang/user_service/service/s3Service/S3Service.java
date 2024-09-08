@@ -6,8 +6,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.AvatarConfigProperties;
 import school.faang.user_service.exception.s3.FileDownloadException;
 import school.faang.user_service.exception.s3.FileUploadException;
 
@@ -23,16 +23,15 @@ import java.nio.file.Files;
 public class S3Service {
 
     private final AmazonS3 amazonS3Client;
-    @Value("${aws.bucket-name}")
-    private String bucketName;
+    private final AvatarConfigProperties avatarProperties;
 
-    public String uploadFile(File file, String folder) {
-        String key = generateBucketKey(folder, file);
+    public String uploadFile(File file) {
+        String key = generateBucketKey(avatarProperties.getFolder(), file);
 
         ObjectMetadata objectMetadata = generateObjectMetadata(file);
 
         try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, new FileInputStream(file), objectMetadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(avatarProperties.getBucketName(), key, new FileInputStream(file), objectMetadata);
             amazonS3Client.putObject(putObjectRequest);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -44,7 +43,7 @@ public class S3Service {
 
     public InputStream getFile(String key) {
         try {
-            S3Object object = amazonS3Client.getObject(bucketName, key);
+            S3Object object = amazonS3Client.getObject(avatarProperties.getBucketName(), key);
             return object.getObjectContent();
         } catch (Exception e) {
             log.error(e.getMessage());

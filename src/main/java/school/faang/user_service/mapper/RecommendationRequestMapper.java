@@ -29,10 +29,12 @@ public interface RecommendationRequestMapper {
 
     @Named("skillsToIds")
     default List<Long> mapSkillsToIds(List<SkillRequest> skills) {
-        return skills != null
-                ? skills.stream()
+        if (skills == null) {
+            return new ArrayList<>();
+        }
+
+        return skills.stream()
                 .map(s -> s.getSkill().getId())
-                .toList()
-                : new ArrayList<>();
+                .toList();
     }
 }

@@ -44,8 +44,8 @@ public class SkillServiceTest {
         SkillDto dto = new SkillDto("title", 1L);
         Skill skill = new Skill();
         when(skillRepository.save(skill)).thenReturn(skill);
-        when(skillMapper.skillDtoToSkill(dto)).thenReturn(skill);
-        when(skillMapper.skillToSkillDto(skill)).thenReturn(dto);
+        when(skillMapper.toSkill(dto)).thenReturn(skill);
+        when(skillMapper.toDto(skill)).thenReturn(dto);
 
         assertEquals(dto, skillService.create(dto));
         verify(skillRepository).save(skill);
@@ -59,7 +59,7 @@ public class SkillServiceTest {
         Skill skill1 = new Skill();
         List<Skill> skills = List.of(skill1);
         when(skillRepository.findSkillsOfferedToUser(id)).thenReturn(skills);
-        when(skillCandidateMapper.skillToSkillCandidateDto(skill1)).thenReturn(candidateDto1);
+        when(skillCandidateMapper.toDto(skill1)).thenReturn(candidateDto1);
 
         List<SkillCandidateDto> actualDtos = skillService.getOfferedSkills(id);
         assertEquals(skillCandidateDtos, actualDtos);
@@ -73,7 +73,7 @@ public class SkillServiceTest {
         List<SkillOffer> skillOffers = List.of(new SkillOffer());
         Skill skill1 = new Skill();
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill1));
-        when(skillMapper.skillToSkillDto(skill1)).thenReturn(dto1);
+        when(skillMapper.toDto(skill1)).thenReturn(dto1);
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
 
         SkillDto actualDto = skillService.acquireSkillFromOffers(skillId, userId);
@@ -88,7 +88,7 @@ public class SkillServiceTest {
         List<SkillOffer> skillOffers = List.of(new SkillOffer(), new SkillOffer(), new SkillOffer());
         Skill skill1 = new Skill();
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill1));
-        when(skillMapper.skillToSkillDto(skill1)).thenReturn(dto1);
+        when(skillMapper.toDto(skill1)).thenReturn(dto1);
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
 
         SkillDto actualDto = skillService.acquireSkillFromOffers(skillId, userId);

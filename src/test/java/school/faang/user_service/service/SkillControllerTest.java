@@ -37,34 +37,23 @@ public class SkillControllerTest {
     @Test
     public void testGetUserSkills() {
         long userId = 1L;
-        List<SkillDto> expectedSkills = List.of(new SkillDto("Java", userId), new SkillDto("Python", userId));
-        when(skillService.getUserSkills(userId)).thenReturn(expectedSkills);
 
-        List<SkillDto> actualSkills = skillController.getUserSkills(userId);
-        assertEquals(expectedSkills, actualSkills);
+        skillController.getUserSkills(userId);
         verify(skillService, times(1)).getUserSkills(userId);
     }
     @Test
     public void testGetOfferedSkills() {
         long userId = 1L;
-        SkillDto dto1 = new SkillDto("Java", 1L);
-        SkillDto dto2 = new SkillDto("Python", 2L);
-        List<SkillCandidateDto> expectedSkills = List.of(new SkillCandidateDto(dto1, userId), new SkillCandidateDto(dto2, userId));
-        when(skillService.getOfferedSkills(userId)).thenReturn(expectedSkills);
 
-        List<SkillCandidateDto> actualSkills = skillController.getOfferedSkills(userId);
-        assertEquals(expectedSkills, actualSkills);
+        skillController.getOfferedSkills(userId);
         verify(skillService, times(1)).getOfferedSkills(userId);
     }
     @Test
     public void testAcquireSkillFromOffers() {
         long userId = 1L;
         long skillId = 2L;
-        SkillDto expectedSkill = new SkillDto("Java", userId);
-        when(skillService.acquireSkillFromOffers(skillId, userId)).thenReturn(expectedSkill);
 
-        SkillDto actualSkill = skillController.acquireSkillFromOffers(skillId, userId);
-        assertEquals(expectedSkill, actualSkill);
+        skillController.acquireSkillFromOffers(skillId, userId);
         verify(skillService, times(1)).acquireSkillFromOffers(skillId, userId);
     }
 

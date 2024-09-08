@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,13 +34,13 @@ public class GoalInvitationController {
                 .body(goalInvitationMapper.toDto(goalInvitation));
     }
 
-    @PutMapping("accept/{id}")
+    @PatchMapping("accept/{id}")
     public ResponseEntity<Void> acceptGoalInvitation(@PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("reject/{id}")
+    @PatchMapping("reject/{id}")
     public ResponseEntity<Void> rejectGoalInvitation(@PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
         return ResponseEntity.ok().build();

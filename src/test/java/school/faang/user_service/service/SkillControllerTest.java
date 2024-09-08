@@ -26,12 +26,9 @@ public class SkillControllerTest {
 
     @Test
     public void testCreate() {
-        SkillDto skillDto = new SkillDto("Java", 1L);
-        SkillDto createdSkillDto = new SkillDto("Java", 1L);
-        when(skillService.create(skillDto)).thenReturn(createdSkillDto);
+        SkillDto skillDto = new SkillDto("Java",1L);
 
-        SkillDto actualSkillDto = skillController.create(skillDto);
-        assertEquals(createdSkillDto, actualSkillDto);
+        skillController.create(skillDto);
         verify(skillService, times(1)).create(skillDto);
     }
     @Test

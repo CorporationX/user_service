@@ -12,7 +12,7 @@ import school.faang.user_service.repository.SubscriptionRepository;
 public class SubscriptionValidator {
     public void validateId(long fistId, long secondId) {
         if (fistId < 0 || secondId < 0) {
-            throw new DataValidationException(MessageError.USER_NOT_FOUND_EXCEPTION);
+            throw new DataValidationException(MessageError.USER_NOT_FOUND_EXCEPTIONdddffd);
         }
     }
 

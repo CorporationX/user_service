@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -48,6 +48,7 @@ import static school.faang.user_service.service.goal.util.GoalInvitationErrorMes
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.USER_GOALS_LIMIT_EXCEEDED;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.*;
 
+
 class GoalInvitationServiceTest {
     private static final long FIRST_USER_ID = 1L;
     private static final long SECOND_USER_ID = 2L;
@@ -59,8 +60,7 @@ class GoalInvitationServiceTest {
     private static final int EXCEEDED_NUMBER_OF_GOALS = 4;
     private static final long NEW_GOAL_ID = EXCEEDED_NUMBER_OF_GOALS + 1L;
 
-    @Value("${app.goal.max-active-per-user}")
-    private Integer USER_GOALS_LIMIT;
+    private static final Integer USER_GOALS_LIMIT = 3;
 
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
@@ -82,6 +82,7 @@ class GoalInvitationServiceTest {
     @BeforeEach
     void setUp() {
         closeable = openMocks(this);
+        ReflectionTestUtils.setField(goalInvitationService, "userGoalsLimit", USER_GOALS_LIMIT);
     }
 
     @Test

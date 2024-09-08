@@ -35,6 +35,8 @@ public class GoalInvitationService {
     @Value("${app.goal.max-active-per-user}")
     private  Integer userGoalsLimit;
 
+    private Integer field;
+
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;

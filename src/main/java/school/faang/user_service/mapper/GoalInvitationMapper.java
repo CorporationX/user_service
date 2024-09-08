@@ -14,9 +14,6 @@ import java.util.List;
 public interface GoalInvitationMapper {
 
     @Mapping(target = "id", source = "invitation.id")
-    @Mapping(target = "goal", source = "goal")
-    @Mapping(target = "inviter", source = "inviter")
-    @Mapping(target = "invited", source = "invited")
     @Mapping(target = "status", source = "invitation.status")
     @Mapping(target = "createdAt", source = "invitation.createdAt")
     @Mapping(target = "updatedAt", source = "invitation.updatedAt")

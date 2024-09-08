@@ -6,16 +6,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.webjars.NotFoundException;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.entity.goal.QGoalInvitation;
+import school.faang.user_service.filter.*;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.service.impl.GoalInvitationServiceImpl;
+import school.faang.user_service.validator.ValidationInvitation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +37,7 @@ class GoalInvitationServiceImplTest {
     private GoalInvitationRepository goalInvitationRepository;
     private GoalInvitationMapper goalInvitationMapper;
     private GoalInvitationService goalInvitationService;
+    private ValidationInvitation validationInvitation;
 
     Goal goal = Goal.builder()
             .id(2L)
@@ -70,8 +75,12 @@ class GoalInvitationServiceImplTest {
         userRepository = mock(UserRepository.class);
         goalInvitationRepository = mock(GoalInvitationRepository.class);
         goalInvitationMapper = mock(GoalInvitationMapper.class);
+        List<FilterInvitation<InvitationFilterDto, QGoalInvitation>> filterInvitations = List.of(new InviterIdFilterInvitation(),
+                new InvitedIdFilterInvitation(), new InvitedUsernameFilterInvitation(),
+                new InviterUsernameFilterInvitation(), new InvitationStatusFilterInvitation());
+        validationInvitation = mock(ValidationInvitation.class);
         goalInvitationService = new GoalInvitationServiceImpl(goalInvitationRepository, goalRepository,
-                userRepository, goalInvitationMapper);
+                userRepository, goalInvitationMapper, filterInvitations, validationInvitation);
     }
 
     @Test
@@ -170,31 +179,6 @@ class GoalInvitationServiceImplTest {
                 goalInvitationService.acceptGoalInvitation(1L, 2L));
     }
 
-
-    @Test
-    void testAcceptGoalInvitation_invitedUserHasMaxGoals_throwsIllegalArgumentException() {
-        List<Goal> goals = new ArrayList<>();
-        goals.add(new Goal());
-        goals.add(new Goal());
-        goals.add(new Goal());
-
-        User invited = User.builder()
-                .id(3L)
-                .aboutMe("AboutMe")
-                .city("Moscow")
-                .username("RicardoIdris")
-                .goals(goals)
-                .build();
-
-        when(goalInvitationRepository.findById(any())).thenReturn(Optional.of(goalInvitationEntity));
-        when(userRepository.findById(any())).thenReturn(Optional.of(invited));
-
-        Exception e = assertThrows(IllegalArgumentException.class, () ->
-                goalInvitationService.acceptGoalInvitation(1L, 3L));
-        assertEquals(e.getMessage(), "Users can not accept the invitation, " +
-                "maximum number of active goals (max = 3)");
-    }
-
     @Test
     void testRejectGoalInvitation_validInput() {
         GoalInvitation goalInvitationEntity = GoalInvitation.builder()
@@ -209,7 +193,6 @@ class GoalInvitationServiceImplTest {
         resultDto.setStatus(RequestStatus.REJECTED);
 
         when(goalInvitationRepository.findById(10L)).thenReturn(Optional.of(goalInvitationEntity));
-        when(userRepository.findById(3L)).thenReturn(Optional.of(invited));
         when(goalInvitationMapper.toDto(goalInvitationEntity)).thenReturn(resultDto);
         when(goalInvitationRepository.save(goalInvitationEntity)).thenReturn(goalInvitationEntity);
 
@@ -219,32 +202,7 @@ class GoalInvitationServiceImplTest {
         assertEquals(result.getStatus(), RequestStatus.REJECTED);
 
         verify(goalInvitationRepository).findById(10L);
-        verify(userRepository).findById(3L);
         verify(goalInvitationRepository).save(goalInvitationEntity);
         verify(goalInvitationMapper).toDto(goalInvitationEntity);
-    }
-
-    @Test
-    void testRejectGoalInvitation_invitedNotFound_throwsNotFoundException() {
-        when(goalInvitationRepository.findById(any())).thenReturn(Optional.of(goalInvitationEntity));
-        when(userRepository.findById(invited.getId())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () ->
-                goalInvitationService.rejectGoalInvitation(1L, invited.getId()));
-    }
-
-    @Test
-    void testRejectGoalInvitation_statusNotPending_throwsIllegalArgumentException() {
-        GoalInvitation goalInvitationEntity = GoalInvitation.builder()
-                .id(10L)
-                .goal(goal)
-                .invited(invited)
-                .status(RequestStatus.ACCEPTED)
-                .build();
-        when(goalInvitationRepository.findById(any())).thenReturn(Optional.of(goalInvitationEntity));
-        when(userRepository.findById(any())).thenReturn(Optional.of(invited));
-
-        assertThrows(IllegalArgumentException.class, () ->
-                goalInvitationService.rejectGoalInvitation(1L, 2L));
     }
 }

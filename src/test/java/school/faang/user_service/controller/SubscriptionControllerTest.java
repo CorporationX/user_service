@@ -54,7 +54,7 @@ public class SubscriptionControllerTest {
         assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(userId, userId));
     }
 
-    /*@Test
+    @Test
     public void testGetFollowers() {
 
         UserDto user1 = new UserDto(1L, "Ruslan", "ruslan@example.ru");
@@ -64,9 +64,8 @@ public class SubscriptionControllerTest {
         when(subscriptionService.getFollowers(1L, filterDto)).thenReturn(List.of(user1));
         List<UserDto> followers = subscriptionController.getFollowers(1L, filterDto);
 
-        assertEquals(1, followers.size());
         assertEquals("Ruslan", followers.get(0).getUsername());
-    }*/
+    }
 
     @Test
     public void testOfGetFollowersCount() {
@@ -80,5 +79,18 @@ public class SubscriptionControllerTest {
         long followerId = 1L;
 
         subscriptionController.getFollowingCount(followerId);
+    }
+
+    @Test
+    public void testGetFollowing() {
+
+        UserDto user1 = new UserDto(1L, "Ruslan", "ruslan@example.ru");
+        UserFilterDto filterDto = new UserFilterDto();
+        filterDto.setNamePattern("Ruslan");
+
+        when(subscriptionService.getFollowing(1L, filterDto)).thenReturn(List.of(user1));
+        List<UserDto> following = subscriptionController.getFollowing(1L, filterDto);
+
+        assertEquals("Ruslan", following.get(0).getUsername());
     }
 }

@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.NameFilter;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,10 +29,13 @@ public class SubscriptionServiceTest {
     @Mock
     SubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private NameFilter nameFilter;
+
     private User user1 = new User();
     private User user2 = new User();
 
-    private void createUser(){
+    private void createUser() {
         user1.setId(1L);
         user1.setUsername("Ruslan");
         user1.setEmail("ruslan@example.ru");
@@ -69,55 +74,46 @@ public class SubscriptionServiceTest {
         subscriptionService.unFollowUser(followerId, followeeId);
     }
 
-    /*@Test
+    @Test
     public void testGetFollowersWithNoFilter() {
         createUser();
 
-        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1,user2));
+        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1, user2));
         List<UserDto> followers = subscriptionService.getFollowers(1L, new UserFilterDto());
 
         assertEquals(2, followers.size());
-        assertEquals("Alice", followers.get(0).getUsername());
+        assertEquals("Ruslan", followers.get(0).getUsername());
         assertEquals("Bob", followers.get(1).getUsername());
     }
 
     @Test
-    public void testGetFollowersWithNameFilter() {
+    public void testGetFollowersNoMatchesAfterFilters() {
         createUser();
 
-        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1,user2));
-        UserFilterDto filter = new UserFilterDto();
-        filter.setNamePattern("Bob");
-        List<UserDto> followers = subscriptionService.getFollowers(1L, filter);
+        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1, user2));
+        when(nameFilter.isApplicable(any())).thenReturn(true);
+        when(nameFilter.apply(any(), any())).thenAnswer(invocation -> {
+            Stream<User> inputUsers = invocation.getArgument(0);
+            return inputUsers.filter(user -> user.getUsername().contains("Charlie"));
+        });
+        UserFilterDto filters = new UserFilterDto();
+        filters.setNamePattern("Charlie");
+        List<UserDto> result = subscriptionService.getFollowers(1L, filters);
 
-        assertEquals(1, followers.size());
-        assertEquals("Bob", followers.get(0).getUsername());
-    }
-
-    @Test
-    public void testGetFollowersWithEmailFilter() {
-        createUser();
-
-        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1,user2));
-        UserFilterDto filter = new UserFilterDto();
-        filter.setEmailPattern("bob@example.ru");
-        List<UserDto> followers = subscriptionService.getFollowers(1L, filter);
-
-        assertEquals(1, followers.size());
-        assertEquals("bob@example.ru", followers.get(0).getEmail());
+        assertEquals(0, result.size());
     }
 
     @Test
     public void testGetFollowerWithNoMatches() {
         createUser();
 
-        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1,user2));
+        when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1, user2));
         UserFilterDto filter = new UserFilterDto();
         filter.setEmailPattern("charlie@example.ru");
         List<UserDto> followers = subscriptionService.getFollowers(1L, filter);
 
-        assertEquals(0,followers.size());
-    }*/
+        assertEquals(0, followers.size());
+    }
 
     @Test
     public void testOfGetFollowersCount() {

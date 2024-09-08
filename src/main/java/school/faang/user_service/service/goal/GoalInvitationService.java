@@ -2,6 +2,7 @@ package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -31,7 +32,8 @@ import static school.faang.user_service.service.goal.util.GoalInvitationErrorMes
 @Service
 @RequiredArgsConstructor
 public class GoalInvitationService {
-    public static final int USER_GOALS_LIMIT = 3;
+    @Value("${app.goal.max-active-per-user}")
+    private  Integer userGoalsLimit;
 
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalRepository goalRepository;
@@ -56,14 +58,19 @@ public class GoalInvitationService {
     private void invitationSetEntities(GoalInvitation invitationEntity, long inviterId, long invitedUserId, long goalId) {
         log.info("Set entities to new invitation");
         log.info("Find inviter user with id: {}", inviterId);
-        invitationEntity.setInviter(userRepository.findById(inviterId).orElseThrow(() ->
-                new InvitationEntityNotFoundException(INVITER_NOT_FOUND_MESSAGE_FORMAT, inviterId)));
+        var inviter = findUserById(inviterId, INVITER_NOT_FOUND_MESSAGE_FORMAT);
+        invitationEntity.setInviter(inviter);
         log.info("Find invited user with id: {}", invitedUserId);
-        invitationEntity.setInvited(userRepository.findById(invitedUserId).orElseThrow(() ->
-                new InvitationEntityNotFoundException(INVITED_USER_NOT_FOUND_MESSAGE_FORMAT, invitedUserId)));
+        var invitedUser = findUserById(invitedUserId, INVITED_USER_NOT_FOUND_MESSAGE_FORMAT);
+        invitationEntity.setInvited(invitedUser);
         log.info("Find goal with id: {}", goalId);
-        invitationEntity.setGoal(goalRepository.findById(goalId).orElseThrow(() ->
-                new InvitationEntityNotFoundException(GOAL_NOT_FOUND_MESSAGE_FORMAT, goalId)));
+        var goal = goalRepository.findById(goalId).orElseThrow(() ->
+                new InvitationEntityNotFoundException(GOAL_NOT_FOUND_MESSAGE_FORMAT, goalId));
+        invitationEntity.setGoal(goal);
+    }
+
+    private User findUserById(long id, String notFoundMessage) {
+        return userRepository.findById(id).orElseThrow(() -> new InvitationEntityNotFoundException(notFoundMessage, id));
     }
 
     @Transactional
@@ -84,9 +91,9 @@ public class GoalInvitationService {
             invitation.setStatus(RequestStatus.REJECTED);
             throw new InvitationCheckException(USER_ALREADY_HAS_GOAL, invitedUser.getId(), goal.getId());
         }
-        if (activeGoals.size() >= USER_GOALS_LIMIT) {
+        if (activeGoals.size() >= userGoalsLimit) {
             invitation.setStatus(RequestStatus.REJECTED);
-            throw new InvitationCheckException(USER_GOALS_LIMIT_EXCEEDED, invitedUser.getId(), USER_GOALS_LIMIT);
+            throw new InvitationCheckException(USER_GOALS_LIMIT_EXCEEDED, invitedUser.getId(), userGoalsLimit);
         }
     }
 

@@ -8,8 +8,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
+import school.faang.user_service.validator.Predicates;
 import school.faang.user_service.validator.validatorResult.NotValidated;
 import school.faang.user_service.validator.validatorResult.Validated;
+
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -30,7 +33,7 @@ class MentorshipRequestServiceTest {
     @Test
     void test_service_method_called_() {
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(dto)).thenReturn(new Validated(null));
+        when(mentorshipRequestValidator.validate(dto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate))).thenReturn(new Validated(null));
         service.requestMentorship(dto);
         verify(repository).create(dto.getRequesterId(),dto.getReceiverId(),dto.getDescription());
     }
@@ -38,7 +41,7 @@ class MentorshipRequestServiceTest {
     @Test
     void test_service_method_not_called(){
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(dto)).thenReturn(new NotValidated(""));
+        when(mentorshipRequestValidator.validate(dto,List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate))).thenReturn(new NotValidated(""));
         service.requestMentorship(dto);
         verifyNoInteractions(repository);
     }

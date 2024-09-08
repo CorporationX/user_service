@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public final class NotValidated extends ValidationResult {
+public final class NotValidated extends ValidationResult<String>  {
     private final String message;
 }

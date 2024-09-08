@@ -48,4 +48,11 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
             """)
     MentorshipRequest updateMentorshipRequestStatusByRequesterId(Long id, RequestStatus status);
 
+    @Modifying
+    @Query(nativeQuery = true, value = """
+                UPDATE mentorship_request m SET m.status = :status , m.rejection_reason = rejectionReason 
+                                            WHERE id = : id
+            """)
+    MentorshipRequest updateMentorshipRequestStatusWithReasonByRequesterId(Long id, RequestStatus status, String rejectionReason);
+
 }

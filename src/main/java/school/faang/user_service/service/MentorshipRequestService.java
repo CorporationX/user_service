@@ -5,6 +5,7 @@ import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.RequestMapper;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
+import static school.faang.user_service.entity.RequestStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor
@@ -71,4 +73,12 @@ public class MentorshipRequestService {
             throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
         }
     }
+
+    @Transactional
+    void rejectRequest(long id, RejectionDto rejection){
+        MentorshipRequest request =  repository.getMentorshipRequestById(id);
+        repository.updateMentorshipRequestStatusWithReasonByRequesterId(id,REJECTED, rejection.getReason());
+
+    }
+
 }

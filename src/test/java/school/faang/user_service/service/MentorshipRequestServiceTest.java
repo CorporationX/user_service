@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.RequestMapper;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -144,4 +145,27 @@ class MentorshipRequestServiceTest {
         verify(repository, never()).updateMentorshipRequestStatusByRequesterId(anyLong(), any(RequestStatus.class));
     }
 
+    @Test
+    void rejectRequesst_ShouldThrowException_WhenRequestIsNotFound() {
+        when(repository.getMentorshipRequestById(1L)).thenThrow(new EmptyResultDataAccessException(1));
+
+        // Act & Assert
+        assertThrows(EmptyResultDataAccessException.class, () -> service.rejectRequest(1L,any()));
+
+        verify(repository, never()).updateMentorshipRequestStatusByRequesterId(anyLong(), any(RequestStatus.class));
+    }
+
+    @Test
+    void rejectRequest_ShouldCall_updateMentorshipRequestStatusByRequesterId(){
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(1L);
+        request.setRejectionReason("reason");
+        request.setStatus(RequestStatus.PENDING);
+        when(repository.getMentorshipRequestById(1L)).thenReturn(request);
+        RejectionDto rejectionDto = RejectionDto.builder().reason("reason").build();
+
+        service.rejectRequest(request.getId(),rejectionDto);
+
+        verify(repository).updateMentorshipRequestStatusWithReasonByRequesterId(request.getId(),RequestStatus.REJECTED, rejectionDto.getReason());
+    }
 }

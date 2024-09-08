@@ -98,6 +98,7 @@ class EventParticipationServiceImplTest {
         List<User> actualParticipants = eventParticipationServiceImpl.getParticipants(eventId);
 
         Assertions.assertEquals(participants, actualParticipants);
+        Assertions.fail();
     }
 
     @Test

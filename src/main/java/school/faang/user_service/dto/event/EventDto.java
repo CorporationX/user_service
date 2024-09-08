@@ -3,8 +3,10 @@ package school.faang.user_service.dto.event;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor

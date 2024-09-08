@@ -4,19 +4,26 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = {SkillMapper.class}, unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface EventMapper {
 
-    @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToId")
+    // TODO: finish event mapper
+
+    @Mapping(source = "owner.id", target = "ownerId")
+    @Mapping(target = "relatedSkills", qualifiedByName = "skillsToSkillsDto")
     EventDto toDto(Event event);
 
     Event toEntity(EventDto eventDto);
 
-    @Named("userToId")
-    static Long userToId(User user) {
-        return user.getId();
+    @Named("skillsToSkillsDto")
+    static List<SkillDto> skillsToSkillsDto(List<Skill> skills) {
+        return skills.stream().map(() -> )
     }
 }

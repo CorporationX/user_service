@@ -27,10 +27,15 @@ public class SkillValidator implements Validator<RecommendationRequestDto> {
 
     @Override
     public boolean validate(final RecommendationRequestDto recommendationRequestDto) {
+
+        if (recommendationRequestDto.getStatus() == null) {
+            return true;
+        }
+
         List<Long> skillIds = recommendationRequestDto.getSkillIds();
         boolean areSkillsExists = skillRepository.countExisting(skillIds) == skillIds.size();
 
-        if (! areSkillsExists) {
+        if (!areSkillsExists) {
             throw new ValidationException(
                     ExceptionMessage.SKILLS_DONT_EXIST
             );

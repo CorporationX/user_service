@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ feature/pipeline-BC-BJS2-26461 ]
+    branches: [ feature/pipeline-BC-BJS2-26461, feature/pipeline-test-BC-BJS2-26461 ]
   pull_request:
-    branches: [ feature/pipeline-BC-BJS2-26461 ]
+    branches: [ feature/pipeline-BC-BJS2-26461, feature/pipeline-test-BC-BJS2-26461 ]
 
 jobs:
   build:
@@ -12,16 +12,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}

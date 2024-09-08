@@ -104,7 +104,7 @@ public class User {
     @OneToMany(mappedBy = "mentor")
     private List<Goal> setGoals;
 
-    @ManyToMany(mappedBy = "users"/*, cascade = CascadeType.ALL, fetch = FetchType.EAGER*/)
+    @ManyToMany(mappedBy = "users")
     private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")

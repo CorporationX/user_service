@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -20,6 +18,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitation;
@@ -30,12 +30,6 @@ class GoalInvitationControllerTest {
     private static final Long SECOND_USER_ID = 2L;
     private static final Long GOAL_ID = 1L;
     private static final RequestStatus STATUS = RequestStatus.ACCEPTED;
-    private static final int CREATED_RESPONSE_CODE = 201;
-
-    private final GoalInvitationDto invitationDto =
-            new GoalInvitationDto(null, FIRS_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
-    private final GoalInvitationDto expectedInvitationDto =
-            new GoalInvitationDto(INVITATION_ID, FIRS_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
 
     @Mock
     private GoalInvitationService goalInvitationService;
@@ -56,46 +50,39 @@ class GoalInvitationControllerTest {
     @Test
     @DisplayName("Given invitationDto when create invitation then return invitationDto")
     void testCreateInvitationSuccessful() {
-        var expectedInvitation = getInvitation(INVITATION_ID, FIRS_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
+        var invitationDto = new GoalInvitationDto(null, FIRS_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
+        var invitation = getInvitation(INVITATION_ID, FIRS_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
         when(goalInvitationService.createInvitation(goalInvitationMapper.toEntity(invitationDto),
-                FIRS_USER_ID, SECOND_USER_ID, GOAL_ID)).thenReturn(expectedInvitation);
+                invitationDto.inviterId(), invitationDto.invitedUserId(), invitationDto.goalId())).thenReturn(invitation);
 
-        ResponseEntity<GoalInvitationDto> response = goalInvitationController.createInvitation(invitationDto);
-        assertThat(response)
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("statusCode.value", CREATED_RESPONSE_CODE)
-                .extracting(ResponseEntity::getBody)
-                .isEqualTo(expectedInvitationDto);
+        assertThat(goalInvitationController.createInvitation(invitationDto)).isNotNull()
+                .isInstanceOf(GoalInvitationDto.class);
+        verify(goalInvitationService, times(1))
+                .createInvitation(goalInvitationMapper.toEntity(invitationDto), invitationDto.inviterId(),
+                        invitationDto.invitedUserId(), invitationDto.goalId());
     }
 
     @Test
-    @DisplayName("Given invitation id when accept invitation return response")
+    @DisplayName("Given invitation id then accept invitation")
     void testAcceptInvitationSuccessful() {
-        var response = goalInvitationController.acceptGoalInvitation(INVITATION_ID);
-        assertThat(response)
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("statusCode", HttpStatus.OK);
+        goalInvitationController.acceptGoalInvitation(INVITATION_ID);
+        verify(goalInvitationService, times(1)).acceptGoalInvitation(INVITATION_ID);
     }
 
     @Test
-    @DisplayName("Given invitation id when reject invitation return response")
+    @DisplayName("Given invitation id then reject invitation")
     void testRejectInvitationSuccessful() {
-        var response = goalInvitationController.rejectGoalInvitation(INVITATION_ID);
-        assertThat(response)
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("statusCode", HttpStatus.OK);
+        goalInvitationController.rejectGoalInvitation(INVITATION_ID);
+        verify(goalInvitationService, times(1)).rejectGoalInvitation(INVITATION_ID);
     }
 
     @Test
-    @DisplayName("Given invitationFilterDto when get invitations then return response")
+    @DisplayName("Given invitationFilterDto when get invitations then return invitations list")
     void getInvitationsSuccessful() {
         var filter = new InvitationFilterDto(null, null, null, null, null);
-        when(goalInvitationService.getInvitations(filter))
-                .thenReturn(List.of(mock(GoalInvitation.class)));
-        var response = goalInvitationController.getInvitations(filter);
-        assertThat(response)
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("statusCode", HttpStatus.FOUND);
+        when(goalInvitationService.getInvitations(filter)).thenReturn(List.of(mock(GoalInvitation.class)));
+        assertThat(goalInvitationController.getInvitations(filter)).isInstanceOf(List.class);
+        verify(goalInvitationService, times(1)).getInvitations(filter);
     }
 
     @AfterEach

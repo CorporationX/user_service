@@ -2,6 +2,7 @@ package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -21,15 +22,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SkillService {
+
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
-    private final SkillValidator skillServiceValidator;
+    private final SkillValidator skillValidator;
 
+    @Transactional
     public SkillDto create(SkillDto skillDto) {
-        skillServiceValidator.validateSkillByTitle(skillDto);
+        skillValidator.validateSkillByTitle(skillDto);
         Skill skillEntity = skillMapper.toEntity(skillDto);
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }
@@ -48,23 +51,25 @@ public class SkillService {
                 .toList();
     }
 
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        skillServiceValidator.validateOfferedSkill(skillId, userId);
+        skillValidator.validateOfferedSkill(skillId, userId);
         List<SkillOffer> allSkillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-        skillServiceValidator.validateSkillByMinSkillOffers(allSkillOffers.size(), skillId, userId);
+        skillValidator.validateSkillByMinSkillOffers(allSkillOffers.size(), skillId, userId);
         skillRepository.assignSkillToUser(skillId, userId);
         addUserSkillGuarantee(allSkillOffers);
         return skillMapper.toDto(allSkillOffers.get(0).getSkill());
     }
 
-    private void addUserSkillGuarantee(List<SkillOffer> offeredSkills) {
-        userSkillGuaranteeRepository.saveAll(offeredSkills.stream()
-                .map(offeredSkill -> UserSkillGuarantee.builder()
-                        .user(offeredSkill.getRecommendation().getReceiver())
-                        .skill(offeredSkill.getSkill())
-                        .guarantor(offeredSkill.getRecommendation().getAuthor())
+    private void addUserSkillGuarantee(List<SkillOffer> skillOffers) {
+        List<UserSkillGuarantee> guarantees = skillOffers.stream()
+                .map(offer -> UserSkillGuarantee.builder()
+                        .user(offer.getRecommendation().getReceiver())
+                        .skill(offer.getSkill())
+                        .guarantor(offer.getRecommendation().getAuthor())
                         .build())
                 .distinct()
-                .toList());
+                .toList();
+        userSkillGuaranteeRepository.saveAll(guarantees);
     }
 }

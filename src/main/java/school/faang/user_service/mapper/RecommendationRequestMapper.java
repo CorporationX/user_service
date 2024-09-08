@@ -1,4 +1,4 @@
-package school.faang.user_service.service.recomendation;
+package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -23,8 +23,16 @@ public interface RecommendationRequestMapper {
     @Mapping(source = "receiverId", target = "receiver.id")
     RecommendationRequest toEntity(CreateRecommendationRequestDto dto);
 
+    default List<RecommendationRequestDto> listEntitiesToListDto(List<RecommendationRequest> requests) {
+        return requests.stream().map(this::toDto).toList();
+    }
+
     @Named("skillsToIds")
     default List<Long> mapSkillsToIds(List<SkillRequest> skills) {
-        return skills != null ? skills.stream().map(s -> s.getSkill().getId()).toList() : new ArrayList<>();
+        return skills != null
+                ? skills.stream()
+                .map(s -> s.getSkill().getId())
+                .toList()
+                : new ArrayList<>();
     }
 }

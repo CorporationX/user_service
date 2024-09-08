@@ -1,8 +1,10 @@
 package school.faang.user_service.dto.recomendation;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Data
+@Getter
+@AllArgsConstructor
 public class CreateRecommendationResponseDto {
     private final long id;
 }

@@ -34,8 +34,8 @@ public class RecommendationRequestValidator {
         this.checkUserExists(receiverId);
         this.checkSkillsExists(skills);
         this.checkLastRequestMoreSixMonths(
-            requesterId,
-            receiverId
+                requesterId,
+                receiverId
         );
     }
 
@@ -56,14 +56,14 @@ public class RecommendationRequestValidator {
     private void checkLastRequestMoreSixMonths(Long requesterId, Long receiverId) {
         Optional<RecommendationRequest> lastRecommendationRequest = this.recommendationRequestRepository
                 .findLatestPendingRequest(
-                    requesterId,
-                    receiverId
+                        requesterId,
+                        receiverId
                 );
 
         if (lastRecommendationRequest.isPresent()) {
             Duration duration = Duration.between(
-                lastRecommendationRequest.get().getCreatedAt(),
-                LocalDateTime.now()
+                    lastRecommendationRequest.get().getCreatedAt(),
+                    LocalDateTime.now()
             );
 
             if (duration.toDays() < SIX_MONTHS_IN_DAYS) {

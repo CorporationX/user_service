@@ -6,7 +6,12 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recomendation.CreateRecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.FilterRecommendationRequestsDto;
@@ -19,7 +24,7 @@ import school.faang.user_service.exception.recomendation.request.RecommendationR
 import school.faang.user_service.exception.recomendation.request.RecommendationRequestRejectException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.recomendation.RecommendationRequestMapper;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.service.recomendation.RecommendationRequestService;
 import school.faang.user_service.service.recomendation.filters.RecommendationRequestIdFilter;
 import school.faang.user_service.service.recomendation.filters.RecommendationRequestMessageFilter;
@@ -32,7 +37,9 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
@@ -61,7 +68,7 @@ public class RecommendationRequestServiceTest {
         when(this.recommendationRequestRepository.save(any(RecommendationRequest.class))).thenReturn(createdRequest);
 
         Long result = this.recommendationRequestService.create(
-            this.mapper.toEntity(dto), dto.getSkills()
+                this.mapper.toEntity(dto), dto.getSkills()
         );
 
         assertEquals(result, createdRequest.getId());
@@ -80,11 +87,11 @@ public class RecommendationRequestServiceTest {
         CreateRecommendationRequestDto dto = this.validCreatedDto();
 
         doThrow(ValidationException.class).when(this.validator).validateCreateRecommendationRequest(
-            any(RecommendationRequest.class), anyList()
+                any(RecommendationRequest.class), anyList()
         );
 
         assertThrows(ValidationException.class, () -> this.recommendationRequestService.create(
-            this.mapper.toEntity(dto), dto.getSkills()
+                this.mapper.toEntity(dto), dto.getSkills()
         ));
 
         verify(this.recommendationRequestRepository, times(0)).save(any(RecommendationRequest.class));
@@ -101,7 +108,7 @@ public class RecommendationRequestServiceTest {
         recommendationRequest.setStatus(RequestStatus.PENDING);
 
         when(this.recommendationRequestRepository.findById(anyLong()))
-            .thenReturn(Optional.of(recommendationRequest));
+                .thenReturn(Optional.of(recommendationRequest));
 
         this.recommendationRequestService.rejectRequest(rejectionDto);
 
@@ -118,7 +125,7 @@ public class RecommendationRequestServiceTest {
         rejectionDto.setReason("Reject");
 
         assertThrows(RecommendationRequestNotFoundException.class, () -> this.recommendationRequestService
-            .rejectRequest(rejectionDto)
+                .rejectRequest(rejectionDto)
         );
 
         RecommendationRequest recommendationRequest = this.mapper.toEntity(this.validCreatedDto());
@@ -163,9 +170,9 @@ public class RecommendationRequestServiceTest {
 
         this.recommendationRequestService = new RecommendationRequestService(
                 List.of(
-                    new RecommendationRequestIdFilter(),
-                    new RecommendationRequestStatusFilter(),
-                    new RecommendationRequestMessageFilter()
+                        new RecommendationRequestIdFilter(),
+                        new RecommendationRequestStatusFilter(),
+                        new RecommendationRequestMessageFilter()
                 ),
                 this.skillRequestRepository,
                 this.recommendationRequestRepository,
@@ -173,21 +180,21 @@ public class RecommendationRequestServiceTest {
         );
 
         when(this.recommendationRequestRepository.findAll())
-            .thenReturn(List.of(
-                new RecommendationRequest().builder()
-                        .id(1L)
-                        .message("Request 1")
-                        .status(RequestStatus.PENDING)
-                        .build(),
-                new RecommendationRequest().builder()
-                        .id(2L)
-                        .message("Request 2")
-                        .status(RequestStatus.ACCEPTED)
-                        .build()
-            ));
+                .thenReturn(List.of(
+                        new RecommendationRequest().builder()
+                                .id(1L)
+                                .message("Request 1")
+                                .status(RequestStatus.PENDING)
+                                .build(),
+                        new RecommendationRequest().builder()
+                                .id(2L)
+                                .message("Request 2")
+                                .status(RequestStatus.ACCEPTED)
+                                .build()
+                ));
 
         List<RecommendationRequest> result1 = this.recommendationRequestService.getRecommendationRequests(
-            filterRecommendationRequestsDto
+                filterRecommendationRequestsDto
         );
 
         List<RecommendationRequest> result2 = this.recommendationRequestService.getRecommendationRequests(
@@ -199,11 +206,11 @@ public class RecommendationRequestServiceTest {
     }
 
     private CreateRecommendationRequestDto validCreatedDto() {
-        return new CreateRecommendationRequestDto (
-            "Message",
-            new ArrayList<>(List.of(1L, 2L)),
-            1L,
-            2L
+        return new CreateRecommendationRequestDto(
+                "Message",
+                new ArrayList<>(List.of(1L, 2L)),
+                1L,
+                2L
         );
     }
 }

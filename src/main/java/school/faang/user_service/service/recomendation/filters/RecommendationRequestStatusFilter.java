@@ -15,8 +15,8 @@ public class RecommendationRequestStatusFilter implements RecommendationRequestF
 
     @Override
     public Stream<RecommendationRequest> apply(
-        Stream<RecommendationRequest> requestStream,
-        FilterRecommendationRequestsDto filter
+            Stream<RecommendationRequest> requestStream,
+            FilterRecommendationRequestsDto filter
     ) {
         return requestStream.filter(
                 recommendationRequest -> recommendationRequest.getStatus().equals(filter.getStatus())

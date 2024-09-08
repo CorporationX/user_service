@@ -9,7 +9,7 @@ public interface RecommendationRequestFilter {
     boolean isApplicable(FilterRecommendationRequestsDto filter);
 
     Stream<RecommendationRequest> apply(
-        Stream<RecommendationRequest> requestStream,
-        FilterRecommendationRequestsDto filter
+            Stream<RecommendationRequest> requestStream,
+            FilterRecommendationRequestsDto filter
     );
 }

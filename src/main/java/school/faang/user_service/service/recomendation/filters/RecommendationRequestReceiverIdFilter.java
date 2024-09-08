@@ -19,7 +19,7 @@ public class RecommendationRequestReceiverIdFilter implements RecommendationRequ
             FilterRecommendationRequestsDto filter
     ) {
         return requestStream.filter(
-            recommendationRequest -> recommendationRequest.getReceiver().getId().equals(filter.getReceiverId())
+                recommendationRequest -> recommendationRequest.getReceiver().getId().equals(filter.getReceiverId())
         );
     }
 }

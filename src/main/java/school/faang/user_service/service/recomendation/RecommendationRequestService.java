@@ -1,7 +1,9 @@
 package school.faang.user_service.service.recomendation;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recomendation.FilterRecommendationRequestsDto;
 import school.faang.user_service.dto.recomendation.RejectRecommendationRequestDto;
@@ -18,8 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Component
-@Data
+@Service
+@AllArgsConstructor
 public class RecommendationRequestService {
     private final List<RecommendationRequestFilter> filters;
     private final SkillRequestRepository skillRequestRepository;
@@ -32,7 +34,7 @@ public class RecommendationRequestService {
 
         recommendationRequest.setStatus(RequestStatus.PENDING);
         RecommendationRequest savedRequest = this.recommendationRequestRepository.save(
-            recommendationRequest
+                recommendationRequest
         );
 
         skillIds.forEach((skillId) -> {
@@ -42,26 +44,30 @@ public class RecommendationRequestService {
         return savedRequest.getId();
     }
 
+    @Transactional(readOnly = true)
     public List<RecommendationRequest> getRecommendationRequests(
             FilterRecommendationRequestsDto filterRecommendationRequestsDto
     ) {
         Stream<RecommendationRequest> requests = this.recommendationRequestRepository.findAll().stream();
 
         return this.filters.stream()
-            .filter(filter -> filter.isApplicable(filterRecommendationRequestsDto))
-            .reduce(requests,
-                    (stream, filter) -> filter.apply(stream, filterRecommendationRequestsDto),
-                    (s1, s2) -> s1)
-            .toList();
+                .filter(filter -> filter.isApplicable(filterRecommendationRequestsDto))
+                .reduce(requests,
+                        (stream, filter) -> filter.apply(stream, filterRecommendationRequestsDto),
+                        (s1, s2) -> s1)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public RecommendationRequest findRequestById(Long id) {
-        return this.getRequestById(id);
+        return this.recommendationRequestRepository
+                .findById(id)
+                .orElseThrow(RecommendationRequestNotFoundException::new);
     }
 
     @Transactional
     public RecommendationRequest rejectRequest(RejectRecommendationRequestDto rejection) {
-        RecommendationRequest recommendationRequest = getRequestById(rejection.getId());
+        RecommendationRequest recommendationRequest = this.findRequestById(rejection.getId());
 
         if (recommendationRequest.getStatus() != RequestStatus.PENDING) {
             throw new RecommendationRequestRejectException();
@@ -70,15 +76,5 @@ public class RecommendationRequestService {
         recommendationRequest.setStatus(RequestStatus.REJECTED);
         recommendationRequest.setRejectionReason(rejection.getReason());
         return this.recommendationRequestRepository.save(recommendationRequest);
-    }
-
-    private RecommendationRequest getRequestById(Long id) {
-        Optional<RecommendationRequest> recommendationRequest =  this.recommendationRequestRepository.findById(id);
-
-        if (recommendationRequest.isEmpty()) {
-            throw new RecommendationRequestNotFoundException();
-        }
-
-        return recommendationRequest.get();
     }
 }

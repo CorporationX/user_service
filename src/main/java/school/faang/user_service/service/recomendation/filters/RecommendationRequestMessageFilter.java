@@ -15,11 +15,11 @@ public class RecommendationRequestMessageFilter implements RecommendationRequest
 
     @Override
     public Stream<RecommendationRequest> apply(
-        Stream<RecommendationRequest> requestStream,
-        FilterRecommendationRequestsDto filter
+            Stream<RecommendationRequest> requestStream,
+            FilterRecommendationRequestsDto filter
     ) {
         return requestStream.filter(
-            recommendationRequest -> recommendationRequest.getMessage().contains(filter.getMessage())
+                recommendationRequest -> recommendationRequest.getMessage().contains(filter.getMessage())
         );
     }
 }

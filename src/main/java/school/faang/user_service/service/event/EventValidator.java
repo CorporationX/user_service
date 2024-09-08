@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EventExistsException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
+import school.faang.user_service.exception.UserExistsException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
@@ -14,8 +15,9 @@ public class EventValidator {
         User participant = eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId);
         if (participant != null) {
             throw new EventParticipationRegistrationException("User %d already registered on event %d".formatted(userId, eventId));
+        } else {
+            return false;
         }
-        return true;
     }
 
     public boolean validateParticipationNotRegistered(long eventId, long userId) {
@@ -23,19 +25,19 @@ public class EventValidator {
         if (participant == null) {
             throw new EventParticipationRegistrationException("User %d does not registered on event %d".formatted(userId, eventId));
         }
-        return true;
+        return false;
     }
 
-    public boolean validateEvent(long eventId) {
+    public boolean checkEventExists(long eventId) {
         if (!eventParticipationRepository.eventExistsById(eventId)) {
             throw new EventExistsException("Event %d does not exist".formatted(eventId));
         }
         return true;
     }
 
-    public boolean validateUser(long userId) {
+    public boolean checkUserExists(long userId) {
         if (!eventParticipationRepository.userExistsById(userId)) {
-            throw new EventExistsException("User %d does not exist".formatted(userId));
+            throw new UserExistsException("User %d does not exist".formatted(userId));
         }
         return true;
     }

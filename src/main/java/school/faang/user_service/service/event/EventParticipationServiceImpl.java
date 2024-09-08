@@ -20,29 +20,30 @@ public class EventParticipationServiceImpl implements EventParticipationService 
     private final UserMapper userMapper;
 
     public void registerParticipant(long eventId, long userId) {
-        eventValidator.validateEvent(eventId);
-        eventValidator.validateUser(userId);
+        eventValidator.checkEventExists(eventId);
+        eventValidator.checkUserExists(userId);
         eventValidator.validateParticipationRegistered(eventId, userId);
         eventParticipationRepository.register(eventId, userId);
         log.info("User {} has been registered with event {}", userId, eventId);
     }
 
     public void unregisterParticipant(long eventId, long userId) {
-        eventValidator.validateEvent(eventId);
-        eventValidator.validateUser(userId);
+        eventValidator.checkEventExists(eventId);
+        eventValidator.checkUserExists(userId);
         eventValidator.validateParticipationNotRegistered(eventId, userId);
         eventParticipationRepository.unregister(eventId, userId);
         log.info("User {} has been unregistered with event {}", userId, eventId);
     }
 
     public List<EventUserDto> getParticipants(long eventId) {
-        eventValidator.validateEvent(eventId);
+        eventValidator.checkEventExists(eventId);
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        return userMapper.usersToUsersDto(participants);
+        List<EventUserDto> participantsDto = userMapper.usersToUsersDto(participants);
+        return participantsDto;
     }
 
     public EventParticipantsDto getParticipantsCount(long eventId) {
-        eventValidator.validateEvent(eventId);
+        eventValidator.checkEventExists(eventId);
         int count = eventParticipationRepository.countParticipants(eventId);
         return new EventParticipantsDto(count);
     }

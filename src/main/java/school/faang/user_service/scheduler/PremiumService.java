@@ -1,4 +1,4 @@
-package school.faang.user_service.service.premium;
+package school.faang.user_service.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,6 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
 
     @Async("executor")
-    public CompletableFuture<Void> removePremium(int batchSize) {
+    public void removePremium(int batchSize) {
         List<Premium> premiumForRemove = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
 
         int totalSize = premiumForRemove.size();
@@ -34,6 +33,5 @@ public class PremiumService {
             premiumRepository.deleteAll(batch);
             log.info("Sublist with elements from {} to {} deleted", start, end);
         }
-        return CompletableFuture.completedFuture(null);
     }
 }

@@ -5,12 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.scheduler.PremiumService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -25,8 +23,6 @@ public class PremiumServiceTest {
     @InjectMocks
     PremiumService premiumService;
 
-    List<Premium> testPremiums = new ArrayList<>();
-    List<Premium> testBatch = new ArrayList<>();
     int testBatchSize = 30;
 
     @Test

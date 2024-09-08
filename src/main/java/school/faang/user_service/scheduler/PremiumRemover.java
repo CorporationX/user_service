@@ -1,4 +1,4 @@
-package school.faang.user_service.service.premium;
+package school.faang.user_service.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ public class PremiumRemover {
 
     private final PremiumService premiumService;
 
-    @Scheduled(cron = "0 0 3 * * MON")
+    @Scheduled(cron = "${spring.scheduler.cron.premium_removal}")
     public void removePremium() {
 
         premiumService.removePremium(batchSize);

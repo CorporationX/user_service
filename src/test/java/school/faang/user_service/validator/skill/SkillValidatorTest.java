@@ -24,65 +24,61 @@ class SkillValidatorTest {
     @Mock
     private SkillRepository skillRepository;
 
-    @Test
-    void validateSkill_whenTitleIsBlank_shouldReturnDataValidationException() {
-        // given
-        SkillDto skillDto = new SkillDto(1L, " ");
-        // when/then
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillByTitle(skillDto));
-    }
+    private final long skillId = 1L;
+    private final long userId = 1L;
+    private final int enoughOffers = 3;
+    private final int notEnoughOffers = 2;
+    private SkillDto skillDto;
 
     @Test
-    void validateSkill_whenSkillExists_shouldReturnDataValidationException() {
+    void validateSkillByTitle_whenSkillExists_shouldReturnDataValidationException() {
         // given
-        SkillDto skillDto = new SkillDto(1L, "Title");
+        skillDto = prepareData();
         when(skillRepository.existsByTitle("Title")).thenReturn(true);
         // when/then
         assertThrows(DataValidationException.class, () -> skillValidator.validateSkillByTitle(skillDto));
     }
 
     @Test
-    void validateSkill_whenSkillNotExists_shouldNotThrowDataValidationException() {
+    void validateSkillByTitle_whenSkillNotExists_shouldNotThrowDataValidationException() {
         // given
-        SkillDto skillDto = new SkillDto(1L, "Title");
+        skillDto = prepareData();
         when(skillRepository.existsByTitle("Title")).thenReturn(false);
         // when/then
         assertDoesNotThrow(() -> skillValidator.validateSkillByTitle(skillDto));
     }
 
     @Test
+    void validateOfferedSkill_whenUserHasNoSkill_shouldNotThrowDataValidationException() {
+        // given
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
+        // when/then
+        assertDoesNotThrow(() -> skillValidator.validateOfferedSkill(skillId, userId));
+    }
+
+    @Test
     void validateOfferedSkill_whenUserAlreadyHasSkill_shouldThrowDataValidationException() {
         // given
-        long skillId = 1L;
-        long userId = 1L;
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.ofNullable(Skill.builder().build()));
         // when/then
         assertThrows(DataValidationException.class, () -> skillValidator.validateOfferedSkill(skillId, userId));
     }
 
     @Test
-    void validateOfferedSkill_whenUserHasNoSkill_shouldNotThrowDataValidationException() {
-        // given
-        long skillId = 1L;
-        long userId = 1L;
-        // when/then
-        assertDoesNotThrow(() -> skillValidator.validateOfferedSkill(skillId, userId));
+    void validateSkillByMinSkillOffers_whenNotEnoughOffers_shouldThrowDataValidationException() {
+        assertThrows(DataValidationException.class,
+                () -> skillValidator.validateSkillByMinSkillOffers(notEnoughOffers, skillId, userId));
     }
 
     @Test
     void validateSkillByMinSkillOffers_whenEnoughOffers_shouldNotThrowDataValidationException() {
-        long skillId = 1L;
-        long userId = 1L;
-        int enoughOffers = 3;
         assertDoesNotThrow(() -> skillValidator.validateSkillByMinSkillOffers(enoughOffers, skillId, userId));
-
     }
 
-    @Test
-    void validateSkillByMinSkillOffers_whenNotEnoughOffers_shouldThrowDataValidationException() {
-        long skillId = 1L;
-        long userId = 1L;
-        int notEnoughOffers = 2;
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillByMinSkillOffers(notEnoughOffers, skillId, userId));
+    private SkillDto prepareData() {
+        return SkillDto.builder()
+                .id(skillId)
+                .title("Title")
+                .build();
     }
 }

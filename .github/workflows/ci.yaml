@@ -1,10 +1,7 @@
-name: CI
+name: Java build CI with Gradle
 
 on:
-  push:
-    branches: [ feature/pipeline-BC-BJS2-26461, feature/pipeline-test-BC-BJS2-26461 ]
-  pull_request:
-    branches: [ feature/pipeline-BC-BJS2-26461, feature/pipeline-test-BC-BJS2-26461 ]
+  [push, pull_request]
 
 jobs:
   build:
@@ -19,13 +16,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
+#
+#      - name: Cache Gradle packages
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.gradle/caches
+#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+#          restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
         run: ./gradlew build

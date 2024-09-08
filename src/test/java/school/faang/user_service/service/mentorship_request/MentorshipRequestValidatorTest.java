@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mentorshipRequest;
+package school.faang.user_service.service.mentorship_request;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +15,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.EMPTY_DESCRIPTION;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.ONCE_EVERY_THREE_MONTHS;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.REQUEST_IS_ACCEPTED_BEFORE;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.REQUEST_TO_HIMSELF;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.USER_NOT_FOUND;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.EMPTY_DESCRIPTION;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.ONCE_EVERY_THREE_MONTHS;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_IS_ACCEPTED_BEFORE;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_TO_HIMSELF;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.USER_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestValidatorTest {

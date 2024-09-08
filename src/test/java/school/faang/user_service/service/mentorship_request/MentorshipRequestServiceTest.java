@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mentorshipRequest;
+package school.faang.user_service.service.mentorship_request;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
+import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 import static school.faang.user_service.entity.RequestStatus.PENDING;
 import static school.faang.user_service.entity.RequestStatus.REJECTED;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {

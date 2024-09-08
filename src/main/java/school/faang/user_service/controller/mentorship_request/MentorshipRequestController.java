@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.mentorshipRequest;
+package school.faang.user_service.controller.mentorship_request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
-import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship_request.RejectionDto;
+import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.mapper.mentorshipRequest.MentorshipRequestMapper;
-import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
+import school.faang.user_service.mapper.mentorship_request.MentorshipRequestMapper;
+import school.faang.user_service.service.mentorship_request.MentorshipRequestService;
 
 import java.util.List;
 

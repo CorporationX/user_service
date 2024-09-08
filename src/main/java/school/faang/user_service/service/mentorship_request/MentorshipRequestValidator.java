@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mentorshipRequest;
+package school.faang.user_service.service.mentorship_request;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,11 +9,11 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 
 import java.time.LocalDateTime;
 
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.EMPTY_DESCRIPTION;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.ONCE_EVERY_THREE_MONTHS;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.REQUEST_IS_ACCEPTED_BEFORE;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.REQUEST_TO_HIMSELF;
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.USER_NOT_FOUND;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.EMPTY_DESCRIPTION;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.ONCE_EVERY_THREE_MONTHS;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_IS_ACCEPTED_BEFORE;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_TO_HIMSELF;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.USER_NOT_FOUND;
 
 @Slf4j
 @Component

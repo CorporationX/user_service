@@ -1,10 +1,10 @@
-package school.faang.user_service.service.mentorshipRequest;
+package school.faang.user_service.service.mentorship_request;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
+import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -13,7 +13,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.util.List;
 import java.util.stream.Stream;
 
-import static school.faang.user_service.service.mentorshipRequest.errorMessages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
+import static school.faang.user_service.service.mentorship_request.errorMessages.MentorshipRequestErrorMessages.REQUEST_NOT_FOUND;
 
 @Slf4j
 @Component

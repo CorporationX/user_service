@@ -1,9 +1,9 @@
-package school.faang.user_service.mapper.mentorshipRequest;
+package school.faang.user_service.mapper.mentorship_request;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship_request.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;

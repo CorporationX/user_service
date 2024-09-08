@@ -20,24 +20,25 @@ public class MentorshipController {
 
     @GetMapping("/{userId}/mentees")
     public List<MentorshipUserDto> getMentees(@PathVariable @Positive Long userId) {
+        System.out.println(userId);
         return mentorshipService.getMentees(userId);
     }
 
     @GetMapping("/{userId}/mentors")
-    public List<MentorshipUserDto> getMentors(@PathVariable @Positive Long userId) {
+    public List<MentorshipUserDto> getMentors(@PathVariable Long userId) {
         return mentorshipService.getMentors(userId);
     }
 
     @DeleteMapping("/{mentorId}/mentees/{menteeId}")
-    public void deleteMentee(@PathVariable @Positive Long mentorId,
-                             @PathVariable @Positive Long menteeId) {
-        mentorshipService.deleteMentee(menteeId, mentorId);
+    public void deleteMentee(@PathVariable Long mentorId,
+                             @PathVariable Long menteeId) {
+        mentorshipService.deleteMentorship(menteeId, mentorId);
     }
 
     @DeleteMapping("/{menteeId}/mentors/{mentorId}")
-    public void deleteMentor(@PathVariable @Positive Long menteeId,
-                             @PathVariable @Positive Long mentorId) {
-        mentorshipService.deleteMentor(menteeId, mentorId);
+    public void deleteMentor(@PathVariable Long menteeId,
+                             @PathVariable Long mentorId) {
+        mentorshipService.deleteMentorship(menteeId, mentorId);
     }
 
 }

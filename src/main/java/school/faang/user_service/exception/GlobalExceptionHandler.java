@@ -14,4 +14,10 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleException(EntityNotFoundException e) {
         return new ErrorResponseDto(e.getMessage());
     }
+
+    @ExceptionHandler({DataValidationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDto handleException(DataValidationException e) {
+        return new ErrorResponseDto(e.getMessage());
+    }
 }

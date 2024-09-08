@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipUserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -19,29 +20,34 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public List<MentorshipUserDto> getMentees(Long userId) {
+        if (userId < 0) {
+            throw new DataValidationException("id пользователя не может быть отрицательным");
+        }
         User user = getUserById(userId);
         return userMapper.toMentorshipUserDtos(user.getMentees());
     }
 
     @Override
     public List<MentorshipUserDto> getMentors(Long userId) {
+        if (userId < 0) {
+            throw new DataValidationException("id пользователя не может быть отрицательным");
+        }
         User user = getUserById(userId);
         return userMapper.toMentorshipUserDtos(user.getMentors());
     }
 
     @Override
-    public void deleteMentee(Long menteeId, Long mentorId) {
-        deleteMentorship(menteeId, mentorId);
-    }
-
-    @Override
-    public void deleteMentor(Long menteeId, Long mentorId) {
-        deleteMentorship(menteeId, mentorId);
-    }
-
-    private void deleteMentorship(Long menteeId, Long mentorId) {
+    public void deleteMentorship(Long menteeId, Long mentorId) {
+        if (mentorId < 0) {
+            throw new DataValidationException("Ментор не может иметь отрицательный идентификатор %d"
+                    .formatted(mentorId));
+        }
+        if (menteeId < 0) {
+            throw new DataValidationException("Менти не может иметь отрицательный идентификатор %d"
+                    .formatted(mentorId));
+        }
         if (Objects.equals(menteeId, mentorId)) {
-            throw new EntityNotFoundException("Ментор и менти не могут иметь одинаковые идентификаторы");
+            throw new DataValidationException("Ментор и менти не могут иметь одинаковые идентификаторы");
         }
         User mentee = getUserById(menteeId);
         List<User> mentors = mentee.getMentors();
@@ -49,7 +55,8 @@ public class MentorshipServiceImpl implements MentorshipService {
         if (isRemoved) {
             mentorshipRepository.save(mentee);
         } else {
-            throw new EntityNotFoundException("Не найдена пара менти с id %d и ментор с id %d"
+            System.out.println("12312321");
+            throw new EntityNotFoundException("Не найдена пара менти с id %d и ментора с id %d"
                     .formatted(menteeId, mentorId));
         }
     }

@@ -130,7 +130,7 @@ public class EventParticipationServiceImplTest {
     @DisplayName("testGetParticipants_Success")
     public void testGetParticipants_Success() {
         List<User> users = createUsers();
-        List<EventUserDto> participantsDto = createParticipantsDto();
+        List<EventUserDto> participantsDto = createParticipantsDto(users);
 
         setUpEventValidator(true);
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(users);
@@ -229,11 +229,8 @@ public class EventParticipationServiceImplTest {
         return List.of(firstUser, secondUser);
     }
 
-    private List<EventUserDto> createParticipantsDto() {
-        return List.of(
-                new EventUserDto(1L, "Tom", "tom@gmail.com"),
-                new EventUserDto(2L, "Bob", "bob@gmail.com")
-        );
+    private List<EventUserDto> createParticipantsDto(List<User> users) {
+        return userMapper.usersToUsersDto(users);
     }
 
     private void verifyGetParticipants() {

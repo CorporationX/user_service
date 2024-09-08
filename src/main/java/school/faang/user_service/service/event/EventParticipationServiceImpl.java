@@ -39,12 +39,14 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         eventValidator.checkEventExists(eventId);
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         List<EventUserDto> participantsDto = userMapper.usersToUsersDto(participants);
+        log.info("Participants of event {}:", eventId);
         return participantsDto;
     }
 
     public EventParticipantsDto getParticipantsCount(long eventId) {
         eventValidator.checkEventExists(eventId);
         int count = eventParticipationRepository.countParticipants(eventId);
+        log.info("Participant count of event {}:", eventId);
         return new EventParticipantsDto(count);
     }
 }

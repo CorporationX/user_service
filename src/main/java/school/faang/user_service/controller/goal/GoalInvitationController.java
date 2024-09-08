@@ -48,12 +48,12 @@ public class GoalInvitationController {
 
     @GetMapping()
     public ResponseEntity<List<GoalInvitationDto>> getInvitations(@RequestBody InvitationFilterDto filter) {
-        var invitationDto = goalInvitationService.getInvitations(filter)
+        var invitationDtoList = goalInvitationService.getInvitations(filter)
                 .stream()
                 .map(goalInvitationMapper::toDto)
                 .toList();
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(invitationDto);
+                .body(invitationDtoList);
     }
 }

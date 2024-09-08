@@ -8,6 +8,4 @@ import org.springframework.stereotype.Component;
 public class EventFilterDto {
     private String eventTitle;
     private String eventType;
-    private String eventLocation;
-    private String eventStatus;
 }

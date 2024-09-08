@@ -16,7 +16,6 @@ public class EventController {
 
 
     public EventDto create(EventDto event) {
-        validateForCreate(event);
         eventService.create(event);
         return event;
     }
@@ -25,8 +24,8 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
-    public void getEventsByFilter(EventFilterDto filter) {
-        eventService.getEventsByFilter(filter);
+    public EventDto getEventsByFilter(EventFilterDto filter) {
+      return eventService.getEventsByFilter(filter);
     }
 
     public void deleteEvent(long eventId) {
@@ -34,7 +33,6 @@ public class EventController {
     }
 
     public void updateEvent(EventDto event) {
-        validateForUpdate(event);
         eventService.updateEvent(event);
     }
 
@@ -46,21 +44,4 @@ public class EventController {
        return eventService.getParticipatedEvents(userId);
     }
 
-
-
-    private EventDto validateForUpdate(EventDto event) {
-        if (event.getTitle() != null || event.getOwnerId() != null || event.getStartDate() != null) {
-            return event;
-        } else {
-            throw new DataValidationException("");
-        }
-    }
-
-    private EventDto validateForCreate(EventDto event) {
-           if (event.getTitle() != null && event.getOwnerId() != null && event.getStartDate() != null) {
-               return event;
-           } else {
-               throw new IllegalArgumentException("Обязательные поля пустые");
-           }
-    }
 }

@@ -2,16 +2,16 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
@@ -25,6 +25,13 @@ public class UserController {
 
     private final UserService userService;
 
+    @PostMapping("/new")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto createUser(@RequestBody UserDto userDto,
+                              @RequestParam(value = "file", required = false) MultipartFile multipartFile) {
+        return userService.createUser(userDto, multipartFile);
+    }
+
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(@ParameterObject UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
@@ -35,23 +42,19 @@ public class UserController {
         return userService.getRegularUsers(userFilterDto);
     }
 
+    @GetMapping("/{id}")
+    public UserDto getUserById(@PathVariable Long id) {
+        return userService.getById(id);
+    }
+
     @GetMapping("/exists/{id}")
     public boolean existsById(@PathVariable Long id) {
         return userService.existsById(id);
     }
 
-    @PostMapping("/{userId}/random-avatar")
+    @GetMapping("/{userId}/avatar")
     @ResponseStatus(HttpStatus.OK)
-    public String generateRandomAvatar(@PathVariable Long userId) {
-        return userService.generateRandomAvatar(userId);
-    }
-
-    @GetMapping("{userId}/random-avatar")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<byte[]> getAssignedRandomAvatar(@PathVariable Long userId) {
-        byte[] userRandomAvatar = userService.getUserRandomAvatar(userId);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.valueOf("image/svg+xml"));
-        return new ResponseEntity<>(userRandomAvatar, httpHeaders, HttpStatus.OK);
+    public byte[] getAvatar(@PathVariable Long userId) {
+          return userService.getAvatar(userId);
     }
 }

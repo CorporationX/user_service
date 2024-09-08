@@ -18,10 +18,14 @@ public interface RecommendationRequestMapper {
     @Mapping(source = "skills", target = "skillsIds", qualifiedByName = "mapSkillsReqsToSkillsReqsIds")
     RecommendationRequestDto mapToDto(RecommendationRequest recommendationRequest);
 
+    List<RecommendationRequestDto> mapToDto(List<RecommendationRequest> recommendationRequests);
+
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "receiverId", target = "receiver.id")
     @Mapping(target = "skills", ignore = true)
     RecommendationRequest mapToEntity(RecommendationRequestDto recommendationRequestDto);
+
+
 
     @Named("mapSkillsReqsToSkillsReqsIds")
     static List<Long> mapSkillsReqsToSkillsReqsIds(List<SkillRequest> skillRequests) {

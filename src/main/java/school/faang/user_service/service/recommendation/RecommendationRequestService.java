@@ -40,13 +40,15 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.mapToDto(recommendationRequestEntity);
     }
 
-    public List<RecommendationRequest> getRequests(RecommendationRequestFilterDto requestFilterDto) {
+    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto requestFilterDto) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
 
-        return recommendationRequestFilters.stream()
+        List<RecommendationRequest> recommendationRequestsEntity = recommendationRequestFilters.stream()
                 .filter(filter -> filter.isApplicable(requestFilterDto))
                 .flatMap(filter -> filter.apply(recommendationRequests, requestFilterDto))
                 .toList();
+
+        return recommendationRequestMapper.mapToDto(recommendationRequestsEntity);
     }
 }
 

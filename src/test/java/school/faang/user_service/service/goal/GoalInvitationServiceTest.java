@@ -26,7 +26,6 @@ import school.faang.user_service.service.goal.filter.invitation.InvitedNamePatte
 import school.faang.user_service.service.goal.filter.invitation.InviterIdFilter;
 import school.faang.user_service.service.goal.filter.invitation.InviterNamePatternFilter;
 import school.faang.user_service.service.goal.filter.invitation.RequestStatusFilter;
-import school.faang.user_service.util.goal.invitation.InvitationFabric;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +45,10 @@ import static school.faang.user_service.service.goal.util.GoalInvitationErrorMes
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.USERS_SAME_MESSAGE_FORMAT;
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.USER_ALREADY_HAS_GOAL;
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.USER_GOALS_LIMIT_EXCEEDED;
-import static school.faang.user_service.util.goal.invitation.InvitationFabric.*;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getGoal;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getGoals;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitation;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getUser;
 
 
 class GoalInvitationServiceTest {
@@ -167,7 +169,7 @@ class GoalInvitationServiceTest {
         var goals = getGoals(USER_GOALS_LIMIT);
         var invitedUser = getUser(SECOND_USER_ID, goals);
         var alreadyExistGoal = goals.get(0);
-        return InvitationFabric.getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, alreadyExistGoal);
+        return getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, alreadyExistGoal);
     }
 
     @Test
@@ -186,7 +188,7 @@ class GoalInvitationServiceTest {
         var goals = getGoals(EXCEEDED_NUMBER_OF_GOALS);
         var invitedUser = getUser(SECOND_USER_ID, goals);
         var newGoal = getGoal(NEW_GOAL_ID);
-        return InvitationFabric.getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, newGoal);
+        return getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, newGoal);
     }
 
     @Test
@@ -203,7 +205,7 @@ class GoalInvitationServiceTest {
         var invitedUser = getUser(SECOND_USER_ID, new ArrayList<>());
         var newGoal = getGoal(NEW_GOAL_ID);
         newGoal.setUsers(new ArrayList<>());
-        return InvitationFabric.getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, newGoal);
+        return getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, newGoal);
     }
 
     @Test

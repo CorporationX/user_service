@@ -65,7 +65,8 @@ public class RecommendationRequestServiceTest {
 
         when(recommendationRequestRepository.findAll().stream()).thenReturn(recommendationRequests.stream());
         //TODO need to think
-//        when(recommendationRequestFilters.stream().filter().toList()).thenReturn(List.of(new RecommendationRequest(),new RecommendationRequest()).stream().toList());
+//        when(recommendationRequestFilters.stream()).thenReturn(i->Stream.of(new RecommendationRequest(), new RecommendationRequest()));
+        when(recommendationRequestFilters.stream()).thenReturn(recommendationRequestFilters.stream());
         verify(recommendationRequestMapper, times(1)).mapToDto(recommendationRequestsCaptor.capture());
         assertAll(
                 () -> assertEquals(1, recommendationRequestDtos.size()),

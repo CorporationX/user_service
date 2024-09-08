@@ -1,0 +1,102 @@
+package school.faang.user_service.service;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.service.event.EventParticipationService;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class EventParticipationServiceTest {
+
+    @InjectMocks
+    private EventParticipationService eventParticipationService;
+
+    @Mock
+    private EventParticipationRepository eventParticipationRepository;
+
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+
+    private static long eventId;
+    private static long userId;
+    private static User registeredUser = new User();
+
+    @BeforeAll
+    static void setup() {
+        eventId = 1L;
+        userId = 1L;
+        registeredUser.setId(1L);
+    }
+
+    @Test
+    void testRegisterExistingParticipant() {
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(Collections.singletonList(registeredUser));
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationService.registerParticipant(eventId, userId));
+        verify(eventParticipationRepository, times(0)).register(eventId, userId);
+    }
+
+    @Test
+    void testRegisterNewParticipant() {
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(Collections.emptyList());
+        eventParticipationService.registerParticipant(eventId, userId);
+        verify(eventParticipationRepository, times(1)).register(eventId, userId);
+    }
+
+    @Test
+    void testUnregisterNonExistingParticipant() {
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(Collections.emptyList());
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationService.unregisterParticipant(eventId, userId));
+        verify(eventParticipationRepository, times(0)).unregister(eventId, userId);
+    }
+
+    @Test
+    void testUnregisterExistingParticipant() {
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(Collections.singletonList(registeredUser));
+        eventParticipationService.unregisterParticipant(eventId, userId);
+        verify(eventParticipationRepository, times(1)).unregister(eventId, userId);
+    }
+
+    @Test
+    void testGetParticipant() {
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(Collections.singletonList(registeredUser));
+        List<UserDto> participants = eventParticipationService.getParticipant(eventId);
+        assertEquals(1, participants.size());
+        assertEquals(userId, participants.get(0).getId());
+        verify(eventParticipationRepository, times(1)).findAllParticipantsByEventId(eventId);
+        verify(userMapper, times(1)).toDto(registeredUser);
+    }
+
+    @Test
+    void testGetParticipantCount() {
+        when(eventParticipationRepository.countParticipants(eventId))
+                .thenReturn(1);
+        assertEquals(1, eventParticipationService.getParticipantCount(eventId));
+        verify(eventParticipationRepository, times(1)).countParticipants(eventId);
+    }
+}

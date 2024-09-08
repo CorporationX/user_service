@@ -1,14 +1,12 @@
 package school.faang.user_service.controller;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.org.apache.commons.lang.NullArgumentException;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
@@ -23,7 +21,6 @@ class SkillControllerTest {
 
     @InjectMocks
     private SkillController skillController;
-
 
     @Test
     void testEmptyTitleCreate() {

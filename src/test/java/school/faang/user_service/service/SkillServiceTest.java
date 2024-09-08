@@ -21,8 +21,8 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
@@ -44,7 +44,7 @@ public class SkillServiceTest {
     private SkillCandidateMapper skillCandidateMapper;
 
     @InjectMocks
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
 
     private SkillDto skillDto;
 
@@ -106,7 +106,7 @@ public class SkillServiceTest {
 
     @Test
     void testAcquireNullSkillFromOffers() {
-        Assert.assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(1L, 1L));
+        Assert.assertThrows(NoSuchElementException.class, () -> skillService.acquireSkillFromOffers(1L, 1L));
     }
 
     @Test

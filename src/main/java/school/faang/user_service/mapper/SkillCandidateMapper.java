@@ -12,7 +12,6 @@ public interface SkillCandidateMapper {
 
     SkillDto toDto(Skill skill);
 
-    @Mapping(target = "skill", source = "skill")
     @Mapping(target = "offersAmount", expression = "java(0L)")
     SkillCandidateDto toSkillCandidateDto(Skill skill);
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -9,10 +10,13 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.publisher.ProjectFollowerEventPublisher;
 
-@Configuration
 @Slf4j
+@Configuration
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -23,6 +27,9 @@ public class RedisConfig {
     private String followerViewChannelName;
     @Value("${spring.data.redis.channels.event-start.name}")
     private String eventStartTopicName;
+
+    @Value("${spring.data.redis.channels.project_follower_channel.name}")
+    private String projectFollowerTopicName;
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
@@ -50,4 +57,9 @@ public class RedisConfig {
     public ChannelTopic eventStartTopic() {
         return new ChannelTopic(eventStartTopicName);
     }
+    @Bean
+    ChannelTopic projectFollowerTopic(){
+        return new ChannelTopic(projectFollowerTopicName);
+    }
+
 }

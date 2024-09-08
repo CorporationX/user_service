@@ -1,6 +1,5 @@
 package school.faang.user_service.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,10 +9,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.publisher.EventPublisher;
-import school.faang.user_service.publisher.ProjectFollowerEventPublisher;
 
 @Slf4j
 @Configuration
@@ -52,13 +48,13 @@ public class RedisConfig {
         return new ChannelTopic(followerViewChannelName);
     }
 
-
     @Bean
     public ChannelTopic eventStartTopic() {
         return new ChannelTopic(eventStartTopicName);
     }
+
     @Bean
-    ChannelTopic projectFollowerTopic(){
+    ChannelTopic projectFollowerTopic() {
         return new ChannelTopic(projectFollowerTopicName);
     }
 

@@ -18,7 +18,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestValidatorTest {
@@ -42,7 +42,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testDescriptionValidation_NullDescription_ThrowsException() {
+    public void descriptionValidationTest_NullDescription() {
         mentorshipRequestDto.setDescription(null);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator.descriptionValidation(mentorshipRequestDto));
@@ -50,7 +50,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testDescriptionValidation_EmptyDescription_ThrowsException() {
+    public void descriptionValidationTest_EmptyDescription() {
         mentorshipRequestDto.setDescription("");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator.descriptionValidation(mentorshipRequestDto));
@@ -58,7 +58,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testRequesterReceiverValidation_RequesterNotFound_ThrowsException() {
+    public void requesterReceiverValidationTest_RequesterNotFound() {
         when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(false);
         DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> mentorshipRequestValidator.requesterReceiverValidation(mentorshipRequestDto));
@@ -66,7 +66,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testRequesterReceiverValidation_ReceiverNotFound_ThrowsException() {
+    public void requesterReceiverValidationTest_ReceiverNotFound() {
         when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(true);
         when(userRepository.existsById(mentorshipRequestDto.getReceiverId())).thenReturn(false);
         DataValidationException exception = assertThrows(DataValidationException.class,
@@ -75,10 +75,10 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testLastRequestDateValidation_WithinThreeMonths_ThrowsException() {
-        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(2);
+    public void lastRequestDateValidationTest_LessThanThreeMonths() {
+        LocalDateTime requestDate = LocalDateTime.now().minusMonths(2);
         MentorshipRequest lastRequest = new MentorshipRequest();
-        lastRequest.setUpdatedAt(threeMonthsAgo);
+        lastRequest.setUpdatedAt(requestDate);
         when(mentorshipRequestRepository.findLatestRequest(1L, 2L)).thenReturn(Optional.of(lastRequest));
 
         DataValidationException exception = assertThrows(DataValidationException.class,
@@ -87,7 +87,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testLastRequestDateValidation_NoLastRequest_Valid() {
+    public void lastRequestDateValidationTest_NoLastRequest() {
         mentorshipRequestDto.setRequesterId(1L);
         mentorshipRequestDto.setReceiverId(2L);
         when(mentorshipRequestRepository.findLatestRequest(1L, 2L)).thenReturn(Optional.empty());
@@ -95,7 +95,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testSelfRequestValidation_SelfRequest_ThrowsException() {
+    public void selfRequestValidationTest_SelfRequest() {
         mentorshipRequestDto.setReceiverId(1L);
         DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> mentorshipRequestValidator.selfRequestValidation(mentorshipRequestDto));
@@ -103,13 +103,13 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testSelfRequestValidation_Valid() {
+    public void selfRequestValidationTest_Valid() {
         mentorshipRequestDto.setReceiverId(2L);
         assertDoesNotThrow(() -> mentorshipRequestValidator.selfRequestValidation(mentorshipRequestDto));
     }
 
     @Test
-    public void testRequestValidation_RequestNotFound_ThrowsException() {
+    public void requestValidationTest_RequestNotFound() {
         Long requestId = 1L;
         when(mentorshipRequestRepository.existsById(requestId)).thenReturn(false);
         DataValidationException exception = assertThrows(DataValidationException.class,
@@ -118,7 +118,7 @@ public class MentorshipRequestValidatorTest {
     }
 
     @Test
-    public void testRequestValidation_RequestFound_Valid() {
+    public void requestValidationTest_Valid() {
         Long requestId = 1L;
         when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
         assertDoesNotThrow(() -> mentorshipRequestValidator.requestValidation(requestId));

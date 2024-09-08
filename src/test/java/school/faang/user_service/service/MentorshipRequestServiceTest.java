@@ -15,7 +15,11 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestReceiverFilter;
+import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestRequesterFilter;
+import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.mentorshipRequest.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -25,8 +29,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
@@ -47,6 +59,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequest mentorshipRequest;
     private User requester;
     private User receiver;
+    private List<MentorshipRequest> requests;
+    private MentorshipRequestFilterDto filters;
 
     @BeforeEach
     public void setUp() {
@@ -67,6 +81,8 @@ public class MentorshipRequestServiceTest {
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequest.setDescription("Need mentorship on Java.");
+
+        requests = List.of(mentorshipRequest);
     }
 
     @Test
@@ -87,7 +103,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    public void requestMentorshipTest_ValidationFailure() {
+    public void requestMentorshipTest_ValidationFail() {
         doThrow(new DataValidationException("Ошибка валидации")).when(mentorshipRequestValidator).descriptionValidation(mentorshipRequestDto);
         DataValidationException exception = assertThrows(DataValidationException.class, () -> {
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);
@@ -100,7 +116,6 @@ public class MentorshipRequestServiceTest {
         verify(mentorshipRequestValidator, never()).lastRequestDateValidation(any());
     }
 
-
     @Test
     public void getRequestsTest_NoFilters() {
         when(mentorshipRequestFilterList.isEmpty()).thenReturn(true);
@@ -108,6 +123,28 @@ public class MentorshipRequestServiceTest {
         assertTrue(result.isEmpty());
         verify(mentorshipRequestFilterList, times(1)).isEmpty();
     }
+
+    @Test
+    public void getRequestsTest_ValidRequest() {
+        List<MentorshipRequestFilter> mentorshipRequestFilterList = List.of(new MentorshipRequestDescriptionFilter(),
+                new MentorshipRequestRequesterFilter(), new MentorshipRequestReceiverFilter(), new MentorshipRequestStatusFilter());
+        mentorshipRequestService = new MentorshipRequestService(mentorshipRequestValidator, mentorshipRequestRepository,
+                userRepository, mentorshipRequestMapper, mentorshipRequestFilterList);
+        filters = MentorshipRequestFilterDto.builder().descriptionPattern("Need mentorship on Java.").build();
+        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
+        when(mentorshipRequestMapper.toDto(requests.get(0))).thenReturn(mentorshipRequestDto);
+        List<MentorshipRequestDto> result = mentorshipRequestService.getRequests(filters);
+        assertEquals(1, result.size(), "Должен вернуть один запрос на менторство");
+    }
+
+    @Test
+    public void getRequests_NoRequests() {
+        mentorshipRequestFilterList.clear();
+        when(mentorshipRequestRepository.findAll()).thenReturn(new ArrayList<>());
+        List<MentorshipRequestDto> result = mentorshipRequestService.getRequests(new MentorshipRequestFilterDto());
+        assertTrue(result.isEmpty(), "Список должен быть пустым, если запросов нет");
+    }
+
 
     @Test
     public void acceptRequestTest_Success() {

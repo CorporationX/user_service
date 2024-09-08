@@ -59,12 +59,10 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto acceptRequest(Long id) {
         mentorshipRequestValidator.requestValidation(id);
-        MentorshipRequest request = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Запрос id" + id + " не найден"));
-        User requestMentee = userRepository.findById(request.getRequester().getId())
-                .orElseThrow(() -> new DataValidationException("Пользователь id" + request.getRequester().getId() + " не найден"));
-        User requestMentor = userRepository.findById(request.getReceiver().getId())
-                .orElseThrow(() -> new DataValidationException("Пользователь id" + request.getReceiver().getId() + " не найден"));
+        MentorshipRequest request = mentorshipRequestRepository.findById(id).orElseThrow();
+        mentorshipRequestValidator.requesterReceiverValidation(mentorshipRequestMapper.toDto(request));
+        User requestMentee = userRepository.findById(request.getRequester().getId()).orElseThrow();
+        User requestMentor = userRepository.findById(request.getReceiver().getId()).orElseThrow();
         if (requestMentee.getMentors().stream().noneMatch(mentor -> mentor.equals(requestMentor))) {
             requestMentee.getMentors().add(requestMentor);
             log.info("Запрос на менторство id{} принят", id);

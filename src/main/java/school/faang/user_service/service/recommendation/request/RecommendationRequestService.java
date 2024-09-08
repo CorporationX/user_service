@@ -7,6 +7,8 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -40,10 +42,17 @@ public class RecommendationRequestService {
         CompletableFuture<RecommendationRequestDto> createRequestFuture = CompletableFuture.supplyAsync(
                 () -> {
 
-                    var recommendation = recommendationReqRep.create(
-                            recommendationRequestDto.getRequesterId(),
-                            recommendationRequestDto.getReceiverId(),
-                            recommendationRequestDto.getMessage()
+                    var recommendation = recommendationReqRep.save(
+                            RecommendationRequest.builder()
+                                    .requester(User.builder().id(
+                                            recommendationRequestDto.getRequesterId()
+                                    ).build())
+                                    .receiver(User.builder().id(
+                                            recommendationRequestDto.getReceiverId()
+                                    ).build())
+                                    .message(recommendationRequestDto.getMessage())
+                                    .status(RequestStatus.PENDING)
+                                    .build()
                     );
 
                     recommendationEventPublisher.publish(

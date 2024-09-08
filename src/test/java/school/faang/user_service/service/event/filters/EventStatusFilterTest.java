@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,41 +18,42 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class EventLocationFilterTest {
+class EventStatusFilterTest {
     @Mock
     private Event event;
     @Mock
     private EventFilterDto filter;
     @InjectMocks
-    private EventLocationFilter eventLocationFilter;
+    private EventStatusFilter eventStatusFilter;
+
 
     @BeforeEach
     void setUp() {
-        eventLocationFilter = new EventLocationFilter();
+        eventStatusFilter = new EventStatusFilter();
     }
 
     @Nested
     class PositiveTests {
         @Test
         public void testIsApplicable_Success() {
-            when(filter.getLocationPattern()).thenReturn("test");
+            when(filter.getStatusPattern()).thenReturn("planned");
 
-            boolean result = eventLocationFilter.isApplicable(filter);
+            boolean result = eventStatusFilter.isApplicable(filter);
             assertTrue(result);
 
-            verify(filter, atLeastOnce()).getLocationPattern();
+            verify(filter, atLeastOnce()).getStatusPattern();
         }
 
         @Test
         public void testApplyFilter_Success() {
-            when(event.getLocation()).thenReturn("test");
-            when(filter.getLocationPattern()).thenReturn("test");
+            when(event.getStatus()).thenReturn(EventStatus.PLANNED);
+            when(filter.getStatusPattern()).thenReturn("planned");
 
-            boolean result = eventLocationFilter.applyFilter(event, filter);
+            boolean result = eventStatusFilter.applyFilter(event, filter);
             assertTrue(result);
 
-            verify(event, atLeastOnce()).getLocation();
-            verify(filter, atLeastOnce()).getLocationPattern();
+            verify(event, atLeastOnce()).getStatus();
+            verify(filter, atLeastOnce()).getStatusPattern();
         }
     }
 
@@ -59,28 +61,28 @@ class EventLocationFilterTest {
     class NegativeTest {
         @Test
         public void testIsApplicable_NullPattern_AssertFalse() {
-            filter.setLocationPattern(null);
+            filter.setStatusPattern(null);
 
-            assertFalse(eventLocationFilter.isApplicable(filter));
+            assertFalse(eventStatusFilter.isApplicable(filter));
         }
 
         @Test
         public void testIsApplicable_BlankPattern_AssertFalse() {
-            filter.setLocationPattern(" ");
+            filter.setStatusPattern(" ");
 
-            assertFalse(eventLocationFilter.isApplicable(filter));
+            assertFalse(eventStatusFilter.isApplicable(filter));
         }
 
         @Test
         public void testApplyFilter_NoMatch_AssertFalse() {
-            when(event.getLocation()).thenReturn("test");
-            when(filter.getLocationPattern()).thenReturn("not-test");
+            when(event.getStatus()).thenReturn(EventStatus.PLANNED);
+            when(filter.getStatusPattern()).thenReturn("not-planned");
 
-            boolean result = eventLocationFilter.applyFilter(event, filter);
+            boolean result = eventStatusFilter.applyFilter(event, filter);
             assertFalse(result);
 
-            verify(event, atLeastOnce()).getLocation();
-            verify(filter, atLeastOnce()).getLocationPattern();
+            verify(event, atLeastOnce()).getStatus();
+            verify(filter, atLeastOnce()).getStatusPattern();
         }
     }
 }

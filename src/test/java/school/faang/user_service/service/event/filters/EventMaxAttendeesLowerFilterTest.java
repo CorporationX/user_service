@@ -17,41 +17,41 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class EventTitleFilterTest {
+class EventMaxAttendeesLowerFilterTest {
     @Mock
     private Event event;
     @Mock
     private EventFilterDto filter;
     @InjectMocks
-    private EventTitleFilter eventTitleFilter;
+    private EventMaxAttendeesLowerFilter eventMaxAttendeesLowerFilter;
 
     @BeforeEach
     void setUp() {
-        eventTitleFilter = new EventTitleFilter();
+        eventMaxAttendeesLowerFilter = new EventMaxAttendeesLowerFilter();
     }
 
     @Nested
     class PositiveTests {
         @Test
         public void testIsApplicable_Success() {
-            when(filter.getTitlePattern()).thenReturn("test");
+            when(filter.getMaxAttendeesLowerPattern()).thenReturn(10);
 
-            boolean result = eventTitleFilter.isApplicable(filter);
+            boolean result = eventMaxAttendeesLowerFilter.isApplicable(filter);
             assertTrue(result);
 
-            verify(filter, atLeastOnce()).getTitlePattern();
+            verify(filter).getMaxAttendeesLowerPattern();
         }
 
         @Test
         public void testApply_Success() {
-            when(event.getTitle()).thenReturn("test");
-            when(filter.getTitlePattern()).thenReturn("test");
+            when(event.getMaxAttendees()).thenReturn(15);
+            when(filter.getMaxAttendeesLowerPattern()).thenReturn(20);
 
-            boolean result = eventTitleFilter.applyFilter(event, filter);
+            boolean result = eventMaxAttendeesLowerFilter.applyFilter(event, filter);
             assertTrue(result);
 
-            verify(event, atLeastOnce()).getTitle();
-            verify(filter, atLeastOnce()).getTitlePattern();
+            verify(event, atLeastOnce()).getMaxAttendees();
+            verify(filter, atLeastOnce()).getMaxAttendeesLowerPattern();
         }
     }
 
@@ -59,28 +59,21 @@ class EventTitleFilterTest {
     class NegativeTest {
         @Test
         public void testIsApplicable_NullPattern_AssertFalse() {
-            filter.setTitlePattern(null);
+            filter.setMaxAttendeesLargerPattern(0);
 
-            assertFalse(eventTitleFilter.isApplicable(filter));
+            assertFalse(eventMaxAttendeesLowerFilter.isApplicable(filter));
         }
 
         @Test
-        public void testIsApplicable_BlankPattern_AssertFalse() {
-            filter.setTitlePattern(" ");
+        void testApplyFilter_MoreThanCriteria_AssertFalse() {
+            when(event.getMaxAttendees()).thenReturn(10);
+            when(filter.getMaxAttendeesLowerPattern()).thenReturn(5);
 
-            assertFalse(eventTitleFilter.isApplicable(filter));
-        }
-
-        @Test
-        public void testApply_NoMatch_AssertFalse() {
-            when(event.getTitle()).thenReturn("test");
-            when(filter.getTitlePattern()).thenReturn("not-test");
-
-            boolean result = eventTitleFilter.applyFilter(event, filter);
+            boolean result = eventMaxAttendeesLowerFilter.applyFilter(event, filter);
             assertFalse(result);
 
-            verify(event, atLeastOnce()).getTitle();
-            verify(filter, atLeastOnce()).getTitlePattern();
+            verify(event).getMaxAttendees();
+            verify(filter).getMaxAttendeesLowerPattern();
         }
     }
 }

@@ -1,83 +1,86 @@
-//package school.faang.user_service.service.event.filters;
-//
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Nested;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import school.faang.user_service.dto.event.filters.EventFilterDto;
-//import school.faang.user_service.entity.event.Event;
-//import school.faang.user_service.test_data.event.TestDataEvent;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.stream.Stream;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertFalse;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
-//
-//@ExtendWith(MockitoExtension.class)
-//class EventDescriptionFilterTest {
-//    @InjectMocks
-//    private EventDescriptionFilter eventDescriptionFilter;
-//
-//    private TestDataEvent testDataEvent;
-//    private EventFilterDto eventFilterDto;
-//
-//    @BeforeEach
-//    void setUp() {
-//        testDataEvent = new TestDataEvent();
-//
-//        eventFilterDto = testDataEvent.getEventFilterDto();
-//    }
-//
-//    @Nested
-//    class PositiveTests {
-//        @Test
-//        public void testIsApplicable_Success() {
-//            assertTrue(eventDescriptionFilter.isApplicable(eventFilterDto));
-//        }
-//
-//        @Test
-//        public void testApply_Success_returnEvent1() {
-//            Event event1 = testDataEvent.getEvent();
-//            Event event2 = testDataEvent.getEvent2();
-//            List<Event> eventList = List.of(event1, event2);
-//
-//            Stream<Event> result = eventDescriptionFilter.apply(eventList, eventFilterDto);
-//            List<Event> resultList = result.toList();
-//
-//            assertEquals(1, resultList.size());
-//            assertEquals("desc1", resultList.get(0).getDescription());
-//        }
-//    }
-//
-//    @Nested
-//    class NegativeTest {
-//        @Test
-//        public void testIsApplicable_NullPattern_returnFalse() {
-//            eventFilterDto.setDescriptionPattern(null);
-//
-//            assertFalse(eventDescriptionFilter.isApplicable(eventFilterDto));
-//        }
-//
-//        @Test
-//        public void testIsApplicable_BlankPattern_returnFalse() {
-//            eventFilterDto.setDescriptionPattern(" ");
-//
-//            assertFalse(eventDescriptionFilter.isApplicable(eventFilterDto));
-//        }
-//
-//        @Test
-//        public void testApply_NoMatch_returnEmpty() {
-//            List<Event> eventList = new ArrayList<>();
-//
-//            Stream<Event> result = eventDescriptionFilter.apply(eventList, eventFilterDto);
-//            List<Event> resultList = result.toList();
-//
-//            assertTrue(resultList.isEmpty());
-//        }
-//    }
-//}
+package school.faang.user_service.service.event.filters;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.event.filters.EventFilterDto;
+import school.faang.user_service.entity.event.Event;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class EventDescriptionFilterTest {
+    @Mock
+    private Event event;
+    @Mock
+    private EventFilterDto filter;
+    @InjectMocks
+    private EventDescriptionFilter eventDescriptionFilter;
+
+    @BeforeEach
+    void setUp() {
+        eventDescriptionFilter = new EventDescriptionFilter();
+    }
+
+    @Nested
+    class PositiveTests {
+        @Test
+        public void testIsApplicable_Success() {
+            when(filter.getDescriptionPattern()).thenReturn("test");
+
+            boolean result = eventDescriptionFilter.isApplicable(filter);
+            assertTrue(result);
+
+            verify(filter, atLeastOnce()).getDescriptionPattern();
+        }
+
+        @Test
+        public void testApplyFilter_Success() {
+            when(event.getDescription()).thenReturn("test");
+            when(filter.getDescriptionPattern()).thenReturn("test");
+
+            boolean result = eventDescriptionFilter.applyFilter(event, filter);
+            assertTrue(result);
+
+            verify(event, atLeastOnce()).getDescription();
+            verify(filter, atLeastOnce()).getDescriptionPattern();
+        }
+    }
+
+    @Nested
+    class NegativeTest {
+        @Test
+        public void testIsApplicable_NullPattern_AssertFalse() {
+            filter.setDescriptionPattern(null);
+
+            assertFalse(eventDescriptionFilter.isApplicable(filter));
+        }
+
+        @Test
+        public void testIsApplicable_BlankPattern_AssertFalse() {
+            filter.setDescriptionPattern(" ");
+
+            assertFalse(eventDescriptionFilter.isApplicable(filter));
+        }
+
+        @Test
+        public void testApplyFilter_NoMatch_AssertFalse() {
+            when(event.getDescription()).thenReturn("test");
+            when(filter.getDescriptionPattern()).thenReturn("not-test");
+
+            boolean result = eventDescriptionFilter.applyFilter(event, filter);
+            assertFalse(result);
+
+            verify(event, atLeastOnce()).getDescription();
+            verify(filter, atLeastOnce()).getDescriptionPattern();
+        }
+    }
+}

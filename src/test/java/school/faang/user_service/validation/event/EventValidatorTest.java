@@ -20,6 +20,8 @@ import java.util.List;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,7 +102,9 @@ class EventValidatorTest {
                     () -> eventValidator.eventExistValidation(eventDto)
             );
 
-            assertEquals("Event ID cannot be null.", exception.getMessage());
+            assertEquals("Event ID: 1 dont exist", exception.getMessage());
+
+            verify(eventRepository, atLeastOnce()).existsById(1L);
         }
     }
 }

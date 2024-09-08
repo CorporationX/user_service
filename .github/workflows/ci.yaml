@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ feature/pipeline-BC-BJS2-26461 ]
   pull_request:
-    branches: [ dev ]
+    branches: [ feature/pipeline-BC-BJS2-26461 ]
 
 jobs:
   build:

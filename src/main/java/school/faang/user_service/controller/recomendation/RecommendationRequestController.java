@@ -5,8 +5,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recomendation.RecommendationRequestFilterDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 import school.faang.user_service.validator.recommendation.RequestValidator;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,5 +23,9 @@ public class RecommendationRequestController {
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
         requestValidator.validateRecomendationRequest(recommendationRequestDto);
         return recommendationRequestService.create(recommendationRequestDto);
+    }
+
+    public List<RecommendationRequest> getRecommendationRequests(RecommendationRequestFilterDto filter) {
+        return recommendationRequestService.getRequests(filter);
     }
 }

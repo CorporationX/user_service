@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.RequestMapper;
@@ -16,6 +17,8 @@ import school.faang.user_service.validator.validatorResult.Validated;
 import java.util.List;
 import java.util.Optional;
 
+import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
+
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
@@ -23,6 +26,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository repository;
     private final Predicates predicates = new Predicates();
     private final RequestMapper requestMapper;
+    public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         val res = mentorshipRequestValidator.validate(mentorshipRequestDto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
@@ -58,7 +62,13 @@ public class MentorshipRequestService {
         }
     }
 
-    void acceptRequest(long id) {
-
+    @Transactional
+    void acceptRequest(long id) throws Exception {
+        MentorshipRequest request =  repository.getMentorshipRequestById(id);
+        if (request.getStatus()!=ACCEPTED){
+            repository.updateMentorshipRequestStatusByRequesterId(id,ACCEPTED);
+        }else if(request.getStatus() == ACCEPTED){
+            throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
+        }
     }
 }

@@ -19,7 +19,7 @@ public class MentorshipRequestController {
          mentorshipRequestService.getRequests(filter);
     }
 
-    void acceptRequest(long id){
+    void acceptRequest(long id) throws Exception {
         mentorshipRequestService.acceptRequest( id);
     }
 }

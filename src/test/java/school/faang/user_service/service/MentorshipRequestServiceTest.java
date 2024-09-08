@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.EmptyResultDataAccessException;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.RequestMapper;
@@ -20,7 +21,10 @@ import school.faang.user_service.validator.validatorResult.Validated;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static school.faang.user_service.service.MentorshipRequestService.MENTOR_IS_ALREADY_ACCEPTED;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
@@ -99,5 +103,45 @@ class MentorshipRequestServiceTest {
         verifyNoMoreInteractions(repository);  // Ensure no further interaction with the repository
     }
 
+    @Test
+    void acceptRequest_ShouldUpdateStatus_WhenRequestIsNotAccepted() throws Exception {
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(1L);
+        request.setStatus(RequestStatus.PENDING);
+        // Arrange
+        when(repository.getMentorshipRequestById(1L)).thenReturn(request);
+
+        // Act
+        service.acceptRequest(1L);
+
+        // Assert
+        verify(repository, times(1)).updateMentorshipRequestStatusByRequesterId(1L, RequestStatus.ACCEPTED);
+    }
+
+
+    @Test
+    void acceptRequest_ShouldThrowException_WhenRequestIsAlreadyAccepted() {
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(1L);
+        request.setStatus(RequestStatus.PENDING);
+        // Arrange
+        request.setStatus(RequestStatus.ACCEPTED);
+        when(repository.getMentorshipRequestById(1L)).thenReturn(request);
+
+        // Act & Assert
+        Exception exception = assertThrows(Exception.class, () -> service.acceptRequest(1L));
+        assertEquals(MENTOR_IS_ALREADY_ACCEPTED, exception.getMessage());
+        verify(repository, never()).updateMentorshipRequestStatusByRequesterId(anyLong(), any(RequestStatus.class));
+    }
+
+    @Test
+    void acceptRequest_ShouldThrowException_WhenRequestIsNotFound() {
+        // Arrange
+        when(repository.getMentorshipRequestById(1L)).thenThrow(new EmptyResultDataAccessException(1));
+
+        // Act & Assert
+        assertThrows(EmptyResultDataAccessException.class, () -> service.acceptRequest(1L));
+        verify(repository, never()).updateMentorshipRequestStatusByRequesterId(anyLong(), any(RequestStatus.class));
+    }
 
 }

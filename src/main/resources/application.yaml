@@ -40,3 +40,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+springdoc:
+  api-docs:
+    path: /swagger
+  swagger-ui:
+    tagsSorter: alpha
+    operationsSorter: alpha

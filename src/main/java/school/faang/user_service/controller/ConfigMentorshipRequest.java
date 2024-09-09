@@ -1,4 +1,4 @@
-package school.faang.user_service.controller_mentorship;
+package school.faang.user_service.controller;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +9,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper_mentorship.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service_mentorship.MentorshipRequestService;
+import school.faang.user_service.service.MentorshipRequestService;
 
 import java.util.List;
 import java.util.Optional;

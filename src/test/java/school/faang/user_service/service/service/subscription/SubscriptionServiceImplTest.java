@@ -50,10 +50,7 @@ class SubscriptionServiceImplTest {
 
     private final Long followerId = 2L;
     private final Long followeeId = 1L;
-    private final UserFilterDto userFilterDto = new UserFilterDto(null, null, null,
-            null, null, null,
-            null, null, null,
-            null, null, null);
+    private final UserFilterDto userFilterDto = UserFilterDto.builder().build();
 
     @Test
     @DisplayName("Successfully subscription creation")

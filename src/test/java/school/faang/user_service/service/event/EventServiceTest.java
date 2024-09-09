@@ -93,4 +93,6 @@ public class EventServiceTest {
         assertEquals(eventDto, result);
     }
 
+    // TODO: create getEvent_shouldReturnEventDto test
+
 }

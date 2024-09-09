@@ -46,4 +46,6 @@ class EventControllerTest {
         verify(eventService, times(1)).create(eventDto);
         assertEquals(eventDto, result);
     }
+
+    // TODO: create getEvent_shouldReturnEventDto test
 }

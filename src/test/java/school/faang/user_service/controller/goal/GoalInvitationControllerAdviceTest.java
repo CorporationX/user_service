@@ -6,7 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import school.faang.user_service.dto.response.ErrorResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import school.faang.user_service.exception.goal.invitation.InvitationCheckException;
 import school.faang.user_service.exception.goal.invitation.InvitationEntityNotFoundException;
 
@@ -39,22 +41,38 @@ class GoalInvitationControllerAdviceTest {
     @DisplayName("Handle Entity not found exception")
     void testHandleEntityNotFoundException() {
         when(invitationEntityNotFoundException.getMessage()).thenReturn(ENTITY_MESSAGE);
-        ErrorResponse response = goalInvitationControllerAdvice
+        var response = goalInvitationControllerAdvice
                 .handleEntityNotFoundException(invitationEntityNotFoundException);
         assertThat(response)
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("message", ENTITY_MESSAGE);
+                .extracting(ResponseEntity::getStatusCode)
+                .isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody())
+                .isNotNull()
+                .extracting(ProblemDetail::getStatus)
+                .isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getBody())
+                .extracting(ProblemDetail::getDetail)
+                .isEqualTo(ENTITY_MESSAGE);
     }
 
     @Test
     @DisplayName("Handle same user exception")
     void testHandInvitationCheckException() {
         when(invitationCheckException.getMessage()).thenReturn(SAME_USERS_MESSAGE);
-        ErrorResponse response = goalInvitationControllerAdvice
+        var response = goalInvitationControllerAdvice
                 .handleInvitationCheckException(invitationCheckException);
         assertThat(response)
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("message", SAME_USERS_MESSAGE);
+                .extracting(ResponseEntity::getStatusCode)
+                .isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody())
+                .isNotNull()
+                .extracting(ProblemDetail::getStatus)
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getBody())
+                .extracting(ProblemDetail::getDetail)
+                .isEqualTo(SAME_USERS_MESSAGE);
     }
 
     @AfterEach

@@ -26,15 +26,15 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Cache build outputs
         uses: actions/cache@v4
         with:
             path: build
             key: ${{ runner.os }}-build-${{ hashFiles('gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
             restore-keys: ${{ runner.os }}-build-
+
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Run tests
         run: ./gradlew test --continue

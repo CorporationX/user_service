@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserExperienceMinFilter implements UserFilter {
+class UserExperienceMinFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getExperienceMin() > 0;

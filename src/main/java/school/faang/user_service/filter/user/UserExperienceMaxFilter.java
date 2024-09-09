@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserExperienceMaxFilter implements UserFilter {
+class UserExperienceMaxFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getExperienceMax() > 0;

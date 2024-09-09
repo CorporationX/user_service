@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserAboutFilter implements UserFilter {
+class UserAboutFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getAboutPattern() != null && !userFilterDto.getAboutPattern().isBlank();

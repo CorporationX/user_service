@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserContactFilter implements UserFilter {
+class UserContactFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getContactPattern() != null && !userFilterDto.getContactPattern().isBlank();
@@ -15,7 +15,9 @@ public class UserContactFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto userFilterDto) {
-        return userStream.filter(user -> user.getContacts().parallelStream()
-                .anyMatch(contact -> contact.getContact().contains(userFilterDto.getContactPattern())));
+        return userStream.filter(user -> user.getContacts().stream()
+                .anyMatch(contact ->
+                        contact.getContact() != null && contact.getContact().contains(userFilterDto.getContactPattern())
+                ));
     }
 }

@@ -11,42 +11,42 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/subscriptions")
+@RequestMapping("/v1/subscriptions")
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
 
-    @PostMapping("/followUser")
+    @PostMapping("/follow")
     @ResponseStatus(HttpStatus.CREATED)
-    public void followUser(@RequestParam("followerId") long followerId,
-                           @RequestParam("followeeId") long followeeId) {
+    public void followUserById(@RequestParam("followerId") long followerId,
+                               @RequestParam("followeeId") long followeeId) {
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    @PostMapping("/unfollowUser")
+    @DeleteMapping("/unfollow")
     @ResponseStatus(HttpStatus.OK)
-    public void unfollowUser(@RequestParam("followerId") long followerId,
-                             @RequestParam("followeeId") long followeeId) {
+    public void unfollowUserById(@RequestParam("followerId") long followerId,
+                                 @RequestParam("followeeId") long followeeId) {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    @GetMapping("/getFollowers")
+    @PostMapping("/followers")
     public List<UserDto> getFollowers(@RequestParam("followeeId") long followeeId,
                                       @RequestBody(required = false) UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
-    @GetMapping("/getFollowersCount")
+    @GetMapping("/followers/count")
     public int getFollowersCount(@RequestParam("followerId") long followerId) {
         return subscriptionService.getFollowersCount(followerId);
     }
 
-    @GetMapping("/getFollowingCount")
+    @GetMapping("/following/count")
     public int getFollowingCount(@RequestParam("followerId") long followerId) {
         return subscriptionService.getFollowingCount(followerId);
     }
 
-    @GetMapping("/getFollowing")
+    @PostMapping("/following")
     public List<UserDto> getFollowing(@RequestParam("followeeId") long followeeId,
                                       @RequestBody(required = false) UserFilterDto filter) {
         return subscriptionService.getFollowing(followeeId, filter);

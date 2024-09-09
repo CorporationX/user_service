@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserSkillFilter implements UserFilter {
+class UserSkillFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getSkillPattern() != null && !userFilterDto.getSkillPattern().isBlank();
@@ -16,6 +16,7 @@ public class UserSkillFilter implements UserFilter {
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto userFilterDto) {
         return userStream.filter(user -> user.getSkills().parallelStream()
-                .anyMatch(skill -> skill.getTitle().contains(userFilterDto.getSkillPattern())));
+                .anyMatch(skill ->
+                        skill.getTitle() != null && skill.getTitle().contains(userFilterDto.getSkillPattern())));
     }
 }

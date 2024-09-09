@@ -10,14 +10,14 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalInvitationMapper {
-    @Mapping(source = "dto.inviterId", target = "inviter.id")
-    @Mapping(source = "dto.invitedUserId", target = "invited.id")
-    @Mapping(source = "dto.goalId", target = "goal.id")
+    @Mapping(source = "inviterId", target = "inviter.id")
+    @Mapping(source = "invitedUserId", target = "invited.id")
+    @Mapping(source = "goalId", target = "goal.id")
     GoalInvitation toEntity(GoalInvitationDto dto);
 
-    @Mapping(source = "entity.inviter.id", target = "inviterId")
-    @Mapping(source = "entity.invited.id", target = "invitedUserId")
-    @Mapping(source = "entity.goal.id", target = "goalId")
+    @Mapping(source = "inviter.id", target = "inviterId")
+    @Mapping(source = "invited.id", target = "invitedUserId")
+    @Mapping(source = "goal.id", target = "goalId")
     GoalInvitationDto toDto(GoalInvitation entity);
 
     List<GoalInvitationDto> toDtoList(List<GoalInvitation> entityList);

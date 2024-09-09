@@ -10,8 +10,8 @@ import school.faang.user_service.controller.goal.GoalInvitationController;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice(assignableTypes = {
-        GoalInvitationController.class}
-)
+        GoalInvitationController.class
+})
 public class ApiControllerAdvice {
 
     // Validator exceptions, based on convention chosen by the team

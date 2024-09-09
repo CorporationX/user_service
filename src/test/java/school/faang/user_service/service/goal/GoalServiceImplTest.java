@@ -42,6 +42,7 @@ class GoalServiceImplTest {
         goalDto.setId(GOAL_ID);
     }
 
+
     @Test
     public void whenDeleteByIdAndIdNotExistThenThrowException() {
         when(goalRepository.existsById(GOAL_ID)).thenReturn(false);

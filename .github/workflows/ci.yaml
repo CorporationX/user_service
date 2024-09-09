@@ -17,23 +17,23 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path:
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Cache build outputs
         uses: actions/cache@v4
         with:
             path: build
-            key: ${{ runner.os }}-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            key: ${{ runner.os }}-build-${{ hashFiles('gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
             restore-keys: ${{ runner.os }}-build-
 
       - name: Run tests

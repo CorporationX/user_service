@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
-import school.faang.user_service.validator.skill.SubscriptionValidator;
+import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
 import java.util.List;
 

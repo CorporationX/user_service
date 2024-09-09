@@ -10,7 +10,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.service.subscription.SubscriptionService;
 import school.faang.user_service.util.TestDataFactory;
-import school.faang.user_service.validator.skill.SubscriptionValidator;
+import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {

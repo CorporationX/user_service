@@ -91,10 +91,6 @@ jsonSchema2Pojo {
     setSourceType("jsonschema")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }
 
 tasks.bootJar {

@@ -6,7 +6,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.recomendation.RecommendationRequestService;
+import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
 import java.util.List;
 

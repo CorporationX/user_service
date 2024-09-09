@@ -3,26 +3,33 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
+import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PremiumRepository premiumRepository;
     private final GoalService goalService;
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
+    private final List<UserFilter> userFilters;
 
     @Transactional
     public void deactivateUser(Long userId) {
@@ -72,5 +79,22 @@ public class UserService {
             eventRepository.save(event);
             eventRepository.delete(event);
         });
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
+        Stream<Premium> premiums = premiumRepository.findPremiumUsers();
+        Stream<User> users = premiums.map(Premium::getUser);
+        return filterUsers(users, userFilterDto);
+    }
+
+    public List<User> filterUsers(Stream<User> users, UserFilterDto userFilterDto) {
+        return userFilters
+            .stream()
+            .filter(f -> f.isApplicable(userFilterDto))
+            .reduce(users,
+                (stream, filter) -> filter.apply(stream, userFilterDto),
+                (s1, s2) -> s1)
+            .toList();
     }
 }

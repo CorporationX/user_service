@@ -93,7 +93,7 @@ public class User {
     @JoinTable(name = "mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
-    private Set<User> mentors;
+    private List<User> mentors;
 
     public Long getId() {
         return id;

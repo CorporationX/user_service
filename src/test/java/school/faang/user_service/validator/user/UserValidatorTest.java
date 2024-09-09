@@ -8,12 +8,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,37 +26,106 @@ class UserValidatorTest {
     @Mock
     private UserRepository userRepository;
 
-    private final long LONG_NEGATIVE_USER_ID_IS_ONE = -1L;
-    private final long LONG_POSITIVE_USER_ID_IS_ONE = 1L;
+    private final long USER_ID_IS_NEGATIVE_ONE = -1L;
+    private final long USER_ID_IS_ONE = 1L;
+    private final long USER_ID_IS_TWO = 2L;
 
     @Nested
     class NegativeTests {
 
-        @Test
-        @DisplayName("Ошибка валидации если переданное число null")
-        void When_NullValue_Then_ThrowValidationException() {
-            assertThrows(ValidationException.class,
-                    () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
-                    "User id can't be null");
+        @Nested
+        class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Ошибка валидации если переданный id = null")
+            void WhenNullValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
+                        "User id can't be null");
+            }
+
+            @Test
+            @DisplayName("Ошибка валидации если переданный id отрицательный")
+            void WhenNegativeValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> userValidator
+                                .userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_NEGATIVE_ONE),
+                        "User id can't be less than 0");
+            }
         }
 
-        @Test
-        @DisplayName("Ошибка валидации если переданное число отрицательное")
-        void When_NegativeValue_Then_ThrowValidationException() {
-            assertThrows(ValidationException.class,
-                    () -> userValidator
-                            .userIdIsPositiveAndNotNullOrElseThrowValidationException(LONG_NEGATIVE_USER_ID_IS_ONE),
-                    "User id can't be less than 0");
+        @Nested
+        class UserIsExistedOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
+            void WhenUserNotExistsThenThrowValidationException() {
+                when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+                assertThrows(ValidationException.class,
+                        () -> userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE),
+                        "User with id " + USER_ID_IS_ONE + " not exists");
+            }
         }
 
-        @Test
-        @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
-        void When_UserNotExists_Then_ThrowValidationException() {
-            when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        @Nested
+        class CheckIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowExceptionMethod {
 
-            assertThrows(ValidationException.class,
-                    () -> userValidator.userIsExistedOrElseThrowValidationException(LONG_POSITIVE_USER_ID_IS_ONE),
-                    "User with id " + LONG_POSITIVE_USER_ID_IS_ONE + " not exists");
+            @Test
+            @DisplayName("Ошибка валидации если переданные id у пользователей одинаковые")
+            void WhenId1AndId2EqualsThenThrowValidationExceptionWithMessage() {
+                String exceptionMessage = "Exception";
+
+                assertThrows(ValidationException.class,
+                        () -> userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
+                                USER_ID_IS_ONE,
+                                USER_ID_IS_ONE,
+                                exceptionMessage),
+                        exceptionMessage);
+            }
+        }
+    }
+
+    @Nested
+    class PositiveTests {
+
+        @Nested
+        class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Если переданный id пользователя не null и больше нуля то метод ничего не возвращает")
+            void WhenUserIdNotNullValueAndMoreThanZeroThenSuccess() {
+                userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_ONE);
+            }
+        }
+
+        @Nested
+        class UserIsExistedOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Если пользователь с переданным id существует то метод ничего не возвращает")
+            void WhenUserExistsThenSuccess() {
+                when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+
+                userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE);
+
+                verify(userRepository).findById(anyLong());
+            }
+        }
+
+        @Nested
+        class CheckIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowExceptionMethod {
+
+            @Test
+            @DisplayName("Если переданные id у пользователей разные то метод ничего не возвращает")
+            void WhenId1AndId2EqualsThenNotThrowValidationException() {
+                String exceptionMessage = "Exception";
+
+                userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
+                        USER_ID_IS_ONE,
+                        USER_ID_IS_TWO,
+                        exceptionMessage);
+            }
         }
     }
 }

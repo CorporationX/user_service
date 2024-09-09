@@ -26,12 +26,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
-
-    @Query(nativeQuery = true, value = """
-            SELECT u.*
-              FROM users u
-              JOIN FETCH u.goals
-             WHERE u.id = ?1
-            """)
-    Optional<User> findByIdWithGoals(long userId);
 }

@@ -10,31 +10,31 @@ import school.faang.user_service.service.goal.GoalInvitationService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/goalInvitation")
+@RequestMapping("/v1/goalInvitations")
 @RequiredArgsConstructor
 public class GoalInvitationController {
 
     private final GoalInvitationService goalInvitationService;
 
-    @PostMapping("/createInvitation")
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public void createInvitation(@RequestBody GoalInvitationDto goalInvitationDto) {
         goalInvitationService.createInvitation(goalInvitationDto);
     }
 
-    @PatchMapping("/acceptGoalInvitation")
+    @PatchMapping("/accept")
     @ResponseStatus(HttpStatus.OK)
     public void acceptGoalInvitation(@RequestParam("id") long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
 
-    @PatchMapping("/acceptGoalInvitation")
+    @PatchMapping("/reject")
     @ResponseStatus(HttpStatus.OK)
     public void rejectGoalInvitation(@RequestParam("id") long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
-    @GetMapping("/getInvitations")
+    @PostMapping("/invitations")
     public List<GoalInvitationDto> getInvitations(@RequestBody GoalInvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }

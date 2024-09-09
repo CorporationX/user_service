@@ -2,8 +2,10 @@ package school.faang.user_service.validator.user;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.repository.UserRepository;
 
+@Component
 @RequiredArgsConstructor
 public class UserValidator {
 
@@ -22,5 +24,14 @@ public class UserValidator {
         userRepository.findById(userId).orElseThrow(() -> new ValidationException("User with id " + userId + " not exists"));
     }
 
+    public void checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(long firstUserId,
+                                                                               long secondUserId,
+                                                                               String exceptionMsg)
+            throws ValidationException {
+
+        if (firstUserId == secondUserId) {
+            throw new ValidationException(exceptionMsg);
+        }
+    }
 
 }

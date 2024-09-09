@@ -11,18 +11,16 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.filter.goalInvitation.GoalInvitationFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class GoalInvitationService {
 
-    private final UserService userService;
     private final GoalValidator goalValidator;
     private final UserValidator userValidator;
     private final GoalInvitationMapper goalInvitationMapper;
@@ -31,14 +29,13 @@ public class GoalInvitationService {
 
     private final int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
 
+    @Transactional
     public void createInvitation(GoalInvitationDto goalInvitationDto) {
-        checkUser(goalInvitationDto.getInviterId());
-        checkUser(goalInvitationDto.getInvitedUserId());
+        checkUsers(goalInvitationDto.getInviterUserId(), goalInvitationDto.getInvitedUserId());
         checkGoal(goalInvitationDto.getGoalId());
-
-        if (isInviterAndInvitedAreEquals(goalInvitationDto.getInviterId(), goalInvitationDto.getInvitedUserId())) {
-            throw new ValidationException("Inviter and invited cannot be equal");
-        }
+        userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(goalInvitationDto.getInviterUserId(),
+                goalInvitationDto.getInvitedUserId(),
+                "Inviter and invited cannot be equal");
 
         goalInvitationRepository.save(goalInvitationMapper.toEntity(goalInvitationDto));
     }
@@ -48,18 +45,18 @@ public class GoalInvitationService {
         GoalInvitation goalInvitation = getGoalInvitationOrElseThrowException(goalInvitationId);
 
         checkGoal(goalInvitation.getGoal().getId());
-
         goalValidator.userActiveGoalsAreLessThenIncomingOrElseThrowException(goalInvitation.getInvited().getId(),
                 MAX_LIMIT_ACTIVE_GOALS_FOR_USER);
-        goalValidator.userNotWorkingWithGoalOrElseThrowException(goalInvitation.getGoal().getId(),
+        goalValidator.userNotWorkingWithGoalOrElseThrowException(goalInvitation.getInvited().getId(),
                 goalInvitation.getGoal().getId());
 
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
 
         goalInvitationRepository.save(goalInvitation);
-        userService.addGoalToUserGoals(goalInvitation.getInvited().getId(), goalInvitation.getGoal());
+        goalInvitation.getGoal().getUsers().add(goalInvitation.getInvited());
     }
 
+    @Transactional
     public void rejectGoalInvitation(long goalInvitationId) {
         GoalInvitation goalInvitation = getGoalInvitationOrElseThrowException(goalInvitationId);
 
@@ -69,13 +66,17 @@ public class GoalInvitationService {
         goalInvitationRepository.save(goalInvitation);
     }
 
+    @Transactional(readOnly = true)
     public List<GoalInvitationDto> getInvitations(GoalInvitationFilterDto filter) {
-        List<GoalInvitation> invitations = goalInvitationRepository.findAll();
-        goalInvitationFilters.stream()
-                .filter(goalInvitationFilter -> goalInvitationFilter.isApplicable(filter))
-                .forEach(goalInvitationFilter -> goalInvitationFilter
-                        .apply(invitations, filter));
-        return goalInvitationMapper.toDto(invitations);
+        Stream<GoalInvitation> invitations = goalInvitationRepository.findAll().stream();
+        if (filter != null) {
+            invitations = goalInvitationFilters.stream()
+                    .filter(goalInvitationFilter -> goalInvitationFilter.isApplicable(filter))
+                    .reduce(invitations,
+                            (stream, goalInvitationFilter) -> goalInvitationFilter.apply(stream, filter),
+                            (s1, s2) -> s1);
+        }
+        return goalInvitationMapper.toDtos(invitations.toList());
     }
 
     private GoalInvitation getGoalInvitationOrElseThrowException(long goalInvitationId) {
@@ -83,8 +84,9 @@ public class GoalInvitationService {
                 .orElseThrow(() -> new ValidationException("No goal invitation with id " + goalInvitationId + " found"));
     }
 
-    private boolean isInviterAndInvitedAreEquals(Long inviterId, Long inventedId) {
-        return Objects.equals(inviterId, inventedId);
+    private void checkUsers(Long firstUserId, Long secondUserId) {
+        checkUser(firstUserId);
+        checkUser(secondUserId);
     }
 
     private void checkUser(Long userId) {

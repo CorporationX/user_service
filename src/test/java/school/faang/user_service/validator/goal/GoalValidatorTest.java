@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,67 +27,146 @@ class GoalValidatorTest {
     @Mock
     private GoalRepository goalRepository;
 
-    private final Long LONG_NEGATIVE_VALUE_ONE = -1L;
-    private final Long LONG_POSITIVE_VALUE_ONE = 1L;
-    private final Long LONG_POSITIVE_VALUE_TWO = 2L;
+    private final Long GOAL_ID_NEGATIVE_ONE = -1L;
+    private final Long USER_ID_IS_ONE = 1L;
+    private final Long GOAL_ID_IS_ONE = 1L;
+    private final Long GOAL_ID_IS_TWO = 2L;
 
-    private final int INT_MAX_LIMIT_GOALS_COUNT = 3;
+    private final int MAX_LIMIT_GOALS_COUNT = 3;
 
     @Nested
     class NegativeTests {
 
-        @Test
-        @DisplayName("Ошибка валидации если переданное число null")
-        void When_NullValue_Then_ThrowValidationException() {
-            assertThrows(ValidationException.class,
-                    () -> goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(null),
-                    "Goal id can't be null");
+        @Nested
+        class GoalIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Ошибка валидации если переданный id цели = null")
+            void WhenIdIsNullValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(null),
+                        "Goal id can't be null");
+            }
+
+            @Test
+            @DisplayName("Ошибка валидации если переданный id цели отрицательный")
+            void WhenIdIsNegativeValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(
+                                GOAL_ID_NEGATIVE_ONE),
+                        "Goal id can't be less than 0");
+            }
         }
 
-        @Test
-        @DisplayName("Ошибка валидации если переданное число отрицательное")
-        void When_NegativeValue_Then_ThrowValidationException() {
-            assertThrows(ValidationException.class,
-                    () -> goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(LONG_NEGATIVE_VALUE_ONE),
-                    "Goal id can't be less than 0");
+        @Nested
+        class GoalIsExistedOrElseThrowExceptionMethod {
+
+            @Test
+            @DisplayName("Ошибка валидации если цели с переданным id не существует")
+            void WhenGoalNotExistsThenThrowValidationException() {
+                when(goalRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.goalIsExistedOrElseThrowException(GOAL_ID_IS_ONE),
+                        "Goal with id " + GOAL_ID_IS_ONE + " not exists");
+            }
         }
 
-        @Test
-        @DisplayName("Ошибка валидации если цели с переданным id не существует")
-        void When_GoalNotExists_Then_ThrowValidationException() {
-            when(goalRepository.findById(anyLong())).thenReturn(Optional.empty());
+        @Nested
+        class UserActiveGoalsAreLessThenIncomingOrElseThrowExceptionMethod {
 
-            assertThrows(ValidationException.class,
-                    () -> goalValidator.goalIsExistedOrElseThrowException(LONG_POSITIVE_VALUE_ONE),
-                    "Goal with id " + LONG_POSITIVE_VALUE_ONE + " not exists");
+            @Test
+            @DisplayName("Ошибка валидации если у пользователя активных целей больше или равно лимиту")
+            void WhenUserActiveGoalsMoreOrEqualsLimitThenThrowValidationException() {
+                when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(MAX_LIMIT_GOALS_COUNT);
+
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.userActiveGoalsAreLessThenIncomingOrElseThrowException(USER_ID_IS_ONE,
+                                MAX_LIMIT_GOALS_COUNT),
+                        "User " + USER_ID_IS_ONE + " has max active goals");
+            }
         }
 
-        @Test
-        @DisplayName("Ошибка валидации если у пользователя активных целей больше или равно лимиту")
-        void When_UserActiveGoalsMoreOrEquals_Then_ThrowValidationException() {
-            when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(INT_MAX_LIMIT_GOALS_COUNT);
+        @Nested
+        class UserNotWorkingWithGoalOrElseThrowExceptionMethod {
 
-            assertThrows(ValidationException.class,
-                    () -> goalValidator.userActiveGoalsAreLessThenIncomingOrElseThrowException(LONG_POSITIVE_VALUE_ONE, INT_MAX_LIMIT_GOALS_COUNT),
-                    "User " + LONG_POSITIVE_VALUE_ONE + " has max active goals");
+            @Test
+            @DisplayName("Ошибка валидации если у пользователя есть переданная цель")
+            void WhenUserActiveGoalsContainsGoalThenThrowValidationException() {
+                Stream<Goal> goalStream = Stream.of(
+                        Goal.builder()
+                                .id(GOAL_ID_IS_ONE)
+                                .build(),
+                        Goal.builder()
+                                .id(GOAL_ID_IS_TWO)
+                                .build());
+
+                when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goalStream);
+
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.userNotWorkingWithGoalOrElseThrowException(USER_ID_IS_ONE, GOAL_ID_IS_TWO),
+                        "User with id " + USER_ID_IS_ONE + " already has goal with id " + GOAL_ID_IS_TWO);
+            }
+        }
+    }
+
+    @Nested
+    class PositiveTests {
+
+        @Nested
+        class GoalIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Если переданный id цели не null и больше нуля, то метод ничего не возвращает")
+            void WhenIdIsNullValueThenSuccess() {
+                goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(GOAL_ID_IS_ONE);
+            }
         }
 
-        @Test
-        @DisplayName("Ошибка валидации если у пользователя есть переданная цель")
-        void When_UserActiveGoalNotExistsGoal_Then_ThrowValidationException() {
-            Goal goal = new Goal();
-            goal.setId(LONG_POSITIVE_VALUE_ONE);
+        @Nested
+        class GoalIsExistedOrElseThrowExceptionMethod {
 
-            Goal anotherGoal = new Goal();
-            goal.setId(LONG_POSITIVE_VALUE_TWO);
+            @Test
+            @DisplayName("Если цель с переданным id существует, то метод ничего не возвращает")
+            void WhenGoalExistsThenSuccess() {
+                when(goalRepository.findById(anyLong())).thenReturn(Optional.of(new Goal()));
 
-            Stream<Goal> goalStream = Stream.of(goal, anotherGoal);
+                goalValidator.goalIsExistedOrElseThrowException(GOAL_ID_IS_ONE);
 
-            when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goalStream);
+                verify(goalRepository).findById(anyLong());
+            }
+        }
 
-            assertThrows(ValidationException.class,
-                    () -> goalValidator.userNotWorkingWithGoalOrElseThrowException(LONG_POSITIVE_VALUE_ONE, LONG_POSITIVE_VALUE_TWO),
-                    "User with id " + LONG_POSITIVE_VALUE_ONE + " already has goal with id " + LONG_POSITIVE_VALUE_TWO);
+        @Nested
+        class UserActiveGoalsAreLessThenIncomingOrElseThrowExceptionMethod {
+
+            @Test
+            @DisplayName("Если у пользователя активных целей больше или равно лимиту, то метод ничего не возвращает")
+            void WhenUserActiveGoalsLessLimitThenSuccess() {
+                when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(MAX_LIMIT_GOALS_COUNT - 1);
+
+                goalValidator.userActiveGoalsAreLessThenIncomingOrElseThrowException(USER_ID_IS_ONE,
+                        MAX_LIMIT_GOALS_COUNT);
+
+                verify(goalRepository).countActiveGoalsPerUser(anyLong());
+            }
+        }
+
+        @Nested
+        class UserNotWorkingWithGoalOrElseThrowExceptionMethod {
+
+            @Test
+            @DisplayName("Если у пользователя нет переданной цели, то метод ничего не возвращает")
+            void WhenUserActiveGoalsContainsGoalThenThrowValidationException() {
+                Stream<Goal> goalStream = Stream.of(
+                        Goal.builder()
+                                .id(GOAL_ID_IS_ONE)
+                                .build());
+
+                when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goalStream);
+
+                goalValidator.userNotWorkingWithGoalOrElseThrowException(USER_ID_IS_ONE, GOAL_ID_IS_TWO);
+            }
         }
     }
 }

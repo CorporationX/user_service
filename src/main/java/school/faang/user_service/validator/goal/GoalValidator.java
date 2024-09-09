@@ -2,9 +2,11 @@ package school.faang.user_service.validator.goal;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+@Component
 @RequiredArgsConstructor
 public class GoalValidator {
 

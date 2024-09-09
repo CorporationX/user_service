@@ -17,24 +17,36 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Verify Gradle cache directories before build
+        run: |
+          echo "Checking Gradle cache directories before build..."
+          ls -la ~/.gradle/caches || true
+          ls -la ~/.gradle/wrapper || true
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
-          path:
+          path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle
+        run: ./gradlew build --info
+
+      - name: Verify Gradle cache directories after build
+        run: |
+          echo "Checking Gradle cache directories after build..."
+          ls -la ~/.gradle/caches
+          ls -la ~/.gradle/wrapper
 
       - name: Cache build outputs
         uses: actions/cache@v4
         with:
-            path: build
-            key: ${{ runner.os }}-build-${{ hashFiles('gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
-            restore-keys: ${{ runner.os }}-build-
-
-      - name: Build with Gradle
-        run: ./gradlew build
+          path: build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Run tests
-        run: ./gradlew test --continue
+        run: ./gradlew test --no-daemon --continue

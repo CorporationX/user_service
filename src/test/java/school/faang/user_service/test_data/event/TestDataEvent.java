@@ -46,7 +46,7 @@ public class TestDataEvent {
                 .build();
     }
 
-    private SkillDto getSkillDto2() {
+    public SkillDto getSkillDto2() {
         return SkillDto.builder()
                 .id(2L)
                 .title("skill2")
@@ -85,6 +85,22 @@ public class TestDataEvent {
                 .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
                 .type(EventType.MEETING)
                 .status(EventStatus.PLANNED)
+                .build();
+    }
+
+    public Event getEvent2() {
+        return Event.builder()
+                .id(2L)
+                .title("title2")
+                .description("desc2")
+                .startDate(LocalDateTime.now().plusDays(3))
+                .endDate(LocalDateTime.now().plusDays(4))
+                .location("location2")
+                .maxAttendees(20)
+                .owner(getUser())
+                .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
+                .type(EventType.GIVEAWAY)
+                .status(EventStatus.CANCELED)
                 .build();
     }
     

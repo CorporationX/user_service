@@ -11,7 +11,6 @@ import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.test_data.event.TestDataEvent;
-import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 
@@ -25,8 +24,6 @@ import static org.mockito.Mockito.when;
 class EventControllerTest {
     @Mock
     private EventService eventService;
-    @Mock
-    private EventValidator eventValidator;
     @InjectMocks
     private EventController eventController;
 
@@ -36,6 +33,7 @@ class EventControllerTest {
     @BeforeEach
     void setUp() {
         testDataEvent = new TestDataEvent();
+
         eventDto = testDataEvent.getEventDto();
     }
 
@@ -48,8 +46,6 @@ class EventControllerTest {
         assertNotNull(result);
         assertEquals(eventDto, result);
 
-        verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
-        verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto);
         verify(eventService, atLeastOnce()).createEvent(eventDto);
     }
 
@@ -94,9 +90,6 @@ class EventControllerTest {
         assertNotNull(result);
         assertEquals(eventDto.getId(), result.getId());
 
-        verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
-        verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto);
-        verify(eventValidator, atLeastOnce()).eventExistValidation(eventDto);
         verify(eventService, atLeastOnce()).updateEvent(eventDto);
     }
 

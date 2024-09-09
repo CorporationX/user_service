@@ -41,7 +41,7 @@ class UserServiceTest {
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-            User result = userService.getUser(user.getId());
+            User result = userService.findUserById(user.getId());
             assertNotNull(result);
             assertEquals(user.getId(), result.getId());
             assertEquals("User1", result.getUsername());
@@ -55,7 +55,7 @@ class UserServiceTest {
             when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
             var exception = assertThrows(DataValidationException.class,
-                    () -> userService.getUser(1L)
+                    () -> userService.findUserById(1L)
             );
 
             assertEquals("User with ID: 1 not found", exception.getMessage());

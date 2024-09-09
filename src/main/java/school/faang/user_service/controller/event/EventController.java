@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,11 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 
@@ -24,18 +25,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-    private final EventValidator eventValidator;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public EventDto createEvent(@RequestBody @Valid EventDto eventDto) {
-        eventValidator.eventDatesValidation(eventDto);
-        eventValidator.relatedSkillsValidation(eventDto);
-
         return eventService.createEvent(eventDto);
     }
 
     @GetMapping("/{eventId}")
-    public EventDto getEvent(@PathVariable @Positive Long eventId) {
+    public EventDto getEvent(@PathVariable @Positive long eventId) {
         return eventService.getEvent(eventId);
     }
 
@@ -45,26 +43,22 @@ public class EventController {
     }
 
     @DeleteMapping("/{eventId}")
-    public void deleteEvent(@PathVariable @Positive Long eventId) {
+    public void deleteEvent(@PathVariable @Positive long eventId) {
         eventService.deleteEvent(eventId);
     }
 
     @PatchMapping
     public EventDto updateEvent(@RequestBody @Valid EventDto eventDto) {
-        eventValidator.eventDatesValidation(eventDto);
-        eventValidator.relatedSkillsValidation(eventDto);
-        eventValidator.eventExistValidation(eventDto);
-
         return eventService.updateEvent(eventDto);
     }
 
     @GetMapping("/owner/{userId}")
-    public List<EventDto> getEventsOwner(@PathVariable @Positive Long userId) {
+    public List<EventDto> getEventsOwner(@PathVariable @Positive long userId) {
         return eventService.getEventsOwner(userId);
     }
 
     @GetMapping("/participant/{userId}")
-    public List<EventDto> getEventParticipants(@PathVariable @Positive Long userId) {
+    public List<EventDto> getEventParticipants(@PathVariable @Positive long userId) {
         return eventService.getEventParticipants(userId);
     }
 }

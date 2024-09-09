@@ -59,10 +59,17 @@ class EventValidatorTest {
         }
 
         @Test
-        public void testEventExistValidation_Success() {
+        public void testEventExistByDtoValidation_Success() {
             when(eventRepository.existsById(eventDto.getId())).thenReturn(true);
 
-            assertDoesNotThrow(() -> eventValidator.eventExistValidation(eventDto));
+            assertDoesNotThrow(() -> eventValidator.eventExistByDtoValidation(eventDto));
+        }
+
+        @Test
+        public void testEventExistByIdValidation_Success() {
+            when(eventRepository.existsById(eventDto.getId())).thenReturn(true);
+
+            assertDoesNotThrow(() -> eventValidator.eventExistByIdValidation(eventDto.getId()));
         }
     }
 
@@ -95,11 +102,24 @@ class EventValidatorTest {
         }
 
         @Test
-        public void testEventExistValidation_NotFound_throwDataValidationException() {
+        public void testEventExistByDtoValidation_NotFound_throwDataValidationException() {
             when(eventRepository.existsById(eventDto.getId())).thenReturn(false);
 
             var exception = assertThrows(DataValidationException.class,
-                    () -> eventValidator.eventExistValidation(eventDto)
+                    () -> eventValidator.eventExistByDtoValidation(eventDto)
+            );
+
+            assertEquals("Event ID: 1 dont exist", exception.getMessage());
+
+            verify(eventRepository, atLeastOnce()).existsById(1L);
+        }
+
+        @Test
+        public void testEventExistByIdValidation_NotFound_throwDataValidationException() {
+            when(eventRepository.existsById(eventDto.getId())).thenReturn(false);
+
+            var exception = assertThrows(DataValidationException.class,
+                    () -> eventValidator.eventExistByIdValidation(eventDto.getId())
             );
 
             assertEquals("Event ID: 1 dont exist", exception.getMessage());

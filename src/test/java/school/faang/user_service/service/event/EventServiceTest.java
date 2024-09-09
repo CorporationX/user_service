@@ -12,11 +12,12 @@ import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.event.EventCustomMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.event.filters.EventFilter;
 import school.faang.user_service.test_data.event.TestDataEvent;
+import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +37,9 @@ class EventServiceTest {
     @InjectMocks
     private EventService eventService;
     private EventRepository eventRepository;
-    private EventMapper eventMapper;
+    private EventCustomMapper eventMapper;
     private UserService userService;
+    private EventValidator eventValidator;
     private TestDataEvent testDataEvent;
     private EventDto eventDto;
     private User user;
@@ -46,10 +48,11 @@ class EventServiceTest {
     @BeforeEach
     void setUp() {
         eventRepository = Mockito.mock(EventRepository.class);
-        eventMapper = Mockito.mock(EventMapper.class);
+        eventMapper = Mockito.mock(EventCustomMapper.class);
         userService = Mockito.mock(UserService.class);
+        eventValidator = Mockito.mock(EventValidator.class);
         List<EventFilter> filters = List.of(mock(EventFilter.class));
-        eventService = new EventService(eventRepository, eventMapper, userService, filters);
+        eventService = new EventService(eventRepository, eventMapper, userService, eventValidator, filters);
 
         testDataEvent = new TestDataEvent();
         user = testDataEvent.getUser();
@@ -65,7 +68,7 @@ class EventServiceTest {
             eventDto.setOwnerId(user.getId());
 
             when(eventMapper.toEntity(eventDto)).thenReturn(event);
-            when(userService.getUser(user.getId())).thenReturn(user);
+            when(userService.findUserById(user.getId())).thenReturn(user);
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto);
 
@@ -73,7 +76,9 @@ class EventServiceTest {
             assertNotNull(result);
             assertEquals(eventDto, result);
 
-            verify(userService, atLeastOnce()).getUser(user.getId());
+            verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
+            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto);
+            verify(userService, atLeastOnce()).findUserById(user.getId());
             verify(eventRepository, atLeastOnce()).save(event);
         }
 
@@ -94,7 +99,7 @@ class EventServiceTest {
             Event event1 = new Event();
             Event event2 = new Event();
             Event event3 = new Event();
-            List<Event> events = List.of(event1, event2,event3);
+            List<Event> events = List.of(event1, event2, event3);
             EventFilterDto filter = testDataEvent.getEventFilterDto();
 
             when(eventRepository.findAll()).thenReturn(events);
@@ -121,43 +126,70 @@ class EventServiceTest {
             EventDto eventDto2 = testDataEvent.getEventDto2();
 
             when(eventMapper.toEntity(eventDto2)).thenReturn(event);
-            when(userService.getUser(user.getId())).thenReturn(user);
+            when(userService.findUserById(user.getId())).thenReturn(user);
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto2);
 
             EventDto result = eventService.updateEvent(eventDto2);
             assertNotNull(result);
             assertEquals(eventDto2, result);
+
+            verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto2);
+            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto2);
+            verify(eventValidator, atLeastOnce()).eventExistByDtoValidation(eventDto2);
         }
 
         @Test
         void testGetEventsOwner_Success() {
-            List<Event> eventList = List.of(event);
-            List<EventDto> eventDtoList = List.of(eventDto);
+            Event event1 = testDataEvent.getEvent();
+            Event event2 = testDataEvent.getEvent2();
+            List<Event> eventList = List.of(event1, event2);
+
+            EventDto eventDto1 = testDataEvent.getEventDto();
+            EventDto eventDto2 = testDataEvent.getEventDto2();
+            List<EventDto> eventDtoList = List.of(eventDto1, eventDto2);
 
             when(eventRepository.findAllByUserId(user.getId())).thenReturn(eventList);
-            when(eventMapper.toDtoList(eventList)).thenReturn(eventDtoList);
+            when(eventMapper.toDto(any(Event.class))).thenAnswer(invocation -> {
+                Event event = invocation.getArgument(0);
+                return eventDtoList.stream()
+                        .filter(dto -> dto.getId().equals(event.getId()))
+                        .findFirst()
+                        .orElse(null);
+            });
 
             List<EventDto> result = eventService.getEventsOwner(user.getId());
             assertNotNull(result);
-            assertEquals(1, result.size());
-            assertEquals(eventDto, result.get(0));
+            assertEquals(eventDtoList.size(), result.size());
+            assertEquals(eventDtoList, result);
 
             verify(eventRepository, atLeastOnce()).findAllByUserId(user.getId());
         }
 
         @Test
         void getEventParticipants_Success() {
-            List<Event> eventList = List.of(event);
-            List<EventDto> eventDtoList = List.of(eventDto);
+            Event event1 = testDataEvent.getEvent();
+            Event event2 = testDataEvent.getEvent2();
+            List<Event> eventList = List.of(event1, event2);
+
+            EventDto eventDto1 = testDataEvent.getEventDto();
+            EventDto eventDto2 = testDataEvent.getEventDto2();
+            List<EventDto> eventDtoList = List.of(eventDto1, eventDto2);
 
             when(eventRepository.findParticipatedEventsByUserId(user.getId())).thenReturn(eventList);
-            when(eventMapper.toDtoList(eventList)).thenReturn(eventDtoList);
+            when(eventMapper.toDto(any(Event.class))).thenAnswer(invocation -> {
+                Event event = invocation.getArgument(0);
+                return eventDtoList.stream()
+                        .filter(dto -> dto.getId()
+                                .equals(event.getId()))
+                        .findFirst()
+                        .orElse(null);
+            });
 
             List<EventDto> result = eventService.getEventParticipants(user.getId());
             assertNotNull(result);
-            assertEquals(1, result.size());
-            assertEquals(eventDto, result.get(0));
+            assertEquals(eventDtoList.size(), result.size());
+            assertEquals(eventDtoList, result);
 
             verify(eventRepository, atLeastOnce()).findParticipatedEventsByUserId(user.getId());
         }

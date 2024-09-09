@@ -31,8 +31,13 @@ public class EventValidator {
         }
     }
 
-    public void eventExistValidation(EventDto eventDto) {
+    public void eventExistByDtoValidation(EventDto eventDto) {
         Long id = eventDto.getId();
+        if (!eventRepository.existsById(id)) {
+            throw new DataValidationException("Event ID: " + id + " dont exist");
+        }
+    }
+    public void eventExistByIdValidation(Long id) {
         if (!eventRepository.existsById(id)) {
             throw new DataValidationException("Event ID: " + id + " dont exist");
         }

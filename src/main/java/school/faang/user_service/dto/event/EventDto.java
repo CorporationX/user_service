@@ -21,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventDto {
+    @Positive(message = "ID must be positive")
     private Long id;
 
     @NotBlank(message = "Event title cannot be blank.")
@@ -45,7 +46,7 @@ public class EventDto {
     @NotNull(message = "Event max_attendees cannot be null")
     private Integer maxAttendees;
 
-    @Positive(message = "Owner_Id must be positive")
+    @Positive(message = "Owner_ID must be positive")
     private Long ownerId;
 
     @NotNull(message = "Event related_skills cannot be null.")

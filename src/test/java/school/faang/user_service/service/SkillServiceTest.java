@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillCustomMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.test_data.event.TestDataEvent;
 
@@ -17,6 +17,8 @@ import java.util.List;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,9 +26,7 @@ class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Mock
-    private SkillMapper skillMapper;
-    @Mock
-    private UserService userService;
+    private SkillCustomMapper skillMapper;
     @InjectMocks
     private SkillService skillService;
 
@@ -40,19 +40,19 @@ class SkillServiceTest {
     @Test
     public void testGetUserSkillsList_Success() {
         User user = testDataEvent.getUser();
-        Skill skill = testDataEvent.getSkill1();
+        Skill skill1 = testDataEvent.getSkill1();
         SkillDto skillDto = testDataEvent.getSkillDto1();
+        List<Skill> ownerSkillsList = List.of(skill1);
 
-        List<Skill> ownerSkillsList = List.of(skill);
-        List<SkillDto> skillDtoList = List.of(skillDto);
-
-        when(userService.getUser(user.getId())).thenReturn(user);
         when(skillRepository.findAllByUserId(user.getId())).thenReturn(ownerSkillsList);
-        when(skillMapper.toDtoList(ownerSkillsList)).thenReturn(skillDtoList);
+        when(skillMapper.toDto(skill1)).thenReturn(skillDto);
 
         List<SkillDto> result = skillService.getUserSkillsList(user.getId());
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("skill1", result.get(0).getTitle());
+        assertEquals(ownerSkillsList.size(), result.size());
+        assertEquals(ownerSkillsList.get(0).getTitle(), result.get(0).getTitle());
+
+        verify(skillRepository, atLeastOnce()).findAllByUserId(user.getId());
+        verify(skillMapper, atLeastOnce()).toDto(skill1);
     }
 }

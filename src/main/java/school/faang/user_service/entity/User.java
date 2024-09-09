@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -18,6 +20,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -30,6 +33,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
 
     @Column(name = "username", length = 64, nullable = false, unique = true)
     private String username;
@@ -83,11 +87,21 @@ public class User {
     @ManyToMany(mappedBy = "mentors")
     private List<User> mentees;
 
+    @Setter
+    @Getter
     @ManyToMany
-    @JoinTable(name = "school/faang/user_service/controller/mentorship",
+    @JoinTable(name = "mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
-    private List<User> mentors;
+    private Set<User> mentors;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @OneToMany(mappedBy = "receiver")
     private List<MentorshipRequest> receivedMentorshipRequests;

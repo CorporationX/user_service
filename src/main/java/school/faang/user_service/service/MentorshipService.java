@@ -2,8 +2,9 @@ package school.faang.user_service.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.repository.MentorshipRepository;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

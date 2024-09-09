@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 public class UserExperienceMinFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
-        return userFilterDto.getExperienceMax() >= 0;
+        return userFilterDto.getExperienceMax() > 0;
     }
 
     @Override
-    public void apply(Stream<User> userStream, UserFilterDto filterDto) {
-        userStream.filter(user -> user.getExperience() >= filterDto.getExperienceMax());
+    public Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto) {
+        return userStream.filter(user -> user.getExperience() >= filterDto.getExperienceMin());
     }
 }

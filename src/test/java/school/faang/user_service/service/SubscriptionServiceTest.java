@@ -10,6 +10,8 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.filters.UserAboutFilter;
+import school.faang.user_service.service.filters.UserExperienceMinFilter;
 import school.faang.user_service.service.filters.UserFilter;
 
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ public class SubscriptionServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        userFilters.add(mock(UserExperienceMinFilter.class));
+        userFilters.add(mock(UserAboutFilter.class));
     }
 
     @Test
@@ -97,8 +101,10 @@ public class SubscriptionServiceTest {
         UserFilterDto filter = new UserFilterDto();
 
         when(subscriptionRepository.findByFolloweeId(user1.getId())).thenReturn(followers.stream());
-        Assert.assertEquals(followers, subscriptionService.getFollowers(user1.getId(), filter));
+        List<User> result = subscriptionService.getFollowers(user1.getId(), filter);
+        Assert.assertEquals(followers, result);
     }
+
 
     @Test
     public void testGetFollowingsList() {

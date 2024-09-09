@@ -14,7 +14,7 @@ public class UserAboutFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> userStream, UserFilterDto filterDto) {
-        userStream.filter(user -> user.getAboutMe().contains(filterDto.getAboutPattern()));
+    public Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto) {
+        return userStream.filter(user -> user.getAboutMe().contains(filterDto.getAboutPattern()));
     }
 }

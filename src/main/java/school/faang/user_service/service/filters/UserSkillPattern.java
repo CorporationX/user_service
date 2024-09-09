@@ -14,7 +14,7 @@ public class UserSkillPattern implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> userStream, UserFilterDto filterDto) {
-        userStream.filter(user -> user.getSkills().stream().anyMatch(skill -> skill.getTitle().contains(filterDto.getSkillPattern())));
+    public Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto) {
+        return userStream.filter(user -> user.getSkills().stream().anyMatch(skill -> skill.getTitle().contains(filterDto.getSkillPattern())));
     }
 }

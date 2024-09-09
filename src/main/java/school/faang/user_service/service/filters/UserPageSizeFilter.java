@@ -10,12 +10,12 @@ public class UserPageSizeFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
-        return userFilterDto.getPageSize() >= 0;
+        return userFilterDto.getPageSize() > 0;
     }
 
     @Override
-    public void apply(Stream<User> userStream, UserFilterDto filterDto) {
+    public Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto) {
         int pageSize = (filterDto.getPageSize() > 0) ? filterDto.getPageSize() : DEFAULT_PAGE_SIZE;
-        userStream.limit(pageSize);
+        return userStream.limit(pageSize);
     }
 }

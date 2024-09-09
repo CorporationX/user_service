@@ -9,5 +9,5 @@ import java.util.stream.Stream;
 public interface UserFilter {
     boolean isApplicable(UserFilterDto userFilterDto);
 
-    void apply(Stream<User> userStream, UserFilterDto filterDto);
+    Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto);
 }

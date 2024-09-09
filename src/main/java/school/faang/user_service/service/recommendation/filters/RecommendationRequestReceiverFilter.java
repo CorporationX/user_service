@@ -13,12 +13,10 @@ public class RecommendationRequestReceiverFilter implements RecommendationReques
         return requestFilterDto.getReceiverIdPattern() != null;
     }
 
-
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequests, RecommendationRequestFilterDto requestFilterDto) {
         return recommendationRequests
                 .filter(recommendationRequest ->
                         recommendationRequest.getReceiver().getId().equals(requestFilterDto.getReceiverIdPattern()));
     }
-
 }

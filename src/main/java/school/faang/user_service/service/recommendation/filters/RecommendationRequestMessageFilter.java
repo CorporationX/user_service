@@ -13,7 +13,6 @@ public class RecommendationRequestMessageFilter implements RecommendationRequest
         return requestFilterDto.getMessagePattern() != null;
     }
 
-
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequests, RecommendationRequestFilterDto requestFilterDto) {
         return recommendationRequests

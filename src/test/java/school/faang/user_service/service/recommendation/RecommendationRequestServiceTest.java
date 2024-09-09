@@ -64,23 +64,42 @@ public class RecommendationRequestServiceTest {
 
     private RecommendationRequestDto recommendationRequestDto;
     private final List<RecommendationRequest> recommendationRequests = prepareRecommendationRequests();
-    private List<RecommendationRequestFilter> recommendationRequestFilters = initializeRequestFilters();
+    private final List<RecommendationRequestFilter> recommendationRequestFilters = initializeRequestFilters();
+
+    @Test
+    public void testRejectRequestSuccess() {
+        RecommendationRequest recommendationRequest = recommendationRequests.get(0);
+        Long id = recommendationRequest.getId();
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setId(id);
+        rejectionDto.setRejectionReason("someReason");
+        when(recommendationRequestRepository.findById(id)).thenReturn(Optional.of(recommendationRequest));
+
+        RejectionDto finalRejectionDto = recommendationRequestService.rejectRequest(id, rejectionDto);
+
+        verify(recommendationRequestRepository, times(1)).save(recommendationRequestArgumentCaptor.capture());
+        RecommendationRequest finalRecommendationRequest = recommendationRequestArgumentCaptor.getValue();
+        assertAll(
+                () -> assertEquals(recommendationRequest, finalRecommendationRequest),
+                () -> assertEquals(rejectionDto.getId(), finalRejectionDto.getId()),
+                () -> assertEquals(rejectionDto.getRejectionReason(), finalRejectionDto.getRejectionReason())
+        );
+    }
 
     @Test
     public void testRejectRequestThrowException() {
         Long id = 10L;
         RejectionDto rejectionDto = new RejectionDto();
         rejectionDto.setId(id);
-        rejectionDto.setRejectReason("someReason");
+        rejectionDto.setRejectionReason("someReason");
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
                 recommendationRequestService.rejectRequest(id, rejectionDto));
         assertEquals("No such element in db", exception.getMessage());
     }
 
-
     @Test
-    public void testFindByIdSuccessful() {
+    public void testFindByIdSuccess() {
         RecommendationRequest resultRecommendationRequest = new RecommendationRequest();
         resultRecommendationRequest.setSkills(createSkillRequests());
         resultRecommendationRequest.setId(1L);

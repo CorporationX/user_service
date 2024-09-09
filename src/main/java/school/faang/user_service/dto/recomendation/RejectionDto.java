@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class RejectionDto {
     private Long id;
-    private String rejectReason;
+    private String rejectionReason;
 }

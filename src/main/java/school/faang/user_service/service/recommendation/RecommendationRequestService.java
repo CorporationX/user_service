@@ -31,13 +31,12 @@ public class RecommendationRequestService {
         recommendationRequestValidator.isUsersInDb(recommendationRequestDto);
         recommendationRequestValidator.isSkillsInDb(recommendationRequestDto);
         recommendationRequestValidator.isRequestAllowed(recommendationRequestDto);
-
         List<SkillRequest> skillRequests = StreamSupport.stream(skillRequestRepository
                 .findAllById(recommendationRequestDto.getSkillsIds()).spliterator(), false).toList();
         RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.mapToEntity(recommendationRequestDto);
         recommendationRequestEntity.setSkills(skillRequests);
         skillRequests.forEach(skillRequest ->
-                skillRequestRepository.create(skillRequest.getId(), skillRequest.getSkill().getId()));
+                skillRequestRepository.create((int) skillRequest.getId(), (int) skillRequest.getSkill().getId()));
         recommendationRequestRepository.save(recommendationRequestEntity);
         return recommendationRequestMapper.mapToDto(recommendationRequestEntity);
     }
@@ -59,10 +58,11 @@ public class RecommendationRequestService {
     }
 
     public RejectionDto rejectRequest(Long id, RejectionDto rejectionDto) {
-        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(rejectionDto.getId()).orElseThrow(() ->
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).orElseThrow(() ->
                 new NoSuchElementException("No such element in db"));
         recommendationRequest.setStatus(RequestStatus.REJECTED);
-        recommendationRequest.setRejectionReason(rejectionDto.getRejectReason());
+        recommendationRequest.setRejectionReason(rejectionDto.getRejectionReason());
+        recommendationRequestRepository.save(recommendationRequest);
         return recommendationRequestMapper.mapToRejectionDto(recommendationRequest);
     }
 }

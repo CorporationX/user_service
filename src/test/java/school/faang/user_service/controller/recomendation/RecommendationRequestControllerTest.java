@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.recomendation;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,11 +50,9 @@ public class RecommendationRequestControllerTest {
     }
 
     @Test
-    @DisplayName("Test success requestRecommendation")
     public void testRequestRecommendationSuccess() {
         when(recommendationRequestController.requestRecommendation(recommendationRequestDto)).thenReturn(recommendationRequestDto);
         recommendationRequestController.requestRecommendation(recommendationRequestDto);
         verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequestDto);
     }
-
 }

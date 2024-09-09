@@ -1,7 +1,10 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.repository.event.EventRepository;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService{
@@ -9,7 +12,7 @@ public class EventServiceImpl implements EventService{
 
 
     @Override
-    public void removeEvent(long id) {
-        eventRepository.deleteById(id);
+    public void removeEvents(List<Event> events) {
+        eventRepository.deleteAll(events);
     }
 }

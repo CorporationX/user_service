@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recomendation.RejectionDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 
@@ -25,7 +26,7 @@ public interface RecommendationRequestMapper {
     @Mapping(target = "skills", ignore = true)
     RecommendationRequest mapToEntity(RecommendationRequestDto recommendationRequestDto);
 
-
+    RejectionDto mapToRejectionDto(RecommendationRequest recommendationRequest);
 
     @Named("mapSkillsReqsToSkillsReqsIds")
     static List<Long> mapSkillsReqsToSkillsReqsIds(List<SkillRequest> skillRequests) {

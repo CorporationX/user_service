@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recomendation.RejectionDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recomendation.RecommendationRequestMapper;
@@ -14,7 +16,6 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Component
@@ -42,10 +43,11 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto requestFilterDto) {
-        Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
+        List<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll();
         List<RecommendationRequest> recommendationRequestsEntity = recommendationRequestFilters.stream()
                 .filter(filter -> filter.isApplicable(requestFilterDto))
-                .flatMap(filter -> filter.apply(recommendationRequests, requestFilterDto))
+                .reduce(recommendationRequests.stream(), (stream, filter) -> filter.apply(stream, requestFilterDto),
+                        (s1, s2) -> s1)
                 .toList();
         return recommendationRequestMapper.mapToDto(recommendationRequestsEntity);
     }
@@ -54,6 +56,14 @@ public class RecommendationRequestService {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).orElseThrow(() ->
                 new NoSuchElementException("No such element in db"));
         return recommendationRequestMapper.mapToDto(recommendationRequest);
+    }
+
+    public RejectionDto rejectRequest(Long id, RejectionDto rejectionDto) {
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(rejectionDto.getId()).orElseThrow(() ->
+                new NoSuchElementException("No such element in db"));
+        recommendationRequest.setStatus(RequestStatus.REJECTED);
+        recommendationRequest.setRejectionReason(rejectionDto.getRejectReason());
+        return recommendationRequestMapper.mapToRejectionDto(recommendationRequest);
     }
 }
 

@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recomendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,10 +45,6 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
-
-    private RecommendationRequestDto recommendationRequestDto;
-    @Spy
-    private List<RecommendationRequestFilter> recommendationRequestFilters;
 
     @Mock
     private RecommendationRequestValidator recommendationRequestValidator;
@@ -61,9 +59,24 @@ public class RecommendationRequestServiceTest {
     @Mock
     private SkillRequestRepository skillRequestRepository;
 
-
     @InjectMocks
     RecommendationRequestService recommendationRequestService;
+
+    private RecommendationRequestDto recommendationRequestDto;
+    private final List<RecommendationRequest> recommendationRequests = prepareRecommendationRequests();
+    private List<RecommendationRequestFilter> recommendationRequestFilters = initializeRequestFilters();
+
+    @Test
+    public void testRejectRequestThrowException() {
+        Long id = 10L;
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setId(id);
+        rejectionDto.setRejectReason("someReason");
+        when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
+                recommendationRequestService.rejectRequest(id, rejectionDto));
+        assertEquals("No such element in db", exception.getMessage());
+    }
 
 
     @Test
@@ -85,64 +98,71 @@ public class RecommendationRequestServiceTest {
         resultRecommendationRequest.setId(1L);
 
         when(recommendationRequestRepository.findById(resultRecommendationRequest.getId()))
-                .thenReturn(Optional.ofNullable(null));
+                .thenReturn(Optional.empty());
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
                 recommendationRequestService.getRequest(resultRecommendationRequest.getId()));
         assertEquals("No such element in db", exception.getMessage());
     }
 
-
     @Test
     public void testGetRequestsMessageFilter() {
-        List<RecommendationRequestFilter> recommendationRequestFilters = initializeRequestFilters();
-        List<RecommendationRequest> recommendationRequestsPrepare = prepareRecommendationRequests();
         List<RecommendationRequestFilterDto> recommendationRequestFilterDtos = prepareRequestFilterDtos();
-
         ReflectionTestUtils.setField(recommendationRequestService, "recommendationRequestFilters", recommendationRequestFilters);
 
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequestsPrepare);
+        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
         List<RecommendationRequestDto> recommendationRequestDtos = recommendationRequestService.getRequests(recommendationRequestFilterDtos.get(0));
 
         verify(recommendationRequestMapper, times(1)).mapToDto(recommendationRequestsCaptor.capture());
         assertAll(
                 () -> assertEquals(1, recommendationRequestDtos.size()),
-                () -> assertEquals(recommendationRequestDtos.get(0).getMessage(), recommendationRequestsPrepare.get(0).getMessage())
+                () -> assertEquals(recommendationRequestDtos.get(0).getMessage(), recommendationRequests.get(0).getMessage())
+        );
+    }
+
+    @Test
+    public void testGetRequestsMessageAndStatusFilters() {
+        List<RecommendationRequestFilterDto> recommendationRequestFilterDtos = prepareRequestFilterDtos();
+        ReflectionTestUtils.setField(recommendationRequestService, "recommendationRequestFilters", recommendationRequestFilters);
+
+        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
+        List<RecommendationRequestDto> recommendationRequestDtos = recommendationRequestService.getRequests(recommendationRequestFilterDtos.get(4));
+
+        verify(recommendationRequestMapper, times(1)).mapToDto(recommendationRequestsCaptor.capture());
+        assertAll(
+                () -> assertEquals(2, recommendationRequestDtos.size()),
+                () -> assertEquals(recommendationRequestDtos.get(0).getStatus(), recommendationRequests.get(4).getStatus()),
+                () -> assertTrue(recommendationRequestDtos.get(0).getMessage().contains(recommendationRequestFilterDtos.get(4).getMessagePattern())),
+                () -> assertTrue(recommendationRequestDtos.get(1).getMessage().contains(recommendationRequestFilterDtos.get(4).getMessagePattern()))
         );
     }
 
     @Test
     public void testGetRequestsStatusFilter() {
-        List<RecommendationRequestFilter> recommendationRequestFilters = initializeRequestFilters();
-        List<RecommendationRequest> recommendationRequestsPrepare = prepareRecommendationRequests();
         List<RecommendationRequestFilterDto> recommendationRequestFilterDtos = prepareRequestFilterDtos();
-
         ReflectionTestUtils.setField(recommendationRequestService, "recommendationRequestFilters", recommendationRequestFilters);
 
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequestsPrepare);
+        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
         List<RecommendationRequestDto> recommendationRequestDtos = recommendationRequestService.getRequests(recommendationRequestFilterDtos.get(3));
 
         verify(recommendationRequestMapper, times(1)).mapToDto(recommendationRequestsCaptor.capture());
         assertAll(
                 () -> assertEquals(1, recommendationRequestDtos.size()),
-                () -> assertEquals(recommendationRequestDtos.get(0).getStatus(), recommendationRequestsPrepare.get(3).getStatus())
+                () -> assertEquals(recommendationRequestDtos.get(0).getStatus(), recommendationRequests.get(3).getStatus())
         );
     }
 
     @Test
     public void testGetRequestsRequesterIdFilter() {
-        List<RecommendationRequestFilter> recommendationRequestFilters = initializeRequestFilters();
-        List<RecommendationRequest> recommendationRequestsPrepare = prepareRecommendationRequests();
         List<RecommendationRequestFilterDto> recommendationRequestFilterDtos = prepareRequestFilterDtos();
-
         ReflectionTestUtils.setField(recommendationRequestService, "recommendationRequestFilters", recommendationRequestFilters);
 
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequestsPrepare);
+        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
         List<RecommendationRequestDto> recommendationRequestDtos = recommendationRequestService.getRequests(recommendationRequestFilterDtos.get(3));
 
         verify(recommendationRequestMapper, times(1)).mapToDto(recommendationRequestsCaptor.capture());
         assertAll(
                 () -> assertEquals(1, recommendationRequestDtos.size()),
-                () -> assertEquals(recommendationRequestDtos.get(0).getRequesterId(), recommendationRequestsPrepare.get(2).getRequester().getId())
+                () -> assertEquals(recommendationRequestDtos.get(0).getRequesterId(), recommendationRequests.get(2).getRequester().getId())
         );
     }
 
@@ -165,7 +185,7 @@ public class RecommendationRequestServiceTest {
         recommendationRequestFilterDtos.get(2).setReceiverIdPattern(20L);
         recommendationRequestFilterDtos.get(3).setStatusPattern(RequestStatus.ACCEPTED);
         recommendationRequestFilterDtos.get(4).setStatusPattern(RequestStatus.PENDING);
-        recommendationRequestFilterDtos.get(4).setMessagePattern("testMessage");
+        recommendationRequestFilterDtos.get(4).setMessagePattern("Message");
         return recommendationRequestFilterDtos;
     }
 
@@ -195,7 +215,7 @@ public class RecommendationRequestServiceTest {
         recommendationRequests.get(2).setSkills(skillRequests);
         recommendationRequests.get(2).setStatus(RequestStatus.PENDING);
 
-        recommendationRequests.get(3).setMessage("bla bla bla");
+        recommendationRequests.get(3).setMessage("Message");
         recommendationRequests.get(3).setRequester(users.get(4));
         recommendationRequests.get(3).setReceiver(users.get(5));
         recommendationRequests.get(3).setSkills(skillRequests);

@@ -14,7 +14,7 @@ public interface SubscriptionService {
 
     int getFollowersCount(Long followeeId);
 
-    List<SubscriptionUserDto> getFollowing(Long followerId, UserFilterDto filters);
+    List<SubscriptionUserDto> getFollowings(Long followerId, UserFilterDto filters);
 
-    int getFollowingCount(Long followerId);
+    int getFollowingCounts(Long followerId);
 }

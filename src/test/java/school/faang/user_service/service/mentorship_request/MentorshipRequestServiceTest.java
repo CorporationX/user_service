@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,7 +36,7 @@ class MentorshipRequestServiceTest {
     @Mock
     private List<RequestFilter> requestFilters;
     @Mock
-    private MentorshipRequestValidator validator;
+    private MentorshipRequestParametersChecker validator;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -64,9 +65,11 @@ class MentorshipRequestServiceTest {
         long requesterId = 1L;
         long receiverId = 2L;
         String description = "description";
+
         mentorshipRequestService.requestMentorship(requesterId, receiverId, description);
+
         verify(validator, times(1))
-                .validateRequest(requesterId, receiverId, description);
+                .checkRequestParams(requesterId, receiverId, description);
         verify(mentorshipRequestRepository, times(1))
                 .create(requesterId, receiverId, description);
     }
@@ -80,7 +83,9 @@ class MentorshipRequestServiceTest {
         );
         whenRepositoryFindAllAndRequestFilterStream(requests);
         setElementsToRequestFilterDto(1L, 2L, null);
+
         List<MentorshipRequest> result = mentorshipRequestService.getRequests(requestFilterDto);
+
         assertEquals(1, result.size());
         MentorshipRequest expected = requests.get(1);
         assertEquals(expected, result.get(0));
@@ -95,18 +100,25 @@ class MentorshipRequestServiceTest {
         );
         whenRepositoryFindAllAndRequestFilterStream(requests);
         setElementsToRequestFilterDto(null, 3L, ACCEPTED);
+
         List<MentorshipRequest> result = mentorshipRequestService.getRequests(requestFilterDto);
+
         Assertions.assertTrue(result.isEmpty());
     }
 
     @Test
-    void testRequestByIdNotFound() {
+    void testRequestByIdNotFoundWhenAcceptRequest() {
         long mentorshipRequestId = 1L;
-        whenMentorshipRequestRepositoryFindById(Optional.empty(), mentorshipRequestId);
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        forTestRequestByIdNotFound(mentorshipRequestId,
                 () -> mentorshipRequestService.acceptRequest(mentorshipRequestId));
-        String expected = String.format(REQUEST_NOT_FOUND, mentorshipRequestId);
-        assertEquals(expected, exception.getMessage());
+    }
+
+    @Test
+    void testRequestByIdNotFoundWhenRejectRequest() {
+        long mentorshipRequestId = 1L;
+        String reason = "reason";
+        forTestRequestByIdNotFound(mentorshipRequestId,
+                () -> mentorshipRequestService.rejectRequest(mentorshipRequestId, reason));
     }
 
     @Test
@@ -135,6 +147,14 @@ class MentorshipRequestServiceTest {
 
         assertEquals(mentorshipRequest.getStatus(), REJECTED);
         assertEquals(mentorshipRequest.getRejectionReason(), reason);
+    }
+
+    private void forTestRequestByIdNotFound(long id, Executable executable) {
+        whenMentorshipRequestRepositoryFindById(Optional.empty(), id);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, executable);
+        String expected = String.format(REQUEST_NOT_FOUND, id);
+        assertEquals(expected, exception.getMessage());
     }
 
     private MentorshipRequest createMentorshipRequest(User requester, User receiver, RequestStatus status) {

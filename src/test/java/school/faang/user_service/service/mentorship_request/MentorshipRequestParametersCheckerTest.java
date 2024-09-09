@@ -22,18 +22,18 @@ import static school.faang.user_service.service.mentorship_request.error_message
 import static school.faang.user_service.service.mentorship_request.error_messages.MentorshipRequestErrorMessages.USER_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
-class MentorshipRequestValidatorTest {
+class MentorshipRequestParametersCheckerTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private UserRepository userRepository;
 
     @InjectMocks
-    private MentorshipRequestValidator validator;
+    private MentorshipRequestParametersChecker checker;
 
 
     @Test
-    void testUserSendRequestToHimselfIsInvalid() {
+    void testUserSendRequestToHimself() {
         long requesterId = 1L;
         long receiverId = 1L;
         String description = "description";
@@ -43,7 +43,7 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
-    void testDescriptionIsNullIsInvalid() {
+    void testDescriptionIsNull() {
         long requesterId = 1L;
         long receiverId = 2L;
         String description = "  ";
@@ -79,7 +79,7 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
-    void testRequestWithinTheLastThreeMonthsIsInvalid() {
+    void testRequestWithinTheLastThreeMonths() {
         long requesterId = 1L;
         long receiverId = 2L;
         String description = "description";
@@ -101,14 +101,14 @@ class MentorshipRequestValidatorTest {
                 .existAcceptedRequest(requesterId, receiverId))
                 .thenReturn(true);
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> validator.checkExistAcceptedRequest(requesterId, receiverId));
+                () -> checker.checkExistAcceptedRequest(requesterId, receiverId));
         String expected = String.format(REQUEST_IS_ACCEPTED_BEFORE, requesterId, receiverId);
         assertEquals(expected, exception.getMessage());
     }
 
     private RuntimeException assertException(long requesterId, long receiverId, String description) {
         return assertThrows(RuntimeException.class,
-                () -> validator.validateRequest(requesterId, receiverId, description));
+                () -> checker.checkRequestParams(requesterId, receiverId, description));
     }
 
     private void whenExistById(long id, boolean exist) {

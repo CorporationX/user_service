@@ -18,7 +18,7 @@ import static school.faang.user_service.service.mentorship_request.error_message
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MentorshipRequestValidator {
+public class MentorshipRequestParametersChecker {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
 
@@ -34,7 +34,7 @@ public class MentorshipRequestValidator {
         log.info("Request mentorship wasn't accepted before");
     }
 
-    public void validateRequest(long requesterId, long receiverId, String description) {
+    public void checkRequestParams(long requesterId, long receiverId, String description) {
         validateDescription(description);
         checkSameUserIds(requesterId, receiverId);
         checkExistUserId(requesterId);

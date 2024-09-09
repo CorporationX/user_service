@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorship_request.RejectionDto;
+import school.faang.user_service.dto.mentorship_request.RejectionMentorshipRequestDto;
 import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper.mentorship_request.MentorshipRequestMapper;
@@ -18,7 +18,7 @@ import school.faang.user_service.service.mentorship_request.MentorshipRequestSer
 import java.util.List;
 
 @RestController
-@RequestMapping("mentorship_requests")
+@RequestMapping("mentorship-requests")
 @RequiredArgsConstructor
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
@@ -46,7 +46,7 @@ public class MentorshipRequestController {
     }
 
     @PutMapping("reject/{id}")
-    public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+    public void rejectRequest(@PathVariable long id, @RequestBody RejectionMentorshipRequestDto rejection) {
         mentorshipRequestService.rejectRequest(id, rejection.getReason());
     }
 }

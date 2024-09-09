@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.RecommendationServiceValidator;
+import school.faang.user_service.validator.recommendation.RecommendationServiceValidator;
 
 import java.util.List;
 

@@ -7,7 +7,6 @@ import school.faang.user_service.exceptions.DataValidationException;
 
 import java.util.List;
 
-@Component
 public interface SubscriptionService {
 
     void followUser(long followerId, long followeeId) throws DataValidationException;

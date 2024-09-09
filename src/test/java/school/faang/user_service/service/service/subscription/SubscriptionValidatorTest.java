@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.ValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -92,7 +92,7 @@ class SubscriptionValidatorTest {
     @Test
     @DisplayName("Check subscription with same follower and followee ids")
     void testValidateUsers_CheckSubscriptionWithSameFollowerAndFolloweeIds() {
-        assertThrows(ValidationException.class,
+        assertThrows(DataValidationException.class,
                 () -> subscriptionValidator.checkSubscriptionOnHimself(followerId, followerId));
     }
 

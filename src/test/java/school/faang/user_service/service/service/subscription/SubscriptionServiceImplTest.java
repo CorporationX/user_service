@@ -11,7 +11,7 @@ import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.ValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
@@ -66,10 +66,10 @@ class SubscriptionServiceImplTest {
     @Test
     @DisplayName("Subscription with failed subscription validation")
     void testFollowUser_FailedSubscriptionValidation() {
-        doThrow(ValidationException.class)
+        doThrow(DataValidationException.class)
                 .when(validator).checkSubscriptionOnHimself(followerId, followerId);
 
-        assertThrows(ValidationException.class, () -> subscriptionService.followUser(followerId, followerId));
+        assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followerId));
     }
 
     @Test

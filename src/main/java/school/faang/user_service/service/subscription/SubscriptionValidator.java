@@ -2,7 +2,7 @@ package school.faang.user_service.service.subscription;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.ValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -29,7 +29,7 @@ public class SubscriptionValidator {
 
     public void checkSubscriptionOnHimself(Long followerId, Long followeeId) {
         if (followerId.equals(followeeId)) {
-            throw new ValidationException(SUBSCRIBE_ITSELF_VALIDATION.getMessage());
+            throw new DataValidationException(SUBSCRIBE_ITSELF_VALIDATION.getMessage());
         }
     }
 

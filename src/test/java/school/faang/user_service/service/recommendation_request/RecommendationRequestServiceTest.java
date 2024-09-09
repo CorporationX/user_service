@@ -79,7 +79,7 @@ public class RecommendationRequestServiceTest {
         recommendationEntity.setReceiver(receiver);
         recommendationEntity.setRequester(requester);
 
-        verify(this.recommendationRequestRepository, times(1)).save(recommendationEntity);
+        verify(this.recommendationRequestRepository).save(recommendationEntity);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class RecommendationRequestServiceTest {
         recommendationRequest.setStatus(RequestStatus.REJECTED);
         recommendationRequest.setRejectionReason(rejectionDto.getReason());
 
-        verify(this.recommendationRequestRepository, times(1)).save(recommendationRequest);
+        verify(this.recommendationRequestRepository).save(recommendationRequest);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class RecommendationRequestServiceTest {
         RecommendationRequest result = this.recommendationRequestService.findRequestById(findId);
 
         assertEquals(result.getId(), findId);
-        verify(this.recommendationRequestRepository, times(1)).findById(findId);
+        verify(this.recommendationRequestRepository).findById(findId);
     }
 
     @Test

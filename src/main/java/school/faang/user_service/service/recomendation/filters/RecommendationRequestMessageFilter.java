@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class RecommendationRequestMessageFilter implements RecommendationRequestFilter {
     @Override
     public boolean isApplicable(FilterRecommendationRequestsDto filter) {
-        return filter.getMessage() != null && !filter.getMessage().isBlank();
+        return filter.getMessage() != null;
     }
 
     @Override

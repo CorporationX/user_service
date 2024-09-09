@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.Skill.SkillDto;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 @RequiredArgsConstructor
 @Component

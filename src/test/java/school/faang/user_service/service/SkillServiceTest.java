@@ -7,12 +7,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.Skill.SkillCandidateDto;
 import school.faang.user_service.dto.Skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validator.candidate.Skill.SkillCandidateValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +37,9 @@ public class SkillServiceTest {
     private SkillCandidateMapper skillCandidateMapper;
     @Mock
     private SkillValidator skillValidator;
-    @Captor
-    private ArgumentCaptor<SkillDto> skillDtoCaptor;
+    @Mock
+    private SkillCandidateValidator skillCandidateValidator;
+
 
     @Test
     public void testCreate() {
@@ -59,25 +61,10 @@ public class SkillServiceTest {
         Skill skill1 = new Skill();
         List<Skill> skills = List.of(skill1);
         when(skillRepository.findSkillsOfferedToUser(id)).thenReturn(skills);
-        when(skillCandidateMapper.toDto(skill1)).thenReturn(candidateDto1);
+        when(skillCandidateMapper.toListDto(skills)).thenReturn(skillCandidateDtos);
 
         List<SkillCandidateDto> actualDtos = skillService.getOfferedSkills(id);
         assertEquals(skillCandidateDtos, actualDtos);
-    }
-
-    @Test
-    public void testNotEnoughOffersToAcquireSkillsFromOffers() {
-        long userId = 1L;
-        long skillId = 2L;
-        SkillDto dto1 = new SkillDto("Java", userId);
-        List<SkillOffer> skillOffers = List.of(new SkillOffer());
-        Skill skill1 = new Skill();
-        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill1));
-        when(skillMapper.toDto(skill1)).thenReturn(dto1);
-        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
-
-        SkillDto actualDto = skillService.acquireSkillFromOffers(skillId, userId);
-        assertEquals(dto1, actualDto);
     }
 
     @Test
@@ -85,19 +72,14 @@ public class SkillServiceTest {
         long userId = 1L;
         long skillId = 2L;
         SkillDto dto1 = new SkillDto("Java", userId);
-        List<SkillOffer> skillOffers = List.of(new SkillOffer(), new SkillOffer(), new SkillOffer());
         Skill skill1 = new Skill();
-        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill1));
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(skill1));
         when(skillMapper.toDto(skill1)).thenReturn(dto1);
-        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
 
         SkillDto actualDto = skillService.acquireSkillFromOffers(skillId, userId);
-        verify(skillRepository, times(1)).assignSkillToUser(skillId, userId);
-
-        for (SkillOffer skillOffer : skillOffers) {
-            verify(skillRepository, times(3))
-                    .assignGuarantorToUserSkill(userId, skillId, skillOffer.getId());
-            assertEquals(dto1, actualDto);
-        }
+        verify(skillValidator,times(1)).validateSkill(dto1);
+        verify(skillCandidateValidator,times(1)).validateSkillOfferSize(skillId, userId);
+        assertEquals(dto1, actualDto);
     }
 }
+

@@ -3,7 +3,6 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +31,7 @@ public class SkillValidatorTest {
     public void testValidateSkillWithExistingTitle() {
         SkillDto dto = preparedData(true);
 
-        Assertions.assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(dto));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> skillValidator.validateSkill(dto));
     }
 
     @Test

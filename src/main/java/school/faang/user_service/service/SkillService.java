@@ -5,11 +5,9 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.Skill.SkillCandidateDto;
 import school.faang.user_service.dto.Skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.candidate.Skill.SkillCandidateValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
 
@@ -44,9 +42,11 @@ public class SkillService {
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) throws IllegalArgumentException {
         AtomicReference<SkillDto> dto = new AtomicReference<>();
-        skillRepository.findById(skillId).ifPresentOrElse(skill -> dto.set(skillMapper.toDto(skill)),() -> {throw new IllegalArgumentException("Skill not found");});
+        skillRepository.findUserSkill(skillId,userId).ifPresentOrElse(skill -> dto.set(skillMapper.toDto(skill)), () -> {
+            throw new IllegalArgumentException("Skill not found");
+        });
         skillValidator.validateSkill(dto.get());
-        skillCandidateValidator.validateSkillOfferSize(skillId,userId);
+        skillCandidateValidator.validateSkillOfferSize(skillId, userId);
         return dto.get();
 
     }

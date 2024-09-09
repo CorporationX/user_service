@@ -20,6 +20,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Verify Gradle cache directories
+        run: |
+            echo "Checking Gradle cache directories..."
+            ls -la ~/.gradle/caches
+            ls -la ~/.gradle/wrapper
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:

@@ -7,6 +7,7 @@ import school.faang.user_service.dto.mentorship.MentorshipDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipMapper mentorshipMapper;
+    private final MentorshipValidator validator;
 
     public List<MentorshipDto> getMentees(long mentorId) {
         var mentees = new ArrayList<MentorshipDto>();
@@ -52,13 +54,18 @@ public class MentorshipService {
 
     @Transactional
     public void deleteMentorFromMentees(long mentorId, List<User> mentees) {
-        mentees.forEach(mentee -> {
-            mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
-            mentee.getGoals()
-                    .stream()
-                    .filter(goal -> goal.getMentor().getId() == mentorId)
-                    .forEach(goal -> goal.setMentor(mentee));
-        });
+        validator.validateMenteesList(mentees);
+
+        mentees
+                .stream()
+                .filter(mentee -> mentee.getMentors() != null)
+                .forEach(mentee -> {
+                    mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+                    mentee.getGoals()
+                            .stream()
+                            .filter(goal -> goal.getMentor().getId() == mentorId)
+                            .forEach(goal -> goal.setMentor(mentee));
+                });
 
         mentorshipRepository.saveAll(mentees);
     }

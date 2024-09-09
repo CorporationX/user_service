@@ -1,3 +1,7 @@
+controller:
+  goalInvitation:
+    baseUrl: "/goal-invitations"
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver

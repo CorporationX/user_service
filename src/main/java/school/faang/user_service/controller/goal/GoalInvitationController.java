@@ -3,6 +3,7 @@ package school.faang.user_service.controller.goal;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,14 +18,8 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-// TODO: ??? как то вынести в yaml /api/v1  ?
-@RequestMapping("/api/v1/goal_invitations")
+@RequestMapping("/goal-invitations")
 public class GoalInvitationController {
-
-    // TODO: ??? как быстро сгенерить json для POST запроса ? Как быстро сгенерить файл с коллекцией для Постмана?
-    // TODO: ??? как понять когда POST а когда GET ?
-    // TODO: ??? как понять когда надо что-то возвращать потребителю ?
-    // TODO: ??? как сгенерить чейнжсет для ликвибейз на основе текущих изменений в БД ?
 
     private final GoalInvitationService service;
 
@@ -48,17 +43,17 @@ public class GoalInvitationController {
         return service.createInvitation(goalInvitationDto);
     }
 
-    @GetMapping(value = "/accept/{goalId}")
+    @PatchMapping(value = "/accept/{goalId}")
     public void acceptGoalInvitation(@PathVariable long goalId) {
         service.acceptGoalInvitation(goalId);
     }
 
-    @GetMapping(value = "/reject/{goalId}")
+    @PatchMapping(value = "/reject/{goalId}")
     public void rejectGoalInvitation(@PathVariable long goalId) {
         service.rejectGoalInvitation(goalId);
     }
 
-    @PostMapping(value = "/invitations",
+    @GetMapping(value = "/invitations",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {

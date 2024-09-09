@@ -34,10 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static school.faang.user_service.service.GoalInvitationService.MAX_ACTIVE_USER_GOALS;
 
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
+
+    private static final int MAX_ACTIVE_USER_GOALS = 3;
 
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
@@ -126,6 +127,7 @@ class GoalInvitationServiceTest {
         goalInvitation.setInvited(invitedUser);
 
         Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+        goalInvitationService.setMaxActiveUserGoals(MAX_ACTIVE_USER_GOALS);
 
         goalInvitationService.acceptGoalInvitation(1L);
 
@@ -189,6 +191,7 @@ class GoalInvitationServiceTest {
 
         goalInvitation.setInvited(invited);
         Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+        goalInvitationService.setMaxActiveUserGoals(MAX_ACTIVE_USER_GOALS);
 
         GoalInvitationValidationException exception = assertThrows(GoalInvitationValidationException.class,
                 () -> goalInvitationService.acceptGoalInvitation(1L));
@@ -247,7 +250,6 @@ class GoalInvitationServiceTest {
 
         List<GoalInvitation> goalInvitations = List.of(goalInvitation);
 
-        // TODO: !!! тут не очень красиво, но не придумал как лучше
         List<GoalInvitationFilter> filters = new ArrayList<>();
         filters.add(new GoalInvitationInvitedIdFilter());
         filters.add(new GoalInvitationInvitedNameFilter());

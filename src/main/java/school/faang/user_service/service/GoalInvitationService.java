@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
-import lombok.AllArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -21,10 +22,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
 public class GoalInvitationService {
 
-    public static final int MAX_ACTIVE_USER_GOALS = 3;
+    @Setter
+    @Value("${app.max-active-user-goals}")
+    private int maxActiveUserGoals;
 
     private final GoalInvitationRepository goalInvitationRepository;
     private final UserRepository userRepository;
@@ -32,6 +34,16 @@ public class GoalInvitationService {
 
     private final List<GoalInvitationFilter> goalInvitationFilters;
     private final GoalInvitationMapper mapper;
+
+    public GoalInvitationService(GoalInvitationRepository goalInvitationRepository, UserRepository userRepository,
+                                 GoalRepository goalRepository, List<GoalInvitationFilter> goalInvitationFilters,
+                                 GoalInvitationMapper mapper) {
+        this.goalInvitationRepository = goalInvitationRepository;
+        this.userRepository = userRepository;
+        this.goalRepository = goalRepository;
+        this.goalInvitationFilters = goalInvitationFilters;
+        this.mapper = mapper;
+    }
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
 
@@ -58,7 +70,6 @@ public class GoalInvitationService {
             throw new GoalInvitationValidationException("Goal with id " + goalId + " does not exist");
         }
 
-        // TODO: ??? в маппере нет смысла ? пусть будет на будущее?
         GoalInvitation entity = mapper.toEntity(goalInvitationDto);
 
         entity.setInviter(optionalUserInviter.get());
@@ -93,8 +104,8 @@ public class GoalInvitationService {
         }
 
         long activeGoalsAmount = invitedUserGoals.stream().filter(g -> g.getStatus() == GoalStatus.ACTIVE).count();
-        if (activeGoalsAmount >= MAX_ACTIVE_USER_GOALS) {
-            throw new GoalInvitationValidationException("User with id " + invitedUser.getId() + " has more or equals then " + MAX_ACTIVE_USER_GOALS
+        if (activeGoalsAmount >= maxActiveUserGoals) {
+            throw new GoalInvitationValidationException("User with id " + invitedUser.getId() + " has more or equals then " + maxActiveUserGoals
                     + " active goals (current amount = " + activeGoalsAmount + ")");
         }
 
@@ -121,7 +132,6 @@ public class GoalInvitationService {
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
-        // TODO: !!! в лекции походу было не корректный пример со Stream
         List<GoalInvitation> goalInvitations = new ArrayList<>(goalInvitationRepository.findAll());
 
         goalInvitationFilters.stream()

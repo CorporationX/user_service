@@ -14,4 +14,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
-      file: db/changelog/changeset/user_V008__insert_goals.sql
+      file: db/changelog/changeset/user_V008__BJS2-27196_insert_goals.sql

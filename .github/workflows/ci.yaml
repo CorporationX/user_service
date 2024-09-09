@@ -1,7 +1,12 @@
 name: CI
 
 on:
-  [push, pull_request]
+  push:
+    branches:
+      - basilisk-master-stream6
+  pull_request:
+    branches:
+      - basilisk-master-stream6
 
 jobs:
   build:

@@ -3,9 +3,9 @@ package school.faang.user_service.service.event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EventExistsException;
+import school.faang.user_service.exception.EventNotExistException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
-import school.faang.user_service.exception.UserExistsException;
+import school.faang.user_service.exception.UserNotExistException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
@@ -39,7 +39,7 @@ public class EventValidator {
     public boolean checkEventExists(long eventId) {
         if (!eventParticipationRepository.eventExistsById(eventId)) {
             log.error(EVENT_NOT_EXISTS_MESSAGE.formatted(eventId));
-            throw new EventExistsException(EVENT_NOT_EXISTS_MESSAGE.formatted(eventId));
+            throw new EventNotExistException(EVENT_NOT_EXISTS_MESSAGE.formatted(eventId));
         }
         return true;
     }
@@ -47,7 +47,7 @@ public class EventValidator {
     public boolean checkUserExists(long userId) {
         if (!eventParticipationRepository.userExistsById(userId)) {
             log.error(USER_NOT_EXISTS_MESSAGE.formatted(userId));
-            throw new UserExistsException(USER_NOT_EXISTS_MESSAGE.formatted(userId));
+            throw new UserNotExistException(USER_NOT_EXISTS_MESSAGE.formatted(userId));
         }
         return true;
     }

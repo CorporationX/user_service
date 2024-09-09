@@ -7,9 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EventExistsException;
+import school.faang.user_service.exception.EventNotExistException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
-import school.faang.user_service.exception.UserExistsException;
+import school.faang.user_service.exception.UserNotExistException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,7 +85,7 @@ public class EventValidatorTest {
     public void checkEventExists_NotExists() {
         setUpCheckEventExists(false);
 
-        assertThrows(EventExistsException.class, () ->
+        assertThrows(EventNotExistException.class, () ->
                 eventValidator.checkEventExists(eventId));
     }
 
@@ -104,7 +104,7 @@ public class EventValidatorTest {
     public void checkUserExists_UserNotExists() {
         setUpCheckUserExists(false);
 
-        assertThrows(UserExistsException.class, () ->
+        assertThrows(UserNotExistException.class, () ->
                 eventValidator.checkUserExists(userId));
     }
 

@@ -17,6 +17,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Build with Gradle
+        run: ./gradlew build
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -32,9 +35,6 @@ jobs:
             path: build
             key: ${{ runner.os }}-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
             restore-keys: ${{ runner.os }}-build-
-
-      - name: Build with Gradle
-        run: ./gradlew build
 
       - name: Run tests
         run: ./gradlew test --continue

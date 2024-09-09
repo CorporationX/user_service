@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.validator.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
 @Slf4j
-public class EventValidator {
+public class EventParticipationValidator {
     private EventParticipationRepository eventParticipationRepository;
     private static final String USER_ALREADY_REGISTERED_MESSAGE = "User %d already registered on event %d";
     private static final String USER_NOT_REGISTERED_MESSAGE = "User %d does not registered on event %d";

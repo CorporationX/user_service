@@ -15,6 +15,7 @@ import school.faang.user_service.exception.EventParticipationRegistrationExcepti
 import school.faang.user_service.exception.UserNotExistException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.validator.event.EventParticipationValidator;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class EventParticipationServiceImplTest {
     private EventParticipationRepository eventParticipationRepository;
 
     @Mock
-    private EventValidator eventValidator;
+    private EventParticipationValidator eventParticipationValidator;
 
     @Spy
     private UserMapper userMapper;
@@ -59,7 +60,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testRegisterParticipant_EventNotExists")
     public void testRegisterParticipant_EventNotExists() {
-        when(eventValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
 
         assertThrows(EventNotExistException.class, () -> {
             eventParticipationService.registerParticipant(eventId, userId);
@@ -69,7 +70,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testRegisterParticipant_UserNotExists")
     public void testRegisterParticipant_UserNotExists() {
-        when(eventValidator.checkUserExists(userId)).thenThrow(new UserNotExistException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkUserExists(userId)).thenThrow(new UserNotExistException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
         assertThrows(UserNotExistException.class, () -> {
             eventParticipationService.registerParticipant(eventId, userId);
@@ -79,7 +80,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testRegisterParticipant_AlreadyRegisteredOnEvent")
     public void testRegisterParticipant_AlreadyRegisteredOnEvent() {
-        when(eventValidator.validateParticipationRegistered(eventId, userId))
+        when(eventParticipationValidator.validateParticipationRegistered(eventId, userId))
                 .thenThrow(new EventParticipationRegistrationException(USER_ALREADY_REGISTERED_EXCEPTION_MESSAGE));
 
         assertThrows(EventParticipationRegistrationException.class, () -> {
@@ -98,7 +99,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testUnregisterParticipant_EventNotExists")
     public void testUnregisterParticipant_EventNotExists() {
-        when(eventValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
 
         assertThrows(EventNotExistException.class, () -> {
             eventParticipationService.unregisterParticipant(eventId, userId);
@@ -108,7 +109,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testUnregisterParticipant_UserNotExists")
     public void testUnregisterParticipant_UserNotExists() {
-        when(eventValidator.checkUserExists(userId)).thenThrow(new UserNotExistException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkUserExists(userId)).thenThrow(new UserNotExistException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
         assertThrows(UserNotExistException.class, () -> {
             eventParticipationService.unregisterParticipant(eventId, userId);
@@ -118,7 +119,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testUnregisterParticipant_NotRegisteredOnEvent")
     public void testUnregisterParticipant_NotRegisteredOnEvent() {
-        when(eventValidator.validateParticipationNotRegistered(eventId, userId))
+        when(eventParticipationValidator.validateParticipationNotRegistered(eventId, userId))
                 .thenThrow(new EventParticipationRegistrationException(USER_NOT_REGISTERED_EXCEPTION_MESSAGE));
 
         assertThrows(EventParticipationRegistrationException.class, () -> {
@@ -211,9 +212,9 @@ public class EventParticipationServiceImplTest {
 
     private void setUpEventValidator(boolean isValid) {
         if (isValid) {
-            when(eventValidator.checkEventExists(eventId)).thenReturn(true);
+            when(eventParticipationValidator.checkEventExists(eventId)).thenReturn(true);
         } else {
-            when(eventValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException("Event not exists"));
+            when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException("Event not exists"));
         }
     }
 
@@ -237,13 +238,13 @@ public class EventParticipationServiceImplTest {
     }
 
     private void verifyGetParticipants() {
-        verify(eventValidator, times(1)).checkEventExists(eventId);
+        verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).findAllParticipantsByEventId(eventId);
         verify(userMapper, times(1)).usersToUsersDto(anyList());
     }
 
     private void verifyGetParticipantsCount() {
-        verify(eventValidator, times(1)).checkEventExists(eventId);
+        verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).countParticipants(eventId);
     }
 }

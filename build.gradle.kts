@@ -111,7 +111,7 @@ val jacocoInclude = listOf(
     "**/mapper/**"
 )
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
@@ -123,7 +123,7 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(false)
         csv.required.set(false)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        html.outputLocation.set(layout.buildDirectory.dir("${buildDir}/reports/jacocoHtml"))
     }
 
     classDirectories.setFrom(
@@ -148,6 +148,10 @@ tasks.jacocoTestCoverageVerification {
         }
     }
 }
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
 kotlin {
     jvmToolchain(17)
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.validator.event;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,12 +18,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EventValidatorTest")
-public class EventValidatorTest {
+public class EventParticipationValidatorTest {
     long eventId = 1L;
     long userId = 1L;
 
     @InjectMocks
-    private EventValidator eventValidator;
+    private EventParticipationValidator eventParticipationValidator;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -36,7 +36,7 @@ public class EventValidatorTest {
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(participant);
 
         assertThrows(EventParticipationRegistrationException.class, () ->
-                eventValidator.validateParticipationRegistered(eventId, userId));
+                eventParticipationValidator.validateParticipationRegistered(eventId, userId));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class EventValidatorTest {
     public void validateParticipantRegistered_NotRegistered() {
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(null);
 
-        boolean result = eventValidator.validateParticipationRegistered(eventId, userId);
+        boolean result = eventParticipationValidator.validateParticipationRegistered(eventId, userId);
 
         assertEquals(false, result);
     }
@@ -56,7 +56,7 @@ public class EventValidatorTest {
 
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(participant);
 
-        boolean result = eventValidator.validateParticipationNotRegistered(eventId, userId);
+        boolean result = eventParticipationValidator.validateParticipationNotRegistered(eventId, userId);
 
         assertEquals(false, result);
     }
@@ -67,7 +67,7 @@ public class EventValidatorTest {
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(null);
 
         assertThrows(EventParticipationRegistrationException.class, () ->
-                eventValidator.validateParticipationNotRegistered(eventId, userId));
+                eventParticipationValidator.validateParticipationNotRegistered(eventId, userId));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class EventValidatorTest {
     public void checkEventExists_Exists() {
         setUpCheckEventExists(true);
 
-        boolean result = eventValidator.checkEventExists(eventId);
+        boolean result = eventParticipationValidator.checkEventExists(eventId);
 
         assertEquals(true, result);
     }
@@ -86,7 +86,7 @@ public class EventValidatorTest {
         setUpCheckEventExists(false);
 
         assertThrows(EventNotExistException.class, () ->
-                eventValidator.checkEventExists(eventId));
+                eventParticipationValidator.checkEventExists(eventId));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class EventValidatorTest {
     public void checkUserExists_Exists() {
         setUpCheckUserExists(true);
 
-        boolean result = eventValidator.checkUserExists(userId);
+        boolean result = eventParticipationValidator.checkUserExists(userId);
 
         assertEquals(true, result);
     }
@@ -105,7 +105,7 @@ public class EventValidatorTest {
         setUpCheckUserExists(false);
 
         assertThrows(UserNotExistException.class, () ->
-                eventValidator.checkUserExists(userId));
+                eventParticipationValidator.checkUserExists(userId));
     }
 
     private void setUpCheckUserExists(boolean isUserExists) {

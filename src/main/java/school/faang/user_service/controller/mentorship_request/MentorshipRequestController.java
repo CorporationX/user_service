@@ -25,11 +25,12 @@ public class MentorshipRequestController {
     private final MentorshipRequestMapper mentorshipRequestMapper;
 
     @PostMapping
-    public MentorshipRequest requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
-        return mentorshipRequestService.requestMentorship(
+    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestService.requestMentorship(
                 mentorshipRequestDto.getRequesterId(),
                 mentorshipRequestDto.getReceiverId(),
                 mentorshipRequestDto.getDescription());
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     @GetMapping

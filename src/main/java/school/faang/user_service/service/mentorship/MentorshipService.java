@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -47,5 +48,18 @@ public class MentorshipService {
     @Transactional
     public void deleteMentor(long menteeId, long mentorId) {
         mentorshipRepository.deleteMentorship(menteeId, mentorId);
+    }
+
+    @Transactional
+    public void deleteMentorFromMentees(long mentorId, List<User> mentees) {
+        mentees.forEach(mentee -> {
+            mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+            mentee.getGoals()
+                    .stream()
+                    .filter(goal -> goal.getMentor().getId() == mentorId)
+                    .forEach(goal -> goal.setMentor(mentee));
+        });
+
+        mentorshipRepository.saveAll(mentees);
     }
 }

@@ -22,7 +22,7 @@ public class Recommendation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "content", length = 4096, nullable = false)
     private String content;

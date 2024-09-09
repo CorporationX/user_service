@@ -43,6 +43,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         Stream<User> followers = subscriptionRepository.findByFollowerId(followeeId);
@@ -51,6 +52,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filters) {
         Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);

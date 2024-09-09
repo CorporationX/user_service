@@ -18,8 +18,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 
 class GoalInvitationControllerAdviceTest {
-    private static final String ENTITY_MESSAGE = "Entity not found";
-    private static final String SAME_USERS_MESSAGE = "Users should not be same";
+    private static final String TEST_MESSAGE = "test message";
 
     @Mock
     private InvitationEntityNotFoundException invitationEntityNotFoundException;
@@ -39,40 +38,34 @@ class GoalInvitationControllerAdviceTest {
 
     @Test
     @DisplayName("Handle Entity not found exception")
-    void testHandleEntityNotFoundException() {
-        when(invitationEntityNotFoundException.getMessage()).thenReturn(ENTITY_MESSAGE);
+    void testHandleEntityNotFoundExceptionSuccessful() {
+        when(invitationEntityNotFoundException.getMessage()).thenReturn(TEST_MESSAGE);
         var response = goalInvitationControllerAdvice
                 .handleEntityNotFoundException(invitationEntityNotFoundException);
-        assertThat(response)
-                .isNotNull()
-                .extracting(ResponseEntity::getStatusCode)
-                .isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody())
-                .isNotNull()
-                .extracting(ProblemDetail::getStatus)
-                .isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(response.getBody())
-                .extracting(ProblemDetail::getDetail)
-                .isEqualTo(ENTITY_MESSAGE);
+        assertResponse(response, HttpStatus.NOT_FOUND);
     }
 
     @Test
     @DisplayName("Handle same user exception")
-    void testHandInvitationCheckException() {
-        when(invitationCheckException.getMessage()).thenReturn(SAME_USERS_MESSAGE);
+    void testHandInvitationCheckExceptionSuccessful() {
+        when(invitationCheckException.getMessage()).thenReturn(TEST_MESSAGE);
         var response = goalInvitationControllerAdvice
                 .handleInvitationCheckException(invitationCheckException);
+        assertResponse(response, HttpStatus.BAD_REQUEST);
+    }
+
+    private void assertResponse(ResponseEntity<ProblemDetail> response, HttpStatus httpStatus) {
         assertThat(response)
                 .isNotNull()
                 .extracting(ResponseEntity::getStatusCode)
-                .isEqualTo(HttpStatus.BAD_REQUEST);
+                .isEqualTo(httpStatus);
         assertThat(response.getBody())
                 .isNotNull()
                 .extracting(ProblemDetail::getStatus)
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+                .isEqualTo(httpStatus.value());
         assertThat(response.getBody())
                 .extracting(ProblemDetail::getDetail)
-                .isEqualTo(SAME_USERS_MESSAGE);
+                .isEqualTo(TEST_MESSAGE);
     }
 
     @AfterEach

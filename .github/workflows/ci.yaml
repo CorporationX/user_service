@@ -17,6 +17,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Verify Gradle cache directories before build
+        run: |
+          echo "Checking Gradle cache directories before build..."
+          ls -la ~/.gradle/caches || true
+          ls -la ~/.gradle/wrapper || true
+
       - name: Build with Gradle
         run: ./gradlew build
 

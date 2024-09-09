@@ -13,6 +13,7 @@ import school.faang.user_service.service.recommendation.filters.RecommendationRe
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -42,13 +43,17 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto requestFilterDto) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
-
         List<RecommendationRequest> recommendationRequestsEntity = recommendationRequestFilters.stream()
                 .filter(filter -> filter.isApplicable(requestFilterDto))
                 .flatMap(filter -> filter.apply(recommendationRequests, requestFilterDto))
                 .toList();
-
         return recommendationRequestMapper.mapToDto(recommendationRequestsEntity);
+    }
+
+    public RecommendationRequestDto getRequest(Long id) {
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).orElseThrow(() ->
+                new NoSuchElementException("No such element in db"));
+        return recommendationRequestMapper.mapToDto(recommendationRequest);
     }
 }
 

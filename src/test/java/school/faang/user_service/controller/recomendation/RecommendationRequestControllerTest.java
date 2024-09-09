@@ -41,7 +41,6 @@ public class RecommendationRequestControllerTest {
         recommendationRequestDto.setRequesterId(55L);
         recommendationRequestDto.setMessage("");
         recommendationRequestDto.setStatus(RequestStatus.PENDING);
-//        recommendationRequestDto.setSkillsId(List.of(5L, 56L, 53L, 10L));
     }
 
     @Test

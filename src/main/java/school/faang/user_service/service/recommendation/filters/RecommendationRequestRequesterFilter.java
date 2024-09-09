@@ -13,6 +13,7 @@ public class RecommendationRequestRequesterFilter implements RecommendationReque
         return requestFilterDto.getRequestIdPattern() != null;
     }
 
+
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequests, RecommendationRequestFilterDto requestFilterDto) {
         return recommendationRequests

@@ -43,7 +43,6 @@ class RecommendationRequestMessageFilterTest {
         RecommendationRequest thirdRecommendationRequest = new RecommendationRequest();
         thirdRecommendationRequest.setMessage("some Message");
         Stream<RecommendationRequest> recommendationRequests = Stream.of(firstRecommendationRequest, secondRecommendationRequest, thirdRecommendationRequest);
-
         List<RecommendationRequest> resultRecommendationRequests = recommendationRequestMessageFilter.apply(recommendationRequests, requestFilterDto).toList();
 
         assertAll(

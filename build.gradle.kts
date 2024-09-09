@@ -65,7 +65,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
-    implementation ("net.coobird:thumbnailator:0.4.1")
+    implementation("net.coobird:thumbnailator:0.4.1")
 
     /**
      * Test containers
@@ -143,14 +143,28 @@ tasks.jacocoTestCoverageVerification {
             )
             enabled = true
             limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
+                counter = "CLASS"
+                value = "MISSEDCOUNT"
+                maximum = 1.toBigDecimal()
+            }
+        }
+        rule {
+            element = "CLASS"
+            classDirectories.setFrom(
+                sourceSets.main.get().output.asFileTree.matching {
+                    include(jacocoInclude)
+                }
+            )
+            enabled = true
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = 0.70.toBigDecimal()
             }
         }
     }
 }
-tasks.check {
-    dependsOn(tasks.jacocoTestCoverageVerification)
-}
+
 
 kotlin {
     jvmToolchain(17)

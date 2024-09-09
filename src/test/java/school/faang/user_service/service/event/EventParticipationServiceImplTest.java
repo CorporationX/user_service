@@ -10,9 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.EventParticipantsDto;
 import school.faang.user_service.dto.EventUserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EventNotExistException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
-import school.faang.user_service.exception.UserNotExistException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.validator.event.EventParticipationValidator;
@@ -60,9 +59,9 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testRegisterParticipant_EventNotExists")
     public void testRegisterParticipant_EventNotExists() {
-        when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EntityNotFoundException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
 
-        assertThrows(EventNotExistException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             eventParticipationService.registerParticipant(eventId, userId);
         });
     }
@@ -70,9 +69,9 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testRegisterParticipant_UserNotExists")
     public void testRegisterParticipant_UserNotExists() {
-        when(eventParticipationValidator.checkUserExists(userId)).thenThrow(new UserNotExistException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkUserExists(userId)).thenThrow(new EntityNotFoundException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
-        assertThrows(UserNotExistException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             eventParticipationService.registerParticipant(eventId, userId);
         });
     }
@@ -99,9 +98,9 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testUnregisterParticipant_EventNotExists")
     public void testUnregisterParticipant_EventNotExists() {
-        when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EntityNotFoundException(EVENT_NOT_EXISTS_EXCEPTION_MESSAGE));
 
-        assertThrows(EventNotExistException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             eventParticipationService.unregisterParticipant(eventId, userId);
         });
     }
@@ -109,9 +108,9 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("testUnregisterParticipant_UserNotExists")
     public void testUnregisterParticipant_UserNotExists() {
-        when(eventParticipationValidator.checkUserExists(userId)).thenThrow(new UserNotExistException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
+        when(eventParticipationValidator.checkUserExists(userId)).thenThrow(new EntityNotFoundException(USER_NOT_EXISTS_EXCEPTION_MESSAGE));
 
-        assertThrows(UserNotExistException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             eventParticipationService.unregisterParticipant(eventId, userId);
         });
     }
@@ -164,7 +163,7 @@ public class EventParticipationServiceImplTest {
     public void testGetParticipants_EventNotExists() {
         setUpEventValidator(false);
 
-        assertThrows(EventNotExistException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             eventParticipationService.getParticipants(eventId);
         });
     }
@@ -190,7 +189,7 @@ public class EventParticipationServiceImplTest {
     public void testGetParticipantsCount_EventNotExists() {
         setUpEventValidator(false);
 
-        assertThrows(EventNotExistException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             eventParticipationService.getParticipantsCount(eventId);
         });
     }
@@ -214,7 +213,7 @@ public class EventParticipationServiceImplTest {
         if (isValid) {
             when(eventParticipationValidator.checkEventExists(eventId)).thenReturn(true);
         } else {
-            when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EventNotExistException("Event not exists"));
+            when(eventParticipationValidator.checkEventExists(eventId)).thenThrow(new EntityNotFoundException("Event not exists"));
         }
     }
 

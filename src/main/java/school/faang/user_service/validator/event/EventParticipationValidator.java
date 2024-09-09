@@ -3,9 +3,8 @@ package school.faang.user_service.validator.event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EventNotExistException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
-import school.faang.user_service.exception.UserNotExistException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
@@ -20,7 +19,6 @@ public class EventParticipationValidator {
     public boolean validateParticipationRegistered(long eventId, long userId) {
         User participant = eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId);
         if (participant != null) {
-            log.error(USER_ALREADY_REGISTERED_MESSAGE.formatted(userId, eventId));
             throw new EventParticipationRegistrationException(USER_ALREADY_REGISTERED_MESSAGE.formatted(userId, eventId));
         } else {
             return false;
@@ -30,7 +28,6 @@ public class EventParticipationValidator {
     public boolean validateParticipationNotRegistered(long eventId, long userId) {
         User participant = eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId);
         if (participant == null) {
-            log.error(USER_NOT_REGISTERED_MESSAGE.formatted(userId, eventId));
             throw new EventParticipationRegistrationException(USER_NOT_REGISTERED_MESSAGE.formatted(userId, eventId));
         }
         return false;
@@ -38,16 +35,14 @@ public class EventParticipationValidator {
 
     public boolean checkEventExists(long eventId) {
         if (!eventParticipationRepository.eventExistsById(eventId)) {
-            log.error(EVENT_NOT_EXISTS_MESSAGE.formatted(eventId));
-            throw new EventNotExistException(EVENT_NOT_EXISTS_MESSAGE.formatted(eventId));
+            throw new EntityNotFoundException(EVENT_NOT_EXISTS_MESSAGE.formatted(eventId));
         }
         return true;
     }
 
     public boolean checkUserExists(long userId) {
         if (!eventParticipationRepository.userExistsById(userId)) {
-            log.error(USER_NOT_EXISTS_MESSAGE.formatted(userId));
-            throw new UserNotExistException(USER_NOT_EXISTS_MESSAGE.formatted(userId));
+            throw new EntityNotFoundException(USER_NOT_EXISTS_MESSAGE.formatted(userId));
         }
         return true;
     }

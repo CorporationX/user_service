@@ -1,24 +1,31 @@
 package school.faang.user_service.dto.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
 import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class EventDto {
-    private Long id;
-    private String title;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private Long ownerId;
-    private String description;
-    private List<SkillDto> relatedSkills;
-    private String location;
-    private int maxAttendees;
+@Builder
+public record EventDto(
+        @NotNull(message = "Event ID can't be null")
+        @Positive
+        Long id,
+        @NotBlank(message = "Event title can't be null or empty")
+        String title,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+        @NotNull(message = "Event owner ID can't be null")
+        @Positive
+        Long ownerId,
+        @NotBlank(message = "Event description can't be null or empty")
+        String description,
+        List<SkillDto> relatedSkills,
+        String location,
+        @NotNull(message = "maxAttendees can't be null")
+        @Positive
+        int maxAttendees) {
 }

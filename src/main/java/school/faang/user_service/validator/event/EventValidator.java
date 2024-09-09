@@ -1,5 +1,6 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.validator.event;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
@@ -8,6 +9,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,44 +20,30 @@ import java.util.Optional;
 public class EventValidator {
     private final UserRepository userRepository;
 
-    public void validateEvent(EventDto eventDto) {
-        checkTitle(eventDto);
-        checkStartDate(eventDto);
-        checkOwnerId(eventDto);
-    }
-
-    public void checkTitle(EventDto eventDto) {
-        String title = eventDto.getTitle();
-        if (title == null || title.isBlank()) {
-            throw new DataValidationException("Event title can not be null or empty");
-        }
-    }
-
-    public void checkStartDate(EventDto eventDto) {
-        Optional.ofNullable(eventDto.getStartDate())
+    public void validateStartDate(EventDto eventDto) {
+        Optional.ofNullable(eventDto.startDate())
                 .orElseThrow(() -> new DataValidationException("Event start date can not be null"));
     }
 
-    public void checkOwnerId(EventDto eventDto) {
-        userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new DataValidationException("Event owner does not exist"));
-    }
-
-    public void checkOwnerSkills(EventDto eventDto) {
+    public void validateOwnerSkills(EventDto eventDto) {
         User owner = userRepository
-                .findById(eventDto.getOwnerId())
+                .findById(eventDto.ownerId())
                 .orElseThrow(() -> new DataValidationException("Event owner does not exist"));
 
         List<Long> ownerSkillsIds = owner.getSkills().stream()
                 .map(Skill::getId)
                 .toList();
-        List<Long> eventSkillsIds = eventDto.getRelatedSkills().stream()
-                .map(SkillDto::getId)
+        List<Long> eventSkillsIds = eventDto.relatedSkills().stream()
+                .map(SkillDto::id)
                 .toList();
 
-        if (!new HashSet<>(eventSkillsIds).containsAll(ownerSkillsIds)) {
+        if (!ownerSkillsIds.containsAll(eventSkillsIds)) {
             throw new DataValidationException("Event owner does not have skills related to this event");
         }
+
+        /*if (!new HashSet<>(ownerSkillsIds).containsAll(eventSkillsIds)) {
+            throw new DataValidationException("Event owner does not have skills related to this event");
+        }*/
     }
 
 }

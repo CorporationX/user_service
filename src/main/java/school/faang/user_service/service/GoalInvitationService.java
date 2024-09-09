@@ -20,6 +20,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class GoalInvitationService {
@@ -131,13 +132,15 @@ public class GoalInvitationService {
         goalInvitationRepository.updateStatusById(RequestStatus.REJECTED, id);
     }
 
-    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
-        List<GoalInvitation> goalInvitations = new ArrayList<>(goalInvitationRepository.findAll());
-
-        goalInvitationFilters.stream()
-                .filter(f -> f.isApplicable(filter))
-                .forEach(f -> f.apply(goalInvitations, filter));
-
-        return goalInvitations.stream().map(mapper::toDto).toList();
+    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filterDto) {
+        Stream<GoalInvitation> goalInvitations = new ArrayList<>(goalInvitationRepository.findAll()).stream();
+        return goalInvitationFilters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .reduce(goalInvitations,
+                        (stream, filter) -> filter.apply(stream, filterDto),
+                        (s1, s2) -> s1)
+                .map(mapper::toDto)
+                .toList();
     }
+
 }

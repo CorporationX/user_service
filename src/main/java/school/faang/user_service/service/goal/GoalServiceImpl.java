@@ -1,22 +1,26 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.exception.ResourceNotFoundException;
+import school.faang.user_service.mapping.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static school.faang.user_service.entity.goal.GoalStatus.ACTIVE;
 import static school.faang.user_service.entity.goal.GoalStatus.COMPLETED;
 
@@ -24,47 +28,81 @@ import static school.faang.user_service.entity.goal.GoalStatus.COMPLETED;
 @Transactional
 @RequiredArgsConstructor
 public class GoalServiceImpl implements GoalService {
+    @Value("${app.goal.max-active-per-user}")
+    private Integer maxExistedActiveGoals;
+
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
     private final List<GoalFilter> goalFilters;
+    private final GoalMapper goalMapper;
 
     @Override
-    public void createGoal(Goal goal, Long userId) {
-        Goal createdGoal = goalRepository.create(
-            goal.getTitle(), goal.getDescription(), goal.getParent() == null ? null : goal.getParent().getId());
+    public Goal createGoal(Goal goal, Long userId, Long parentGoalId, List<Long> skillIds) {
+        validateExistingSkills(skillIds);
 
-        goalRepository.assignGoalToUser(createdGoal.getId(), userId);
-        assignSkillsToGoal(goal, createdGoal.getId());
+        int alreadyExistedActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
+        if (alreadyExistedActiveGoals >= maxExistedActiveGoals) {
+            throw new BadRequestException("User %s can have maximum %s goals", userId, maxExistedActiveGoals);
+        }
+
+        if (parentGoalId != null) {
+            goalRepository.findById(parentGoalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Parent Goal", parentGoalId));
+        }
+
+        User user = userRepository.findById(userId).
+            orElseThrow(() -> new ResourceNotFoundException("User", userId));
+        goal.setUsers(List.of(user));
+
+        Goal parentGoal = parentGoalId != null ? findById(parentGoalId) : null;
+        goal.setParent(parentGoal);
+
+        List<Skill> skills = skillIds != null ? skillRepository.findByIds(skillIds) : null;
+        goal.setSkillsToAchieve(skills);
+
+        return goalRepository.save(goal);
     }
 
     @Override
-    public void updateGoal(Goal goal) {
-        goalRepository.update(goal.getId(), goal.getTitle(), goal.getDescription(),
-            goal.getParent() == null ? null : goal.getParent().getId(), goal.getStatus().ordinal());
+    public Goal updateGoal(Goal goal, List<Long> skillIds) {
+        validateExistingSkills(skillIds);
 
-        updateSkills(goal);
+        Goal existedGoal = findById(goal.getId());
 
-        if (isMakeGoalCompleted(goal)) {
-            assignGoalSkillsToUsers(goal);
+        if (existedGoal.getStatus() == COMPLETED) {
+            throw new BadRequestException("You cannot update Goal %s with the %s status.", existedGoal.getId(), COMPLETED.name());
         }
+        boolean isMakeGoalCompleted = goal.getStatus() == COMPLETED && existedGoal.getStatus() == ACTIVE;
+
+        goalMapper.update(goal, existedGoal);
+
+        if (skillIds != null) {
+            List<Skill> skills = skillRepository.findByIds(skillIds);
+            existedGoal.setSkillsToAchieve(skills);
+        }
+
+        if (isMakeGoalCompleted) {
+            List<Skill> skills = existedGoal.getSkillsToAchieve();
+            if (isEmpty(skills)) {
+                throw new BadRequestException("You cannot complete Goal %s with empty list of Goals.", existedGoal.getId());
+            }
+            List<User> users = existedGoal.getUsers();
+            skills.forEach(skill -> {
+                users.forEach(user -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
+            });
+        }
+
+        return goalRepository.save(existedGoal);
     }
 
     @Override
     public void deleteGoal(Long goalId) {
-        List<Long> goalIds = new ArrayList<>();
         goalRepository.findByParent(goalId)
             .toList()
-            .forEach(goal -> goalIds.add(goal.getId()));
-        goalIds.add(goalId);
+            .forEach(goal -> goalRepository.deleteById(goal.getId()));
 
-        for (Long id : goalIds) {
-            goalRepository.unassignGoalFromUsers(id);
-            skillRepository.findSkillsByGoalId(id)
-                .forEach(skill -> skillRepository.unassignSkillFromUsers(skill.getId()));
-            skillRepository.deleteSkillsByGoalId(id);
-
-            goalRepository.delete(id);
-        }
+        goalRepository.deleteById(goalId);
     }
 
     @Override
@@ -83,37 +121,15 @@ public class GoalServiceImpl implements GoalService {
         return filterGoalsByPredicate(goalsByUser, predicate);
     }
 
-    private Goal findById(Long goalId) {
+    public Goal findById(Long goalId) {
         return goalRepository.findById(goalId)
             .orElseThrow(() -> new ResourceNotFoundException("Goal", goalId));
     }
 
-    private void updateSkills(Goal goal) {
-        skillRepository.deleteSkillsByGoalId(goal.getId());
-        assignSkillsToGoal(goal, goal.getId());
-    }
-
-    private void assignSkillsToGoal(Goal goal, Long goalId) {
-        List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
-        if (isNotEmpty(skillsToAchieve)) {
-            List<Long> skillIds = skillsToAchieve.stream()
-                .map(Skill::getId)
-                .toList();
-            skillIds.forEach(skillId -> skillRepository.addSkillToGoal(skillId, goalId));
+    private void validateExistingSkills(List<Long> skillIds) {
+        if (skillIds != null && skillIds.size() != skillRepository.countExisting(skillIds)) {
+            throw new BadRequestException("Skills from request are not presented in DB");
         }
-    }
-
-    private void assignGoalSkillsToUsers(Goal goal) {
-        List<Skill> skills = skillRepository.findSkillsByGoalId(goal.getId());
-        Goal foundGoal = goalRepository.findById(goal.getId()).get();
-        foundGoal.getUsers().forEach(user -> {
-            skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
-        });
-    }
-
-    private boolean isMakeGoalCompleted(Goal goal) {
-        Goal goalFromDb = findById(goal.getId());
-        return goal.getStatus() == COMPLETED && goalFromDb.getStatus() == ACTIVE;
     }
 
     private Predicate<Goal> combinePredicateFromFilter(GoalFilterDto filterDto) {

@@ -12,8 +12,11 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.exception.ResourceNotFoundException;
+import school.faang.user_service.mapping.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalDescriptionFilter;
 import school.faang.user_service.service.goal.filter.GoalFilter;
@@ -27,24 +30,28 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.goal.GoalStatus.ACTIVE;
 import static school.faang.user_service.entity.goal.GoalStatus.COMPLETED;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceImplTest extends CommonGoalTest {
+    private static final int MAX_EXISTED_ACTIVE_GOALS = 3;
+
     @Mock
     private GoalRepository goalRepository;
 
     @Mock
     private SkillRepository skillRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private GoalMapper goalMapper;
 
     @InjectMocks
     private GoalServiceImpl goalService;
@@ -52,6 +59,8 @@ class GoalServiceImplTest extends CommonGoalTest {
     private static List<GoalFilter> goalFilters;
 
     private Goal goal;
+
+    private User user;
 
     private GoalFilterDto filterDto;
 
@@ -66,126 +75,145 @@ class GoalServiceImplTest extends CommonGoalTest {
     @BeforeEach
     void setUpEach() {
         ReflectionTestUtils.setField(goalService, "goalFilters", goalFilters);
+        ReflectionTestUtils.setField(goalService, "maxExistedActiveGoals", MAX_EXISTED_ACTIVE_GOALS);
 
         goal = createGoal();
+        user = createUser();
         filterDto = createGoalFilterDto();
     }
 
     @Test
-    void testCreateGoal_successfullyCreatedWithEmptySkills() {
-        when(goalRepository.create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null))).thenReturn(goal);
+    void testCreateGoal_exception_hasNoExistingSkills() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(0);
 
-        goalService.createGoal(goal, USER_ID);
-
-        verify(goalRepository).create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null));
-        verify(skillRepository, times(0)).addSkillToGoal(anyLong(), anyLong());
-        verify(goalRepository).assignGoalToUser(eq(goal.getId()), eq(USER_ID));
-    }
-
-    @Test
-    void testCreateGoal_successWithSkills() {
-        goal.setSkillsToAchieve(List.of(Skill.builder().id(SKILL_ID).build()));
-
-        when(goalRepository.create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null))).thenReturn(goal);
-        doNothing().when(skillRepository).addSkillToGoal(eq(SKILL_IDS.get(0)), eq(goal.getId()));
-
-        goalService.createGoal(goal, USER_ID);
-
-        verify(goalRepository).create(eq(goal.getTitle()), eq(goal.getDescription()), eq(null));
-        verify(skillRepository).addSkillToGoal(eq(SKILL_IDS.get(0)), eq(goal.getId()));
-        verify(goalRepository).assignGoalToUser(eq(goal.getId()), eq(USER_ID));
-    }
-
-    @Test
-    void testUpdateGoal_throwGoalNotFoundById() {
-        when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.empty());
-
-        ResourceNotFoundException goalNotFoundException = assertThrows(ResourceNotFoundException.class, () ->
-            goalService.updateGoal(goal)
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+            goalService.createGoal(goal, USER_ID, null, List.of(SKILL_ID))
         );
 
-        assertEquals("Goal " + GOAL_ID + " not found", goalNotFoundException.getMessage());
+        assertEquals("Skills from request are not presented in DB", exception.getMessage());
     }
 
     @Test
-    void deleteGoal_successfullyUpdatedWithoutSkills() {
-        when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.of(goal));
-        when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(0);
+    void testCreateGoal_exception_activeGoalsForUserMoreThanLimit() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(1);
+        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS);
 
-        goalService.updateGoal(goal);
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+            goalService.createGoal(goal, USER_ID, null, List.of(SKILL_ID))
+        );
 
-        verify(goalRepository).findById(eq(GOAL_ID));
-        verify(goalRepository).update(eq(GOAL_ID), eq(GOAL_TITLE), eq(GOAL_DESCRIPTION),
-            eq(null), eq(goal.getStatus().ordinal()));
-        verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
-        verify(skillRepository, times(0)).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
-        verify(skillRepository, times(0)).findSkillsByGoalId(eq(GOAL_ID));
-        verify(skillRepository, times(0)).assignSkillToUser(eq(SKILL_ID), eq(USER_ID));
+        assertEquals("User 1 can have maximum 3 goals", exception.getMessage());
     }
 
     @Test
-    void deleteGoal_successfullyUpdatedWithSkills() {
-        goal.setSkillsToAchieve(List.of(Skill.builder().id(SKILL_ID).build()));
+    void testCreateGoal_exception_parentGoalNotFound() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(1);
+        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
+        when(goalRepository.findById(eq(PARENT_GOAL_ID))).thenReturn(Optional.empty());
 
-        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goal));
-        when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(0);
-        doNothing().when(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+            goalService.createGoal(goal, USER_ID, PARENT_GOAL_ID, List.of(SKILL_ID))
+        );
 
-        goalService.updateGoal(goal);
-
-        verify(goalRepository).findById(eq(GOAL_ID));
-        verify(goalRepository).update(eq(GOAL_ID), eq(GOAL_TITLE), eq(GOAL_DESCRIPTION),
-            eq(null), eq(goal.getStatus().ordinal()));
-        verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
-        verify(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
-        verify(skillRepository, times(0)).findSkillsByGoalId(anyLong());
-        verify(skillRepository, times(0)).assignSkillToUser(anyLong(), anyLong());
+        assertEquals("Parent Goal 3 not found", exception.getMessage());
     }
 
     @Test
-    void deleteGoal_successfullyUpdatedFromActiveToCompleted() {
-        goal.setSkillsToAchieve(List.of(Skill.builder().id(SKILL_ID).build()));
-        goal.setStatus(COMPLETED);
+    void testCreateGoal_exception_userNotFound() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(1);
+        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
 
-        goal.setUsers(List.of(User.builder().id(USER_ID).build()));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+            goalService.createGoal(goal, USER_ID, null, List.of(SKILL_ID))
+        );
 
-        List<Skill> skillsFromDb = List.of(Skill.builder().id(SKILL_ID).build());
-
-        var goalFromDb = createGoal();
-        goalFromDb.setStatus(ACTIVE);
-        goalFromDb.setUsers(List.of(User.builder().id(USER_ID).build()));
-
-        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(goalFromDb));
-        when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(0);
-        doNothing().when(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
-        when(skillRepository.findSkillsByGoalId(eq(GOAL_ID))).thenReturn(skillsFromDb);
-        doNothing().when(skillRepository).assignSkillToUser(eq(SKILL_ID), eq(USER_ID));
-
-        goalService.updateGoal(goal);
-
-        verify(goalRepository, times(2)).findById(eq(GOAL_ID));
-        verify(goalRepository).update(anyLong(), anyString(), anyString(), eq(null), anyInt());
-        verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
-        verify(skillRepository).addSkillToGoal(eq(SKILL_ID), eq(GOAL_ID));
-        verify(skillRepository).findSkillsByGoalId(eq(GOAL_ID));
-        verify(skillRepository).assignSkillToUser(eq(SKILL_ID), eq(USER_ID));
+        assertEquals("User 1 not found", exception.getMessage());
     }
 
     @Test
-    void testDeleteGoal_seccessfullyDeletedIncludingSkills() {
-        List<Skill> skillsFromDb = List.of(Skill.builder().id(SKILL_ID).build());
+    void testCreateGoal_success_ParentGoalNull_SkillIdsNull() {
+        Goal createdGoal = createGoal();
+        createdGoal.setId(GOAL_ID);
+        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
+        when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(user));
+        when(goalRepository.save(any(Goal.class))).thenReturn(createdGoal);
 
-        when(goalRepository.delete(eq(GOAL_ID))).thenReturn(1);
-        when(skillRepository.findSkillsByGoalId(eq(GOAL_ID))).thenReturn(skillsFromDb);
-        doNothing().when(skillRepository).unassignSkillFromUsers(eq(SKILL_ID));
-        when(skillRepository.deleteSkillsByGoalId(eq(GOAL_ID))).thenReturn(1);
+        Goal result = goalService.createGoal(goal, USER_ID, null, null);
+
+        assertEquals(createdGoal.getId(), result.getId());
+    }
+
+    @Test
+    void testCreateGoal_success_ParentGoalNotNull_SkillIdsNotNull() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        Goal parentGoal = createGoal();
+        Goal createdGoal = createGoal();
+        createdGoal.setId(GOAL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(1);
+        when(goalRepository.countActiveGoalsPerUser(eq(USER_ID))).thenReturn(MAX_EXISTED_ACTIVE_GOALS - 1);
+        when(userRepository.findById(eq(USER_ID))).thenReturn(Optional.of(user));
+        when(goalRepository.save(any(Goal.class))).thenReturn(createdGoal);
+        when(skillRepository.findByIds(eq(skillIds))).thenReturn(List.of(Skill.builder().id(SKILL_ID).build()));
+        when(goalRepository.findById(eq(PARENT_GOAL_ID))).thenReturn(Optional.of(parentGoal));
+
+        Goal result = goalService.createGoal(goal, USER_ID, PARENT_GOAL_ID, List.of(SKILL_ID));
+
+        assertEquals(createdGoal.getId(), result.getId());
+    }
+
+
+    @Test
+    void testUpdateGoal_exception_hasNoExistingSkills() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(0);
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+            goalService.updateGoal(goal, List.of(SKILL_ID))
+        );
+
+        assertEquals("Skills from request are not presented in DB", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateGoal_exception_goalAlreadyCompleted() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        Goal existedGoal = createGoal();
+        existedGoal.setStatus(COMPLETED);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(1);
+        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(existedGoal));
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+            goalService.updateGoal(goal, List.of(SKILL_ID))
+        );
+
+        assertEquals("You cannot update Goal 2 with the COMPLETED status.", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateGoal_success() {
+        List<Long> skillIds = List.of(SKILL_ID);
+        Goal existedGoal = createGoal();
+        Goal createdGoal = createGoal();
+        createdGoal.setId(GOAL_ID);
+        when(skillRepository.countExisting(eq(skillIds))).thenReturn(1);
+        when(goalRepository.findById(eq(GOAL_ID))).thenReturn(Optional.of(existedGoal));
+        when(goalRepository.save(any(Goal.class))).thenReturn(createdGoal);
+
+        Goal result = goalService.updateGoal(goal, List.of(SKILL_ID));
+
+        assertEquals(createdGoal.getId(), result.getId());
+    }
+
+    @Test
+    void testDeleteGoal_success() {
+        when(goalRepository.findByParent(eq(GOAL_ID))).thenReturn(Stream.of());
+        doNothing().when(goalRepository).deleteById(GOAL_ID);
 
         goalService.deleteGoal(GOAL_ID);
-
-        verify(goalRepository).delete(eq(GOAL_ID));
-        verify(skillRepository).findSkillsByGoalId(eq(GOAL_ID));
-        verify(skillRepository).unassignSkillFromUsers(eq(SKILL_ID));
-        verify(skillRepository).deleteSkillsByGoalId(eq(GOAL_ID));
     }
 
     @Test

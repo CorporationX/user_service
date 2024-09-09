@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
@@ -24,6 +25,12 @@ public abstract class CommonGoalTest {
             .title(GOAL_TITLE)
             .description(GOAL_DESCRIPTION)
             .status(ACTIVE)
+            .build();
+    }
+
+    protected User createUser() {
+        return User.builder()
+            .id(USER_ID)
             .build();
     }
 

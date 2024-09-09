@@ -6,9 +6,9 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.List;
 
 public interface GoalService {
-    void createGoal(Goal goal, Long userId);
+    Goal createGoal(Goal goal, Long userId, Long parentGoalId, List<Long> skillIds);
 
-    void updateGoal(Goal goal);
+    Goal updateGoal(Goal goal, List<Long> skillIds);
 
     void deleteGoal(Long goalId);
 

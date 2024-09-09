@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.goal.mentorship.MentorshipRepository;
+import school.faang.user_service.service.MentorshipService;
 
 @Component
 @Slf4j

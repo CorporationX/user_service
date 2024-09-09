@@ -65,5 +65,5 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             UPDATE goal SET mentor_id = :newMentorId
             WHERE goal.mentor_id = :mentorId
             """)
-    void updateMentorIdByMentorId(Long mentorId, Long newMentorId);
+    void updateMentorIdByMentorId(long mentorId, Long newMentorId);
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.user;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.UserService;
 
 @Slf4j
 @Component

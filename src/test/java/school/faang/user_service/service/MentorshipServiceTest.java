@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.goal.mentorship.MentorshipRepository;
+import school.faang.user_service.service.mentorship.MentorshipServiceImp;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,10 +27,10 @@ class MentorshipServiceImplTest {
 
     @InjectMocks
     private MentorshipServiceImp mentorshipService;
+    private final Long id = 1L;
 
     @Test
     void stopMentorship_WithValidId() {
-        Long id = 1L;
         doNothing().when(mentorshipRepository).deleteByMentorId(id);
         doNothing().when(goalRepository).updateMentorIdByMentorId(eq(id), isNull());
 
@@ -41,10 +42,8 @@ class MentorshipServiceImplTest {
 
     @Test
     void stopMentorship_WithNull() {
-        Long id = null;
-
         assertThrows(NullPointerException.class,
-                () -> mentorshipService.stopMentorship(id));
+                () -> mentorshipService.stopMentorship(null));
 
         verify(mentorshipRepository, never()).deleteByMentorId(id);
         verify(goalRepository, never()).updateMentorIdByMentorId(eq(id), isNull());

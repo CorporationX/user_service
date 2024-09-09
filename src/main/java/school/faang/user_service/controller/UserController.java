@@ -11,6 +11,7 @@ import school.faang.user_service.service.UserService;
 @RequiredArgsConstructor
 @RestController("/api/v1/users")
 public class UserController {
+
     private final UserService userService;
 
     @PutMapping("/deactivate/{id}")

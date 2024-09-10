@@ -42,7 +42,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если переданный id цели = null")
-            void WhenIdIsNullValueThenThrowValidationException() {
+            void whenIdIsNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(null),
                         "Goal id can't be null");
@@ -50,7 +50,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если переданный id цели отрицательный")
-            void WhenIdIsNegativeValueThenThrowValidationException() {
+            void whenIdIsNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(
                                 GOAL_ID_NEGATIVE_ONE),
@@ -63,7 +63,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если цели с переданным id не существует")
-            void WhenGoalNotExistsThenThrowValidationException() {
+            void whenGoalNotExistsThenThrowValidationException() {
                 when(goalRepository.findById(anyLong())).thenReturn(Optional.empty());
 
                 assertThrows(ValidationException.class,
@@ -77,7 +77,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если у пользователя активных целей больше или равно лимиту")
-            void WhenUserActiveGoalsMoreOrEqualsLimitThenThrowValidationException() {
+            void whenUserActiveGoalsMoreOrEqualsLimitThenThrowValidationException() {
                 when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(MAX_LIMIT_GOALS_COUNT);
 
                 assertThrows(ValidationException.class,
@@ -92,7 +92,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если у пользователя есть переданная цель")
-            void WhenUserActiveGoalsContainsGoalThenThrowValidationException() {
+            void whenUserActiveGoalsContainsGoalThenThrowValidationException() {
                 Stream<Goal> goalStream = Stream.of(
                         Goal.builder()
                                 .id(GOAL_ID_IS_ONE)
@@ -118,7 +118,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Если переданный id цели не null и больше нуля, то метод ничего не возвращает")
-            void WhenIdIsNullValueThenSuccess() {
+            void whenIdIsNullValueThenSuccess() {
                 goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(GOAL_ID_IS_ONE);
             }
         }
@@ -128,7 +128,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Если цель с переданным id существует, то метод ничего не возвращает")
-            void WhenGoalExistsThenSuccess() {
+            void whenGoalExistsThenSuccess() {
                 when(goalRepository.findById(anyLong())).thenReturn(Optional.of(new Goal()));
 
                 goalValidator.goalIsExistedOrElseThrowException(GOAL_ID_IS_ONE);
@@ -142,7 +142,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Если у пользователя активных целей больше или равно лимиту, то метод ничего не возвращает")
-            void WhenUserActiveGoalsLessLimitThenSuccess() {
+            void whenUserActiveGoalsLessLimitThenSuccess() {
                 when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(MAX_LIMIT_GOALS_COUNT - 1);
 
                 goalValidator.userActiveGoalsAreLessThenIncomingOrElseThrowException(USER_ID_IS_ONE,
@@ -157,7 +157,7 @@ class GoalValidatorTest {
 
             @Test
             @DisplayName("Если у пользователя нет переданной цели, то метод ничего не возвращает")
-            void WhenUserActiveGoalsContainsGoalThenThrowValidationException() {
+            void whenUserActiveGoalsContainsGoalThenThrowValidationException() {
                 Stream<Goal> goalStream = Stream.of(
                         Goal.builder()
                                 .id(GOAL_ID_IS_ONE)

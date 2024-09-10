@@ -38,7 +38,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если переданный id = null")
-            void WhenNullValueThenThrowValidationException() {
+            void whenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
                         "User id can't be null");
@@ -46,7 +46,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если переданный id отрицательный")
-            void WhenNegativeValueThenThrowValidationException() {
+            void whenNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator
                                 .userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_NEGATIVE_ONE),
@@ -59,7 +59,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
-            void WhenUserNotExistsThenThrowValidationException() {
+            void whenUserNotExistsThenThrowValidationException() {
                 when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
                 assertThrows(ValidationException.class,
@@ -73,7 +73,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Ошибка валидации если переданные id у пользователей одинаковые")
-            void WhenId1AndId2EqualsThenThrowValidationExceptionWithMessage() {
+            void whenId1AndId2EqualsThenThrowValidationExceptionWithMessage() {
                 String exceptionMessage = "Exception";
 
                 assertThrows(ValidationException.class,
@@ -94,7 +94,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Если переданный id пользователя не null и больше нуля то метод ничего не возвращает")
-            void WhenUserIdNotNullValueAndMoreThanZeroThenSuccess() {
+            void whenUserIdNotNullValueAndMoreThanZeroThenSuccess() {
                 userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_ONE);
             }
         }
@@ -104,7 +104,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Если пользователь с переданным id существует то метод ничего не возвращает")
-            void WhenUserExistsThenSuccess() {
+            void whenUserExistsThenSuccess() {
                 when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
 
                 userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE);
@@ -118,7 +118,7 @@ class UserValidatorTest {
 
             @Test
             @DisplayName("Если переданные id у пользователей разные то метод ничего не возвращает")
-            void WhenId1AndId2EqualsThenNotThrowValidationException() {
+            void whenId1AndId2EqualsThenNotThrowValidationException() {
                 String exceptionMessage = "Exception";
 
                 userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(

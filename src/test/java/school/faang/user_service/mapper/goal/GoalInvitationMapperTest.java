@@ -59,13 +59,13 @@ class GoalInvitationMapperTest {
 
         @Test
         @DisplayName("Если передали null, на выходе получим null")
-        void WhenDtoIsNullThenReturnNull() {
+        void whenDtoIsNullThenReturnNull() {
             assertNull(mapper.toEntity(null));
         }
 
         @Test
         @DisplayName("Если передали GoalInvitationDto dto, на выходе получим GoalInvitation entity")
-        void WhenDtoIsNotNullThenReturnEntity() {
+        void whenDtoIsNotNullThenReturnEntity() {
             goalInvitationDto = GoalInvitationDto.builder()
                     .id(GOAL_INVITATION_ID_ONE)
                     .inviterUserId(USER_ID_ONE)
@@ -87,13 +87,13 @@ class GoalInvitationMapperTest {
 
         @Test
         @DisplayName("Если передали null, на выходе получим null")
-        void WhenListUsersIsNullThenGetNull() {
+        void whenListUsersIsNullThenGetNull() {
             assertNull(mapper.toDtos(null));
         }
 
         @Test
         @DisplayName("При передаче 2 элементов List<GoalInvitation> на выходе получим размер List<GoalInvitationDto> равным 2")
-        void WhenListOfGoalInvitationIsNotNullThenReturnListOfGoalInvitationDtos() {
+        void whenListOfGoalInvitationIsNotNullThenReturnListOfGoalInvitationDtos() {
             List<GoalInvitation> goalInvitations = List.of(
                     goalInvitation,
                     GoalInvitation.builder()

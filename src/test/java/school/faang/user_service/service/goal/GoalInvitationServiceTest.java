@@ -68,7 +68,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Ошибка валидации если цели не существует")
-            void WhenGoalNotExistsThenThrowValidationException() {
+            void whenGoalNotExistsThenThrowValidationException() {
                 when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
                         .thenReturn(Optional.empty());
 
@@ -83,7 +83,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Ошибка валидации если цели не существует")
-            void WhenGoalNotExistsThenThrowValidationException() {
+            void whenGoalNotExistsThenThrowValidationException() {
                 when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
                         .thenReturn(Optional.empty());
 
@@ -130,7 +130,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Успех если приглашаемый и приглашенный имеют разные id в передаваемом Dto")
-            void WhenInviterAndInvitedAreNotEqualsThenSuccess() {
+            void whenInviterAndInvitedAreNotEqualsThenSuccess() {
                 when(goalInvitationMapper.toEntity(goalInvitationDto))
                         .thenReturn(goalInvitation);
 
@@ -161,7 +161,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Обновляем сущность если цель существует")
-            void WhenGoalExistsThenSuccessAccept() {
+            void whenGoalExistsThenSuccessAccept() {
                 when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
                         .thenReturn(Optional.of(goalInvitation));
 
@@ -187,7 +187,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Обновляем сущность если цель существует")
-            void WhenGoalExistsThenSuccessReject() {
+            void whenGoalExistsThenSuccessReject() {
                 when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
                         .thenReturn(Optional.of(goalInvitation));
 
@@ -231,7 +231,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Успех если передаем null в фильтре")
-            void WhenFilterIsNullThenSuccess() {
+            void whenFilterIsNullThenSuccess() {
                 when(goalInvitationRepository.findAll())
                         .thenReturn(goalInvitations);
 
@@ -245,7 +245,7 @@ class GoalInvitationServiceTest {
 
             @Test
             @DisplayName("Успех если передаем не null в фильтр")
-            void WhenFilterIsNotNullThenSuccess() {
+            void whenFilterIsNotNullThenSuccess() {
                 when(goalInvitationRepository.findAll())
                         .thenReturn(goalInvitations);
                 when(goalInvitationFilterList.get(0).isApplicable(goalInvitationFilterDto))

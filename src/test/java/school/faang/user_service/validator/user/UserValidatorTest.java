@@ -38,15 +38,15 @@ class UserValidatorTest {
         class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
 
             @Test
-            @DisplayName("Ошибка валидации если переданный id = null")
-            void whenNullValueThenThrowValidationException() {
+            @DisplayName("Ошибка валидации если переданное число null")
+            void WhenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
-                        () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
+                        () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
                         "User id can't be null");
             }
 
             @Test
-            @DisplayName("Ошибка валидации если переданный id отрицательный")
+            @DisplayName("Ошибка валидации если переданное число отрицательное")
             void whenNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator

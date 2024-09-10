@@ -33,7 +33,7 @@ class SubscriptionValidatorTest {
         class CheckIfSubscriptionExistsEqualsShouldExistThenThrowExceptionMethod {
             @Test
             @DisplayName("Если существует подписка и она равна параметру shouldExist то выбрасывается ошибка")
-            void WhenSubscriptionIsExistAndEqualsShouldExistThenThrowValidationException() {
+            void whenSubscriptionIsExistAndEqualsShouldExistThenThrowValidationException() {
                 String exceptionMessage = "Exception";
                 boolean isExistTrue = Boolean.TRUE;
 
@@ -58,7 +58,7 @@ class SubscriptionValidatorTest {
         class CheckIfSubscriptionExistsEqualsShouldExistThenThrowExceptionMethod {
             @Test
             @DisplayName("Если существует подписка и она не равна параметру shouldExist то метод ничего не возвращает")
-            void WhenSubscriptionIsExistAndNotEqualsShouldExistThenNotThrowValidationException() {
+            void whenSubscriptionIsExistAndNotEqualsShouldExistThenNotThrowValidationException() {
                 String exceptionMessage = "Exception";
 
                 when(subscriptionRepository.existsByFollowerIdAndFolloweeId(anyLong(), anyLong())).

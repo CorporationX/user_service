@@ -26,13 +26,13 @@ class UserMapperTest {
 
     @Test
     @DisplayName("Если передали null, на выходе получим null")
-    void WhenListUsersIsNullThenGetNull() {
+    void whenListUsersIsNullThenGetNull() {
         assertNull(userMapper.toDtos(null));
     }
 
     @Test
     @DisplayName("При передаче 2 элементов List<User> на выходе получим размер List<UserDto> равным 2")
-    void WhenListOfUsersIsNotNullThenGetListOfUserDtos() {
+    void whenListOfUsersIsNotNullThenGetListOfUserDtos() {
         List<User> users = List.of(
                 User.builder()
                         .id(USER_ID_ONE)

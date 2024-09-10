@@ -9,30 +9,33 @@ import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.EventMapImpl;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
+    private final UserRepository userRepository;
     private final EventMapper eventMapper;
-    private final EventMapImpl eventMap;
     private final List<EventFilter> eventFilters;
     private final SkillRepository skillRepository;
 
     @Transactional
     public EventDto create(EventDto eventDto) {
         skillCheck(eventDto);
-        Event event = eventMap.toEntity(eventDto);
-        System.out.println(event);
+        Event event = eventMapper.toEntity(eventDto);
+        event.setOwner(userRepository.findById(eventDto.getOwnerId()).orElseThrow(() -> new DataValidationException("ОШЫБКА"))); // в отдельный класс
+        event.setRelatedSkills(skillRepository.findAllById(eventDto.getRelatedSkillsIds()));
         eventRepository.save(event);
-        return null;
+        return eventMapper.toDto(event);
     }
 
     @Transactional
@@ -56,7 +59,11 @@ public class EventService {
 
     public void updateEvent(EventDto eventDto) {
         skillCheck(eventDto);
-        eventRepository.save(eventMapper.toEntity(eventDto));
+        Event event = eventRepository.findById(eventDto.getId()).orElseThrow(() -> new DataValidationException("Ошибка поиска ивента"));
+        eventRepository.delete(event);
+        Event event1 = eventMapper.toEntity(eventDto);
+        event1.setOwner(userRepository.findById(eventDto.getOwnerId()).orElseThrow(() -> new DataValidationException("ОШЫБКА")));
+        eventRepository.save(event1);
     }
 
     public List<EventDto> getOwnedEvents(long userId) {
@@ -69,15 +76,21 @@ public class EventService {
         return events.stream().map(eventMapper::toDto).toList();
     }
 
-    private void skillCheck(EventDto eventDto) {
-        List<Long> userSkills = skillRepository.findSkillsOfferedToUser(eventDto.getOwnerId()).stream()
-                .map(Skill::getId)
-                .toList();
-        List<Long> eventSkills = eventDto.getRelatedSkills().stream()
-                .map(SkillDto::getId)
-                .toList();
-        if (userSkills.size() != eventSkills.size()) {
-            throw new DataValidationException("Недостаточно навыков для создания ивента");
+    public void skillCheck(EventDto eventDto) {
+        List<Long> userSkill = skillRepository.findSkillsOfferedToUser(eventDto.getOwnerId()).stream().map(Skill::getId).toList();
+
+        Set<Long> userSkillSet = new HashSet<>(userSkill);
+
+        List<Long> eventSill = eventDto.getRelatedSkillsIds();
+
+        if (eventSill == null) {
+            throw new DataValidationException("Список связанных навыков не может быть пустым");
+        }
+
+        if (!userSkillSet.containsAll(eventSill)) {
+            throw new DataValidationException("Пользователь не имеет всех необходимых навыков");
+        } else {
+            System.out.println("Все круто!");
         }
     }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EventController {
+
     private final EventService eventService;
 
     public EventDto create(EventDto event) {
@@ -23,8 +24,8 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
-    public EventDto getEventsByFilter(EventFilterDto filter) {
-      return eventService.getEventsByFilter(filter);
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+      return (List<EventDto>) eventService.getEventsByFilter(filter);
     }
 
     public void deleteEvent(long eventId) {
@@ -55,4 +56,4 @@ public class EventController {
             throw new DataValidationException("Обязательный поля пустые");
         }
     }
-}
+ }

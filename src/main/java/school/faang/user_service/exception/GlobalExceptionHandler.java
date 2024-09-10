@@ -41,7 +41,6 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(ex.getMessage());
     }
 
-    @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ConstraintErrorResponse onConstraintValidationException(ConstraintViolationException ex) {
@@ -55,5 +54,12 @@ public class GlobalExceptionHandler {
                 .toList();
         log.error(ex.getMessage(), ex);
         return new ConstraintErrorResponse(violations);
+    }
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleOtherExceptions(Throwable ex) {
+        log.error(ex.getMessage(), ex);
+        return new ErrorResponse(ex.getMessage());
     }
 }

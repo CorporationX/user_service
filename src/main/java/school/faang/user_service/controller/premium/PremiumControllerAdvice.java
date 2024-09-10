@@ -1,6 +1,10 @@
 package school.faang.user_service.controller.premium;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -12,7 +16,12 @@ import school.faang.user_service.exception.premium.PremiumNotFoundException;
 
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class PremiumControllerAdvice {
+    private static final String DEFAULT_MESSAGE = "Unknown error occurred";
+    private static final String MESSAGE_FIELD = "message";
+
+    private final ObjectMapper objectMapper;
 
     @ExceptionHandler(PremiumCheckFailureException.class)
     public ResponseEntity<ProblemDetail> premiumCheckFailureExceptionHandler(PremiumCheckFailureException exception) {
@@ -32,9 +41,24 @@ public class PremiumControllerAdvice {
 
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<ProblemDetail> httpClientErrorExceptionHandler(FeignException exception) {
-        log.info(exception.getMessage());
+        var errorMessage = getErrorResponseMessage(exception);
+        log.info(errorMessage);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage()));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, errorMessage));
+    }
+
+    private String getErrorResponseMessage(FeignException exception) {
+        String errorMessage = DEFAULT_MESSAGE;
+        try {
+            String responseBody = exception.contentUTF8();
+            JsonNode responseJson = objectMapper.readTree(responseBody);
+            if (responseJson.has(MESSAGE_FIELD)) {
+                errorMessage = responseJson.get(MESSAGE_FIELD).asText();
+            }
+        } catch (JsonProcessingException exc) {
+            log.info("Json processing exception: {}", exc.getMessage());
+        }
+        return errorMessage;
     }
 }

@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.premium;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +15,16 @@ import org.springframework.http.ResponseEntity;
 import school.faang.user_service.exception.premium.PremiumCheckFailureException;
 import school.faang.user_service.exception.premium.PremiumNotFoundException;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class PremiumControllerAdviceTest {
     private static final String TEST_MESSAGE = "test message";
+    private static final String RESPONSE_JSON = "{\"message\":\"We only accept [USD, EUR]\"}";
 
     @Mock
     private PremiumCheckFailureException premiumCheckFailureException;
@@ -28,6 +34,9 @@ class PremiumControllerAdviceTest {
 
     @Mock
     private FeignException feignException;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private PremiumControllerAdvice premiumControllerAdvice;
@@ -57,8 +66,14 @@ class PremiumControllerAdviceTest {
 
     @Test
     @DisplayName("Test http client error exception handler")
-    void testHttpClientErrorExceptionHandlerSuccessful() {
-        when(feignException.getMessage()).thenReturn(TEST_MESSAGE);
+    void testHttpClientErrorExceptionHandlerSuccessful() throws IOException {
+        JsonNode jsonNode = mock(JsonNode.class);
+        when(feignException.contentUTF8()).thenReturn(RESPONSE_JSON);
+        when(objectMapper.readTree(RESPONSE_JSON)).thenReturn(jsonNode);
+        when(jsonNode.has("message")).thenReturn(true);
+        when(jsonNode.get("message")).thenReturn(jsonNode);
+        when(jsonNode.asText()).thenReturn(TEST_MESSAGE);
+
         var response = premiumControllerAdvice.httpClientErrorExceptionHandler(feignException);
         assertResponse(response, HttpStatus.BAD_REQUEST);
     }

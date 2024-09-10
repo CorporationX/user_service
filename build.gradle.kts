@@ -104,3 +104,24 @@ tasks.bootJar {
 /**
  * JaCoCo settings
  */
+jacoco {
+    version = "0.8.12"
+}
+
+tasks.test {
+    useJUnitPlatform()
+    jvmArgs = listOf("-XX:-UseSplitVerifier")
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        html.outputLocation.set(file("$buildDir/reports/jacoco"))
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestReport)
+}

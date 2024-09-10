@@ -1,6 +1,8 @@
 package school.faang.user_service.service.mentorship;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -12,16 +14,11 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MentorshipService {
-
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
 
-    @Autowired
-    public MentorshipService(MentorshipRepository mentorshipRepository, UserMapper userMapper) {
-        this.mentorshipRepository = mentorshipRepository;
-        this.userMapper = userMapper;
-    }
 
     public List<UserDTO> getMentees(long mentorId) {
         List<User> mentees = mentorshipRepository.findMenteesByMentorId(mentorId);

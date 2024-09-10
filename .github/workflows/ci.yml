@@ -1,0 +1,32 @@
+name: CI for user_service
+
+on:
+  pull_request:
+    branches:
+      - hydra-master-stream6
+  push:
+    branches:
+      - hydra-master-stream6
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v4
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+
+      - name: Test with Gradle
+        run: ./gradlew check --no-daemon

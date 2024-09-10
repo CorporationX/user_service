@@ -8,14 +8,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.sevice.event.EventParticipationService;
+import school.faang.user_service.sevice.event.EventParticipationServiceImpl;
 
 @ExtendWith(SpringExtension.class)
-class EventParticipationControllerTest {
+class EventParticipationControllerImplTest {
     @Mock
-    EventParticipationService service;
+    EventParticipationServiceImpl service;
     @InjectMocks
-    EventParticipationController controller;
+    EventParticipationControllerImpl controller;
 
     UserDto userDto;
 

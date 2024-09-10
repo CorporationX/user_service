@@ -14,13 +14,13 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.sevice.event.EventParticipationService;
+import school.faang.user_service.sevice.event.EventParticipationServiceImpl;
 import school.faang.user_service.validator.EventParticipationServiceValidator;
 
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class EventParticipationServiceTest {
+class EventParticipationServiceImplTest {
     @Mock
     private EventParticipationRepository repository;
     @Spy
@@ -28,7 +28,7 @@ class EventParticipationServiceTest {
     @Mock
     private EventParticipationServiceValidator validator;
     @InjectMocks
-    private EventParticipationService service;
+    private EventParticipationServiceImpl service;
 
     User user;
 
@@ -40,9 +40,6 @@ class EventParticipationServiceTest {
 
     @Test
     void testUserRegister() {
-        Mockito.doNothing().when(validator).validateEvent(1L);
-        Mockito.doNothing().when(validator).validateUserRegister(1L, 2L);
-
         service.registerParticipant(1, 2);
         Mockito.verify(repository, Mockito.times(1))
                 .register(1, 2);
@@ -50,9 +47,6 @@ class EventParticipationServiceTest {
 
     @Test
     void testUserUnregister() {
-        Mockito.doNothing().when(validator).validateEvent(1L);
-        Mockito.doNothing().when(validator).validateUserUnregister(1L, 2L);
-
         service.unregisterParticipant(1, 2);
         Mockito.verify(repository, Mockito.times(1))
                 .unregister(1, 2);
@@ -60,8 +54,6 @@ class EventParticipationServiceTest {
 
     @Test
     void testGetParticipant() {
-        Mockito.doNothing().when(validator).validateEvent(1L);
-
         Mockito.when(repository.findAllParticipantsByEventId(1))
                 .thenReturn(List.of(user));
 
@@ -75,8 +67,6 @@ class EventParticipationServiceTest {
 
     @Test
     void testGetParticipantsCount() {
-        Mockito.doNothing().when(validator).validateEvent(1L);
-
         service.getParticipantsCount(1L);
 
         Mockito.verify(repository, Mockito.times(1))

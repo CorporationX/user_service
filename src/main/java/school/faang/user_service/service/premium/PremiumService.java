@@ -43,8 +43,12 @@ public class PremiumService {
     }
 
     private PaymentResponse sendPayment(PremiumPeriod period) {
-        var paymentRequest = new PaymentRequest(System.currentTimeMillis(), BigDecimal.valueOf(period.getCost()),
-                period.getCurrency());
+        var paymentRequest = PaymentRequest
+                .builder()
+                .paymentNumber(System.currentTimeMillis())
+                .amount(BigDecimal.valueOf(period.getCost()))
+                .currency(period.getCurrency())
+                .build();
         return paymentServiceClient.sendPayment(paymentRequest);
     }
 

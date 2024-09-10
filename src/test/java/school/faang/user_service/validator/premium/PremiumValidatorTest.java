@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.premium.PaymentResponse;
+import school.faang.user_service.dto.premium.PaymentResponseDto;
 import school.faang.user_service.entity.premium.PaymentStatus;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
@@ -22,7 +22,7 @@ class PremiumValidatorTest {
     private PremiumRepository premiumRepository;
 
     private final long userId = 1L;
-    private PaymentResponse paymentResponseDto;
+    private PaymentResponseDto paymentResponseDto;
 
     @Test
     void validateUser_whenUserDoesNotHavePremium_thenCorrect() {
@@ -39,7 +39,7 @@ class PremiumValidatorTest {
 
     @Test
     void verifyPayment_whenPaymentSuccessful_thenCorrect() {
-        paymentResponseDto = PaymentResponse.builder()
+        paymentResponseDto = PaymentResponseDto.builder()
                 .status(PaymentStatus.SUCCESS)
                 .paymentNumber(1L)
                 .build();
@@ -48,7 +48,7 @@ class PremiumValidatorTest {
 
     @Test
     void verifyPayment_whenPaymentFailed_thenThrowException() {
-        paymentResponseDto = PaymentResponse.builder()
+        paymentResponseDto = PaymentResponseDto.builder()
                 .status(null)
                 .paymentNumber(1L)
                 .build();

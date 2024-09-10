@@ -1,22 +1,18 @@
 package school.faang.user_service.dto.premium;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import school.faang.user_service.entity.premium.Currency;
+import school.faang.user_service.entity.premium.PaymentStatus;
 
 import java.math.BigDecimal;
 
 @Builder
-public record PaymentRequest(
-        @NotNull
+public record PaymentResponseDto(
+        PaymentStatus status,
+        int verificationCode,
         long paymentNumber,
-
-        @Min(1)
-        @NotNull
         BigDecimal amount,
-
-        @NotNull
-        Currency currency
+        Currency currency,
+        String message
 ) {
 }

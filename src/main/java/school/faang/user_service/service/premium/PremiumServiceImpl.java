@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.premium.Currency;
-import school.faang.user_service.dto.premium.PaymentRequest;
+import school.faang.user_service.dto.premium.PaymentRequestDto;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
@@ -44,8 +44,8 @@ public class PremiumServiceImpl implements PremiumService {
                 () -> new IllegalStateException("User with ID: %d does not exist.".formatted(userId)));
     }
 
-    private static PaymentRequest buildRequest(PremiumPeriod period) {
-        return PaymentRequest.builder()
+    private static PaymentRequestDto buildRequest(PremiumPeriod period) {
+        return PaymentRequestDto.builder()
                 .paymentNumber(System.currentTimeMillis())
                 .amount(period.getPrice())
                 .currency(Currency.USD)

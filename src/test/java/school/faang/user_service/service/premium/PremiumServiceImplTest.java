@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.premium.PaymentResponse;
+import school.faang.user_service.dto.premium.PaymentResponseDto;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Currency;
@@ -51,7 +51,7 @@ class PremiumServiceImplTest {
     private final long userId = 1L;
     private User user;
     private PremiumPeriod period;
-    private PaymentResponse paymentResponse;
+    private PaymentResponseDto paymentResponse;
     private Premium premium;
     private PremiumDto premiumDto;
 
@@ -98,8 +98,8 @@ class PremiumServiceImplTest {
                 .build();
     }
 
-    private PaymentResponse buildPaymentResponse() {
-        return PaymentResponse.builder()
+    private PaymentResponseDto buildPaymentResponse() {
+        return PaymentResponseDto.builder()
                 .status(PaymentStatus.SUCCESS)
                 .paymentNumber(1L)
                 .amount(period.getPrice())

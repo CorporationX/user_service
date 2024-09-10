@@ -20,34 +20,25 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public List<MentorshipUserDto> getMentees(Long userId) {
-        if (userId < 0) {
-            throw new DataValidationException("id пользователя не может быть отрицательным");
-        }
+        validateNegativeId(userId);
         User user = getUserById(userId);
         return userMapper.toMentorshipUserDtos(user.getMentees());
     }
 
     @Override
     public List<MentorshipUserDto> getMentors(Long userId) {
-        if (userId < 0) {
-            throw new DataValidationException("id пользователя не может быть отрицательным");
-        }
+        validateNegativeId(userId);
         User user = getUserById(userId);
         return userMapper.toMentorshipUserDtos(user.getMentors());
     }
 
     @Override
     public void deleteMentorship(Long menteeId, Long mentorId) {
-        if (mentorId < 0) {
-            throw new DataValidationException("Ментор не может иметь отрицательный идентификатор %d"
-                    .formatted(mentorId));
-        }
-        if (menteeId < 0) {
-            throw new DataValidationException("Менти не может иметь отрицательный идентификатор %d"
-                    .formatted(mentorId));
-        }
+        validateNegativeId(menteeId);
+        validateNegativeId(mentorId);
         if (Objects.equals(menteeId, mentorId)) {
-            throw new DataValidationException("Ментор и менти не могут иметь одинаковые идентификаторы");
+            throw new DataValidationException("Mentor and mentee must not have the same ID: %d"
+                    .formatted(menteeId));
         }
         User mentee = getUserById(menteeId);
         List<User> mentors = mentee.getMentors();
@@ -55,8 +46,7 @@ public class MentorshipServiceImpl implements MentorshipService {
         if (isRemoved) {
             mentorshipRepository.save(mentee);
         } else {
-            System.out.println("12312321");
-            throw new EntityNotFoundException("Не найдена пара менти с id %d и ментора с id %d"
+            throw new EntityNotFoundException("A pair of mentee with id %d and a mentor with id %d was not found"
                     .formatted(menteeId, mentorId));
         }
     }
@@ -64,6 +54,13 @@ public class MentorshipServiceImpl implements MentorshipService {
     private User getUserById(Long userId) {
         return mentorshipRepository
                 .findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Не найден пользователь с id %d".formatted(userId)));
+                .orElseThrow(() -> new EntityNotFoundException("User with id %d not found".formatted(userId)));
+    }
+
+    private void validateNegativeId(Long id) {
+        if (id < 0) {
+            throw new DataValidationException("ID has incorrect value: %d"
+                    .formatted(id));
+        }
     }
 }

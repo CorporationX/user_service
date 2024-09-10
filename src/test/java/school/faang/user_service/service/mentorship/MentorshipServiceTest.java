@@ -54,6 +54,7 @@ public class MentorshipServiceTest {
         user1 = User.builder()
                 .id(USER_ID)
                 .mentees(List.of())
+                .mentors(List.of())
                 .build();
         mentor = User.builder()
                 .id(MENTOR_ID)
@@ -117,9 +118,8 @@ public class MentorshipServiceTest {
 
     @Test
     @DisplayName("Получение пустого списка менторов у пользователя без менторов")
-    public void testGetMentorsPositiveEmptyTest() {
+    public void testGetEmptyMentors() {
         when(mentorshipRepository.findById(USER_ID)).thenReturn(Optional.of(user1));
-        user1.setMentors(List.of());
         List<MentorshipUserDto> result = mentorshipService.getMentors(USER_ID);
         assertEquals(user1.getMentors().size(), result.size());
         verify(mentorshipRepository).findById(USER_ID);
@@ -128,7 +128,7 @@ public class MentorshipServiceTest {
 
     @Test
     @DisplayName("Получение менторов у пользователя с существующим id")
-    public void testGetMentorsPositiveTest() {
+    public void testGetMentors() {
         when(mentorshipRepository.findById(MENTEE_ID)).thenReturn(Optional.of(mentee));
         List<MentorshipUserDto> result = mentorshipService.getMentors(MENTEE_ID);
         assertEquals(mentee.getMentors().size(), result.size());
@@ -156,7 +156,7 @@ public class MentorshipServiceTest {
 
     @Test
     @DisplayName("Позитивный тест для удаления связи ментор-менти")
-    public void testDeleteMentorshipPositive() {
+    public void testSuccessDeleteMentorship() {
         when(mentorshipRepository.findById(MENTEE_ID)).thenReturn(Optional.of(mentee));
         mentorshipService.deleteMentorship(mentee.getId(), user2.getId());
         verify(mentorshipRepository).findById(MENTEE_ID);
@@ -202,5 +202,4 @@ public class MentorshipServiceTest {
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.deleteMentorship(1L, 1L));
     }
-
 }

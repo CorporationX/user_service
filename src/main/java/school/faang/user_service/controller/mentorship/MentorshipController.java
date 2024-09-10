@@ -20,7 +20,6 @@ public class MentorshipController {
 
     @GetMapping("/{userId}/mentees")
     public List<MentorshipUserDto> getMentees(@PathVariable @Positive Long userId) {
-        System.out.println(userId);
         return mentorshipService.getMentees(userId);
     }
 

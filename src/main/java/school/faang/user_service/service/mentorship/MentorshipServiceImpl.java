@@ -20,22 +20,22 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public List<MentorshipUserDto> getMentees(Long userId) {
-        validateNegativeId(userId);
+        validateId(userId);
         User user = getUserById(userId);
         return userMapper.toMentorshipUserDtos(user.getMentees());
     }
 
     @Override
     public List<MentorshipUserDto> getMentors(Long userId) {
-        validateNegativeId(userId);
+        validateId(userId);
         User user = getUserById(userId);
         return userMapper.toMentorshipUserDtos(user.getMentors());
     }
 
     @Override
     public void deleteMentorship(Long menteeId, Long mentorId) {
-        validateNegativeId(menteeId);
-        validateNegativeId(mentorId);
+        validateId(menteeId);
+        validateId(mentorId);
         if (Objects.equals(menteeId, mentorId)) {
             throw new DataValidationException("Mentor and mentee must not have the same ID: %d"
                     .formatted(menteeId));
@@ -57,7 +57,7 @@ public class MentorshipServiceImpl implements MentorshipService {
                 .orElseThrow(() -> new EntityNotFoundException("User with id %d not found".formatted(userId)));
     }
 
-    private void validateNegativeId(Long id) {
+    private void validateId(Long id) {
         if (id < 0) {
             throw new DataValidationException("ID has incorrect value: %d"
                     .formatted(id));

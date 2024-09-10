@@ -14,6 +14,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorship.MentorshipRequestPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -43,6 +44,9 @@ class MentorshipRequestServiceImplTest {
 
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
+
+    @Mock
+    MentorshipRequestPublisher mentorshipRequestPublisher;
 
     @InjectMocks
     private MentorshipRequestServiceImpl mentorshipRequestService;
@@ -87,7 +91,7 @@ class MentorshipRequestServiceImplTest {
         when(mentorshipRequestMapper.toEntity(any(MentorshipRequestDto.class))).thenReturn(mentorshipRequest);
         when(mentorshipRequestRepository.save(any(MentorshipRequest.class))).thenReturn(mentorshipRequest);
         when(mentorshipRequestMapper.toDto(any(MentorshipRequest.class))).thenReturn(mentorshipRequestDto);
-
+        doNothing().when(mentorshipRequestPublisher).publish(any());
         MentorshipRequestDto result = mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
         assertEquals(mentorshipRequestDto, result);

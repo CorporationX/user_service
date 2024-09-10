@@ -25,10 +25,14 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        mentorship_channel:
+          name: mentorship_check_channel
+        mentorship_request_channel:
+          name: mentorship_request_channel
 
 server:
-  port: 8080
+  port: 8081
 
 logging:
   level:
@@ -71,3 +75,12 @@ dicebear:
 number-months:
   new:
     request: 6
+
+task:
+  expired-premium-remove:
+    remove-premium-interval : "@weekly"
+    batch-size : 10
+    thread-pool:
+      core-pool-size : 10
+      max-pool-capacity : 20
+      queue-capacity : 500

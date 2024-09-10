@@ -15,14 +15,12 @@ import school.faang.user_service.entity.premium.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,7 @@ class PremiumServiceImplTest {
     private PremiumRepository premiumRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
     private PremiumValidator premiumValidator;
@@ -64,7 +62,7 @@ class PremiumServiceImplTest {
     void buyPremium_whenValidPayment_thenSaveUser() {
         // given
         user = buildUser();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userService.findUserById(userId)).thenReturn(user);
         paymentResponse = buildPaymentResponse();
         when(paymentServiceClient.sendPayment(any())).thenReturn(paymentResponse);
         premium = buildPremium();
@@ -75,20 +73,11 @@ class PremiumServiceImplTest {
         premiumService.buyPremium(userId, period);
         // then
         verify(premiumValidator).validateUser(userId);
-        verify(userRepository).findById(userId);
+        verify(userService).findUserById(userId);
         verify(paymentServiceClient).sendPayment(any());
         verify(premiumValidator).verifyPayment(paymentResponse);
         verify(premiumRepository).save(any(Premium.class));
         verify(premiumMapper).toDto(premium);
-    }
-
-    @Test
-    void buyPremium_whenUserNotFound_thenThrowException() {
-        // given
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        // when/then
-        assertThrows(IllegalStateException.class, () -> premiumService.buyPremium(userId, period),
-                "User with ID: %d does not exist.".formatted(userId));
     }
 
     private User buildUser() {

@@ -119,7 +119,7 @@ class SubscriptionServiceImplTest {
         Stream<User> followersStream = followers.stream();
 
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followersStream);
-        when(userFilter.filterUsers(followersStream, userFilterDto)).thenReturn(followers);
+        when(userFilter.applyFilters(followersStream, userFilterDto)).thenReturn(followers);
 
         var result = subscriptionService.getFollowers(followeeId, userFilterDto);
         List<Long> resultIds = result.stream()
@@ -127,7 +127,7 @@ class SubscriptionServiceImplTest {
                 .toList();
 
         verify(subscriptionRepository).findByFolloweeId(followeeId);
-        verify(userFilter).filterUsers(followersStream, userFilterDto);
+        verify(userFilter).applyFilters(followersStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followers);
         assertEquals(followersIds, resultIds);
     }
@@ -139,12 +139,12 @@ class SubscriptionServiceImplTest {
         var followersStream = followers.stream();
 
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followersStream);
-        when(userFilter.filterUsers(followersStream, userFilterDto)).thenReturn(followers);
+        when(userFilter.applyFilters(followersStream, userFilterDto)).thenReturn(followers);
 
         var result = subscriptionService.getFollowers(followeeId, userFilterDto);
 
         verify(subscriptionRepository).findByFolloweeId(followeeId);
-        verify(userFilter).filterUsers(followersStream, userFilterDto);
+        verify(userFilter).applyFilters(followersStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followers);
 
         assertTrue(result.isEmpty());
@@ -191,7 +191,7 @@ class SubscriptionServiceImplTest {
         Stream<User> followingsStream = followings.stream();
 
         when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(followingsStream);
-        when(userFilter.filterUsers(followingsStream, userFilterDto)).thenReturn(followings);
+        when(userFilter.applyFilters(followingsStream, userFilterDto)).thenReturn(followings);
 
         var result = subscriptionService.getFollowings(followerId, userFilterDto);
         List<Long> resultIds = result.stream()
@@ -199,7 +199,7 @@ class SubscriptionServiceImplTest {
                 .toList();
 
         verify(subscriptionRepository).findByFollowerId(followerId);
-        verify(userFilter).filterUsers(followingsStream, userFilterDto);
+        verify(userFilter).applyFilters(followingsStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followings);
 
         assertEquals(followingIds, resultIds);
@@ -212,12 +212,12 @@ class SubscriptionServiceImplTest {
         var followingsStream = followings.stream();
 
         when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(followingsStream);
-        when(userFilter.filterUsers(followingsStream, userFilterDto)).thenReturn(followings);
+        when(userFilter.applyFilters(followingsStream, userFilterDto)).thenReturn(followings);
 
         var result = subscriptionService.getFollowings(followerId, userFilterDto);
 
         verify(subscriptionRepository).findByFollowerId(followerId);
-        verify(userFilter).filterUsers(followingsStream, userFilterDto);
+        verify(userFilter).applyFilters(followingsStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followings);
 
         assertTrue(result.isEmpty());

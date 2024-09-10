@@ -2,8 +2,8 @@ package school.faang.user_service.service.subscription;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -18,7 +18,7 @@ import static school.faang.user_service.exception.ExceptionMessages.USER_NOT_FOU
 public class SubscriptionValidator {
     private final SubscriptionRepository subscriptionRepository;
 
-    public void validateUserIds(Long ... userIds) {
+    public void validateUserIds(Long... userIds) {
         for (Long userId : userIds) {
             if (subscriptionRepository.existsById(userId) == false) {
                 throw new EntityNotFoundException(USER_NOT_FOUND.getMessage().formatted(userId));

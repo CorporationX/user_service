@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final UserFiltersApplier userFilter;
+    private final UserFiltersApplier userFilterApplier;
     private final UserMapper userMapper;
     private final SubscriptionValidator validator;
 
@@ -42,7 +42,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<SubscriptionUserDto> getFollowers(Long followeeId, UserFilterDto filters) {
         validator.validateUserIds(followeeId);
         Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);
-        return userMapper.toSubscriptionUserDtos(userFilter.filterUsers(followers, filters));
+        return userMapper.toSubscriptionUserDtos(userFilterApplier.applyFilters(followers, filters));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<SubscriptionUserDto> getFollowings(Long followerId, UserFilterDto filters) {
         validator.validateUserIds(followerId);
         Stream<User> followees = subscriptionRepository.findByFollowerId(followerId);
-        return userMapper.toSubscriptionUserDtos(userFilter.filterUsers(followees, filters));
+        return userMapper.toSubscriptionUserDtos(userFilterApplier.applyFilters(followees, filters));
     }
 
     @Override

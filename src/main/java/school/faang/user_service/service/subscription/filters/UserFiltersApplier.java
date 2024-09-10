@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class UserFiltersApplier {
     private final List<UserFilter> userFilters;
 
-    public List<User> filterUsers(@NonNull Stream<User> users, @NonNull UserFilterDto filters) {
+    public List<User> applyFilters(@NonNull Stream<User> users, @NonNull UserFilterDto filters) {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .reduce(users,

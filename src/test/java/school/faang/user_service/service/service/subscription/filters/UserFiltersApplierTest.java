@@ -73,7 +73,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_SuccessfullyFilteredUsers() {
         var expected = List.of(users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(), userFilterDto);
+        var result = userFiltersApplier.applyFilters(users.stream(), userFilterDto);
 
         assertEquals(expected, result);
     }
@@ -83,7 +83,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringEmptyStreamOfUser() {
         var expected = new ArrayList<>();
 
-        var result = userFiltersApplier.filterUsers(Stream.empty(), userFilterDto);
+        var result = userFiltersApplier.applyFilters(Stream.empty(), userFilterDto);
 
         assertEquals(expected, result);
     }
@@ -93,7 +93,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithEmptyUserFilterDto() {
         var expected = users;
 
-        var result = userFiltersApplier.filterUsers(users.stream(), UserFilterDto.builder().build());
+        var result = userFiltersApplier.applyFilters(users.stream(), UserFilterDto.builder().build());
 
         assertEquals(expected, result);
     }
@@ -103,7 +103,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithOneFilter() {
         var expected = List.of(users.get(0), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().namePattern("nameTest").build());
 
         assertEquals(expected, result);
@@ -114,7 +114,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithAboutMeFilter() {
         var expected = List.of(users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().aboutPattern("aboutMeTest").build());
 
         assertEquals(expected, result);
@@ -125,7 +125,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithEmailFilter() {
         var expected = List.of(users.get(1), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().emailPattern("emailTest").build());
 
         assertEquals(expected, result);
@@ -136,7 +136,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithContactFilter() {
         var expected = List.of(users.get(2), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().contactPattern("contactTest").build());
 
         assertEquals(expected, result);
@@ -147,7 +147,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithCountryFilter() {
         var expected = List.of(users.get(3), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().countryPattern("countryTest").build());
 
         assertEquals(expected, result);
@@ -158,7 +158,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithCityFilter() {
         var expected = List.of(users.get(4), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().cityPattern("cityTest").build());
 
         assertEquals(expected, result);
@@ -169,7 +169,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithPhoneFilter() {
         var expected = List.of(users.get(5), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().phonePattern("phoneTest").build());
 
         assertEquals(expected, result);
@@ -180,7 +180,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithSkillFilter() {
         var expected = List.of(users.get(6), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().skillPattern("skillTest").build());
 
         assertEquals(expected, result);
@@ -191,7 +191,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithExperienceMinFilter() {
         var expected = List.of(users.get(7), users.get(8), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().experienceMin(3).build());
 
         assertEquals(expected, result);
@@ -202,7 +202,7 @@ class UserFiltersApplierTest {
     void testFilterUsers_FilteringUsersWithExperienceMaxFilter() {
         var expected = List.of(users.get(8), users.get(9), users.get(10), users.get(users.size() - 1));
 
-        var result = userFiltersApplier.filterUsers(users.stream(),
+        var result = userFiltersApplier.applyFilters(users.stream(),
                 UserFilterDto.builder().experienceMax(10).build());
 
         assertEquals(expected, result);
@@ -211,9 +211,9 @@ class UserFiltersApplierTest {
     @Test
     @DisplayName("Filtering users with null arguments")
     void testFilterUsers_FilteringUsersWithNullArguments() {
-        assertThrows(NullPointerException.class, () -> userFiltersApplier.filterUsers(null, userFilterDto));
-        assertThrows(NullPointerException.class, () -> userFiltersApplier.filterUsers(users.stream(), null));
-        assertThrows(NullPointerException.class, () -> userFiltersApplier.filterUsers(null, null));
+        assertThrows(NullPointerException.class, () -> userFiltersApplier.applyFilters(null, userFilterDto));
+        assertThrows(NullPointerException.class, () -> userFiltersApplier.applyFilters(users.stream(), null));
+        assertThrows(NullPointerException.class, () -> userFiltersApplier.applyFilters(null, null));
     }
 
     private List<User> initUsers() {

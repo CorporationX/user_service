@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.client.payment_service.PaymentServiceClient;
+import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.PaymentResponse;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;

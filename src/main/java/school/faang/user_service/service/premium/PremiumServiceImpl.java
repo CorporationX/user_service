@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.premium.Currency;
 import school.faang.user_service.dto.premium.PaymentRequest;
-import school.faang.user_service.client.payment_service.PaymentServiceClient;
+import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;

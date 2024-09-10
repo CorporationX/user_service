@@ -1,11 +1,11 @@
 package school.faang.user_service.controller.goal;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,8 +31,7 @@ public class GoalController {
     @ResponseStatus(HttpStatus.CREATED)
     public GoalDto createGoal(
             @RequestParam Long userId,
-            @RequestBody GoalDto goalDto
-    ) {
+            @RequestBody GoalDto goalDto) {
         Goal goal = mapper.toEntity(goalDto);
         Goal newGoal = goalService.createGoal(userId, goal);
         return mapper.toDto(newGoal);
@@ -50,5 +49,12 @@ public class GoalController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteGoal(@PathVariable Long goalId) {
         goalService.deleteGoal(goalId);
+    }
+
+    @GetMapping("/{goalId}/subtasks")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GoalDto> findSubtaskByGoalId(@PathVariable Long goalId) {
+        List<Goal> subtasks = goalService.findSubtaskByGoalId(goalId);
+        return mapper.toDtoList(subtasks);
     }
 }

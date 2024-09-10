@@ -21,6 +21,8 @@ public interface GoalMapper {
     @Mapping(source = "parent", target = "parent", qualifiedByName = "mapParentIdToParent")
     Goal toEntity(GoalDto goalDto);
 
+    List<GoalDto> toDtoList(List<Goal> subtasks);
+
     @Named("mapSkillEntityToSkillId")
     static List<Long> mapSkillEntityToSkillId(List<Skill> skills) {
        return skills.stream()
@@ -49,4 +51,6 @@ public interface GoalMapper {
             return parentGoal;
         }
     }
+
+
 }

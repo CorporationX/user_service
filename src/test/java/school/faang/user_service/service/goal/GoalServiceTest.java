@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,13 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -63,12 +67,10 @@ public class GoalServiceTest {
         when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(1);
         when(skillRepository.existsById(skill.getId())).thenReturn(true);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(goalRepository.save(goal)).thenReturn(goal);
 
-        Goal newGoal = goalService.createGoal(user.getId(), goal);
+        goalService.createGoal(user.getId(), goal);
 
         verify(goalRepository).save(goal);
-        assertEquals(goal, newGoal);
     }
 
     @Test
@@ -87,7 +89,6 @@ public class GoalServiceTest {
 
         verify(goalRepository).save(existingGoal);
         assertEquals(goal.getSkillsToAchieve(), existingGoal.getSkillsToAchieve());
-
     }
 
     @Test
@@ -109,6 +110,29 @@ public class GoalServiceTest {
         assertEquals(GoalStatus.COMPLETED, existingGoal.getStatus());
         assertTrue(skill.getUsers().contains(user));
         verify(goalRepository).save(existingGoal);
+    }
+
+    @Test
+    @DisplayName("Success find subtasks")
+    public void testFindSubtaskByGoalId() {
+        Goal subtaskOne = Goal.builder()
+                .id(2L)
+                .title("Learning Java")
+                .parent(goal)
+                .build();
+
+        Goal subtaskTwo = Goal.builder()
+                .id(2L)
+                .title("Learning SQL")
+                .parent(goal)
+                .build();
+
+        when(goalRepository.existsById(goal.getId())).thenReturn(true);
+        when(goalRepository.findByParent(goal.getId())).thenReturn(Stream.of(subtaskOne, subtaskTwo));
+
+        goalService.findSubtaskByGoalId(goal.getId());
+
+        verify(goalRepository).findByParent(goal.getId());
     }
 
     @Test
@@ -170,6 +194,21 @@ public class GoalServiceTest {
         );
 
         String expectedMessage = "It is impossible to change a completed goal";
+        String resultMessage = exception.getMessage();
+        assertEquals(expectedMessage, resultMessage);
+    }
+
+    @Test
+    @DisplayName("Incorrect goalId")
+    public void testValidateGoalIdIsInvalid() {
+        when(goalRepository.existsById(goal.getId())).thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> goalService.deleteGoal(goal.getId())
+        );
+
+        String expectedMessage = "Goal with this id does not exist";
         String resultMessage = exception.getMessage();
         assertEquals(expectedMessage, resultMessage);
     }

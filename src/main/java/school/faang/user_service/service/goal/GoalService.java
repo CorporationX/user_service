@@ -3,6 +3,7 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -64,7 +65,21 @@ public class GoalService {
     }
 
     public void deleteGoal(Long goalId) {
+        validateGoalId(goalId);
         goalRepository.deleteById(goalId);
+    }
+
+    @Transactional
+    public List<Goal> findSubtaskByGoalId(Long goalId) {
+        validateGoalId(goalId);
+        return goalRepository.findByParent(goalId).toList();
+    }
+
+    private void validateGoalId(Long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            log.error("Goal with id={} does not exist", goalId);
+            throw new IllegalArgumentException("Goal with this id does not exist");
+        }
     }
 
     private void validateTitle(Goal goal) {

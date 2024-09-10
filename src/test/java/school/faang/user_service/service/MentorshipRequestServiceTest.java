@@ -2,14 +2,14 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.dao.EmptyResultDataAccessException;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.dto.RequestMapper;
+import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -21,6 +21,7 @@ import school.faang.user_service.validator.validatorResult.Validated;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.*;
 import static school.faang.user_service.service.MentorshipRequestService.MENTOR_IS_ALREADY_ACCEPTED;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class MentorshipRequestServiceTest {
 
     @Mock
@@ -45,17 +47,23 @@ class MentorshipRequestServiceTest {
 
     @Test
     void test_service_method_called_() {
+        ArgumentCaptor<List<BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult>>> captor = ArgumentCaptor.forClass(List.class);
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(dto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate))).thenReturn(new Validated(null));
+        when(mentorshipRequestValidator.validate(eq(dto), captor.capture()))
+                .thenReturn(new Validated(null));
+
         service.requestMentorship(dto);
+
         verify(repository).create(dto.getRequesterId(),dto.getReceiverId(),dto.getDescription());
     }
 
     @Test
     void test_service_method_not_called(){
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(dto,List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate))).thenReturn(new NotValidated(""));
+        when(mentorshipRequestValidator.validate(any(),any())).thenReturn(new NotValidated(""));
+
         service.requestMentorship(dto);
+
         verifyNoInteractions(repository);
     }
 

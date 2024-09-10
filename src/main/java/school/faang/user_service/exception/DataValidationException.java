@@ -1,4 +1,4 @@
-package school.faang.user_service.EventOrganization.exception;
+package school.faang.user_service.exception;
 
 public class DataValidationException extends RuntimeException {
 

@@ -1,23 +1,27 @@
-package school.faang.user_service.EventOrganization.controller.event;
+package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import school.faang.user_service.EventOrganization.dto.event.EventDto;
-import school.faang.user_service.EventOrganization.dto.event.EventFilterDto;
-import school.faang.user_service.EventOrganization.service.event.EventService;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/v1/events")
 @RequiredArgsConstructor
 public class EventController {
+
     private final EventService eventService;
 
-    public EventDto create(EventDto event) {
+    @PostMapping("/create")
+    public EventDto create(@RequestBody EventDto event) {
         return eventService.create(event);
     }
 
-    public EventDto getEvent(long eventId) {
+    @GetMapping("/events")
+    public EventDto getEvent(@RequestParam("eventId") long eventId) {
         return eventService.getEvent(eventId);
     }
 

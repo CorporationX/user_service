@@ -1,4 +1,4 @@
-package school.faang.user_service.EventOrganization.service.event;
+package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,12 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.EventOrganization.mapper.event.mapper.EventMapper;
-import school.faang.user_service.EventOrganization.dto.event.EventDto;
-import school.faang.user_service.EventOrganization.dto.event.SkillDto;
-import school.faang.user_service.EventOrganization.exception.DataValidationException;
+import school.faang.user_service.mapper.event.mapper.EventMapper;
+import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.SkillDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;

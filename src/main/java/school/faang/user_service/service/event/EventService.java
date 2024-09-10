@@ -1,16 +1,16 @@
-package school.faang.user_service.EventOrganization.service.event;
+package school.faang.user_service.service.event;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.EventOrganization.mapper.event.mapper.EventMapper;
-import school.faang.user_service.EventOrganization.dto.event.EventDto;
-import school.faang.user_service.EventOrganization.dto.event.EventFilterDto;
-import school.faang.user_service.EventOrganization.exception.DataValidationException;
+import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.event.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -24,15 +24,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class EventService {
-    private final EventRepository eventRepository;
+
     private final EventMapper eventMapper;
+
+    private final EventRepository eventRepository;
     private final SkillRepository skillRepository;
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     public EventDto create(EventDto eventDto) {
+        //validateEventDto(eventDto);
+        //validateOwnerSkills(eventDto);
 
-        validateEventDto(eventDto);
-        validateOwnerSkills(eventDto);
         return saveEventInDB(eventDto);
     }
 
@@ -42,15 +45,15 @@ public class EventService {
                     LOGGER.warn("Event not found with id {}:", eventId);
                     return new NoSuchElementException("Event not found with id: " + eventId);
                 });
-        return eventMapper.EventToDto(event);
+        return eventMapper.eventToDto(event);
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventRepository.findAll().stream()
-                .map(eventMapper::EventToEventFilterDto)
+                .map(eventMapper::eventToEventFilterDto)
                 .filter(event -> event.equals(filter))
-                .map(eventMapper::EventFilterDtoToEvent)
-                .map(eventMapper::EventToDto)
+                .map(eventMapper::eventFilterDtoToEvent)
+                .map(eventMapper::eventToDto)
                 .toList();
     }
 
@@ -72,13 +75,13 @@ public class EventService {
 
     public List<EventDto> getOwnedEvents(long userId) {
         return eventRepository.findAllByUserId(userId).stream()
-                .map(eventMapper::EventToDto)
+                .map(eventMapper::eventToDto)
                 .toList();
     }
 
     public List<EventDto> getParticipatedEvents(long userId) {
         return eventRepository.findParticipatedEventsByUserId(userId).stream()
-                .map(eventMapper::EventToDto)
+                .map(eventMapper::eventToDto)
                 .toList();
     }
 
@@ -93,7 +96,7 @@ public class EventService {
         List<Skill> skillsOwner = skillRepository.findAllByUserId(ownerId);
 
         //Мапим дто в событие
-        Event event = eventMapper.EventDtoToEvent(eventDto);
+        Event event = eventMapper.eventDtoToEvent(eventDto);
         System.out.println("маппер в дто сработал" + event);
         List<Skill> skillsEvent = event.getRelatedSkills();
 
@@ -114,9 +117,18 @@ public class EventService {
     }
 
     private EventDto saveEventInDB(EventDto eventDto) {
-        Event event = eventMapper.EventDtoToEvent(eventDto);
-        Event eventInDB = eventRepository.save(event);
-        return eventMapper.EventToDto(eventInDB);
+        System.out.println("EventDto:");
+        System.out.println(eventDto);
+
+        Event event = eventMapper.eventDtoToEvent(eventDto);
+
+        System.out.println("Event:");
+        System.out.println(event);
+
+        //Event eventInDB = eventRepository.save(event);
+
+        return null;
+        //return eventMapper.eventToDto(eventInDB);
     }
 
     private void validateEventDto(EventDto eventDto) {

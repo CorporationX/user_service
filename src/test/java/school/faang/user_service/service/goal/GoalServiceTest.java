@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -14,6 +15,10 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.filter.GoalFilter;
+import school.faang.user_service.service.goal.filter.GoalFilterByAnySkills;
+import school.faang.user_service.service.goal.filter.GoalFilterByStatus;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +42,9 @@ public class GoalServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private List<GoalFilter> goalFilters;
 
     @InjectMocks
     private GoalService goalService;
@@ -135,7 +143,64 @@ public class GoalServiceTest {
         verify(goalRepository).findByParent(goal.getId());
     }
 
+    @Test
+    @DisplayName("Success find goal by filter")
+    public void testFindUserGoalByFilter() {
 
+        GoalFilterDto filterDto = GoalFilterDto.builder()
+                .status(GoalStatus.COMPLETED)
+                .skillIds(new ArrayList<>(List.of(3L, 4L)))
+                .build();
+
+        Goal goalOne = Goal.builder()
+                .id(1L)
+                .status(GoalStatus.ACTIVE)
+                .skillsToAchieve(
+                        new ArrayList<>(List.of(
+                                Skill.builder().id(3L).build(),
+                                Skill.builder().id(4L).build()))
+                )
+                .build();
+
+        Goal goalTwo = Goal.builder()
+                .id(2L)
+                .status(GoalStatus.COMPLETED)
+                .skillsToAchieve(
+                        new ArrayList<>(List.of(
+                                Skill.builder().id(1L).build(),
+                                Skill.builder().id(2L).build()))
+                )
+                .build();
+
+        Goal goalThree = Goal.builder()
+                .id(3L)
+                .status(GoalStatus.COMPLETED)
+                .skillsToAchieve(
+                        new ArrayList<>(List.of(
+                                Skill.builder().id(3L).build(),
+                                Skill.builder().id(1L).build()))
+                )
+                .build();
+
+        User user = User.builder()
+                .id(100L)
+                .goals(new ArrayList<>(List.of(
+                        goalOne,
+                        goalTwo,
+                        goalThree
+                )))
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(goalFilters.stream()).thenReturn(Stream.of(
+                new GoalFilterByStatus(),
+                new GoalFilterByAnySkills()
+        ));
+
+        List<Goal> expectedGoals = new ArrayList<>(List.of(goalThree));
+        List<Goal> resultGoals = goalService.findGoalsByUser(user.getId(), filterDto);
+        assertEquals(expectedGoals, resultGoals);
+    }
 
     @Test
     @DisplayName("Incorrect goal title")
@@ -170,6 +235,7 @@ public class GoalServiceTest {
     @Test
     @DisplayName("Incorrect goal skill")
     public void testGoalSkillsIsInvalid() {
+
         when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(1);
         when(skillRepository.existsById(skill.getId())).thenReturn(false);
 
@@ -204,7 +270,6 @@ public class GoalServiceTest {
     @DisplayName("Incorrect goalId")
     public void testValidateGoalIdIsInvalid() {
         when(goalRepository.existsById(goal.getId())).thenReturn(false);
-
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> goalService.deleteGoal(goal.getId())

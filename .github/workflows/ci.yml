@@ -10,32 +10,20 @@ on:
       - dev
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      # Шаг: Проверить проект из репозитория
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Шаг: Установить JDK 17 (можете изменить на вашу версию)
-      - name: Set up JDK 17
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Шаг: Кэшировать зависимости Gradle
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: Install dependencies
+        run: ./gradlew clean build --no-daemon
 
-      # Шаг: Сборка проекта и выполнение тестов
-      - name: Build and run tests
-        run: ./gradlew build
+      - name: Run tests
+        run: ./gradlew test --no-daemon

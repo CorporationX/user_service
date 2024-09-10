@@ -23,9 +23,9 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public List<UserDto> getMentees(Long userId) {
-        User mentor = findUserById(userId);
+        User user = findUserById(userId);
 
-        return Optional.ofNullable(mentor.getMentees())
+        return Optional.ofNullable(user.getMentees())
                 .orElse(Collections.emptyList())
                 .stream()
                 .map(userMapper::toDto)
@@ -34,9 +34,9 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public List<UserDto> getMentors(Long userId) {
-        User mentee = findUserById(userId);
+        User user = findUserById(userId);
 
-        return Optional.ofNullable(mentee.getMentors())
+        return Optional.ofNullable(user.getMentors())
                 .orElse(Collections.emptyList())
                 .stream()
                 .map(userMapper::toDto)
@@ -45,9 +45,9 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public void deleteMentee(Long menteeId, Long mentorId) {
-        User mentor = findUserById(mentorId);
+        User user = findUserById(mentorId);
 
-        User mentee = Optional.ofNullable(mentor.getMentees())
+        User mentee = Optional.ofNullable(user.getMentees())
                 .orElse(Collections.emptyList())
                 .stream()
                 .filter(current -> Objects.equals(current.getId(), menteeId))
@@ -61,9 +61,9 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public void deleteMentor(Long menteeId, Long mentorId) {
-        User mentee = findUserById(menteeId);
+        User user = findUserById(menteeId);
 
-        User mentor = Optional.ofNullable(mentee.getMentors())
+        User mentor = Optional.ofNullable(user.getMentors())
                 .orElse(Collections.emptyList())
                 .stream()
                 .filter(current -> Objects.equals(current.getId(), mentorId))

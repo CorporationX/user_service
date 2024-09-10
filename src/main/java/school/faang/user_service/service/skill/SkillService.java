@@ -74,7 +74,7 @@ public class SkillService {
     }
 
     public List<Skill> getSkillsByTitle(List<String> skillsTitle) {
-        serviceValidator.validateSkill(skillsTitle, skillRepository);
+        skillValidator.validateSkill(skillsTitle, skillRepository);
         return skillRepository.findByTitleIn(skillsTitle);
     }
 

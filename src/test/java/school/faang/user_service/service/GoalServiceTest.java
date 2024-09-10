@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -21,6 +22,7 @@ import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -53,6 +55,7 @@ public class GoalServiceTest {
     private List<Skill> skills;
     private Goal goal;
     private Goal updateGoal1;
+    private User user;
 
     @BeforeEach
     public void setUp() {
@@ -65,12 +68,14 @@ public class GoalServiceTest {
                 List.of("Skill1"),
                 GoalStatus.ACTIVE);
         skills = List.of(Skill.builder()
+                .id(1L)
                 .title("Skill2")
-                .build());
+                .build(), Skill.builder().title("Skill1").build());
         goal = new Goal();
         updateGoal1 = Goal.builder()
                 .id(1L)
                 .build();
+        user = new User();
     }
 
     @Test
@@ -120,6 +125,18 @@ public class GoalServiceTest {
 
         goal.setSkillsToAchieve(skills);
         Mockito.verify(goalRepository).save(goal);
+    }
+
+    @Test
+    public void updateGoalAssignNewSkillToGoal() {
+        goal.setId(1L);
+        goal.setSkillsToAchieve(List.of(Skill.builder().title("skill2").build()));
+        Mockito.when(goalValidator.validateUpdate(goalId, goalDto)).thenReturn(goal);
+
+        Mockito.when(skillService.getSkillsByTitle(goalDto.titleSkills())).thenReturn(skills);
+        goalService.updateGoal(goalId, goalDto);
+
+        assertEquals(goal.getSkillsToAchieve(), skills);
     }
 
     @Test

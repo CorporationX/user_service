@@ -3,7 +3,7 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.mentorship.MentorshipServiceImpl;
+import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipController {
 
-    private final MentorshipServiceImpl mentorshipService;
+    private MentorshipService mentorshipService;
 
     public List<UserDto> getMentees(Long userId) {
         return mentorshipService.getMentees(userId);
@@ -30,4 +30,3 @@ public class MentorshipController {
     }
 
 }
-

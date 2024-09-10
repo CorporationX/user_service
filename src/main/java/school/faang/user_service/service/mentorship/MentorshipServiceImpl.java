@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class MentorshipServiceImpl implements MentorshipService {
-    private final MentorshipRepository mentorshipRepository;
+
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
@@ -54,7 +56,7 @@ public class MentorshipServiceImpl implements MentorshipService {
                         () -> new EntityNotFoundException(String.format("There is no mentee with ID %d%n among your mentee.", menteeId))
                 );
 
-        mentorshipRepository.delete(mentee);
+        userRepository.delete(mentee);
     }
 
     @Override
@@ -70,11 +72,11 @@ public class MentorshipServiceImpl implements MentorshipService {
                         () -> new EntityNotFoundException(String.format("You do not have the mentor with ID: %d%n.", menteeId))
                 );
 
-        mentorshipRepository.delete(mentor);
+        userRepository.delete(mentor);
     }
 
     private User findUserById(Long userId) {
-        Optional<User> user = mentorshipRepository.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
         return user.orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d%n is not found", userId)));
     }
 }

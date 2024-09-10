@@ -1,6 +1,5 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,6 +79,7 @@ public class GoalServiceTest {
         existingGoal.setId(100L);
         existingGoal.setSkillsToAchieve(new ArrayList<>());
         existingGoal.setUsers(new ArrayList<>());
+        existingGoal.setStatus(GoalStatus.ACTIVE);
 
         when(skillRepository.existsById(skill.getId())).thenReturn(true);
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(existingGoal));
@@ -134,6 +134,8 @@ public class GoalServiceTest {
 
         verify(goalRepository).findByParent(goal.getId());
     }
+
+
 
     @Test
     @DisplayName("Incorrect goal title")
@@ -212,4 +214,6 @@ public class GoalServiceTest {
         String resultMessage = exception.getMessage();
         assertEquals(expectedMessage, resultMessage);
     }
+
+
 }

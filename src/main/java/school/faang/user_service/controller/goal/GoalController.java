@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.service.goal.GoalService;
@@ -31,7 +32,8 @@ public class GoalController {
     @ResponseStatus(HttpStatus.CREATED)
     public GoalDto createGoal(
             @RequestParam Long userId,
-            @RequestBody GoalDto goalDto) {
+            @RequestBody GoalDto goalDto
+    ) {
         Goal goal = mapper.toEntity(goalDto);
         Goal newGoal = goalService.createGoal(userId, goal);
         return mapper.toDto(newGoal);
@@ -56,5 +58,15 @@ public class GoalController {
     public List<GoalDto> findSubtaskByGoalId(@PathVariable Long goalId) {
         List<Goal> subtasks = goalService.findSubtaskByGoalId(goalId);
         return mapper.toDtoList(subtasks);
+    }
+
+    @GetMapping("/filters")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GoalDto> findGoalsByUser(
+            @RequestParam Long userId,
+            @RequestBody GoalFilterDto filterDto
+    ) {
+        List<Goal> newGoals = goalService.findGoalsByUser(userId, filterDto);
+        return mapper.toDtoList(newGoals);
     }
 }

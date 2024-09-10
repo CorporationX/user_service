@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -11,6 +12,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.filter.GoalFilter;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final List<GoalFilter> goalFilters;
 
     public Goal createGoal(Long userId, Goal goal) {
         validateTitle(goal);
@@ -75,6 +78,21 @@ public class GoalService {
         return goalRepository.findByParent(goalId).toList();
     }
 
+    
+    public List<Goal> findGoalsByUser(Long userId, GoalFilterDto filterDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow();
+        List<Goal> userGoal = user.getGoals();
+
+        return goalFilters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .reduce(
+                        userGoal,
+                        (list, filter) -> filter.applyFilter(list, filterDto),
+                        (list, filter) -> list
+                );
+    }
+
     private void validateGoalId(Long goalId) {
         if (!goalRepository.existsById(goalId)) {
             log.error("Goal with id={} does not exist", goalId);
@@ -116,4 +134,6 @@ public class GoalService {
             throw new IllegalArgumentException("It is impossible to change a completed goal");
         }
     }
+
+
 }

@@ -36,75 +36,50 @@ public class GoalInvitationServiceTest {
     @InjectMocks
     private GoalInvitationService goalInvitationService;
 
-    Goal g1 = new Goal();
-    Goal g2 = new Goal();
-    Goal g3 = new Goal();
-    Goal g4 = new Goal();
-
-    User u1 = new User();
-    User u2 = new User();
-    User u3 = new User();
-    User u4 = new User();
+    Goal testGoal;
+    GoalInvitation testInvitation;
+    User inviter;
+    User invited;
 
     @BeforeEach
     public void init() {
-        g1.setId(1L);
-        g1.setTitle("Programming");
-        g1.setUsers(new ArrayList<>());
+        inviter = new User();
+        inviter.setId(1L);
+        inviter.setGoals(new ArrayList<>());
 
-        g2.setId(2L);
-        g2.setTitle("Testing");
-        g1.setUsers(new ArrayList<>());
+        invited = new User();
+        invited.setId(2L);
+        invited.setGoals(new ArrayList<>());
 
-        g3.setId(3L);
-        g3.setTitle("SQL");
-        g1.setUsers(new ArrayList<>());
+        testGoal = new Goal();
+        testGoal.setId(1L);
+        testGoal.setUsers(new ArrayList<>());
 
-        g4.setId(4L);
-        g4.setTitle("DevOps");
-        g1.setUsers(new ArrayList<>());
-
-        u1.setId(1L);
-        u1.setUsername("Nathan Thompson");
-        u1.setGoals(new ArrayList<>());
-
-        u2.setId(2L);
-        u2.setUsername("Flash Thompson");
-        u2.setGoals(new ArrayList<>());
-
-
-        u3.setId(3L);
-        u3.setUsername("Sam Winchester");
-        u3.setGoals(new ArrayList<>());
-
-        u4.setId(4L);
-        u4.setUsername("Dean Winchester");
-        u4.setGoals(new ArrayList<>());
+        testInvitation = new GoalInvitation();
+        testInvitation.setId(1L);
+        testInvitation.setInviter(inviter);
+        testInvitation.setInvited(invited);
+        testInvitation.setGoal(testGoal);
+        testInvitation.setStatus(RequestStatus.PENDING);
     }
 
     @Test
     public void testCreateInvitation() {
-        GoalInvitation toSave = new GoalInvitation();
-        toSave.setInviter(u1);
-        toSave.setInvited(u2);
-        toSave.setGoal(g1);
-        toSave.setStatus(RequestStatus.PENDING);
-
         GoalInvitation saved = new GoalInvitation();
         saved.setId(1L);
-        saved.setInviter(u1);
-        saved.setInvited(u2);
-        saved.setGoal(g1);
+        saved.setInviter(inviter);
+        saved.setInvited(invited);
+        saved.setGoal(testGoal);
         saved.setStatus(RequestStatus.PENDING);
 
-        List<User> existingUsers = List.of(u1, u2);
+        List<User> existingUsers = List.of(inviter, invited);
         List<Long> existingUserIds = existingUsers.stream().map(User::getId).toList();
 
         when(goalRepository.existsById(1L)).thenReturn(true);
         when(userRepository.findAllById(existingUserIds)).thenReturn(existingUsers);
-        when(goalInvitationRepository.save(toSave)).thenReturn(saved);
+        when(goalInvitationRepository.save(testInvitation)).thenReturn(saved);
 
-        GoalInvitation result = goalInvitationService.createInvitation(toSave);
+        GoalInvitation result = goalInvitationService.createInvitation(testInvitation);
         assertEquals(RequestStatus.PENDING, result.getStatus());
     }
 
@@ -117,8 +92,8 @@ public class GoalInvitationServiceTest {
         missingUser.setId(5L);
 
         GoalInvitation invalid = new GoalInvitation();
-        invalid.setInviter(u1);
-        invalid.setInvited(u1);
+        invalid.setInviter(inviter);
+        invalid.setInvited(inviter);
         invalid.setGoal(missingGoal);
         invalid.setStatus(RequestStatus.PENDING);
 
@@ -127,7 +102,7 @@ public class GoalInvitationServiceTest {
         );
         assertEquals(GoalInvitationService.GOAL_MISSING, e1.getMessage());
 
-        invalid.setGoal(g1);
+        invalid.setGoal(testGoal);
         when(goalRepository.existsById(1L)).thenReturn(true);
         IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class,
                 () -> goalInvitationService.createInvitation(invalid)
@@ -135,8 +110,8 @@ public class GoalInvitationServiceTest {
         assertEquals(GoalInvitationService.INVITER_INVITED_SAME, e2.getMessage());
 
         invalid.setInvited(missingUser);
-        List<Long> ids = Stream.of(u1, missingUser).map(User::getId).toList();
-        when(userRepository.findAllById(ids)).thenReturn(List.of(u1));
+        List<Long> ids = Stream.of(inviter, missingUser).map(User::getId).toList();
+        when(userRepository.findAllById(ids)).thenReturn(List.of(inviter));
         IllegalStateException e3 = assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.createInvitation(invalid)
         );
@@ -145,43 +120,29 @@ public class GoalInvitationServiceTest {
 
     @Test
     public void testAcceptInvitation() {
-        Goal g = new Goal();
-        g.setId(1L);
-        g.setUsers(new ArrayList<>());
-
         User updatedUser = new User();
         updatedUser.setId(2L);
-        updatedUser.setGoals(List.of(g));
 
         Goal updatedGoal = new Goal();
         updatedGoal.setId(1L);
-        g.setUsers(new ArrayList<>());
-        g.getUsers().add(u2);
 
-        int initialUsers = g.getUsers().size();
-        int initialGoals = u2.getGoals().size();
-
-        GoalInvitation invitation = new GoalInvitation();
-        invitation.setId(1L);
-        invitation.setInviter(u1);
-        invitation.setInvited(u2);
-        invitation.setGoal(g);
-        invitation.setStatus(RequestStatus.PENDING);
+        updatedUser.setGoals(List.of(updatedGoal));
+        updatedGoal.setUsers(List.of(updatedUser));
 
         GoalInvitation updatedInvitation = new GoalInvitation();
-        invitation.setId(1L);
-        invitation.setInviter(u1);
-        invitation.setInvited(u2);
-        invitation.setGoal(g);
-        invitation.setStatus(RequestStatus.ACCEPTED);
+        updatedInvitation.setId(1L);
+        updatedInvitation.setInviter(inviter);
+        updatedInvitation.setInvited(updatedUser);
+        updatedInvitation.setGoal(updatedGoal);
+        updatedInvitation.setStatus(RequestStatus.ACCEPTED);
 
-        when(goalInvitationRepository.findById(invitation.getId())).thenReturn(Optional.of(invitation));
-        when(goalRepository.existsById(g.getId())).thenReturn(true);
-        when(goalRepository.countActiveGoalsPerUser(invitation.getInvited().getId())).thenReturn(2);
-        when(goalRepository.save(g)).thenReturn(updatedGoal);
-        when(userRepository.save(invitation.getInvited())).thenReturn(updatedUser);
-        when(goalInvitationRepository.save(invitation)).thenReturn(updatedInvitation);
-        goalInvitationService.acceptGoalInvitation(invitation.getId());
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(testInvitation));
+        when(goalRepository.existsById(1L)).thenReturn(true);
+        when(goalRepository.countActiveGoalsPerUser(2L)).thenReturn(0);
+        when(goalRepository.save(testGoal)).thenReturn(updatedGoal);
+        when(userRepository.save(invited)).thenReturn(updatedUser);
+        when(goalInvitationRepository.save(testInvitation)).thenReturn(updatedInvitation);
+        goalInvitationService.acceptGoalInvitation(testInvitation.getId());
 
         ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -195,8 +156,8 @@ public class GoalInvitationServiceTest {
         User userArg = userCaptor.getValue();
         GoalInvitation invitationArg = invitationCaptor.getValue();
 
-        assertEquals(initialUsers + 1, goalArg.getUsers().size());
-        assertEquals(initialGoals + 1, userArg.getGoals().size());
+        assertEquals(testGoal.getUsers().size(), goalArg.getUsers().size());
+        assertEquals(invited.getGoals().size(), userArg.getGoals().size());
         assertEquals(RequestStatus.ACCEPTED, invitationArg.getStatus());
     }
 
@@ -207,32 +168,37 @@ public class GoalInvitationServiceTest {
 
         GoalInvitation invalid = new GoalInvitation();
         invalid.setId(5L);
-        invalid.setInviter(u2);
-        invalid.setInvited(u2);
+        invalid.setInviter(inviter);
+        invalid.setInvited(inviter);
         invalid.setGoal(missing);
         invalid.setStatus(RequestStatus.PENDING);
-        u2.getGoals().add(missing);
+        invited.getGoals().add(missing);
 
-        IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException e1 = assertThrows(
+                IllegalArgumentException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
         assertEquals(GoalInvitationService.INVITATION_MISSING, e1.getMessage());
 
-        when(goalInvitationRepository.findById(invalid.getId())).thenReturn(Optional.of(invalid));
-        IllegalStateException e2 = assertThrows(IllegalStateException.class,
+        when(goalInvitationRepository.findById(5L)).thenReturn(Optional.of(invalid));
+        IllegalStateException e2 = assertThrows(
+                IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
         assertEquals(GoalInvitationService.GOAL_MISSING, e2.getMessage());
 
-        when(goalRepository.existsById(missing.getId())).thenReturn(true);
-        e2 = assertThrows(IllegalStateException.class,
+        invalid.setInvited(invited);
+        when(goalRepository.existsById(4L)).thenReturn(true);
+        e2 = assertThrows(
+                IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
         assertEquals(GoalInvitationService.INVITED_ALREADY_WORKING_ON_GOAL, e2.getMessage());
 
-        u2.getGoals().clear();
-        when(goalRepository.countActiveGoalsPerUser(u2.getId())).thenReturn(3);
-        e2 = assertThrows(IllegalStateException.class,
+        invited.getGoals().clear();
+        when(goalRepository.countActiveGoalsPerUser(2L)).thenReturn(3);
+        e2 = assertThrows(
+                IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
         assertEquals(GoalInvitationService.INVITED_MAX_ACTIVE_GOALS, e2.getMessage());
@@ -240,27 +206,17 @@ public class GoalInvitationServiceTest {
 
     @Test
     public void testRejectInvitation() {
-        Goal g = new Goal();
-        g.setId(1L);
-
-        GoalInvitation invitation = new GoalInvitation();
-        invitation.setId(1L);
-        invitation.setInviter(u1);
-        invitation.setInvited(u2);
-        invitation.setGoal(g);
-        invitation.setStatus(RequestStatus.PENDING);
-
         GoalInvitation rejected = new GoalInvitation();
         rejected.setId(1L);
-        rejected.setInviter(u1);
-        rejected.setInvited(u2);
-        rejected.setGoal(g);
+        rejected.setInviter(inviter);
+        rejected.setInvited(invited);
+        rejected.setGoal(testGoal);
         rejected.setStatus(RequestStatus.REJECTED);
 
-        when(goalInvitationRepository.findById(invitation.getId())).thenReturn(Optional.of(invitation));
-        when(goalRepository.existsById(g.getId())).thenReturn(true);
-        when(goalInvitationRepository.save(invitation)).thenReturn(rejected);
-        goalInvitationService.rejectGoalInvitation(invitation.getId());
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(testInvitation));
+        when(goalRepository.existsById(1L)).thenReturn(true);
+        when(goalInvitationRepository.save(testInvitation)).thenReturn(rejected);
+        goalInvitationService.rejectGoalInvitation(testInvitation.getId());
 
         ArgumentCaptor<GoalInvitation> invitationCaptor = ArgumentCaptor.forClass(GoalInvitation.class);
         verify(goalInvitationRepository, times(1)).save(invitationCaptor.capture());
@@ -282,7 +238,7 @@ public class GoalInvitationServiceTest {
         );
         assertEquals(GoalInvitationService.INVITATION_MISSING, e1.getMessage());
 
-        when(goalInvitationRepository.findById(invalid.getId())).thenReturn(Optional.of(invalid));
+        when(goalInvitationRepository.findById(10L)).thenReturn(Optional.of(invalid));
         IllegalStateException e2 = assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.rejectGoalInvitation(invalid.getId())
         );

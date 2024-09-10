@@ -85,24 +85,31 @@ public class MentorshipRequestService {
         }
 
         return mentorshipRequestList.stream()
-                .filter(req -> filter.getDescription() == null || req.getDescription().contains(filter.getDescription()))
-                .filter(req -> filter.getRequester() == null || req.getRequester().equals(filter.getRequester()))
-                .filter(req -> filter.getReceiver() == null || req.getReceiver().equals(filter.getReceiver()))
+                .filter(req -> filter.getDescription() == null || (req.getDescription() != null
+                        && req.getDescription().contains(filter.getDescription())))
+                .filter(req -> filter.getRequester() == null || (req.getRequester() != null
+                        && req.getRequester().getId().equals(filter.getRequester())))
+                .filter(req -> filter.getReceiver() == null || (req.getReceiver() != null
+                        && req.getReceiver().getId().equals(filter.getReceiver())))
                 .filter(req -> filter.getStatus() == null || req.getStatus().equals(filter.getStatus()))
                 .toList();
     }
 
-    public void acceptRequest(long id) {
-
-        MentorshipRequest request = mentorshipRequestRepository.findById(id)
+    public MentorshipRequest getRequestById(long id) {
+        return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Request does not exist"));
+    }
+
+    public void acceptRequest(long id) {
+        MentorshipRequest mentorshipRequest = getRequestById(id);
 
         if (!mentorshipRequestRepository
-                .existAcceptedRequest(request.getRequester().getId(), request.getReceiver().getId())) {
+                .existAcceptedRequest(mentorshipRequest.getRequester().getId(),
+                        mentorshipRequest.getReceiver().getId())) {
 
-            User user = request.getRequester();
-            user.getMentors().add(request.getReceiver());
-            request.setStatus(RequestStatus.ACCEPTED);
+            User user = mentorshipRequest.getRequester();
+            user.getMentors().add(mentorshipRequest.getReceiver());
+            mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
         } else {
             throw new NoSuchElementException("This user is already your mentor");
@@ -118,7 +125,6 @@ public class MentorshipRequestService {
         }
 
         entity.setRejectionReason(rejectionDto.getRejectionReason());
-
         entity.setStatus(RequestStatus.REJECTED);
 
         return mentorshipRequestMapper.toDto(id, entity);

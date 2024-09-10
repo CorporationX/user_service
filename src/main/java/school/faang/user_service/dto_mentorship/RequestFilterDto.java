@@ -6,7 +6,7 @@ import school.faang.user_service.entity.RequestStatus;
 @Data
 public class RequestFilterDto {
     private String description;
-    private String requester;
-    private String receiver;
+    private Long requester;
+    private Long receiver;
     private RequestStatus status;
 }

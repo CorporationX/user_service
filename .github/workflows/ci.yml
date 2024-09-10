@@ -1,4 +1,4 @@
-name: CI
+name: CI-DankeVilletti
 
 on: [push]
 

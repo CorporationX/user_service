@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.goal;
+package school.faang.user_service.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;

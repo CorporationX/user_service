@@ -30,10 +30,6 @@ public class UserService {
     }
 
     private boolean applyFilter(User user, UserFilterDto filter) {
-        return checkStringFieldsMatch(user, filter);
-    }
-
-    private boolean checkStringFieldsMatch(User user, UserFilterDto filter) {
         for (Field field : filter.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {

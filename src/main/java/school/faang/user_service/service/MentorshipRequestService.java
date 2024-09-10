@@ -3,7 +3,6 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -31,11 +30,9 @@ public class MentorshipRequestService {
     public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        val res = mentorshipRequestValidator.validate(mentorshipRequestDto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
-        if (!(res instanceof Validated)) {
-            if (res instanceof NotValidated notValidated) {
-                System.out.println(notValidated.getMessage());
-            }
+        val response = mentorshipRequestValidator.validate(mentorshipRequestDto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
+        if (!(response instanceof Validated)) {
+            System.out.println(((NotValidated) response).getMessage());
         } else {
             repository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
         }
@@ -70,31 +67,18 @@ public class MentorshipRequestService {
         }
     }
 
-
     void acceptRequest(long id) throws Exception {
-        try {
-            MentorshipRequest request = repository.getMentorshipRequestById(id);
-            if (request.getStatus() != ACCEPTED) {
-                repository.updateMentorshipRequestStatusByRequesterId(id, ACCEPTED);
-            } else if (request.getStatus() == ACCEPTED) {
-                throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
-            }
-        } catch (Exception e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            if (e.getMessage().equals(MENTOR_IS_ALREADY_ACCEPTED)) {
-                throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
-            }
+        MentorshipRequest request = repository.getMentorshipRequestById(id);
+        if (request.getStatus() != ACCEPTED) {
+            repository.updateMentorshipRequestStatusByRequesterId(id, ACCEPTED);
+        } else if (request.getStatus() == ACCEPTED) {
+            throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
         }
-
     }
 
     void rejectRequest(long id, RejectionDto rejection) {
-        try {
-            MentorshipRequest request = repository.getMentorshipRequestById(id);
-            repository.updateMentorshipRequestStatusWithReasonByRequesterId(id, REJECTED, rejection.getReason());
-        } catch (Exception e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        }
+        MentorshipRequest request = repository.getMentorshipRequestById(id);
+        repository.updateMentorshipRequestStatusWithReasonByRequesterId(id, REJECTED, rejection.getReason());
 
     }
 

@@ -32,101 +32,64 @@ class SubscriptionValidatorTest {
 
     @Test
     @DisplayName("Validate existing user")
-    void testValidateUser_ValidateExistUser() {
+    void testValidateUserIds_ValidateExistUser() {
         when(subscriptionRepository.existsById(userId)).thenReturn(true);
 
-        assertDoesNotThrow(() -> subscriptionValidator.validateUser(userId));
+        assertDoesNotThrow(() -> subscriptionValidator.validateUserIds(userId));
     }
 
     @Test
     @DisplayName("Validate non-existing user")
-    void testValidateUser_ValidateNonExistUser() {
+    void testValidateUserIds_ValidateNonExistUser() {
         when(subscriptionRepository.existsById(userId)).thenReturn(false);
 
-        assertThrows(EntityNotFoundException.class, () -> subscriptionValidator.validateUser(userId));
-    }
-
-    @Test
-    @DisplayName("Validate follower and followee exists")
-    void testValidateUsers_ValidateFollowerAndFolloweeExists() {
-        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
-        when(subscriptionRepository.existsById(followeeId)).thenReturn(true);
-
-        assertDoesNotThrow(() -> subscriptionValidator.validateUsers(followerId, followeeId));
-    }
-
-    @Test
-    @DisplayName("Validate users with follower don't exist")
-    void testValidateUsers_ValidateUsersWithFollowerDontExist() {
-        when(subscriptionRepository.existsById(followerId)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class,
-                () -> subscriptionValidator.validateUsers(followerId, followeeId));
-    }
-
-    @Test
-    @DisplayName("Validate users with followee don't exist")
-    void testValidateUsers_ValidateUsersWithFolloweeDontExist() {
-        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
-        when(subscriptionRepository.existsById(followeeId)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class,
-                () -> subscriptionValidator.validateUsers(followerId, followeeId));
-    }
-
-    @Test
-    @DisplayName("Validate users with follower and followee don't exist")
-    void testValidateUsers_ValidateUsersWithFollowerAndFolloweeDontExist() {
-        when(subscriptionRepository.existsById(followerId)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class,
-                () -> subscriptionValidator.validateUsers(followerId, followeeId));
+        assertThrows(EntityNotFoundException.class, () -> subscriptionValidator.validateUserIds(userId));
     }
 
     @Test
     @DisplayName("Check subscription with different follower and followee ids")
-    void testValidateUsers_CheckSubscriptionWithDifferentFollowerAndFolloweeIds() {
-        assertDoesNotThrow(() -> subscriptionValidator.checkSubscriptionOnHimself(followerId, followeeId));
+    void testIfSubscriptionOnHimself_CheckSubscriptionWithDifferentFollowerAndFolloweeIds() {
+        assertDoesNotThrow(() -> subscriptionValidator.checkIfSubscriptionToHimself(followerId, followeeId));
     }
 
     @Test
     @DisplayName("Check subscription with same follower and followee ids")
-    void testValidateUsers_CheckSubscriptionWithSameFollowerAndFolloweeIds() {
+    void testIfSubscriptionOnHimself_CheckSubscriptionWithSameFollowerAndFolloweeIds() {
         assertThrows(DataValidationException.class,
-                () -> subscriptionValidator.checkSubscriptionOnHimself(followerId, followerId));
+                () -> subscriptionValidator.checkIfSubscriptionToHimself(followerId, followerId));
     }
 
     @Test
-    @DisplayName("Check existing subscription with checkIfSubscriptionExist")
-    void testValidateUsers_CheckExistingSubscriptionWithCheckSubscriptionExist() {
+    @DisplayName("Check existing subscription for exception")
+    void testSubscriptionNotExists_CheckSubscriptionAlreadyExistException() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         assertThrows(SubscriptionAlreadyExistsException.class,
-                () -> subscriptionValidator.checkIfSubscriptionExists(followerId, followeeId));
+                () -> subscriptionValidator.checkIfSubscriptionNotExists(followerId, followeeId));
     }
 
     @Test
-    @DisplayName("Check non-existing subscription with checkIfSubscriptionExist")
-    void testValidateUsers_CheckNonExistingSubscriptionWithCheckSubscriptionExist() {
+    @DisplayName("Check non-existing subscription for not throwing exception")
+    void testSubscriptionNotExists_CheckWithNonExistingSubscription() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
-
-        assertDoesNotThrow(() -> subscriptionValidator.checkIfSubscriptionExists(followerId, followeeId));
-    }
-
-    @Test
-    @DisplayName("Check existing subscription with checkIfSubscriptionNotExist")
-    void testValidateUsers_CheckExistingSubscriptionWithCheckSubscriptionNotExist() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         assertDoesNotThrow(() -> subscriptionValidator.checkIfSubscriptionNotExists(followerId, followeeId));
     }
 
     @Test
-    @DisplayName("Check non-existing subscription with checkIfSubscriptionNotExist")
-    void testValidateUsers_CheckNonExistingSubscriptionWithCheckSubscriptionNotExist() {
+    @DisplayName("Check existing subscription for not throwing exception")
+    void testSubscriptionExists_CheckWithExistingSubscription() {
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+
+        assertDoesNotThrow(() -> subscriptionValidator.checkIfSubscriptionExists(followerId, followeeId));
+    }
+
+    @Test
+    @DisplayName("Check non-existing subscription for exception")
+    void testSubscriptionExists_CheckSubscriptionNotFoundException() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
 
         assertThrows(SubscriptionNotFoundException.class,
-                () -> subscriptionValidator.checkIfSubscriptionNotExists(followerId, followeeId));
+                () -> subscriptionValidator.checkIfSubscriptionExists(followerId, followeeId));
     }
 }

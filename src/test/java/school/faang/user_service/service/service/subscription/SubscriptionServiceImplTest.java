@@ -10,21 +10,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.SubscriptionServiceImpl;
 import school.faang.user_service.service.subscription.SubscriptionValidator;
-import school.faang.user_service.service.subscription.filters.SubscriptionUserFilter;
+import school.faang.user_service.service.subscription.filters.UserFiltersApplier;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,10 +40,10 @@ class SubscriptionServiceImplTest {
     private SubscriptionRepository subscriptionRepository;
 
     @Mock
-    private SubscriptionUserFilter userFilter;
+    private UserFiltersApplier userFilter;
 
     @Spy
-    private UserMapper userMapper;
+    private UserMapper userMapper = new UserMapperImpl();
 
     @Mock
     private SubscriptionValidator validator;
@@ -57,14 +60,14 @@ class SubscriptionServiceImplTest {
     void testFollowUser_SuccessfullyFollowing() {
         subscriptionService.followUser(followerId, followeeId);
 
-        verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
+        verify(subscriptionRepository).followUser(followerId, followeeId);
     }
 
     @Test
     @DisplayName("Subscription with failed subscription validation")
     void testFollowUser_FailedSubscriptionValidation() {
         doThrow(DataValidationException.class)
-                .when(validator).checkSubscriptionOnHimself(followerId, followerId);
+                .when(validator).checkIfSubscriptionToHimself(followerId, followerId);
 
         assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followerId));
     }
@@ -73,7 +76,7 @@ class SubscriptionServiceImplTest {
     @DisplayName("Subscription with failed subscription existing validation")
     void testFollowUser_FailedSubscriptionExistingValidation() {
         doThrow(SubscriptionAlreadyExistsException.class)
-                .when(validator).checkIfSubscriptionExists(followerId, followeeId);
+                .when(validator).checkIfSubscriptionNotExists(followerId, followeeId);
 
         assertThrows(SubscriptionAlreadyExistsException.class,
                 () -> subscriptionService.followUser(followerId, followeeId));
@@ -83,7 +86,7 @@ class SubscriptionServiceImplTest {
     @DisplayName("Subscription with failed users validation")
     void testFollowUser_FailedUsersValidation() {
         doThrow(EntityNotFoundException.class)
-                .when(validator).validateUsers(followerId, followeeId);
+                .when(validator).validateUserIds(followerId, followeeId);
 
         assertThrows(EntityNotFoundException.class, () -> subscriptionService.followUser(followerId, followeeId));
     }
@@ -93,7 +96,7 @@ class SubscriptionServiceImplTest {
     void testUnfollowUser_SuccessfullyUnfollowing() {
         subscriptionService.unfollowUser(followerId, followeeId);
 
-        verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository).unfollowUser(followerId, followeeId);
     }
 
     @Test
@@ -103,32 +106,55 @@ class SubscriptionServiceImplTest {
                 .when(validator).checkIfSubscriptionExists(followerId, followeeId);
 
         assertThrows(SubscriptionNotFoundException.class,
-                () -> subscriptionService.followUser(followerId, followeeId));
+                () -> subscriptionService.unfollowUser(followerId, followeeId));
     }
 
     @Test
     @DisplayName("Successfully getting followers")
     void testGetFollowers_SuccessfullyGettingFollowers() {
         List<User> followers = initUsers();
-        List<SubscriptionUserDto> followersDto = getSubscriptionUserDtos(followers);
+        List<Long> followersIds = followers.stream()
+                .map(User::getId)
+                .toList();
         Stream<User> followersStream = followers.stream();
 
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followersStream);
         when(userFilter.filterUsers(followersStream, userFilterDto)).thenReturn(followers);
 
         var result = subscriptionService.getFollowers(followeeId, userFilterDto);
+        List<Long> resultIds = result.stream()
+                .map(SubscriptionUserDto::id)
+                .toList();
 
-        verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
-        verify(userFilter, times(1)).filterUsers(followersStream, userFilterDto);
-        verify(userMapper, times(2)).toSubscriptionUserDtos(followers);
-        assertEquals(followersDto, result);
+        verify(subscriptionRepository).findByFolloweeId(followeeId);
+        verify(userFilter).filterUsers(followersStream, userFilterDto);
+        verify(userMapper).toSubscriptionUserDtos(followers);
+        assertEquals(followersIds, resultIds);
+    }
+
+    @Test
+    @DisplayName("Getting followers when followee doesn't have followers")
+    void testGetFollowers_GetEmptyFollowers() {
+        List<User> followers = new ArrayList<>();
+        var followersStream = followers.stream();
+
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followersStream);
+        when(userFilter.filterUsers(followersStream, userFilterDto)).thenReturn(followers);
+
+        var result = subscriptionService.getFollowers(followeeId, userFilterDto);
+
+        verify(subscriptionRepository).findByFolloweeId(followeeId);
+        verify(userFilter).filterUsers(followersStream, userFilterDto);
+        verify(userMapper).toSubscriptionUserDtos(followers);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
     @DisplayName("Getting followers failed with user validation")
     void testGetFollowers_FailedUsersValidation() {
         doThrow(EntityNotFoundException.class)
-                .when(validator).validateUser(followeeId);
+                .when(validator).validateUserIds(followeeId);
 
         assertThrows(EntityNotFoundException.class, () -> subscriptionService.getFollowers(followeeId, userFilterDto));
     }
@@ -150,7 +176,7 @@ class SubscriptionServiceImplTest {
     @DisplayName("Getting followers count failed with user validation")
     void testGetFollowersCount_FailedUsersValidation() {
         doThrow(EntityNotFoundException.class)
-                .when(validator).validateUser(followeeId);
+                .when(validator).validateUserIds(followeeId);
 
         assertThrows(EntityNotFoundException.class, () -> subscriptionService.getFollowersCount(followeeId));
     }
@@ -159,25 +185,49 @@ class SubscriptionServiceImplTest {
     @DisplayName("Successfully getting following")
     void testGetFollowing_SuccessfullyGettingFollowing() {
         List<User> followings = initUsers();
-        List<SubscriptionUserDto> followingsDto = getSubscriptionUserDtos(followings);
+        List<Long> followingIds = followings.stream()
+                .map(User::getId)
+                .toList();
         Stream<User> followingsStream = followings.stream();
 
         when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(followingsStream);
         when(userFilter.filterUsers(followingsStream, userFilterDto)).thenReturn(followings);
 
         var result = subscriptionService.getFollowings(followerId, userFilterDto);
+        List<Long> resultIds = result.stream()
+                .map(SubscriptionUserDto::id)
+                .toList();
 
-        verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
-        verify(userFilter, times(1)).filterUsers(followingsStream, userFilterDto);
-        verify(userMapper, times(2)).toSubscriptionUserDtos(followings);
-        assertEquals(followingsDto, result);
+        verify(subscriptionRepository).findByFollowerId(followerId);
+        verify(userFilter).filterUsers(followingsStream, userFilterDto);
+        verify(userMapper).toSubscriptionUserDtos(followings);
+
+        assertEquals(followingIds, resultIds);
+    }
+
+    @Test
+    @DisplayName("Getting following when follower doesn't have following")
+    void testGetFollowing_GetEmptyFollowing() {
+        List<User> followings = new ArrayList<>();
+        var followingsStream = followings.stream();
+
+        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(followingsStream);
+        when(userFilter.filterUsers(followingsStream, userFilterDto)).thenReturn(followings);
+
+        var result = subscriptionService.getFollowings(followerId, userFilterDto);
+
+        verify(subscriptionRepository).findByFollowerId(followerId);
+        verify(userFilter).filterUsers(followingsStream, userFilterDto);
+        verify(userMapper).toSubscriptionUserDtos(followings);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
     @DisplayName("Getting following failed with user validation")
     void testGetFollowing_FailedUsersValidation() {
         doThrow(EntityNotFoundException.class)
-                .when(validator).validateUser(followerId);
+                .when(validator).validateUserIds(followerId);
 
         assertThrows(EntityNotFoundException.class,
                 () -> subscriptionService.getFollowings(followerId, userFilterDto));
@@ -192,7 +242,7 @@ class SubscriptionServiceImplTest {
 
         int result = subscriptionService.getFollowingCounts(followerId);
 
-        verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
+        verify(subscriptionRepository).findFolloweesAmountByFollowerId(followerId);
         assertEquals(followings.size(), result);
     }
 
@@ -200,13 +250,9 @@ class SubscriptionServiceImplTest {
     @DisplayName("Getting following count failed with user validation")
     void testGetFollowingCount_FailedUsersValidation() {
         doThrow(EntityNotFoundException.class)
-                .when(validator).validateUser(followerId);
+                .when(validator).validateUserIds(followerId);
 
         assertThrows(EntityNotFoundException.class, () -> subscriptionService.getFollowingCounts(followerId));
-    }
-
-    private List<SubscriptionUserDto> getSubscriptionUserDtos(List<User> users) {
-        return userMapper.toSubscriptionUserDtos(users);
     }
 
     private List<User> initUsers() {

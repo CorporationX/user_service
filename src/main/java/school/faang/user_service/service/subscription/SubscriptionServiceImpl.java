@@ -8,7 +8,7 @@ import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.subscription.filters.SubscriptionUserFilter;
+import school.faang.user_service.service.subscription.filters.UserFiltersApplier;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,51 +17,51 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final SubscriptionUserFilter userFilter;
+    private final UserFiltersApplier userFilter;
     private final UserMapper userMapper;
     private final SubscriptionValidator validator;
 
     @Override
     @Transactional
     public void followUser(Long followerId, Long followeeId) {
-        validator.checkSubscriptionOnHimself(followerId, followeeId);
-        validator.checkIfSubscriptionExists(followerId, followeeId);
-        validator.validateUsers(followerId, followeeId);
+        validator.checkIfSubscriptionToHimself(followerId, followeeId);
+        validator.checkIfSubscriptionNotExists(followerId, followeeId);
+        validator.validateUserIds(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     @Override
     @Transactional
     public void unfollowUser(Long followerId, Long followeeId) {
-        validator.checkIfSubscriptionNotExists(followerId, followeeId);
+        validator.checkIfSubscriptionExists(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
     @Override
     @Transactional
     public List<SubscriptionUserDto> getFollowers(Long followeeId, UserFilterDto filters) {
-        validator.validateUser(followeeId);
+        validator.validateUserIds(followeeId);
         Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);
         return userMapper.toSubscriptionUserDtos(userFilter.filterUsers(followers, filters));
     }
 
     @Override
     public int getFollowersCount(Long followeeId) {
-        validator.validateUser(followeeId);
+        validator.validateUserIds(followeeId);
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
     @Override
     @Transactional
     public List<SubscriptionUserDto> getFollowings(Long followerId, UserFilterDto filters) {
-        validator.validateUser(followerId);
+        validator.validateUserIds(followerId);
         Stream<User> followees = subscriptionRepository.findByFollowerId(followerId);
         return userMapper.toSubscriptionUserDtos(userFilter.filterUsers(followees, filters));
     }
 
     @Override
     public int getFollowingCounts(Long followerId) {
-        validator.validateUser(followerId);
+        validator.validateUserIds(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 }

@@ -7,16 +7,18 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class NameFilter implements UserFilter {
+public class CountryFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.namePattern() != null;
+        return filters.countryPattern() != null;
     }
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
-                .filter(user -> user.getUsername() != null && user.getUsername().contains(filters.namePattern()));
+                .filter(user -> user.getCountry() != null &&
+                        user.getCountry().getTitle() != null &&
+                        user.getCountry().getTitle().contains(filters.countryPattern()));
     }
 }

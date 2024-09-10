@@ -7,16 +7,16 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class NameFilter implements UserFilter {
+public class PhoneFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.namePattern() != null;
+        return filters.phonePattern() != null;
     }
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
-                .filter(user -> user.getUsername() != null && user.getUsername().contains(filters.namePattern()));
+                .filter(user -> user.getPhone() != null && user.getPhone().contains(filters.phonePattern()));
     }
 }

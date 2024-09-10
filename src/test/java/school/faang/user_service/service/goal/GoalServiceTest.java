@@ -1,24 +1,27 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -29,114 +32,145 @@ public class GoalServiceTest {
     @Mock
     private SkillRepository skillRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private GoalService goalService;
 
-    private Long userId;
-    private GoalDto goalDto;
-    private Long firstSkillId;
+    private User user;
+    private Goal goal;
+    private Skill skill;
 
     @BeforeEach
     public void setUp() {
-        userId = 1L;
-        goalDto = new GoalDto();
-        goalDto.setId(100L);
-        goalDto.setTitle("Learning");
-        firstSkillId = 10L;
-        goalDto.setSkillIds(List.of(firstSkillId));
+        user = new User();
+        user.setId(1L);
+
+        skill = new Skill();
+        skill.setId(10L);
+
+        goal = new Goal();
+        goal.setId(100L);
+        goal.setTitle("Learning");
+        goal.setSkillsToAchieve(new ArrayList<>(List.of(skill)));
+
     }
 
     @Test
-    @DisplayName("Success create new goal in service")
+    @DisplayName("Success create new goal")
     public void testCreateNewGoalIsSuccess() {
-        Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(1);
-        Mockito.when(skillRepository.existsById(firstSkillId)).thenReturn(true);
+        when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(1);
+        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(goalRepository.save(goal)).thenReturn(goal);
 
-        goalService.createGoal(userId, goalDto);
-        Mockito.verify(goalRepository, Mockito.atMostOnce())
-                .create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParent());
-        Mockito.verify(goalRepository, Mockito.atMostOnce())
-                .addSkillToGoal(firstSkillId, goalDto.getId());
+        Goal newGoal = goalService.createGoal(user.getId(), goal);
+
+        verify(goalRepository).save(goal);
+        assertEquals(goal, newGoal);
     }
 
     @Test
-    @DisplayName("Success update active goalDto in service")
+    @DisplayName("Success update active goal")
     public void testUpdateActiveGoalDtoIsSuccess() {
-        Goal goalEntity = new Goal();
-        goalEntity.setId(goalDto.getId());
-        goalEntity.setStatus(GoalStatus.ACTIVE);
-        Mockito.when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goalEntity));
-        Mockito.when(skillRepository.existsById(firstSkillId)).thenReturn(true);
+        Goal existingGoal = new Goal();
+        existingGoal.setId(100L);
+        existingGoal.setSkillsToAchieve(new ArrayList<>());
+        existingGoal.setUsers(new ArrayList<>());
 
-        goalDto.setStatus(GoalStatus.ACTIVE);
-        goalService.updateGoal(userId, goalDto);
+        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(existingGoal));
+        goal.setStatus(GoalStatus.ACTIVE);
 
-        Mockito.verify(goalRepository, Mockito.atMostOnce())
-                .removeSkillsFromGoal(goalDto.getId());
+        goalService.updateGoal(goal);
 
-        Mockito.verify(goalRepository, Mockito.atLeastOnce())
-                .addSkillToGoal(firstSkillId, goalDto.getId());
+        verify(goalRepository).save(existingGoal);
+        assertEquals(goal.getSkillsToAchieve(), existingGoal.getSkillsToAchieve());
+
     }
 
     @Test
-    @DisplayName("Success update completed goalDto in service")
+    @DisplayName("Success update completed goal")
     public void testUpdateCompletedGoalDtoIsSuccess() {
-        Goal goalEntity = new Goal();
-        goalEntity.setId(goalDto.getId());
-        goalEntity.setStatus(GoalStatus.ACTIVE);
+        Goal existingGoal = new Goal();
+        existingGoal.setId(100L);
+        skill.setUsers(new ArrayList<>());
+        existingGoal.setSkillsToAchieve(new ArrayList<>(List.of(skill)));
+        existingGoal.setUsers(new ArrayList<>(List.of(user)));
+        existingGoal.setStatus(GoalStatus.ACTIVE);
 
-        User user = new User();
-        user.setId(userId);
-        List<User> users = List.of(user);
+        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(existingGoal));
+        goal.setStatus(GoalStatus.COMPLETED);
 
-        Mockito.when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goalEntity));
-        Mockito.when(skillRepository.existsById(firstSkillId)).thenReturn(true);
-        Mockito.when(goalRepository.findUsersByGoalId(goalDto.getId())).thenReturn(users);
+        goalService.updateGoal(goal);
 
-        goalDto.setStatus(GoalStatus.COMPLETED);
-        goalService.updateGoal(userId, goalDto);
+        assertEquals(GoalStatus.COMPLETED, existingGoal.getStatus());
+        assertTrue(skill.getUsers().contains(user));
+        verify(goalRepository).save(existingGoal);
+    }
 
-        Mockito.verify(skillRepository, Mockito.atLeastOnce())
-                .assignSkillToUser(firstSkillId, userId);
+    @Test
+    @DisplayName("Incorrect goal title")
+    public void testGoalTitleIsInvalid() {
+        goal.setTitle(null);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> goalService.createGoal(user.getId(), goal)
+        );
+
+        String expectedMessage = "Title cannot be null or empty";
+        String resultMessage = exception.getMessage();
+        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
     @DisplayName("Incorrect amount active goals")
     public void testUserActiveGoalCountIsInvalid() {
-        Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(3);
+        when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(3);
 
-        IllegalArgumentException exception = Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> goalService.createGoal(userId, goalDto)
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> goalService.createGoal(user.getId(), goal)
         );
-        Assertions.assertEquals("The number of active user goals has been exceeded", exception.getMessage());
+
+        String expectedMessage = "The number of active user goals has been exceeded";
+        String resultMessage = exception.getMessage();
+        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
     @DisplayName("Incorrect goal skill")
     public void testGoalSkillsIsInvalid() {
-        Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(1);
-        Mockito.when(skillRepository.existsById(firstSkillId)).thenReturn(false);
+        when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(1);
+        when(skillRepository.existsById(skill.getId())).thenReturn(false);
 
-        IllegalArgumentException exception = Assert.assertThrows(
+        IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> goalService.createGoal(userId, goalDto));
-        Assertions.assertEquals("Skill does not exist", exception.getMessage());
+                () -> goalService.createGoal(user.getId(), goal)
+        );
+
+        String expectedMessage = "Skill does not exist";
+        String resultMessage = exception.getMessage();
+        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
     @DisplayName("Incorrect goalEntity status")
     public void updateGoalIsInvalid() {
-        Goal goalEntity = new Goal();
-        goalEntity.setId(goalDto.getId());
-        goalEntity.setStatus(GoalStatus.COMPLETED);
-        Mockito.when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goalEntity));
+        goal.setStatus(GoalStatus.COMPLETED);
+        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
-        IllegalArgumentException exception = Assert.assertThrows(
+        IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> goalService.updateGoal(userId, goalDto));
-        Assertions.assertEquals("Cannot update a completed goal", exception.getMessage());
+                () -> goalService.updateGoal(goal)
+        );
 
-
+        String expectedMessage = "It is impossible to change a completed goal";
+        String resultMessage = exception.getMessage();
+        assertEquals(expectedMessage, resultMessage);
     }
 }

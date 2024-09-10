@@ -21,7 +21,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
-            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
+            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) RETURNING *
             """)
     Goal create(String title, String description, Long parent);
 
@@ -49,8 +49,4 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
-
-    void addSkillToGoal(Long skillId, Long goalId);
-
-    void removeSkillsFromGoal(Long goalId);
 }

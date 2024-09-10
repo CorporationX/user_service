@@ -1,28 +1,54 @@
 package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.service.goal.GoalService;
 
-@Component
 @RequiredArgsConstructor
+@RestController
+@RequestMapping("/goals")
+@Slf4j
 public class GoalController {
     private final GoalService goalService;
+    private final GoalMapper mapper;
 
-    public void createGoal(Long userId, GoalDto goal) {
-        validateGoalTitle(goal);
-        goalService.createGoal(userId, goal);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public GoalDto createGoal(
+            @RequestParam Long userId,
+            @RequestBody GoalDto goalDto
+    ) {
+        Goal goal = mapper.toEntity(goalDto);
+        Goal newGoal = goalService.createGoal(userId, goal);
+        return mapper.toDto(newGoal);
     }
 
-    public void updateGoal(Long userId, GoalDto goal) {
-        validateGoalTitle(goal);
-        goalService.updateGoal(userId, goal);
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public GoalDto updateGoal(@RequestBody GoalDto goalDto) {
+        Goal goal = mapper.toEntity(goalDto);
+        Goal newGoal = goalService.updateGoal(goal);
+        return mapper.toDto(newGoal);
     }
 
-    private void validateGoalTitle(GoalDto goal) {
-        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
-            throw new IllegalArgumentException("Goal title is empty or null");
-        }
+    @DeleteMapping("/{goalId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteGoal(@PathVariable Long goalId) {
+        goalService.deleteGoal(goalId);
     }
 }

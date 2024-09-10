@@ -1,85 +1,104 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.goal.GoalDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
+@Slf4j
 public class GoalService {
     private static final int MAX_AMOUNT_ACTIVE_GOAL = 3;
 
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
 
-    public void createGoal(Long userId, GoalDto goal) {
+    public Goal createGoal(Long userId, Goal goal) {
+        validateTitle(goal);
         validateUserActiveGoalCount(userId);
-        validateGoalSkillsIsExist(goal);
-        goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent());
-        addSkillsToGoal(goal);
+        validateGoalSkillsExist(goal);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow();
+        goal.setUsers(List.of(user));
+
+        return goalRepository.save(goal);
     }
 
-    public void updateGoal(Long userId, GoalDto goal) {
-        validateGoalStatus(userId, goal);
-        validateGoalSkillsIsExist(goal);
+    public Goal updateGoal(Goal goal) {
+        validateTitle(goal);
+        validateGoalSkillsExist(goal);
+        validateExistingGoalStatus(goal);
+
+        Long goalId = goal.getId();
         if (goal.getStatus() == GoalStatus.COMPLETED) {
-            assignSkillsForUsers(goal);
+            Goal existingGoal = goalRepository.findById(goalId)
+                    .orElseThrow();
+
+            existingGoal.setStatus(GoalStatus.COMPLETED);
+
+            List<Skill> existingSkills = existingGoal.getSkillsToAchieve();
+            List<User> existingUsers = existingGoal.getUsers();
+            existingSkills.forEach(skill -> skill.getUsers().addAll(existingUsers));
+
+            return goalRepository.save(existingGoal);
+
         } else {
-            updateSkillsInGoal(goal);
+            Goal existingGoal = goalRepository.findById(goalId)
+                    .orElseThrow();
+            existingGoal.getSkillsToAchieve().clear();
+            List<Skill> newSkills = goal.getSkillsToAchieve();
+            existingGoal.getSkillsToAchieve().addAll(newSkills);
+            return goalRepository.save(existingGoal);
         }
     }
 
-    private void updateSkillsInGoal(GoalDto goal) {
-        goalRepository.removeSkillsFromGoal(goal.getId());
-        goal.getSkillIds()
-                .forEach(skillId -> goalRepository.addSkillToGoal(skillId, goal.getId()));
+    public void deleteGoal(Long goalId) {
+        goalRepository.deleteById(goalId);
     }
 
-    private void assignSkillsForUsers(GoalDto goal) {
-        List<User> users = goalRepository.findUsersByGoalId(goal.getId());
-        List<Long> skillIds = goal.getSkillIds();
-        users.forEach(user -> assignSkillsForOneUser(user, skillIds));
-    }
-
-    private void assignSkillsForOneUser(User user, List<Long> skillIds) {
-        skillIds.forEach(skillId -> skillRepository.assignSkillToUser(skillId, user.getId()));
+    private void validateTitle(Goal goal) {
+        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
+            log.error("Title cannot be null or empty");
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
     }
 
     private void validateUserActiveGoalCount(Long userId) {
         if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_AMOUNT_ACTIVE_GOAL) {
-            throw new IllegalArgumentException("The number of active user goals has been exceeded");
+            log.error("The number of active user goals has been exceeded");
+            throw new IllegalStateException("The number of active user goals has been exceeded");
         }
     }
 
-    private void validateGoalSkillsIsExist(GoalDto goal) {
-        List<Long> skillIds = goal.getSkillIds();
-        skillIds.forEach(skillId -> {
-            if (!skillRepository.existsById(skillId)) {
-                throw new IllegalArgumentException("Skill does not exist");
-            }
-        });
+    private void validateGoalSkillsExist(Goal goal) {
+        List<Skill> skills = goal.getSkillsToAchieve();
+        skills.stream()
+                .map(Skill::getId)
+                .forEach(skillId -> {
+                    if (!skillRepository.existsById(skillId)) {
+                        log.error("Skill={} does not exist", skillId);
+                        throw new IllegalArgumentException("Skill does not exist");
+                    }
+                });
     }
 
-    private void addSkillsToGoal(GoalDto goal) {
-        goal.getSkillIds()
-                .forEach(skillId -> goalRepository.addSkillToGoal(skillId, goal.getId()));
-    }
-
-    private void validateGoalStatus(Long userId, GoalDto goalDto) {
-        Goal goalEntity = goalRepository.findGoalsByUserId(userId)
-                .filter(goal -> goal.getId().equals(goalDto.getId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("The goal does not exist"));
-
-        if (goalEntity.getStatus() == GoalStatus.COMPLETED) {
-            throw new IllegalArgumentException("Cannot update a completed goal");
+    private void validateExistingGoalStatus(Goal goal) {
+        Goal exsitingGoal = goalRepository.findById(goal.getId())
+                .orElseThrow();
+        if (exsitingGoal.getStatus().equals(GoalStatus.COMPLETED)) {
+            log.error("It is impossible to change a completed goal={}", exsitingGoal.getId());
+            throw new IllegalArgumentException("It is impossible to change a completed goal");
         }
     }
 }

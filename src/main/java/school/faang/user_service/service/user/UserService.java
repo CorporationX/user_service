@@ -4,15 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.randomAvatar.AvatarService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserFilterValidation;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -26,6 +31,32 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final UserFilterValidation userFilterValidation;
     private final UserMapper userMapper;
+    private final AvatarService avatarService;
+    private final CountryRepository countryRepository;
+
+    private final UserValidator userValidator;
+
+    @Transactional
+    public UserDto createUser(UserDto userDto, MultipartFile avatar) {
+        Country country = countryRepository.findById(userDto.getCountryId())
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Country with %s id doesn't exist", userDto.getCountryId())));
+
+        User userToSave = userMapper.toEntity(userDto);
+        userToSave.setCountry(country);
+
+        userRepository.save(userToSave);
+
+        if (avatar == null) {
+            avatarService.setAvatar(userDto, null);
+        } else {
+            avatarService.setAvatar(userDto, avatarService.convertMultipartFileToBytes(avatar));
+        }
+
+        userToSave.setUserProfilePic(userDto.getUserProfilePic());
+        User savedUser = userRepository.save(userToSave);
+
+        return userMapper.toDto(savedUser);
+    }
 
     @Transactional(readOnly = true)
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
@@ -79,5 +110,21 @@ public class UserService {
             log.error("User with id :{} doesn't exist!", id);
             throw new EntityNotFoundException("User with id :" + id + " doesn't exist!");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getById(Long userId) {
+        User foundedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with %s id doesn't exist", userId)));
+
+        return userMapper.toDto(foundedUser);
+    }
+
+    @Transactional
+    public byte[] getAvatar(Long userId) {
+        UserDto userById = getById(userId);
+        String avatarId = userById.getUserProfilePic().getSmallFileId();
+
+        return avatarService.get(avatarId);
     }
 }

@@ -13,6 +13,8 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(source = "premium.id", target = "premiumId")
+    @Mapping(source = "password", target = "password", ignore = true)
+    @Mapping(source = "country.id", target = "countryId")
     UserDto toDto(User user);
 
     List<UserDto> toDtoList(List<User> users);

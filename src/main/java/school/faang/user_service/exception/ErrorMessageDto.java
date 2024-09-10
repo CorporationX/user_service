@@ -1,4 +1,4 @@
-package school.faang.user_service.handler;
+package school.faang.user_service.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

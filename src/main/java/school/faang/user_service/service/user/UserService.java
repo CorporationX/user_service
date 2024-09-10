@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -12,6 +13,7 @@ import school.faang.user_service.service.user.filter.UserFilter;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -20,12 +22,13 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
+        log.info("Find premium users by filter: {}", userFilterDto.toString());
         Stream<Premium> premiums = premiumRepository.findPremiumUsers();
         Stream<User> users = premiums.map(Premium::getUser);
         return filterUsers(users, userFilterDto);
     }
 
-    public List<User> filterUsers(Stream<User> users, UserFilterDto userFilterDto) {
+    private List<User> filterUsers(Stream<User> users, UserFilterDto userFilterDto) {
         return userFilters
             .stream()
             .filter(f -> f.isApplicable(userFilterDto))

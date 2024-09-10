@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceTest extends AbstractUserServiceTest {
     @Mock
     private PremiumRepository premiumRepository;
 
@@ -48,15 +48,15 @@ class UserServiceTest {
     @Test
     void testGetPremiumUsers() {
         UserFilterDto userFilterDto = UserFilterDto.builder()
-            .username("jdoe")
-            .email("john.doe@email.com")
+            .username(USERNAME)
+            .email(EMAIL)
             .build();
 
         Premium premiumToFind = Premium.builder()
-            .user(User.builder().username("jdoe").email("john.doe@email.com").build())
+            .user(createUser(USERNAME, EMAIL))
             .build();
         Premium premiumToNotFind = Premium.builder()
-            .user(User.builder().username("").email("").build())
+            .user(createUser("", ""))
             .build();
         Stream<Premium> premiums = Stream.of(premiumToFind, premiumToNotFind);
 
@@ -65,7 +65,7 @@ class UserServiceTest {
         List<User> result = userService.getPremiumUsers(userFilterDto);
 
         assertEquals(1, result.size());
-        assertEquals("jdoe", result.get(0).getUsername());
-        assertEquals("john.doe@email.com", result.get(0).getEmail());
+        assertEquals(USERNAME, result.get(0).getUsername());
+        assertEquals(EMAIL, result.get(0).getEmail());
     }
 }

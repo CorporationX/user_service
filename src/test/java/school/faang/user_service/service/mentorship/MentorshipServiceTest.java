@@ -75,16 +75,13 @@ public class MentorshipServiceTest {
                 .build();
         mentee.setMentors(new ArrayList<>(List.of(user2)));
         mentor.setMentees(new ArrayList<>(List.of(user2, user3)));
-
     }
 
     @Test
     @DisplayName("Получение пустого списка менти у пользователя без менти")
     public void testGetEmptyMentees() {
         when(mentorshipRepository.findById(USER_ID)).thenReturn(Optional.of(user1));
-
         List<MentorshipUserDto> result = mentorshipService.getMentees(USER_ID);
-
         assertEquals(user1.getMentees().size(), result.size());
         verify(mentorshipRepository).findById(USER_ID);
         verify(userMapper).toMentorshipUserDtos(user1.getMentees());
@@ -94,9 +91,7 @@ public class MentorshipServiceTest {
     @DisplayName("Получение списка менти у пользователя с существующим id")
     public void testGetMentees() {
         when(mentorshipRepository.findById(MENTOR_ID)).thenReturn(Optional.of(mentor));
-
         List<MentorshipUserDto> result = mentorshipService.getMentees(MENTOR_ID);
-
         assertEquals(mentor.getMentees().size(), result.size());
         List<Long> resultIds = result.stream()
                         .map(MentorshipUserDto::id)
@@ -128,6 +123,7 @@ public class MentorshipServiceTest {
         List<MentorshipUserDto> result = mentorshipService.getMentors(USER_ID);
         assertEquals(user1.getMentors().size(), result.size());
         verify(mentorshipRepository).findById(USER_ID);
+        verify(userMapper).toMentorshipUserDtos(user1.getMentors());
     }
 
     @Test
@@ -136,8 +132,12 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.findById(MENTEE_ID)).thenReturn(Optional.of(mentee));
         List<MentorshipUserDto> result = mentorshipService.getMentors(MENTEE_ID);
         assertEquals(mentee.getMentors().size(), result.size());
-        assertTrue(result.containsAll(userMapper.toMentorshipUserDtos(mentee.getMentors())));
+        List<Long> resultIds = result.stream()
+                .map(MentorshipUserDto::id)
+                .toList();
+        assertTrue(resultIds.contains(4L));
         verify(mentorshipRepository).findById(MENTEE_ID);
+        verify(userMapper).toMentorshipUserDtos(mentee.getMentors());
     }
 
     @Test
@@ -158,7 +158,6 @@ public class MentorshipServiceTest {
     @DisplayName("Позитивный тест для удаления связи ментор-менти")
     public void testDeleteMentorshipPositive() {
         when(mentorshipRepository.findById(MENTEE_ID)).thenReturn(Optional.of(mentee));
-
         mentorshipService.deleteMentorship(mentee.getId(), user2.getId());
         verify(mentorshipRepository).findById(MENTEE_ID);
         assertFalse(mentee.getMentors().contains(user2));

@@ -3,6 +3,7 @@ package school.faang.user_service.service.service.subscription;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -15,7 +16,6 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.SubscriptionServiceImpl;
 import school.faang.user_service.service.subscription.SubscriptionValidator;
@@ -43,7 +43,7 @@ class SubscriptionServiceImplTest {
     private UserFiltersApplier userFilter;
 
     @Spy
-    private UserMapper userMapper = new UserMapperImpl();
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Mock
     private SubscriptionValidator validator;

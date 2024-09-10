@@ -11,15 +11,15 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("EventValidatorTest")
 public class EventParticipationValidatorTest {
-    long eventId = 1L;
-    long userId = 1L;
+    private final long eventId = 1L;
+    private final long userId = 1L;
 
     @InjectMocks
     private EventParticipationValidator eventParticipationValidator;
@@ -28,9 +28,8 @@ public class EventParticipationValidatorTest {
     private EventParticipationRepository eventParticipationRepository;
 
     @Test
-    @DisplayName("validateParticipantRegistered_Registered")
     public void validateParticipantRegistered_Registered() {
-        User participant = setUpCreateUser();
+        User participant = createUser();
 
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(participant);
 
@@ -39,30 +38,16 @@ public class EventParticipationValidatorTest {
     }
 
     @Test
-    @DisplayName("validateParticipantRegistered_NotRegistered")
     public void validateParticipantRegistered_NotRegistered() {
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(null);
 
-        boolean result = eventParticipationValidator.validateParticipationRegistered(eventId, userId);
+        assertDoesNotThrow(() -> eventParticipationValidator.validateParticipationRegistered(eventId, userId));
 
-        assertEquals(false, result);
+        verify(eventParticipationRepository).findParticipantByIdAndEventId(eventId, userId);
     }
 
     @Test
-    @DisplayName("validateParticipationNotRegistered_Registered")
     public void validateParticipationNotRegistered_Registered() {
-        User participant = setUpCreateUser();
-
-        when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(participant);
-
-        boolean result = eventParticipationValidator.validateParticipationNotRegistered(eventId, userId);
-
-        assertEquals(false, result);
-    }
-
-    @Test
-    @DisplayName("validateParticipationNotRegistered_NotRegistered")
-    public void validateParticipationNotRegistered_NotRegistered() {
         when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(null);
 
         assertThrows(EventParticipationRegistrationException.class, () ->
@@ -70,53 +55,51 @@ public class EventParticipationValidatorTest {
     }
 
     @Test
-    @DisplayName("checkEventExists_Exists")
-    public void checkEventExists_Exists() {
-        setUpCheckEventExists(true);
+    public void validateParticipationNotRegistered_NotRegistered() {
+        User participant = createUser();
 
-        boolean result = eventParticipationValidator.checkEventExists(eventId);
+        when(eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId)).thenReturn(participant);
 
-        assertEquals(true, result);
+        assertDoesNotThrow(() -> eventParticipationValidator.validateParticipationNotRegistered(eventId, userId));
+
+        verify(eventParticipationRepository).findParticipantByIdAndEventId(eventId, userId);
     }
 
     @Test
-    @DisplayName("checkEventExists_NotExists")
+    public void checkEventExists_Exists() {
+        when(eventParticipationRepository.eventExistsById(eventId)).thenReturn(true);
+
+        assertDoesNotThrow(() -> eventParticipationValidator.checkEventExists(eventId));
+
+        verify(eventParticipationRepository).eventExistsById(eventId);
+    }
+
+    @Test
     public void checkEventExists_NotExists() {
-        setUpCheckEventExists(false);
+        when(eventParticipationRepository.eventExistsById(eventId)).thenReturn(false);
 
         assertThrows(EntityNotFoundException.class, () ->
                 eventParticipationValidator.checkEventExists(eventId));
     }
 
     @Test
-    @DisplayName("checkUserExists_Exists")
     public void checkUserExists_Exists() {
-        setUpCheckUserExists(true);
+        when(eventParticipationRepository.userExistsById(userId)).thenReturn(true);
 
-        boolean result = eventParticipationValidator.checkUserExists(userId);
+        assertDoesNotThrow(() -> eventParticipationValidator.checkUserExists(userId));
 
-        assertEquals(true, result);
+        verify(eventParticipationRepository).userExistsById(userId);
     }
 
     @Test
-    @DisplayName("checkUserExists_UserNotExists")
     public void checkUserExists_UserNotExists() {
-        setUpCheckUserExists(false);
+        when(eventParticipationRepository.userExistsById(userId)).thenReturn(false);
 
         assertThrows(EntityNotFoundException.class, () ->
                 eventParticipationValidator.checkUserExists(userId));
     }
 
-    private void setUpCheckUserExists(boolean isUserExists) {
-        when(eventParticipationRepository.userExistsById(userId)).thenReturn(isUserExists);
-    }
-
-    private void setUpCheckEventExists(boolean isEventExists) {
-        when(eventParticipationRepository.eventExistsById(eventId)).thenReturn(isEventExists);
-    }
-
-    private User setUpCreateUser() {
-        User user = new User();
-        return user;
+    private User createUser() {
+        return new User();
     }
 }

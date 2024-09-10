@@ -20,6 +20,7 @@ public class EventParticipationServiceImpl implements EventParticipationService 
     private final EventParticipationValidator eventParticipationValidator;
     private final UserMapper userMapper;
 
+    @Override
     public void registerParticipant(long eventId, long userId) {
         eventParticipationValidator.checkEventExists(eventId);
         eventParticipationValidator.checkUserExists(userId);
@@ -28,6 +29,7 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         log.info("User {} has been registered with event {}", userId, eventId);
     }
 
+    @Override
     public void unregisterParticipant(long eventId, long userId) {
         eventParticipationValidator.checkEventExists(eventId);
         eventParticipationValidator.checkUserExists(userId);
@@ -36,18 +38,20 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         log.info("User {} has been unregistered with event {}", userId, eventId);
     }
 
+    @Override
     public List<EventUserDto> getParticipants(long eventId) {
         eventParticipationValidator.checkEventExists(eventId);
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        List<EventUserDto> participantsDto = userMapper.usersToUsersDto(participants);
+        List<EventUserDto> participantsDto = userMapper.usersToUserDtos(participants);
         log.info("Participants of event {}:", eventId);
         return participantsDto;
     }
 
+    @Override
     public EventParticipantsDto getParticipantsCount(long eventId) {
         eventParticipationValidator.checkEventExists(eventId);
         int count = eventParticipationRepository.countParticipants(eventId);
-        log.info("Participant count of event {}:", eventId);
+        log.info("The count of participants in the event {} is {}", eventId, count);
         return new EventParticipantsDto(count);
     }
 }

@@ -2,6 +2,9 @@ name: CI Pipeline for user_service-DankeVilletti
 
 # Запускать pipeline при pull request в ветку dev
 on:
+  push:
+    branches:
+      - dev
   pull_request:
     branches:
       - dev

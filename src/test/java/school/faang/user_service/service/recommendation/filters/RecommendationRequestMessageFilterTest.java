@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RecommendationRequestMessageFilterTest {
-    RecommendationRequestMessageFilter recommendationRequestMessageFilter = new RecommendationRequestMessageFilter();
+  private RecommendationRequestMessageFilter recommendationRequestMessageFilter = new RecommendationRequestMessageFilter();
     RecommendationRequestFilterDto requestFilterDto;
 
     @BeforeEach

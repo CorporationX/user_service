@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
-    RecommendationRequestDto recommendationRequestDto;
+   private RecommendationRequestDto recommendationRequestDto;
     @Mock
-    RequestValidator requestValidator;
+   private RequestValidator requestValidator;
 
     @Mock
     private RecommendationRequestService recommendationRequestService;

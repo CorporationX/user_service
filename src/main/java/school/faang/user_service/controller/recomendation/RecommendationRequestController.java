@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/requests")
+@RequestMapping("/recommendation-requests")
 public class RecommendationRequestController {
     private final RequestValidator requestValidator;
     private final RecommendationRequestService recommendationRequestService;

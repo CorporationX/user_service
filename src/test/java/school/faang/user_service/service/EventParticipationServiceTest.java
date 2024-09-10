@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.service.event.EventParticipationService;
+import school.faang.user_service.service.event.EventParticipationServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class EventParticipationServiceTest {
 
     @InjectMocks
-    private EventParticipationService eventParticipationService;
+    private EventParticipationServiceImpl eventParticipationService;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -48,7 +48,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    void testRegisterExistingParticipant() {
+    void registerParticipant_alreadyRegistered_throwsException() {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(Collections.singletonList(registeredUser));
         assertThrows(DataValidationException.class,
@@ -57,7 +57,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    void testRegisterNewParticipant() {
+    void registerParticipant_newParticipant_repositoryCalled() {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(Collections.emptyList());
         eventParticipationService.registerParticipant(eventId, userId);
@@ -65,7 +65,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    void testUnregisterNonExistingParticipant() {
+    void unregisterParticipant_notRegistered_throwsException() {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(Collections.emptyList());
         assertThrows(DataValidationException.class,
@@ -74,7 +74,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    void testUnregisterExistingParticipant() {
+    void unregisterParticipant_registeredParticipant_repositoryCalled() {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(Collections.singletonList(registeredUser));
         eventParticipationService.unregisterParticipant(eventId, userId);
@@ -82,7 +82,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    void testGetParticipant() {
+    void getParticipant_existingEvent_returnsListOfUserDto() {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(Collections.singletonList(registeredUser));
         List<UserDto> participants = eventParticipationService.getParticipant(eventId);
@@ -93,7 +93,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    void testGetParticipantCount() {
+    void getParticipantCount_existingEvent_returnsNumberOfParticipants() {
         when(eventParticipationRepository.countParticipants(eventId))
                 .thenReturn(1);
         assertEquals(1, eventParticipationService.getParticipantCount(eventId));

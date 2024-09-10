@@ -31,25 +31,25 @@ public class EventParticipationControllerTest {
     }
 
     @Test
-    void testRegisterParticipant() {
+    void registerParticipant_validRequest_serviceCalled() {
         eventParticipationController.registerParticipant(eventId, userId);
         verify(eventParticipationService, times(1)).registerParticipant(eventId, userId);
     }
 
     @Test
-    void testUnregisterParticipant() {
+    void unregisterParticipant_validRequest_serviceCalled() {
         eventParticipationController.unregisterParticipant(eventId, userId);
         verify(eventParticipationService, times(1)).unregisterParticipant(eventId, userId);
     }
 
     @Test
-    void testGetParticipant() {
+    void getParticipant_validRequest_serviceCalled() {
         eventParticipationController.getParticipant(eventId);
         verify(eventParticipationService, times(1)).getParticipant(eventId);
     }
 
     @Test
-    void testGetParticipantCount() {
+    void getParticipantCount_validRequest_serviceCalled() {
         eventParticipationController.getParticipantCount(eventId);
         verify(eventParticipationService, times(1)).getParticipantCount(eventId);
     }

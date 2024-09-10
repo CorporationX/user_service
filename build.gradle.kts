@@ -54,6 +54,10 @@ dependencies {
     /**
      * Utils & Logging
      */
+
+    implementation ("org.apache.logging.log4j:log4j-api:2.19.0")
+    implementation ("org.apache.logging.log4j:log4j-core:2.19.0")
+
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.slf4j:slf4j-api:2.0.5")

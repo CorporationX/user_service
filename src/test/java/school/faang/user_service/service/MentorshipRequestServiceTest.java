@@ -29,8 +29,6 @@ import static school.faang.user_service.service.MentorshipRequestService.MENTOR_
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
-    @Mock
-    MentorshipRequestService mentorshipRequestService;
 
     @Mock
     MentorshipRequestValidator mentorshipRequestValidator;

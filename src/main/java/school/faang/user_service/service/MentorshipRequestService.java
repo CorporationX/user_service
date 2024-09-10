@@ -3,7 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -48,36 +48,53 @@ public class MentorshipRequestService {
 
         Optional<List<MentorshipRequest>> mentorshipRequestList = repository.getRequests();
         if (mentorshipRequestList.isPresent()) {
-           val result  = mentorshipRequestList.get().stream()
+            val result = mentorshipRequestList.get().stream()
                     .filter(predicates.isDescriptionEmptyPredicate)
-                    .filter(request -> {return predicates.areAuthorsMatch.test(request,requestFilter);})
-                    .filter(request->{return predicates.isRecieverMatch.test(request,requestFilter);})
-                    .filter(request->{return predicates.isStatusMatch.test(request,requestFilter);})
+                    .filter(request -> {
+                        return predicates.areAuthorsMatch.test(request, requestFilter);
+                    })
+                    .filter(request -> {
+                        return predicates.isRecieverMatch.test(request, requestFilter);
+                    })
+                    .filter(request -> {
+                        return predicates.isStatusMatch.test(request, requestFilter);
+                    })
                     .toList();
-           if (!result.isEmpty()){
-               System.out.println("here are the filtered result = " + result);
-           }else {
-               System.out.println("results are empty ");
-           }
-        }else {
+            if (!result.isEmpty()) {
+                System.out.println("here are the filtered result = " + result);
+            } else {
+                System.out.println("results are empty ");
+            }
+        } else {
             System.out.println("database is empty");
         }
     }
 
-    @Transactional
+
     void acceptRequest(long id) throws Exception {
-        MentorshipRequest request =  repository.getMentorshipRequestById(id);
-        if (request.getStatus()!=ACCEPTED){
-            repository.updateMentorshipRequestStatusByRequesterId(id,ACCEPTED);
-        }else if(request.getStatus() == ACCEPTED){
-            throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
+        try {
+            MentorshipRequest request = repository.getMentorshipRequestById(id);
+            if (request.getStatus() != ACCEPTED) {
+                repository.updateMentorshipRequestStatusByRequesterId(id, ACCEPTED);
+            } else if (request.getStatus() == ACCEPTED) {
+                throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
+            }
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            if (e.getMessage().equals(MENTOR_IS_ALREADY_ACCEPTED)) {
+                throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
+            }
         }
+
     }
 
-    @Transactional
-    void rejectRequest(long id, RejectionDto rejection){
-        MentorshipRequest request =  repository.getMentorshipRequestById(id);
-        repository.updateMentorshipRequestStatusWithReasonByRequesterId(id,REJECTED, rejection.getReason());
+    void rejectRequest(long id, RejectionDto rejection) {
+        try {
+            MentorshipRequest request = repository.getMentorshipRequestById(id);
+            repository.updateMentorshipRequestStatusWithReasonByRequesterId(id, REJECTED, rejection.getReason());
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
 
     }
 

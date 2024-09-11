@@ -27,7 +27,6 @@ class SubscriptionServiceTest {
 
     @InjectMocks
     private SubscriptionService subscriptionService;
-
     @Mock
     private SubscriptionRepository subscriptionRepository;
     @Mock
@@ -59,7 +58,7 @@ class SubscriptionServiceTest {
                 String exceptionMsg = "User can't subscribe to himself";
 
                 doThrow(new ValidationException(exceptionMsg)).
-                        when(userValidator).checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
+                        when(userValidator).validateFirstUserIdAndSecondUserIdNotEquals(
                                 USER_ID_IS_ONE,
                                 USER_ID_IS_ONE,
                                 exceptionMsg);
@@ -75,7 +74,7 @@ class SubscriptionServiceTest {
                 String exceptionMsg = "Already subscribed";
 
                 doThrow(new ValidationException(exceptionMsg)).
-                        when(subscriptionValidator).checkIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(
+                        when(subscriptionValidator).validateSubscriptionExistsAndEqualsShouldExistVariable(
                                 USER_ID_IS_ONE,
                                 USER_ID_IS_TWO,
                                 true,
@@ -96,7 +95,7 @@ class SubscriptionServiceTest {
                 String exceptionMsg = "User can't unsubscribe to himself";
 
                 doThrow(new ValidationException(exceptionMsg)).
-                        when(userValidator).checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
+                        when(userValidator).validateFirstUserIdAndSecondUserIdNotEquals(
                                 USER_ID_IS_ONE,
                                 USER_ID_IS_ONE,
                                 exceptionMsg);
@@ -112,7 +111,7 @@ class SubscriptionServiceTest {
                 String exceptionMsg = "Already unsubscribed";
 
                 doThrow(new ValidationException(exceptionMsg)).
-                        when(subscriptionValidator).checkIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(
+                        when(subscriptionValidator).validateSubscriptionExistsAndEqualsShouldExistVariable(
                                 USER_ID_IS_ONE,
                                 USER_ID_IS_TWO,
                                 false,
@@ -128,74 +127,58 @@ class SubscriptionServiceTest {
     @Nested
     class PositiveTests {
 
-        @Nested
-        class FollowUserMethod {
+        @Test
+        @DisplayName("Успех если передали корректные значения в методе подписки")
+        void whenCorrectValuesInFollowUserThenSuccess() {
+            subscriptionService.followUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
 
-            @Test
-            @DisplayName("Успех если передали корректные значения в методе подписки")
-            void whenCorrectValuesInFollowUserThenSuccess() {
-                subscriptionService.followUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
-
-                verifyUsers(USER_ID_IS_ONE, USER_ID_IS_TWO);
-                verifyIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(USER_ID_IS_ONE,
-                        USER_ID_IS_TWO,
-                        "User can't subscribe to himself");
-                verifyIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(USER_ID_IS_ONE,
-                        USER_ID_IS_TWO,
-                        true,
-                        "Already subscribed");
-                verify(subscriptionRepository)
-                        .followUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
-            }
+            verifyUsers(USER_ID_IS_ONE, USER_ID_IS_TWO);
+            verifyIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(USER_ID_IS_ONE,
+                    USER_ID_IS_TWO,
+                    "User can't subscribe to himself");
+            verifyIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(USER_ID_IS_ONE,
+                    USER_ID_IS_TWO,
+                    true,
+                    "Already subscribed");
+            verify(subscriptionRepository)
+                    .followUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
         }
 
-        @Nested
-        class UnfollowUserMethod {
+        @Test
+        @DisplayName("Успех если передали корректные значения в методе отписки")
+        void whenCorrectValuesInUnfollowUserThenSuccess() {
+            subscriptionService.unfollowUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
 
-            @Test
-            @DisplayName("Успех если передали корректные значения в методе отписки")
-            void whenCorrectValuesInUnfollowUserThenSuccess() {
-                subscriptionService.unfollowUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
-
-                verifyUsers(USER_ID_IS_ONE, USER_ID_IS_TWO);
-                verifyIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(USER_ID_IS_ONE,
-                        USER_ID_IS_TWO,
-                        "User can't unsubscribe to himself");
-                verifyIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(USER_ID_IS_ONE,
-                        USER_ID_IS_TWO,
-                        false,
-                        "Already unsubscribed");
-                verify(subscriptionRepository)
-                        .unfollowUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
-            }
+            verifyUsers(USER_ID_IS_ONE, USER_ID_IS_TWO);
+            verifyIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(USER_ID_IS_ONE,
+                    USER_ID_IS_TWO,
+                    "User can't unsubscribe to himself");
+            verifyIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(USER_ID_IS_ONE,
+                    USER_ID_IS_TWO,
+                    false,
+                    "Already unsubscribed");
+            verify(subscriptionRepository)
+                    .unfollowUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
         }
 
-        @Nested
-        class GetFollowersCountMethod {
+        @Test
+        @DisplayName("Успех если передали корректные значения в методе получения количества подписчиков")
+        void whenCorrectValuesInGetFollowersCountThenSuccess() {
+            subscriptionService.getFollowersCount(USER_ID_IS_TWO);
 
-            @Test
-            @DisplayName("Успех если передали корректные значения в методе получения количества подписчиков")
-            void whenCorrectValuesInGetFollowersCountThenSuccess() {
-                subscriptionService.getFollowersCount(USER_ID_IS_TWO);
-
-                verifyUser(USER_ID_IS_TWO);
-                verify(subscriptionRepository)
-                        .findFollowersAmountByFolloweeId(USER_ID_IS_TWO);
-            }
+            verifyUser(USER_ID_IS_TWO);
+            verify(subscriptionRepository)
+                    .findFollowersAmountByFolloweeId(USER_ID_IS_TWO);
         }
 
-        @Nested
-        class GetFollowingCountMethod {
+        @Test
+        @DisplayName("Успех если передали корректные значения в методе получения количества подписок")
+        void whenCorrectValuesInGetFollowingCountThenSuccess() {
+            subscriptionService.getFollowingCount(USER_ID_IS_ONE);
 
-            @Test
-            @DisplayName("Успех если передали корректные значения в методе получения количества подписок")
-            void whenCorrectValuesInGetFollowingCountThenSuccess() {
-                subscriptionService.getFollowingCount(USER_ID_IS_ONE);
-
-                verifyUser(USER_ID_IS_ONE);
-                verify(subscriptionRepository)
-                        .findFolloweesAmountByFollowerId(USER_ID_IS_ONE);
-            }
+            verifyUser(USER_ID_IS_ONE);
+            verify(subscriptionRepository)
+                    .findFolloweesAmountByFollowerId(USER_ID_IS_ONE);
         }
 
         @Nested
@@ -294,9 +277,9 @@ class SubscriptionServiceTest {
 
     private void verifyUser(long userId) {
         verify(userValidator)
-                .userIdIsPositiveAndNotNullOrElseThrowValidationException(userId);
+                .validateUserIdIsPositiveAndNotNull(userId);
         verify(userValidator)
-                .userIsExistedOrElseThrowValidationException(userId);
+                .validateUserIsExisted(userId);
     }
 
     private void verifyUsers(long userId1, long userId2) {
@@ -308,7 +291,7 @@ class SubscriptionServiceTest {
                                                                                  long userId2,
                                                                                  String messageError) {
         verify(userValidator)
-                .checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(userId1,
+                .validateFirstUserIdAndSecondUserIdNotEquals(userId1,
                         userId2,
                         messageError);
     }
@@ -318,7 +301,7 @@ class SubscriptionServiceTest {
                                                                                     boolean shouldExist,
                                                                                     String messageError) {
         verify(subscriptionValidator)
-                .checkIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(userId1,
+                .validateSubscriptionExistsAndEqualsShouldExistVariable(userId1,
                         userId2,
                         shouldExist,
                         messageError);

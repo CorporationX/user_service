@@ -15,6 +15,6 @@ class UserCityFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto userFilterDto) {
-        return userStream.peek(u -> System.out.println("city " + u)).filter(user -> user.getCity().contains(userFilterDto.getCityPattern())).peek(u -> System.out.println("city " + u));
+        return userStream.filter(user -> user.getCity().contains(userFilterDto.getCityPattern()));
     }
 }

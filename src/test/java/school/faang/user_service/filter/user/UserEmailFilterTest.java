@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,54 +16,46 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserEmailFilterTest {
 
-    @Spy
+    @InjectMocks
     private UserEmailFilter userEmailFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final String EMAIL_PATTERN = "email";
+    private final static String EMAIL_PATTERN = "email";
 
     @Nested
     class PositiveTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto заполнено поле emailPattern не null и не пустое, тогда возвращаем true")
+        void whenUserFilterDtoSpecifiedEmailPatternNotNullAndNotBlankThenReturnTrue() {
+            userFilterDto = UserFilterDto.builder()
+                    .emailPattern(EMAIL_PATTERN)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto заполнено поле emailPattern не null и не пустое, тогда возвращаем true")
-            void whenUserFilterDtoSpecifiedEmailPatternNotNullAndNotBlankThenReturnTrue() {
-                userFilterDto = UserFilterDto.builder()
-                        .emailPattern(EMAIL_PATTERN)
-                        .build();
-
-                assertTrue(userEmailFilter.isApplicable(userFilterDto));
-            }
+            assertTrue(userEmailFilter.isApplicable(userFilterDto));
         }
 
-        @Nested
-        class Apply {
+        @Test
+        @DisplayName("Если у UserFilterDto заполнено поле emailPattern, тогда возвращаем отфильтрованный список")
+        void whenUserFilterDtoSpecifiedEmailPatternThenReturnFilteredList() {
+            Stream<User> userStream = Stream.of(
+                    User.builder()
+                            .email(EMAIL_PATTERN)
+                            .build(),
+                    User.builder()
+                            .email("false")
+                            .build());
 
-            @Test
-            @DisplayName("Если у UserFilterDto заполнено поле emailPattern, тогда возвращаем отфильтрованный список")
-            void whenUserFilterDtoSpecifiedEmailPatternThenReturnFilteredList() {
-                Stream<User> userStream = Stream.of(
-                        User.builder()
-                                .email(EMAIL_PATTERN)
-                                .build(),
-                        User.builder()
-                                .email("false")
-                                .build());
+            userFilterDto = UserFilterDto.builder()
+                    .emailPattern(EMAIL_PATTERN)
+                    .build();
 
-                userFilterDto = UserFilterDto.builder()
-                        .emailPattern(EMAIL_PATTERN)
-                        .build();
-
-                Stream<User> userStreamAfterFilter = Stream.of(
-                        User.builder()
-                                .email(EMAIL_PATTERN)
-                                .build());
-                assertEquals(userStreamAfterFilter.toList(), userEmailFilter.apply(userStream, userFilterDto).toList());
-            }
+            Stream<User> userStreamAfterFilter = Stream.of(
+                    User.builder()
+                            .email(EMAIL_PATTERN)
+                            .build());
+            assertEquals(userStreamAfterFilter.toList(), userEmailFilter.apply(userStream, userFilterDto).toList());
         }
     }
 

@@ -15,6 +15,6 @@ class UserNameFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto userFilterDto) {
-        return userStream.peek(u -> System.out.println("name " + u)).filter(user -> user.getUsername().contains(userFilterDto.getNamePattern())).peek(u -> System.out.println("name " + u));
+        return userStream.filter(user -> user.getUsername().contains(userFilterDto.getNamePattern()));
     }
 }

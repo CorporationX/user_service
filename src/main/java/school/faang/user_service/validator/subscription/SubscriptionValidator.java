@@ -11,12 +11,10 @@ public class SubscriptionValidator {
 
     private final SubscriptionRepository subscriptionRepository;
 
-    public void checkIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(long followerId,
-                                                                                  long followeeId,
-                                                                                  boolean shouldExist,
-                                                                                  String exceptionMsg)
-            throws ValidationException {
-
+    public void validateSubscriptionExistsAndEqualsShouldExistVariable(long followerId,
+                                                                       long followeeId,
+                                                                       boolean shouldExist,
+                                                                       String exceptionMsg) {
         boolean isExist = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
 
         if (isExist == shouldExist) {

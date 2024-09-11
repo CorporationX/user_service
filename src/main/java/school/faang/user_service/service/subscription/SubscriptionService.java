@@ -28,9 +28,9 @@ public class SubscriptionService {
     @Transactional
     public void followUser(long followerId, long followeeId) {
         validateTwoUsers(followerId, followeeId);
-        userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(followerId,
+        userValidator.validateFirstUserIdAndSecondUserIdNotEquals(followerId,
                 followeeId, "User can't subscribe to himself");
-        subscriptionValidator.checkIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(followerId,
+        subscriptionValidator.validateSubscriptionExistsAndEqualsShouldExistVariable(followerId,
                 followeeId, true, "Already subscribed");
 
         subscriptionRepository.followUser(followerId, followeeId);
@@ -39,9 +39,9 @@ public class SubscriptionService {
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         validateTwoUsers(followerId, followeeId);
-        userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(followerId,
+        userValidator.validateFirstUserIdAndSecondUserIdNotEquals(followerId,
                 followeeId, "User can't unsubscribe to himself");
-        subscriptionValidator.checkIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(followerId,
+        subscriptionValidator.validateSubscriptionExistsAndEqualsShouldExistVariable(followerId,
                 followeeId, false, "Already unsubscribed");
 
         subscriptionRepository.unfollowUser(followerId, followeeId);
@@ -90,8 +90,8 @@ public class SubscriptionService {
     }
 
     private void validateUser(long userId) {
-        userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(userId);
-        userValidator.userIsExistedOrElseThrowValidationException(userId);
+        userValidator.validateUserIdIsPositiveAndNotNull(userId);
+        userValidator.validateUserIsExisted(userId);
     }
 
     private void validateTwoUsers(long firstUser, long secondUser) {

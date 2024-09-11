@@ -3,7 +3,7 @@ package school.faang.user_service.mapper.user;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
-    @Spy
+    @InjectMocks
     private UserMapperImpl userMapper;
 
-    private final long USER_ID_ONE = 1L;
-    private final long USER_ID_TWO = 2L;
+    private final static long USER_ID_ONE = 1L;
+    private final static long USER_ID_TWO = 2L;
 
-    private final int SIZE_USER_DTO_LIST = 2;
+    private final static int SIZE_USER_DTO_LIST = 2;
 
     @Test
     @DisplayName("Если передали null, на выходе получим null")

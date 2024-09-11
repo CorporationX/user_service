@@ -36,12 +36,11 @@ class UserValidatorTest {
 
         @Nested
         class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
-
             @Test
             @DisplayName("Ошибка валидации если переданное число null")
-            void WhenNullValueThenThrowValidationException() {
+            void whenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
-                        () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
+                        () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
                         "User id can't be null");
             }
 

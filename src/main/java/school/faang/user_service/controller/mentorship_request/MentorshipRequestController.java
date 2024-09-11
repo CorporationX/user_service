@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.mentorship_request;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,13 +17,13 @@ import school.faang.user_service.service.mentorship_request.MentorshipRequestSer
 import java.util.List;
 
 @RestController
-@RequestMapping("mentorship-requests")
+@RequestMapping("/mentorship-requests")
 @RequiredArgsConstructor
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
     private final MentorshipRequestMapper mentorshipRequestMapper;
 
-    @PostMapping
+    @PostMapping("/create")
     public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mentorshipRequestService.requestMentorship(
                 mentorshipRequestDto.getRequesterId(),
@@ -33,20 +32,22 @@ public class MentorshipRequestController {
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    @GetMapping
+    @PostMapping("/get-requests")
     public List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter).stream()
                 .map(mentorshipRequestMapper::toDto)
                 .toList();
     }
 
-    @PutMapping("accept/{id}")
-    public void acceptRequest(@PathVariable long id) {
-        mentorshipRequestService.acceptRequest(id);
+    @PutMapping("/accept/{id}")
+    public MentorshipRequestDto acceptRequest(@PathVariable long id) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestService.acceptRequest(id);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    @PutMapping("reject/{id}")
-    public void rejectRequest(@PathVariable long id, @RequestBody RejectionMentorshipRequestDto rejection) {
-        mentorshipRequestService.rejectRequest(id, rejection.getReason());
+    @PutMapping("/reject/{id}")
+    public MentorshipRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionMentorshipRequestDto rejection) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestService.rejectRequest(id, rejection.getReason());
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 }

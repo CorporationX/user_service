@@ -10,8 +10,8 @@ import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class MentorshipRequestMapperTest {
     private MentorshipRequestMapper mentorshipRequestMapper;
@@ -35,16 +35,13 @@ class MentorshipRequestMapperTest {
         mentorshipRequest.setRejectionReason("RejectionReason");
         mentorshipRequest.setCreatedAt(LocalDateTime.now().minusDays(1));
         mentorshipRequest.setUpdatedAt(LocalDateTime.now());
-
         MentorshipRequestDto mentorshipRequestDto = mentorshipRequestMapper.toDto(mentorshipRequest);
 
-        assertNotNull(mentorshipRequestDto);
-        assertEquals(mentorshipRequestDto.getDescription(), mentorshipRequest.getDescription());
         assertEquals(mentorshipRequestDto.getRequesterId(), mentorshipRequest.getRequester().getId());
         assertEquals(mentorshipRequestDto.getReceiverId(), mentorshipRequest.getReceiver().getId());
-        assertEquals(mentorshipRequestDto.getStatus(), mentorshipRequest.getStatus());
-        assertEquals(mentorshipRequestDto.getRejectionReason(), mentorshipRequest.getRejectionReason());
-        assertEquals(mentorshipRequestDto.getCreatedAt(), mentorshipRequest.getCreatedAt());
-        assertEquals(mentorshipRequestDto.getUpdatedAt(), mentorshipRequest.getUpdatedAt());
+        assertThat(mentorshipRequest)
+                .usingRecursiveComparison()
+                .ignoringFieldsOfTypes(User.class)
+                .isEqualTo(mentorshipRequestDto);
     }
 }

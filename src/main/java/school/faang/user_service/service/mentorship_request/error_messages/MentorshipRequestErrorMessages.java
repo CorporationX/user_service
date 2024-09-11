@@ -1,5 +1,8 @@
 package school.faang.user_service.service.mentorship_request.error_messages;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class MentorshipRequestErrorMessages {
     public static final String REQUEST_IS_ACCEPTED_BEFORE =
             "Mentorship request from user with id %d to user with %d was accepted before";

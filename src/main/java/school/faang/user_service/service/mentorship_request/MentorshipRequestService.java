@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.List;
@@ -22,13 +23,12 @@ import static school.faang.user_service.service.mentorship_request.error_message
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final List<RequestFilter> requestFilters;
-    private final MentorshipRequestParametersChecker validator;
+    private final MentorshipRequestParametersChecker checker;
+    private final UserRepository userRepository;
 
     @Transactional
     public MentorshipRequest requestMentorship(long requesterId, long receiverId, String description) {
-        log.info("Start validation of params");
-        validator.checkRequestParams(requesterId, receiverId, description);
-        log.info("Validation of params successful");
+        checker.checkRequestParams(requesterId, receiverId, description);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
         log.info("Mentorship request from user with id {} to user with id {} created", requesterId, receiverId);
         return mentorshipRequest;
@@ -46,27 +46,25 @@ public class MentorshipRequestService {
     }
 
     @Transactional
-    public void acceptRequest(long id) {
+    public MentorshipRequest acceptRequest(long id) {
         MentorshipRequest mentorshipRequest = findMentorshipRequestById(id);
-        log.info("Request with id {} was found", id);
         User requester = mentorshipRequest.getRequester();
         User receiver = mentorshipRequest.getReceiver();
-        validator.checkExistAcceptedRequest(requester.getId(), receiver.getId());
-        log.info("Accept request from user with id {} to user with id {} not found", requester.getId(), receiver.getId());
+        checker.checkExistAcceptedRequest(requester.getId(), receiver.getId());
         requester.getMentors().add(receiver);
-        log.info("User with id {} added to the list of mentors by user with id {}", receiver.getId(), requester.getId());
+        userRepository.save(requester);
         mentorshipRequest.setStatus(ACCEPTED);
         log.info("Request with id {} accepted", id);
+        return mentorshipRequestRepository.save(mentorshipRequest);
     }
 
     @Transactional
-    public void rejectRequest(long id, String reason) {
-        log.info("Find mentorship request with id {}", id);
+    public MentorshipRequest rejectRequest(long id, String reason) {
         MentorshipRequest mentorshipRequest = findMentorshipRequestById(id);
         mentorshipRequest.setStatus(REJECTED);
-        log.info("Request with id {} rejected", id);
         mentorshipRequest.setRejectionReason(reason);
-        log.info("Rejection reason of mentorship request with id {} changed to {}", id, REJECTED);
+        log.info("Request with id {} rejected", id);
+        return mentorshipRequestRepository.save(mentorshipRequest);
     }
 
     private MentorshipRequest findMentorshipRequestById(long id) {

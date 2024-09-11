@@ -12,6 +12,7 @@ import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.ArrayList;
@@ -36,7 +37,9 @@ class MentorshipRequestServiceTest {
     @Mock
     private List<RequestFilter> requestFilters;
     @Mock
-    private MentorshipRequestParametersChecker validator;
+    private MentorshipRequestParametersChecker checker;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -68,7 +71,7 @@ class MentorshipRequestServiceTest {
 
         mentorshipRequestService.requestMentorship(requesterId, receiverId, description);
 
-        verify(validator, times(1))
+        verify(checker, times(1))
                 .checkRequestParams(requesterId, receiverId, description);
         verify(mentorshipRequestRepository, times(1))
                 .create(requesterId, receiverId, description);
@@ -130,10 +133,13 @@ class MentorshipRequestServiceTest {
 
         mentorshipRequestService.acceptRequest(mentorshipRequestId);
 
-        verify(validator, times(1))
+        verify(checker, times(1))
                 .checkExistAcceptedRequest(user1.getId(), user2.getId());
         assertTrue(user1.getMentors().contains(user2));
         assertEquals(mentorshipRequest.getStatus(), ACCEPTED);
+        verify(userRepository, times(1))
+                .save(user1);
+        verifySaveRequest(mentorshipRequest);
     }
 
     @Test
@@ -145,8 +151,14 @@ class MentorshipRequestServiceTest {
 
         mentorshipRequestService.rejectRequest(mentorshipRequestId, reason);
 
+        verifySaveRequest(mentorshipRequest);
         assertEquals(mentorshipRequest.getStatus(), REJECTED);
         assertEquals(mentorshipRequest.getRejectionReason(), reason);
+    }
+
+    private void verifySaveRequest(MentorshipRequest mentorshipRequest) {
+        verify(mentorshipRequestRepository, times(1))
+                .save(mentorshipRequest);
     }
 
     private void forTestRequestByIdNotFound(long id, Executable executable) {

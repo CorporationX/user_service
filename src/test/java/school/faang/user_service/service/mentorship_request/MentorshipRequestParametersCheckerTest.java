@@ -31,7 +31,6 @@ class MentorshipRequestParametersCheckerTest {
     @InjectMocks
     private MentorshipRequestParametersChecker checker;
 
-
     @Test
     void testUserSendRequestToHimself() {
         long requesterId = 1L;

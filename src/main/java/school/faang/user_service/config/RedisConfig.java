@@ -35,6 +35,8 @@ public class RedisConfig {
     private String mentorshipOfferedChannelName;
     @Value("${spring.data.redis.channels.profile_picture_channel.name}")
     private String profilePicture;
+    @Value("${spring.data.redis.channels.mentorship-accepted-channel}")
+    private String mentorshipAcceptedChannel;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewTopicName;
 
@@ -61,6 +63,11 @@ public class RedisConfig {
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipAcceptedChannelTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
     }
 
     @Bean

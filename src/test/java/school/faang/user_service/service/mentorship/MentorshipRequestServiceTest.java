@@ -9,6 +9,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.event.MentorshipAcceptedEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -27,6 +28,7 @@ import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
 import school.faang.user_service.publisher.MentorshipStartEventPublisher;
@@ -41,6 +43,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -72,9 +75,12 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
     @Mock
     private MentorshipRequestEventMapper mentorshipRequestEventMapper;
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
+
     private MentorshipRequestMapperImpl mentorshipRequestMapperImpl;
     private MentorshipOfferedEvent mentorshipOfferedEvent;
     private MentorshipRequestEvent mentorshipRequestEvent;
@@ -111,9 +117,10 @@ class MentorshipRequestServiceTest {
     @DisplayName("testing requestMentorship methods execution")
     public void testRequestMentorshipValidatorExecution() {
         when(mentorshipRequestRepository.create(requesterId, receiverId, description)).thenReturn(mentorshipRequest);
-        when(mentorshipOfferedEventMapper.toEvent(mentorshipRequest)).thenReturn(mentorshipOfferedEvent);
-
+        when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(new MentorshipRequestDto());
+        doNothing().when(mentorshipRequestValidator).validateParticipantsAndRequestFrequency(any(), any(), any());
         when(mentorshipRequestEventMapper.toEvent(mentorshipRequestCaptor.capture())).thenReturn(mentorshipRequestEvent);
+        doNothing().when(mentorshipRequestEventPublisher).publish(any());
 
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
@@ -127,10 +134,10 @@ class MentorshipRequestServiceTest {
                         mentorshipRequestDto.getReceiverId(),
                         mentorshipRequestDto.getDescription()
                 );
+
+        verify(mentorshipRequestValidator, times(1)).validateParticipantsAndRequestFrequency(any(), any(), any());
         verify(mentorshipRequestEventMapper, times(1)).toEvent(mentorshipRequestCaptor.getValue());
         verify(mentorshipRequestEventPublisher, times(1)).publish(mentorshipRequestEvent);
-        verify(mentorshipOfferedEventMapper, times(1)).toEvent(mentorshipRequest);
-        verify(mentorshipOfferedEventPublisher, times(1)).publish(mentorshipOfferedEvent);
         verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequestCaptor.getValue());
     }
 
@@ -179,32 +186,65 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    @DisplayName("test acceptRequest methods execution")
-    public void testAcceptRequest() {
+    @DisplayName("test acceptRequest validator validateRequestStatusIsPending() method execution")
+    public void testAcceptRequestValidatorExecution() {
         long requestId = 1L;
-        User requester = User.builder().mentors(new ArrayList<>()).build();
-        User receiver = User.builder().mentees(new ArrayList<>()).build();
+        User requester = User.builder().mentors(new ArrayList<>()).id(2L).build();
+        User receiver = User.builder().mentees(new ArrayList<>()).id(1L).build();
         MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
                 .id(requestId)
                 .requester(requester)
                 .receiver(receiver)
                 .status(RequestStatus.PENDING).build();
 
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-        when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(mentorshipRequest);
-        when(mentorshipRequestMapper.toMentorshipStartEvent(mentorshipRequest)).thenReturn(mentorshipStartEvent);
+        doNothing().when(mentorshipAcceptedEventPublisher).publish(any(MentorshipAcceptedEvent.class));
+        when(mentorshipRequestRepository.save(any())).thenReturn(mentorshipRequest);
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId())).thenReturn(Optional.of(mentorshipRequest));
 
         mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
-
         verify(mentorshipRequestValidator, times(1))
                 .validateRequestStatusIsPending(requestStatusCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("test acceptRequest validator validateReceiverIsNotMentorOfRequester() method execution")
+    public void testAcceptRequestValidatorReceiverIsNotMentorExecution() {
+        long requestId = 1L;
+        User requester = User.builder().mentors(new ArrayList<>()).id(2L).build();
+        User receiver = User.builder().mentees(new ArrayList<>()).id(1L).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(requestId)
+                .requester(requester)
+                .receiver(receiver)
+                .status(RequestStatus.PENDING).build();
+
+        doNothing().when(mentorshipAcceptedEventPublisher).publish(any(MentorshipAcceptedEvent.class));
+        when(mentorshipRequestRepository.save(any())).thenReturn(mentorshipRequest);
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.acceptRequest(requestId);
         verify(mentorshipRequestValidator, times(1))
                 .validateReceiverIsNotMentorOfRequester(requester, receiver);
+    }
+
+    @Test
+    @DisplayName("testing acceptRequest repository save() method execution")
+    public void testAcceptRequestRepositorySaveExecution() {
+        long requestId = 1L;
+        User requester = User.builder().mentors(new ArrayList<>()).id(2L).build();
+        User receiver = User.builder().mentees(new ArrayList<>()).id(1L).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(requestId)
+                .requester(requester)
+                .receiver(receiver)
+                .status(RequestStatus.PENDING).build();
+
+        doNothing().when(mentorshipAcceptedEventPublisher).publish(any(MentorshipAcceptedEvent.class));
+        when(mentorshipRequestRepository.save(any())).thenReturn(mentorshipRequest);
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
         verify(mentorshipRequestRepository, times(1)).save(mentorshipRequest);
-        verify(mentorshipRequestMapper, times(1)).toMentorshipStartEvent(mentorshipRequest);
-        verify(mentorshipStartEventPublisher, times(1)).publish(mentorshipStartEvent);
-        verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequest);
     }
 
     @Test

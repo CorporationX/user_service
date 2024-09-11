@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.CreateGroup;
 import school.faang.user_service.dto.UpDateGroup;
 
@@ -36,6 +37,12 @@ public class UserDto {
     @NotBlank(message = "phone should not be blank", groups = {CreateGroup.class, UpDateGroup.class})
     @Size(max = 32, message = "phone length max 32 characters", groups = CreateGroup.class)
     private String phone;
+    private boolean isActive;
+    private MultipartFile multipartFile;
     private PreferredContact preference;
-}
 
+    public enum PreferredContact {
+        EMAIL, SMS, TELEGRAM
+    }
+
+}

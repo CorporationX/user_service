@@ -3,6 +3,7 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.MentorshipAcceptedEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -16,6 +17,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
@@ -32,13 +34,11 @@ import java.util.stream.Stream;
 public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestEventMapper mentorshipRequestEventMapper;
-    private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
     private final MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
-    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -46,14 +46,11 @@ public class MentorshipRequestService {
         long receiverId = mentorshipRequestDto.getReceiverId();
         String description = mentorshipRequestDto.getDescription();
 
-        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId, LocalDateTime.now());
+        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId, mentorshipRequestDto.getCreatedAt());
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
 
-        MentorshipOfferedEvent mentorshipOfferedEvent = mentorshipOfferedEventMapper.toEvent(mentorshipRequest);
-        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEvent);
         MentorshipRequestEvent mentorshipRequestEvent = mentorshipRequestEventMapper.toEvent(mentorshipRequest);
         mentorshipRequestEventPublisher.publish(mentorshipRequestEvent);
-
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
@@ -80,9 +77,13 @@ public class MentorshipRequestService {
             receiver.getMentees().add(requester);
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         });
-        MentorshipStartEvent mentorshipStartEvent = mentorshipRequestMapper
-                .toMentorshipStartEvent(processedMentorshipRequest);
-        mentorshipStartEventPublisher.publish(mentorshipStartEvent);
+
+        mentorshipAcceptedEventPublisher.publish(new MentorshipAcceptedEvent(
+                        processedMentorshipRequest.getRequester().getId(),
+                        processedMentorshipRequest.getReceiver().getId(),
+                        processedMentorshipRequest.getId())
+        );
+
         return mentorshipRequestMapper.toDto(processedMentorshipRequest);
     }
 

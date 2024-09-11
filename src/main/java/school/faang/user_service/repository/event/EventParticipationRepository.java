@@ -31,4 +31,21 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
             WHERE ue.event_id = :eventId
             """)
     int countParticipants(long eventId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users u 
+            JOIN users_event ue ON u.id = ue.user_id
+            WHERE ue.event_id = :eventId and ue.user_id = :userId
+            """)
+    User findParticipantByIdAndEventId(long eventId, long userId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(*) > 0 FROM Event e WHERE e.id = :eventId
+            """)
+    boolean eventExistsById(long eventId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(*) > 0 FROM User u WHERE u.id = :userId
+            """)
+    boolean userExistsById(long userId);
 }

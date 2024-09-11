@@ -7,6 +7,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class DataValidationException extends RuntimeException {
     public DataValidationException(String message) {
         super( message );
-
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
@@ -75,12 +74,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
-    }
-
-    @PutMapping("/deactivate/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto deactivateUser(@PathVariable Long userId) {
-        return userService.deactivateUser(userId);
     }
 
     @PutMapping("/avatar/put")

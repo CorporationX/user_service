@@ -1,21 +1,16 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
-
-import lombok.Setter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.dto.BanEvent;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.ProfileViewEvent;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
@@ -36,11 +31,9 @@ import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-
 import java.util.List;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 @Slf4j
@@ -187,6 +180,7 @@ public class UserService {
                 .forEach(goal -> goal.setMentor(mentee));
     }
 
+    @Transactional
     public void deleteAvatar(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
@@ -201,5 +195,16 @@ public class UserService {
         user.setUserProfilePic(userProfilePic);
 
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfilePicDto getAvatarKeys(long userId) {
+        userValidator.validateUserExistence(userId);
+
+        UserProfilePic userProfilePic = userRepository.findById(userId).get().getUserProfilePic();
+        if (userProfilePic == null) {
+            return new UserProfilePicDto("", "");
+        }
+        return new UserProfilePicDto(userProfilePic.getFileId(), userProfilePic.getSmallFileId());
     }
 }

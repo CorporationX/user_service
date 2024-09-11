@@ -106,7 +106,6 @@ class UserServiceTest {
 
         userDto = new UserDto();
 
-        userDtoList = List.of(userDto);
         user = User.builder()
                 .id(userId)
                 .username("username")

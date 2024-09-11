@@ -1,12 +1,10 @@
 package school.faang.user_service.service.mentorship;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -20,12 +18,12 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
 
-    public List<UserDTO> getMentees(long mentorId) {
+    public List<UserDto> getMentees(long mentorId) {
         List<User> mentees = mentorshipRepository.findMenteesByMentorId(mentorId);
         return userMapper.toDTOs(mentees);
     }
 
-    public List<UserDTO> getMentors(long menteeId) {
+    public List<UserDto> getMentors(long menteeId) {
         List<User> mentees = mentorshipRepository.findMentorsByMenteeId(menteeId);
         return userMapper.toDTOs(mentees);
     }

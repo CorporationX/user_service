@@ -75,7 +75,7 @@ public class User {
     private List<User> followers;
 
     @ManyToMany(mappedBy = "followers")
-    private List<User> followes; // здесь опечатка?
+    private List<User> followees;
 
     @OneToMany(mappedBy = "owner")
     private List<Event> ownedEvents;

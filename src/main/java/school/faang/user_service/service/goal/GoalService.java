@@ -1,7 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -16,7 +16,7 @@ import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class GoalService {
     private final static int MAX_NUMBER_ACTIVE_GOALS = 3;
@@ -31,7 +31,7 @@ public class GoalService {
 
         Goal saveGoal = goalRepository.create(goalDto.tittle(),
                 goalDto.description(),
-                goalDto.parentId() == null ? null : goalDto.parentId());
+                goalDto.parentId() == null ? null : goalRepository.findById(goalDto.parentId()).get().getId());
 
         List<Skill> skills = skillService.getSkillsByTitle(goalDto.titleSkills());
         saveGoal.setSkillsToAchieve(skills);

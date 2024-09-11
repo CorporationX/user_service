@@ -1,4 +1,4 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.validator.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -118,10 +118,6 @@ public class GoalValidatorTest {
     @Test
     @DisplayName("Проверка на не существующей цели")
     public void givenNotValidWhenValidateGoalIdThenException() {
-        Goal goal = new Goal();
-        goal.setStatus(GoalStatus.ACTIVE);
-        Mockito.when(goalRepository.findById(userId)).thenReturn(Optional.empty());
-
         assertThrows(ResourceNotFoundException.class, () ->
                 goalValidator.validateGoalId(goalId));
     }

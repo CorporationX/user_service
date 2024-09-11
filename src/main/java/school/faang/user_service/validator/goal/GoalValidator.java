@@ -12,7 +12,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 
 @Component
 @RequiredArgsConstructor
-
 public class GoalValidator {
     private final UserRepository userRepository;
     private final GoalRepository repository;
@@ -42,7 +41,7 @@ public class GoalValidator {
     }
 
     public void validateGoalId(long goalId) {
-        if (repository.findById(goalId).isEmpty()) {
+        if (!repository.existsById(goalId)) {
             throw new ResourceNotFoundException("Goal with ID " + goalId + " not found");
         }
     }

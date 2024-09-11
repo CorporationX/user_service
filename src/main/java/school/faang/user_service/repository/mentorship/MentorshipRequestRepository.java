@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Component
 public interface MentorshipRequestRepository extends JpaRepository<MentorshipRequest, Long> {
 
     @Query(nativeQuery = true, value = """

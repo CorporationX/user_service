@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto_mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto_mentorship.RejectionDto;
@@ -11,13 +10,14 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
-
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.repository.mentorship.filter.MentorshipRequestFilter;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
 
     public void mentorshipRequestValidation(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().trim().isEmpty()) {
@@ -77,21 +78,14 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(requestEntity));
     }
 
-    public List<MentorshipRequest> getRequests(RequestFilterDto filter) {
-        List<MentorshipRequest> mentorshipRequestList = mentorshipRequestRepository.findAll();
-
-        if (filter == null) {
-            return mentorshipRequestList;
-        }
-
-        return mentorshipRequestList.stream()
-                .filter(req -> filter.getDescription() == null || (req.getDescription() != null
-                        && req.getDescription().contains(filter.getDescription())))
-                .filter(req -> filter.getRequester() == null || (req.getRequester() != null
-                        && req.getRequester().getId().equals(filter.getRequester())))
-                .filter(req -> filter.getReceiver() == null || (req.getReceiver() != null
-                        && req.getReceiver().getId().equals(filter.getReceiver())))
-                .filter(req -> filter.getStatus() == null || req.getStatus().equals(filter.getStatus()))
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filters) {
+        Stream<MentorshipRequest> mentorshipRequestStream = mentorshipRequestRepository.findAll().stream();
+        return mentorshipRequestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .reduce(mentorshipRequestStream,
+                        (requestStream, filter) -> filter.apply(requestStream, filters),
+                        (s1, s2) -> s1)
+                .map(mentorshipRequestMapper::toDto)
                 .toList();
     }
 

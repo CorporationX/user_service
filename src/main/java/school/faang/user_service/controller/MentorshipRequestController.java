@@ -16,16 +16,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipRequestController {
 
-    @Autowired
     private final MentorshipRequestService mentorshipRequestService;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    public List<MentorshipRequest> getRequests(RequestFilterDto filter) {
-        return mentorshipRequestService.getRequests(filter);
-    }
+//    public List<MentorshipRequest> getRequests(RequestFilterDto filter) {
+//        return mentorshipRequestService.getRequests(filter);
+//    }
 
     public void acceptRequest(long id) {
         mentorshipRequestService.acceptRequest(id);

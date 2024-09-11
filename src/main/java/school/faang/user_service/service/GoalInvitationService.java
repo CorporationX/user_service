@@ -55,8 +55,25 @@ public class GoalInvitationService {
             throw new IllegalStateException(INVITER_INVITED_MISSING);
         }
 
+        User inviter = userRepository.findById(inviterId).get();
+        User invited = userRepository.findById(invitedId).get();
+
         GoalInvitation saved = goalInvitationRepository.save(invitation);
         log.info("Created goal invitation (id: {}, status: {})", saved.getId(), saved.getStatus());
+
+        inviter.getSentGoalInvitations().add(saved);
+        invited.getReceivedGoalInvitations().add(saved);
+
+        User inviterUpdated = userRepository.save(inviter);
+        User invitedUpdated = userRepository.save(invited);
+
+        log.info("Added invitation to inviter user's(id: {}) sent invitations: {}", inviterId, inviterUpdated.getSentGoalInvitations().stream()
+                .map(GoalInvitation::getId)
+                .toList());
+        log.info("Added invitation to invited user's(id: {}) received invitations: {}", invitedId, invitedUpdated.getReceivedGoalInvitations().stream()
+                .map(GoalInvitation::getId)
+                .toList());
+
         return saved;
     }
 

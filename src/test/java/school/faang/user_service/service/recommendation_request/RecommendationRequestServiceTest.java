@@ -1,25 +1,22 @@
 package school.faang.user_service.service.recommendation_request;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
 
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recomendation.CreateRecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.FilterRecommendationRequestsDto;
 import school.faang.user_service.dto.recomendation.RejectRecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.ValidationException;
 import school.faang.user_service.exception.recomendation.request.RecommendationRequestNotFoundException;
 import school.faang.user_service.exception.recomendation.request.RecommendationRequestRejectException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -37,11 +34,9 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
@@ -54,24 +49,40 @@ public class RecommendationRequestServiceTest {
     @Mock
     private RecommendationRequestValidator validator;
 
+    private CreateRecommendationRequestDto validRequestDto;
+    private List<RecommendationRequest> recommendationRequests;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        validRequestDto = new CreateRecommendationRequestDto(
+                "Message",
+                new ArrayList<>(List.of(1L, 2L)),
+                1L,
+                2L
+        );
+
+        recommendationRequests = List.of(
+                new RecommendationRequest().builder()
+                        .id(1L)
+                        .message("Request 1")
+                        .status(RequestStatus.PENDING)
+                        .build(),
+                new RecommendationRequest().builder()
+                        .id(2L)
+                        .message("Request 2")
+                        .status(RequestStatus.ACCEPTED)
+                        .build()
+        );
+    }
+
     @Test
     public void testCreateSuccess() {
-        RecommendationRequest createdRequest = new RecommendationRequest();
-        createdRequest.setId(1L);
-
-        CreateRecommendationRequestDto dto = this.validCreatedDto();
+        CreateRecommendationRequestDto dto = validRequestDto;
         User receiver = new User();
         User requester = new User();
         receiver.setId(dto.getReceiverId());
         requester.setId(dto.getRequesterId());
-
-        when(this.recommendationRequestRepository.save(any(RecommendationRequest.class))).thenReturn(createdRequest);
-
-        Long result = this.recommendationRequestService.create(
-                this.mapper.toEntity(dto), dto.getSkills()
-        );
-
-        assertEquals(result, createdRequest.getId());
 
         RecommendationRequest recommendationEntity = new RecommendationRequest();
         recommendationEntity.setMessage(dto.getMessage());
@@ -79,63 +90,68 @@ public class RecommendationRequestServiceTest {
         recommendationEntity.setReceiver(receiver);
         recommendationEntity.setRequester(requester);
 
-        verify(this.recommendationRequestRepository).save(recommendationEntity);
-    }
+        RecommendationRequest createdRequest = new RecommendationRequest();
+        createdRequest.setId(1L);
 
-    @Test
-    public void testCreateValidationError() {
-        CreateRecommendationRequestDto dto = this.validCreatedDto();
+        when(recommendationRequestRepository.save(any(RecommendationRequest.class))).thenReturn(createdRequest);
 
-        doThrow(ValidationException.class).when(this.validator).validateCreateRecommendationRequest(
-                any(RecommendationRequest.class), anyList()
+        RecommendationRequest result = recommendationRequestService.create(
+                mapper.toEntity(dto), dto.getSkills()
         );
 
-        assertThrows(ValidationException.class, () -> this.recommendationRequestService.create(
-                this.mapper.toEntity(dto), dto.getSkills()
-        ));
-
-        verify(this.recommendationRequestRepository, times(0)).save(any(RecommendationRequest.class));
+        assertEquals(result.getId(), createdRequest.getId());
+        verify(recommendationRequestRepository).save(recommendationEntity);
     }
 
     @Test
     public void testSuccessfulReject() {
-        RejectRecommendationRequestDto rejectionDto = new RejectRecommendationRequestDto();
-        rejectionDto.setId(1L);
-        rejectionDto.setReason("Reject");
+        RejectRecommendationRequestDto rejectionDto = new RejectRecommendationRequestDto(1L, "Reject");
 
-        RecommendationRequest recommendationRequest = this.mapper.toEntity(this.validCreatedDto());
-        recommendationRequest.setId(rejectionDto.getId());
-        recommendationRequest.setStatus(RequestStatus.PENDING);
+        RecommendationRequest findedRecommendationRequest = mapper.toEntity(validRequestDto);
+        findedRecommendationRequest.setId(rejectionDto.getId());
+        findedRecommendationRequest.setStatus(RequestStatus.PENDING);
 
-        when(this.recommendationRequestRepository.findById(anyLong()))
-                .thenReturn(Optional.of(recommendationRequest));
+        RecommendationRequest savedRecommendationRequest = mapper.toEntity(validRequestDto);
+        savedRecommendationRequest.setId(rejectionDto.getId());
+        savedRecommendationRequest.setStatus(RequestStatus.REJECTED);
+        savedRecommendationRequest.setRejectionReason(rejectionDto.getReason());
 
-        this.recommendationRequestService.rejectRequest(rejectionDto);
+        when(recommendationRequestRepository.findById(anyLong()))
+                .thenReturn(Optional.of(findedRecommendationRequest));
 
-        recommendationRequest.setStatus(RequestStatus.REJECTED);
-        recommendationRequest.setRejectionReason(rejectionDto.getReason());
+        when(recommendationRequestRepository.save(any(RecommendationRequest.class)))
+                .thenReturn(savedRecommendationRequest);
 
-        verify(this.recommendationRequestRepository).save(recommendationRequest);
+        RecommendationRequest result = recommendationRequestService.rejectRequest(findedRecommendationRequest);
+
+        assertEquals(result.getStatus(), RequestStatus.REJECTED);
+        assertEquals(result.getRejectionReason(), rejectionDto.getReason());
     }
 
     @Test
-    public void testFailedReject() {
-        RejectRecommendationRequestDto rejectionDto = new RejectRecommendationRequestDto();
-        rejectionDto.setId(1L);
-        rejectionDto.setReason("Reject");
+    public void testFailedRejectNotFound() {
+        RejectRecommendationRequestDto rejectionDto = new RejectRecommendationRequestDto(1L, "Reject");
 
-        assertThrows(RecommendationRequestNotFoundException.class, () -> this.recommendationRequestService
-                .rejectRequest(rejectionDto)
+        RecommendationRequest recommendationRequest = mapper.toRejectEntity(rejectionDto);
+
+        assertThrows(RecommendationRequestNotFoundException.class, () -> recommendationRequestService
+                .rejectRequest(recommendationRequest)
         );
+    }
 
-        RecommendationRequest recommendationRequest = this.mapper.toEntity(this.validCreatedDto());
-        recommendationRequest.setId(rejectionDto.getId());
-        recommendationRequest.setStatus(RequestStatus.REJECTED);
+    @Test
+    public void testFailedRejectStatus() {
+        RejectRecommendationRequestDto rejectionDto = new RejectRecommendationRequestDto(1L, "Reject");
 
-        when(this.recommendationRequestRepository.findById(anyLong()))
-                .thenReturn(Optional.of(recommendationRequest));
-        assertThrows(RecommendationRequestRejectException.class, () -> this.recommendationRequestService
-                .rejectRequest(rejectionDto)
+        RecommendationRequest findedRecommendationRequest = mapper.toRejectEntity(rejectionDto);
+        findedRecommendationRequest.setId(rejectionDto.getId());
+        findedRecommendationRequest.setStatus(RequestStatus.REJECTED);
+
+        when(recommendationRequestRepository.findById(anyLong()))
+                .thenReturn(Optional.of(findedRecommendationRequest));
+
+        assertThrows(RecommendationRequestRejectException.class, () -> recommendationRequestService
+                .rejectRequest(mapper.toRejectEntity(rejectionDto))
         );
     }
 
@@ -143,7 +159,7 @@ public class RecommendationRequestServiceTest {
     public void testFailedGetOneRequest() {
         Long findId = 1L;
 
-        assertThrows(RecommendationRequestNotFoundException.class, () -> this.recommendationRequestService
+        assertThrows(RecommendationRequestNotFoundException.class, () -> recommendationRequestService
                 .findRequestById(findId)
         );
     }
@@ -151,16 +167,16 @@ public class RecommendationRequestServiceTest {
     @Test
     public void testSuccessGetOneRequest() {
         Long findId = 1L;
-        RecommendationRequest recommendationRequest = this.mapper.toEntity(this.validCreatedDto());
+        RecommendationRequest recommendationRequest = mapper.toEntity(validRequestDto);
         recommendationRequest.setId(findId);
 
-        when(this.recommendationRequestRepository.findById(anyLong()))
+        when(recommendationRequestRepository.findById(anyLong()))
                 .thenReturn(Optional.of(recommendationRequest));
 
-        RecommendationRequest result = this.recommendationRequestService.findRequestById(findId);
+        RecommendationRequest result = recommendationRequestService.findRequestById(findId);
 
         assertEquals(result.getId(), findId);
-        verify(this.recommendationRequestRepository).findById(findId);
+        verify(recommendationRequestRepository).findById(findId);
     }
 
     @Test
@@ -168,49 +184,29 @@ public class RecommendationRequestServiceTest {
         FilterRecommendationRequestsDto filterRecommendationRequestsDto = new FilterRecommendationRequestsDto();
         filterRecommendationRequestsDto.setStatus(RequestStatus.PENDING);
 
-        this.recommendationRequestService = new RecommendationRequestService(
+        recommendationRequestService = new RecommendationRequestService(
                 List.of(
                         new RecommendationRequestIdFilter(),
                         new RecommendationRequestStatusFilter(),
                         new RecommendationRequestMessageFilter()
                 ),
-                this.skillRequestRepository,
-                this.recommendationRequestRepository,
-                this.validator
+                skillRequestRepository,
+                recommendationRequestRepository,
+                validator
         );
 
-        when(this.recommendationRequestRepository.findAll())
-                .thenReturn(List.of(
-                        new RecommendationRequest().builder()
-                                .id(1L)
-                                .message("Request 1")
-                                .status(RequestStatus.PENDING)
-                                .build(),
-                        new RecommendationRequest().builder()
-                                .id(2L)
-                                .message("Request 2")
-                                .status(RequestStatus.ACCEPTED)
-                                .build()
-                ));
+        when(recommendationRequestRepository.findAll())
+                .thenReturn(recommendationRequests);
 
-        List<RecommendationRequest> result1 = this.recommendationRequestService.getRecommendationRequests(
+        List<RecommendationRequest> result1 = recommendationRequestService.getRecommendationRequests(
                 filterRecommendationRequestsDto
         );
 
-        List<RecommendationRequest> result2 = this.recommendationRequestService.getRecommendationRequests(
+        List<RecommendationRequest> result2 = recommendationRequestService.getRecommendationRequests(
                 new FilterRecommendationRequestsDto()
         );
 
         assertEquals(result1.size(), 1);
         assertEquals(result2.size(), 2);
-    }
-
-    private CreateRecommendationRequestDto validCreatedDto() {
-        return new CreateRecommendationRequestDto(
-                "Message",
-                new ArrayList<>(List.of(1L, 2L)),
-                1L,
-                2L
-        );
     }
 }

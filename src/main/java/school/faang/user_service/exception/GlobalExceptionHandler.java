@@ -21,9 +21,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(RecommendationRequestException.class)
-    public ResponseEntity<Object> handleRecommendationRequestException(
-            RecommendationRequestException exception
-    ) {
+    public ResponseEntity<Object> handleRecommendationRequestException(RecommendationRequestException exception) {
         Map<String, Object> body = new HashMap<>();
         body.put("message", exception.getMessage());
 

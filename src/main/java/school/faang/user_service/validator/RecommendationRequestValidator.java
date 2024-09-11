@@ -1,7 +1,9 @@
 package school.faang.user_service.validator;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.recomendation.CreateRecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.ValidationException;
 import school.faang.user_service.repository.SkillRepository;
@@ -10,11 +12,12 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Component
-@Data
+@AllArgsConstructor
 public class RecommendationRequestValidator {
     private static final int SIX_MONTHS_IN_DAYS = 30 * 6;
 
@@ -22,7 +25,7 @@ public class RecommendationRequestValidator {
     private final SkillRepository skillRepository;
     private final RecommendationRequestRepository recommendationRequestRepository;
 
-    public void validateCreateRecommendationRequest(RecommendationRequest recommendationRequest, List<Long> skills) {
+    public void validateCreateRecommendationRequest(RecommendationRequest recommendationRequest, List<Long> skillIds) {
         Long requesterId = recommendationRequest.getRequester().getId();
         Long receiverId = recommendationRequest.getReceiver().getId();
 
@@ -32,7 +35,7 @@ public class RecommendationRequestValidator {
 
         this.checkUserExists(requesterId);
         this.checkUserExists(receiverId);
-        this.checkSkillsExists(skills);
+        this.checkSkillsExists(skillIds);
         this.checkLastRequestMoreSixMonths(
                 requesterId,
                 receiverId
@@ -60,15 +63,18 @@ public class RecommendationRequestValidator {
                         receiverId
                 );
 
-        if (lastRecommendationRequest.isPresent()) {
-            Duration duration = Duration.between(
-                    lastRecommendationRequest.get().getCreatedAt(),
-                    LocalDateTime.now()
-            );
+        if (lastRecommendationRequest.isEmpty()) {
+            return;
+        }
 
-            if (duration.toDays() < SIX_MONTHS_IN_DAYS) {
-                throw new ValidationException("The last request was sent less than 6 months ago");
-            }
+        Duration duration = Duration.between(
+                lastRecommendationRequest.get().getCreatedAt(),
+                LocalDateTime.now()
+        );
+
+        if (duration.toDays() < SIX_MONTHS_IN_DAYS) {
+            throw new ValidationException("The last request was sent less than 6 months ago");
         }
     }
+
 }

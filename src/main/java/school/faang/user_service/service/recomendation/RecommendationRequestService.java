@@ -29,7 +29,7 @@ public class RecommendationRequestService {
     private final RecommendationRequestValidator validator;
 
     @Transactional
-    public Long create(RecommendationRequest recommendationRequest, List<Long> skillIds) {
+    public RecommendationRequest create(RecommendationRequest recommendationRequest, List<Long> skillIds) {
         validator.validateCreateRecommendationRequest(recommendationRequest, skillIds);
 
         recommendationRequest.setStatus(RequestStatus.PENDING);
@@ -41,7 +41,7 @@ public class RecommendationRequestService {
             this.skillRequestRepository.create(savedRequest.getId(), skillId);
         });
 
-        return savedRequest.getId();
+        return savedRequest;
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +66,7 @@ public class RecommendationRequestService {
     }
 
     @Transactional
-    public RecommendationRequest rejectRequest(RejectRecommendationRequestDto rejection) {
+    public RecommendationRequest rejectRequest(RecommendationRequest rejection) {
         RecommendationRequest recommendationRequest = this.findRequestById(rejection.getId());
 
         if (recommendationRequest.getStatus() != RequestStatus.PENDING) {
@@ -74,7 +74,7 @@ public class RecommendationRequestService {
         }
 
         recommendationRequest.setStatus(RequestStatus.REJECTED);
-        recommendationRequest.setRejectionReason(rejection.getReason());
+        recommendationRequest.setRejectionReason(rejection.getRejectionReason());
         return this.recommendationRequestRepository.save(recommendationRequest);
     }
 }

@@ -5,6 +5,7 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.recomendation.CreateRecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recomendation.RejectRecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 
@@ -23,8 +24,13 @@ public interface RecommendationRequestMapper {
     @Mapping(source = "receiverId", target = "receiver.id")
     RecommendationRequest toEntity(CreateRecommendationRequestDto dto);
 
+    @Mapping(source = "reason", target = "rejectionReason")
+    RecommendationRequest toRejectEntity(RejectRecommendationRequestDto dto);
+
     default List<RecommendationRequestDto> listEntitiesToListDto(List<RecommendationRequest> requests) {
-        return requests.stream().map(this::toDto).toList();
+        return requests.stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @Named("skillsToIds")

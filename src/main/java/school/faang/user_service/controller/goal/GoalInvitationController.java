@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,25 +16,23 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/goals/invitations")
-@Slf4j
 public class GoalInvitationController {
 
     private final GoalInvitationService goalInvitationService;
 
     @PostMapping("/creation")
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
-
         return goalInvitationService.createInvitation(invitation);
     }
 
     @PutMapping("/acceptance")
     public GoalInvitationDto acceptGoalInvitation(@RequestParam long id) {
-        return goalInvitationService.acceptGoalInvitation(id);
+        return goalInvitationService.acceptInvitation(id);
     }
 
     @PutMapping("/rejection")
     public GoalInvitationDto rejectGoalInvitation(@RequestParam long id) {
-        return goalInvitationService.rejectGoalInvitation(id);
+        return goalInvitationService.rejectInvitation(id);
     }
 
     @PostMapping("/invitations-by-filter")

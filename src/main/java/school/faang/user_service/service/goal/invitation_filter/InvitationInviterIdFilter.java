@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 @Component
 public class InvitationInviterIdFilter implements InvitationFilter {
+
     @Override
     public boolean isApplicable(InvitationFilterDto invitationFilterDto) {
         return invitationFilterDto.getInviterId() != null;

@@ -11,10 +11,10 @@ import school.faang.user_service.entity.RequestStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InvitationFilterDto {
-    @Pattern(regexp = "^$|\\S+", message = "inviterNamePattern must not be empty, but can be null")
+    @Pattern(regexp = "^\\S.*$", message = "inviterNamePattern must not be empty, but can be null")
     private String inviterNamePattern;
 
-    @Pattern(regexp = "^$|\\S+", message = "invitedNamePattern must not be empty, but can be null")
+    @Pattern(regexp = "^\\S.*$", message = "invitedNamePattern must not be empty, but can be null")
     private String invitedNamePattern;
 
     @Positive(message = "inviterId must be a positive number or null")

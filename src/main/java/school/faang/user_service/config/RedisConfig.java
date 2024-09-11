@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,9 +9,14 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.listener.UserBanListener;
+import school.faang.user_service.dto.ProfileViewEvent;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -21,8 +27,35 @@ public class RedisConfig {
     private String mentorshipRequestTopicName;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
+    @Value("${spring.data.redis.channels.mentorship_channel.name}")
+    private String mentorshipChannel;
+    @Value("${spring.data.redis.topic.userBan}")
+    private String userBanChannel;
+    @Value("${spring.data.redis.channels.mentorship_offered_channel.name}")
+    private String mentorshipOfferedChannelName;
     @Value("${spring.data.redis.channels.profile_picture_channel.name}")
     private String profilePicture;
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopicName;
+
+    public interface MessagePublisher {
+        void publish(ProfileViewEvent profileViewEvent);
+    }
+
+    @Bean(name = "followerChannelTopic")
+    public ChannelTopic followerChannelTopic() {
+        return new ChannelTopic(followerChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipChannelTopic() {
+        return new ChannelTopic(mentorshipChannel);
+    }
+
+    @Bean
+    public ChannelTopic userBanTopic() {
+        return new ChannelTopic(userBanChannel);
+    }
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -40,17 +73,27 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic mentorshipOfferedChannel() {
+        return new ChannelTopic(mentorshipOfferedChannelName);
+    }
+
+    @Bean
     public ChannelTopic profilePictureTopic() {
         return new ChannelTopic(profilePicture);
     }
 
-    @Bean(name = "followerChannelTopic")
-    public ChannelTopic followerChannelTopic() {
-        return new ChannelTopic(followerChannel);
+    @Bean
+    public ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewTopicName);
     }
 
     @Bean
     public ChannelTopic mentorshipRequestTopic() {
         return new ChannelTopic(mentorshipRequestTopicName);
+    }
+
+    @Bean
+    MessageListenerAdapter messageListener(UserBanListener userBanListener) {
+        return new MessageListenerAdapter(userBanListener);
     }
 }

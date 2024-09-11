@@ -7,7 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -17,6 +18,7 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -34,6 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +60,8 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private MentorshipService mentorshipService;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -64,13 +69,14 @@ class UserServiceTest {
     private long id;
     private List<Long> ids;
     private long userId;
+    private long authorId;
     private User user;
     private UserDto userDto;
+    private UserTransportDto userTransportDto;
     private User mentee;
     private Goal mentorAssignedGoal;
-    private List<User> users;
     private List<Long> userIds;
-    private List<UserDto> userDtoList;
+    private List<UserTransportDto> userTransportDtoList;
     private List<User> userFollowers;
 
     @BeforeEach
@@ -81,6 +87,8 @@ class UserServiceTest {
         List<Event> ownedEvents = new ArrayList<>();
 
         userId = 1L;
+        authorId = 2L;
+        userIds = List.of(userId);
         long countryId = 2L;
         userFollowers = List.of(new User());
 
@@ -111,11 +119,23 @@ class UserServiceTest {
                 .goals(goalList)
                 .ownedEvents(ownedEvents)
                 .mentees(menteesList).build();
+        userDto = UserDto.builder()
+                .id(userId)
+                .username("username")
+                .country(1L)
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
+        userTransportDto = UserTransportDto.builder()
+                .id(userId)
+                .username("username")
+                .email("test@mail.com")
+                .phone("123456")
+                .build();
 
         userIds = List.of(userId);
-        users = List.of(user);
+        userTransportDtoList = List.of(userTransportDto);
 
-        userDtoList = List.of(userDto);
         Goal goal = Goal.builder()
                 .id(1L)
                 .users(userList).build();
@@ -133,11 +153,23 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("testing getUser method")
+    public void testGetUser() {
+        when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
+        doNothing().when(profileViewEventPublisher).publish(any());
+        userService.getUser(userId, authorId);
+        verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
+        verify(userMapper, times(1)).toDto(user);
+    }
+
+    @Test
     @DisplayName("testing createUser method with null multipartFile")
     public void testCreateUser() {
         when(userMapper.toEntity(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
+
         userService.createUser(userDto, null);
+
         verify(userMapper, times(1)).toEntity(userDto);
         verify(userRepository, times(2)).save(user);
         verify(avatarService, times(1)).setRandomAvatar(user);
@@ -148,39 +180,27 @@ class UserServiceTest {
     @DisplayName("testing updateUserAvatar method with null multipartFile")
     public void testUpdateUserAvatar() {
         when(entityHandler.getOrThrowException(eq(User.class), eq(userId), any())).thenReturn(user);
+
         userService.updateUserAvatar(userId, null);
+
         verify(entityHandler, times(1)).getOrThrowException(eq(User.class), eq(userId), any());
         verify(avatarService, times(1)).setRandomAvatar(user);
         verify(userRepository, times(1)).save(user);
     }
 
-    @Test
-    @DisplayName("test that getUser calls all methods correctly + return test")
-    public void testGetUser() {
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userDto);
-
-        UserDto result = userService.getUserById(id);
-
-        verify(userValidator).validateUserExistence(id);
-        verify(userRepository).findById(id);
-        verify(userMapper).toDto(user);
-
-        assertEquals(result, userDto);
-    }
 
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
     public void testGetUsersByIds() {
-        when(userRepository.findAllById(userIds)).thenReturn(users);
-        when(userMapper.toDtoList(List.of(user))).thenReturn(List.of(userDto));
+        when(userRepository.findAllById(userIds)).thenReturn(List.of(user));
+        when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        List<UserDto> result = userService.getUsersByIds(userIds);
+        List<UserTransportDto> result = userService.getUsersByIds(userIds);
 
         verify(userRepository).findAllById(userIds);
-        verify(userMapper).toDtoList(List.of(user));
+        verify(userMapper).toTransportDto(user);
 
-        assertEquals(result, userDtoList);
+        assertEquals(result, userTransportDtoList);
     }
 
     @Test
@@ -196,21 +216,7 @@ class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         userService.deactivateUser(user.getId());
         verify(goalRepository, times(1)).deleteAll(any());
-    }
-
-    @Test
-    @DisplayName("testing deactivateUser by eventRepository saveAll method execution")
-    public void testDeactivateUserWithEventRepositorySaveExecution() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        userService.deactivateUser(user.getId());
         verify(eventRepository, times(1)).saveAll(any());
-    }
-
-    @Test
-    @DisplayName("testing deactivateUser by deleteMentor method execution")
-    public void testDeactivateUserWithDeleteMethodExecution() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        userService.deactivateUser(user.getId());
         verify(mentorshipService, times(1)).deleteMentor(mentee.getId(), user.getId());
         assertEquals(mentorAssignedGoal.getMentor(), mentee);
     }

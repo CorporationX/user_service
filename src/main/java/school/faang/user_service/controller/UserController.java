@@ -18,14 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/user")
 public class UserController {
     private final UserService userService;
     private final ObjectMapper objectMapper;
@@ -45,16 +47,16 @@ public class UserController {
         userService.updateUserAvatar(userId, multipartFile);
     }
 
+    @PutMapping("/deactivate/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto deactivateUser(@PathVariable Long userId) {
+        return userService.deactivateUser(userId);
+    }
+
     @GetMapping("/exists/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public boolean checkUserExistence(@PathVariable Long userId) {
         return userService.checkUserExistence(userId);
-    }
-
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDto getUserById(@PathVariable long userId) {
-        return userService.getUserById(userId);
     }
 
     @GetMapping("/{userId}/followers")
@@ -71,7 +73,7 @@ public class UserController {
 
     @GetMapping("/byList")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+    public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 
@@ -95,5 +97,12 @@ public class UserController {
     @GetMapping("avatar/keys")
     public UserProfilePicDto getAvatarKeys(@RequestHeader(value = "x-user-id") long userId) {
         return userService.getAvatarKeys(userId);
+    }
+
+    @GetMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUser(@PathVariable long userId,
+                           @RequestHeader(value = "x-user-id") long authorId) {
+        return userService.getUser(userId, authorId);
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -38,6 +38,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     private long userId;
+    private long authorId;
     private String userDtoJson;
     private MockMultipartFile mockMultipartFile;
 
@@ -48,16 +49,22 @@ class UserControllerTest {
     public void setUp() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         userId = 1L;
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        authorId = 2L;
         followersIds = List.of(1L, 2L);
         followerIdsJson = objectMapper.writeValueAsString(followersIds);
 
+        String username = "username";
+        String password = "password";
+        long country = 1L;
+        String email = "email";
+        String phone = "123456";
+
         UserDto userDto = UserDto.builder()
-                .username("username")
-                .password("password")
-                .country(1L)
-                .email("test@mail.com")
-                .phone("123456")
+                .username(username)
+                .password(password)
+                .country(country)
+                .email(email)
+                .phone(phone)
                 .build();
 
         mockMultipartFile = new MockMultipartFile(
@@ -68,14 +75,16 @@ class UserControllerTest {
         );
 
         userDtoJson = objectMapper.writeValueAsString(userDto);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
     @DisplayName("testing getUser method")
     void testGetUser() throws Exception {
-        mockMvc.perform(get("/api/v1/user/{userId}", userId))
+        mockMvc.perform(get("/api/v1/user/{userId}", userId)
+                .header("x-user-id", authorId))
                 .andExpect(status().isOk());
-        verify(userService, times(1)).getUserById(userId);
+        verify(userService, times(1)).getUser(userId, authorId);
     }
 
     @Test

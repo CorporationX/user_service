@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,14 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.CreateGroup;
+import school.faang.user_service.dto.UpDateGroup;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserDto {
-
     private Long id;
 
     @NotBlank(message = "username should not be blank", groups = {CreateGroup.class, UpDateGroup.class})
@@ -36,6 +36,6 @@ public class UserDto {
     @NotBlank(message = "phone should not be blank", groups = {CreateGroup.class, UpDateGroup.class})
     @Size(max = 32, message = "phone length max 32 characters", groups = CreateGroup.class)
     private String phone;
-    private boolean isActive;
-    private MultipartFile multipartFile;
+    private PreferredContact preference;
 }
+

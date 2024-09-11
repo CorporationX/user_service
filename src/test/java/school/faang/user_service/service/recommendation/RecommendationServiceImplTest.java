@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -25,8 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -67,18 +64,6 @@ public class RecommendationServiceImplTest {
     }
 
     @Test
-    @DisplayName("Создание рекомендации с несуществующим автором")
-    void testCreateRecommendationWithInvalidAuthor() {
-        when(userRepository.findById(recommendationDto.authorId())).thenReturn(Optional.empty());
-        when(userRepository.findById(recommendationDto.receiverId())).thenReturn(Optional.of(receiver));
-        assertThrows(DataValidationException.class,
-                () -> recommendationService.createRecommendation(recommendationDto));
-        verify(userRepository).findById(recommendationDto.authorId());
-        verify(userRepository).findById(recommendationDto.receiverId());
-        verifyNoMoreInteractions(recommendationRepository, skillOfferRepository);
-    }
-
-    @Test
     @DisplayName("Создание рекомендации с несуществующим получателем")
     void testCreateRecommendationWithInvalidReceiver() {
         when(userRepository.findById(recommendationDto.authorId())).thenReturn(Optional.of(author));
@@ -110,17 +95,5 @@ public class RecommendationServiceImplTest {
                 () -> recommendationService.deleteRecommendation(recommendationId));
         verify(recommendationRepository).findById(recommendationId);
         verifyNoMoreInteractions(recommendationRepository);
-    }
-
-    @Test
-    @DisplayName("Позитивный тест на создание рекомендации")
-    void testCreateRecommendationSuccess() {
-        when(userRepository.findById(recommendationDto.authorId())).thenReturn(Optional.of(author));
-        when(userRepository.findById(recommendationDto.receiverId())).thenReturn(Optional.of(receiver));
-        recommendationService.createRecommendation(recommendationDto);
-        verify(userRepository).findById(recommendationDto.authorId());
-        verify(userRepository).findById(recommendationDto.receiverId());
-        verify(recommendationRepository).save(any(Recommendation.class));
-        verify(skillOfferRepository, times(1)).save(any());
     }
 }

@@ -10,13 +10,11 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitation;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitationFilterDto;
 
 class RequestStatusFilterTest {
-    private final InvitationFilterDto applicableFilterDto =
-            new InvitationFilterDto(null, null, null, null, RequestStatus.ACCEPTED);
-    private final InvitationFilterDto nonApplicableFilterDto =
-            new InvitationFilterDto(null, null, null, null, null);
-
+    private final InvitationFilterDto applicableFilterDto = getInvitationFilterDto(RequestStatus.ACCEPTED);
+    private final InvitationFilterDto nonApplicableFilterDto = getInvitationFilterDto();
     private final RequestStatusFilter requestStatusFilter = new RequestStatusFilter();
 
     @Test
@@ -34,9 +32,9 @@ class RequestStatusFilterTest {
     @Test
     @DisplayName("Given invitations when apply then return invitation stream")
     void testApplySuccessful() {
-        var invitation1 = getInvitation(RequestStatus.PENDING);
-        var invitation2 = getInvitation(RequestStatus.ACCEPTED);
-        var invitation3 = getInvitation(RequestStatus.REJECTED);
+        GoalInvitation invitation1 = getInvitation(RequestStatus.PENDING);
+        GoalInvitation invitation2 = getInvitation(RequestStatus.ACCEPTED);
+        GoalInvitation invitation3 = getInvitation(RequestStatus.REJECTED);
 
         Stream<GoalInvitation> invitationStream = Stream.of(invitation1, invitation2, invitation3);
         Stream<GoalInvitation> expectedInvitationStream = Stream.of(invitation2);

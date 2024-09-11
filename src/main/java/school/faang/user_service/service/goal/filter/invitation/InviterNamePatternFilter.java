@@ -15,7 +15,10 @@ public class InviterNamePatternFilter implements InvitationFilter {
 
     @Override
     public Stream<GoalInvitation> apply(Stream<GoalInvitation> invitations, InvitationFilterDto filters) {
-        return invitations.filter(invitation ->
-                invitation.getInviter().getUsername().toLowerCase().contains(filters.inviterNamePattern().toLowerCase()));
+        return invitations.filter(invitation -> {
+            String username = invitation.getInviter().getUsername().toLowerCase();
+            String pattern = filters.inviterNamePattern().toLowerCase();
+            return username.contains(pattern);
+        });
     }
 }

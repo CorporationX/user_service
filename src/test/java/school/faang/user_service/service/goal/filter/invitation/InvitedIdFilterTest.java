@@ -8,6 +8,8 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitationDto;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitationFilterDto;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitations;
 
 class InvitedIdFilterTest {
@@ -15,11 +17,8 @@ class InvitedIdFilterTest {
     private static final int NUMBER_OF_INVITATIONS = 5;
     private static final int ONE_INVITATION = 1;
 
-    private final InvitationFilterDto applicableFilterDto =
-            new InvitationFilterDto(null, null, null, INVITED_USER_ID, null);
-    private final InvitationFilterDto nonApplicableFilterDto =
-            new InvitationFilterDto(null, null, null, null, null);
-
+    private final InvitationFilterDto applicableFilterDto = getInvitationFilterDto(null, INVITED_USER_ID);
+    private final InvitationFilterDto nonApplicableFilterDto = getInvitationFilterDto();
     private final InvitedIdFilter invitedIdFilter = new InvitedIdFilter();
 
     @Test

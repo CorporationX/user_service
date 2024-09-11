@@ -1,13 +1,14 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -36,7 +37,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.GOAL_INVITATION_NOT_FOUND;
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.GOAL_NOT_FOUND_MESSAGE_FORMAT;
 import static school.faang.user_service.service.goal.util.GoalInvitationErrorMessages.INVITED_USER_NOT_FOUND_MESSAGE_FORMAT;
@@ -49,6 +49,7 @@ import static school.faang.user_service.util.goal.invitation.InvitationFabric.ge
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitation;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getUser;
 
+@ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
     private static final long FIRST_USER_ID = 1L;
     private static final long SECOND_USER_ID = 2L;
@@ -59,7 +60,6 @@ class GoalInvitationServiceTest {
     private static final long NON_EXIST_GOAL_INVITATION_ID = 2L;
     private static final int EXCEEDED_NUMBER_OF_GOALS = 4;
     private static final long NEW_GOAL_ID = EXCEEDED_NUMBER_OF_GOALS + 1L;
-
     private static final Integer USER_GOALS_LIMIT = 3;
 
     @Mock
@@ -74,14 +74,11 @@ class GoalInvitationServiceTest {
     @InjectMocks
     private GoalInvitationService goalInvitationService;
 
-    private AutoCloseable closeable;
-
     @Captor
     private ArgumentCaptor<GoalInvitation> goalInvitationCaptor;
 
     @BeforeEach
     void setUp() {
-        closeable = openMocks(this);
         ReflectionTestUtils.setField(goalInvitationService, "userGoalsLimit", USER_GOALS_LIMIT);
     }
 
@@ -154,7 +151,7 @@ class GoalInvitationServiceTest {
     @Test
     @DisplayName("Given already accepted goal when checking then throw exception")
     void testAcceptGoalInvitationGoalAlreadyAccepted() {
-        var invitation = getGoalInvitationAlreadyAcceptedGoal();
+        GoalInvitation invitation = getGoalInvitationAlreadyAcceptedGoal();
         when(goalInvitationRepository.findById(GOAL_INVITATION_ID)).thenReturn(Optional.of(invitation));
 
         assertThatThrownBy(() -> goalInvitationService.acceptGoalInvitation(GOAL_INVITATION_ID))
@@ -164,16 +161,16 @@ class GoalInvitationServiceTest {
     }
 
     private GoalInvitation getGoalInvitationAlreadyAcceptedGoal() {
-        var goals = getGoals(USER_GOALS_LIMIT);
-        var invitedUser = getUser(SECOND_USER_ID, goals);
-        var alreadyExistGoal = goals.get(0);
+        List<Goal> goals = getGoals(USER_GOALS_LIMIT);
+        User invitedUser = getUser(SECOND_USER_ID, goals);
+        Goal alreadyExistGoal = goals.get(0);
         return getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, alreadyExistGoal);
     }
 
     @Test
     @DisplayName("Given exceeded size active goals when accepted then throw exception")
     void testAcceptGoalInvitationExceededSizeOfActiveGoals() {
-        var invitation = getGoalInvitationExceededSizeOfActiveGoals();
+        GoalInvitation invitation = getGoalInvitationExceededSizeOfActiveGoals();
         when(goalInvitationRepository.findById(GOAL_INVITATION_ID)).thenReturn(Optional.of(invitation));
 
         assertThatThrownBy(() -> goalInvitationService.acceptGoalInvitation(GOAL_INVITATION_ID))
@@ -183,25 +180,27 @@ class GoalInvitationServiceTest {
     }
 
     private GoalInvitation getGoalInvitationExceededSizeOfActiveGoals() {
-        var goals = getGoals(EXCEEDED_NUMBER_OF_GOALS);
-        var invitedUser = getUser(SECOND_USER_ID, goals);
-        var newGoal = getGoal(NEW_GOAL_ID);
+        List<Goal> goals = getGoals(EXCEEDED_NUMBER_OF_GOALS);
+        User invitedUser = getUser(SECOND_USER_ID, goals);
+        Goal newGoal = getGoal(NEW_GOAL_ID);
         return getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, newGoal);
     }
 
     @Test
     @DisplayName("Given correct invitation id when accept invitation then set request status")
     void testAcceptGoalInvitationSuccessful() {
-        var invitation = getCorrectInvitation();
+        GoalInvitation invitation = getCorrectInvitation();
         when(goalInvitationRepository.findById(GOAL_INVITATION_ID)).thenReturn(Optional.of(invitation));
 
         goalInvitationService.acceptGoalInvitation(GOAL_INVITATION_ID);
         assertThat(invitation.getStatus()).isEqualTo(RequestStatus.ACCEPTED);
+        verify(goalRepository).save(invitation.getGoal());
+        verify(goalInvitationRepository).save(invitation);
     }
 
     private GoalInvitation getCorrectInvitation() {
-        var invitedUser = getUser(SECOND_USER_ID, new ArrayList<>());
-        var newGoal = getGoal(NEW_GOAL_ID);
+        User invitedUser = getUser(SECOND_USER_ID, new ArrayList<>());
+        Goal newGoal = getGoal(NEW_GOAL_ID);
         newGoal.setUsers(new ArrayList<>());
         return getInvitation(GOAL_INVITATION_ID, mock(User.class), invitedUser, newGoal);
     }
@@ -219,21 +218,23 @@ class GoalInvitationServiceTest {
     @Test
     @DisplayName("Given existing invitation id when reject invitation then change status invitation")
     void testRejectGoalInvitationSuccessful() {
-        var invitation = GoalInvitation.builder()
+        GoalInvitation invitation = GoalInvitation.builder()
                 .status(RequestStatus.PENDING)
                 .build();
         when(goalInvitationRepository.findById(GOAL_INVITATION_ID)).thenReturn(Optional.of(invitation));
 
         goalInvitationService.rejectGoalInvitation(GOAL_INVITATION_ID);
         assertThat(invitation.getStatus()).isEqualTo(RequestStatus.REJECTED);
+        verify(goalInvitationRepository).save(invitation);
     }
 
     @Test
     @DisplayName("Given ")
     void testGetInvitationsSuccessful() {
-        var filters = getRealFilters();
-        var invitationFilterDto = new InvitationFilterDto(null, null, FIRST_USER_ID, SECOND_USER_ID, null);
-        var invitations = getGoalInvitationsWithUserIds();
+        List<InvitationFilter> filters = getRealFilters();
+        InvitationFilterDto invitationFilterDto = new InvitationFilterDto(null, null,
+                FIRST_USER_ID, SECOND_USER_ID, null);
+        List<GoalInvitation> invitations = getGoalInvitationsWithUserIds();
         goalInvitationService = new GoalInvitationService(goalInvitationRepository, goalRepository, userRepository, filters);
         when(goalInvitationRepository.findAll()).thenReturn(invitations);
 
@@ -256,10 +257,5 @@ class GoalInvitationServiceTest {
                 getInvitation(1L, getUser(FIRST_USER_ID), getUser(SECOND_USER_ID), null),
                 getInvitation(2L, getUser(NON_EXIST_USER_ID), getUser(NON_EXIST_USER_ID), null)
         );
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        closeable.close();
     }
 }

@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitation;
+import static school.faang.user_service.util.goal.invitation.InvitationFabric.getInvitationFilterDto;
 
 class InviterNamePatternFilterTest {
     private static final String INVITER_NAME_PATTERN = "bob";
@@ -16,11 +17,8 @@ class InviterNamePatternFilterTest {
     private static final String USERNAME_2 = "Bobby";
     private static final String USERNAME_3 = "Anna";
 
-    private final InvitationFilterDto applicableFilterDto =
-            new InvitationFilterDto(INVITER_NAME_PATTERN, null, null, null, null);
-    private final InvitationFilterDto nonApplicableFilterDto =
-            new InvitationFilterDto(null, null, null, null, null);
-
+    private final InvitationFilterDto applicableFilterDto = getInvitationFilterDto(INVITER_NAME_PATTERN, null);
+    private final InvitationFilterDto nonApplicableFilterDto = getInvitationFilterDto();
     private final InviterNamePatternFilter inviterNamePatternFilter = new InviterNamePatternFilter();
 
     @Test
@@ -38,9 +36,9 @@ class InviterNamePatternFilterTest {
     @Test
     @DisplayName("Given invitations when apply then return invitation stream")
     void testApplySuccessful() {
-        var invitation1 = getInvitation(USERNAME_1, null);
-        var invitation2 = getInvitation(USERNAME_2, null);
-        var invitation3 = getInvitation(USERNAME_3, null);
+        GoalInvitation invitation1 = getInvitation(USERNAME_1, null);
+        GoalInvitation invitation2 = getInvitation(USERNAME_2, null);
+        GoalInvitation invitation3 = getInvitation(USERNAME_3, null);
 
         Stream<GoalInvitation> invitationStream = Stream.of(invitation1, invitation2, invitation3);
         Stream<GoalInvitation> expectedInvitationStream = Stream.of(invitation2);

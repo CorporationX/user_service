@@ -41,6 +41,6 @@ payment-service:
   host: localhost
   port: 9080
 
-  app:
-    goal:
-      max-active-per-user: 3
+app:
+  goal:
+    max-active-per-user: 3

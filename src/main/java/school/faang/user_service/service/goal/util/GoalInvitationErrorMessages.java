@@ -1,5 +1,8 @@
 package school.faang.user_service.service.goal.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class GoalInvitationErrorMessages {
     public static final String USERS_SAME_MESSAGE_FORMAT = "Inviter user id: %s and invited user id: %s should not be same";
     public static final String GOAL_NOT_FOUND_MESSAGE_FORMAT = "Goal with id: %s not found";

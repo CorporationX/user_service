@@ -1,5 +1,7 @@
 package school.faang.user_service.util.goal.invitation;
 
+import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -91,6 +93,59 @@ public class InvitationFabric {
         return Goal.builder()
                 .id(id)
                 .status(GoalStatus.ACTIVE)
+                .build();
+    }
+
+    public static GoalInvitationDto getInvitationDto(Long id, Long inviterId, Long invitedUserId,
+                                                     Long goalId, RequestStatus status) {
+        return GoalInvitationDto
+                .builder()
+                .id(id)
+                .inviterId(inviterId)
+                .invitedUserId(invitedUserId)
+                .goalId(goalId)
+                .status(status)
+                .build();
+    }
+
+    public static InvitationFilterDto getInvitationFilterDto(String inviterNamePattern, String invitedNamePattern,
+                                                             Long inviterId, Long invitedId, RequestStatus status) {
+        return InvitationFilterDto
+                .builder()
+                .inviterNamePattern(inviterNamePattern)
+                .invitedNamePattern(invitedNamePattern)
+                .inviterId(inviterId)
+                .invitedId(invitedId)
+                .status(status)
+                .build();
+    }
+
+    public static InvitationFilterDto getInvitationFilterDto(String inviterNamePattern, String invitedNamePattern) {
+        return InvitationFilterDto
+                .builder()
+                .inviterNamePattern(inviterNamePattern)
+                .invitedNamePattern(invitedNamePattern)
+                .build();
+    }
+
+    public static InvitationFilterDto getInvitationFilterDto(Long inviterId, Long invitedUserId) {
+        return InvitationFilterDto
+                .builder()
+                .inviterId(inviterId)
+                .invitedId(invitedUserId)
+                .build();
+    }
+
+    public static InvitationFilterDto getInvitationFilterDto(RequestStatus status) {
+        return InvitationFilterDto
+                .builder()
+                .status(status)
+                .build();
+    }
+
+    public static InvitationFilterDto getInvitationFilterDto() {
+        return InvitationFilterDto
+                .builder()
                 .build();
     }
 }

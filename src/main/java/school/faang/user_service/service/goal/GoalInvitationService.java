@@ -33,7 +33,7 @@ import static school.faang.user_service.service.goal.util.GoalInvitationErrorMes
 @RequiredArgsConstructor
 public class GoalInvitationService {
     @Value("${app.goal.max-active-per-user}")
-    private  Integer userGoalsLimit;
+    private Integer userGoalsLimit;
 
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalRepository goalRepository;
@@ -48,6 +48,42 @@ public class GoalInvitationService {
         return goalInvitationRepository.save(invitation);
     }
 
+    @Transactional
+    public void acceptGoalInvitation(long id) {
+        log.info("Accept goal invitation with id: {}", id);
+        GoalInvitation invitation = findGoalInvitationById(id);
+        User invitedUser = invitation.getInvited();
+        Goal goal = invitation.getGoal();
+
+        checkUserGoals(invitedUser, goal, invitation);
+        goal.getUsers().add(invitedUser);
+        invitation.setStatus(RequestStatus.ACCEPTED);
+
+        goalRepository.save(goal);
+        goalInvitationRepository.save(invitation);
+    }
+
+    @Transactional
+    public void rejectGoalInvitation(long id) {
+        log.info("Reject goal with id: {}", id);
+        GoalInvitation invitation = findGoalInvitationById(id);
+        invitation.setStatus(RequestStatus.REJECTED);
+        goalInvitationRepository.save(invitation);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GoalInvitation> getInvitations(InvitationFilterDto filterDto) {
+        log.info("Get invitations by filter: {}", filterDto);
+        List<GoalInvitation> invitations = goalInvitationRepository.findAll();
+        return filters
+                .stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .reduce(invitations.stream(),
+                        (stream, filter) -> filter.apply(stream, filterDto),
+                        (s1, s2) -> s1)
+                .toList();
+    }
+
     private void checkUsersForMatching(long inviterId, long invitedUserId) {
         log.info("Check users for matching, inviterId: {}, invitedUserId: {}", inviterId, invitedUserId);
         if (inviterId == invitedUserId) {
@@ -57,14 +93,13 @@ public class GoalInvitationService {
 
     private void invitationSetEntities(GoalInvitation invitationEntity, long inviterId, long invitedUserId, long goalId) {
         log.info("Set entities to new invitation");
-        log.info("Find inviter user with id: {}", inviterId);
-        var inviter = findUserById(inviterId, INVITER_NOT_FOUND_MESSAGE_FORMAT);
+
+        User inviter = findUserById(inviterId, INVITER_NOT_FOUND_MESSAGE_FORMAT);
         invitationEntity.setInviter(inviter);
-        log.info("Find invited user with id: {}", invitedUserId);
-        var invitedUser = findUserById(invitedUserId, INVITED_USER_NOT_FOUND_MESSAGE_FORMAT);
+        User invitedUser = findUserById(invitedUserId, INVITED_USER_NOT_FOUND_MESSAGE_FORMAT);
         invitationEntity.setInvited(invitedUser);
-        log.info("Find goal with id: {}", goalId);
-        var goal = goalRepository.findById(goalId).orElseThrow(() ->
+
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
                 new InvitationEntityNotFoundException(GOAL_NOT_FOUND_MESSAGE_FORMAT, goalId));
         invitationEntity.setGoal(goal);
     }
@@ -73,20 +108,9 @@ public class GoalInvitationService {
         return userRepository.findById(id).orElseThrow(() -> new InvitationEntityNotFoundException(notFoundMessage, id));
     }
 
-    @Transactional
-    public void acceptGoalInvitation(long id) {
-        log.info("Accept goal invitation with id: {}", id);
-        var invitation = findGoalInvitationById(id);
-        var invitedUser = invitation.getInvited();
-        var goal = invitation.getGoal();
-        checkUserGoals(invitedUser, goal, invitation);
-        goal.getUsers().add(invitedUser);
-        invitation.setStatus(RequestStatus.ACCEPTED);
-    }
-
     private void checkUserGoals(User invitedUser, Goal goal, GoalInvitation invitation) {
         log.info("Check for user ability with id: {} get goal with id: {}", invitedUser.getId(), goal.getId());
-        var activeGoals = getActiveGoals(invitedUser);
+        List<Goal> activeGoals = getActiveGoals(invitedUser);
         if (activeGoals.contains(goal)) {
             invitation.setStatus(RequestStatus.REJECTED);
             throw new InvitationCheckException(USER_ALREADY_HAS_GOAL, invitedUser.getId(), goal.getId());
@@ -105,29 +129,9 @@ public class GoalInvitationService {
                 .toList();
     }
 
-    @Transactional
-    public void rejectGoalInvitation(long id) {
-        log.info("Reject goal with id: {}", id);
-        var invitation = findGoalInvitationById(id);
-        invitation.setStatus(RequestStatus.REJECTED);
-    }
-
     private GoalInvitation findGoalInvitationById(long id) {
         log.info("Find invitation with id: {}", id);
         return goalInvitationRepository.findById(id).orElseThrow(() ->
                 new InvitationEntityNotFoundException(GOAL_INVITATION_NOT_FOUND, id));
-    }
-
-    @Transactional(readOnly = true)
-    public List<GoalInvitation> getInvitations(InvitationFilterDto filterDto) {
-        log.info("Get invitations by filter: {}", filterDto);
-        var invitations = goalInvitationRepository.findAll();
-        return filters
-                .stream()
-                .filter(filter -> filter.isApplicable(filterDto))
-                .reduce(invitations.stream(),
-                        (stream, filter) -> filter.apply(stream, filterDto),
-                        (s1, s2) -> s1)
-                .toList();
     }
 }

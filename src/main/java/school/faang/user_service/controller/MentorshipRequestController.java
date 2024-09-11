@@ -1,13 +1,14 @@
-package school.faang.user_service.service;
+package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
-@Service
+@Controller
 @RequiredArgsConstructor
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
@@ -16,15 +17,16 @@ public class MentorshipRequestController {
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
-     void getRequests(RequestFilterDto filter){
-         mentorshipRequestService.getRequests(filter);
+
+    public void getRequests(RequestFilterDto filter) {
+        mentorshipRequestService.getRequests(filter);
     }
 
-    void acceptRequest(long id) throws Exception {
-        mentorshipRequestService.acceptRequest( id);
+    public void acceptRequest(long id) throws Exception {
+        mentorshipRequestService.acceptRequest(id);
     }
 
-    void rejectRequest(long id, RejectionDto rejection){
-        mentorshipRequestService.rejectRequest(id,rejection);
+    public void rejectRequest(long id, RejectionDto rejection) {
+        mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

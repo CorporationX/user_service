@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -14,7 +15,6 @@ import school.faang.user_service.validator.validatorResult.ValidationResult;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +27,9 @@ class MentorshipRequestValidatorTest {
     private MentorshipRequestRepository repository;
     @InjectMocks
     private MentorshipRequestValidator validator;
-    private final Predicates predicates = new Predicates();
+    @Spy
+    private Predicates predicates;
+
 
     @Test
     void validate_request_accepted() {
@@ -36,10 +38,8 @@ class MentorshipRequestValidatorTest {
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
 
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(true);
-        when(repository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId()))
-                .thenReturn(Optional.of(request));
 
-        ValidationResult status = validator.validate(dto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
+        ValidationResult status = validator.validate(dto);
 
         assertInstanceOf(Validated.class, status, "Status should be an instance of Validated");
     }
@@ -48,14 +48,16 @@ class MentorshipRequestValidatorTest {
     void validate_request_not_accepted_when_update_was_before_3_month() {
         MentorshipRequest request = new MentorshipRequest();
         request.setUpdatedAt(LocalDateTime.now().minus(1, ChronoUnit.MONTHS));
-        MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
+        MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L)
+                .updatedAt(LocalDateTime.now()).createdAt(LocalDateTime.now()).build();
 
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(true);
         when(repository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId()))
                 .thenReturn(Optional.of(request));
 
-        NotValidated status = (NotValidated) validator.validate(dto,List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
-        assertEquals(status.getMessage(),predicates.REQUEST_TIME_EXEEDED);
+        NotValidated status = (NotValidated) validator.validate(dto);
+
+        assertEquals(status.getMessage(), predicates.REQUEST_TIME_EXEEDED);
 
     }
 
@@ -66,8 +68,8 @@ class MentorshipRequestValidatorTest {
 
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(false);
 
-        NotValidated status = (NotValidated) validator.validate(dto,List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
-        assertEquals(status.getMessage(),predicates.USERS_NOT_EXIST_IN_DATABASE);
+        NotValidated status = (NotValidated) validator.validate(dto);
+        assertEquals(status.getMessage(), predicates.USERS_NOT_EXIST_IN_DATABASE);
 
     }
 
@@ -77,8 +79,8 @@ class MentorshipRequestValidatorTest {
 
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(true);
 
-        NotValidated status = (NotValidated) validator.validate(dto,List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
-        assertEquals(status.getMessage(),predicates.REQUEST_AND_RECEIVER_HAS_SAME_ID);
+        NotValidated status = (NotValidated) validator.validate(dto);
+        assertEquals(status.getMessage(), predicates.REQUEST_AND_RECEIVER_HAS_SAME_ID);
 
     }
 
@@ -86,14 +88,15 @@ class MentorshipRequestValidatorTest {
     void validate_request_not_accepted_because_request_was_not_found() {
         MentorshipRequest request = new MentorshipRequest();
         request.setUpdatedAt(LocalDateTime.now().minus(1, ChronoUnit.MONTHS));
-        MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
+        MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L)
+                .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
 
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(true);
         when(repository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId()))
                 .thenReturn(Optional.empty());
 
-        NotValidated status = (NotValidated) validator.validate(dto,List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
-        assertEquals(status.getMessage(),predicates.REQUEST_WAS_NOT_FOUND);
+        NotValidated status = (NotValidated) validator.validate(dto);
+        assertEquals(status.getMessage(), predicates.REQUEST_WAS_NOT_FOUND);
 
     }
 }

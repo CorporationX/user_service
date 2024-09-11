@@ -5,15 +5,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.EmptyResultDataAccessException;
-import school.faang.user_service.dto.*;
+import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.RequestMapper;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.util.predicate.PredicateResult;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 import school.faang.user_service.validator.Predicates;
 import school.faang.user_service.validator.validatorResult.NotValidated;
@@ -40,7 +45,8 @@ class MentorshipRequestServiceTest {
 
     @Mock
     MentorshipRequestRepository repository;
-    private final Predicates predicates = new Predicates();
+    @Spy
+    private Predicates predicates;
 
     @InjectMocks
     MentorshipRequestService service;
@@ -49,7 +55,7 @@ class MentorshipRequestServiceTest {
     void test_service_method_called_() {
         ArgumentCaptor<List<BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult>>> captor = ArgumentCaptor.forClass(List.class);
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(eq(dto), captor.capture()))
+        when(mentorshipRequestValidator.validate(eq(dto)))
                 .thenReturn(new Validated(null));
 
         service.requestMentorship(dto);
@@ -60,7 +66,7 @@ class MentorshipRequestServiceTest {
     @Test
     void test_service_method_not_called(){
         MentorshipRequestDto dto = MentorshipRequestDto.builder().requesterId(1L).receiverId(2L).build();
-        when(mentorshipRequestValidator.validate(any(),any())).thenReturn(new NotValidated(""));
+        when(mentorshipRequestValidator.validate(any())).thenReturn(new NotValidated(""));
 
         service.requestMentorship(dto);
 

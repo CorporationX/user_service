@@ -25,12 +25,12 @@ import static school.faang.user_service.entity.RequestStatus.REJECTED;
 public class MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository repository;
-    private final Predicates predicates = new Predicates();
+    private final Predicates predicates;
     private final RequestMapper requestMapper;
     public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        val response = mentorshipRequestValidator.validate(mentorshipRequestDto, List.of(predicates.userExistsPredicate, predicates.sameUserPredicate, predicates.requestTimeExceededPredicate));
+        val response = mentorshipRequestValidator.validate(mentorshipRequestDto);
         if (!(response instanceof Validated)) {
             System.out.println(((NotValidated) response).getMessage());
         } else {
@@ -67,7 +67,7 @@ public class MentorshipRequestService {
         }
     }
 
-    void acceptRequest(long id) throws Exception {
+    public void acceptRequest(long id) throws Exception {
         MentorshipRequest request = repository.getMentorshipRequestById(id);
         if (request.getStatus() != ACCEPTED) {
             repository.updateMentorshipRequestStatusByRequesterId(id, ACCEPTED);
@@ -76,7 +76,7 @@ public class MentorshipRequestService {
         }
     }
 
-    void rejectRequest(long id, RejectionDto rejection) {
+    public void rejectRequest(long id, RejectionDto rejection) {
         MentorshipRequest request = repository.getMentorshipRequestById(id);
         repository.updateMentorshipRequestStatusWithReasonByRequesterId(id, REJECTED, rejection.getReason());
 

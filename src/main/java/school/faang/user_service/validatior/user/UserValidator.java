@@ -11,7 +11,7 @@ public class UserValidator {
 
     private final UserRepository userRepository;
 
-    public void userIdIsPositiveAndNotNullOrElseThrowValidationException(Long userId) throws ValidationException {
+    public void validateUserIdIsPositiveAndNotNull(Long userId) {
         if (userId == null) {
             throw new ValidationException("User id can't be null");
         }
@@ -20,7 +20,7 @@ public class UserValidator {
         }
     }
 
-    public void userIsExistedOrElseThrowValidationException(Long userId) throws ValidationException {
+    public void validateUserIsExisted(Long userId) {
         userRepository.findById(userId).orElseThrow(() ->
                 new ValidationException("User with id " + userId + " not exists"));
     }

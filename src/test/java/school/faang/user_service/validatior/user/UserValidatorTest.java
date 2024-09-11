@@ -23,12 +23,11 @@ class UserValidatorTest {
 
     @InjectMocks
     private UserValidator userValidator;
-
     @Mock
     private UserRepository userRepository;
 
-    private final long USER_ID_IS_NEGATIVE_ONE = -1L;
-    private final long USER_ID_IS_ONE = 1L;
+    private final static long USER_ID_IS_NEGATIVE_ONE = -1L;
+    private final static long USER_ID_IS_ONE = 1L;
 
     @Nested
     class NegativeTests {
@@ -39,7 +38,7 @@ class UserValidatorTest {
             @DisplayName("Ошибка валидации если id пользователя null")
             void whenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
-                        () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
+                        () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
                         "User id can't be null");
             }
 
@@ -48,49 +47,40 @@ class UserValidatorTest {
             void whenNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator
-                                .userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_NEGATIVE_ONE),
+                                .validateUserIdIsPositiveAndNotNull(USER_ID_IS_NEGATIVE_ONE),
                         "User id can't be less than 0");
             }
         }
 
-        @Nested
-        class UserIsExistedOrElseThrowValidationExceptionMethod {
-            @Test
-            @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
-            void whenUserNotExistsThenThrowValidationException() {
-                when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        @Test
+        @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
+        void whenUserNotExistsThenThrowValidationException() {
+            when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-                assertThrows(ValidationException.class,
-                        () -> userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE),
-                        "User with id " + USER_ID_IS_ONE + " not exists");
-            }
+            assertThrows(ValidationException.class,
+                    () -> userValidator.validateUserIsExisted(USER_ID_IS_ONE),
+                    "User with id " + USER_ID_IS_ONE + " not exists");
         }
     }
 
     @Nested
     class PositiveTests {
 
-        @Nested
-        class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
-            @Test
-            @DisplayName("Если переданный id пользователя положительный и не null, то метод ничего не делает")
-            void whenUserIdNotNullAndPositiveValueThenSuccess() {
+        @Test
+        @DisplayName("Если переданный id пользователя положительный и не null, то метод ничего не делает")
+        void whenUserIdNotNullAndPositiveValueThenSuccess() {
 
-                userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_ONE);
-            }
+            userValidator.validateUserIdIsPositiveAndNotNull(USER_ID_IS_ONE);
         }
 
-        @Nested
-        class UserIsExistedOrElseThrowValidationExceptionMethod {
-            @Test
-            @DisplayName("Если пользователь с переданным id существует, то метод ничего не делает")
-            void whenUserExistsThenSuccess() {
-                when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+        @Test
+        @DisplayName("Если пользователь с переданным id существует, то метод ничего не делает")
+        void whenUserExistsThenSuccess() {
+            when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
 
-                userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE);
+            userValidator.validateUserIsExisted(USER_ID_IS_ONE);
 
-                verify(userRepository).findById(USER_ID_IS_ONE);
-            }
+            verify(userRepository).findById(USER_ID_IS_ONE);
         }
     }
 }

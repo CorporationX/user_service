@@ -24,7 +24,7 @@ public class UserService {
 
     @Transactional
     public void deactivateAccount(Long userId) {
-        checkUser(userId);
+        validateUser(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " not existed"));
@@ -39,9 +39,9 @@ public class UserService {
         user.getMentees().clear();
     }
 
-    private void checkUser(Long userId) {
-        userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(userId);
-        userValidator.userIsExistedOrElseThrowValidationException(userId);
+    private void validateUser(Long userId) {
+        userValidator.validateUserIdIsPositiveAndNotNull(userId);
+        userValidator.validateUserIsExisted(userId);
     }
 
 }

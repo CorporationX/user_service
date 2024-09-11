@@ -23,20 +23,19 @@ class GoalInvitationServiceTest {
 
     @InjectMocks
     private GoalInvitationService goalInvitationService;
-
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
 
-    private final int TWO_TIMES_USES_REPOSITORY = 2;
+    private final static int TWO_TIMES_USES_REPOSITORY = 2;
 
-    private final long USER_ID_IS_ONE = 1L;
-    private final long USER_ID_IS_TWO = 2L;
+    private final static long USER_ID_IS_ONE = 1L;
+    private final static long USER_ID_IS_TWO = 2L;
 
     @Nested
     class PositiveTests {
 
-        private List<GoalInvitation> goalInvitations;
         private User user;
+        private List<GoalInvitation> goalInvitations;
 
         @BeforeEach
         void init() {
@@ -58,28 +57,22 @@ class GoalInvitationServiceTest {
                             .build());
         }
 
-        @Nested
-        class DeleteGoalInvitationsMethod {
-            @Test
-            @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteById должен вызваться 2 раза")
-            void whenGoalInvitationsSizeIsTwoThenTwoTimesUsesRepository() {
-                goalInvitationService.deleteGoalInvitations(goalInvitations);
+        @Test
+        @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteById должен вызваться 2 раза")
+        void whenGoalInvitationsSizeIsTwoThenTwoTimesUsesRepository() {
+            goalInvitationService.deleteGoalInvitations(goalInvitations);
 
-                verify(goalInvitationRepository, times(TWO_TIMES_USES_REPOSITORY))
-                        .deleteById(anyLong());
-            }
+            verify(goalInvitationRepository, times(TWO_TIMES_USES_REPOSITORY))
+                    .deleteById(anyLong());
         }
 
-        @Nested
-        class DeleteGoalInvitationForUserMethod {
-            @Test
-            @DisplayName("Если в фильтре подходит одно из значений входного листа то deleteById вызывается один раз")
-            void whenUserExistsThenSuccess() {
-                goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
+        @Test
+        @DisplayName("Если в фильтре подходит одно из значений входного листа то deleteById вызывается один раз")
+        void whenUserExistsThenSuccess() {
+            goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
 
-                verify(goalInvitationRepository)
-                        .deleteById(anyLong());
-            }
+            verify(goalInvitationRepository)
+                    .deleteById(anyLong());
         }
     }
 }

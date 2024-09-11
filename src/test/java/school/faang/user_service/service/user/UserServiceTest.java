@@ -31,7 +31,6 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -43,71 +42,64 @@ class UserServiceTest {
     @Mock
     private MentorshipService mentorshipService;
 
-    private long USER_ID_IS_ONE = 1L;
-    private int USER_MENTEES_FINAL_SIZE = 0;
+    private static long USER_ID_IS_ONE = 1L;
+    private static int USER_MENTEES_FINAL_SIZE = 0;
 
     @Nested
     class NegativeTests {
 
-        @Nested
-        class DeactivateAccountMethod {
-            @Test
-            @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
-            void whenNullValueThenThrowValidationException() {
-                when(userRepository.findById(anyLong()))
-                        .thenReturn(Optional.empty());
+        @Test
+        @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
+        void whenNullValueThenThrowValidationException() {
+            when(userRepository.findById(anyLong()))
+                    .thenReturn(Optional.empty());
 
-                assertThrows(ValidationException.class,
-                        () -> userService.deactivateAccount(anyLong()));
-            }
+            assertThrows(ValidationException.class,
+                    () -> userService.deactivateAccount(anyLong()));
         }
     }
 
     @Nested
-    class PositiveTests {
+    class DeactivateAccountMethod {
 
-        @Nested
-        class DeactivateAccountMethod {
+        private User user;
 
-            private User user;
+        @BeforeEach
+        void init() {
+            List<User> mentees = new ArrayList<>();
+            mentees.add(new User());
 
-            @BeforeEach
-            void init() {
-                List<User> mentees = new ArrayList<>();
-                mentees.add(new User());
+            user = User.builder()
+                    .id(USER_ID_IS_ONE)
+                    .goals(List.of(new Goal()))
+                    .active(Boolean.TRUE)
+                    .mentees(mentees)
+                    .build();
+        }
 
-                user = User.builder()
-                        .id(USER_ID_IS_ONE)
-                        .goals(List.of(new Goal()))
-                        .active(Boolean.TRUE)
-                        .mentees(mentees)
-                        .build();
-            }
+        @Test
+        @DisplayName("Если id пользователя прошел все проверки то деактивируем профиль и удаляем всех подопечных")
+        void whenUserIdCorrectThenDeactivateProfileAndRemoveMentees() {
+            when(userRepository.findById(anyLong()))
+                    .thenReturn(Optional.of(user));
 
-            @Test
-            @DisplayName("Если id пользователя прошел все проверки то деактивируем профиль и удаляем всех подопечных")
-            void whenUserIdCorrectThenDeactivateProfileAndRemoveMentees() {
-                when(userRepository.findById(anyLong()))
-                        .thenReturn(Optional.of(user));
+            userService.deactivateAccount(USER_ID_IS_ONE);
 
-                userService.deactivateAccount(USER_ID_IS_ONE);
+            verify(userValidator)
+                    .validateUserIdIsPositiveAndNotNull(USER_ID_IS_ONE);
+            verify(userValidator)
+                    .validateUserIsExisted(USER_ID_IS_ONE);
+            verify(userRepository)
+                    .findById(USER_ID_IS_ONE);
+            verify(goalService)
+                    .deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user);
+            verify(eventService)
+                    .deactivatePlanningUserEventsAndDeleteEvent(user);
+            verify(mentorshipService)
+                    .removeUserFromListHisMentees(user);
 
-                verify(userValidator)
-                        .userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_ONE);
-                verify(userValidator)
-                        .userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE);
-                verify(userRepository)
-                        .findById(USER_ID_IS_ONE);
-                verify(goalService)
-                        .deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user);
-                verify(eventService)
-                        .deactivatePlanningUserEventsAndDeleteEvent(user);
-                verify(mentorshipService)
-                        .removeUserFromListHisMentees(user);
-
-                assertFalse(user.isActive());
-                assertEquals(USER_MENTEES_FINAL_SIZE, user.getMentees().size());
-            }
+            assertFalse(user.isActive());
+            assertEquals(USER_MENTEES_FINAL_SIZE, user.getMentees().size());
         }
     }
 }

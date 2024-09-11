@@ -7,7 +7,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import java.util.stream.Stream;
 
 @Component
-public class GoalInvitationInvitedNameFilter implements GoalInvitationFilter {
+class GoalInvitationInvitedNameFilter implements GoalInvitationFilter {
     @Override
     public boolean isApplicable(GoalInvitationFilterDto goalInvitationFilterDto) {
         return goalInvitationFilterDto.getInvitedNamePattern() != null &&

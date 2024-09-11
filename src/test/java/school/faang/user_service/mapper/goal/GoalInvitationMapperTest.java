@@ -24,15 +24,15 @@ class GoalInvitationMapperTest {
     @Spy
     private GoalInvitationMapperImpl mapper;
 
-    private final long USER_ID_ONE = 1L;
-    private final long USER_ID_TWO = 2L;
-    private final long GOAL_ID_ONE = 1L;
-    private final long GOAL_INVITATION_ID_ONE = 1L;
-    private final long GOAL_INVITATION_ID_TWO = 2L;
+    private final static long USER_ID_ONE = 1L;
+    private final static long USER_ID_TWO = 2L;
+    private final static long GOAL_ID_ONE = 1L;
+    private final static long GOAL_INVITATION_ID_ONE = 1L;
+    private final static long GOAL_INVITATION_ID_TWO = 2L;
 
-    private final int SIZE_OF_GOAL_INVITATION_DTOS = 2;
+    private final static int SIZE_OF_GOAL_INVITATION_DTOS = 2;
 
-    private final RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
+    private final static RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
 
     private GoalInvitation goalInvitation;
     private GoalInvitationDto goalInvitationDto;

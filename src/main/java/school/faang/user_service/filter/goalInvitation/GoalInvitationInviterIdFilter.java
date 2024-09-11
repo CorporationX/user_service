@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Component
-public class GoalInvitationInviterIdFilter implements GoalInvitationFilter {
+class GoalInvitationInviterIdFilter implements GoalInvitationFilter {
     @Override
     public boolean isApplicable(GoalInvitationFilterDto goalInvitationFilterDto) {
         return goalInvitationFilterDto.getInviterId() != null &&

@@ -43,54 +43,43 @@ class GoalInvitationServiceTest {
     @Mock
     private GoalInvitationFilter goalInvitationFilter;
 
-    private final int TWO_TIMES_CALL_METHOD = 2;
+    private final static int TWO_TIMES_CALL_METHOD = 2;
 
-    private final Long GOAL_INVITATION_ID_IS_ONE = 1L;
-    private final Long GOAL_INVITATION_ID_IS_TWO = 2L;
+    private final static Long GOAL_INVITATION_ID_IS_ONE = 1L;
+    private final static Long GOAL_INVITATION_ID_IS_TWO = 2L;
+    private final static Long USER_ID_IS_ONE = 1L;
+    private final static Long USER_ID_IS_TWO = 2L;
+    private final static Long GOAL_ID_IS_ONE = 1L;
+    private final static Long GOAL_ID_IS_TWO = 2L;
 
-    private final Long USER_ID_IS_ONE = 1L;
-    private final Long USER_ID_IS_TWO = 2L;
-
-    private final Long GOAL_ID_IS_ONE = 1L;
-    private final Long GOAL_ID_IS_TWO = 2L;
-
-    private GoalInvitationDto goalInvitationDto;
     private GoalInvitation goalInvitation;
-
+    private GoalInvitationDto goalInvitationDto;
     private GoalInvitationFilterDto goalInvitationFilterDto;
     private List<GoalInvitationFilter> goalInvitationFilterList;
 
     @Nested
     class NegativeTests {
 
-        @Nested
-        class AcceptGoalInvitation {
+        @Test
+        @DisplayName("Ошибка валидации если цели не существует")
+        void whenGoalNotExistsInAcceptGoalInvitationThenThrowValidationException() {
+            when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
+                    .thenReturn(Optional.empty());
 
-            @Test
-            @DisplayName("Ошибка валидации если цели не существует")
-            void whenGoalNotExistsThenThrowValidationException() {
-                when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
-                        .thenReturn(Optional.empty());
-
-                assertThrows(ValidationException.class,
-                        () -> goalInvitationService.acceptGoalInvitation(GOAL_ID_IS_ONE),
-                        "No goal with id " + GOAL_ID_IS_ONE + " found");
-            }
+            assertThrows(ValidationException.class,
+                    () -> goalInvitationService.acceptGoalInvitation(GOAL_ID_IS_ONE),
+                    "No goal with id " + GOAL_ID_IS_ONE + " found");
         }
 
-        @Nested
-        class RejectGoalInvitation {
+        @Test
+        @DisplayName("Ошибка валидации если цели не существует")
+        void whenGoalNotExistsInRejectGoalInvitationThenThrowValidationException() {
+            when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
+                    .thenReturn(Optional.empty());
 
-            @Test
-            @DisplayName("Ошибка валидации если цели не существует")
-            void whenGoalNotExistsThenThrowValidationException() {
-                when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
-                        .thenReturn(Optional.empty());
-
-                assertThrows(ValidationException.class,
-                        () -> goalInvitationService.rejectGoalInvitation(GOAL_ID_IS_ONE),
-                        "No goal with id " + GOAL_ID_IS_ONE + " found");
-            }
+            assertThrows(ValidationException.class,
+                    () -> goalInvitationService.rejectGoalInvitation(GOAL_ID_IS_ONE),
+                    "No goal with id " + GOAL_ID_IS_ONE + " found");
         }
     }
 
@@ -125,81 +114,69 @@ class GoalInvitationServiceTest {
                     .build();
         }
 
-        @Nested
-        class CreateInvitationMethod {
+        @Test
+        @DisplayName("Успех если приглашаемый и приглашенный имеют разные id в передаваемом Dto")
+        void whenInviterAndInvitedAreNotEqualsThenSuccess() {
+            when(goalInvitationMapper.toEntity(goalInvitationDto))
+                    .thenReturn(goalInvitation);
 
-            @Test
-            @DisplayName("Успех если приглашаемый и приглашенный имеют разные id в передаваемом Dto")
-            void whenInviterAndInvitedAreNotEqualsThenSuccess() {
-                when(goalInvitationMapper.toEntity(goalInvitationDto))
-                        .thenReturn(goalInvitation);
+            goalInvitationService.createInvitation(goalInvitationDto);
 
-                goalInvitationService.createInvitation(goalInvitationDto);
-
-                verify(userValidator, times(TWO_TIMES_CALL_METHOD))
-                        .userIdIsPositiveAndNotNullOrElseThrowValidationException(anyLong());
-                verify(userValidator, times(TWO_TIMES_CALL_METHOD))
-                        .userIsExistedOrElseThrowValidationException(anyLong());
-                verify(userValidator)
-                        .checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
-                                goalInvitationDto.getInviterUserId(),
-                                goalInvitationDto.getInvitedUserId(),
-                                "Inviter and invited cannot be equal");
-                verify(goalValidator)
-                        .goalIdIsPositiveAndNotNullOrElseThrowValidationException(goalInvitationDto.getGoalId());
-                verify(goalValidator)
-                        .goalIsExistedOrElseThrowException(goalInvitationDto.getGoalId());
-                verify(goalInvitationMapper)
-                        .toEntity(any());
-                verify(goalInvitationRepository)
-                        .save(goalInvitation);
-            }
+            verify(userValidator, times(TWO_TIMES_CALL_METHOD))
+                    .validateUserIdIsPositiveAndNotNull(anyLong());
+            verify(userValidator, times(TWO_TIMES_CALL_METHOD))
+                    .validateUserIsExisted(anyLong());
+            verify(userValidator)
+                    .validateFirstUserIdAndSecondUserIdNotEquals(
+                            goalInvitationDto.getInviterUserId(),
+                            goalInvitationDto.getInvitedUserId(),
+                            "Inviter and invited cannot be equal");
+            verify(goalValidator)
+                    .validateGoalIdIsPositiveAndNotNull(goalInvitationDto.getGoalId());
+            verify(goalValidator)
+                    .validateGoalWithIdIsExisted(goalInvitationDto.getGoalId());
+            verify(goalInvitationMapper)
+                    .toEntity(any());
+            verify(goalInvitationRepository)
+                    .save(goalInvitation);
         }
 
-        @Nested
-        class AcceptGoalInvitation {
+        @Test
+        @DisplayName("Обновляем сущность если цель существует")
+        void whenGoalExistsThenSuccessAccept() {
+            when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
+                    .thenReturn(Optional.of(goalInvitation));
 
-            @Test
-            @DisplayName("Обновляем сущность если цель существует")
-            void whenGoalExistsThenSuccessAccept() {
-                when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
-                        .thenReturn(Optional.of(goalInvitation));
+            goalInvitationService.acceptGoalInvitation(GOAL_INVITATION_ID_IS_ONE);
 
-                goalInvitationService.acceptGoalInvitation(GOAL_INVITATION_ID_IS_ONE);
-
-                verify(goalValidator)
-                        .goalIdIsPositiveAndNotNullOrElseThrowValidationException(goalInvitation.getGoal().getId());
-                verify(goalValidator)
-                        .goalIsExistedOrElseThrowException(goalInvitation.getGoal().getId());
-                verify(goalValidator)
-                        .userActiveGoalsAreLessThenIncomingOrElseThrowException(eq(goalInvitation.getInvited().getId()),
-                                anyInt());
-                verify(goalValidator)
-                        .userNotWorkingWithGoalOrElseThrowException(goalInvitation.getInvited().getId(),
-                                goalInvitation.getGoal().getId());
-                verify(goalInvitationRepository)
-                        .save(goalInvitation);
-            }
+            verify(goalValidator)
+                    .validateGoalIdIsPositiveAndNotNull(goalInvitation.getGoal().getId());
+            verify(goalValidator)
+                    .validateGoalWithIdIsExisted(goalInvitation.getGoal().getId());
+            verify(goalValidator)
+                    .validateUserActiveGoalsAreLessThenIncoming(eq(goalInvitation.getInvited().getId()),
+                            anyInt());
+            verify(goalValidator)
+                    .validateUserNotWorkingWithGoal(goalInvitation.getInvited().getId(),
+                            goalInvitation.getGoal().getId());
+            verify(goalInvitationRepository)
+                    .save(goalInvitation);
         }
 
-        @Nested
-        class RejectGoalInvitationMethod {
+        @Test
+        @DisplayName("Обновляем сущность если цель существует")
+        void whenGoalExistsThenSuccessReject() {
+            when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
+                    .thenReturn(Optional.of(goalInvitation));
 
-            @Test
-            @DisplayName("Обновляем сущность если цель существует")
-            void whenGoalExistsThenSuccessReject() {
-                when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
-                        .thenReturn(Optional.of(goalInvitation));
+            goalInvitationService.rejectGoalInvitation(GOAL_INVITATION_ID_IS_ONE);
 
-                goalInvitationService.rejectGoalInvitation(GOAL_INVITATION_ID_IS_ONE);
-
-                verify(goalValidator)
-                        .goalIdIsPositiveAndNotNullOrElseThrowValidationException(goalInvitation.getGoal().getId());
-                verify(goalValidator)
-                        .goalIsExistedOrElseThrowException(goalInvitation.getGoal().getId());
-                verify(goalInvitationRepository)
-                        .save(goalInvitation);
-            }
+            verify(goalValidator)
+                    .validateGoalIdIsPositiveAndNotNull(goalInvitation.getGoal().getId());
+            verify(goalValidator)
+                    .validateGoalWithIdIsExisted(goalInvitation.getGoal().getId());
+            verify(goalInvitationRepository)
+                    .save(goalInvitation);
         }
 
         @Nested

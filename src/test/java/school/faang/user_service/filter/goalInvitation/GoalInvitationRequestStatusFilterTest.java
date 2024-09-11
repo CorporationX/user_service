@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -18,19 +18,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationRequestStatusFilterTest {
 
-    @Spy
+    @InjectMocks
     private GoalInvitationRequestStatusFilter goalInvitationRequestStatusFilter;
 
     private GoalInvitationFilterDto goalInvitationFilterDto;
 
-    private final RequestStatus REQUEST_PATTERN = RequestStatus.ACCEPTED;
+    private final static RequestStatus REQUEST_PATTERN = RequestStatus.ACCEPTED;
 
 
     @Nested
     class PositiveTests {
-
-        @Nested
-        class IsApplicable {
 
             @Test
             @DisplayName("Если у GoalInvitationFilterDto заполнено поле status тогда возвращаем true")
@@ -41,10 +38,6 @@ class GoalInvitationRequestStatusFilterTest {
 
                 assertTrue(goalInvitationRequestStatusFilter.isApplicable(goalInvitationFilterDto));
             }
-        }
-
-        @Nested
-        class Apply {
 
             @Test
             @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле status, " +
@@ -70,7 +63,6 @@ class GoalInvitationRequestStatusFilterTest {
                 assertEquals(goalInvitationsAfterFilter, goalInvitationRequestStatusFilter.apply(goalInvitations,
                         goalInvitationFilterDto).toList());
             }
-        }
     }
 
     @Nested

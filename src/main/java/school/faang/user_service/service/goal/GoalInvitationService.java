@@ -31,9 +31,9 @@ public class GoalInvitationService {
 
     @Transactional
     public void createInvitation(GoalInvitationDto goalInvitationDto) {
-        checkUsers(goalInvitationDto.getInviterUserId(), goalInvitationDto.getInvitedUserId());
+        validateUsers(goalInvitationDto.getInviterUserId(), goalInvitationDto.getInvitedUserId());
         checkGoal(goalInvitationDto.getGoalId());
-        userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(goalInvitationDto.getInviterUserId(),
+        userValidator.validateFirstUserIdAndSecondUserIdNotEquals(goalInvitationDto.getInviterUserId(),
                 goalInvitationDto.getInvitedUserId(),
                 "Inviter and invited cannot be equal");
 
@@ -42,12 +42,12 @@ public class GoalInvitationService {
 
     @Transactional
     public void acceptGoalInvitation(long goalInvitationId) {
-        GoalInvitation goalInvitation = getGoalInvitationOrElseThrowException(goalInvitationId);
+        GoalInvitation goalInvitation = getGoalInvitation(goalInvitationId);
 
         checkGoal(goalInvitation.getGoal().getId());
-        goalValidator.userActiveGoalsAreLessThenIncomingOrElseThrowException(goalInvitation.getInvited().getId(),
+        goalValidator.validateUserActiveGoalsAreLessThenIncoming(goalInvitation.getInvited().getId(),
                 MAX_LIMIT_ACTIVE_GOALS_FOR_USER);
-        goalValidator.userNotWorkingWithGoalOrElseThrowException(goalInvitation.getInvited().getId(),
+        goalValidator.validateUserNotWorkingWithGoal(goalInvitation.getInvited().getId(),
                 goalInvitation.getGoal().getId());
 
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
@@ -58,7 +58,7 @@ public class GoalInvitationService {
 
     @Transactional
     public void rejectGoalInvitation(long goalInvitationId) {
-        GoalInvitation goalInvitation = getGoalInvitationOrElseThrowException(goalInvitationId);
+        GoalInvitation goalInvitation = getGoalInvitation(goalInvitationId);
 
         checkGoal(goalInvitation.getGoal().getId());
 
@@ -79,23 +79,23 @@ public class GoalInvitationService {
         return goalInvitationMapper.toDtos(invitations.toList());
     }
 
-    private GoalInvitation getGoalInvitationOrElseThrowException(long goalInvitationId) {
+    private GoalInvitation getGoalInvitation(long goalInvitationId) {
         return goalInvitationRepository.findById(goalInvitationId)
                 .orElseThrow(() -> new ValidationException("No goal invitation with id " + goalInvitationId + " found"));
     }
 
-    private void checkUsers(Long firstUserId, Long secondUserId) {
-        checkUser(firstUserId);
-        checkUser(secondUserId);
+    private void validateUsers(Long firstUserId, Long secondUserId) {
+        validateUser(firstUserId);
+        validateUser(secondUserId);
     }
 
-    private void checkUser(Long userId) {
-        userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(userId);
-        userValidator.userIsExistedOrElseThrowValidationException(userId);
+    private void validateUser(Long userId) {
+        userValidator.validateUserIdIsPositiveAndNotNull(userId);
+        userValidator.validateUserIsExisted(userId);
     }
 
     private void checkGoal(Long goalId) {
-        goalValidator.goalIdIsPositiveAndNotNullOrElseThrowValidationException(goalId);
-        goalValidator.goalIsExistedOrElseThrowException(goalId);
+        goalValidator.validateGoalIdIsPositiveAndNotNull(goalId);
+        goalValidator.validateGoalWithIdIsExisted(goalId);
     }
 }

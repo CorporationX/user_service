@@ -26,9 +26,9 @@ class UserValidatorTest {
     @Mock
     private UserRepository userRepository;
 
-    private final long USER_ID_IS_NEGATIVE_ONE = -1L;
-    private final long USER_ID_IS_ONE = 1L;
-    private final long USER_ID_IS_TWO = 2L;
+    private final static long USER_ID_IS_NEGATIVE_ONE = -1L;
+    private final static long USER_ID_IS_ONE = 1L;
+    private final static long USER_ID_IS_TWO = 2L;
 
     @Nested
     class NegativeTests {
@@ -40,7 +40,7 @@ class UserValidatorTest {
             @DisplayName("Ошибка валидации если переданный id = null")
             void whenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
-                        () -> userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(null),
+                        () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
                         "User id can't be null");
             }
 
@@ -49,83 +49,63 @@ class UserValidatorTest {
             void whenNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator
-                                .userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_NEGATIVE_ONE),
+                                .validateUserIdIsPositiveAndNotNull(USER_ID_IS_NEGATIVE_ONE),
                         "User id can't be less than 0");
             }
         }
 
-        @Nested
-        class UserIsExistedOrElseThrowValidationExceptionMethod {
+        @Test
+        @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
+        void whenUserNotExistsThenThrowValidationException() {
+            when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-            @Test
-            @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
-            void whenUserNotExistsThenThrowValidationException() {
-                when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-                assertThrows(ValidationException.class,
-                        () -> userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE),
-                        "User with id " + USER_ID_IS_ONE + " not exists");
-            }
+            assertThrows(ValidationException.class,
+                    () -> userValidator.validateUserIsExisted(USER_ID_IS_ONE),
+                    "User with id " + USER_ID_IS_ONE + " not exists");
         }
 
-        @Nested
-        class CheckIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowExceptionMethod {
+        @Test
+        @DisplayName("Ошибка валидации если переданные id у пользователей одинаковые")
+        void whenId1AndId2EqualsThenThrowValidationExceptionWithMessage() {
+            String exceptionMessage = "Exception";
 
-            @Test
-            @DisplayName("Ошибка валидации если переданные id у пользователей одинаковые")
-            void whenId1AndId2EqualsThenThrowValidationExceptionWithMessage() {
-                String exceptionMessage = "Exception";
-
-                assertThrows(ValidationException.class,
-                        () -> userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
-                                USER_ID_IS_ONE,
-                                USER_ID_IS_ONE,
-                                exceptionMessage),
-                        exceptionMessage);
-            }
+            assertThrows(ValidationException.class,
+                    () -> userValidator.validateFirstUserIdAndSecondUserIdNotEquals(
+                            USER_ID_IS_ONE,
+                            USER_ID_IS_ONE,
+                            exceptionMessage),
+                    exceptionMessage);
         }
     }
 
     @Nested
     class PositiveTests {
 
-        @Nested
-        class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
-
-            @Test
-            @DisplayName("Если переданный id пользователя не null и больше нуля то метод ничего не возвращает")
-            void whenUserIdNotNullValueAndMoreThanZeroThenSuccess() {
-                userValidator.userIdIsPositiveAndNotNullOrElseThrowValidationException(USER_ID_IS_ONE);
-            }
+        @Test
+        @DisplayName("Если переданный id пользователя не null и больше нуля то метод ничего не возвращает")
+        void whenUserIdNotNullValueAndMoreThanZeroThenSuccess() {
+            userValidator.validateUserIdIsPositiveAndNotNull(USER_ID_IS_ONE);
         }
 
-        @Nested
-        class UserIsExistedOrElseThrowValidationExceptionMethod {
+        @Test
+        @DisplayName("Если пользователь с переданным id существует то метод ничего не возвращает")
+        void whenUserExistsThenSuccess() {
+            when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
 
-            @Test
-            @DisplayName("Если пользователь с переданным id существует то метод ничего не возвращает")
-            void whenUserExistsThenSuccess() {
-                when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+            userValidator.validateUserIsExisted(USER_ID_IS_ONE);
 
-                userValidator.userIsExistedOrElseThrowValidationException(USER_ID_IS_ONE);
-
-                verify(userRepository).findById(anyLong());
-            }
+            verify(userRepository).findById(anyLong());
         }
 
-        @Nested
-        class CheckIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowExceptionMethod {
+        @Test
+        @DisplayName("Если переданные id у пользователей разные то метод ничего не возвращает")
+        void whenId1AndId2EqualsThenNotThrowValidationException() {
+            String exceptionMessage = "Exception";
 
-            @Test
-            @DisplayName("Если переданные id у пользователей разные то метод ничего не возвращает")
-            void whenId1AndId2EqualsThenNotThrowValidationException() {
-                String exceptionMessage = "Exception";
-
-                userValidator.checkIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(
-                        USER_ID_IS_ONE,
-                        USER_ID_IS_TWO,
-                        exceptionMessage);
-            }
+            userValidator.validateFirstUserIdAndSecondUserIdNotEquals(
+                    USER_ID_IS_ONE,
+                    USER_ID_IS_TWO,
+                    exceptionMessage);
         }
     }
 }

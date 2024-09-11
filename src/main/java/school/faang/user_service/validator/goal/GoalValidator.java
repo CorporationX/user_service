@@ -12,7 +12,7 @@ public class GoalValidator {
 
     private final GoalRepository goalRepository;
 
-    public void goalIdIsPositiveAndNotNullOrElseThrowValidationException(Long goalId) throws ValidationException {
+    public void validateGoalIdIsPositiveAndNotNull(Long goalId) {
         if (goalId == null) {
             throw new ValidationException("Goal id can't be null");
         }
@@ -21,17 +21,18 @@ public class GoalValidator {
         }
     }
 
-    public void goalIsExistedOrElseThrowException(Long goalId) throws ValidationException {
-        goalRepository.findById(goalId).orElseThrow(() -> new ValidationException("Goal id " + goalId + " not exists"));
+    public void validateGoalWithIdIsExisted(Long goalId) {
+        goalRepository.findById(goalId)
+                .orElseThrow(() -> new ValidationException("Goal id " + goalId + " not exists"));
     }
 
-    public void userActiveGoalsAreLessThenIncomingOrElseThrowException(Long userId, int goalMaxCount) throws ValidationException {
+    public void validateUserActiveGoalsAreLessThenIncoming(Long userId, int goalMaxCount) {
         if (goalRepository.countActiveGoalsPerUser(userId) >= goalMaxCount) {
             throw new ValidationException("User " + userId + " has max active goals");
         }
     }
 
-    public void userNotWorkingWithGoalOrElseThrowException(Long userId, Long goalId) {
+    public void validateUserNotWorkingWithGoal(Long userId, Long goalId) {
         goalRepository.findGoalsByUserId(userId)
                 .mapToLong(Goal::getId)
                 .filter(goal -> goal == goalId)

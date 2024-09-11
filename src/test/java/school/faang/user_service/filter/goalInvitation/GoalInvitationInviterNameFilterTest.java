@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.User;
@@ -18,65 +18,57 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationInviterNameFilterTest {
 
-    @Spy
+    @InjectMocks
     private GoalInvitationInviterNameFilter goalInvitationInviterNameFilter;
 
     private GoalInvitationFilterDto goalInvitationFilterDto;
 
-    private final String INVITER_NAME_PATTERN = "inviterName";
+    private final static String INVITER_NAME_PATTERN = "inviterName";
 
 
     @Nested
     class PositiveTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto заполнено поле inviterNamePattern не null и оно больше нуля, " +
+                "тогда возвращаем true")
+        void whenGoalInvitationFilterDtoSpecifiedInviterNamePatternISNotNullAndMoreThanZeroThenReturnTrue() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .inviterNamePattern(INVITER_NAME_PATTERN)
+                    .build();
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto заполнено поле inviterNamePattern не null и оно больше нуля, " +
-                    "тогда возвращаем true")
-            void whenGoalInvitationFilterDtoSpecifiedInviterNamePatternISNotNullAndMoreThanZeroThenReturnTrue() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .inviterNamePattern(INVITER_NAME_PATTERN)
-                        .build();
-
-                assertTrue(goalInvitationInviterNameFilter.isApplicable(goalInvitationFilterDto));
-            }
+            assertTrue(goalInvitationInviterNameFilter.isApplicable(goalInvitationFilterDto));
         }
 
-        @Nested
-        class Apply {
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле inviterNamePattern, " +
+                "тогда возвращаем отфильтрованный список")
+        void whenGoalInvitationFilterDtoSpecifiedInviterNamePatternThenReturnFilteredList() {
+            Stream<GoalInvitation> goalInvitations = Stream.of(
+                    GoalInvitation.builder()
+                            .inviter(User.builder()
+                                    .username(INVITER_NAME_PATTERN)
+                                    .build())
+                            .build(),
+                    GoalInvitation.builder()
+                            .inviter(User.builder()
+                                    .username("false")
+                                    .build())
+                            .build());
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле inviterNamePattern, " +
-                    "тогда возвращаем отфильтрованный список")
-            void whenGoalInvitationFilterDtoSpecifiedInviterNamePatternThenReturnFilteredList() {
-                Stream<GoalInvitation> goalInvitations = Stream.of(
-                        GoalInvitation.builder()
-                                .inviter(User.builder()
-                                        .username(INVITER_NAME_PATTERN)
-                                        .build())
-                                .build(),
-                        GoalInvitation.builder()
-                                .inviter(User.builder()
-                                        .username("false")
-                                        .build())
-                                .build());
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .inviterNamePattern(INVITER_NAME_PATTERN)
+                    .build();
 
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .inviterNamePattern(INVITER_NAME_PATTERN)
-                        .build();
+            List<GoalInvitation> goalInvitationsAfterFilter = List.of(
+                    GoalInvitation.builder()
+                            .inviter(User.builder()
+                                    .username(INVITER_NAME_PATTERN)
+                                    .build())
+                            .build());
 
-                List<GoalInvitation> goalInvitationsAfterFilter = List.of(
-                        GoalInvitation.builder()
-                                .inviter(User.builder()
-                                        .username(INVITER_NAME_PATTERN)
-                                        .build())
-                                .build());
-
-                assertEquals(goalInvitationsAfterFilter, goalInvitationInviterNameFilter.apply(goalInvitations,
-                        goalInvitationFilterDto).toList());
-            }
+            assertEquals(goalInvitationsAfterFilter, goalInvitationInviterNameFilter.apply(goalInvitations,
+                    goalInvitationFilterDto).toList());
         }
     }
 

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -37,7 +37,7 @@ class UserMapperTest {
     void testUserToUserDto() {
         User user = createUser(USER_ID_1, TEST_USERNAME, TEST_EMAIL);
 
-        UserDto userDto = userMapper.userToUserDto(user);
+        UserDto userDto = userMapper.toDto(user);
 
         assertEquals(user.getId(), userDto.getId());
         assertEquals(user.getUsername(), userDto.getUsername());
@@ -50,7 +50,7 @@ class UserMapperTest {
         User user2 = createUser(USER_ID_2, USERNAME_2, EMAIL_2);
 
         List<User> users = List.of(user1, user2);
-        List<UserDto> userDtos = userMapper.usersToUserDtos(users);
+        List<UserDto> userDtos = userMapper.toListUserDto(users);
 
         assertEquals(2, userDtos.size());
 
@@ -65,13 +65,13 @@ class UserMapperTest {
 
     @Test
     void testUsersToUserDtos_NullInput() {
-        List<UserDto> userDtos = userMapper.usersToUserDtos(null);
+        List<UserDto> userDtos = userMapper.toListUserDto(null);
         assertNull(userDtos);
     }
 
     @Test
     void testUserToUserDto_NullInput() {
-        UserDto userDto = userMapper.userToUserDto(null);
+        UserDto userDto = userMapper.toDto(null);
         assertNull(userDto);
     }
 }

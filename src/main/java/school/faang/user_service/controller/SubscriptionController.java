@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
@@ -22,11 +22,11 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/follow")
-    public void followUser(@RequestParam(name = "followerId") long followerId,
-                           @RequestParam(name = "followeeId") long followeeId) {
+    public void followUser(@RequestParam(name = "followerId") Long followerId,
+                           @RequestParam(name = "followeeId") Long followeeId) {
 
-        if (followerId == followeeId) {
-            throw new DataValidationException("You cannot subscribe to yourself");
+        if (followerId == null || followeeId == null) {
+            throw new DataValidationException("followerId and followeeId cannot be null");
         }
         subscriptionService.followUser(followerId, followeeId);
     }
@@ -34,9 +34,6 @@ public class SubscriptionController {
     @PostMapping("/unfollow")
     public void unfollowUser(@RequestParam(name = "followerId") long followerId,
                              @RequestParam(name = "followeeId") long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("You cannot unfollow yourself");
-        }
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 

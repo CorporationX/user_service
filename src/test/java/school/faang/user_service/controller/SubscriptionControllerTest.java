@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
@@ -37,7 +37,7 @@ class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
 
     private UserDto createTestUserDto(long id, String username, String email) {
-        return new UserDto(id, username, email);
+        return new UserDto(id, true, username, email);
     }
 
     private List<UserDto> createUserDtoList(UserDto... users) {
@@ -45,8 +45,8 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void testFollowUser_checkDataValidationException() {
-        assertThrows(DataValidationException.class, () -> subscriptionController.followUser(FOLLOWER_ID, FOLLOWER_ID));
+    void testFollowUser_checkDataValidationExceptionIfNull() {
+        assertThrows(DataValidationException.class, () -> subscriptionController.followUser(null, null));
     }
 
     @Test
@@ -54,11 +54,6 @@ class SubscriptionControllerTest {
         subscriptionController.followUser(FOLLOWER_ID, FOLLOWEE_ID);
 
         verify(subscriptionService, times(1)).followUser(FOLLOWER_ID, FOLLOWEE_ID);
-    }
-
-    @Test
-    void testUnfollowUser_checkDataValidationException() {
-        assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(FOLLOWER_ID, FOLLOWER_ID));
     }
 
     @Test
@@ -72,7 +67,7 @@ class SubscriptionControllerTest {
     void testGetFollowers_Success() {
         UserFilterDto filter = new UserFilterDto();
         List<UserDto> followers = createUserDtoList(
-                createTestUserDto(2L, TEST_USERNAME, TEST_EMAIL)
+                createTestUserDto(2L, TEST_EMAIL, TEST_USERNAME)
         );
 
         when(subscriptionService.getFollowers(FOLLOWER_ID, filter)).thenReturn(followers);
@@ -97,7 +92,7 @@ class SubscriptionControllerTest {
     void testGetFollowing_Success() {
         UserFilterDto filter = new UserFilterDto();
         List<UserDto> following = createUserDtoList(
-                createTestUserDto(2L, FOLLOWED_USERNAME, FOLLOWED_EMAIL)
+                createTestUserDto(2L, FOLLOWED_EMAIL, FOLLOWED_USERNAME)
         );
 
         when(subscriptionService.getFollowing(FOLLOWER_ID, filter)).thenReturn(following);

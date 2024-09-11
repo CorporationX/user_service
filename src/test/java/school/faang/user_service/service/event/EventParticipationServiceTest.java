@@ -1,6 +1,5 @@
 package school.faang.user_service.service.event;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +14,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.validator.EventParticipationServiceValidator;
 
 import java.util.List;
 
@@ -24,6 +24,8 @@ class EventParticipationServiceTest {
     private EventParticipationRepository repository;
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
+    @Mock
+    private EventParticipationServiceValidator validator;
     @InjectMocks
     private EventParticipationService service;
 
@@ -36,19 +38,7 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    void testUserAlreadyRegister() {
-        Mockito.when(repository.findAllParticipantsByEventId(1))
-                .thenReturn(List.of(user));
-
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> service.registerParticipant(1, 1));
-    }
-
-    @Test
     void testUserIsRegister() {
-        Mockito.when(repository.findAllParticipantsByEventId(1))
-                .thenReturn(List.of(user));
-
         service.registerParticipant(1, 2);
         Mockito.verify(repository, Mockito.times(1))
                 .register(1, 2);

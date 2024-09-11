@@ -1,7 +1,7 @@
 package school.faang.user_service.dto.event;
 
 import lombok.Value;
-import school.faang.user_service.dto.UserReadDto;
+import school.faang.user_service.dto.user.UserReadDto;
 
 import java.time.LocalDateTime;
 

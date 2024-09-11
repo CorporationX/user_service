@@ -14,7 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -50,16 +50,21 @@ class UserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         userId = 1L;
         authorId = 2L;
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
         followersIds = List.of(1L, 2L);
         followerIdsJson = objectMapper.writeValueAsString(followersIds);
 
+        String username = "username";
+        String password = "password";
+        long country = 1L;
+        String email = "email";
+        String phone = "123456";
+
         UserDto userDto = UserDto.builder()
-                .username("username")
-                .password("password")
-                .country(1L)
-                .email("test@mail.com")
-                .phone("123456")
+                .username(username)
+                .password(password)
+                .country(country)
+                .email(email)
+                .phone(phone)
                 .build();
 
         mockMultipartFile = new MockMultipartFile(
@@ -70,6 +75,7 @@ class UserControllerTest {
         );
 
         userDtoJson = objectMapper.writeValueAsString(userDto);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test

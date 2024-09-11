@@ -46,18 +46,15 @@ class GoalInvitationControllerTest {
     @DisplayName("Given invitationDto when create invitation then return invitationDto")
     void testCreateInvitationSuccessful() {
         GoalInvitationDto invitationDto = getInvitationDto(null, FIRST_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
+        GoalInvitationDto expectedInvitationDto = getInvitationDto(INVITATION_ID, FIRST_USER_ID, SECOND_USER_ID,
+                GOAL_ID, STATUS);
         GoalInvitation invitation = getInvitation(INVITATION_ID, FIRST_USER_ID, SECOND_USER_ID, GOAL_ID, STATUS);
         when(goalInvitationService.createInvitation(goalInvitationMapper.toEntity(invitationDto),
                 invitationDto.inviterId(), invitationDto.invitedUserId(), invitationDto.goalId())).thenReturn(invitation);
 
         assertThat(goalInvitationController.createInvitation(invitationDto))
                 .isNotNull()
-                .isInstanceOf(GoalInvitationDto.class)
-                .hasFieldOrPropertyWithValue("id", INVITATION_ID)
-                .hasFieldOrPropertyWithValue("inviterId", FIRST_USER_ID)
-                .hasFieldOrPropertyWithValue("invitedUserId", SECOND_USER_ID)
-                .hasFieldOrPropertyWithValue("goalId", GOAL_ID)
-                .hasFieldOrPropertyWithValue("status", STATUS);
+                .isEqualTo(expectedInvitationDto);
         verify(goalInvitationService).createInvitation(goalInvitationMapper.toEntity(invitationDto),
                 invitationDto.inviterId(), invitationDto.invitedUserId(), invitationDto.goalId());
     }

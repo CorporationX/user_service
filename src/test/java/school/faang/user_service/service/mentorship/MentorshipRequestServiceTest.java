@@ -28,8 +28,8 @@ import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
-import school.faang.user_service.redisPublisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
 import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -117,9 +117,10 @@ class MentorshipRequestServiceTest {
     @DisplayName("testing requestMentorship methods execution")
     public void testRequestMentorshipValidatorExecution() {
         when(mentorshipRequestRepository.create(requesterId, receiverId, description)).thenReturn(mentorshipRequest);
-        when(mentorshipOfferedEventMapper.toEvent(mentorshipRequest)).thenReturn(mentorshipOfferedEvent);
-
+        when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(new MentorshipRequestDto());
+        doNothing().when(mentorshipRequestValidator).validateParticipantsAndRequestFrequency(any(), any(), any());
         when(mentorshipRequestEventMapper.toEvent(mentorshipRequestCaptor.capture())).thenReturn(mentorshipRequestEvent);
+        doNothing().when(mentorshipRequestEventPublisher).publish(any());
 
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
@@ -133,10 +134,10 @@ class MentorshipRequestServiceTest {
                         mentorshipRequestDto.getReceiverId(),
                         mentorshipRequestDto.getDescription()
                 );
+
+        verify(mentorshipRequestValidator, times(1)).validateParticipantsAndRequestFrequency(any(), any(), any());
         verify(mentorshipRequestEventMapper, times(1)).toEvent(mentorshipRequestCaptor.getValue());
         verify(mentorshipRequestEventPublisher, times(1)).publish(mentorshipRequestEvent);
-        verify(mentorshipOfferedEventMapper, times(1)).toEvent(mentorshipRequest);
-        verify(mentorshipOfferedEventPublisher, times(1)).publish(mentorshipOfferedEvent);
         verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequestCaptor.getValue());
     }
 

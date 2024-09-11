@@ -17,8 +17,8 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
-import school.faang.user_service.redisPublisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -34,14 +34,11 @@ import java.util.stream.Stream;
 public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestEventMapper mentorshipRequestEventMapper;
-    private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
     private final MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
-    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -49,8 +46,7 @@ public class MentorshipRequestService {
         long receiverId = mentorshipRequestDto.getReceiverId();
         String description = mentorshipRequestDto.getDescription();
 
-        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId,
-                mentorshipCreationDate);
+        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId, mentorshipRequestDto.getCreatedAt());
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
 
         MentorshipRequestEvent mentorshipRequestEvent = mentorshipRequestEventMapper.toEvent(mentorshipRequest);

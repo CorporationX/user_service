@@ -77,8 +77,8 @@ public class MentorshipRequestValidator {
         }
     }
 
-    public void validateParticipantsAndRequestFrequency(long requesterId,
-                                                        long receiverId,
+    public void validateParticipantsAndRequestFrequency(Long requesterId,
+                                                        Long receiverId,
                                                         LocalDateTime mentorshipCreationDate) {
         validateRequesterNotEqualToReceiver(requesterId, receiverId);
         validateMentorshipRequestParticipantsExistence(requesterId, receiverId);

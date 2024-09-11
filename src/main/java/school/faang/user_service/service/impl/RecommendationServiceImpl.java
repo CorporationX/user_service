@@ -25,6 +25,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RecommendationServiceImpl implements RecommendationService {
+    private final static String AUTHOR_NOT_FOUND_MESSAGE = "Author not found";
+    private final static String RECEIVER_NOT_FOUND_MESSAGE = "Receiver not found";
+    private final static String SKILL_NOT_FOUND_MESSAGE = "Skill not found";
+    private final static String RECOMMENDATION_NOT_FOUND_MESSAGE = "Recommendation not found";
+
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
@@ -33,15 +38,13 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     @Transactional
-    public RecommendationDto create(RecommendationDto recommendationDto) {
+    public RecommendationDto createRecommendation(RecommendationDto recommendationDto) {
         User author = userRepository.findById(recommendationDto.authorId())
-                .orElseThrow(() -> new DataValidationException(
-                        "Author not found"));
+                .orElseThrow(() -> new DataValidationException(AUTHOR_NOT_FOUND_MESSAGE));
         User receiver = userRepository.findById(recommendationDto.receiverId())
-                .orElseThrow(() -> new DataValidationException(
-                        "Receiver not found"));
+                .orElseThrow(() -> new DataValidationException(RECEIVER_NOT_FOUND_MESSAGE));
 
-        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        Recommendation recommendation = recommendationMapper.toRecommendation(recommendationDto);
         recommendation.setAuthor(author);
         recommendation.setReceiver(receiver);
         recommendation.setCreatedAt(LocalDateTime.now());
@@ -49,14 +52,14 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendationRepository.save(recommendation);
         handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
-        return recommendationMapper.toDto(recommendation);
+        return recommendationMapper.toRecommendationDto(recommendation);
     }
 
     @Override
     public List<RecommendationDto> getAllUserRecommendations(long receiverId, Pageable pageable) {
         return recommendationRepository.findAllByReceiverId(receiverId, pageable)
                 .stream()
-                .map(recommendationMapper::toDto)
+                .map(recommendationMapper::toRecommendationDto)
                 .collect(Collectors.toList());
     }
 
@@ -64,16 +67,15 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
         return recommendationRepository.findAllByAuthorId(authorId, pageable)
                 .stream()
-                .map(recommendationMapper::toDto)
+                .map(recommendationMapper::toRecommendationDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public RecommendationDto update(long id, RecommendationDto recommendationDto) {
+    public RecommendationDto updateRecommendation(long id, RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException(
-                        "Recommendation not found"));
+                .orElseThrow(() -> new DataValidationException(RECEIVER_NOT_FOUND_MESSAGE));
 
         recommendationMapper.updateFromDto(recommendationDto, recommendation);
         recommendation.setUpdatedAt(LocalDateTime.now());
@@ -82,23 +84,21 @@ public class RecommendationServiceImpl implements RecommendationService {
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
-        return recommendationMapper.toDto(recommendation);
+        return recommendationMapper.toRecommendationDto(recommendation);
     }
 
     @Override
     @Transactional
-    public void delete(long id) {
+    public void deleteRecommendation(long id) {
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException(
-                        "Recommendation not found"));
+                .orElseThrow(() -> new DataValidationException(RECOMMENDATION_NOT_FOUND_MESSAGE));
         recommendationRepository.delete(recommendation);
     }
 
     private void handleSkillOffers(Recommendation recommendation, List<SkillOfferDto> skillOffers) {
         for (SkillOfferDto skillOfferDto : skillOffers) {
             Skill skill = skillRepository.findById(skillOfferDto.skillId())
-                    .orElseThrow(() -> new DataValidationException(
-                            "Skill not found"));
+                    .orElseThrow(() -> new DataValidationException(SKILL_NOT_FOUND_MESSAGE));
 
             SkillOffer skillOffer = SkillOffer.builder()
                     .skill(skill)

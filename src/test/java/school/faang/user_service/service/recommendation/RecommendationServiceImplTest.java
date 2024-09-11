@@ -59,7 +59,8 @@ public class RecommendationServiceImplTest {
     @BeforeEach
     void setUp() {
         recommendationDto = new RecommendationDto(
-                1L, 1L, 2L, "Test Recommendation", List.of(new SkillOfferDto(1L, 1L, 1L)), null);
+                1L, 1L, 2L, "Test Recommendation", List.of(
+                        new SkillOfferDto(1L, 1L, 1L)), null);
 
         author = User.builder().id(1L).build();
         receiver = User.builder().id(2L).build();
@@ -70,25 +71,20 @@ public class RecommendationServiceImplTest {
     void testCreateRecommendationWithInvalidAuthor() {
         when(userRepository.findById(recommendationDto.authorId())).thenReturn(Optional.empty());
         when(userRepository.findById(recommendationDto.receiverId())).thenReturn(Optional.of(receiver));
-
         assertThrows(DataValidationException.class,
-                () -> recommendationService.create(recommendationDto));
-
+                () -> recommendationService.createRecommendation(recommendationDto));
         verify(userRepository).findById(recommendationDto.authorId());
         verify(userRepository).findById(recommendationDto.receiverId());
         verifyNoMoreInteractions(recommendationRepository, skillOfferRepository);
     }
-
 
     @Test
     @DisplayName("Создание рекомендации с несуществующим получателем")
     void testCreateRecommendationWithInvalidReceiver() {
         when(userRepository.findById(recommendationDto.authorId())).thenReturn(Optional.of(author));
         when(userRepository.findById(recommendationDto.receiverId())).thenReturn(Optional.empty());
-
         assertThrows(DataValidationException.class,
-                () -> recommendationService.create(recommendationDto));
-
+                () -> recommendationService.createRecommendation(recommendationDto));
         verify(userRepository).findById(recommendationDto.authorId());
         verify(userRepository).findById(recommendationDto.receiverId());
         verifyNoMoreInteractions(recommendationRepository, skillOfferRepository);
@@ -99,10 +95,8 @@ public class RecommendationServiceImplTest {
     void testUpdateNonExistingRecommendation() {
         long recommendationId = 99L;
         when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.empty());
-
         assertThrows(DataValidationException.class,
-                () -> recommendationService.update(recommendationId, recommendationDto));
-
+                () -> recommendationService.updateRecommendation(recommendationId, recommendationDto));
         verify(recommendationRepository).findById(recommendationId);
         verifyNoMoreInteractions(skillOfferRepository);
     }
@@ -112,10 +106,8 @@ public class RecommendationServiceImplTest {
     void testDeleteNonExistingRecommendation() {
         long recommendationId = 99L;
         when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.empty());
-
         assertThrows(DataValidationException.class,
-                () -> recommendationService.delete(recommendationId));
-
+                () -> recommendationService.deleteRecommendation(recommendationId));
         verify(recommendationRepository).findById(recommendationId);
         verifyNoMoreInteractions(recommendationRepository);
     }
@@ -125,9 +117,7 @@ public class RecommendationServiceImplTest {
     void testCreateRecommendationSuccess() {
         when(userRepository.findById(recommendationDto.authorId())).thenReturn(Optional.of(author));
         when(userRepository.findById(recommendationDto.receiverId())).thenReturn(Optional.of(receiver));
-
-        recommendationService.create(recommendationDto);
-
+        recommendationService.createRecommendation(recommendationDto);
         verify(userRepository).findById(recommendationDto.authorId());
         verify(userRepository).findById(recommendationDto.receiverId());
         verify(recommendationRepository).save(any(Recommendation.class));

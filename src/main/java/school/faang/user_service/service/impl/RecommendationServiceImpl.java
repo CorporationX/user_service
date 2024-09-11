@@ -2,7 +2,6 @@ package school.faang.user_service.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationDto;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class RecommendationServiceImpl implements RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
@@ -36,10 +34,12 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        User author = userRepository.findById(recommendationDto.getAuthorId())
-                .orElseThrow(() -> new DataValidationException("Author not found"));
-        User receiver = userRepository.findById(recommendationDto.getReceiverId())
-                .orElseThrow(() -> new DataValidationException("Receiver not found"));
+        User author = userRepository.findById(recommendationDto.authorId())
+                .orElseThrow(() -> new DataValidationException(
+                        "Author not found"));
+        User receiver = userRepository.findById(recommendationDto.receiverId())
+                .orElseThrow(() -> new DataValidationException(
+                        "Receiver not found"));
 
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         recommendation.setAuthor(author);
@@ -47,7 +47,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendation.setCreatedAt(LocalDateTime.now());
 
         recommendationRepository.save(recommendation);
-        handleSkillOffers(recommendation, recommendationDto.getSkillOffers());
+        handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
         return recommendationMapper.toDto(recommendation);
     }
@@ -72,14 +72,15 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Transactional
     public RecommendationDto update(long id, RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Recommendation not found"));
+                .orElseThrow(() -> new DataValidationException(
+                        "Recommendation not found"));
 
         recommendationMapper.updateFromDto(recommendationDto, recommendation);
         recommendation.setUpdatedAt(LocalDateTime.now());
 
         recommendationRepository.save(recommendation);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-        handleSkillOffers(recommendation, recommendationDto.getSkillOffers());
+        handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
         return recommendationMapper.toDto(recommendation);
     }
@@ -88,14 +89,16 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Transactional
     public void delete(long id) {
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Recommendation not found"));
+                .orElseThrow(() -> new DataValidationException(
+                        "Recommendation not found"));
         recommendationRepository.delete(recommendation);
     }
 
     private void handleSkillOffers(Recommendation recommendation, List<SkillOfferDto> skillOffers) {
         for (SkillOfferDto skillOfferDto : skillOffers) {
-            Skill skill = skillRepository.findById(skillOfferDto.getSkillId())
-                    .orElseThrow(() -> new DataValidationException("Skill not found"));
+            Skill skill = skillRepository.findById(skillOfferDto.skillId())
+                    .orElseThrow(() -> new DataValidationException(
+                            "Skill not found"));
 
             SkillOffer skillOffer = SkillOffer.builder()
                     .skill(skill)

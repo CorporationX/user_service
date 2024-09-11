@@ -32,7 +32,7 @@ public class UserService {
                 .reduce(premiumUsers,
                         (stream, filter) -> filter.apply(stream, filterDto),
                         (s1, s2) -> s1)
-                .map(mapper::toUserDto)
+                .map(mapper::toDto)
                 .toList();
     }
 }

@@ -10,13 +10,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -25,21 +31,23 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Spy
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
+
+    @Mock
+    private UserFilter userFilter;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     Stream<User> userStream;
     UserDto userDto;
     UserFilterDto userFilterDto;
     User user;
+    List<UserFilter> filters;
 
     @BeforeEach
     void setUp() {
         userFilterDto = new UserFilterDto();
-        userFilterDto.setExperienceMax(6);
-        userFilterDto.setExperienceMin(4);
         userDto = new UserDto(
                 2L,
                 "JaneSmith",
@@ -55,12 +63,15 @@ class UserServiceTest {
                 .build();
 
         userStream = Stream.of(user);
+        filters = List.of(userFilter);
+        userService = new UserServiceImpl(userRepository, filters, userMapper);
     }
 
     @Test
-    void testGetPremiumUsers() {
+    void shouldReturnPremiumUsersByFilters() {
         when(userRepository.findPremiumUsers()).thenReturn(Stream.of(user));
-        doReturn(userDto).when(userMapper).toDto(user);
+        when(filters.get(0).isApplicable(any())).thenReturn(true);
+        when(filters.get(0).apply(any(), any())).thenReturn(Stream.of(user));
 
         var result = userService.getPremiumUsers(userFilterDto);
 

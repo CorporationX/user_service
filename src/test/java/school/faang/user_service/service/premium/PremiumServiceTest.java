@@ -13,75 +13,57 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
-import school.faang.user_service.exception.payment.UnSuccessPaymentException;
-import school.faang.user_service.exception.premium.PremiumCheckFailureException;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.service.premium.util.PremiumErrorMessages.UNSUCCESSFUL_PAYMENT;
-import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_ALREADY_HAS_PREMIUM;
-import static school.faang.user_service.util.PremiumFabric.getPaymentResponse;
-import static school.faang.user_service.util.PremiumFabric.getPremium;
-import static school.faang.user_service.util.PremiumFabric.getUser;
+import static school.faang.user_service.util.premium.PremiumFabric.getPaymentResponse;
+import static school.faang.user_service.util.premium.PremiumFabric.getPremium;
+import static school.faang.user_service.util.premium.PremiumFabric.getUser;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumServiceTest {
     private static final long USER_ID = 1L;
     private static final long PREMIUM_ID = 1L;
     private static final PremiumPeriod PERIOD = PremiumPeriod.MONTH;
-    private static final LocalDateTime START_DATE = LocalDateTime.of(2000, 1, 1, 1, 1);
-    private static final LocalDateTime END_DATE = START_DATE.plusDays(PERIOD.getDays());
+    private static final LocalDateTime START_DATE = LocalDateTime.now();
+    private static final LocalDateTime EXPIRED_DATE = START_DATE.minusDays(1);
+    private static final String MESSAGE = "test message";
 
     @Mock
     private PremiumRepository premiumRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private PaymentServiceClient paymentServiceClient;
 
     @Mock
-    private PaymentServiceClient paymentServiceClient;
+    private PremiumCheckService premiumCheckService;
 
     @InjectMocks
     private PremiumService premiumService;
 
     @Test
-    @DisplayName("Given user with premium when check then throw exception")
-    void testBuyPremiumCheckUserForSubPeriod() {
-        Premium premium = getPremium(PREMIUM_ID, START_DATE, END_DATE);
+    @DisplayName("Given user with expired premium when buy then delete expired premium")
+    void testBuyPremiumDeleteExpiredPremium() {
+        Premium premium = getPremium(PREMIUM_ID, START_DATE, EXPIRED_DATE);
         User user = getUser(USER_ID, premium);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(premiumCheckService.checkUserForSubPeriod(USER_ID)).thenReturn(user);
+        when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(successResponse);
+        premiumService.buyPremium(USER_ID, PremiumPeriod.MONTH);
 
-        assertThatThrownBy(() -> premiumService.buyPremium(USER_ID, PremiumPeriod.MONTH))
-                .isInstanceOf(PremiumCheckFailureException.class)
-                .hasMessageContaining(USER_ALREADY_HAS_PREMIUM, END_DATE);
-    }
-
-    @Test
-    @DisplayName("Given not success response when check then throw exception")
-    void testBuyPremiumNotSuccessResponse() {
-        User user = getUser(USER_ID, null);
-        PaymentResponse notSuccessResponse = getPaymentResponse(PaymentStatus.NOT_SUCCESS);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
-        when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(notSuccessResponse);
-
-        assertThatThrownBy(() -> premiumService.buyPremium(USER_ID, PremiumPeriod.MONTH))
-                .isInstanceOf(UnSuccessPaymentException.class)
-                .hasMessageContaining(UNSUCCESSFUL_PAYMENT, USER_ID, PERIOD.getDays());
+        verify(premiumRepository).delete(premium);
     }
 
     @Test
     @DisplayName("Buy premium successful")
     void testBuyPremiumSuccessful() {
         User user = getUser(USER_ID, null);
-        PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(premiumCheckService.checkUserForSubPeriod(USER_ID)).thenReturn(user);
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(successResponse);
         premiumService.buyPremium(USER_ID, PERIOD);
 

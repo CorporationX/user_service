@@ -1,4 +1,4 @@
-package school.faang.user_service.util;
+package school.faang.user_service.util.premium;
 
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.premium.ResponsePremiumDto;
@@ -55,10 +55,11 @@ public class PremiumFabric {
                 .build();
     }
 
-    public static PaymentResponse getPaymentResponse(PaymentStatus status) {
+    public static PaymentResponse getPaymentResponse(PaymentStatus status, String message) {
         return PaymentResponse
                 .builder()
                 .status(status)
+                .message(message)
                 .build();
     }
 }

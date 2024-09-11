@@ -29,6 +29,7 @@ class PremiumPeriodTest {
     private void assertPeriodException(PremiumPeriod period) {
         assertThatThrownBy(() -> PremiumPeriod.fromDays(period.getDays() + 1))
                 .isInstanceOf(PremiumNotFoundException.class)
-                .hasMessageContaining(PREMIUM_PERIOD_NOT_FOUND, period.getDays() + 1, PremiumPeriod.daysOptions());
+                .hasMessageContaining(PREMIUM_PERIOD_NOT_FOUND, period.getDays() + 1,
+                        PremiumPeriod.daysOptions());
     }
 }

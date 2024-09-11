@@ -27,10 +27,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
+    @Query(nativeQuery = true, value = """
+            SELECT u.*
+            FROM users u
+            LEFT JOIN user_promotion up ON u.id = up.user_id
+            ORDER BY
+                CASE WHEN up.coefficient IS NULL THEN 1 ELSE 0 END,
+                up.coefficient DESC,
+                up.creation_date ASC
+            LIMIT :limit 
+            OFFSET :offset
+            """)
+    List<User> findAllSortedByPromotedUsersPerPage(@Param("limit") int limit, @Param("offset") int offset);
+
     @Query("""
-    SELECT COUNT(f) FROM User u 
-    JOIN u.followers f 
-    WHERE u.id = :userId
-    """)
+            SELECT COUNT(f) FROM User u 
+            JOIN u.followers f 
+            WHERE u.id = :userId
+            """)
     Integer countFollowersByUserId(@Param("userId") Long userId);
 }

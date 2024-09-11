@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.util.PremiumFabric.getPremium;
-import static school.faang.user_service.util.PremiumFabric.getResponsePremiumDto;
-import static school.faang.user_service.util.PremiumFabric.getUser;
+import static school.faang.user_service.util.premium.PremiumFabric.getPremium;
+import static school.faang.user_service.util.premium.PremiumFabric.getResponsePremiumDto;
+import static school.faang.user_service.util.premium.PremiumFabric.getUser;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumControllerTest {

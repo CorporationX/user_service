@@ -18,7 +18,6 @@ import school.faang.user_service.exception.premium.PremiumNotFoundException;
 @ControllerAdvice
 @RequiredArgsConstructor
 public class PremiumControllerAdvice {
-    private static final String DEFAULT_MESSAGE = "Unknown error occurred";
     private static final String MESSAGE_FIELD = "message";
 
     private final ObjectMapper objectMapper;
@@ -41,15 +40,15 @@ public class PremiumControllerAdvice {
 
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<ProblemDetail> feignExceptionHandler(FeignException exception) {
-        var errorMessage = getErrorResponseMessage(exception);
+        var errorMessage = exception.getMessage();
+        errorMessage = getErrorResponseMessage(exception, errorMessage);
         log.info(errorMessage);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, errorMessage));
     }
 
-    private String getErrorResponseMessage(FeignException exception) {
-        String errorMessage = DEFAULT_MESSAGE;
+    private String getErrorResponseMessage(FeignException exception, String errorMessage) {
         try {
             String responseBody = exception.contentUTF8();
             JsonNode responseJson = objectMapper.readTree(responseBody);

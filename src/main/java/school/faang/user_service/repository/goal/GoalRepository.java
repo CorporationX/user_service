@@ -20,6 +20,13 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     Stream<Goal> findGoalsByUserId(long userId);
 
     @Query(nativeQuery = true, value = """
+            SELECT g.* FROM goal g
+            JOIN user_goal ug ON g.id = ug.goal_id
+            WHERE ug.user_id = ?1
+            """)
+    List<Goal> findByUserId(long userId);
+
+    @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
             VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning *
             """)
@@ -42,6 +49,17 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             SELECT * FROM subtasks WHERE id != :goalId
             """)
     Stream<Goal> findByParent(long goalId);
+
+    @Query(nativeQuery = true, value = """
+            WITH RECURSIVE subtasks AS (
+            SELECT * FROM goal WHERE id = :goalId
+            UNION
+            SELECT g.* FROM goal g
+            JOIN subtasks st ON st.id = g.parent_goal_id
+            )
+            SELECT * FROM subtasks WHERE id != :goalId
+            """)
+    List<Goal> findGoalsByParent(long goalId);
 
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM users u

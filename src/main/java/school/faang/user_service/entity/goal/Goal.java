@@ -13,8 +13,6 @@ import school.faang.user_service.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static school.faang.user_service.entity.goal.GoalStatus.ACTIVE;
-
 @Data
 @Builder
 @NoArgsConstructor

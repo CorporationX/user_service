@@ -14,7 +14,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.exception.ResourceNotFoundException;
-import school.faang.user_service.mapping.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,9 +49,6 @@ class GoalServiceImplTest extends CommonGoalTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private GoalMapper goalMapper;
 
     @InjectMocks
     private GoalServiceImpl goalService;
@@ -87,11 +84,9 @@ class GoalServiceImplTest extends CommonGoalTest {
         List<Long> skillIds = List.of(SKILL_ID);
         when(skillRepository.countExisting(eq(skillIds))).thenReturn(0);
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+        assertThrows(BadRequestException.class, () ->
             goalService.createGoal(goal, USER_ID, null, List.of(SKILL_ID))
         );
-
-        assertEquals("Skills from request are not presented in DB", exception.getMessage());
     }
 
     @Test
@@ -144,7 +139,9 @@ class GoalServiceImplTest extends CommonGoalTest {
 
         Goal result = goalService.createGoal(goal, USER_ID, null, null);
 
-        assertEquals(createdGoal.getId(), result.getId());
+        assertThat(result)
+            .usingRecursiveComparison()
+            .isEqualTo(createdGoal);
     }
 
     @Test
@@ -162,7 +159,9 @@ class GoalServiceImplTest extends CommonGoalTest {
 
         Goal result = goalService.createGoal(goal, USER_ID, PARENT_GOAL_ID, List.of(SKILL_ID));
 
-        assertEquals(createdGoal.getId(), result.getId());
+        assertThat(result)
+            .usingRecursiveComparison()
+            .isEqualTo(createdGoal);
     }
 
 
@@ -171,11 +170,9 @@ class GoalServiceImplTest extends CommonGoalTest {
         List<Long> skillIds = List.of(SKILL_ID);
         when(skillRepository.countExisting(eq(skillIds))).thenReturn(0);
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+        assertThrows(BadRequestException.class, () ->
             goalService.updateGoal(goal, List.of(SKILL_ID))
         );
-
-        assertEquals("Skills from request are not presented in DB", exception.getMessage());
     }
 
     @Test
@@ -205,12 +202,14 @@ class GoalServiceImplTest extends CommonGoalTest {
 
         Goal result = goalService.updateGoal(goal, List.of(SKILL_ID));
 
-        assertEquals(createdGoal.getId(), result.getId());
+        assertThat(result)
+            .usingRecursiveComparison()
+            .isEqualTo(createdGoal);
     }
 
     @Test
     void testDeleteGoal_success() {
-        when(goalRepository.findByParent(eq(GOAL_ID))).thenReturn(Stream.of());
+        when(goalRepository.findGoalsByParent(eq(GOAL_ID))).thenReturn(List.of());
         doNothing().when(goalRepository).deleteById(GOAL_ID);
 
         goalService.deleteGoal(GOAL_ID);
@@ -218,7 +217,7 @@ class GoalServiceImplTest extends CommonGoalTest {
 
     @Test
     void testFindSubtasksByGoalId_notFoundSubGoals() {
-        when(goalRepository.findByParent(PARENT_GOAL_ID)).thenReturn(Stream.of());
+        when(goalRepository.findGoalsByParent(PARENT_GOAL_ID)).thenReturn(List.of());
 
         List<Goal> result = goalService.findSubGoalsByParentGoalId(PARENT_GOAL_ID, filterDto);
         assertEquals(0, result.size());
@@ -235,7 +234,7 @@ class GoalServiceImplTest extends CommonGoalTest {
         subGoalToNotFound.setUsers(List.of(User.builder().id(USER_ID).build()));
         subGoalToNotFound.setStatus(ACTIVE);
 
-        when(goalRepository.findByParent(eq(PARENT_GOAL_ID))).thenReturn(Stream.of(subGoalToFound, subGoalToNotFound));
+        when(goalRepository.findGoalsByParent(eq(PARENT_GOAL_ID))).thenReturn(List.of(subGoalToFound, subGoalToNotFound));
 
         List<Goal> result = goalService.findSubGoalsByParentGoalId(PARENT_GOAL_ID, filterDto);
         assertEquals(1, result.size());

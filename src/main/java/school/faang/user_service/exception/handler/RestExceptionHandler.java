@@ -26,7 +26,7 @@ public class RestExceptionHandler {
 
     private ResponseEntity<?> handleExceptionInternal(Exception ex, HttpStatus status) {
         log.error(status.name(), ex);
-        var errorResponse = ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
             .errorMessage(ex.getMessage())
             .build();
         return new ResponseEntity<>(errorResponse, status);

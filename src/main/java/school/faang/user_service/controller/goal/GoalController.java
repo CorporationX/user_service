@@ -33,7 +33,13 @@ public class GoalController {
     @ResponseStatus(CREATED)
     public GoalResponseDto createGoal(@RequestBody @Valid CreateGoalDto dto) {
         Goal goal = goalMapper.toEntity(dto);
-        Goal createdGoal = goalService.createGoal(goal, dto.getUserId(), dto.getParentGoalId(), dto.getSkillIds());
+
+        Long userId = dto.getUserId();
+        Long parentGoalId = dto.getParentGoalId();
+        List<Long> skillIds = dto.getSkillIds();
+
+        Goal createdGoal = goalService.createGoal(goal, userId, parentGoalId, skillIds);
+
         return goalMapper.toDto(createdGoal);
     }
 

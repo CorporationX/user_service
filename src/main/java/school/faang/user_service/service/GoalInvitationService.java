@@ -167,15 +167,12 @@ public class GoalInvitationService {
         }
 
         Specification<GoalInvitation> spec = Specification.where(null);
-        if (anyNull(filter.getInviterNamePattern(), filter.getInvitedNamePattern())) {
-            spec = spec.and(hasInviterId(filter.getInviterId()))
-                    .and(hasInvitedId(filter.getInvitedId()))
-                    .and(hasStatus(filter.getStatus()));
-        } else if (anyNull(filter.getInviterId(), filter.getInvitedId())) {
-            spec = spec.and(hasInviterNamePattern(filter.getInviterNamePattern()))
-                    .and(hasInvitedNamePattern(filter.getInvitedNamePattern()))
-                    .and(hasStatus(filter.getStatus()));
-        }
+        spec = spec
+                .and(hasInviterId(filter.getInviterId()))
+                .and(hasInvitedId(filter.getInvitedId()))
+                .and(hasInviterNamePattern(filter.getInviterNamePattern()))
+                .and(hasInvitedNamePattern(filter.getInvitedNamePattern()))
+                .and(hasStatus(filter.getStatus()));
 
         return goalInvitationRepository.findAll(spec);
     }

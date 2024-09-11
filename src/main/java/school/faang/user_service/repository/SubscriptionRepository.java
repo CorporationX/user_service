@@ -1,5 +1,6 @@
 package school.faang.user_service.repository;
 
+import org.reactivestreams.Publisher;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,5 +1,8 @@
 package school.faang.user_service.service.premium.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class PremiumErrorMessages {
     public static final String USER_NOT_FOUND = "User with id: %s not found";
     public static final String USER_ALREADY_HAS_PREMIUM = "The user already has a premium subscription before: %s";

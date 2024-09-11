@@ -35,8 +35,8 @@ public class PremiumService {
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod period) {
         log.info("User with id: {} buys a premium {} days subscription", userId, period.getDays());
-        var user = checkUserForSubPeriod(userId);
-        var paymentResponse = sendPayment(period);
+        User user = checkUserForSubPeriod(userId);
+        PaymentResponse paymentResponse = sendPayment(period);
         checkPaymentResponse(paymentResponse, userId, period);
         var premium = new Premium(null, user, LocalDateTime.now(), LocalDateTime.now().plusDays(period.getDays()));
         return premiumRepository.save(premium);
@@ -54,8 +54,8 @@ public class PremiumService {
 
     private User checkUserForSubPeriod(long userId) {
         log.info("Verification of User with id: {} for premium subscription", userId);
-        var user = userRepository.findById(userId).orElseThrow(() -> new PremiumNotFoundException(USER_NOT_FOUND, userId));
-        var premium = user.getPremium();
+        User user = userRepository.findById(userId).orElseThrow(() -> new PremiumNotFoundException(USER_NOT_FOUND, userId));
+        Premium premium = user.getPremium();
         if (premium != null) {
             throw new PremiumCheckFailureException(USER_ALREADY_HAS_PREMIUM, premium.getEndDate());
         }

@@ -40,7 +40,7 @@ public class PremiumControllerAdvice {
     }
 
     @ExceptionHandler(FeignException.class)
-    public ResponseEntity<ProblemDetail> httpClientErrorExceptionHandler(FeignException exception) {
+    public ResponseEntity<ProblemDetail> feignExceptionHandler(FeignException exception) {
         var errorMessage = getErrorResponseMessage(exception);
         log.info(errorMessage);
         return ResponseEntity

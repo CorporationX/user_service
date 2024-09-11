@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.premium.ResponsePremiumDto;
+import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.exception.premium.PremiumCheckFailureException;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.service.premium.PremiumService;
 
@@ -24,8 +26,17 @@ public class PremiumController {
     @PostMapping("/buy")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponsePremiumDto buyPremium(@RequestParam(name = "days") int days) {
-        var premiumPeriod = PremiumPeriod.fromDays(days);
-        var premium = premiumService.buyPremium(userContext.getUserId(), premiumPeriod);
+        PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
+        long userId = getContextUserId();
+        Premium premium = premiumService.buyPremium(userId, premiumPeriod);
         return premiumMapper.toDto(premium);
+    }
+
+    private long getContextUserId() {
+        try {
+            return userContext.getUserId();
+        } catch (IllegalArgumentException exception) {
+            throw new PremiumCheckFailureException(exception.getMessage());
+        }
     }
 }

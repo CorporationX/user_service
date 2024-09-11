@@ -38,7 +38,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Test with Gradle
-        run: ./gradlew check --no-daemon
+        run: ./gradlew check --no-daemon --continue
 
       - name: Archive test report
         uses: actions/upload-artifact@v4

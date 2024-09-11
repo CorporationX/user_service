@@ -11,11 +11,16 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.event.MentorshipRequestEvent;
+import school.faang.user_service.event.MentorshipStartEvent;
+import school.faang.user_service.event.MentorshipOfferedEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.redisPublisher.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
+import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -29,18 +34,20 @@ import java.util.stream.Stream;
 public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestEventMapper mentorshipRequestEventMapper;
+    private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
     private final MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         long requesterId = mentorshipRequestDto.getRequesterId();
         long receiverId = mentorshipRequestDto.getReceiverId();
         String description = mentorshipRequestDto.getDescription();
-        LocalDateTime mentorshipCreationDate = mentorshipRequestDto.getCreatedAt();
 
         mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId,
                 mentorshipCreationDate);

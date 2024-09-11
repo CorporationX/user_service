@@ -53,8 +53,8 @@ public class MentorshipRequestValidator {
         if (latestRequest.isPresent() && latestRequest.get().getCreatedAt()
                 .plusDays(MENTORSHIP_REQUEST_FREQUENCY_IN_DAYS)
                 .isAfter(mentorshipCreationDate)) {
-            throw new IllegalArgumentException("MentorshipRequest can be sent once in "
-                    + MENTORSHIP_REQUEST_FREQUENCY_IN_DAYS + " days");
+            throw new IllegalArgumentException("MentorshipRequest can be sent once in %d days"
+                    .formatted(MENTORSHIP_REQUEST_FREQUENCY_IN_DAYS));
         }
     }
 

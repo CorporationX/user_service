@@ -16,17 +16,22 @@ import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.MentorshipOfferedEvent;
 import school.faang.user_service.event.MentorshipRequestEvent;
+import school.faang.user_service.event.MentorshipStartEvent;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
+import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
 import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.redisPublisher.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.publishier.MentorshipOfferedEventPublisher;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -39,6 +44,11 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
@@ -54,7 +64,13 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
+    @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    @Mock
+    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    @Mock
+    private MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     @Mock
     private MentorshipRequestEventPublisher mentorshipRequestEventPublisher;
     @Mock
@@ -64,30 +80,54 @@ class MentorshipRequestServiceTest {
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
+
     private MentorshipRequestMapperImpl mentorshipRequestMapperImpl;
+    private MentorshipOfferedEvent mentorshipOfferedEvent;
+    private MentorshipRequestEvent mentorshipRequestEvent;
+    private MentorshipRequest mentorshipRequest;
+    private MentorshipRequestDto mentorshipRequestDto;
+    private long requesterId;
+    private long receiverId;
+    private String description;
+
+    private MentorshipStartEvent mentorshipStartEvent;
+
 
     @BeforeEach
     public void setUp() {
         mentorshipRequestMapperImpl = new MentorshipRequestMapperImpl();
+        mentorshipStartEvent = new MentorshipStartEvent();
+        mentorshipOfferedEvent = new MentorshipOfferedEvent();
+        mentorshipRequestEvent = new MentorshipRequestEvent();
+        mentorshipRequest = new MentorshipRequest();
+
+        requesterId = 1L;
+        receiverId = 2L;
+        description = "description";
+
+        mentorshipRequestDto = MentorshipRequestDto.builder()
+                .requesterId(requesterId)
+                .receiverId(receiverId)
+                .createdAt(LocalDateTime.now())
+                .description(description)
+                .build();
     }
 
     @Test
     @DisplayName("testing requestMentorship methods execution")
     public void testRequestMentorshipValidatorExecution() {
-        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .requesterId(1L)
-                .receiverId(2L)
-                .createdAt(LocalDateTime.now())
-                .description("description").build();
-        MentorshipRequestEvent mentorshipRequestEvent = new MentorshipRequestEvent();
+        when(mentorshipRequestRepository.create(requesterId, receiverId, description)).thenReturn(mentorshipRequest);
+        when(mentorshipOfferedEventMapper.toEvent(mentorshipRequest)).thenReturn(mentorshipOfferedEvent);
 
         when(mentorshipRequestEventMapper.toEvent(mentorshipRequestCaptor.capture())).thenReturn(mentorshipRequestEvent);
+
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+
         verify(mentorshipRequestValidator, times(1))
                 .validateParticipantsAndRequestFrequency(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId(),
-                        mentorshipRequestDto.getCreatedAt());
+                        eq(mentorshipRequestDto.getRequesterId()),
+                        eq(mentorshipRequestDto.getReceiverId()),
+                        any());
         verify(mentorshipRequestRepository, times(1))
                 .create(mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
@@ -95,6 +135,8 @@ class MentorshipRequestServiceTest {
                 );
         verify(mentorshipRequestEventMapper, times(1)).toEvent(mentorshipRequestCaptor.getValue());
         verify(mentorshipRequestEventPublisher, times(1)).publish(mentorshipRequestEvent);
+        verify(mentorshipOfferedEventMapper, times(1)).toEvent(mentorshipRequest);
+        verify(mentorshipOfferedEventPublisher, times(1)).publish(mentorshipOfferedEvent);
         verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequestCaptor.getValue());
     }
 

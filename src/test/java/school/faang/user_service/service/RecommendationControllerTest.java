@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -58,7 +59,7 @@ public class RecommendationControllerTest {
         recommendationDto.setId(1L);
         recommendationDto.setContent("Updated content");
 
-        when(recommendationService.update(any(RecommendationDto.class))).thenReturn(recommendationDto);
+        when(recommendationService.update(anyLong(), any(RecommendationDto.class))).thenReturn(recommendationDto);
 
         mockMvc.perform(put("/recommendations/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +68,7 @@ public class RecommendationControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.content").value("Updated content"));
 
-        verify(recommendationService).update(any(RecommendationDto.class));
+        verify(recommendationService).update(anyLong(), any(RecommendationDto.class));
     }
 
     @Test

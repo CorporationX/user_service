@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
 import java.util.List;
@@ -23,19 +23,13 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PostMapping()
-    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
-        checkIfContentEmpty(recommendationDto);
+    public RecommendationDto giveRecommendation(@RequestBody @Valid RecommendationDto recommendationDto) {
         return recommendationService.create(recommendationDto);
     }
 
     @PutMapping("/{id}")
     public RecommendationDto updateRecommendation(@PathVariable long id, @RequestBody RecommendationDto recommendationDto) {
-        checkIfContentEmpty(recommendationDto);
-        if (recommendationDto.getId() != null && recommendationDto.getId() != id) {
-            throw new DataValidationException("Mismatched id in the URL and the body");
-        }
-        recommendationDto.setId(id);
-        return recommendationService.update(recommendationDto);
+        return recommendationService.update(id, recommendationDto);
     }
 
     @DeleteMapping("/{id}")
@@ -46,11 +40,5 @@ public class RecommendationController {
     @GetMapping("/user/{receiverId}")
     public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
-    }
-
-    private void checkIfContentEmpty(RecommendationDto recommendationDto) {
-        if (recommendationDto.getContent() == null || recommendationDto.getContent().isBlank()) {
-            throw new DataValidationException("Recommendation should contain non-empty content");
-        }
     }
 }

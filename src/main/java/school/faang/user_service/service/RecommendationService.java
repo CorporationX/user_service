@@ -51,7 +51,11 @@ public class RecommendationService {
     }
 
     @Transactional
-    public RecommendationDto update(RecommendationDto recommendationDto) {
+    public RecommendationDto update(long id, RecommendationDto recommendationDto) {
+        if (recommendationDto.getId() != null && recommendationDto.getId() != id) {
+            throw new DataValidationException("Mismatched id in the URL and the body");
+        }
+        recommendationDto.setId(id);
         checkIfOfferedSkillsExist(recommendationDto);
         checkIfAcceptableTimeForRecommendation(recommendationDto);
 

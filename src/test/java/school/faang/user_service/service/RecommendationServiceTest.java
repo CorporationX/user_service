@@ -247,7 +247,7 @@ class RecommendationServiceTest {
         when(recommendationRepository.findById(currentRecommendationId)).thenReturn(Optional.of(existingRecommendation));
         when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(inputDto);
 
-        RecommendationDto result = recommendationService.update(inputDto);
+        RecommendationDto result = recommendationService.update(currentRecommendationId, inputDto);
 
         assertNotNull(result);
         assertEquals("Updated content", result.getContent());
@@ -260,6 +260,18 @@ class RecommendationServiceTest {
         verify(userRepository, times(1)).findById(receiverId);
         verify(userRepository, times(1)).findById(authorId);
         verify(skillRepository, times(1)).save(any());
+    }
+
+    @Test
+    void testCreate_ThrowsDataValidationException_WhenIdsDontMatch() {
+        long idFromPath = 1L;
+
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(2L);
+        recommendationDto.setContent("Content");
+
+        assertThrows(DataValidationException.class, () -> recommendationService.update(idFromPath, recommendationDto));
+        verifyNoInteractions(skillRepository);
     }
 
     @Test

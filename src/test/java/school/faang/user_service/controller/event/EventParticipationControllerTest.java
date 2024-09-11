@@ -11,11 +11,11 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.sevice.event.EventParticipationServiceImpl;
 
 @ExtendWith(SpringExtension.class)
-class EventParticipationControllerImplTest {
+class EventParticipationControllerTest {
     @Mock
     EventParticipationServiceImpl service;
     @InjectMocks
-    EventParticipationControllerImpl controller;
+    EventParticipationController controller;
 
     UserDto userDto;
 

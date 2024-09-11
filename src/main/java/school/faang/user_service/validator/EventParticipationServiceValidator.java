@@ -23,9 +23,6 @@ public class EventParticipationServiceValidator {
     }
 
     public boolean isUserRegistered(List<User> users,  long userId) {
-        if (users == null) {
-            return false;
-        }
         return users.stream()
                 .map(User::getId)
                 .anyMatch(id -> id == userId);

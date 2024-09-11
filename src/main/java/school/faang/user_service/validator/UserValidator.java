@@ -8,11 +8,11 @@ import school.faang.user_service.repository.UserRepository;
 
 @Component
 @RequiredArgsConstructor
-public class UserInDbValidator {
+public class UserValidator {
 
     private final UserRepository userRepository;
 
-    public User checkIfUserInDbIsEmpty(Long userId) {
+    public User checkIfUserIsExist(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new DataValidationException("Такого юзера нет в БД");
         } else {
@@ -20,3 +20,4 @@ public class UserInDbValidator {
         }
     }
 }
+

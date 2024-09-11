@@ -1,4 +1,4 @@
-package school.faang.user_service.entity.recommendation.dto;
+package school.faang.user_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

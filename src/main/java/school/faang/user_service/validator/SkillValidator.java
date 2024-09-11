@@ -3,8 +3,8 @@ package school.faang.user_service.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.dto.RecommendationDto;
-import school.faang.user_service.entity.recommendation.dto.SkillOfferDto;
+import school.faang.user_service.dto.RecommendationDto;
+import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class SkillInDbValidator {
+public class SkillValidator {
 
     private final SkillRepository skillRepository;
 

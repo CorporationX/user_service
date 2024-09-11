@@ -1,13 +1,14 @@
 package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.entity.recommendation.dto.RecommendationDto;
+import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class RecommendationController {
 

@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.entity.recommendation.dto.SkillOfferDto;
+import school.faang.user_service.dto.SkillOfferDto;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ public interface SkillOfferMapper {
     @Mapping(source = "recommendation.id", target = "recommendationId")
     SkillOfferDto toDto(SkillOffer skillOffer);
 
-    List<SkillOfferDto> skillOffersToSkillOffersDtos(List<SkillOffer> skillOffers);
+    List<SkillOfferDto> toDtos(List<SkillOffer> skillOffers);
 }

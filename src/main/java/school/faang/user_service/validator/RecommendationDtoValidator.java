@@ -3,7 +3,7 @@ package school.faang.user_service.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.dto.RecommendationDto;
+import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
@@ -14,15 +14,15 @@ import java.time.temporal.ChronoUnit;
 public class RecommendationDtoValidator {
 
     private final RecommendationRepository recommendationRepository;
-    private final int MIN_MONTH_COUNT = 6;
+    private static final int MIN_MONTH_COUNT = 6;
 
-    public void checkIfRecommendationContentIsBlank(RecommendationDto recommendation) {
+    public void validateIfRecommendationContentIsBlank(RecommendationDto recommendation) {
         if (recommendation.getContent() == null || recommendation.getContent().isBlank()) {
             throw new DataValidationException("Текст рекомендации не может быть пустым!");
         }
     }
 
-    public void checkIfRecommendationCreatedTimeIsShort(RecommendationDto recommendation) {
+    public void validateIfRecommendationCreatedTimeIsShort(RecommendationDto recommendation) {
         Recommendation existedRecommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                         recommendation.getAuthorId(), recommendation.getReceiverId())

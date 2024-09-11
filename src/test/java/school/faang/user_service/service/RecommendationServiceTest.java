@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,18 +13,19 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.entity.recommendation.dto.RecommendationDto;
+import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.validator.RecommendationDtoValidator;
-import school.faang.user_service.validator.SkillInDbValidator;
-import school.faang.user_service.validator.UserInDbValidator;
+import school.faang.user_service.validator.SkillValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,66 +35,95 @@ public class RecommendationServiceTest {
 
     @InjectMocks
     private RecommendationService recommendationService;
+
     @Mock
     private RecommendationRepository recommendationRepository;
+
     @Mock
     private RecommendationDtoValidator recommendationDtoValidator;
+
     @Mock
-    private UserInDbValidator userInDbValidator;
+    private UserValidator userValidator;
+
     @Mock
-    private SkillInDbValidator skillInDbValidator;
+    private SkillValidator skillValidator;
+
     @Mock
     private RecommendationMapper recommendationMapper;
 
-    private final long USER_ID = 1;
+    private static final long USER_ID = 1;
 
-    @Test
-    public void testCreateWithSaveRecommendation() {
-        RecommendationDto recommendationDto = createRecommendationDto();
-        when(userInDbValidator.checkIfUserInDbIsEmpty(recommendationDto.getAuthorId())).thenReturn(getUser());
-        when(userInDbValidator.checkIfUserInDbIsEmpty(recommendationDto.getReceiverId())).thenReturn(getUser());
-        when(recommendationRepository
-                .create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent()))
-                .thenReturn(getRecommendation().getId());
-        when(recommendationRepository.findById(getRecommendation().getId())).thenReturn(Optional.of(getRecommendation()));
+    @Nested
+    class PositiveTests {
 
-        recommendationService.create(recommendationDto);
+        @Test
+        @DisplayName("Успешное создание рекомендации")
+        public void testCreateWithSaveRecommendation() {
+            RecommendationDto recommendationDto = createRecommendationDto();
+            Recommendation recommendation = getRecommendation();
+            when(userValidator.checkIfUserIsExist(recommendationDto.getAuthorId())).thenReturn(getUser());
+            when(userValidator.checkIfUserIsExist(recommendationDto.getReceiverId())).thenReturn(getUser());
+            when(recommendationRepository
+                    .create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent()))
+                    .thenReturn(recommendation.getId());
+            when(recommendationRepository.findById(recommendation.getId())).thenReturn(Optional.of(recommendation));
+            when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
 
-        verify(recommendationDtoValidator, times(1))
-                .checkIfRecommendationContentIsBlank(recommendationDto);
-        verify(recommendationDtoValidator, times(1))
-                .checkIfRecommendationCreatedTimeIsShort(recommendationDto);
-        verify(userInDbValidator, times(2))
-                .checkIfUserInDbIsEmpty(USER_ID);
-        verify(skillInDbValidator, times(1)).getSkillsFromDb(recommendationDto);
-        verify(recommendationRepository, times(1))
-                .create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
-    }
+            RecommendationDto resultRecommendationDto = recommendationService.create(recommendationDto);
 
-    @Test
-    public void testDelete() {
-        recommendationService.delete(USER_ID);
-        verify(recommendationRepository, times(1)).deleteById(USER_ID);
-    }
+            assertEquals(recommendationDto, resultRecommendationDto);
+            verify(recommendationDtoValidator, times(1))
+                    .validateIfRecommendationContentIsBlank(recommendationDto);
+            verify(recommendationDtoValidator, times(1))
+                    .validateIfRecommendationCreatedTimeIsShort(recommendationDto);
+            verify(userValidator, times(2))
+                    .checkIfUserIsExist(USER_ID);
+            verify(skillValidator, times(1)).getSkillsFromDb(recommendationDto);
+            verify(recommendationRepository, times(1))
+                    .create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
+            verify(recommendationMapper, times(1)).toDto(recommendation);
+        }
 
-    @Test
-    public void testGetAllUserRecommendations() {
-        List<Recommendation> recommendationList = List.of(new Recommendation(), new Recommendation());
-        when(recommendationRepository.findAllByReceiverId(USER_ID, Pageable.unpaged()))
-                .thenReturn(new PageImpl<>(recommendationList, Pageable.unpaged(), recommendationList.size()));
+        @Test
+        @DisplayName("Успешное удаление рекомендации")
+        public void testDelete() {
+            recommendationService.delete(USER_ID);
+            verify(recommendationRepository, times(1)).deleteById(USER_ID);
+        }
 
-        recommendationService.getAllUserRecommendations(USER_ID);
-        verify(recommendationRepository, times(1)).findAllByReceiverId(USER_ID, Pageable.unpaged());
-    }
+        @Test
+        @DisplayName("Успешное получение всех рекомендаций пользователя")
+        public void testGetAllUserRecommendations() {
+            List<Recommendation> recommendations = List.of(new Recommendation(), new Recommendation());
+            List<RecommendationDto> recommendationDtos = List.of(new RecommendationDto(), new RecommendationDto());
+            when(recommendationRepository.findAllByReceiverId(USER_ID, Pageable.unpaged()))
+                    .thenReturn(new PageImpl<>(recommendations, Pageable.unpaged(), recommendations.size()));
+            when(recommendationMapper.toDtos(recommendations)).thenReturn(recommendationDtos);
 
-    @Test
-    public void testGetAllGivenRecommendations() {
-        List<Recommendation> recommendationList = List.of(new Recommendation(), new Recommendation());
-        when(recommendationRepository.findAllByAuthorId(USER_ID, Pageable.unpaged()))
-                .thenReturn(new PageImpl<>(recommendationList, Pageable.unpaged(), recommendationList.size()));
+            List<RecommendationDto> resultRecommendationDtos = recommendationService.getAllUserRecommendations(USER_ID);
 
-        recommendationService.getAllGivenRecommendations(USER_ID);
-        verify(recommendationRepository, times(1)).findAllByAuthorId(USER_ID, Pageable.unpaged());
+            assertEquals(recommendationDtos, resultRecommendationDtos);
+            verify(recommendationRepository, times(1))
+                    .findAllByReceiverId(USER_ID, Pageable.unpaged());
+            verify(recommendationMapper, times(1)).toDtos(recommendations);
+        }
+
+        @Test
+        @DisplayName("Успешное получение всех рекомендации автора")
+        public void testGetAllGivenRecommendations() {
+            List<Recommendation> recommendations = List.of(new Recommendation(), new Recommendation());
+            List<RecommendationDto> recommendationDtos = List.of(new RecommendationDto(), new RecommendationDto());
+            when(recommendationRepository.findAllByAuthorId(USER_ID, Pageable.unpaged()))
+                    .thenReturn(new PageImpl<>(recommendations, Pageable.unpaged(), recommendations.size()));
+            when(recommendationMapper.toDtos(recommendations)).thenReturn(recommendationDtos);
+
+            List<RecommendationDto> resultRecommendationDtos = recommendationService.getAllGivenRecommendations(USER_ID);
+
+            assertEquals(recommendationDtos, resultRecommendationDtos);
+            verify(recommendationRepository, times(1))
+                    .findAllByAuthorId(USER_ID, Pageable.unpaged());
+            verify(recommendationMapper, times(1)).toDtos(recommendations);
+        }
     }
 
     private RecommendationDto createRecommendationDto() {
@@ -112,12 +144,7 @@ public class RecommendationServiceTest {
         recommendation.setReceiver(new User());
         recommendation.setSkillOffers(List.of(new SkillOffer()));
         recommendation.setRequest(new RecommendationRequest());
-
-        String str = "2014-04-08 12:30";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
-
-        recommendation.setCreatedAt(dateTime);
+        recommendation.setCreatedAt(LocalDateTime.of(2014, Month.JULY, 2 , 15, 30));
 
         return recommendation;
     }

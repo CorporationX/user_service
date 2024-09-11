@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.dto.RecommendationDto;
+import school.faang.user_service.dto.RecommendationDto;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ public interface RecommendationMapper {
     @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationDto toDto(Recommendation recommendation);
 
-    List<RecommendationDto> recommendationsToRecommendationsDtos(List<Recommendation> recommendations);
+    List<RecommendationDto> toDtos(List<Recommendation> recommendations);
 }

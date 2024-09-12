@@ -1,11 +1,17 @@
 name: CI for user_service
+
 on:
+  push:
+    branches:
+      - kraken-master-stream6
   pull_request:
     branches:
       - kraken-master-stream6
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

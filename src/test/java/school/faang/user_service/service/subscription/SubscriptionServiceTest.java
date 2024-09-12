@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -155,19 +154,12 @@ public class SubscriptionServiceTest {
         when(subscriptionRepository.findByFolloweeId(followeeId))
                 .thenReturn(users.stream());
 
-        when(userMapper.toDto(users.get(0))).thenReturn(userDto1);
-        when(userMapper.toDto(users.get(1))).thenReturn(userDto2);
-        when(userMapper.toDto(users.get(2))).thenReturn(userDto3);
-
-
-        List<UserDto> expected = List.of(userDto1, userDto2, userDto3);
-        List<UserDto> actual = subscriptionService.getFollowers(followeeId, userFilterDto);
+        List<User> expected = List.of(users.get(0), users.get(1), users.get(2));
+        List<User> actual = subscriptionService.getFollowers(followeeId, userFilterDto);
 
         assertEquals(expected, actual);
 
         verify(subscriptionRepository).findByFolloweeId(followeeId);
-        verify(userMapper, times(3)).toDto(any());
-
     }
 
     @Test
@@ -188,12 +180,10 @@ public class SubscriptionServiceTest {
 
         Stream<User> userStream = Stream.of(user1, user2, user3, user4, user5, user6);
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
-        when(userMapper.toDto(any())).thenReturn(new UserDto());
 
-        List<UserDto> result = subscriptionService.getFollowers(followeeId, filterDto);
+        List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
-        verify(userMapper, times(pageSize)).toDto(any());
         assertEquals(pageSize, result.size());
     }
 
@@ -216,13 +206,11 @@ public class SubscriptionServiceTest {
 
         Stream<User> userStream = Stream.of(user1, user2, user3, user4, user5, user6);
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
-        when(userMapper.toDto(any())).thenReturn(new UserDto());
 
-        List<UserDto> result = subscriptionService.getFollowers(followeeId, filterDto);
+        List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
         assertNotEquals(notCorrectPageSize, result.size());
-        verify(userMapper, times(pageSize)).toDto(any());
     }
 
     @Test
@@ -236,15 +224,15 @@ public class SubscriptionServiceTest {
         when(userFilter.getPredicate(filterDto)).thenReturn(user -> user.getEmail().contains(email));
 
         userFilters = List.of(userFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters);
 
-        List<UserDto> result = subscriptionService.getFollowers(followeeId, filterDto);
-
-        assertEquals(1, result.size());
+        List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
         verify(userFilter, times(1)).isApplicable(filterDto);
         verify(userFilter, times(1)).getPredicate(filterDto);
+
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -254,8 +242,9 @@ public class SubscriptionServiceTest {
                 .thenReturn(followersAmount);
         int result = subscriptionService.getFollowersCount(followeeId);
 
-        assertEquals(followersAmount, result);
         verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
+
+        assertEquals(followersAmount, result);
     }
 
     @Test
@@ -265,28 +254,23 @@ public class SubscriptionServiceTest {
                 .thenReturn(followeesAmount);
         int result = subscriptionService.getFollowingCount(followerId);
 
-        assertEquals(followeesAmount, result);
         verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
+
+        assertEquals(followeesAmount, result);
     }
 
 
     @Test
-    public void testGetFollowing_returnFilteredUserDto() {
+    public void testGetFollowing_returnFilteredUsers() {
         when(subscriptionRepository.findByFollowerId(followerId))
                 .thenReturn(users.stream());
 
-        when(userMapper.toDto(users.get(0))).thenReturn(userDto1);
-        when(userMapper.toDto(users.get(1))).thenReturn(userDto2);
-        when(userMapper.toDto(users.get(2))).thenReturn(userDto3);
-
-
-        List<UserDto> expected = List.of(userDto1, userDto2, userDto3);
-        List<UserDto> actual = subscriptionService.getFollowing(followerId, userFilterDto);
-
-        assertEquals(expected, actual);
+        List<User> expected = List.of(users.get(0), users.get(1), users.get(2));
+        List<User> actual = subscriptionService.getFollowing(followerId, userFilterDto);
 
         verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
-        verify(userMapper, times(3)).toDto(any());
+
+        assertEquals(expected, actual);
     }
 
 }

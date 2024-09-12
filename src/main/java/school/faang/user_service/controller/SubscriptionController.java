@@ -15,7 +15,9 @@ import school.faang.user_service.constant.SuccessMessages;
 import school.faang.user_service.dto.ResponseDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
 
@@ -26,6 +28,7 @@ import java.util.List;
 @RequestMapping("/subscriptions")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
+    private final UserMapper userMapper;
 
     @PostMapping("/{followerId}/follow/{followeeId}")
     public ResponseEntity<ResponseDto> followUser(@PathVariable long followerId, @PathVariable long followeeId) {
@@ -43,7 +46,8 @@ public class SubscriptionController {
 
     @GetMapping("/{followeeId}/followers")
     public List<UserDto> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
-        return subscriptionService.getFollowers(followeeId, filter);
+        List<User> users = subscriptionService.getFollowers(followeeId, filter);
+        return userMapper.toDtos(users);
     }
 
     @GetMapping("/{followeeId}/followers/count")
@@ -53,7 +57,8 @@ public class SubscriptionController {
 
     @GetMapping("/{followerId}/following")
     public List<UserDto> getFollowing(@PathVariable long followerId, @RequestBody UserFilterDto filter) {
-        return subscriptionService.getFollowing(followerId, filter);
+        List<User> users = subscriptionService.getFollowing(followerId, filter);
+        return userMapper.toDtos(users);
     }
 
     @GetMapping("/{followerId}/following/count")

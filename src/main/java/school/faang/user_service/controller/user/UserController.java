@@ -14,8 +14,8 @@ import school.faang.user_service.service.user.UserService;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/{userId}/deactivated")
-    public ResponseEntity<Void> deactivatedUser(@PathVariable("userId") Long userId) {
+    @PostMapping("/{userId}/deactivate")
+    public ResponseEntity<Void> deactivatedUser(@PathVariable Long userId) {
         userService.deactivateUser(userId);
 
         return ResponseEntity.noContent().build();

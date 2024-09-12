@@ -142,9 +142,4 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
-
-    public void removeGoal(Goal goal) {
-        this.goals.remove(goal);
-        goal.getUsers().remove(this);
-    }
 }

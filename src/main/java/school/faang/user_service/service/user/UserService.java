@@ -1,6 +1,6 @@
 package school.faang.user_service.service.user;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.User;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
@@ -33,25 +33,27 @@ public class UserService {
             throw new UserDeactivatedException();
         }
 
-        removeGoalsFromUser(user);
-        removeEventsFromUser(user);
+        removeUserGoals(user);
+        removeUserEvents(user);
         mentorshipService.deleteMentorFromMentees(user.getId(), user.getMentees());
 
         user.setActive(false);
         userRepository.save(user);
     }
 
-    private void removeGoalsFromUser(User user) {
-        for (Goal goal : new ArrayList<>(user.getGoals())) {
+    private void removeUserGoals(User user) {
+        for (Goal goal : user.getGoals()) {
             if (goal.getUsers().size() == 1) {
                 goalRepository.delete(goal);
             }
 
-            user.removeGoal(goal);
+            goal.getUsers().remove(user);
         }
+
+        user.getGoals().clear();
     }
 
-    private void removeEventsFromUser(User user) {
+    private void removeUserEvents(User user) {
         if (user.getOwnedEvents() == null) {
             return;
         }

@@ -1,20 +1,22 @@
 package school.faang.user_service.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-@Service
+@Component
 public class RecommendationService {
     @Autowired
     private RecommendationRepository recommendationRepository;
@@ -22,82 +24,72 @@ public class RecommendationService {
     private SkillOfferRepository skillOfferRepository;
 
     public RecommendationDto create(RecommendationDto recommendation) {
-        if (hasRecommendationInLastSixMonths(recommendation.getAuthorId(), recommendation.getReceiverId())) {
-            throw new DataValidationException("Recommendation cannot be given more than once in 6 months.");
-        }
+        validateRecommendationTiming(recommendation);
 
-        for (SkillOfferDto offer : recommendation.getSkillOffers()) {
-            if (!skillOfferRepository.existsById(offer.getSkillId())) {
-                throw new DataValidationException("One of the skills does not exist.");
+        validateSkills(recommendation.getSkillOffers());
+
+        saveSkillOffers(recommendation);
+
+        Long recommendationId = recommendationRepository.create(
+                recommendation.getAuthorId(),
+                recommendation.getReceiverId(),
+                recommendation.getContent()
+        );
+
+        RecommendationDto savedRecommendation = new RecommendationDto();
+        savedRecommendation.setId(recommendationId);
+        savedRecommendation.setAuthorId(recommendation.getAuthorId());
+        savedRecommendation.setReceiverId(recommendation.getReceiverId());
+        savedRecommendation.setContent(recommendation.getContent());
+        savedRecommendation.setSkillOffers(recommendation.getSkillOffers());
+        savedRecommendation.setCreatedAt(LocalDateTime.now());
+
+        return savedRecommendation;
+    }
+
+    private void validateRecommendationTiming(RecommendationDto recommendationDto) {
+        Optional<Recommendation> recentRecommendation = recommendationRepository
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendationDto.getAuthorId(),
+                        recommendationDto.getReceiverId()
+                );
+
+        if (recentRecommendation.isPresent()) {
+            LocalDateTime lastRecommendationDate = recentRecommendation.get().getCreatedAt();
+            if (lastRecommendationDate != null && lastRecommendationDate.isAfter(LocalDateTime.now().minusMonths(6))) {
+                throw new DataValidationException("You cannot give a recommendation to this user more than once within 6 months.");
             }
         }
-
-        recommendation.setCreatedAt(LocalDateTime.now());
-
-        Recommendation createdRecommendation = recommendationRepository.findById(recommendation.getId()).orElseThrow();
-        return mapToDto(createdRecommendation);
     }
 
-    private RecommendationDto mapToDto(Recommendation recommendation) {
-        RecommendationDto dto = new RecommendationDto();
-        dto.setId(recommendation.getId());
-        dto.setAuthorId(recommendation.getAuthor().getId());
-        dto.setReceiverId(recommendation.getReceiver().getId());
-        dto.setContent(recommendation.getContent());
-        dto.setCreatedAt(recommendation.getCreatedAt());
+    private void validateSkills(List<SkillOfferDto> skillOffers) {
+        Set<Long> skillIds = new HashSet<>();
+        for (SkillOfferDto skillOffer : skillOffers) {
+            if (skillOffer.getSkillId() == null) {
+                throw new DataValidationException("Skill ID must not be null.");
+            }
 
-        List<SkillOfferDto> skillOffers = skillOfferRepository.findAllByUserId(recommendation.getReceiver().getId())
-                .stream()
-                .map(skillOffer -> {
-                    SkillOfferDto offerDto = new SkillOfferDto();
-                    offerDto.setId(skillOffer.getId());
-                    offerDto.setSkillId(skillOffer.getSkill().getId());
-                    return offerDto;
-                })
-                .collect(Collectors.toList());
+            if (!skillOfferRepository.existsById(skillOffer.getSkillId())) {
+                throw new DataValidationException("Skill with ID " + skillOffer.getSkillId() + " does not exist.");
+            }
 
-        dto.setSkillOffers(skillOffers);
-        return dto;
-    }
-
-    public boolean hasRecommendationInLastSixMonths(long authorId, long receiverId) {
-        // Получаем последнюю рекомендацию от автора к получателю
-        Optional<Recommendation> existingRecommendation = recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-                authorId, receiverId);
-
-        if (existingRecommendation.isPresent()) {
-            // Проверяем, была ли рекомендация сделана в последние 6 месяцев
-            LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
-            return existingRecommendation.get().getCreatedAt().isAfter(sixMonthsAgo);
+            if (!skillIds.add(skillOffer.getSkillId())) {
+                throw new DataValidationException("Duplicate skill ID detected: " + skillOffer.getSkillId());
+            }
         }
-
-        // Если рекомендации нет, возвращаем false
-        return false;
     }
 
+    private void saveSkillOffers(RecommendationDto recommendationDto) {
+        for (SkillOfferDto skillOffer : recommendationDto.getSkillOffers()) {
+            List<SkillOffer> existingOffers = skillOfferRepository.findAllOffersOfSkill(
+                    skillOffer.getSkillId(), recommendationDto.getReceiverId()
+            );
 
-
-
-
-
-
-//    @Autowired
-//    public RecommendationService(RecommendationRepository recommendationRepository, SkillOfferRepository skillOfferRepository) {
-//        this.recommendationRepository = recommendationRepository;
-//        this.skillOfferRepository = skillOfferRepository;
-//    }
-//
-//    public RecommendationDto create(RecommendationDto recommendation) {
-//        validateRecommendation(recommendation);
-//        return saveRecommendation(recommendation);
-//    }
-//
-//    private void validateRecommendation(RecommendationDto recommendation) {
-//        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
-//        List<RecommendationDto> recentRecommendations = recommendationRepository.findByAuthorIdAndReceiverIdAndCreatedAtAfter(
-//                recommendation.getAuthorId(), recommendation.getReceiverId(), sixMonthsAgo);
-//        if (!recentRecommendations.isEmpty()) {
-//            throw new DataValidationException("Cannot give another recommendation to this user within 6 months");
-//        }
-//    }
+            if (existingOffers.isEmpty()) {
+                skillOfferRepository.create(skillOffer.getSkillId(), recommendationDto.getId());
+            } else {
+//                TO-DO: create addGuarantor method
+            }
+        }
+    }
 }

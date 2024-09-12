@@ -18,6 +18,7 @@ import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -36,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,6 +45,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -65,6 +68,8 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    private long id;
+    private List<Long> ids;
     private long userId;
     private long authorId;
     private User user;
@@ -97,6 +102,11 @@ class UserServiceTest {
                 .email("test@mail.com")
                 .phone("123456")
                 .build();
+
+        id = 10L;
+        ids = List.of(id);
+
+        userDto = new UserDto();
 
         user = User.builder()
                 .id(userId)

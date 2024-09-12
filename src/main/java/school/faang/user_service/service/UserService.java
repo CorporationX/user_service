@@ -1,16 +1,20 @@
 package school.faang.user_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.event.ProfilePicEvent;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
@@ -28,11 +32,15 @@ import school.faang.user_service.validator.UserValidator;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final EntityHandler entityHandler;
@@ -65,6 +73,17 @@ public class UserService {
             profilePicEventPublisher.publish(new ProfilePicEvent(user.getId(), userAvatar.getOriginalFilename()));
         }
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    public void uploadAvatar(long userId, UserProfilePicDto userProfilePicDto) {
+        User user = userRepository.findById(userId).get();
+
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId(userProfilePicDto.getFileId());
+        userProfilePic.setSmallFileId(userProfilePicDto.getSmallFileId());
+        user.setUserProfilePic(userProfilePic);
+
+        userRepository.save(user);
     }
 
     @Transactional
@@ -155,10 +174,38 @@ public class UserService {
                 .forEach(goal -> goal.setMentor(mentee));
     }
 
+    @Transactional
+    public void deleteAvatar(long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            throw new EntityNotFoundException("there is no user with id: " + userId);
+        }
+
+        User user = userOptional.get();
+        UserProfilePic userProfilePic = user.getUserProfilePic();
+        userProfilePic.setSmallFileId(null);
+        userProfilePic.setFileId(null);
+        user.setUserProfilePic(userProfilePic);
+
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfilePicDto getAvatarKeys(long userId) {
+        userValidator.validateUserExistence(userId);
+
+        UserProfilePic userProfilePic = userRepository.findById(userId).get().getUserProfilePic();
+        if (userProfilePic == null) {
+            return new UserProfilePicDto("", "");
+        }
+        return new UserProfilePicDto(userProfilePic.getFileId(), userProfilePic.getSmallFileId());
+    }
+
     private void publishViewEventProfile(long userId, long authorId) {
         profileViewEventPublisher.publish(ProfileViewEvent.builder()
-                .userOwnerId(userId)
-                .viewId(authorId)
+                .viewedId(userId)
+                .viewerId(authorId)
                 .receivedAt(LocalDateTime.now())
                 .build());
     }

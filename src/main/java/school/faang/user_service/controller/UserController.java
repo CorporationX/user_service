@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -67,10 +70,26 @@ public class UserController {
         return userService.checkAllFollowersExist(followerIds);
     }
 
-    @PostMapping("/byIds")
+    @GetMapping("/byList")
     @ResponseStatus(HttpStatus.OK)
     public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    @PutMapping("/avatar/put")
+    public void uploadAvatar(@RequestHeader(value = "x-user-id") long userId,
+                             @RequestBody UserProfilePicDto userProfilePicDto) {
+        userService.uploadAvatar(userId, userProfilePicDto);
+    }
+
+    @DeleteMapping("/avatar/delete")
+    public void deleteAvatar(@RequestHeader(value = "x-user-id") long userId) {
+        userService.deleteAvatar(userId);
+    }
+
+    @GetMapping("avatar/keys")
+    public UserProfilePicDto getAvatarKeys(@RequestHeader(value = "x-user-id") long userId) {
+        return userService.getAvatarKeys(userId);
     }
 
     @GetMapping("/{userId}")

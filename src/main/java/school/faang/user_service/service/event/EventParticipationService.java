@@ -31,8 +31,7 @@ public class EventParticipationService {
     }
 
     private boolean isRegistered(long eventId, long userId) {
-        return eventRepository.findAllParticipantsByEventId(eventId).stream()
-                .anyMatch(e -> userId == e.getId());
+        return eventRepository.findAllParticipantsByEventId(eventId).stream().anyMatch(e -> userId == e.getId());
     }
 
     @Transactional(readOnly = true)

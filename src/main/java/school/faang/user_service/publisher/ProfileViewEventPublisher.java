@@ -1,32 +1,18 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.config.RedisConfig;
-import school.faang.user_service.dto.ProfileViewEvent;
-import school.faang.user_service.exception.WriteEntityAsStringException;
+import school.faang.user_service.event.ProfileViewEvent;
 
 @Component
-@RequiredArgsConstructor
-public class ProfileViewEventPublisher implements RedisConfig.MessagePublisher {
+public class ProfileViewEventPublisher extends EventPublisher<ProfileViewEvent> {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-
-    private final ChannelTopic profileViewTopic;
-
-    private final ObjectMapper objectMapper;
-
-    public void publish(ProfileViewEvent profileViewEvent) {
-        String jsonProfileViewEvent;
-        try {
-            jsonProfileViewEvent = objectMapper.writeValueAsString(profileViewEvent);
-        } catch (JsonProcessingException e) {
-            throw new WriteEntityAsStringException(profileViewEvent, e);
-        }
-        redisTemplate.convertAndSend(profileViewTopic.getTopic(), jsonProfileViewEvent);
+    public ProfileViewEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                     ObjectMapper objectMapper,
+                                     @Qualifier("profileViewTopic") ChannelTopic channelTopic) {
+        super(redisTemplate, objectMapper, channelTopic);
     }
 }

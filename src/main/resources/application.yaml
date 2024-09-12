@@ -24,6 +24,7 @@ spring:
       topic:
         userBan: user_ban
       channels:
+        mentorship-accepted-channel: mentorship_accepted_channel
         follower_channel:
           name: follower_view_channel
         profile_view_channel:

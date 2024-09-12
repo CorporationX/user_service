@@ -9,11 +9,10 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.listener.UserBanListener;
 import school.faang.user_service.dto.ProfileViewEvent;
+import school.faang.user_service.listener.UserBanListener;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,6 +34,8 @@ public class RedisConfig {
     private String mentorshipOfferedChannelName;
     @Value("${spring.data.redis.channels.profile_picture_channel.name}")
     private String profilePicture;
+    @Value("${spring.data.redis.channels.mentorship-accepted-channel}")
+    private String mentorshipAcceptedChannel;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewTopicName;
 
@@ -64,6 +65,11 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic mentorshipAcceptedChannelTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
+    }
+
+    @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -82,7 +88,7 @@ public class RedisConfig {
         return new ChannelTopic(profilePicture);
     }
 
-    @Bean
+    @Bean(name = "profileViewTopic")
     public ChannelTopic profileViewTopic() {
         return new ChannelTopic(profileViewTopicName);
     }

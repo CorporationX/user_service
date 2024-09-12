@@ -15,7 +15,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,23 +42,29 @@ public class GoalService {
     public Goal updateGoal(Goal goal) {
         validateTitle(goal);
         validateGoalSkillsExist(goal);
-        validateExistingGoalStatus(goal.getId());
+        validateExistingGoalStatus(goal);
 
-        Goal existingGoal = goalRepository.findById(goal.getId())
-                .orElseThrow();
+        Long goalId = goal.getId();
+        if (goal.getStatus() == GoalStatus.COMPLETED) {
+            Goal existingGoal = goalRepository.findById(goalId)
+                    .orElseThrow();
 
-        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
             existingGoal.setStatus(GoalStatus.COMPLETED);
+
             List<Skill> existingSkills = existingGoal.getSkillsToAchieve();
             List<User> existingUsers = existingGoal.getUsers();
             existingSkills.forEach(skill -> skill.getUsers().addAll(existingUsers));
+
+            return goalRepository.save(existingGoal);
+
         } else {
+            Goal existingGoal = goalRepository.findById(goalId)
+                    .orElseThrow();
             existingGoal.getSkillsToAchieve().clear();
             List<Skill> newSkills = goal.getSkillsToAchieve();
             existingGoal.getSkillsToAchieve().addAll(newSkills);
+            return goalRepository.save(existingGoal);
         }
-
-        return goalRepository.save(existingGoal);
     }
 
     public void deleteGoal(Long goalId) {
@@ -77,12 +82,12 @@ public class GoalService {
     public List<Goal> findGoalsByUser(Long userId, GoalFilterDto filterDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow();
-        List<Goal> userGoals = user.getGoals();
+        List<Goal> userGoal = user.getGoals();
 
         return goalFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .reduce(
-                        userGoals,
+                        userGoal,
                         (list, filter) -> filter.applyFilter(list, filterDto),
                         (list, filter) -> list
                 );
@@ -96,7 +101,7 @@ public class GoalService {
     }
 
     private void validateTitle(Goal goal) {
-        if (Objects.nonNull(goal.getTitle()) || goal.getTitle().isBlank()) {
+        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
             log.error("Title cannot be null or empty");
             throw new IllegalArgumentException("Title cannot be null or empty");
         }
@@ -121,11 +126,11 @@ public class GoalService {
                 });
     }
 
-    private void validateExistingGoalStatus(Long existingGoalId) {
-        Goal exsitingGoal = goalRepository.findById(existingGoalId)
+    private void validateExistingGoalStatus(Goal goal) {
+        Goal exsitingGoal = goalRepository.findById(goal.getId())
                 .orElseThrow();
         if (exsitingGoal.getStatus().equals(GoalStatus.COMPLETED)) {
-            log.error("It is impossible to change a completed goal={}", existingGoalId);
+            log.error("It is impossible to change a completed goal={}", exsitingGoal.getId());
             throw new IllegalArgumentException("It is impossible to change a completed goal");
         }
     }

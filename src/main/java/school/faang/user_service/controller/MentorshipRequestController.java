@@ -3,6 +3,8 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.*;
+import school.faang.user_service.mapper.RejectionMapper;
+import school.faang.user_service.mapper.RequestMapper;
 import school.faang.user_service.service.MentorshipRequestService;
 
 @Controller

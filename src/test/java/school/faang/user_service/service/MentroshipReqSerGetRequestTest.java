@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RequestFilter;
-import school.faang.user_service.dto.RequestMapper;
+import school.faang.user_service.mapper.RequestMapper;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;

@@ -3,7 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.Rejection;
 import school.faang.user_service.dto.RequestFilter;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -70,7 +70,7 @@ public class MentorshipRequestService {
         }
     }
 
-    public void rejectRequest(long id, RejectionDto rejection) {
+    public void rejectRequest(long id, Rejection rejection) {
         Optional<MentorshipRequest> requestOptional = repository.findById(id);
 
         if (requestOptional.isPresent()) {

@@ -15,4 +15,6 @@ public interface GoalService {
     List<Goal> findSubGoalsByParentGoalId(Long parentGoalId, GoalFilterDto filterDto);
 
     List<Goal> findGoalsByUserId(Long userId, GoalFilterDto filter);
+
+    void deleteGoalAndUnlinkChildren(Goal goal);
 }

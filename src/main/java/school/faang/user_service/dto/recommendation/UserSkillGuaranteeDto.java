@@ -10,10 +10,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SkillOfferDto {
+public class UserSkillGuaranteeDto {
     @Positive(message = "ID must be positive")
-    private Long skillId;
+    private long id;
 
-    @Positive(message = "RecommendationID must be positive")
-    private Long recommendationId;
+    @Positive(message = "UserID must be positive")
+    private long userId;
+
+    @Positive(message = "SkillID must be positive")
+    private long skillId;
+
+    @Positive(message = "GuarantorID must be positive")
+    private long guarantorId;
 }

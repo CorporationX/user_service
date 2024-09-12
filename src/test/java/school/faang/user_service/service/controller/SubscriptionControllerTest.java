@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class SubscriptionControllerTest {
+    private long followerId;
 
     @Mock
     private SubscriptionService subscriptionService;
@@ -33,12 +34,12 @@ class SubscriptionControllerTest {
 
     @BeforeEach
     void setUp() {
+        followerId = 1l;
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void shouldFollowUserSuccessfully() throws Exception, DataValidationException {
-        long followerId = 1L;
         long followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);
@@ -48,7 +49,6 @@ class SubscriptionControllerTest {
 
     @Test
     void shouldThrowExceptionWhenFollowYourself() throws DataValidationException, DataFormatException {
-        long followerId = 1L;
         long followeeId = 1L;
 
         assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
@@ -57,7 +57,6 @@ class SubscriptionControllerTest {
 
     @Test
     void shouldUnfollowUserSuccessfully() throws DataValidationException {
-        long followerId = 1L;
         long followeeId = 2L;
 
         subscriptionController.unfollowUser(followerId, followeeId);
@@ -67,7 +66,6 @@ class SubscriptionControllerTest {
 
     @Test
     void shouldThrowExceptionWhenUnfollowYourself() throws DataValidationException {
-        long followerId = 1L;
         long followeeId = 1L;
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> {
@@ -149,7 +147,6 @@ class SubscriptionControllerTest {
     }
     @Test
     public void testGetFollowersCount() {
-        long followerId = 1L;
         int expectedCount = 5;
 
         when(subscriptionService.getFollowersCount(followerId)).thenReturn(expectedCount);

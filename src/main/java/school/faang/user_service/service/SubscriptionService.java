@@ -19,7 +19,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
 
-    public void followUser(long followerId, long followeeId) throws DataValidationException, DataFormatException {
+    public void followUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Подписка уже существует");
         }
@@ -33,7 +33,7 @@ public class SubscriptionService {
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         List<UserDto> followers = subscriptionRepository.findByFolloweeId(followeeId)
                 .map(userMapper::userToUserDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return filterUsers(followers, filter);
     }
@@ -42,7 +42,7 @@ public class SubscriptionService {
         return users.stream()
                 .filter(user -> filter.getNamePattern() == null || user.getUsername().matches(filter.getNamePattern()))
                 .filter(user -> filter.getEmailPattern() == null || user.getEmail().matches(filter.getEmailPattern()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public int getFollowersCount(long followeeId) {
@@ -52,7 +52,7 @@ public class SubscriptionService {
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
         List<UserDto> following = subscriptionRepository.findByFollowerId(followeeId)
                 .map(userMapper::userToUserDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return filterUsers(following, filter);
     }

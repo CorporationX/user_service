@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 
 public class SubscriptionServiceTest {
-
+    private long followerId;
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
@@ -37,11 +37,11 @@ public class SubscriptionServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        followerId = 1L;
     }
 
     @Test
     void shouldFollowUserSuccessfully() throws Exception, DataValidationException {
-        long followerId = 1L;
         long followeeId = 2L;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
@@ -53,7 +53,6 @@ public class SubscriptionServiceTest {
 
     @Test
     void shouldThrowExceptionWhenSubscriptionAlreadyExists() {
-        long followerId = 1L;
         long followeeId = 2L;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
@@ -65,7 +64,6 @@ public class SubscriptionServiceTest {
 
     @Test
     void shouldUnfollowUserSuccessfully() {
-        long followerId = 1L;
         long followeeId = 2L;
 
         subscriptionService.unfollowUser(followerId, followeeId);
@@ -144,12 +142,14 @@ public class SubscriptionServiceTest {
         long followeeId = 1L;
         int expectedCount = 5;
 
-        when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId)).thenReturn(expectedCount);
+        when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId))
+                .thenReturn(expectedCount);
 
         int actualCount = subscriptionService.getFollowersCount(followeeId);
 
         assertEquals(expectedCount, actualCount);
-        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
+        verify(subscriptionRepository, times(1))
+                .findFollowersAmountByFolloweeId(followeeId);
     }
 
     @Test
@@ -180,7 +180,6 @@ public class SubscriptionServiceTest {
     }
     @Test
     void testGetFollowingCount() {
-        long followerId = 1L;
         int expectedCount = 5;
 
         when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId))

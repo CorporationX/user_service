@@ -1,7 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -10,20 +10,20 @@ import school.faang.user_service.service.SubscriptionService;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeeId) throws DataValidationException, DataFormatException {
+    public void followUser(long followerId, long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("Нельзя подписываться на самого себя.");
         }
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
+    public void unfollowUser(long followerId, long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("Нельзя отписываться от самого себя.");
         }

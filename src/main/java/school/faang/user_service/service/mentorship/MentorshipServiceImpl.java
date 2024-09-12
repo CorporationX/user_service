@@ -21,50 +21,26 @@ public class MentorshipServiceImpl implements MentorshipService {
     @Override
     public Collection<User> getMentees(@NonNull Long userId) {
         var user = findById(userId);
-        return user.getMentees().stream()
-                .toList();
+        return user.getMentees();
     }
 
     @Override
     public Collection<User> getMentors(@NonNull Long userId) {
         var user = findById(userId);
-        return user.getMentors().stream()
-                .toList();
+        return user.getMentors();
     }
 
     @Transactional
     public void deleteMentee(@NotNull Long menteeId, @NotNull Long mentorId) {
         var mentor = findById(mentorId);
-        var mentee = mentor.getMentees().stream()
-                .filter(u -> u.getId().equals(menteeId))
-                .findFirst()
-                .orElseThrow(
-                        () -> new UserNotFoundException(
-                                String.format(
-                                        "Mentee with id = [%d] is not a mentee of mentor with id = [%d]",
-                                        menteeId,
-                                        mentorId
-                                )
-                        )
-                );
+        var mentee = checkMentorOrMentee(mentor.getMentees(), mentorId, menteeId, "mentee");
         mentorshipRepository.delete(mentee.getId(), mentorId);
     }
 
     @Transactional
     public void deleteMentor(@NonNull Long menteeId, @NonNull Long mentorId) {
         var mentee = findById(menteeId);
-        var mentor = mentee.getMentors().stream()
-                .filter(u -> u.getId().equals(mentorId))
-                .findFirst()
-                .orElseThrow(
-                        () -> new UserNotFoundException(
-                                String.format(
-                                        "Mentor with id = [%d] is not a mentor of mentee with id = [%d]",
-                                        mentorId,
-                                        menteeId
-                                )
-                        )
-                );
+        var mentor = checkMentorOrMentee(mentee.getMentors(), menteeId, mentorId, "mentor");
         mentorshipRepository.delete(menteeId, mentor.getId());
     }
 
@@ -72,6 +48,20 @@ public class MentorshipServiceImpl implements MentorshipService {
         return userRepository.findById(userId)
                 .orElseThrow(
                         () -> new UserNotFoundException("User with id = [" + userId + "] not found")
+                );
+    }
+
+    private User checkMentorOrMentee(Collection<User> users, Long parentId, Long filteredId, String mentorship) {
+        return users.stream()
+                .filter(u -> u.getId().equals(filteredId))
+                .findFirst()
+                .orElseThrow(
+                        () -> new UserNotFoundException(
+                                String.format(
+                                        "User with id = [%d] is not a %s of user with id = [%d].",
+                                        filteredId, mentorship, parentId
+                                )
+                        )
                 );
     }
 }

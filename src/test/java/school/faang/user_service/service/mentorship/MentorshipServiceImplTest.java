@@ -14,6 +14,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
@@ -29,10 +30,10 @@ class MentorshipServiceImplTest {
     @InjectMocks
     MentorshipServiceImpl mentorshipService;
     private User user;
-    private final Long userId = 10L;
-    private final Long menteeId = 1L;
-    private final Long mentorId = 3L;
-    private final Long notExistingId = 20L;
+    private static final Long userId = 10L;
+    private static final Long menteeId = 1L;
+    private static final Long mentorId = 3L;
+    private static final Long notExistingId = 20L;
 
     @BeforeEach
     void init() {
@@ -76,9 +77,14 @@ class MentorshipServiceImplTest {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
 
-        assertThrows(
+        var result = assertThrows(
                 UserNotFoundException.class,
                 () -> mentorshipService.getMentees(userId)
+        );
+
+        assertEquals(
+                "User with id = [10] not found",
+                result.getMessage()
         );
     }
 
@@ -100,9 +106,14 @@ class MentorshipServiceImplTest {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
 
-        assertThrows(
+        var result = assertThrows(
                 UserNotFoundException.class,
                 () -> mentorshipService.getMentors(userId)
+        );
+
+        assertEquals(
+                "User with id = [10] not found",
+                result.getMessage()
         );
     }
 
@@ -118,13 +129,18 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testDeleteMenteeThrowsUserNotFoundExceptionIfMentorNotFound() {
+    void testDeleteMenteeThrowsUserNotFoundExceptionIfUserNotFound() {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
 
-        assertThrows(
+        var result = assertThrows(
                 UserNotFoundException.class,
                 () -> mentorshipService.deleteMentee(menteeId, userId)
+        );
+
+        assertEquals(
+                String.format("User with id = [%d] not found", userId),
+                result.getMessage()
         );
     }
 
@@ -133,9 +149,14 @@ class MentorshipServiceImplTest {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.ofNullable(user));
 
-        assertThrows(
+        var result = assertThrows(
                 UserNotFoundException.class,
                 () -> mentorshipService.deleteMentee(notExistingId, userId)
+        );
+
+        assertEquals(
+                String.format("User with id = [%d] is not a mentee of user with id = [%d].", notExistingId, userId),
+                result.getMessage()
         );
     }
 
@@ -151,13 +172,18 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testDeleteMentorThrowsUserNotFoundExceptionIfMenteeNotFound() {
+    void testDeleteMentorThrowsUserNotFoundExceptionIfUserNotFound() {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
 
-        assertThrows(
+        var result = assertThrows(
                 UserNotFoundException.class,
                 () -> mentorshipService.deleteMentor(userId, mentorId)
+        );
+
+        assertEquals(
+                String.format("User with id = [%d] not found", userId),
+                result.getMessage()
         );
     }
 
@@ -166,9 +192,14 @@ class MentorshipServiceImplTest {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.ofNullable(user));
 
-        assertThrows(
+        var result = assertThrows(
                 UserNotFoundException.class,
                 () -> mentorshipService.deleteMentor(userId, notExistingId)
+        );
+
+        assertEquals(
+                String.format("User with id = [%d] is not a mentor of user with id = [%d].", notExistingId, userId),
+                result.getMessage()
         );
     }
 }

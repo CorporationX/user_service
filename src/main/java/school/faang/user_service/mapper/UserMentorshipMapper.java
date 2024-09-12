@@ -16,5 +16,5 @@ public interface UserMentorshipMapper {
     @Mapping(source = "country.id", target = "countryId")
     UserMentorshipDto toDto(User user);
 
-    Collection<UserMentorshipDto> toDtoList(Collection<User> users);
+    Collection<UserMentorshipDto> toDtos(Collection<User> users);
 }

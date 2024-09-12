@@ -15,7 +15,7 @@ import java.util.Collection;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("mentorship")
+@RequestMapping("/mentorship")
 public class MentorshipController {
     private final MentorshipService mentorshipService;
     private final UserMentorshipMapper userMentorshipMapper;
@@ -23,12 +23,12 @@ public class MentorshipController {
 
     @GetMapping("/{userId}/mentees")
     public Collection<UserMentorshipDto> getMentees(@PathVariable("userId") Long userId) {
-        return userMentorshipMapper.toDtoList(mentorshipService.getMentees(userId));
+        return userMentorshipMapper.toDtos(mentorshipService.getMentees(userId));
     }
 
     @GetMapping("/{userId}/mentors")
     public Collection<UserMentorshipDto> getMentors(@PathVariable("userId") Long userId) {
-        return userMentorshipMapper.toDtoList(mentorshipService.getMentors(userId));
+        return userMentorshipMapper.toDtos(mentorshipService.getMentors(userId));
     }
 
     @DeleteMapping("/{mentorId}/mentees")

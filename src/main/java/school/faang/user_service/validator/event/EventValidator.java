@@ -11,13 +11,13 @@ public class EventValidator {
 
     private final EventParticipationRepository eventParticipationRepository;
 
-    public void checkIfRegisterParticipantThenThrowException(long userId) throws ValidationException {
+    public void checkIfUserRegisterOnEvent(long userId) throws ValidationException {
             if (eventParticipationRepository.existsById(userId)) {
                 throw new ValidationException("Пользователь уже зарегистрирован");
             }
     }
 
-    public void checkIfUnregisterParticipantThenThrowException(long userId) throws ValidationException {
+    public void checkIfUserUnregisterOnEvent(long userId) throws ValidationException {
         if (!eventParticipationRepository.existsById(userId)) {
             throw new ValidationException("Пользователь ещё не зарегистрирован");
         }

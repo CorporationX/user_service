@@ -19,9 +19,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
+
+    private final long ID = 1L;
 
     @InjectMocks
     private EventParticipationService eventParticipationService;
@@ -45,18 +46,18 @@ class EventParticipationServiceTest {
         @DisplayName("Ошибка при регистрации если пользователь уже зарегистрирован")
         void testRegisterParticipantIfUserExists() {
             doThrow(new ValidationException("Пользователь уже зарегистрирован")).
-                    when(userValidator).userIdIsNotNullOrElseThrowValidationException(1L);
+                    when(userValidator).checkUserIdIsNotNull(ID);
             assertThrows(ValidationException.class,
-                    () -> eventParticipationService.registerParticipant(1L, 1L));
+                    () -> eventParticipationService.registerParticipant(ID, ID));
         }
 
         @Test
         @DisplayName("Ошибка при отмене регистрации если пользователь уже зарегистрирован")
         void testUnregisterParticipantIfUserNoExists() {
             doThrow(new ValidationException("Пользователь ещё не зарегистрирован")).
-                    when(userValidator).userIdIsNotNullOrElseThrowValidationException(1L);
+                    when(userValidator).checkUserIdIsNotNull(ID);
             assertThrows(ValidationException.class,
-                    () -> eventParticipationService.unregisterParticipant(1L, 1L));
+                    () -> eventParticipationService.unregisterParticipant(ID, ID));
         }
     }
 
@@ -66,40 +67,47 @@ class EventParticipationServiceTest {
         @Test
         @DisplayName("Успешная регистрация")
         void testRegisterParticipant() {
-            eventParticipationService.registerParticipant(1L, 1L);
-            verify(userValidator).userIdIsNotNullOrElseThrowValidationException(1L);
-            verify(eventValidator).checkIfRegisterParticipantThenThrowException(1L);
-            verify(eventParticipationRepository).register(1L, 1L);
+            eventParticipationService.registerParticipant(ID, ID);
+
+            verify(userValidator).checkUserIdIsNotNull(ID);
+            verify(eventValidator).checkIfUserRegisterOnEvent(ID);
+            verify(eventParticipationRepository).register(ID, ID);
         }
 
         @Test
         @DisplayName("Успешная отмена регистрации")
         void testUnregisterParticipant() {
-            eventParticipationService.unregisterParticipant(1L, 1L);
-            verify(userValidator).userIdIsNotNullOrElseThrowValidationException(1L);
-            verify(eventValidator).eventIdIsNotNullOrElseThrowValidationException(1L);
-            verify(eventParticipationRepository).unregister(1L, 1L);
+            eventParticipationService.unregisterParticipant(ID, ID);
+
+            verify(userValidator).checkUserIdIsNotNull(ID);
+            verify(eventValidator).eventIdIsNotNullOrElseThrowValidationException(ID);
+            verify(eventValidator).checkIfUserUnregisterOnEvent(ID);
+            verify(eventParticipationRepository).unregister(ID, ID);
         }
 
         @Test
         @DisplayName("Успешное получение списка всех участников события")
         void testGetParticipant() {
+
             List<User> users = List.of(User.builder()
-                    .id(1L)
+                    .id(ID)
                     .build());
-            when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(users);
-            eventParticipationService.getParticipant(1L);
-            verify(eventValidator).checkIfUnregisterParticipantThenThrowException(1L);
-            verify(eventParticipationRepository).findAllParticipantsByEventId(1L);
+
+            when(eventParticipationRepository.findAllParticipantsByEventId(ID))
+                    .thenReturn(users);
+            eventParticipationService.getParticipant(ID);
+
+            verify(eventValidator).eventIdIsNotNullOrElseThrowValidationException(ID);
+            verify(eventParticipationRepository).findAllParticipantsByEventId(ID);
             verify(userMapper).toDtos(users);
         }
 
         @Test
         @DisplayName("Успешное получение количетва участников события")
         void testGetParticipantCount() {
-            eventParticipationService.getParticipantCount(1L);
-            verify(eventValidator).eventIdIsNotNullOrElseThrowValidationException(1L);
-            verify(eventParticipationRepository).countParticipants(1L);
+            eventParticipationService.getParticipantCount(ID);
+            verify(eventValidator).eventIdIsNotNullOrElseThrowValidationException(ID);
+            verify(eventParticipationRepository).countParticipants(ID);
         }
     }
 }

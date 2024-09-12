@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserValidator {
 
-    public void userIdIsNotNullOrElseThrowValidationException(Long userId)  {
+    public void checkUserIdIsNotNull(Long userId) {
         if (userId == null) {
             throw new ValidationException("User id can't be null");
         }

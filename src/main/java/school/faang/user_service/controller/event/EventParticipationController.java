@@ -1,19 +1,15 @@
 package school.faang.user_service.controller.event;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/event")
+@RequestMapping("v1/events")
 @RequiredArgsConstructor
 public class EventParticipationController {
 
@@ -32,13 +28,13 @@ public class EventParticipationController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/participant")
+    @GetMapping("/participants")
     public List<UserDto> getParticipant(@RequestParam("eventId") Long eventId) {
         return eventParticipationService.getParticipant(eventId);
     }
 
-    @GetMapping("/participant/all{eventId}")
-    public Integer getParticipantCount(@PathVariable Long eventId) {
+    @GetMapping("/{eventId}/participants/count")
+    public int getParticipantCount(@PathVariable Long eventId) {
         return eventParticipationService.getParticipantCount(eventId);
     }
 }

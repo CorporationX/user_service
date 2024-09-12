@@ -19,7 +19,7 @@ class UserValidatorTest {
     @DisplayName("Ошибка валидации если передели null")
     void testUserIdIsNullOrElseThrowValidationException() {
         assertThrows(ValidationException.class,
-                () -> userValidator.userIdIsNotNullOrElseThrowValidationException(null),
+                () -> userValidator.checkUserIdIsNotNull(null),
                 "User id can't be null");
     }
 }

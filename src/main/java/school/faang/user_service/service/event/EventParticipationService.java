@@ -9,9 +9,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.validator.user.UserValidator;
 
-import javax.xml.bind.ValidationException;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +21,21 @@ public class EventParticipationService {
     private final EventValidator eventValidator;
 
     public void registerParticipant(long eventId, long userId) {
-        userValidator.userIdIsNotNullOrElseThrowValidationException(userId);
+        userValidator.checkUserIdIsNotNull(userId);
         eventValidator.eventIdIsNotNullOrElseThrowValidationException(eventId);
-        eventValidator.checkIfRegisterParticipantThenThrowException(userId);
+        eventValidator.checkIfUserRegisterOnEvent(userId);
         eventParticipationRepository.register(eventId, userId);
     }
 
     public void unregisterParticipant(long eventId, long userId) {
-        userValidator.userIdIsNotNullOrElseThrowValidationException(userId);
+        userValidator.checkUserIdIsNotNull(userId);
         eventValidator.eventIdIsNotNullOrElseThrowValidationException(eventId);
-        eventValidator.checkIfUnregisterParticipantThenThrowException(userId);
+        eventValidator.checkIfUserUnregisterOnEvent(userId);
         eventParticipationRepository.unregister(eventId, userId);
     }
 
     public List<UserDto> getParticipant(Long eventId) {
-        eventValidator.checkIfUnregisterParticipantThenThrowException(eventId);
+        eventValidator.eventIdIsNotNullOrElseThrowValidationException(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId
                 (eventId);
         return userMapper.toDtos(users);

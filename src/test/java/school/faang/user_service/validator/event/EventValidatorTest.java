@@ -9,12 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EventValidatorTest {
+
+    private final long ID = 1L;
 
     @InjectMocks
     private EventValidator eventValidator;
@@ -25,18 +26,17 @@ class EventValidatorTest {
     @Test
     @DisplayName("Ошибка если пользователь уже зарегистрирован")
     void testCheckIfRegisterParticipantThenThrowException() {
-        when(eventParticipationRepository.existsById(1L)).thenReturn(true);
+        when(eventParticipationRepository.existsById(ID)).thenReturn(true);
         assertThrows(ValidationException.class,
-                () -> eventValidator.checkIfRegisterParticipantThenThrowException(1L));
+                () -> eventValidator.checkIfUserRegisterOnEvent(ID));
     }
-
 
     @Test
     @DisplayName("Ошибка если пользователь ещё не зарегистрирован")
     void testCheckIfUnregisterParticipantThenThrowException() {
         when(!eventParticipationRepository.existsById(1L)).thenReturn(false);
         assertThrows(ValidationException.class,
-                () -> eventValidator.checkIfUnregisterParticipantThenThrowException(1L));
+                () -> eventValidator.checkIfUserUnregisterOnEvent(ID));
     }
 
     @Test

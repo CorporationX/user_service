@@ -9,11 +9,10 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.listener.UserBanListener;
 import school.faang.user_service.dto.ProfileViewEvent;
+import school.faang.user_service.listener.UserBanListener;
 
 @Configuration
 @RequiredArgsConstructor
@@ -89,7 +88,7 @@ public class RedisConfig {
         return new ChannelTopic(profilePicture);
     }
 
-    @Bean
+    @Bean(name = "profileViewTopic")
     public ChannelTopic profileViewTopic() {
         return new ChannelTopic(profileViewTopicName);
     }

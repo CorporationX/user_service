@@ -7,19 +7,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
-import school.faang.user_service.dto.ProfileViewEvent;
-import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
-import school.faang.user_service.redisPublisher.ProfilePicEventPublisher;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -49,6 +49,7 @@ public class UserService {
     public UserDto getUser(long userId, long authorId) {
         User user = entityHandler.getOrThrowException(User.class, userId, () -> userRepository.findById(userId));
         profileViewEventPublisher.publish(new ProfileViewEvent(authorId, userId, LocalDateTime.now()));
+        publishViewEventProfile(userId, authorId);
         return userMapper.toDto(user);
     }
 
@@ -152,5 +153,13 @@ public class UserService {
         mentee.getGoals().stream()
                 .filter(goal -> goal.getMentor().equals(mentor))
                 .forEach(goal -> goal.setMentor(mentee));
+    }
+
+    private void publishViewEventProfile(long userId, long authorId) {
+        profileViewEventPublisher.publish(ProfileViewEvent.builder()
+                .userOwnerId(userId)
+                .viewId(authorId)
+                .receivedAt(LocalDateTime.now())
+                .build());
     }
 }

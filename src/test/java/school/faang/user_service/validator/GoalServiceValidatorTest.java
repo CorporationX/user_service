@@ -1,4 +1,4 @@
-package school.faang.user_service.service.validator;
+package school.faang.user_service.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +12,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.service.goal.SkillService;
-import school.faang.user_service.validator.GoalServiceValidate;
 
 
 import java.util.Collections;

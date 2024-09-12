@@ -14,12 +14,12 @@ public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
 
     @Transactional
-    public void deleteMentorFromMentees(long mentorId, List<User> mentees) {
+    public void deleteMentorFromMentees(Long mentorId, List<User> mentees) {
         mentees.forEach(mentee -> {
-            mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+            mentee.getMentors().removeIf(mentor -> mentor.getId().equals(mentorId));
             mentee.getGoals()
                     .stream()
-                    .filter(goal -> goal.getMentor().getId() == mentorId)
+                    .filter(goal -> goal.getMentor().getId().equals(mentorId))
                     .forEach(goal -> goal.setMentor(mentee));
         });
 

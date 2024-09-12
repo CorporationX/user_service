@@ -13,7 +13,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private GoalRepository goalRepository;
+    private GoalService goalService;
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -81,7 +81,7 @@ public class UserServiceTest {
         userService.deactivateUser(userId);
 
         verify(userRepository).findById(userId);
-        verify(goalRepository).delete(userGoals.get(0));
+        verify(goalService).deleteGoalAndUnlinkChildren(userGoals.get(0));
         verify(eventRepository).save(userEvents.get(0));
         verify(eventRepository).delete(userEvents.get(0));
         verify(mentorshipService).deleteMentorFromMentees(userId, user.getMentees());

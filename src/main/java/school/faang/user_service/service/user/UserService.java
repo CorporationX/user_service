@@ -11,17 +11,16 @@ import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final GoalRepository goalRepository;
+    private final GoalService goalService;
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
 
@@ -44,7 +43,7 @@ public class UserService {
     private void removeUserGoals(User user) {
         for (Goal goal : user.getGoals()) {
             if (goal.getUsers().size() == 1) {
-                goalRepository.delete(goal);
+                goalService.deleteGoalAndUnlinkChildren(goal);
             }
 
             goal.getUsers().remove(user);

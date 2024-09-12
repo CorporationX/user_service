@@ -26,7 +26,7 @@ public class UserService {
 
     @Transactional
     public void deactivateUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = findById(userId);
 
         if (!user.isActive()) {
             throw new UserDeactivatedException();
@@ -38,6 +38,11 @@ public class UserService {
 
         user.setActive(false);
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User findById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
     private void removeUserGoals(User user) {

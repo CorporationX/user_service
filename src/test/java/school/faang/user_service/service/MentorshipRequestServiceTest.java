@@ -10,10 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.EmptyResultDataAccessException;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.dto.RequestMapper;
+import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -76,7 +73,7 @@ class MentorshipRequestServiceTest {
     @Test
     void getRequests() {
         // Given
-        RequestFilterDto filterDto = new RequestFilterDto("Test Description", 1L, 2L, RequestStatus.ACCEPTED);
+        RequestFilter filterDto = new RequestFilter("Test Description", 1L, 2L, RequestStatus.ACCEPTED);
         MentorshipRequest requestFilter = new MentorshipRequest();  // Returned by requestMapper.toEntity(filter)
         requestFilter.setRequester( User.builder().id(1L).build());
         requestFilter.setReceiver( User.builder().id(2L).build());
@@ -97,7 +94,6 @@ class MentorshipRequestServiceTest {
 
         // Then
         verify(repository, times(1)).getRequests();  // Ensure repository.getRequests() was called once
-        verify(requestMapper, times(1)).toEntity(filterDto);  // Ensure requestMapper was called
 
     }
 
@@ -105,7 +101,7 @@ class MentorshipRequestServiceTest {
     @Test
     void testGetRequestsWithEmptyRepository() {
         // Given
-        RequestFilterDto filterDto = new RequestFilterDto("Test Description", 1L, 2L, RequestStatus.ACCEPTED);
+        RequestFilter filterDto = new RequestFilter("Test Description", 1L, 2L, RequestStatus.ACCEPTED);
         when(repository.getRequests()).thenReturn(Optional.empty());
 
         // When

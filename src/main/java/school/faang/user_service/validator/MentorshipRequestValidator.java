@@ -15,13 +15,11 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class MentorshipRequestValidator implements Validator<MentorshipRequestDto> {
-
+public class MentorshipRequestValidator  {
 
     private final MentorshipRequestRepository repository;
     private final Predicates predicates;
 
-    @Override
     public ValidationResult validate(MentorshipRequestDto mentorshipRequestDto) {
         Optional<PredicateResult> failedPredicate = predicates.mentorshipRequestPredicates
                 .stream()

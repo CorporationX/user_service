@@ -17,20 +17,21 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 @Component
 //@NoArgsConstructor
 @RequiredArgsConstructor
 public class Predicates {
-    public final String REQUEST_AND_RECEIVER_HAS_SAME_ID = "user can not request mentorschihp to himself";
-    public final String USERS_NOT_EXIST_IN_DATABASE = "user are not exists in database";
-    public final String REQUEST_TIME_EXEEDED = "The request was updated within the last 3 months.";
-    public final String REQUEST_WAS_NOT_FOUND = "request was not found";
+    public static final String REQUEST_AND_RECEIVER_HAS_SAME_ID = "user can not request mentorschihp to himself";
+    public static final String USERS_NOT_EXIST_IN_DATABASE = "user are not exists in database";
+    public static final String REQUEST_TIME_EXEEDED = "The request was updated within the last 3 months.";
+    public static final String REQUEST_WAS_NOT_FOUND = "request was not found";
+    public static final String REQUESTER_ID_DONT_MATCH = "authors are not match";
+    public static final String RECEIVER_ID_DONT_MATCH = "receiver are not match";
+    public static final String STATUS_DONT_MATCH = "status are not match";
 
     public final BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult> userExistsPredicate = (repository, dto) -> {
-        if (dto.getRequesterId()==null){
+        if (dto.getRequesterId() == null) {
             return new NotApplicable();
         }
         if (repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())) {
@@ -41,18 +42,18 @@ public class Predicates {
     };
 
     public final BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult> sameUserPredicate = (repository, dto) -> {
-        if (dto.getRequesterId() == null || dto.getReceiverId() == null){
+        if (dto.getRequesterId() == null || dto.getReceiverId() == null) {
             return new NotApplicable();
         }
         if (Objects.equals(dto.getRequesterId(), dto.getReceiverId())) {
-            return new PredicateFalse( REQUEST_AND_RECEIVER_HAS_SAME_ID);
+            return new PredicateFalse(REQUEST_AND_RECEIVER_HAS_SAME_ID);
         } else {
             return new PredicateTrue();
         }
     };
 
     public final BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult> requestTimeExceededPredicate = (repository, dto) -> {
-        if (dto.getCreatedAt() == null || dto.getUpdatedAt() == null){
+        if (dto.getCreatedAt() == null || dto.getUpdatedAt() == null) {
             return new NotApplicable();
         }
         Optional<MentorshipRequest> request = repository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId());
@@ -61,27 +62,56 @@ public class Predicates {
         } else if (request.get().getUpdatedAt().isBefore(LocalDateTime.now().minus(3, ChronoUnit.MONTHS))) {
             return new PredicateTrue();
         } else {
-            return new PredicateFalse( REQUEST_TIME_EXEEDED);
+            return new PredicateFalse(REQUEST_TIME_EXEEDED);
         }
     };
 
     public final List<BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult>>
-            mentorshipRequestPredicates = List.of(userExistsPredicate,requestTimeExceededPredicate,sameUserPredicate);
+            mentorshipRequestPredicates = List.of(userExistsPredicate, requestTimeExceededPredicate, sameUserPredicate);
 
-    public final Predicate<MentorshipRequest> isDescriptionEmptyPredicate = (request) -> {
-        return request.getDescription().isEmpty();
+    public final BiFunction<MentorshipRequest, RequestFilter, PredicateResult> isDescriptionEmptyPredicate = (request, filter) -> {
+        if (filter.getDescription() == null || filter.getDescription().isEmpty()) {
+            return new NotApplicable();
+        } else {
+            return new PredicateTrue();
+        }
     };
 
-    public final BiPredicate<MentorshipRequest, RequestFilter> areAuthorsMatch = (request, filter) -> {
-        return request.getRequester().getId().equals(filter.getRequesterId());
+    public final BiFunction<MentorshipRequest, RequestFilter, PredicateResult> areAuthorsMatch = (request, filter) -> {
+        if (filter.getRequesterId() == null) {
+            return new NotApplicable();
+        }
+        if (request.getRequester().getId().equals(filter.getRequesterId())) {
+            return new PredicateTrue();
+        } else {
+            return new PredicateFalse(REQUESTER_ID_DONT_MATCH);
+        }
     };
 
-    public final BiPredicate<MentorshipRequest, RequestFilter> isRecieverMatch = (request, filter) -> {
-        return request.getReceiver().getId().equals(filter.getReceiverId());
+    public final BiFunction<MentorshipRequest, RequestFilter, PredicateResult> isRecieverMatch = (request, filter) -> {
+        if (filter.getReceiverId() == null) {
+            return new NotApplicable();
+        }
+        if (request.getReceiver().getId().equals(filter.getReceiverId())) {
+            return new PredicateTrue();
+        } else {
+            return new PredicateFalse(RECEIVER_ID_DONT_MATCH);
+        }
     };
 
-    public final BiPredicate<MentorshipRequest, RequestFilter> isStatusMatch = (request, filter) -> {
-        return request.getStatus().equals(filter.getStatus());
+    public final BiFunction<MentorshipRequest, RequestFilter, PredicateResult> isStatusMatch = (request, filter) -> {
+        if (filter.getStatus() == null) {
+            return new NotApplicable();
+        }
+        if (request.getStatus().equals(filter.getStatus())) {
+            return new PredicateTrue();
+        } else {
+            return new PredicateFalse(STATUS_DONT_MATCH);
+        }
     };
+
+    public final List<BiFunction<MentorshipRequest, RequestFilter, PredicateResult>> requestsFilterList =
+            List.of(areAuthorsMatch, isRecieverMatch, isStatusMatch);
+
 
 }

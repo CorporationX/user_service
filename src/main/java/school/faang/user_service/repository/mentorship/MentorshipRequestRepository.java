@@ -1,13 +1,10 @@
 package school.faang.user_service.repository.mentorship;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,26 +30,5 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
             AND receiver_id = :receiverId AND status = 1) 
             """)
     boolean existAcceptedRequest(long requesterId, long receiverId);
-
-
-    @Query(nativeQuery = true, value = """
-                SELECT * FROM mentorship_request 
-            """)
-    Optional<List<MentorshipRequest>> getRequests();
-
-    MentorshipRequest getMentorshipRequestById(Long id);
-
-    @Modifying
-    @Query(nativeQuery = true, value = """
-                UPDATE mentorship_request m SET m.status = :status WHERE id = : id
-            """)
-    MentorshipRequest updateMentorshipRequestStatusByRequesterId(Long id, RequestStatus status);
-
-    @Modifying
-    @Query(nativeQuery = true, value = """
-                UPDATE mentorship_request m SET m.status = :status , m.rejection_reason = rejectionReason 
-                                            WHERE id = : id
-            """)
-    MentorshipRequest updateMentorshipRequestStatusWithReasonByRequesterId(Long id, RequestStatus status, String rejectionReason);
 
 }

@@ -15,6 +15,7 @@ import school.faang.user_service.validator.validatorResult.NotValidated;
 import school.faang.user_service.validator.validatorResult.Validated;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
@@ -58,17 +59,26 @@ public class MentorshipRequestService {
     }
 
     public void acceptRequest(long id) throws Exception {
-        MentorshipRequest request = repository.getMentorshipRequestById(id);
-        if (request.getStatus() != ACCEPTED) {
-            repository.updateMentorshipRequestStatusByRequesterId(id, ACCEPTED);
-        } else if (request.getStatus() == ACCEPTED) {
+
+        Optional<MentorshipRequest> requestOptional = repository.findById(id);
+        if (requestOptional.isPresent() && requestOptional.get().getStatus() != ACCEPTED) {
+            var request = requestOptional.get();
+            request.setStatus(ACCEPTED);
+            repository.save(request);
+        } else if (requestOptional.isPresent() && requestOptional.get().getStatus() == ACCEPTED) {
             throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
         }
     }
 
     public void rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = repository.getMentorshipRequestById(id);
-        repository.updateMentorshipRequestStatusWithReasonByRequesterId(id, REJECTED, rejection.getReason());
+        Optional<MentorshipRequest> requestOptional = repository.findById(id);
+
+        if (requestOptional.isPresent()) {
+            var request = requestOptional.get();
+            request.setStatus(REJECTED);
+            request.setRejectionReason(rejection.getReason());
+            repository.save(request);
+        }
 
     }
 

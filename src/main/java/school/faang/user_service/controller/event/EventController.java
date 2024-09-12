@@ -27,6 +27,7 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
+    //TODO Murzin34 Перенести маппинг из сервиса в контроллер.
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventDto createEvent(@RequestBody @Valid EventDto eventDto) {

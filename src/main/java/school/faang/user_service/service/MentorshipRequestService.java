@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
@@ -31,7 +30,7 @@ public class MentorshipRequestService {
     public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        val response = mentorshipRequestValidator.validate(mentorshipRequestDto);
+        var response = mentorshipRequestValidator.validate(mentorshipRequestDto);
         if (!(response instanceof Validated)) {
             System.out.println(((NotValidated) response).getMessage());
         } else {

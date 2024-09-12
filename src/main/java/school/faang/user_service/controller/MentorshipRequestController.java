@@ -7,13 +7,11 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.RequestMapper;
 import school.faang.user_service.service.MentorshipRequestService;
-import school.faang.user_service.validator.MentorshipRequestValidator;
 
 @Controller
 @RequiredArgsConstructor
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
-    private final MentorshipRequestValidator mentorshipRequestValidator;
     private final RequestMapper requestMapper;
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {

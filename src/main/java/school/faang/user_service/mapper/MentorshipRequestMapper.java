@@ -10,6 +10,7 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 
 import java.util.List;
 
@@ -20,10 +21,17 @@ public interface MentorshipRequestMapper {
     @Mapping(source = "receiver.id", target = "userReceiverId")
     MentorshipRequestDto toDto(MentorshipRequest mentorshipRequest);
 
-    @Mapping(target = "requester", ignore = true)
-    @Mapping(target = "receiver", ignore = true)
+    @Mapping(source = "userRequesterId", target = "requester", qualifiedByName = "userCreator")
+    @Mapping(source = "userReceiverId", target = "receiver", qualifiedByName = "userCreator")
     @Mapping(source = "status", target = "status", qualifiedByName = "map")
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
+
+    @Named("userCreator")
+    default User creator(Long id){
+        User user = new User();
+        user.setId(id);
+        return user;
+    }
 
     @Named("map")
     default RequestStatus convert(String str) {
@@ -32,7 +40,7 @@ public interface MentorshipRequestMapper {
 
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")
-    List<RequestFilterDto> toDto(List<MentorshipRequest> requests);
+    List<MentorshipRequestDto> toDto(List<MentorshipRequest> requests);
 
     @Mapping(source = "id", target = "requestId")
     @Mapping(source = "requester.id", target = "requesterId")

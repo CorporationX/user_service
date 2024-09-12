@@ -20,14 +20,14 @@ public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
     private final UserMapper userMapper;
 
-    @PostMapping(path = "/{eventId}/register")
-    public void registerParticipant(@PathVariable("eventId") long eventId, @RequestBody UserDto userDto) {
-        eventParticipationService.registerParticipant(eventId, userDto.getId());
+    @PostMapping(path = "/{eventId}/register/{userId}")
+    public void registerParticipant(@PathVariable("eventId") long eventId, @PathVariable("userId") long userId) {
+        eventParticipationService.registerParticipant(eventId, userId);
     }
 
-    @PostMapping(path = "/{eventId}/unregister")
-    public void unregisterParticipant(@PathVariable("eventId") long eventId, @RequestBody UserDto userDto) {
-        eventParticipationService.unregisterParticipant(eventId, userDto.getId());
+    @PostMapping(path = "/{eventId}/unregister/{userId}")
+    public void unregisterParticipant(@PathVariable("eventId") long eventId, @PathVariable("userId") long userId) {
+        eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
     @GetMapping(path = "/{eventId}/getParticipants")

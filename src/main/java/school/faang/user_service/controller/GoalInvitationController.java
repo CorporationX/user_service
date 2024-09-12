@@ -1,7 +1,7 @@
-package school.faang.user_service.controller.goal;
+package school.faang.user_service.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,23 +23,9 @@ public class GoalInvitationController {
 
     private final GoalInvitationService service;
 
-    @PostMapping(value = "/create",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto goalInvitationDto) {
-
-        if (goalInvitationDto.getInviterId() == null) {
-            throw new GoalInvitationValidationException("InviterId must not be null");
-        }
-
-        if (goalInvitationDto.getInvitedUserId() == null) {
-            throw new GoalInvitationValidationException("InvitedUserId must not be null");
-        }
-
-        if (goalInvitationDto.getGoalId() == null) {
-            throw new GoalInvitationValidationException("GoalId must not be null");
-        }
-
+    @PostMapping(value = "/create")
+    public @Validated(GoalInvitationDto.AfterCreate.class) GoalInvitationDto createInvitation(
+            @Validated(GoalInvitationDto.BeforeCreate.class) @RequestBody GoalInvitationDto goalInvitationDto) {
         return service.createInvitation(goalInvitationDto);
     }
 
@@ -53,9 +39,7 @@ public class GoalInvitationController {
         service.rejectGoalInvitation(goalId);
     }
 
-    @GetMapping(value = "/invitations",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/invitations")
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
 
         if (filter == null) {

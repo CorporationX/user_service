@@ -5,44 +5,45 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.event.EventServiceImpl;
+
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class EventController {
 
-    private final EventService eventService;
+    private final EventServiceImpl eventServiceImpl;
 
     public EventDto create(EventDto event) {
         validateForCreate(event);
-        eventService.create(event);
+        eventServiceImpl.create(event);
         return event;
     }
 
     public EventDto getEvent(long id) {
-        return eventService.getEvent(id);
+        return eventServiceImpl.getEvent(id);
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-      return (List<EventDto>) eventService.getEventsByFilter(filter);
+      return eventServiceImpl.getEventsByFilter(filter);
     }
 
     public void deleteEvent(long eventId) {
-        eventService.deleteEvent(eventId);
+        eventServiceImpl.deleteEvent(eventId);
     }
 
     public void updateEvent(EventDto event) {
         validateForUpdate(event);
-        eventService.updateEvent(event);
+        eventServiceImpl.updateEvent(event);
     }
 
     public List<EventDto> getOwnedEvents(long userId) {
-        return eventService.getOwnedEvents(userId);
+        return eventServiceImpl.getOwnedEvents(userId);
     }
 
     public List<EventDto> getParticipatedEvents(long userId) {
-       return eventService.getParticipatedEvents(userId);
+       return eventServiceImpl.getParticipatedEvents(userId);
     }
 
     private void validateForCreate(EventDto event) {

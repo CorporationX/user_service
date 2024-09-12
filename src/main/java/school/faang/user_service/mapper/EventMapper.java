@@ -1,14 +1,11 @@
 package school.faang.user_service.mapper;
 
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.repository.UserRepository;
+
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface EventMapper {
@@ -18,4 +15,6 @@ public interface EventMapper {
     Event toEntity(EventDto eventDto);
 
     List<EventDto> toDtoList(List<Event> events);
+
+    EventDto toDtoOp(Optional<Event> event);
 }

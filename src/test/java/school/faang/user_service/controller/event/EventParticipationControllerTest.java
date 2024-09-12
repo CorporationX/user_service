@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.event.EventParticipationServiceImpl;
 
+
 @ExtendWith(SpringExtension.class)
 class EventParticipationControllerTest {
     @Mock

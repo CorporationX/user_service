@@ -42,6 +42,7 @@ class GoalServiceTest {
         private final static int USER_ACTIVE_GOALS_FINAL_SIZE_IS_ZERO = 0;
         private final static int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ZERO = 0;
         private final static int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ONE = 1;
+        private final static int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO = 2;
 
         private final static long USER_ID_ONE = 1L;
         private final static long USER_ID_TWO = 2L;
@@ -91,6 +92,8 @@ class GoalServiceTest {
 
             activeGoal.setUsers(users);
 
+            assertEquals(ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO, activeGoal.getUsers().size());
+
             goalService.deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user1);
 
             verify(goalInvitationService)
@@ -108,6 +111,8 @@ class GoalServiceTest {
             users.add(user1);
 
             activeGoal.setUsers(users);
+
+            assertEquals(ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO, activeGoal.getUsers().size());
 
             goalService.deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user1);
 

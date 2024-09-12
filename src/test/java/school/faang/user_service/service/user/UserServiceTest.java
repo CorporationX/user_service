@@ -43,7 +43,8 @@ class UserServiceTest {
     private MentorshipService mentorshipService;
 
     private static long USER_ID_IS_ONE = 1L;
-    private static int USER_MENTEES_FINAL_SIZE = 0;
+    private static int USER_MENTEES_SIZE_IS_ZERO = 0;
+    private static int USER_MENTEES_SIZE_IS_ONE = 1;
 
     @Nested
     class NegativeTests {
@@ -83,6 +84,8 @@ class UserServiceTest {
             when(userRepository.findById(anyLong()))
                     .thenReturn(Optional.of(user));
 
+            assertEquals(USER_MENTEES_SIZE_IS_ONE, user.getMentees().size());
+
             userService.deactivateAccount(USER_ID_IS_ONE);
 
             verify(userValidator)
@@ -99,7 +102,7 @@ class UserServiceTest {
                     .removeUserFromListHisMentees(user);
 
             assertFalse(user.isActive());
-            assertEquals(USER_MENTEES_FINAL_SIZE, user.getMentees().size());
+            assertEquals(USER_MENTEES_SIZE_IS_ZERO, user.getMentees().size());
         }
     }
 }

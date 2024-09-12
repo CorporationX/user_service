@@ -32,6 +32,7 @@ public class GoalService {
                         goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
                     }
                 });
+
         user.getGoals().clear();
     }
 

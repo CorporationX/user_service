@@ -20,16 +20,12 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.repository.mentorship.filter.DescriptionFilter;
 import school.faang.user_service.repository.mentorship.filter.MentorshipRequestFilter;
-import school.faang.user_service.repository.mentorship.filter.RequesterNameFilter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -213,72 +209,6 @@ public class MentorshipRequestServiceTest {
 
         return requests;
     }
-
-
-
-//    @Test
-//    public void testGetRequestsWithNullFilter() {
-//        List<MentorshipRequest> requests = prepareRequests();
-//
-//        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
-//        List<MentorshipRequest> result = mentorshipRequestService.getRequests(null);
-//        assertEquals(requests, result);
-//    }
-//
-//    @Test
-//    public void testGetRequestsWithFilterDescription() {
-//        List<MentorshipRequest> requests = prepareRequests();
-//
-//        RequestFilterDto filter = new RequestFilterDto();
-//        filter.setDescription("First");
-//
-//        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
-//        List<MentorshipRequest> result = mentorshipRequestService.getRequests(filter);
-//
-//        assertEquals(1, result.size());
-//        assertTrue(result.get(0).getDescription().contains("First"));
-//    }
-//
-//    @Test
-//    public void testGetRequestsWithFilterRequester() {
-//        List<MentorshipRequest> requests = prepareRequests();
-//
-//        RequestFilterDto filter = new RequestFilterDto();
-//        filter.setRequester(1l);
-//
-//        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
-//        List<MentorshipRequest> result = mentorshipRequestService.getRequests(filter);
-//
-//        assertEquals(1, result.size());
-//        assertEquals(result.get(0).getRequester().getId(), filter.getRequester());
-//    }
-//
-//    @Test
-//    public void testGetRequestsWithFilterReceiver() {
-//        List<MentorshipRequest> requests = prepareRequests();
-//
-//        RequestFilterDto filter = new RequestFilterDto();
-//        filter.setReceiver(2l);
-//
-//        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
-//        List<MentorshipRequest> result = mentorshipRequestService.getRequests(filter);
-//
-//        assertEquals(1, result.size());
-//        assertEquals(result.get(0).getReceiver().getId(), filter.getReceiver());
-//    }
-//
-//    @Test
-//    public void testGetRequestsWithFilterStatus() {
-//        List<MentorshipRequest> requests = prepareRequests();
-//
-//        RequestFilterDto filter = new RequestFilterDto();
-//        filter.setStatus(RequestStatus.ACCEPTED);
-//
-//        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
-//        List<MentorshipRequest> result = mentorshipRequestService.getRequests(filter);
-//
-//        assertEquals(result.get(0).getStatus(), filter.getStatus());
-//    }
 
     @Test
     public void testGetRequestByIdDoesNotException() {

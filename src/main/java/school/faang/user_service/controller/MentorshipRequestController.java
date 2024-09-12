@@ -22,9 +22,9 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-//    public List<MentorshipRequest> getRequests(RequestFilterDto filter) {
-//        return mentorshipRequestService.getRequests(filter);
-//    }
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
+        return mentorshipRequestService.getRequests(filter);
+    }
 
     public void acceptRequest(long id) {
         mentorshipRequestService.acceptRequest(id);

@@ -12,7 +12,6 @@ import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.repository.mentorship.filter.MentorshipRequestFilter;
-
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;

@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 class CiFailTest {
 
     @Test
-    @Disabled
     @DisplayName("failed test for ci check")
     void ciTest_checkFailedTest() {
         fail();

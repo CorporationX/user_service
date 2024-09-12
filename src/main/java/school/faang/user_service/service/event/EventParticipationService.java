@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exceptions.EventRegistrationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
@@ -16,7 +17,7 @@ public class EventParticipationService {
     @Transactional
     public void registerParticipant(long eventId, long userId) {
         if (isRegistered(eventId, userId)) {
-            throw new IllegalArgumentException("user is already registered");
+            throw new EventRegistrationException("user is already registered");
         }
         eventRepository.register(eventId, userId);
     }
@@ -24,13 +25,14 @@ public class EventParticipationService {
     @Transactional
     public void unregisterParticipant(long eventId, long userId) {
         if (!isRegistered(eventId, userId)) {
-            throw new IllegalArgumentException("user wasn't registered");
+            throw new EventRegistrationException("user wasn't registered");
         }
         eventRepository.unregister(eventId, userId);
     }
 
     private boolean isRegistered(long eventId, long userId) {
-        return eventRepository.findAllParticipantsByEventId(eventId).stream().anyMatch(e -> userId == e.getId());
+        return eventRepository.findAllParticipantsByEventId(eventId).stream()
+                .anyMatch(e -> userId == e.getId());
     }
 
     @Transactional(readOnly = true)

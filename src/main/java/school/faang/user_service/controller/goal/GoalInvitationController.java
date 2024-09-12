@@ -13,8 +13,7 @@ import school.faang.user_service.service.GoalInvitationService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RestController
-@RequestMapping("${controller.goalInvitation.baseUrl}")
+@RestController("${controller.goalInvitation.baseUrl}")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
     private final GoalInvitationMapper mapper;

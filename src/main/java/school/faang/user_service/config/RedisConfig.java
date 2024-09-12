@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.dto.ProfileViewEvent;
+import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.listener.UserBanListener;
 
 @Configuration

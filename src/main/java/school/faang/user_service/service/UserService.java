@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.BanEvent;
-import school.faang.user_service.dto.ProfileViewEvent;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -206,8 +204,8 @@ public class UserService {
 
     private void publishViewEventProfile(long userId, long authorId) {
         profileViewEventPublisher.publish(ProfileViewEvent.builder()
-                .userOwnerId(userId)
-                .viewId(authorId)
+                .viewedId(userId)
+                .viewerId(authorId)
                 .receivedAt(LocalDateTime.now())
                 .build());
     }

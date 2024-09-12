@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfileViewEvent {
-    private long viewId;
-    private long userOwnerId;
+    private long viewerId;
+    private long viewedId;
     private LocalDateTime receivedAt;
 }

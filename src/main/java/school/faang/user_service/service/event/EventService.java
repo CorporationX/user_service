@@ -38,4 +38,14 @@ public class EventService {
                 .orElseThrow(() -> new DataValidationException("Event not found for ID: " + eventId));
         return eventMapper.toDto(event);
     }
+
+    public List<EventDto> getEventsByFilter(EventFilterDto filterDto) {
+        Stream<Event> eventStream = eventRepository.findAll().stream();
+        for (EventFilter eventFilter : eventFilters) {
+            if (eventFilter.isApplicable(filterDto)) {
+                eventStream = eventFilter.apply(eventStream, filterDto);
+            }
+        }
+        return eventMapper.toListDto(eventStream.toList());
+    }
 }

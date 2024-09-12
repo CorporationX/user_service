@@ -6,6 +6,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.skill.SkillMapper;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {SkillMapper.class}, unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface EventMapper {
 
@@ -16,5 +18,7 @@ public interface EventMapper {
     @Mapping(source = "ownerId", target = "owner.id")
     @Mapping(source = "relatedSkills", target = "relatedSkills")
     Event toEntity(EventDto eventDto);
+
+    List<EventDto> toListDto(List<Event> events);
 
 }

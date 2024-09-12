@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -12,22 +13,21 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.mapper.skill.SkillMapperImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// TODO: resolve tests issues
-// Issues with skills mapping
 @ExtendWith(MockitoExtension.class)
 public class EventMapperTest {
 
     @InjectMocks
     private EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
 
-    @Mock
-    private SkillMapper skillMapper;
+    @Spy
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
 
     @Test
     void toDto_shouldMapEventToEventDto() {
@@ -40,7 +40,7 @@ public class EventMapperTest {
                 .endDate(LocalDateTime.of(2024, 9, 11, 21, 6, 34))
                 .owner(User.builder().id(1L).build())
                 .description("Event Description")
-                .relatedSkills(List.of(skill)) // Not mapping skills
+                .relatedSkills(List.of(skill))
                 .location("Event Location")
                 .maxAttendees(100)
                 .build();
@@ -71,7 +71,7 @@ public class EventMapperTest {
                 .endDate(LocalDateTime.of(2024, 9, 11, 21, 6, 34))
                 .ownerId(1L)
                 .description("Event Description")
-                .relatedSkills(List.of(skillDto)) // Not mapping skills
+                .relatedSkills(List.of(skillDto))
                 .location("Event Location")
                 .maxAttendees(100)
                 .build();

@@ -9,7 +9,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.SkillService;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -25,21 +25,15 @@ public class EventValidator {
     }
 
     public void relatedSkillsValidation(EventDto eventDto) {
-        List<SkillDto> ownerSkills = skillService.getUserSkillsList(eventDto.getOwnerId());
-        if (!new HashSet<>(ownerSkills).containsAll(eventDto.getRelatedSkills())) {
+        Set<SkillDto> ownerSkills = new HashSet<>(skillService.getUserSkillDtoList(eventDto.getOwnerId()));
+        if (!ownerSkills.containsAll(eventDto.getRelatedSkills())) {
             throw new DataValidationException("Owner must have valid skills.");
         }
     }
 
-    public void eventExistByDtoValidation(EventDto eventDto) {
-        Long id = eventDto.getId();
-        if (!eventRepository.existsById(id)) {
-            throw new DataValidationException("Event ID: " + id + " dont exist");
-        }
-    }
     public void eventExistByIdValidation(Long id) {
         if (!eventRepository.existsById(id)) {
-            throw new DataValidationException("Event ID: " + id + " dont exist");
+            throw new DataValidationException("Event by ID: " + id + " dont exist.");
         }
     }
 }

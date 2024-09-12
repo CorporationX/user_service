@@ -68,7 +68,7 @@ class EventServiceTest {
             eventDto.setOwnerId(user.getId());
 
             when(eventMapper.toEntity(eventDto)).thenReturn(event);
-            when(userService.findUserById(user.getId())).thenReturn(user);
+            when(userService.getUserById(user.getId())).thenReturn(user);
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto);
 
@@ -78,7 +78,7 @@ class EventServiceTest {
 
             verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
             verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto);
-            verify(userService, atLeastOnce()).findUserById(user.getId());
+            verify(userService, atLeastOnce()).getUserById(user.getId());
             verify(eventRepository, atLeastOnce()).save(event);
         }
 
@@ -118,6 +118,7 @@ class EventServiceTest {
         public void testDeleteEvent_Success() {
             eventService.deleteEvent(eventDto.getId());
 
+            verify(eventValidator, atLeastOnce()).eventExistByIdValidation(eventDto.getId());
             verify(eventRepository, atLeastOnce()).deleteById(eventDto.getId());
         }
 
@@ -126,7 +127,7 @@ class EventServiceTest {
             EventDto eventDto2 = testDataEvent.getEventDto2();
 
             when(eventMapper.toEntity(eventDto2)).thenReturn(event);
-            when(userService.findUserById(user.getId())).thenReturn(user);
+            when(userService.getUserById(user.getId())).thenReturn(user);
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto2);
 
@@ -136,7 +137,7 @@ class EventServiceTest {
 
             verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto2);
             verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto2);
-            verify(eventValidator, atLeastOnce()).eventExistByDtoValidation(eventDto2);
+            verify(eventValidator, atLeastOnce()).eventExistByIdValidation(eventDto2.getId());
         }
 
         @Test

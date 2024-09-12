@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
@@ -52,13 +53,13 @@ public class EventController {
         return eventService.updateEvent(eventDto);
     }
 
-    @GetMapping("/owner/{userId}")
-    public List<EventDto> getEventsOwner(@PathVariable @Positive long userId) {
-        return eventService.getEventsOwner(userId);
+    @GetMapping("/owner")
+    public List<EventDto> getEventsOwner(@RequestParam @Positive long ownerId) {
+        return eventService.getEventsOwner(ownerId);
     }
 
-    @GetMapping("/participant/{userId}")
-    public List<EventDto> getEventParticipants(@PathVariable @Positive long userId) {
-        return eventService.getEventParticipants(userId);
+    @GetMapping("/participant")
+    public List<EventDto> getEventParticipants(@RequestParam @Positive long participantsId) {
+        return eventService.getEventParticipants(participantsId);
     }
 }

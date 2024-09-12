@@ -29,12 +29,14 @@ public class EventService {
     public EventDto createEvent(EventDto eventDto) {
         eventValidator.eventDatesValidation(eventDto);
         eventValidator.relatedSkillsValidation(eventDto);
+
         return saveEvent(eventDto);
     }
 
     @Transactional(readOnly = true)
     public EventDto getEvent(Long eventId) {
-        Event event = findEvent(eventId);
+        Event event = getEventById(eventId);
+
         return eventMapper.toDto(event);
     }
 
@@ -55,9 +57,12 @@ public class EventService {
 
     @Transactional
     public EventDto updateEvent(EventDto eventDto) {
+        Long eventDtoId = eventDto.getId();
+
         eventValidator.eventDatesValidation(eventDto);
         eventValidator.relatedSkillsValidation(eventDto);
-        eventValidator.eventExistByDtoValidation(eventDto);
+        eventValidator.eventExistByIdValidation(eventDtoId);
+
         return saveEvent(eventDto);
     }
 
@@ -80,14 +85,14 @@ public class EventService {
     private EventDto saveEvent(EventDto eventDto) {
         Event event = eventMapper.toEntity(eventDto);
 
-        User newEventOwner = userService.findUserById(eventDto.getOwnerId());
+        User newEventOwner = userService.getUserById(eventDto.getOwnerId());
         event.setOwner(newEventOwner);
 
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDto(savedEvent);
     }
 
-    private Event findEvent(Long eventId) {
+    private Event getEventById(Long eventId) {
         return eventRepository.findById(eventId).orElseThrow(() ->
                 new DataValidationException("Event with ID: " + eventId + " not found.")
         );

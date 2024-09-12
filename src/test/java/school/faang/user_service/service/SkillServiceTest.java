@@ -47,7 +47,7 @@ class SkillServiceTest {
         when(skillRepository.findAllByUserId(user.getId())).thenReturn(ownerSkillsList);
         when(skillMapper.toDto(skill1)).thenReturn(skillDto);
 
-        List<SkillDto> result = skillService.getUserSkillsList(user.getId());
+        List<SkillDto> result = skillService.getUserSkillDtoList(user.getId());
         assertNotNull(result);
         assertEquals(ownerSkillsList.size(), result.size());
         assertEquals(ownerSkillsList.get(0).getTitle(), result.get(0).getTitle());

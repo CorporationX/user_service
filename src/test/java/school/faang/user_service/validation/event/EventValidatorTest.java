@@ -53,16 +53,9 @@ class EventValidatorTest {
 
         @Test
         public void testRelatedSkillsValidation_Success() {
-            when(skillService.getUserSkillsList(eventDto.getOwnerId())).thenReturn(eventDto.getRelatedSkills());
+            when(skillService.getUserSkillDtoList(eventDto.getOwnerId())).thenReturn(eventDto.getRelatedSkills());
 
             assertDoesNotThrow(() -> eventValidator.relatedSkillsValidation(eventDto));
-        }
-
-        @Test
-        public void testEventExistByDtoValidation_Success() {
-            when(eventRepository.existsById(eventDto.getId())).thenReturn(true);
-
-            assertDoesNotThrow(() -> eventValidator.eventExistByDtoValidation(eventDto));
         }
 
         @Test
@@ -92,26 +85,13 @@ class EventValidatorTest {
             SkillDto invalidSkillDto = testDataEvent.getInvalidSkillDto();
             List<SkillDto> invalidSkillDtoList = List.of(invalidSkillDto);
 
-            when(skillService.getUserSkillsList(eventDto.getOwnerId())).thenReturn(invalidSkillDtoList);
+            when(skillService.getUserSkillDtoList(eventDto.getOwnerId())).thenReturn(invalidSkillDtoList);
 
             var exception = assertThrows(DataValidationException.class,
                     () -> eventValidator.relatedSkillsValidation(eventDto)
             );
 
             assertEquals("Owner must have valid skills.", exception.getMessage());
-        }
-
-        @Test
-        public void testEventExistByDtoValidation_NotFound_throwDataValidationException() {
-            when(eventRepository.existsById(eventDto.getId())).thenReturn(false);
-
-            var exception = assertThrows(DataValidationException.class,
-                    () -> eventValidator.eventExistByDtoValidation(eventDto)
-            );
-
-            assertEquals("Event ID: 1 dont exist", exception.getMessage());
-
-            verify(eventRepository, atLeastOnce()).existsById(1L);
         }
 
         @Test
@@ -122,7 +102,7 @@ class EventValidatorTest {
                     () -> eventValidator.eventExistByIdValidation(eventDto.getId())
             );
 
-            assertEquals("Event ID: 1 dont exist", exception.getMessage());
+            assertEquals("Event by ID: 1 dont exist.", exception.getMessage());
 
             verify(eventRepository, atLeastOnce()).existsById(1L);
         }

@@ -12,7 +12,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     //TODO Murzin34 Задействовать обработчик ошибок
-    public User findUserById(Long userId) {
+    public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new DataValidationException("User with ID: " + userId + " not found")
         );

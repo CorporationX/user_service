@@ -14,7 +14,7 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillCustomMapper skillMapper;
 
-    public List<SkillDto> getUserSkillsList(Long userId) {
+    public List<SkillDto> getUserSkillDtoList(Long userId) {
         return skillRepository.findAllByUserId(userId)
                 .stream()
                 .map(skillMapper::toDto)

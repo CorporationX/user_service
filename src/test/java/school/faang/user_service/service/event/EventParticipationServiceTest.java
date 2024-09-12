@@ -20,16 +20,16 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
+    private final long EVENT_ID = 3L;
+    private final long USER_ID = 3L;
+    private final long NEW_USER_ID = 10L;
+    private final int COUNT = 1;
 
     @Mock
     EventParticipationRepository eventParticipationRepository;
 
     @InjectMocks
     EventParticipationService eventParticipationService;
-    static final long EVENT_ID = 3L;
-    static final long USER_ID = 3L;
-    static final long NEW_USER_ID = 10L;
-    static final int COUNT = 1;
 
     @Test
     @DisplayName("should register new user")

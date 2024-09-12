@@ -14,7 +14,7 @@ import school.faang.user_service.service.event.EventParticipationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/events")
+@RequestMapping("/event-participations")
 public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
     private final UserMapper userMapper;

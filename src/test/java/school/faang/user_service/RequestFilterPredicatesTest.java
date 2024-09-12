@@ -17,7 +17,7 @@ import school.faang.user_service.validator.Predicates;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static school.faang.user_service.validator.Predicates.REQUESTER_ID_DONT_MATCH;
+import static school.faang.user_service.validator.Predicates.*;
 
 @ExtendWith(MockitoExtension.class)
 class RequestFilterPredicatesTest {
@@ -88,7 +88,7 @@ class RequestFilterPredicatesTest {
 
         // Assert
         assertThat(result).isInstanceOf(PredicateFalse.class);
-        assertEquals(REQUESTER_ID_DONT_MATCH, ((PredicateFalse) result).message());
+        assertEquals(RECEIVER_ID_DONT_MATCH, ((PredicateFalse) result).message());
     }
 
     @Test
@@ -128,7 +128,7 @@ class RequestFilterPredicatesTest {
 
         // Assert
         assertTrue(result instanceof PredicateFalse);
-        assertEquals(REQUESTER_ID_DONT_MATCH, ((PredicateFalse) result).message());
+        assertEquals(STATUS_DONT_MATCH, ((PredicateFalse) result).message());
     }
 
     @Test

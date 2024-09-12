@@ -93,7 +93,7 @@ class MentorshipRequestServiceTest {
         service.getRequests(filterDto);
 
         // Then
-        verify(repository, times(1)).getRequests();  // Ensure repository.getRequests() was called once
+        verify(repository, times(1)).findAll();  // Ensure repository.getRequests() was called once
 
     }
 
@@ -108,7 +108,7 @@ class MentorshipRequestServiceTest {
         service.getRequests(filterDto);
 
         // Then
-        verify(repository, times(1)).getRequests();  // Ensure repository.getRequests() was called once
+        verify(repository, times(1)).findAll();  // Ensure repository.getRequests() was called once
         verifyNoMoreInteractions(repository);  // Ensure no further interaction with the repository
     }
 

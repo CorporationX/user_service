@@ -30,13 +30,13 @@ public class EventParticipationController {
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
-    @GetMapping(path = "/{eventId}/getParticipants")
+    @GetMapping(path = "/{eventId}/participants")
     public List<UserDto> getParticipants(@PathVariable("eventId") long eventId) {
         List<User> users = eventParticipationService.getParticipants(eventId);
         return userMapper.toDto(users);
     }
 
-    @GetMapping(path = "/{eventId}/getParticipantsCount")
+    @GetMapping(path = "/{eventId}/participants-count")
     public int getParticipantsCount(@PathVariable("eventId") long eventId) {
         return eventParticipationService.getParticipantsCount(eventId);
     }

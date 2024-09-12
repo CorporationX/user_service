@@ -1,82 +1,172 @@
 package school.faang.user_service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RequestFilter;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.util.predicate.NotApplicable;
+import school.faang.user_service.util.predicate.PredicateFalse;
+import school.faang.user_service.util.predicate.PredicateResult;
+import school.faang.user_service.util.predicate.PredicateTrue;
 import school.faang.user_service.validator.Predicates;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static school.faang.user_service.validator.Predicates.REQUESTER_ID_DONT_MATCH;
 
+@ExtendWith(MockitoExtension.class)
 class RequestFilterPredicatesTest {
-
-    private MentorshipRequest request;
-    private RequestFilter filter;
+    @Spy
     private Predicates predicates;
 
-    @BeforeEach
-    void setUp() {
-        // Setup dummy data
-        User requester = new User();
-        requester.setId(1L);
+    @Test
+    void testAreAuthorsMatch_ShouldReturnTrue_WhenRequesterIdMatches() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().id(1L).requester(User.builder().id(1L).build()).build();
+        RequestFilter filter =  RequestFilter.builder().requesterId(1L).build(); // Requester ID matches
 
-        User receiver = new User();
-        receiver.setId(2L);
+        // Act
+        PredicateResult result = predicates.areAuthorsMatch.apply(request, filter);
 
-        request = new MentorshipRequest();
-        request.setDescription("Test description");
-        request.setRequester(requester);
-        request.setReceiver(receiver);
-        request.setStatus(RequestStatus.ACCEPTED);
-
-        filter = new RequestFilter();
-        filter.setRequesterId(1L);
-        filter.setReceiverId(2L);
-        filter.setStatus(RequestStatus.ACCEPTED);
-
-        predicates = new Predicates();
+        // Assert
+        assertTrue(result instanceof PredicateTrue);
     }
 
     @Test
-    void testIsDescriptionEmptyPredicate() {
-        // Scenario 1: Description is not empty
-        assertFalse(predicates.isDescriptionEmptyPredicate.test(request));
+    void testAreAuthorsMatch_ShouldReturnFalse_WhenRequesterIdDoesNotMatch() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().id(1L).requester(User.builder().id(1L).build()).build();
+        RequestFilter filter =  RequestFilter.builder().requesterId(2L).build();
 
-        // Scenario 2: Description is empty
-        request.setDescription("");
-        assertTrue(predicates.isDescriptionEmptyPredicate.test(request));
+        // Act
+        PredicateResult result = predicates.areAuthorsMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof PredicateFalse);
+        assertEquals(REQUESTER_ID_DONT_MATCH, ((PredicateFalse) result).message());
     }
 
     @Test
-    void testAreAuthorsMatchPredicate() {
-        // Scenario 1: Authors (requesters) match
-        assertTrue(predicates.areAuthorsMatch.test(request, filter));
+    void testAreAuthorsMatch_ShouldReturnNotApplicable_WhenRequesterIdIsNull() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().id(1L).requester(User.builder().id(1L).build()).build();
+        RequestFilter filter =  RequestFilter.builder().build();
 
-        // Scenario 2: Authors (requesters) don't match
-        filter.setRequesterId(99L);
-        assertFalse(predicates.areAuthorsMatch.test(request, filter));
+        // Act
+        PredicateResult result = predicates.areAuthorsMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof NotApplicable);
     }
 
     @Test
-    void testIsReceiverMatchPredicate() {
-        // Scenario 1: Receivers match
-        assertTrue(predicates.isRecieverMatch.test(request, filter));
+    void testIsReceiverMatch_ShouldReturnTrue_WhenReceiverIdMatches() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().id(1L).receiver(User.builder().id(1L).build()).build();
+        RequestFilter filter =  RequestFilter.builder().receiverId(1L).build();
 
-        // Scenario 2: Receivers don't match
-        filter.setReceiverId(99L);
-        assertFalse(predicates.isRecieverMatch.test(request, filter));
+        // Act
+        PredicateResult result = predicates.isRecieverMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof PredicateTrue);
     }
 
     @Test
-    void testIsStatusMatchPredicate() {
-        // Scenario 1: Status matches
-        assertTrue(predicates.isStatusMatch.test(request, filter));
+    void testIsReceiverMatch_ShouldReturnFalse_WhenReceiverIdDoesNotMatch() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().id(1L).receiver(User.builder().id(1L).build()).build();
+        RequestFilter filter =  RequestFilter.builder().receiverId(3L).build();
 
-        // Scenario 2: Status doesn't match
-        filter.setStatus(RequestStatus.REJECTED);
-        assertFalse(predicates.isStatusMatch.test(request, filter));
+        // Act
+        PredicateResult result = predicates.isRecieverMatch.apply(request, filter);
+
+        // Assert
+        assertThat(result).isInstanceOf(PredicateFalse.class);
+        assertEquals(REQUESTER_ID_DONT_MATCH, ((PredicateFalse) result).message());
     }
+
+    @Test
+    void testIsReceiverMatch_ShouldReturnNotApplicable_WhenReceiverIdIsNull() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().id(1L).receiver(User.builder().build()).build();
+        RequestFilter filter =  RequestFilter.builder().requesterId(3L).build();
+
+        // Act
+        PredicateResult result = predicates.isRecieverMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof NotApplicable);
+    }
+
+    @Test
+    void testIsStatusMatch_ShouldReturnTrue_WhenStatusMatches() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().status(RequestStatus.REJECTED).build();
+        RequestFilter filter =  RequestFilter.builder().status(RequestStatus.REJECTED).build();
+
+        // Act
+        PredicateResult result = predicates.isStatusMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof PredicateTrue);
+    }
+
+    @Test
+    void testIsStatusMatch_ShouldReturnFalse_WhenStatusDoesNotMatch() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().status(RequestStatus.PENDING).build();
+        RequestFilter filter =  RequestFilter.builder().status(RequestStatus.REJECTED).build();
+
+        // Act
+        PredicateResult result = predicates.isStatusMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof PredicateFalse);
+        assertEquals(REQUESTER_ID_DONT_MATCH, ((PredicateFalse) result).message());
+    }
+
+    @Test
+    void testIsStatusMatch_ShouldReturnNotApplicable_WhenStatusIsNull() {
+        // Arrange
+        MentorshipRequest request = MentorshipRequest.builder().status(RequestStatus.PENDING).build();
+        RequestFilter filter =  RequestFilter.builder().build();
+
+        // Act
+        PredicateResult result = predicates.isStatusMatch.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof NotApplicable);
+    }
+
+
+    @Test
+    void testIsDescriptionEmpty_ShouldReturnNotApplicable_whenEmpty() {
+        MentorshipRequest request = MentorshipRequest.builder().build();
+        RequestFilter filter =  RequestFilter.builder().build();
+
+        // Act
+        PredicateResult result = predicates.isDescriptionEmptyPredicate.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof NotApplicable);
+    }
+
+    @Test
+    void testIsDescriptionEmpty_ShouldReturnTrue_whenDoesNotMatch() {
+        MentorshipRequest request = MentorshipRequest.builder().description("somthening").build();
+        RequestFilter filter =  RequestFilter.builder().description("somthening").build();
+
+        // Act
+        PredicateResult result = predicates.isDescriptionEmptyPredicate.apply(request, filter);
+
+        // Assert
+        assertTrue(result instanceof PredicateTrue);
+    }
+
 }

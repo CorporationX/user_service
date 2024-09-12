@@ -11,7 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

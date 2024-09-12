@@ -112,7 +112,7 @@ class GoalServiceTest {
 
             activeGoal.setUsers(users);
 
-            assertEquals(ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO, activeGoal.getUsers().size());
+            assertEquals(ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ONE, activeGoal.getUsers().size());
 
             goalService.deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user1);
 

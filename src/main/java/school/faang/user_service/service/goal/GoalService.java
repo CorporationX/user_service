@@ -1,24 +1,18 @@
 package school.faang.user_service.service.goal;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.goal.GoalRepository;
 
-@Service
-@RequiredArgsConstructor
-public class GoalService {
-    private final GoalRepository goalRepository;
+import java.util.List;
 
-    @Transactional
-    public void deleteGoalAndUnlinkChildren(Goal goal) {
-        goal.getChildrenGoals()
-                .forEach(child -> {
-                    child.setParent(null);
-                    goalRepository.save(child);
-                });
+public interface GoalService {
+    Goal createGoal(Goal goal, Long userId, Long parentGoalId, List<Long> skillIds);
 
-        goalRepository.delete(goal);
-    }
+    Goal updateGoal(Goal goal, List<Long> skillIds);
+
+    void deleteGoal(Long goalId);
+
+    List<Goal> findSubGoalsByParentGoalId(Long parentGoalId, GoalFilterDto filterDto);
+
+    List<Goal> findGoalsByUserId(Long userId, GoalFilterDto filter);
 }

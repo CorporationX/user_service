@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal.invitation;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;

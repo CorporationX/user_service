@@ -1,4 +1,4 @@
-package school.faang.user_service.service.impl;
+package school.faang.user_service.service.goal.invitation;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -18,8 +18,7 @@ import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.GoalInvitationService;
-import school.faang.user_service.service.goal.invitation_filter.InvitationFilter;
+import school.faang.user_service.service.goal.invitation.invitation_filter.InvitationFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -45,14 +44,14 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
             throw new IllegalArgumentException("Invited user and inviter user are the same");
         }
 
-        GoalInvitation goalInvitation = goalInvitationMapper.fromDto(goalInvitationDto);
+        GoalInvitation goalInvitation = goalInvitationMapper.fromGoalInvitationDto(goalInvitationDto);
         goalInvitation.setInviter(findUserById(goalInvitationDto.getInviterId()));
         goalInvitation.setInvited(findUserById(goalInvitationDto.getInvitedUserId()));
         goalInvitation.setGoal(findGoalById(goalInvitationDto.getGoalId()));
 
         goalInvitation = goalInvitationRepository.save(goalInvitation);
         log.info("Invitation created with id: {} ", goalInvitation.getId());
-        return goalInvitationMapper.toDto(goalInvitation);
+        return goalInvitationMapper.toGoalInvitationDto(goalInvitation);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
             log.info("Invitation accepted: {} ", goalInvitation.getId());
         }
 
-        return goalInvitationMapper.toDto(goalInvitation);
+        return goalInvitationMapper.toGoalInvitationDto(goalInvitation);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         goalInvitation = goalInvitationRepository.save(goalInvitation);
         log.info("Invitation rejected: {} ", goalInvitation.getId());
 
-        return goalInvitationMapper.toDto(goalInvitation);
+        return goalInvitationMapper.toGoalInvitationDto(goalInvitation);
     }
 
     @Override
@@ -89,8 +88,11 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         Stream<GoalInvitation> invitations = goalInvitationRepository.findAll().stream();
         return filters.stream()
                 .filter(filter -> filter.isApplicable(invitationFilterDto))
-                .flatMap(filter -> filter.apply(invitations, invitationFilterDto))
-                .map(goalInvitationMapper::toDto)
+                .reduce(invitations,
+                        (invites, filter) -> filter.apply(invites, invitationFilterDto),
+                        (inv1, inv2) -> inv1
+                )
+                .map(goalInvitationMapper::toGoalInvitationDto)
                 .toList();
     }
 

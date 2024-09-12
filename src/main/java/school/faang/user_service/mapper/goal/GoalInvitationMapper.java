@@ -12,10 +12,10 @@ public interface GoalInvitationMapper {
     @Mapping(source = "inviter.id", target = "inviterId")
     @Mapping(source = "invited.id", target = "invitedUserId")
     @Mapping(source = "goal.id", target = "goalId")
-    GoalInvitationDto toDto(GoalInvitation goalInvitation);
+    GoalInvitationDto toGoalInvitationDto(GoalInvitation goalInvitation);
 
     @Mapping(target = "inviter", ignore = true)
     @Mapping(target = "invited", ignore = true)
     @Mapping(target = "goal", ignore = true)
-    GoalInvitation fromDto(GoalInvitationDto goalInvitationDto);
+    GoalInvitation fromGoalInvitationDto(GoalInvitationDto goalInvitationDto);
 }

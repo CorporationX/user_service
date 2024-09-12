@@ -117,4 +117,41 @@ public class EventValidatorTest {
         // Act & Assert
         eventValidator.validateOwnerSkills(eventDto);
     }
+
+    @Test
+    void validateOwnerPresent_whenOwnerDoesNotExist_throwsException() {
+        // Arrange
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(DataValidationException.class, () -> eventValidator.validateOwnerPresent(eventDto));
+    }
+
+    @Test
+    void validateOwnerPresent_whenOwnerExists_doesNotThrowException() {
+        // Arrange
+        User owner = User.builder().id(1L).build();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
+
+        // Act & Assert
+        eventValidator.validateOwnerPresent(eventDto);
+    }
+
+    @Test
+    void validateTitlePresent_whenTitleIsNull_throwsException() {
+        // Arrange
+        eventDto = EventDto.builder().title(null).build();
+
+        // Act & Assert
+        assertThrows(DataValidationException.class, () -> eventValidator.validateTitlePresent(eventDto));
+    }
+
+    @Test
+    void validateTitlePresent_whenTitleIsPresent_doesNotThrowException() {
+        // Arrange
+        eventDto = EventDto.builder().title("title").build();
+
+        // Act & Assert
+        eventValidator.validateTitlePresent(eventDto);
+    }
 }

@@ -8,6 +8,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,16 +18,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EventValidator {
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     public void validateStartDate(EventDto eventDto) {
         Optional.ofNullable(eventDto.startDate())
                 .orElseThrow(() -> new DataValidationException("Event start date can not be null"));
     }
 
-    public void validateOwnerSkills(EventDto eventDto) {
-        User owner = userRepository
-                .findById(eventDto.ownerId())
+    public void validateOwnerPresent(EventDto eventDto) {
+        userRepository.findById(eventDto.ownerId())
                 .orElseThrow(() -> new DataValidationException("Event owner does not exist"));
+    }
+
+    public void validateOwnerSkills(EventDto eventDto) {
+        validateOwnerPresent(eventDto);
+        User owner = userRepository.findById(eventDto.ownerId()).get();
 
         List<Long> ownerSkillsIds = owner.getSkills().stream()
                 .map(Skill::getId)
@@ -37,6 +43,12 @@ public class EventValidator {
 
         if (!new HashSet<>(ownerSkillsIds).containsAll(eventSkillsIds)) {
             throw new DataValidationException("Event owner does not have skills related to this event");
+        }
+    }
+
+    public void validateTitlePresent(EventDto eventDto) {
+        if (eventDto.title() == null || eventDto.title().isBlank()) {
+            throw new DataValidationException("Event title can not be null or empty");
         }
     }
 }

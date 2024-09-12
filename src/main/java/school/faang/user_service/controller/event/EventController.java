@@ -31,4 +31,24 @@ public class EventController {
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
+
+    public void deleteEvent(Long id) {
+        eventService.deleteEvent(id);
+    }
+
+    public EventDto updateEvent(EventDto event) {
+        eventValidator.validateTitlePresent(event);
+        eventValidator.validateStartDate(event);
+        eventValidator.validateOwnerPresent(event);
+
+        return eventService.updateEvent(event);
+    }
+
+    public List<Event> getOwnedEvents(Long userId) {
+        return eventService.getOwnedEvents(userId);
+    }
+
+    public List<Event> getParticipatedEvents(Long userId) {
+        return eventService.getParticipatedEvents(userId);
+    }
 }

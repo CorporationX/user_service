@@ -27,5 +27,6 @@ public record EventDto(
         String location,
         @NotNull(message = "maxAttendees can't be null")
         @Positive
-        int maxAttendees) {
+        int maxAttendees
+) {
 }

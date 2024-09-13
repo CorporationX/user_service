@@ -12,10 +12,12 @@ import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventCustomMapper;
+import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.UserService;
-import school.faang.user_service.service.event.filters.EventFilter;
+import school.faang.user_service.repository.event.filters.EventFilter;
 import school.faang.user_service.test_data.event.TestDataEvent;
 
 import java.util.List;
@@ -25,6 +27,8 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -36,9 +40,9 @@ class EventServiceTest {
     @InjectMocks
     private EventService eventService;
     private EventRepository eventRepository;
-    private EventCustomMapper eventMapper;
-    private UserService userService;
-    private EventValidator eventValidator;
+    private EventMapper eventMapper;
+    private EventServiceHelper eventValidator;
+    private UserRepository userRepository;
     private TestDataEvent testDataEvent;
     private EventDto eventDto;
     private User user;
@@ -47,16 +51,20 @@ class EventServiceTest {
     @BeforeEach
     void setUp() {
         eventRepository = Mockito.mock(EventRepository.class);
-        eventMapper = Mockito.mock(EventCustomMapper.class);
-        userService = Mockito.mock(UserService.class);
-        eventValidator = Mockito.mock(EventValidator.class);
+        eventMapper = Mockito.mock(EventMapper.class);
+        eventValidator = Mockito.mock(EventServiceHelper.class);
+        userRepository = Mockito.mock(UserRepository.class);
+        SkillRepository skillRepository = Mockito.mock(SkillRepository.class);
+        SkillMapper skillMapper = Mockito.mock(SkillMapper.class);
         List<EventFilter> filters = List.of(mock(EventFilter.class));
 
         eventService = new EventService(
                 eventRepository,
                 eventMapper,
-                userService,
                 eventValidator,
+                userRepository,
+                skillRepository,
+                skillMapper,
                 filters
         );
 
@@ -74,7 +82,7 @@ class EventServiceTest {
             eventDto.setOwnerId(user.getId());
 
             when(eventMapper.toEntity(eventDto)).thenReturn(event);
-            when(userService.getUserById(user.getId())).thenReturn(user);
+            when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto);
 
@@ -83,7 +91,7 @@ class EventServiceTest {
             assertEquals(eventDto, result);
 
             verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
-            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto);
+            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eq(eventDto), anySet());
             verify(eventRepository, atLeastOnce()).save(event);
         }
 
@@ -133,7 +141,7 @@ class EventServiceTest {
             EventDto eventDto2 = testDataEvent.getEventDto2();
 
             when(eventMapper.toEntity(eventDto2)).thenReturn(event);
-            when(userService.getUserById(user.getId())).thenReturn(user);
+            when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto2);
 
@@ -142,7 +150,7 @@ class EventServiceTest {
             assertEquals(eventDto2, result);
 
             verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto2);
-            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto2);
+            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eq(eventDto2), anySet());
             verify(eventValidator, atLeastOnce()).eventExistByIdValidation(eventDto2.getId());
         }
 
@@ -215,6 +223,17 @@ class EventServiceTest {
             assertEquals("Event with ID: 1 not found.", exception.getMessage());
 
             verify(eventRepository, atLeastOnce()).findById(1L);
+        }
+
+        @Test
+        public void testGetUser_NotFound_throwDataValidationException() {
+            when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+            var exception = assertThrows(DataValidationException.class,
+                    () -> eventService.createEvent(eventDto)
+            );
+
+            assertEquals("User with ID: 1 not found", exception.getMessage());
         }
     }
 }

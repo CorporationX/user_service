@@ -9,37 +9,38 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.service.GoalInvitationService;
-
 import java.util.List;
 
 @RequiredArgsConstructor
-@RestController("${controller.goalInvitation.baseUrl}")
+@RestController
+@RequestMapping("/goal-invitations")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
     private final GoalInvitationMapper mapper;
 
-    @GetMapping
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public List<GoalInvitationDto> getInvitations(@RequestBody(required = false) InvitationFilterDto filter) {
         List<GoalInvitation> filteredInvitations = goalInvitationService.getInvitations(filter);
-//        List<GoalInvitation> filteredInvitations = goalInvitationService.getInvitationsBySpec(filter);
         return mapper.toDtoList(filteredInvitations);
     }
 
-    @PostMapping
+    @PostMapping("/new")
     @ResponseStatus(HttpStatus.CREATED)
     public GoalInvitationDto createInvitation(@RequestBody @Validated GoalInvitationDto dto) {
-        GoalInvitation savedInvitation = goalInvitationService.createInvitation(mapper.toEntity(dto));
+        GoalInvitation toSave = mapper.toEntity(dto);
+        System.out.println(toSave);
+        GoalInvitation savedInvitation = goalInvitationService.createInvitation(toSave);
         return mapper.toDto(savedInvitation);
     }
 
-    @PatchMapping("/{id}/accept")
+    @PutMapping("/{id}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void acceptGoalInvitation(@PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
 
-    @PatchMapping("/{id}/reject")
+    @PutMapping("/{id}/reject")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void rejectGoalInvitation(@PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);

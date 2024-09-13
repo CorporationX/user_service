@@ -1,7 +1,3 @@
-controller:
-  goalInvitation:
-    baseUrl: "/goal-invitations"
-
 spring:
   mvc:
     servlet:

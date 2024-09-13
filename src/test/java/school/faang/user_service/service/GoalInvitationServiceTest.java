@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.service.util.GoalInvitationUtil.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTest {
@@ -100,14 +101,14 @@ public class GoalInvitationServiceTest {
         IllegalStateException e1 = assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.createInvitation(invalid)
         );
-        assertEquals(GoalInvitationService.GOAL_MISSING, e1.getMessage());
+        assertEquals(GOAL_MISSING, e1.getMessage());
 
         invalid.setGoal(testGoal);
         when(goalRepository.existsById(1L)).thenReturn(true);
         IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class,
                 () -> goalInvitationService.createInvitation(invalid)
         );
-        assertEquals(GoalInvitationService.INVITER_INVITED_SAME, e2.getMessage());
+        assertEquals(INVITER_INVITED_SAME, e2.getMessage());
 
         invalid.setInvited(missingUser);
         List<Long> ids = Stream.of(inviter, missingUser).map(User::getId).toList();
@@ -115,7 +116,7 @@ public class GoalInvitationServiceTest {
         IllegalStateException e3 = assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.createInvitation(invalid)
         );
-        assertEquals(GoalInvitationService.INVITER_INVITED_MISSING, e3.getMessage());
+        assertEquals(INVITER_INVITED_MISSING, e3.getMessage());
     }
 
     @Test
@@ -178,14 +179,14 @@ public class GoalInvitationServiceTest {
                 IllegalArgumentException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
-        assertEquals(GoalInvitationService.INVITATION_MISSING, e1.getMessage());
+        assertEquals(INVITATION_MISSING, e1.getMessage());
 
         when(goalInvitationRepository.findById(5L)).thenReturn(Optional.of(invalid));
         IllegalStateException e2 = assertThrows(
                 IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
-        assertEquals(GoalInvitationService.GOAL_MISSING, e2.getMessage());
+        assertEquals(GOAL_MISSING, e2.getMessage());
 
         invalid.setInvited(invited);
         when(goalRepository.existsById(4L)).thenReturn(true);
@@ -193,7 +194,7 @@ public class GoalInvitationServiceTest {
                 IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
-        assertEquals(GoalInvitationService.INVITED_ALREADY_WORKING_ON_GOAL, e2.getMessage());
+        assertEquals(INVITED_ALREADY_WORKING_ON_GOAL, e2.getMessage());
 
         invited.getGoals().clear();
         when(goalRepository.countActiveGoalsPerUser(2L)).thenReturn(3);
@@ -201,7 +202,7 @@ public class GoalInvitationServiceTest {
                 IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(invalid.getId())
         );
-        assertEquals(GoalInvitationService.INVITED_MAX_ACTIVE_GOALS, e2.getMessage());
+        assertEquals(INVITED_MAX_ACTIVE_GOALS, e2.getMessage());
     }
 
     @Test
@@ -236,13 +237,13 @@ public class GoalInvitationServiceTest {
         IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class,
                 () -> goalInvitationService.rejectGoalInvitation(invalid.getId())
         );
-        assertEquals(GoalInvitationService.INVITATION_MISSING, e1.getMessage());
+        assertEquals(INVITATION_MISSING, e1.getMessage());
 
         when(goalInvitationRepository.findById(10L)).thenReturn(Optional.of(invalid));
         IllegalStateException e2 = assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.rejectGoalInvitation(invalid.getId())
         );
-        assertEquals(GoalInvitationService.GOAL_MISSING, e2.getMessage());
+        assertEquals(GOAL_MISSING, e2.getMessage());
     }
 
     @Test

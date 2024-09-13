@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -15,10 +16,10 @@ import school.faang.user_service.validator.GoalServiceValidator;
 import java.util.List;
 import java.util.stream.Stream;
 
-
 @Service
 @RequiredArgsConstructor
 public class GoalService {
+
     private final GoalRepository goalRepository;
     private final SkillService skillService;
     private final GoalMapper goalMapper;
@@ -33,6 +34,7 @@ public class GoalService {
 
         goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
         skillService.create(goalMapper.toGoal(goalDto).getSkillsToAchieve(), userId);
+
         return goalDto;
     }
 
@@ -40,19 +42,14 @@ public class GoalService {
     public GoalDto updateGoal(long goalId, GoalDto goalDto) {
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new NotFoundException("Goal with this id does not exist in the database"));
-        Goal updateGoal = goalMapper.toGoal(goalDto);
 
-        goalServiceValidator.validateGoalStatusNotCompleted(goal);
-        goalServiceValidator.validateSkillsExistByTitle(updateGoal.getSkillsToAchieve());
+        Goal updatedGoal = prepareAndValidateGoalUpdate(goal, goalDto);
+        goalRepository.save(updatedGoal);
 
-        goal.setStatus(updateGoal.getStatus());
-        goal.setTitle(updateGoal.getTitle());
-        goal.setSkillsToAchieve(updateGoal.getSkillsToAchieve());
-        goal.setDescription(updateGoal.getDescription());
+        List<User> users = goalRepository.findUsersByGoalId(goalId);
+        skillService.addSkillToUsers(users, goalId);
 
-        goalRepository.save(goal);
-        skillService.addSkillToUsers(goalRepository.findUsersByGoalId(goalId), goalId);
-        return goalMapper.toGoalDto(goal);
+        return goalMapper.toGoalDto(updatedGoal);
     }
 
     @Transactional
@@ -64,23 +61,43 @@ public class GoalService {
     }
 
     @Transactional
-    public List<GoalDto> getSubtasksByGoalId(long goalId, GoalFilterDto filterDto) {
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filterDto) {
         Stream<Goal> goals = goalRepository.findByParent(goalId);
+
         return filterGoals(goals, filterDto);
     }
 
     @Transactional
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filterDto) {
         Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
+
         return filterGoals(goals, filterDto);
     }
 
+    private Goal prepareAndValidateGoalUpdate(Goal existingGoal, GoalDto goalDto) {
+        Goal updateGoal = goalMapper.toGoal(goalDto);
+
+        goalServiceValidator.validateGoalStatusNotCompleted(existingGoal);
+        goalServiceValidator.validateSkillsExistByTitle(updateGoal.getSkillsToAchieve());
+
+        existingGoal.setStatus(updateGoal.getStatus());
+        existingGoal.setTitle(updateGoal.getTitle());
+        existingGoal.setSkillsToAchieve(updateGoal.getSkillsToAchieve());
+        existingGoal.setDescription(updateGoal.getDescription());
+
+        return existingGoal;
+    }
+
     private List<GoalDto> filterGoals(Stream<Goal> goals, GoalFilterDto filterDto) {
-        return goalFilters.stream()
-                .filter(filter -> filter.isApplicable(filterDto))
-                .reduce(goals, (currentGoals, filter) -> filter.apply(currentGoals, filterDto), (s1, s2) -> s1)
-                .map(goalMapper::toGoalDto)
-                .toList();
+        if (filterDto == null) {
+            return goals.map(goalMapper::toGoalDto).toList();
+        } else {
+            return goalFilters.stream()
+                    .filter(filter -> filter.isApplicable(filterDto))
+                    .reduce(goals, (currentGoals, filter) -> filter.apply(currentGoals, filterDto), (s1, s2) -> s1)
+                    .map(goalMapper::toGoalDto)
+                    .toList();
+        }
     }
 }
 

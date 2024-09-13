@@ -2,7 +2,10 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -13,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class GoalStatusFilterTest {
 
     private GoalStatusFilter goalStatusFilter;
@@ -33,45 +37,56 @@ public class GoalStatusFilterTest {
         goalFilterDto = new GoalFilterDto();
     }
 
-    @Test
-    @DisplayName("Test isApplicable returns true when status is present in filters")
-    public void testIsApplicableWithStatus() {
-        goalFilterDto.setStatus(GoalStatus.ACTIVE);
+    @Nested
+    @DisplayName("isApplicable Method Tests")
+    class IsApplicableTests {
 
-        boolean result = goalStatusFilter.isApplicable(goalFilterDto);
+        @Test
+        @DisplayName("whenStatusIsPresentThenReturnTrue")
+        void whenStatusIsPresentThenReturnTrue() {
+            goalFilterDto.setStatus(GoalStatus.ACTIVE);
 
-        assertTrue(result, "Filter should be applicable when status is provided");
+            boolean result = goalStatusFilter.isApplicable(goalFilterDto);
+
+            assertTrue(result, "Filter should be applicable when status is provided");
+        }
+
+        @Test
+        @DisplayName("whenStatusIsAbsentThenReturnFalse")
+        void whenStatusIsAbsentThenReturnFalse() {
+            boolean result = goalStatusFilter.isApplicable(goalFilterDto);
+
+            assertFalse(result, "Filter should not be applicable when status is not provided");
+        }
     }
 
-    @Test
-    @DisplayName("Test isApplicable returns false when status is not present in filters")
-    public void testIsApplicableWithoutStatus() {
-        boolean result = goalStatusFilter.isApplicable(goalFilterDto);
+    @Nested
+    @DisplayName("apply Method Tests")
+    class ApplyTests {
 
-        assertFalse(result, "Filter should not be applicable when status is not provided");
-    }
+        @Test
+        @DisplayName("whenActiveStatusProvidedThenFilterActiveGoals")
+        void whenActiveStatusProvidedThenFilterActiveGoals() {
+            goalFilterDto.setStatus(GoalStatus.ACTIVE);
 
-    @Test
-    @DisplayName("Test apply filters goals by status")
-    public void testApplyFilterByStatus() {
-        goalFilterDto.setStatus(GoalStatus.ACTIVE);
+            Stream<Goal> goalsStream = Stream.of(activeGoal, completedGoal);
+            List<Goal> filteredGoals = goalStatusFilter.apply(goalsStream, goalFilterDto).toList();
 
-        Stream<Goal> goalsStream = Stream.of(activeGoal, completedGoal);
-        List<Goal> filteredGoals = goalStatusFilter.apply(goalsStream, goalFilterDto).toList();
+            assertEquals(1, filteredGoals.size(), "There should be one goal with ACTIVE status");
+            assertEquals(GoalStatus.ACTIVE, filteredGoals.get(0).getStatus(), "The filtered goal should have ACTIVE status");
+        }
 
-        assertEquals(1, filteredGoals.size(), "There should be one goal with ACTIVE status");
-        assertEquals(GoalStatus.ACTIVE, filteredGoals.get(0).getStatus(), "The filtered goal should have ACTIVE status");
-    }
+        @Test
+        @DisplayName("whenCompletedStatusProvidedThenFilterCompletedGoals")
+        void whenCompletedStatusProvidedThenFilterCompletedGoals() {
+            goalFilterDto.setStatus(GoalStatus.COMPLETED);
 
-    @Test
-    @DisplayName("Test apply does not filter when status is COMPLETED")
-    public void testApplyFilterWithCompletedStatus() {
-        goalFilterDto.setStatus(GoalStatus.COMPLETED);
+            Stream<Goal> goalsStream = Stream.of(activeGoal, completedGoal);
+            List<Goal> filteredGoals = goalStatusFilter.apply(goalsStream, goalFilterDto).toList();
 
-        Stream<Goal> goalsStream = Stream.of(activeGoal, completedGoal);
-        List<Goal> filteredGoals = goalStatusFilter.apply(goalsStream, goalFilterDto).toList();
-
-        assertEquals(1, filteredGoals.size(), "There should be one goal with COMPLETED status");
-        assertEquals(GoalStatus.COMPLETED, filteredGoals.get(0).getStatus(), "The filtered goal should have COMPLETED status");
+            assertEquals(1, filteredGoals.size(), "There should be one goal with COMPLETED status");
+            assertEquals(GoalStatus.COMPLETED, filteredGoals.get(0).getStatus(), "The filtered goal should have COMPLETED status");
+        }
     }
 }
+

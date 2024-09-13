@@ -2,8 +2,11 @@ package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
@@ -12,7 +15,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class GoalMapperTest {
+
+    private static final Long GOAL_ID = 1L;
+    private static final Long PARENT_GOAL_ID = 2L;
+    private static final Long SKILL_ID_1 = 1L;
+    private static final Long SKILL_ID_2 = 2L;
+    private static final String GOAL_TITLE = "Test Goal";
+    private static final String GOAL_DESCRIPTION = "Test Description";
+    private static final String SKILL_TITLE = "Test Skill";
 
     private GoalMapper goalMapper;
 
@@ -21,89 +33,115 @@ public class GoalMapperTest {
         goalMapper = Mappers.getMapper(GoalMapper.class);
     }
 
-    @Test
-    @DisplayName("Test mapping from Goal to GoalDto")
-    public void testToGoalDto() {
-        Skill skill = new Skill();
-        skill.setId(1L);
-        skill.setTitle("Test Skill");
+    @Nested
+    @DisplayName("Mapping from Goal to GoalDto Tests")
+    class ToGoalDtoTests {
 
-        Goal parentGoal = new Goal();
-        parentGoal.setId(2L);
+        @Test
+        @DisplayName("whenGoalProvidedThenMapToGoalDtoCorrectly")
+        void whenGoalProvidedThenMapToGoalDtoCorrectly() {
+            Skill skill = new Skill();
+            skill.setId(SKILL_ID_1);
+            skill.setTitle(SKILL_TITLE);
 
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goal.setTitle("Test Goal");
-        goal.setDescription("Test Description");
-        goal.setParent(parentGoal);
-        goal.setSkillsToAchieve(List.of(skill));
+            Goal parentGoal = new Goal();
+            parentGoal.setId(PARENT_GOAL_ID);
 
-        GoalDto goalDto = goalMapper.toGoalDto(goal);
+            Goal goal = new Goal();
+            goal.setId(GOAL_ID);
+            goal.setTitle(GOAL_TITLE);
+            goal.setDescription(GOAL_DESCRIPTION);
+            goal.setParent(parentGoal);
+            goal.setSkillsToAchieve(List.of(skill));
 
-        assertEquals(goal.getId(), goalDto.getId());
-        assertEquals(goal.getTitle(), goalDto.getTitle());
-        assertEquals(goal.getDescription(), goalDto.getDescription());
-        assertEquals(goal.getParent().getId(), goalDto.getParentId());
-        assertEquals(1, goalDto.getSkillIds().size());
-        assertEquals(skill.getId(), goalDto.getSkillIds().get(0));
+            GoalDto goalDto = goalMapper.toGoalDto(goal);
+
+            assertEquals(GOAL_ID, goalDto.getId());
+            assertEquals(GOAL_TITLE, goalDto.getTitle());
+            assertEquals(GOAL_DESCRIPTION, goalDto.getDescription());
+            assertEquals(PARENT_GOAL_ID, goalDto.getParentId());
+            assertEquals(1, goalDto.getSkillIds().size());
+            assertEquals(SKILL_ID_1, goalDto.getSkillIds().get(0));
+        }
     }
 
-    @Test
-    @DisplayName("Test mapping from GoalDto to Goal")
-    public void testToGoal() {
-        GoalDto goalDto = GoalDto.builder()
-                .id(1L)
-                .title("Test Goal")
-                .description("Test Description")
-                .parentId(2L)
-                .skillIds(List.of(1L))
-                .build();
+    @Nested
+    @DisplayName("Mapping from GoalDto to Goal Tests")
+    class ToGoalTests {
 
-        Goal goal = goalMapper.toGoal(goalDto);
+        @Test
+        @DisplayName("whenGoalDtoProvidedThenMapToGoalCorrectly")
+        void whenGoalDtoProvidedThenMapToGoalCorrectly() {
+            GoalDto goalDto = GoalDto.builder()
+                    .id(GOAL_ID)
+                    .title(GOAL_TITLE)
+                    .description(GOAL_DESCRIPTION)
+                    .parentId(PARENT_GOAL_ID)
+                    .skillIds(List.of(SKILL_ID_1))
+                    .build();
 
-        assertEquals(goalDto.getId(), goal.getId());
-        assertEquals(goalDto.getTitle(), goal.getTitle());
-        assertEquals(goalDto.getDescription(), goal.getDescription());
-        assertEquals(goalDto.getParentId(), goal.getParent().getId());
-        assertEquals(1, goal.getSkillsToAchieve().size());
-        assertEquals(goalDto.getSkillIds().get(0), goal.getSkillsToAchieve().get(0).getId());
+            Goal goal = goalMapper.toGoal(goalDto);
+
+            assertEquals(GOAL_ID, goal.getId());
+            assertEquals(GOAL_TITLE, goal.getTitle());
+            assertEquals(GOAL_DESCRIPTION, goal.getDescription());
+            assertEquals(PARENT_GOAL_ID, goal.getParent().getId());
+            assertEquals(1, goal.getSkillsToAchieve().size());
+            assertEquals(SKILL_ID_1, goal.getSkillsToAchieve().get(0).getId());
+        }
     }
 
-    @Test
-    @DisplayName("Test mapSkillToSkillsId")
-    public void testMapSkillToSkillsId() {
-        Skill skill1 = new Skill();
-        skill1.setId(1L);
-        Skill skill2 = new Skill();
-        skill2.setId(2L);
+    @Nested
+    @DisplayName("Mapping Skills to Skill IDs Tests")
+    class MapSkillToSkillsIdTests {
 
-        List<Skill> skills = List.of(skill1, skill2);
-        List<Long> skillIds = goalMapper.mapSkillToSkillsId(skills);
+        @Test
+        @DisplayName("whenSkillsProvidedThenMapToSkillIdsCorrectly")
+        void whenSkillsProvidedThenMapToSkillIdsCorrectly() {
+            Skill skill1 = new Skill();
+            skill1.setId(SKILL_ID_1);
+            Skill skill2 = new Skill();
+            skill2.setId(SKILL_ID_2);
 
-        assertEquals(2, skillIds.size());
-        assertTrue(skillIds.contains(1L));
-        assertTrue(skillIds.contains(2L));
+            List<Skill> skills = List.of(skill1, skill2);
+            List<Long> skillIds = goalMapper.mapSkillToSkillsId(skills);
+
+            assertEquals(2, skillIds.size());
+            assertTrue(skillIds.contains(SKILL_ID_1));
+            assertTrue(skillIds.contains(SKILL_ID_2));
+        }
     }
 
-    @Test
-    @DisplayName("Test mapIdToParent")
-    public void testMapIdToParent() {
-        Long parentId = 1L;
-        Goal parentGoal = goalMapper.mapIdToParent(parentId);
+    @Nested
+    @DisplayName("Mapping ID to Parent Goal Tests")
+    class MapIdToParentTests {
 
-        assertNotNull(parentGoal);
-        assertEquals(parentId, parentGoal.getId());
+        @Test
+        @DisplayName("whenParentIdProvidedThenMapToParentGoalCorrectly")
+        void whenParentIdProvidedThenMapToParentGoalCorrectly() {
+            Long parentId = PARENT_GOAL_ID;
+            Goal parentGoal = goalMapper.mapIdToParent(parentId);
+
+            assertNotNull(parentGoal);
+            assertEquals(parentId, parentGoal.getId());
+        }
     }
 
-    @Test
-    @DisplayName("Test mapSkillIdToListSkill")
-    public void testMapSkillIdToListSkill() {
-        List<Long> skillIds = List.of(1L, 2L);
+    @Nested
+    @DisplayName("Mapping Skill IDs to Skills Tests")
+    class MapSkillIdToListSkillTests {
 
-        List<Skill> skills = goalMapper.mapSkillIdToListSkill(skillIds);
+        @Test
+        @DisplayName("whenSkillIdsProvidedThenMapToSkillsCorrectly")
+        void whenSkillIdsProvidedThenMapToSkillsCorrectly() {
+            List<Long> skillIds = List.of(SKILL_ID_1, SKILL_ID_2);
 
-        assertEquals(2, skills.size());
-        assertEquals(1L, skills.get(0).getId());
-        assertEquals(2L, skills.get(1).getId());
+            List<Skill> skills = goalMapper.mapSkillIdToListSkill(skillIds);
+
+            assertEquals(2, skills.size());
+            assertEquals(SKILL_ID_1, skills.get(0).getId());
+            assertEquals(SKILL_ID_2, skills.get(1).getId());
+        }
     }
 }
+

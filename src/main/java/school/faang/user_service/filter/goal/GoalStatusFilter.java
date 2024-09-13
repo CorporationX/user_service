@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 @Component
 public class GoalStatusFilter implements GoalFilter {
+
     @Override
     public boolean isApplicable(GoalFilterDto filters) {
         return filters.getStatus() != null;

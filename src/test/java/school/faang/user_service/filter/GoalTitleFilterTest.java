@@ -2,7 +2,10 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
@@ -12,7 +15,9 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class GoalTitleFilterTest {
+
     private static final String TEST = "Test";
     private static final String GOAL_1 = "Goal 1";
     private static final String GOAL_2 = "Goal 2";
@@ -37,57 +42,68 @@ public class GoalTitleFilterTest {
         goalFilterDto = new GoalFilterDto();
     }
 
-    @Test
-    @DisplayName("Test isApplicable returns true when title is present in filters")
-    public void testIsApplicableWithTitle() {
-        goalFilterDto.setTitle(TEST);
+    @Nested
+    @DisplayName("isApplicable Method Tests")
+    class IsApplicableTests {
 
-        boolean result = goalTitleFilter.isApplicable(goalFilterDto);
+        @Test
+        @DisplayName("whenTitleIsPresentThenReturnTrue")
+        void whenTitleIsPresentThenReturnTrue() {
+            goalFilterDto.setTitle(TEST);
 
-        assertTrue(result, "Filter should be applicable when title is provided");
+            boolean result = goalTitleFilter.isApplicable(goalFilterDto);
+
+            assertTrue(result, "Filter should be applicable when title is provided");
+        }
+
+        @Test
+        @DisplayName("whenTitleIsAbsentThenReturnFalse")
+        void whenTitleIsAbsentThenReturnFalse() {
+            boolean result = goalTitleFilter.isApplicable(goalFilterDto);
+
+            assertFalse(result, "Filter should not be applicable when title is not provided");
+        }
     }
 
-    @Test
-    @DisplayName("Test isApplicable returns false when title is not present in filters")
-    public void testIsApplicableWithoutTitle() {
-        boolean result = goalTitleFilter.isApplicable(goalFilterDto);
+    @Nested
+    @DisplayName("apply Method Tests")
+    class ApplyTests {
 
-        assertFalse(result, "Filter should not be applicable when title is not provided");
-    }
+        @Test
+        @DisplayName("whenExactTitleProvidedThenFilterByExactTitle")
+        void whenExactTitleProvidedThenFilterByExactTitle() {
+            goalFilterDto.setTitle(GOAL_1);
 
-    @Test
-    @DisplayName("Test apply filters goals by title")
-    public void testApplyFilterByTitle() {
-        goalFilterDto.setTitle(GOAL_1);
+            Stream<Goal> goalsStream = Stream.of(goal1, goal2);
+            List<Goal> filteredGoals = goalTitleFilter.apply(goalsStream, goalFilterDto).toList();
 
-        Stream<Goal> goalsStream = Stream.of(goal1, goal2);
-        List<Goal> filteredGoals = goalTitleFilter.apply(goalsStream, goalFilterDto).toList();
+            assertEquals(1, filteredGoals.size(), "There should be one goal with 'Goal 1' in the title");
+            assertEquals(TEST_GOAL_1, filteredGoals.get(0).getTitle(), "The filtered goal should have 'Test Goal 1' as title");
+        }
 
-        assertEquals(1, filteredGoals.size(), "There should be one goal with 'Goal 1' in the title");
-        assertEquals(TEST_GOAL_1, filteredGoals.get(0).getTitle(), "The filtered goal should have 'Test Goal 1' as title");
-    }
+        @Test
+        @DisplayName("whenPartialTitleProvidedThenFilterByPartialTitle")
+        void whenPartialTitleProvidedThenFilterByPartialTitle() {
+            goalFilterDto.setTitle(TEST);
 
-    @Test
-    @DisplayName("Test apply filters goals by partial title match")
-    public void testApplyFilterByPartialTitle() {
-        goalFilterDto.setTitle(TEST);
+            Stream<Goal> goalsStream = Stream.of(goal1, goal2);
+            List<Goal> filteredGoals = goalTitleFilter.apply(goalsStream, goalFilterDto).toList();
 
-        Stream<Goal> goalsStream = Stream.of(goal1, goal2);
-        List<Goal> filteredGoals = goalTitleFilter.apply(goalsStream, goalFilterDto).toList();
+            assertEquals(2, filteredGoals.size(), "There should be two goals with 'Test' in the title");
+            assertTrue(filteredGoals.stream().anyMatch(goal -> goal.getTitle().equals(TEST_GOAL_1)));
+            assertTrue(filteredGoals.stream().anyMatch(goal -> goal.getTitle().equals(TEST_GOAL_2)));
+        }
 
-        assertEquals(2, filteredGoals.size(), "There should be two goals with 'Test' in the title");
-        assertTrue(filteredGoals.stream().anyMatch(goal -> goal.getTitle().equals(TEST_GOAL_1)));
-        assertTrue(filteredGoals.stream().anyMatch(goal -> goal.getTitle().equals(TEST_GOAL_2)));
-    }
+        @Test
+        @DisplayName("whenNoMatchThenReturnEmptyList")
+        void whenNoMatchThenReturnEmptyList() {
+            goalFilterDto.setTitle("Unknown");
 
-    @Test
-    @DisplayName("Test apply does not filter when no match")
-    public void testApplyFilterNoMatch() {
-        goalFilterDto.setTitle("Unknown");
+            Stream<Goal> goalsStream = Stream.of(goal1, goal2);
+            List<Goal> filteredGoals = goalTitleFilter.apply(goalsStream, goalFilterDto).toList();
 
-        Stream<Goal> goalsStream = Stream.of(goal1, goal2);
-        List<Goal> filteredGoals = goalTitleFilter.apply(goalsStream, goalFilterDto).toList();
-
-        assertEquals(0, filteredGoals.size(), "There should be no goals with 'Unknown' in the title");
+            assertEquals(0, filteredGoals.size(), "There should be no goals with 'Unknown' in the title");
+        }
     }
 }
+

@@ -12,6 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SkillService {
+
     private final SkillRepository skillRepository;
 
     @Transactional

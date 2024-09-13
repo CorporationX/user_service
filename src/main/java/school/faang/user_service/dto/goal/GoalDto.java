@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class GoalDto {
+
     private Long id;
     private Long parentId;
     private String title;

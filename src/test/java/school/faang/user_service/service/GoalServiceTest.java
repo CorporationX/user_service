@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
+
+    private static final long GOAL_ID = 1L;
+    private static final long USER_ID = 1L;
+    private static final String NEW_GOAL_TITLE = "New Goal";
+    private static final String EXISTING_GOAL_TITLE = "Existing Goal";
+    private static final String GOAL_DESCRIPTION = "Description";
+
     @InjectMocks
     private GoalService goalService;
 
@@ -49,113 +57,135 @@ public class GoalServiceTest {
 
     private GoalDto goalDto;
     private Goal goal;
-    private long goalId;
-    private long userId;
 
     @BeforeEach
     public void setUp() {
-        goalId = 1L;
-        userId = 1L;
         goalDto = GoalDto.builder()
-                .id(goalId)
-                .title("New Goal")
-                .description("Description")
+                .id(GOAL_ID)
+                .title(NEW_GOAL_TITLE)
+                .description(GOAL_DESCRIPTION)
                 .status(GoalStatus.ACTIVE)
                 .build();
 
         goal = new Goal();
-        goal.setId(goalId);
-        goal.setTitle("Existing Goal");
+        goal.setId(GOAL_ID);
+        goal.setTitle(EXISTING_GOAL_TITLE);
         goal.setStatus(GoalStatus.ACTIVE);
     }
 
-    @Test
-    @DisplayName("Test Goal Creation")
-    @Transactional
-    public void testCreateGoal() {
-        when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(0);
-        when(goalMapper.toGoal(goalDto)).thenReturn(goal);
+    @Nested
+    @DisplayName("Goal Creation Tests")
+    class CreateGoalTests {
 
-        GoalDto createdGoal = goalService.createGoal(userId, goalDto);
+        @Test
+        @DisplayName("whenValidInputThenCreateGoalSuccessfully")
+        @Transactional
+        void whenValidInputThenCreateGoalSuccessfully() {
+            when(goalRepository.countActiveGoalsPerUser(USER_ID)).thenReturn(0);
+            when(goalMapper.toGoal(goalDto)).thenReturn(goal);
 
-        verify(goalRepository, times(1)).create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
-        verify(skillService, times(1)).create(goal.getSkillsToAchieve(), userId);
-        verify(goalServiceValidator, times(1)).validateUserGoalLimit(0);
+            GoalDto createdGoal = goalService.createGoal(USER_ID, goalDto);
 
-        assertEquals(goalDto, createdGoal);
+            verify(goalRepository, times(1)).create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
+            verify(skillService, times(1)).create(goal.getSkillsToAchieve(), USER_ID);
+            verify(goalServiceValidator, times(1)).validateUserGoalLimit(0);
+
+            assertEquals(goalDto, createdGoal);
+        }
     }
 
-    @Test
-    @DisplayName("Test Goal Update when Goal Exists")
-    @Transactional
-    public void testUpdateGoalWhenGoalExists() {
-        when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
-        when(goalMapper.toGoal(goalDto)).thenReturn(goal);
-        when(goalMapper.toGoalDto(goal)).thenReturn(goalDto);
+    @Nested
+    @DisplayName("Goal Update Tests")
+    class UpdateGoalTests {
 
-        GoalDto updatedGoal = goalService.updateGoal(goalId, goalDto);
+        @Test
+        @DisplayName("whenGoalExistsThenUpdateSuccessfully")
+        @Transactional
+        void whenGoalExistsThenUpdateSuccessfully() {
+            when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.of(goal));
+            when(goalMapper.toGoal(goalDto)).thenReturn(goal);
+            when(goalMapper.toGoalDto(goal)).thenReturn(goalDto);
 
-        verify(goalRepository, times(1)).save(goal);
-        verify(skillService, times(1)).addSkillToUsers(goalRepository.findUsersByGoalId(goalId), goalId);
-        verify(goalServiceValidator, times(1)).validateGoalStatusNotCompleted(goal);
-        verify(goalServiceValidator, times(1)).validateSkillsExistByTitle(goal.getSkillsToAchieve());
+            GoalDto updatedGoal = goalService.updateGoal(GOAL_ID, goalDto);
 
-        assertNotNull(updatedGoal);
-        assertEquals(goalDto.getTitle(), updatedGoal.getTitle());
+            verify(goalRepository, times(1)).save(goal);
+            verify(skillService, times(1)).addSkillToUsers(goalRepository.findUsersByGoalId(GOAL_ID), GOAL_ID);
+            verify(goalServiceValidator, times(1)).validateGoalStatusNotCompleted(goal);
+            verify(goalServiceValidator, times(1)).validateSkillsExistByTitle(goal.getSkillsToAchieve());
+
+            assertNotNull(updatedGoal);
+            assertEquals(goalDto.getTitle(), updatedGoal.getTitle());
+        }
+
+        @Test
+        @DisplayName("whenGoalDoesNotExistThenThrowNotFoundException")
+        @Transactional
+        void whenGoalDoesNotExistThenThrowNotFoundException() {
+            when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.empty());
+
+            assertThrows(NotFoundException.class, () -> goalService.updateGoal(GOAL_ID, goalDto));
+            verify(goalRepository, times(0)).save(any(Goal.class));
+        }
     }
 
-    @Test
-    @DisplayName("Test Goal Update when Goal Does Not Exist")
-    @Transactional
-    public void testUpdateGoalWhenGoalDoesNotExist() {
-        when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
+    @Nested
+    @DisplayName("Goal Deletion Tests")
+    class DeleteGoalTests {
 
-        assertThrows(NotFoundException.class, () -> goalService.updateGoal(goalId, goalDto));
-        verify(goalRepository, times(0)).save(any(Goal.class));
+        @Test
+        @DisplayName("whenGoalExistsThenDeleteSuccessfully")
+        @Transactional
+        void whenGoalExistsThenDeleteSuccessfully() {
+            Stream<Goal> goalsStream = Stream.of(goal);
+            when(goalRepository.findByParent(GOAL_ID)).thenReturn(goalsStream);
+
+            goalService.deleteGoal(GOAL_ID);
+
+            verify(goalRepository, times(1)).deleteById(GOAL_ID);
+            verify(goalServiceValidator, times(1)).validateGoalsExist(goalsStream);
+        }
     }
 
-    @Test
-    @DisplayName("Test Goal Deletion")
-    @Transactional
-    public void testDeleteGoal() {
-        Stream<Goal> goalsStream = Stream.of(goal);
-        when(goalRepository.findByParent(goalId)).thenReturn(goalsStream);
+    @Nested
+    @DisplayName("Subtasks Fetching Tests")
+    class FetchSubtasksTests {
 
-        goalService.deleteGoal(goalId);
+        @Test
+        @DisplayName("whenGoalIdProvidedThenFetchSubtasksSuccessfully")
+        @Transactional
+        void whenGoalIdProvidedThenFetchSubtasksSuccessfully() {
+            GoalFilterDto filterDto = new GoalFilterDto();
+            Stream<Goal> goalsStream = Stream.of(goal);
 
-        verify(goalRepository, times(1)).deleteById(goalId);
-        verify(goalServiceValidator, times(1)).validateGoalsExist(goalsStream);
+            when(goalRepository.findByParent(GOAL_ID)).thenReturn(goalsStream);
+            when(goalFilters.stream()).thenReturn(Stream.of());
+
+            goalService.findSubtasksByGoalId(GOAL_ID, filterDto);
+
+            verify(goalRepository, times(1)).findByParent(GOAL_ID);
+            verify(goalFilters, times(1)).stream();
+        }
     }
 
-    @Test
-    @DisplayName("Test fetching subtasks by Goal ID")
-    @Transactional
-    public void testGetSubtasksByGoalId() {
-        GoalFilterDto filterDto = new GoalFilterDto();
-        Stream<Goal> goalsStream = Stream.of(goal);
+    @Nested
+    @DisplayName("Goals Fetching Tests")
+    class FetchGoalsTests {
 
-        when(goalRepository.findByParent(goalId)).thenReturn(goalsStream);
-        when(goalFilters.stream()).thenReturn(Stream.of());  // Мокаем отсутствие фильтров
+        @Test
+        @DisplayName("whenUserIdProvidedThenFetchGoalsSuccessfully")
+        @Transactional
+        void whenUserIdProvidedThenFetchGoalsSuccessfully() {
+            GoalFilterDto filterDto = new GoalFilterDto();
+            Stream<Goal> goalsStream = Stream.of(goal);
 
-        goalService.getSubtasksByGoalId(goalId, filterDto);
+            when(goalRepository.findGoalsByUserId(USER_ID)).thenReturn(goalsStream);
+            when(goalFilters.stream()).thenReturn(Stream.of());
 
-        verify(goalRepository, times(1)).findByParent(goalId);
-        verify(goalFilters, times(1)).stream();
-    }
+            goalService.getGoalsByUser(USER_ID, filterDto);
 
-    @Test
-    @DisplayName("Test fetching Goals by User ID")
-    @Transactional
-    public void testGetGoalsByUser() {
-        GoalFilterDto filterDto = new GoalFilterDto();
-        Stream<Goal> goalsStream = Stream.of(goal);
-
-        when(goalRepository.findGoalsByUserId(userId)).thenReturn(goalsStream);
-        when(goalFilters.stream()).thenReturn(Stream.of());  // Мокаем отсутствие фильтров
-
-        goalService.getGoalsByUser(userId, filterDto);
-
-        verify(goalRepository, times(1)).findGoalsByUserId(userId);
-        verify(goalFilters, times(1)).stream();
+            verify(goalRepository, times(1)).findGoalsByUserId(USER_ID);
+            verify(goalFilters, times(1)).stream();
+        }
     }
 }
+

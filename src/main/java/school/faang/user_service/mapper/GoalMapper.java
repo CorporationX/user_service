@@ -12,6 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
+
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "mapSkillToSkillsId")
     GoalDto toGoalDto(Goal goal);
@@ -29,6 +30,7 @@ public interface GoalMapper {
     default Goal mapIdToParent(Long id) {
         Goal goal = new Goal();
         goal.setId(id);
+
         return goal;
     }
 

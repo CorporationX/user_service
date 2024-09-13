@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 @Component
 @RequiredArgsConstructor
 public class GoalServiceValidator {
+
     private static final int MAX_USER_GOALS_LIMIT = 3;
     private final SkillService skillService;
 

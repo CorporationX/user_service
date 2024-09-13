@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoalFilterDto {
+
     private String title;
     private String description;
     private GoalStatus status;

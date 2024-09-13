@@ -9,7 +9,7 @@ import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.test_data.event.TestDataEvent;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +33,9 @@ class SkillCustomMapperTest {
         skillDto = skillCustomMapper.toDto(skill);
 
         assertNotNull(skillDto);
-        assertEquals(skill.getId(), skillDto.getId());
-        assertEquals(skill.getTitle(), skillDto.getTitle());
+        assertThat(skillDto).usingRecursiveComparison()
+                .ignoringActualNullFields()
+                .isEqualTo(skill);
     }
 
     @Test
@@ -45,7 +46,8 @@ class SkillCustomMapperTest {
         skill = skillCustomMapper.toEntity(skillDto);
 
         assertNotNull(skill);
-        assertEquals(skill.getId(), skillDto.getId());
-        assertEquals(skill.getTitle(), skillDto.getTitle());
+        assertThat(skill).usingRecursiveComparison()
+                .ignoringActualNullFields()
+                .isEqualTo(skillDto);
     }
 }

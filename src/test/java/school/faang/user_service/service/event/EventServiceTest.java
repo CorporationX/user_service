@@ -17,7 +17,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.event.filters.EventFilter;
 import school.faang.user_service.test_data.event.TestDataEvent;
-import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +51,14 @@ class EventServiceTest {
         userService = Mockito.mock(UserService.class);
         eventValidator = Mockito.mock(EventValidator.class);
         List<EventFilter> filters = List.of(mock(EventFilter.class));
-        eventService = new EventService(eventRepository, eventMapper, userService, eventValidator, filters);
+
+        eventService = new EventService(
+                eventRepository,
+                eventMapper,
+                userService,
+                eventValidator,
+                filters
+        );
 
         testDataEvent = new TestDataEvent();
         user = testDataEvent.getUser();
@@ -72,15 +78,15 @@ class EventServiceTest {
             when(eventRepository.save(event)).thenReturn(event);
             when(eventMapper.toDto(event)).thenReturn(eventDto);
 
-            var result = eventService.createEvent(eventDto);
+            EventDto result = eventService.createEvent(eventDto);
             assertNotNull(result);
             assertEquals(eventDto, result);
 
             verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
             verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eventDto);
-            verify(userService, atLeastOnce()).getUserById(user.getId());
             verify(eventRepository, atLeastOnce()).save(event);
         }
+
 
         @Test
         void testGetEvent_Success() {

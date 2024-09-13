@@ -1,4 +1,4 @@
-package school.faang.user_service.validation.event;
+package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

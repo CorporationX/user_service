@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.event;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +34,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventDto getEvent(@PathVariable @Positive long eventId) {
+    public EventDto getEvent(@PathVariable long eventId) {
         return eventService.getEvent(eventId);
     }
 
@@ -45,7 +44,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{eventId}")
-    public void deleteEvent(@PathVariable @Positive long eventId) {
+    public void deleteEvent(@PathVariable long eventId) {
         eventService.deleteEvent(eventId);
     }
 
@@ -55,12 +54,12 @@ public class EventController {
     }
 
     @GetMapping("/owner")
-    public List<EventDto> getEventsOwner(@RequestParam @Positive long ownerId) {
+    public List<EventDto> getEventsOwner(@RequestParam long ownerId) {
         return eventService.getEventsOwner(ownerId);
     }
 
     @GetMapping("/participant")
-    public List<EventDto> getEventParticipants(@RequestParam @Positive long participantsId) {
+    public List<EventDto> getEventParticipants(@RequestParam long participantsId) {
         return eventService.getEventParticipants(participantsId);
     }
 }

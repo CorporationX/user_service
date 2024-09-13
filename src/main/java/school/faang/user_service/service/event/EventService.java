@@ -12,7 +12,6 @@ import school.faang.user_service.mapper.event.EventCustomMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.event.filters.EventFilter;
-import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 
@@ -59,9 +58,9 @@ public class EventService {
     public EventDto updateEvent(EventDto eventDto) {
         Long eventDtoId = eventDto.getId();
 
+        eventValidator.eventExistByIdValidation(eventDtoId);
         eventValidator.eventDatesValidation(eventDto);
         eventValidator.relatedSkillsValidation(eventDto);
-        eventValidator.eventExistByIdValidation(eventDtoId);
 
         return saveEvent(eventDto);
     }

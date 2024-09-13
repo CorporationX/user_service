@@ -10,10 +10,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SkillService {
+public class SkillService implements SkillServiceMethodsForEventService {
     private final SkillRepository skillRepository;
     private final SkillCustomMapper skillMapper;
 
+    @Override
     public List<SkillDto> getUserSkillDtoList(Long userId) {
         return skillRepository.findAllByUserId(userId)
                 .stream()

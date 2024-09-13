@@ -10,7 +10,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.SubscriptionServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ class SubscriptionControllerTest {
     private long followerId;
 
     @Mock
-    private SubscriptionService subscriptionService;
+    private SubscriptionServiceImpl subscriptionService;
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
@@ -39,7 +39,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldFollowUserSuccessfully() throws Exception, DataValidationException {
+    void shouldFollowUserSuccessfully_WhenValidInputIsProvided() throws Exception, DataValidationException {
         long followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);
@@ -48,7 +48,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenFollowYourself() throws DataValidationException, DataFormatException {
+    void shouldThrowException_WhenTryingToFollowYourself() throws DataValidationException, DataFormatException {
         long followeeId = 1L;
 
         assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
@@ -56,7 +56,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldUnfollowUserSuccessfully() throws DataValidationException {
+    void shouldUnfollowUserSuccessfully_WhenValidInputIsProvided() throws DataValidationException {
         long followeeId = 2L;
 
         subscriptionController.unfollowUser(followerId, followeeId);
@@ -65,7 +65,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUnfollowYourself() throws DataValidationException {
+    void shouldThrowException_WhenTryingToUnfollowYourself() throws DataValidationException {
         long followeeId = 1L;
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> {
@@ -77,7 +77,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldReturnFilteredFollowersByName() {
+    void shouldReturnFilteredFollowersByName_WhenFilterIsApplied() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
         filter.setNamePattern("John.*");
@@ -96,7 +96,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldReturnFilteredFollowersByEmail() {
+    void shouldReturnFilteredFollowersByEmail_WhenEmailPatternIsProvided() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
         filter.setEmailPattern(".*@example.com");
@@ -115,7 +115,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyListWhenNoFollowers() {
+    void shouldReturnEmptyList_WhenNoFollowersExist() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
 
@@ -129,7 +129,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldReturnAllFollowersWhenNoFilter() {
+    void shouldReturnAllFollowers_WhenNoFilterIsApplied() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
 
@@ -146,7 +146,7 @@ class SubscriptionControllerTest {
         assertEquals("JaneDoe", result.get(1).getUsername());
     }
     @Test
-    public void testGetFollowersCount() {
+    public void shouldReturnFollowersCount_WhenValidFollowerIdIsProvided() {
         int expectedCount = 5;
 
         when(subscriptionService.getFollowersCount(followerId)).thenReturn(expectedCount);
@@ -158,7 +158,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void testGetFollowing() {
+    void shouldReturnFollowingList_WhenNamePatternFilterIsApplied() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
         filter.setNamePattern("username");

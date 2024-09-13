@@ -7,12 +7,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.EmailFilter;
+import school.faang.user_service.filter.UserFilter;
+import school.faang.user_service.filter.UsernameFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.SubscriptionServiceImpl;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
@@ -31,8 +36,11 @@ public class SubscriptionServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private List<UserFilter> filters;
+
     @InjectMocks
-    private SubscriptionService subscriptionService;
+    private SubscriptionServiceImpl subscriptionService;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +49,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void shouldFollowUserSuccessfully() throws Exception, DataValidationException {
+    void shouldFollowUserSuccessfully_WhenSubscriptionDoesNotExist() throws Exception, DataValidationException {
         long followeeId = 2L;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
@@ -52,7 +60,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenSubscriptionAlreadyExists() {
+    void shouldThrowException_WhenSubscriptionAlreadyExists() {
         long followeeId = 2L;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
@@ -63,7 +71,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void shouldUnfollowUserSuccessfully() {
+    void shouldUnfollowUserSuccessfully_WhenCalled() {
         long followeeId = 2L;
 
         subscriptionService.unfollowUser(followerId, followeeId);
@@ -72,7 +80,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void testGetFollowers() {
+    void shouldReturnFollowers_WhenNoFilterIsApplied() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
         UserDto userDto = new UserDto(1L, "username", "email@example.com");
@@ -85,7 +93,7 @@ public class SubscriptionServiceTest {
 
         when(subscriptionRepository.findByFolloweeId(followeeId))
                 .thenReturn(Stream.of(user));
-        when(userMapper.userToUserDto(user))
+        when(userMapper.toDto(user))
                 .thenReturn(userDto);
 
         List<UserDto> result = subscriptionService.getFollowers(followeeId, filter);
@@ -95,7 +103,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void testGetFollowersWithFilter() {
+    void shouldReturnFilteredFollowers_WhenFilterIsApplied() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
         filter.setNamePattern("username");
@@ -109,7 +117,7 @@ public class SubscriptionServiceTest {
 
         when(subscriptionRepository.findByFolloweeId(followeeId))
                 .thenReturn(Stream.of(user));
-        when(userMapper.userToUserDto(user))
+        when(userMapper.toDto(user))
                 .thenReturn(userDto);
 
         List<UserDto> result = subscriptionService.getFollowers(followeeId, filter);
@@ -119,8 +127,8 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void testFilterUsers() throws Exception {
-        Method method = SubscriptionService.class.getDeclaredMethod("filterUsers", List.class, UserFilterDto.class);
+    void shouldFilterUsersCorrectly_WhenFilterIsApplied() throws Exception {
+        Method method = SubscriptionServiceImpl.class.getDeclaredMethod("filterUsers", List.class, UserFilterDto.class);
         method.setAccessible(true);
 
         UserDto user1 = new UserDto(1L, "user1", "email1@example.com");
@@ -130,15 +138,29 @@ public class SubscriptionServiceTest {
 
         List<UserDto> users = Arrays.asList(user1, user2);
 
+        UserFilter filterMock = Mockito.mock(UserFilter.class);
+        Mockito.when(filterMock.apply(Mockito.any(UserDto.class), Mockito.any(UserFilterDto.class)))
+                .thenAnswer(invocation -> {
+                    UserDto user = invocation.getArgument(0);
+                    UserFilterDto userFilter = invocation.getArgument(1);
+                    return user.getUsername().contains(userFilter.getNamePattern());
+                });
+
+        SubscriptionServiceImpl service = new SubscriptionServiceImpl(
+                subscriptionRepository,
+                userMapper,
+                Arrays.asList(filterMock)
+        );
+
         @SuppressWarnings("unchecked")
-        List<UserDto> result = (List<UserDto>) method.invoke(subscriptionService, users, filter);
+        List<UserDto> result = (List<UserDto>) method.invoke(service, users, filter);
 
         assertEquals(1, result.size());
         assertEquals(user1, result.get(0));
     }
 
     @Test
-    public void testGetFollowersCount() {
+    void shouldReturnFollowersCount_WhenCalled() {
         long followeeId = 1L;
         int expectedCount = 5;
 
@@ -153,7 +175,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    void testGetFollowing() {
+    void shouldReturnFollowing_WhenNoFilterIsApplied() {
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
         filter.setNamePattern("username");
@@ -167,7 +189,7 @@ public class SubscriptionServiceTest {
 
         when(subscriptionRepository.findByFollowerId(followeeId))
                 .thenReturn(Stream.of(user));
-        when(userMapper.userToUserDto(user))
+        when(userMapper.toDto(user))
                 .thenReturn(userDto);
 
         List<UserDto> result = subscriptionService.getFollowing(followeeId, filter);
@@ -176,10 +198,11 @@ public class SubscriptionServiceTest {
         assertEquals(userDto, result.get(0));
 
         verify(subscriptionRepository, times(1)).findByFollowerId(followeeId);
-        verify(userMapper, times(1)).userToUserDto(user);
+        verify(userMapper, times(1)).toDto(user);
     }
+
     @Test
-    void testGetFollowingCount() {
+    void shouldReturnFollowingCount_WhenCalled() {
         int expectedCount = 5;
 
         when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId))

@@ -8,7 +8,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
-import java.util.zip.DataFormatException;
 
 @Controller
 @RequiredArgsConstructor

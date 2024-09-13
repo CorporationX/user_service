@@ -8,6 +8,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,11 +26,11 @@ public class UserService {
                 .toList();
 
         return premiumUsers.stream()
-                .filter(user -> isUserMatchesFilters(user, applicableFilters, filterDto))
+                .filter(user -> userMatchesFilters(user, applicableFilters, filterDto))
                 .toList();
     }
 
-    private boolean isUserMatchesFilters(User user, List<UserFilter> filters, UserFilterDto filterDto) {
+    private boolean userMatchesFilters(User user, List<UserFilter> filters, UserFilterDto filterDto) {
         return filters.stream()
                 .allMatch(filter -> filter.test(user, filterDto));
     }

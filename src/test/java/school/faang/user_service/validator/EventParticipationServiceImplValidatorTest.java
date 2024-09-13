@@ -14,7 +14,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class EventParticipationServiceValidatorTest {
+class EventParticipationServiceImplValidatorTest {
     @Mock
     EventParticipationRepository repository;
     @InjectMocks

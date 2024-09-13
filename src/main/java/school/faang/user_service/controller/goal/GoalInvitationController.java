@@ -3,7 +3,6 @@ package school.faang.user_service.controller.goal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,8 +44,8 @@ public class GoalInvitationController {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
-    @GetMapping
-    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
+    @PostMapping("/filters")
+    public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter)
                 .stream()
                 .map(goalInvitationMapper::toDto)

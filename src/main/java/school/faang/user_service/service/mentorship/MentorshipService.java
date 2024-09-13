@@ -1,7 +1,7 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 
 import java.util.List;
 

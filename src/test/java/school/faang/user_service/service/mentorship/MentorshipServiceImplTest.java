@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,11 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.mentorship.MentorshipServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,10 +46,6 @@ public class MentorshipServiceImplTest {
 
         mentee = new User();
         mentee.setId(20L);
-
-        UserDto userDto = new UserDto();
-        userDto.setId(30L);
-        userDto.setEmail("Artem");
 
         mentor.setMentees(List.of(mentee));
         mentee.setMentors(List.of(mentor));

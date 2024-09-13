@@ -1,17 +1,16 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.filter.UserFilter;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.validator.SubscriptionValidator;
+import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;

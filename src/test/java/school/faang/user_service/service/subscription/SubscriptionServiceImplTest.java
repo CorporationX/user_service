@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,11 +8,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.UserFilter;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -66,15 +66,8 @@ class SubscriptionServiceImplTest {
         user2.setUsername("username2");
         user2.setEmail("email2@email.com");
 
-        userDto1 = new UserDto();
-        userDto1.setId(1L);
-        userDto1.setUsername("username1");
-        userDto1.setEmail("email1@email.com");
-
-        userDto2 = new UserDto();
-        userDto2.setId(2L);
-        userDto2.setUsername("username2");
-        userDto2.setEmail("email2@email.com");
+        userDto1 = UserDto.builder().id(1L).username("username1").email("email1@email.com").build();
+        userDto2 = UserDto.builder().id(2L).username("username2").email("email2@email.com").build();
 
         when(subscriptionRepository.findByFollowerId(anyLong())).thenReturn(Stream.of(user1, user2));
         when(subscriptionRepository.findByFolloweeId(anyLong())).thenReturn(Stream.of(user1, user2));

@@ -1,4 +1,4 @@
-package school.faang.user_service.sevice.event;
+package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

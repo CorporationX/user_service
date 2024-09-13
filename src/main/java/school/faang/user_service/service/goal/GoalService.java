@@ -1,115 +1,24 @@
 package school.faang.user_service.service.goal;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.filter.GoalFilter;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validator.GoalValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
-@RequiredArgsConstructor
-public class GoalService {
-    private final GoalRepository goalRepository;
-    private final GoalMapper goalMapper;
-    private final GoalValidator goalValidator;
-    private final List<GoalFilter> goalFilters;
-    private final SkillRepository skillRepository;
+public interface GoalService {
 
     @Transactional
-    public GoalDto createGoal(Long userId, GoalDto goalDto) {
-        goalValidator.validateGoalTitle(goalDto);
-        goalValidator.validateGoalsPerUser(userId);
-        goalValidator.validateGoalSkills(goalDto.getSkillIds());
-
-        Goal createdGoal = goalRepository.create(
-                goalDto.getTitle(),
-                goalDto.getDescription(),
-                goalDto.getParentId(),
-                goalDto.getDeadline()
-        );
-
-        goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, createdGoal.getId()));
-
-        goalRepository.addGoalToUser(userId, createdGoal.getId());
-
-        return goalMapper.toDto(createdGoal);
-    }
+    GoalDto createGoal(Long userId, GoalDto goalDto);
 
     @Transactional
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
-        goalValidator.validateGoalTitle(goalDto);
-        goalValidator.validateGoalSkills(goalDto.getSkillIds());
+    GoalDto updateGoal(Long goalId, GoalDto goalDto);
 
-        Goal goalToUpdate = goalRepository.findById(goalId).orElseThrow(EntityNotFoundException::new);
+    void deleteGoal(Long goalId);
 
-        updateRequiredFields(goalToUpdate, goalDto);
+    List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters);
 
-        return goalMapper.toDto(goalRepository.save(goalToUpdate));
-    }
-
-    private void updateRequiredFields(Goal goalToUpdate, GoalDto goalDto) {
-        goalToUpdate.setTitle(goalDto.getTitle());
-        if (goalDto.getDescription() != null) {
-            goalToUpdate.setDescription(goalDto.getDescription());
-        }
-        if (goalDto.getSkillIds() != null) {
-            updateSkillsToAchieve(goalToUpdate, goalDto.getSkillIds());
-        }
-        if (goalDto.getDeadline() != null) {
-            goalToUpdate.setDeadline(goalDto.getDeadline());
-        }
-        if (isToComplete(goalToUpdate.getId(), goalDto)) {
-            goalToUpdate.setStatus(GoalStatus.COMPLETED);
-            goalRepository.findUsersByGoalId(goalToUpdate.getId()).forEach(user -> {
-                for (Long skillId : goalDto.getSkillIds()) {
-                    skillRepository.assignSkillToUser(user.getId(), skillId);
-                }
-            });
-        }
-        goalToUpdate.setUpdatedAt(LocalDateTime.now());
-    }
-
-    private boolean isToComplete(Long goalId, GoalDto goalDto) {
-        return goalRepository.getReferenceById(goalId).getStatus() != GoalStatus.COMPLETED
-                && goalDto.getStatus() == GoalStatus.COMPLETED;
-    }
-
-    private void updateSkillsToAchieve(Goal goal, List<Long> skillIds) {
-        goal.setSkillsToAchieve(skillIds.stream()
-                .map(skillRepository::getReferenceById)
-                .toList());
-        skillIds.forEach(id -> goalRepository.addSkillToGoal(id, goal.getId()));
-    }
-
-    public void deleteGoal(Long goalId) {
-        goalRepository.deleteById(goalId);
-    }
-
-    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters) {
-        Stream<Goal> goals = goalRepository.findByParent(goalId);
-        goalFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(filters, goals));
-        return goals.map(goalMapper::toDto).toList();
-    }
-
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
-        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
-        goalFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(filters, goals));
-        return goals.map(goalMapper::toDto).toList();
-    }
+    List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters);
 }

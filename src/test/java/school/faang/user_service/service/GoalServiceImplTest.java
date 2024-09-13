@@ -7,12 +7,13 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.exception.ValidationException;
-import school.faang.user_service.filter.GoalFilter;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.goal.GoalServiceImpl;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.Collections;
@@ -22,14 +23,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GoalServiceTest {
+public class GoalServiceImplTest {
+    private static final int GOALS_PER_USER = 3;
+
     private Long userId;
     private Long goalId;
     private GoalDto validGoalDto;
     private GoalDto emptyTitleGoalDto;
 
     @InjectMocks
-    private GoalService goalService;
+    private GoalServiceImpl goalServiceImpl;
 
     @Mock
     private GoalRepository goalRepository;
@@ -44,7 +47,7 @@ public class GoalServiceTest {
     private GoalMapper goalMapper;
 
     @Spy
-    private GoalValidator goalValidator = new GoalValidator(goalRepository, skillRepository);
+    private GoalValidator goalValidator;
 
     @BeforeEach
     void setUp() {
@@ -63,57 +66,48 @@ public class GoalServiceTest {
 
     @Test
     public void testCreateWithEmptyTitle() {
-        ValidationException thrown = assertThrows(ValidationException.class, () ->
-                goalService.createGoal(userId, emptyTitleGoalDto));
+        DataValidationException thrown = assertThrows(DataValidationException.class, () ->
+                goalServiceImpl.createGoal(userId, emptyTitleGoalDto));
 
         assertEquals("Title cannot be empty", thrown.getMessage());
-        verify(goalRepository, never()).create(
-                anyString(),
-                anyString(),
-                anyLong(),
-                any()
-        );
+        verify(goalRepository, never()).save(any(Goal.class));
     }
 
     @Test
     public void testCreateWithUserHavingToManyGoals() {
-        doThrow(ValidationException.class).when(goalValidator).validateGoalsPerUser(userId);
+        when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(GOALS_PER_USER);
 
-        assertThrows(ValidationException.class, () ->
-                goalService.createGoal(userId, validGoalDto));
-        verify(goalRepository, never()).create(
-                anyString(),
-                anyString(),
-                anyLong(),
-                any()
-        );
+        DataValidationException thrown = assertThrows(DataValidationException.class,
+                () -> goalServiceImpl.createGoal(userId, validGoalDto));
+
+        assertEquals("There cannot be more than " + GOALS_PER_USER + " active goals per user", thrown.getMessage());
+        verify(goalRepository, never()).save(any(Goal.class));
     }
 
     @Test
     public void testCreateWithNotExistingSkills() {
-        doNothing().when(goalValidator).validateGoalsPerUser(userId);
-        doThrow(ValidationException.class).when(goalValidator).validateGoalSkills(validGoalDto.getSkillIds());
+        when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(GOALS_PER_USER-1);
+        validGoalDto.setSkillIds(List.of(1L, 2L));
+        when(skillRepository.countExisting(validGoalDto.getSkillIds())).thenReturn(validGoalDto.getSkillIds().size()-1);
 
-        assertThrows(ValidationException.class, () -> goalService.createGoal(userId, validGoalDto));
-        verify(goalRepository, never()).create(
-                anyString(),
-                anyString(),
-                anyLong(),
-                any()
-        );
+        DataValidationException thrown = assertThrows(DataValidationException.class,
+                () -> goalServiceImpl.createGoal(userId, validGoalDto));
+
+        assertEquals("Cannot create goal with non-existent skills", thrown.getMessage());
+        verify(goalRepository, never()).save(any(Goal.class));
     }
 
     @Test
     public void testGettingGoalsByUserWithNoGoals() {
         GoalFilterDto goalFilterDto = new GoalFilterDto();
 
-        assertEquals(goalService.getGoalsByUser(userId, goalFilterDto), Collections.emptyList());
+        assertEquals(goalServiceImpl.getGoalsByUser(userId, goalFilterDto), Collections.emptyList());
     }
 
     @Test
     public void testFindingSubtasksWithNoGoals() {
         GoalFilterDto goalFilterDto = new GoalFilterDto();
 
-        assertEquals(goalService.findSubtasksByGoalId(goalId, goalFilterDto), Collections.emptyList());
+        assertEquals(goalServiceImpl.findSubtasksByGoalId(goalId, goalFilterDto), Collections.emptyList());
     }
 }

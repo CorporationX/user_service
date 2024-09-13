@@ -62,6 +62,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void updateEvent(EventDto eventDto) {
         skillCheck(eventDto);
+        var event = eventMapper.toEntity(eventDto);
+        eventRepository.deleteById(event.getId());
         eventRepository.save(eventMapper.toEntity(eventDto));
     }
 

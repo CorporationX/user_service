@@ -7,18 +7,15 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.event.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @Service
@@ -26,17 +23,18 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventMapper eventMapper;
-
     private final EventRepository eventRepository;
     private final SkillRepository skillRepository;
+    private final List<EventFilter> eventFilters;
+    private final EventValidation eventValidation;
+    private final EventSaving eventSaving;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public EventDto create(EventDto eventDto) {
-        //validateEventDto(eventDto);
-        //validateOwnerSkills(eventDto);
-
-        return saveEventInDB(eventDto);
+        eventValidation.validateEventDto(eventDto);
+        eventValidation.validateOwnerSkills(eventDto);
+        return eventSaving.saveEventInDB(eventDto);
     }
 
     public EventDto getEvent(long eventId) {
@@ -48,11 +46,11 @@ public class EventService {
         return eventMapper.eventToDto(event);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        return eventRepository.findAll().stream()
-                .map(eventMapper::eventToEventFilterDto)
-                .filter(event -> event.equals(filter))
-                .map(eventMapper::eventFilterDtoToEvent)
+    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
+        Stream<Event> events = eventRepository.findAll().stream();
+        return eventFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(events, filters))
                 .map(eventMapper::eventToDto)
                 .toList();
     }
@@ -66,82 +64,36 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
-    public void updateEvent(EventDto eventDto) {
+    public EventDto updateEvent(EventDto eventDto) {
+        if (!eventRepository.findById(eventDto.getId()).isPresent()) {
+            LOGGER.warn("The update event was not found with id {}:", eventDto.getId());
+            throw new NoSuchElementException("Event not found with id: " + eventDto.getId());
+        }
 
-        validateEventDto(eventDto);
-        validateOwnerSkills(eventDto);
-        saveEventInDB(eventDto);
+        eventValidation.validateEventDto(eventDto);
+        eventValidation.validateOwnerSkills(eventDto);
+        return eventSaving.saveEventInDB(eventDto);
     }
 
     public List<EventDto> getOwnedEvents(long userId) {
+        if (eventRepository.findAllByUserId(userId).isEmpty()) {
+            LOGGER.warn("Список событий пуст у user id {}:", userId);
+            throw new NoSuchElementException("Список событий пуст у user id: " + userId);
+        }
+
         return eventRepository.findAllByUserId(userId).stream()
                 .map(eventMapper::eventToDto)
                 .toList();
     }
 
     public List<EventDto> getParticipatedEvents(long userId) {
+        if (eventRepository.findParticipatedEventsByUserId(userId).isEmpty()) {
+            LOGGER.warn("Пользователь с id {}, не участвует ни в одном событии:", userId);
+            throw new NoSuchElementException("Пользователь не участвует ни в одном событии, user id: " + userId);
+        }
+
         return eventRepository.findParticipatedEventsByUserId(userId).stream()
                 .map(eventMapper::eventToDto)
                 .toList();
-    }
-
-    private boolean isBlank(String str) {
-        return str == null || str.isBlank();
-    }
-
-    private void validateOwnerSkills(EventDto eventDto) {
-        System.out.println("начался метод по валидации скиллов дто: " + eventDto);
-        //получаем список скиллов создателя события из БД
-        Long ownerId = eventDto.getOwnerId();
-        List<Skill> skillsOwner = skillRepository.findAllByUserId(ownerId);
-
-        //Мапим дто в событие
-        Event event = eventMapper.eventDtoToEvent(eventDto);
-        System.out.println("маппер в дто сработал" + event);
-        List<Skill> skillsEvent = event.getRelatedSkills();
-
-        //Валидируем навыки по названию
-
-        Set<String> setTitleSkillsOwner = skillsOwner.stream()
-                .map(Skill::getTitle)
-                .collect(Collectors.toSet());
-
-        Set<String> setTitleSkillsEvent = skillsEvent.stream()
-                .map(Skill::getTitle)
-                .collect(Collectors.toSet());
-
-        if (!setTitleSkillsEvent.equals(setTitleSkillsOwner)) {
-            throw new DataValidationException("пользователь не может провести такое" +
-                    " событие с такими навыками");
-        }
-    }
-
-    private EventDto saveEventInDB(EventDto eventDto) {
-        System.out.println("EventDto:");
-        System.out.println(eventDto);
-
-        Event event = eventMapper.eventDtoToEvent(eventDto);
-
-        System.out.println("Event:");
-        System.out.println(event);
-
-        //Event eventInDB = eventRepository.save(event);
-
-        return null;
-        //return eventMapper.eventToDto(eventInDB);
-    }
-
-    private void validateEventDto(EventDto eventDto) {
-        try {
-            Objects.requireNonNull(eventDto.getId(), "ID не должен быть null");
-            Objects.requireNonNull(eventDto.getStartDate(), "StartDate не должен быть null");
-            Objects.requireNonNull(eventDto.getOwnerId(), "OwnerID не должен быть null");
-            Objects.requireNonNull(eventDto.getRelatedSkills(), "RelatedSkills не должен быть null");
-            if (isBlank(eventDto.getTitle())) {
-                throw new DataValidationException("Title не должен быть пустым или null");
-            }
-        } catch (NullPointerException e) {
-            throw new DataValidationException("Данные запроса не валидны: " + e.getMessage());
-        }
     }
 }

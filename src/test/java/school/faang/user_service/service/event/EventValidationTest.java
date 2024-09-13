@@ -7,42 +7,41 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
-class EventServiceTest {
+class EventValidationTest {
 
     private SkillDto skillDto1;
     private SkillDto skillDto2;
-    private EventDto eventDto;
-    private Event event;
-    private EventFilterDto eventFilterDto;
-    private Skill skill;
+    private EventDto validEventDto;
+    private EventDto invalidEventDto;
+    private Skill skill1;
+    private List<Skill> skills;
+    private Event validEvent;
     private User user;
-    private List<Event> events;
-
+    private Skill skill2;
+    private Event invalidEvent;
 
     @InjectMocks
-    private EventService eventService;
-
-    @Mock
-    EventRepository eventRepository;
+    private EventValidation eventValidation;
 
     @Mock
     EventMapper eventMapper;
@@ -64,7 +63,7 @@ class EventServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        eventDto = EventDto.builder()
+        validEventDto = EventDto.builder()
                 .id(1L)
                 .title("Новое событие")
                 .startDate(LocalDateTime.now())
@@ -76,15 +75,32 @@ class EventServiceTest {
                 .maxAttendees(5)
                 .build();
 
-        skill = Skill.builder()
+        invalidEventDto = EventDto.builder()
+                .id(null)
+                .title("")
+                .startDate(null)
+                .ownerId(null)
+                .relatedSkills(null)
+                .build();
+
+        skill1 = Skill.builder()
                 .id(1L)
                 .title("title")
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        user = new User();
+        skill2 = Skill.builder()
+                .id(2L)
+                .title("title2")
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        event = Event.builder()
+        skills = new ArrayList<>();
+        skills.add(skill1);
+        skills.add(skill2);
+
+        user = new User();
+        validEvent = Event.builder()
                 .id(1L)
                 .title("Новое событие")
                 .description("какое-то описание")
@@ -93,80 +109,44 @@ class EventServiceTest {
                 .location("location")
                 .maxAttendees(5)
                 .owner(user)
-                .relatedSkills(List.of(skill))
+                .relatedSkills(List.of(skill1, skill2))
                 .type(EventType.GIVEAWAY)
                 .status(EventStatus.IN_PROGRESS)
                 .build();
 
-        eventFilterDto = EventFilterDto.builder()
+        invalidEvent = Event.builder()
+                .id(1L)
                 .title("Новое событие")
+                .description("какое-то описание")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.of(2024, 10, 1, 12, 0))
                 .location("location")
                 .maxAttendees(5)
+                .owner(user)
+                .relatedSkills(List.of(skill1))
                 .type(EventType.GIVEAWAY)
                 .status(EventStatus.IN_PROGRESS)
                 .build();
-
-        events = new ArrayList<>();
-        events.add(event);
     }
 
     //positive test
 
     @Test
-    void testGetEventWithValidObjFromDB() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
-        assertDoesNotThrow(() -> eventService.getEvent(1L));
+    void testValidateEventDtoToValidArgs() {
+        eventValidation.validateEventDto(validEventDto);
     }
 
     @Test
-    void testDeleteEventWithValidObjFromDB() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
-        assertDoesNotThrow(() -> eventService.getEvent(1L));
-    }
-
-    @Test
-    void testGetOwnedEventsWithValidObjFromDB() {
-        when(eventRepository.findAllByUserId(1L)).thenReturn(events);
-        assertDoesNotThrow(() -> eventService.getOwnedEvents(1L));
-    }
-
-    @Test
-    void testGetParticipatedEventsWithValidObjFromDB() {
-        when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(events);
-        assertDoesNotThrow(() -> eventService.getParticipatedEvents(1L));
+    void testValidateOwnerSkillsToValidArgs() {
+        when(skillRepository.findAllByUserId(1L)).thenReturn(skills);
+        when(eventMapper.eventDtoToEvent(validEventDto)).thenReturn(validEvent);
+        assertDoesNotThrow(() -> eventValidation.validateOwnerSkills(validEventDto));
     }
 
     //negative test
 
     @Test
-    void testGetEventWithNullFromDB() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> eventService.getEvent(1L));
-    }
-
-    @Test
-    void testDeleteEventNullFromDB() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> eventService.getEvent(1L));
-    }
-
-    @Test
-    void testGetOwnedEventsWithInvalidObjFromDB() {
-        when(eventRepository.findAllByUserId(1L)).thenReturn(Collections.emptyList());
-        assertThrows(NoSuchElementException.class, () -> eventService.getOwnedEvents(1L));
-    }
-
-    @Test
-    void testGetParticipatedEventsWithInvalidObjFromDB() {
-        when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(Collections.emptyList());
-        assertThrows(NoSuchElementException.class, () -> eventService.getParticipatedEvents(1L));
-    }
-
-    @Test
-    void testUpdateEventWithAbsenceObjFromDB() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> eventService.updateEvent(eventDto));
+    void testValidateEventDtoToInvalidationArgs() {
+        assertThrows(DataValidationException.class, () -> eventValidation.validateEventDto(invalidEventDto));
     }
 }

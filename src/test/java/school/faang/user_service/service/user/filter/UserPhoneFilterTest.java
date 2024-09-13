@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserPhoneFilterTest {
-
     private UserFilter userPhoneFilter;
     private String phoneTest;
 
@@ -68,6 +67,4 @@ public class UserPhoneFilterTest {
 
         assertFalse(result);
     }
-
-
 }

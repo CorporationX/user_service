@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.constant.ErrorMessages;
 import school.faang.user_service.constant.SubscriptionConst;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -18,13 +18,12 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {
-
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFilter> userFilters;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        checkNotToFollowUnfollowToSelf(followerId, followeeId);
+        checkNotToFollowOrUnfollowToSelf(followerId, followeeId);
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException(ErrorMessages.ALREADY_SUBSCRIBE);
         }
@@ -33,7 +32,7 @@ public class SubscriptionService {
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
-        checkNotToFollowUnfollowToSelf(followerId, followeeId);
+        checkNotToFollowOrUnfollowToSelf(followerId, followeeId);
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException(ErrorMessages.USER_NOT_SUBSCRIBED);
         }
@@ -50,7 +49,7 @@ public class SubscriptionService {
         return paginatedUsers.toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
@@ -84,9 +83,9 @@ public class SubscriptionService {
                 .limit(filters.getPageSize() == 0 ? SubscriptionConst.DEFAULT_PAGE_SIZE : filters.getPageSize());
     }
 
-    private void checkNotToFollowUnfollowToSelf(long followerId, long followeeId) {
+    private void checkNotToFollowOrUnfollowToSelf(long followerId, long followeeId) {
         if (followerId == followeeId) {
-            throw new DataValidationException(ErrorMessages.CANNOT_SUBSCRIBE_TO_SELF);
+            throw new DataValidationException(ErrorMessages.CANNOT_SUBSCRIBE_OR_UNSUBSCRIBE_TO_SELF);
         }
     }
 }

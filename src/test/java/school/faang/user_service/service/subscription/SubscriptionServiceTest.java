@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.constant.ErrorMessages;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
-
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
@@ -113,7 +112,7 @@ public class SubscriptionServiceTest {
                 () -> subscriptionService.followUser(followerId, followerId)
         );
 
-        assertTrue(ErrorMessages.CANNOT_SUBSCRIBE_TO_SELF.equals(exception.getMessage()));
+        assertTrue(ErrorMessages.CANNOT_SUBSCRIBE_OR_UNSUBSCRIBE_TO_SELF.equals(exception.getMessage()));
         verify(subscriptionRepository, never()).followUser(followerId, followeeId);
     }
 
@@ -145,7 +144,7 @@ public class SubscriptionServiceTest {
                 () -> subscriptionService.unfollowUser(followerId, followerId)
         );
 
-        assertTrue(ErrorMessages.CANNOT_SUBSCRIBE_TO_SELF.equals(exception.getMessage()));
+        assertTrue(ErrorMessages.CANNOT_SUBSCRIBE_OR_UNSUBSCRIBE_TO_SELF.equals(exception.getMessage()));
         verify(subscriptionRepository, never()).unfollowUser(followerId, followeeId);
     }
 

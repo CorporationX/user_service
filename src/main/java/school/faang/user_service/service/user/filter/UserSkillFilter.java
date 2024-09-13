@@ -1,7 +1,7 @@
 package school.faang.user_service.service.user.filter;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -17,6 +17,6 @@ public class UserSkillFilter implements UserFilter {
     @Override
     public Predicate<User> getPredicate(UserFilterDto filters) {
         return user -> user.getSkills().stream()
-                    .anyMatch(skill -> skill.getTitle().contains(filters.getSkillPattern()));
+                    .anyMatch(skill -> skill.getTitle() != null && skill.getTitle().contains(filters.getSkillPattern()));
     }
 }

@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserSkillFilterTest {
-
     private UserFilter userSkillFilter;
     private String skillTest;
     private List<Skill> skills;
@@ -83,6 +82,4 @@ public class UserSkillFilterTest {
 
         assertFalse(result);
     }
-
-
 }

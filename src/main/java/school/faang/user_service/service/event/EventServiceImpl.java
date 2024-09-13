@@ -32,7 +32,7 @@ public class EventServiceImpl implements EventService {
     public EventDto create(EventDto eventDto) {
         skillCheck(eventDto);
         Event event = eventMapper.toEntity(eventDto);
-        event.setOwner(userRepository.findById(eventDto.getOwnerId()).orElseThrow(() -> new DataValidationException("Пользователь не обнаружен"))); // в отдельный класс
+        event.setOwner(userRepository.findById(eventDto.getOwnerId()).orElseThrow(() -> new DataValidationException("Пользователь не обнаружен")));
         event.setRelatedSkills(skillRepository.findAllById(eventDto.getRelatedSkillsIds()));
         eventRepository.save(event);
         return eventMapper.toDto(event);

@@ -29,7 +29,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
+ //   implementation("io.springfox:springfox-boot-starter:3.0.0")
+    implementation("io.github.openfeign:feign-core:11.8")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:3.0.3")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**

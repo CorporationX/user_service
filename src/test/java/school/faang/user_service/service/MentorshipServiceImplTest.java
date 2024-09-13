@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipServiceImplTest {
+class MentorshipServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -47,10 +47,6 @@ public class MentorshipServiceImplTest {
 
         mentee = new User();
         mentee.setId(20L);
-
-        UserDto userDto = new UserDto();
-        userDto.setId(30L);
-        userDto.setEmail("Artem");
 
         mentor.setMentees(List.of(mentee));
         mentee.setMentors(List.of(mentor));

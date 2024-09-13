@@ -10,12 +10,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.EmailFilter;
 import school.faang.user_service.filter.UserFilter;
-import school.faang.user_service.filter.UsernameFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionServiceImpl;
 import school.faang.user_service.dto.UserDto;

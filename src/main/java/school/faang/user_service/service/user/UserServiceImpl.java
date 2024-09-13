@@ -30,7 +30,8 @@ public class UserServiceImpl implements UserService {
 
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
-                .reduce(premiumUsersStream, (stream, filter) -> stream.filter(user -> filter.apply(user, filterDto)), (s1, s2) -> s1)
+                .reduce(premiumUsersStream, (stream, filter)
+                        -> stream.filter(user -> filter.apply(user, filterDto)), (s1, s2) -> s1)
                 .map(mapper::toDto)
                 .toList();
     }

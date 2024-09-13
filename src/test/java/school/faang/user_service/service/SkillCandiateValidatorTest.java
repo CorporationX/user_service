@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,22 +31,23 @@ public class SkillCandiateValidatorTest {
     public void testValidateSkillSizeToSmall() {
         long skillId = 1L;
         long userId = 2L;
-        List<SkillOffer> skillOffers = List.of(new SkillOffer(), new SkillOffer());
-        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
+        List<SkillOffer> skillOfferList = List.of(new SkillOffer(), new SkillOffer());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            skillCandidateValidator.validateSkillOfferSize(skillId, userId);
+        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOfferList);
+
+        Assertions.assertThrows(DataValidationException.class, () -> {
+            skillCandidateValidator.validateSkillOfferSize(skillOfferList);
         });
     }
 
     @Test
-    public void testValidationSuccesfull() {
+    public void testValidationSuccessfull() {
         long skillId = 1L;
         long userId = 2L;
         List<SkillOffer> skillOffers = List.of(new SkillOffer(), new SkillOffer(), new SkillOffer(), new SkillOffer());
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
 
-        skillCandidateValidator.validateSkillOfferSize(skillId, userId);
+        skillCandidateValidator.validateSkillOfferSize(skillOffers);
 
         verify(skillRepository, times(1)).assignSkillToUser(skillId, userId);
         for (SkillOffer skillOffer : skillOffers) {

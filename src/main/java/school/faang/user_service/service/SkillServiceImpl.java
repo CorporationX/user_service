@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;

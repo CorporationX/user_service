@@ -1,6 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -13,7 +14,7 @@ import java.util.List;
 @Controller
 public class SkillController implements SkillService {
 
-    public SkillDto create(Skill skill) throws IllegalArgumentException {
+    public SkillDto create(Skill skill) throws DataValidationException {
         return create(skill);
     }
 
@@ -25,7 +26,7 @@ public class SkillController implements SkillService {
         return getOfferedSkills(userId);
     }
 
-    public SkillDto acquireSkillFromOffers(long skillId, long userId) throws IllegalArgumentException {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) throws DataValidationException {
         return acquireSkillFromOffers(skillId, userId);
     }
 }

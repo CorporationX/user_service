@@ -34,6 +34,7 @@ public class SkillControllerTest {
         long userId = 1L;
 
         skillController.getUserSkills(userId);
+
         verify(skillService, times(1)).getUserSkills(userId);
     }
     @Test
@@ -41,6 +42,7 @@ public class SkillControllerTest {
         long userId = 1L;
 
         skillController.getOfferedSkills(userId);
+
         verify(skillService, times(1)).getOfferedSkills(userId);
     }
     @Test
@@ -49,7 +51,7 @@ public class SkillControllerTest {
         long skillId = 2L;
 
         skillController.acquireSkillFromOffers(skillId, userId);
+
         verify(skillService, times(1)).acquireSkillFromOffers(skillId, userId);
     }
-
 }

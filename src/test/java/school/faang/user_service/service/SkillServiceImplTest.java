@@ -63,7 +63,6 @@ public class SkillServiceImplTest {
         Skill skill1 = new Skill();
         List<Skill> skills = List.of(skill1);
         when(skillRepository.findSkillsOfferedToUser(id)).thenReturn(skills);
-       // when(skillCandidateMapperImpl.toListDto(skills)).thenReturn(skillCandidateDtos);
 
         List<SkillCandidateDto> actualDtos = skillServiceImpl.getOfferedSkills(id);
         assertEquals(skillCandidateDtos, actualDtos);

@@ -16,16 +16,13 @@ public class GoalFilterByAnySkills implements GoalFilter{
     }
 
     @Override
-    public List<Goal> applyFilter(List<Goal> goals, GoalFilterDto filters) {
+    public boolean test(Goal goal, GoalFilterDto filters) {
         List<Long> requiredSkillIds = filters.getSkillIds();
-        return goals.stream()
-                .filter(goal -> isGoalGetAnySkills(goal, requiredSkillIds))
-                .toList();
-    }
-
-    private boolean isGoalGetAnySkills(Goal goal, List<Long> skillIds) {
-        return goal.getSkillsToAchieve().stream()
+        List<Long> goalSkillIds = goal.getSkillsToAchieve().stream()
                 .map(Skill::getId)
-                .anyMatch(skillIds::contains);
+                .toList();
+
+         return requiredSkillIds.stream()
+                .allMatch(goalSkillIds::contains);
     }
 }

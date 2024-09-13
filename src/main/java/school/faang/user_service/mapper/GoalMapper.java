@@ -25,19 +25,17 @@ public interface GoalMapper {
 
     @Named("mapSkillEntityToSkillId")
     static List<Long> mapSkillEntityToSkillId(List<Skill> skills) {
-       return skills.stream()
-               .map(Skill::getId)
-               .toList();
+        return skills.stream()
+                .map(Skill::getId)
+                .toList();
     }
 
     @Named("mapSkillIdToSkillEntity")
     static List<Skill> mapSkillIdToSkillEntity(List<Long> skillIds) {
         return skillIds.stream()
-                .map(skillId -> {
-                    Skill skill = new Skill();
-                    skill.setId(skillId);
-                    return skill;
-                })
+                .map(skillId -> Skill.builder()
+                        .id(skillId)
+                        .build())
                 .toList();
     }
 
@@ -46,11 +44,9 @@ public interface GoalMapper {
         if (parentId == null) {
             return null;
         } else {
-            Goal parentGoal = new Goal();
-            parentGoal.setId(parentId);
-            return parentGoal;
+            return Goal.builder()
+                    .id(parentId)
+                    .build();
         }
     }
-
-
 }

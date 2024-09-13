@@ -19,7 +19,6 @@ import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.service.goal.filter.GoalFilterByAnySkills;
 import school.faang.user_service.service.goal.filter.GoalFilterByStatus;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -147,10 +146,10 @@ public class GoalServiceTest {
     @DisplayName("Success find goal by filter")
     public void testFindUserGoalByFilter() {
 
-        GoalFilterDto filterDto = GoalFilterDto.builder()
-                .status(GoalStatus.COMPLETED)
-                .skillIds(new ArrayList<>(List.of(3L, 4L)))
-                .build();
+        GoalFilterDto filterDto = new GoalFilterDto();
+        filterDto.setStatus(GoalStatus.COMPLETED);
+        filterDto.setSkillIds(new ArrayList<>(List.of(3L)));
+
 
         Goal goalOne = Goal.builder()
                 .id(1L)
@@ -197,9 +196,17 @@ public class GoalServiceTest {
                 new GoalFilterByAnySkills()
         ));
 
-        List<Goal> expectedGoals = new ArrayList<>(List.of(goalThree));
+        int expectedGoalsSize = 1;
+        Long expectedGoalId = 3L;
+        GoalStatus expectedGoalStatus = GoalStatus.COMPLETED;
+
         List<Goal> resultGoals = goalService.findGoalsByUser(user.getId(), filterDto);
-        assertEquals(expectedGoals, resultGoals);
+        Long resultGoalId = resultGoals.get(0).getId();
+        GoalStatus resultGoalStatus = resultGoals.get(0).getStatus();
+
+        assertEquals(expectedGoalsSize, resultGoals.size());
+        assertEquals(expectedGoalId, resultGoalId);
+        assertEquals(expectedGoalStatus, resultGoalStatus);
     }
 
     @Test
@@ -279,6 +286,4 @@ public class GoalServiceTest {
         String resultMessage = exception.getMessage();
         assertEquals(expectedMessage, resultMessage);
     }
-
-
 }

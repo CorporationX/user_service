@@ -15,6 +15,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class GoalService {
         validateExistingGoalStatus(goal);
 
         Long goalId = goal.getId();
-        if (goal.getStatus() == GoalStatus.COMPLETED) {
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
             Goal existingGoal = goalRepository.findById(goalId)
                     .orElseThrow();
 
@@ -73,24 +74,29 @@ public class GoalService {
     }
 
     @Transactional
-    public List<Goal> findSubtaskByGoalId(Long goalId) {
-        validateGoalId(goalId);
-        return goalRepository.findByParent(goalId).toList();
+    public List<Goal> findSubtaskByGoalId(Long parentGoalId) {
+        validateGoalId(parentGoalId);
+        return goalRepository.findByParent(parentGoalId).toList();
     }
 
     
     public List<Goal> findGoalsByUser(Long userId, GoalFilterDto filterDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow();
-        List<Goal> userGoal = user.getGoals();
+        List<Goal> userGoals = user.getGoals();
 
-        return goalFilters.stream()
-                .filter(filter -> filter.isApplicable(filterDto))
-                .reduce(
-                        userGoal,
-                        (list, filter) -> filter.applyFilter(list, filterDto),
-                        (list, filter) -> list
-                );
+        List<GoalFilter> applicableFilters = goalFilters.stream()
+                .filter(goalFilter -> goalFilter.isApplicable(filterDto))
+                .toList();
+
+        return userGoals.stream()
+                .filter(goal -> isGoalMatchFilters(goal, applicableFilters, filterDto))
+                .toList();
+    }
+
+    private boolean isGoalMatchFilters(Goal goal, List<GoalFilter> filters, GoalFilterDto filterDto) {
+        return filters.stream()
+                .allMatch(filter -> filter.test(goal, filterDto));
     }
 
     private void validateGoalId(Long goalId) {
@@ -101,7 +107,7 @@ public class GoalService {
     }
 
     private void validateTitle(Goal goal) {
-        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
+        if (Objects.isNull(goal.getTitle()) || goal.getTitle().isBlank()) {
             log.error("Title cannot be null or empty");
             throw new IllegalArgumentException("Title cannot be null or empty");
         }

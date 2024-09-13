@@ -8,5 +8,5 @@ import java.util.List;
 public interface GoalFilter {
     boolean isApplicable(GoalFilterDto filters);
 
-    List<Goal> applyFilter(List<Goal> goals, GoalFilterDto filters);
+    boolean test(Goal goal, GoalFilterDto filters);
 }

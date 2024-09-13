@@ -6,14 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.SkillController;
-import school.faang.user_service.dto.Skill.SkillCandidateDto;
-import school.faang.user_service.dto.Skill.SkillDto;
-
-import java.util.List;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,10 +23,11 @@ public class SkillControllerTest {
 
     @Test
     public void testCreate() {
-        SkillDto skillDto = new SkillDto("Java",1L);
+        Skill skill = new Skill();
 
-        skillController.create(skillDto);
-        verify(skillService, times(1)).create(skillDto);
+        skillController.create(skill);
+
+        verify(skillService, times(1)).create(skill);
     }
     @Test
     public void testGetUserSkills() {

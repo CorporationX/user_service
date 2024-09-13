@@ -1,33 +1,32 @@
 package school.faang.user_service.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.dto.Skill.SkillCandidateDto;
-import school.faang.user_service.dto.Skill.SkillDto;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @Controller
-public class SkillController {
-    private final SkillService skillService;
+public class SkillController implements SkillService {
 
-    public SkillDto create(SkillDto skill) throws IllegalArgumentException {
-        return skillService.create(skill);
+    public SkillDto create(Skill skill) throws IllegalArgumentException {
+        return create(skill);
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        return skillService.getUserSkills(userId);
+        return getUserSkills(userId);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillService.getOfferedSkills(userId);
+        return getOfferedSkills(userId);
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) throws IllegalArgumentException {
-        return skillService.acquireSkillFromOffers(skillId, userId);
+        return acquireSkillFromOffers(skillId, userId);
     }
-
 }
 

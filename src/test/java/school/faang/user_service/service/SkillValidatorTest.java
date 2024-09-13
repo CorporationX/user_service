@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.Skill.SkillDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.validator.skill.SkillValidator;
 

@@ -10,7 +10,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.user.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @Data
 @RequiredArgsConstructor
 public class UserController {

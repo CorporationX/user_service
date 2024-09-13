@@ -2,14 +2,12 @@ package school.faang.user_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
 
 import java.util.ArrayList;
@@ -20,41 +18,51 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
     private final List<UserFilter> userFilters = new ArrayList<>();
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            subscriptionRepository.followUser(followerId, followeeId);
-        } else {
-            throw new DataValidationException("Already followed");
-        }
+        userExistence(followerId);
+        userExistence(followeeId);
+        validateFollowUnfollow(followerId, followeeId, true);
+
+        subscriptionRepository.followUser(followerId, followeeId);
     }
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            subscriptionRepository.unfollowUser(followerId, followeeId);
-        } else {
-            throw new DataValidationException("You are not following this user");
-        }
+        userExistence(followerId);
+        userExistence(followeeId);
+        validateFollowUnfollow(followerId, followeeId, false);
+        subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
     @Transactional
     public List<User> getFollowers(long followeeId, UserFilterDto filters) {
+        userExistence(followeeId);
         Stream<User> userStream = subscriptionRepository.findByFolloweeId(followeeId);
-        Stream<User> filteredStream = filter(userStream, filters);
-        return filteredStream.toList();
+        return filter(userStream, filters).toList();
     }
 
     @Transactional
     public List<User> getFollowing(long followerId, UserFilterDto filters) {
+        userExistence(followerId);
         Stream<User> userStream = subscriptionRepository.findByFollowerId(followerId);
-        Stream<User> filteredStream = filter(userStream, filters);
-        return filteredStream.toList();
+        return filter(userStream, filters).toList();
     }
 
-    public Stream<User> filter(Stream<User> users, UserFilterDto filters) {
+    public int getFollowersCount(long followeeId) {
+        userExistence(followeeId);
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    public int getFollowingCount(long followerId) {
+        userExistence(followerId);
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    private Stream<User> filter(Stream<User> users, UserFilterDto filters) {
         for (UserFilter filter : userFilters) {
             if (filter.isApplicable(filters)) {
                 users = filter.apply(users, filters);
@@ -63,11 +71,23 @@ public class SubscriptionService {
         return users;
     }
 
-    public int getFollowersCount(long followeeId) {
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    private void validateFollowUnfollow(long followerId, long followeeId, boolean isFollow) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("You cannot subscribe to yourself");
+        }
+
+        boolean exists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+
+        if (isFollow && exists) {
+            throw new DataValidationException("Already followed");
+        } else if (!isFollow && !exists) {
+            throw new DataValidationException("You are not following this user");
+        }
     }
 
-    public int getFollowingCount(long followerId) {
-        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    public void userExistence(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new DataValidationException("User with the ID " + userId + " doesn't exits");
+        }
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.mentorship.filter;
+package school.faang.user_service.filter.mentorship.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,18 +9,14 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.stream.Stream;
 
 @Component
-@Data
-@AllArgsConstructor
-public class RequesterNameFilter implements MentorshipRequestFilter {
-
-
+public class ReceiverNameFilter implements MentorshipRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getRequesterName() != null;
+        return filters.getReceiverName() != null;
     }
 
     @Override
     public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> requests, RequestFilterDto filters) {
-        return requests.filter(request -> request.getRequester().getUsername().contains(filters.getRequesterName()));
+        return requests.filter(request -> request.getReceiver().getUsername().contains(filters.getReceiverName()));
     }
 }

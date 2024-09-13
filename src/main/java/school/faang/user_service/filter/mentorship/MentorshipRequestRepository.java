@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.mentorship;
+package school.faang.user_service.filter.mentorship;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

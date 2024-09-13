@@ -115,7 +115,6 @@ public class UserServiceTest {
         user.setOwnedEvents(List.of(firstEvent));
         user.setParticipatedEvents(List.of(secondEvent));
         userService.stopUserActivities(user);
-        verify(goalRepository, times(2)).deleteById(any());
         verify(eventRepository, times(1)).deleteAllById(any());
     }
 

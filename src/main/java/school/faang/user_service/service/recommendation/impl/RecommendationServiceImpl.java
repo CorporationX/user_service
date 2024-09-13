@@ -20,6 +20,7 @@ import school.faang.user_service.service.recommendation.RecommendationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,11 +104,21 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     private void handleSkillOffers(Recommendation recommendation, List<SkillOfferDto> skillOffers) {
+        List<Long> skillIds = skillOffers.stream()
+                .map(SkillOfferDto::skillId)
+                .collect(Collectors.toList());
+
+        List<Skill> skills = skillRepository.findAllById(skillIds);
+
+        Map<Long, Skill> skillsMap = skills.stream().collect(Collectors.toMap(Skill::getId, skill -> skill));
+
         for (SkillOfferDto skillOfferDto : skillOffers) {
             validateId(skillOfferDto.skillId(), "Skill ID");
 
-            Skill skill = skillRepository.findById(skillOfferDto.skillId())
-                    .orElseThrow(() -> new DataValidationException("Skill with id " + skillOfferDto.skillId() + " not found"));
+            Skill skill = skillsMap.get(skillOfferDto.skillId());
+            if (skill == null) {
+                throw new DataValidationException("Skill with id " + skillOfferDto.skillId() + " not found");
+            }
 
             SkillOffer skillOffer = SkillOffer.builder()
                     .skill(skill)

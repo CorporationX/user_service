@@ -18,7 +18,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.impl.RecommendationServiceImpl;
+import school.faang.user_service.service.recommendation.impl.RecommendationServiceImpl;
 
 import java.util.List;
 import java.util.Optional;

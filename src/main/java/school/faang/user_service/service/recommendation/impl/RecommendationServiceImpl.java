@@ -1,4 +1,4 @@
-package school.faang.user_service.service.impl;
+package school.faang.user_service.service.recommendation.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

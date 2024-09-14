@@ -1,6 +1,7 @@
 package school.faang.user_service.repository.goal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
@@ -49,4 +50,20 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            DELETE FROM goal
+            WHERE goal.mentor_id = :mentorId AND
+                  goal.id NOT IN
+                  (SELECT DISTINCT user_goal.goal_id FROM user_goal)
+            """)
+    void deleteUnusedGoalsByMentorId(long mentorId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE goal SET mentor_id = :newMentorId
+            WHERE goal.mentor_id = :mentorId
+            """)
+    void updateMentorIdByMentorId(long mentorId, Long newMentorId);
 }

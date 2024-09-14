@@ -9,4 +9,6 @@ public interface UserService {
     UserDto getUser(long userId);
 
     List<UserDto> getUsersByIds(List<Long> ids);
+
+    void deactivateUser(Long id);
 }

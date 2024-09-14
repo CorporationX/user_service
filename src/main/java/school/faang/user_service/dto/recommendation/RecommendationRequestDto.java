@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.recommendation;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -15,17 +15,17 @@ import java.util.List;
 
 @Data
 public class RecommendationRequestDto {
-    @Min(value = 0, message = "")
-    private long id;
-    @NotNull(message = "")
+    private Long id;
+    @NotNull(message = "Requester ID cannot be null.")
     private Long requesterId;
-    @NotNull(message = "")
+    @NotNull(message = "Receiver ID cannot be null.")
     private Long receiverId;
-    @NotBlank(message = "")
+    @NotBlank(message = "Message cannot be blank.")
     private String message;
     private RequestStatus status;
-    @NotEmpty(message = "")
+    @NotEmpty(message = "Skills list cannot be empty.")
     private List<Long> skillsId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

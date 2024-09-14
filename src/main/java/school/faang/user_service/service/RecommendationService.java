@@ -64,7 +64,6 @@ public class RecommendationService {
 
         for (Long skillId : skillIds) {
             skillOfferRepository.create(skillId, recommendation.getId());
-
 //            Optional<Skill> skill = skillRepository.findById(skillId);
 
 //            if (skill.isPresent()) {

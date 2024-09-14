@@ -27,7 +27,7 @@ public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final List<GoalInvitationFilter> goalInvitationFilters;
 
-    private final int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
+    private final static int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
 
     @Transactional
     public void createInvitation(GoalInvitationDto goalInvitationDto) {

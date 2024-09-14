@@ -13,6 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -41,7 +42,7 @@ public class RecommendationRequestService {
     public RecommendationRequestDto create(RecommendationRequestDto dto) {
         validateRecommendationRequestDto(dto);
 
-        dto.getSkills().forEach(skill -> skillRequestRepository.create(skill.getRequestId(), skill.getSkillId()));
+        dto.skills().forEach(skill -> skillRequestRepository.create(skill.requestId(), skill.skillId()));
 
         RecommendationRequest request = mapper.toEntity(dto);
         return mapper.toDto(requestRepository.save(request));
@@ -70,47 +71,47 @@ public class RecommendationRequestService {
     public void rejectRequest(long id, RejectionDto rejection) {
         Optional<RecommendationRequest> requestOpt = requestRepository.findById(id);
         if (requestOpt.isEmpty()) {
-            throw new RuntimeException("Запрашиваемого запроса нет в базе данных");
+            throw new DataValidationException("Запрашиваемого запроса нет в базе данных");
         }
         RecommendationRequest request = requestOpt.get();
         if (request.getStatus() == RequestStatus.REJECTED) {
-            throw new RuntimeException("Запрос уже был отклонён");
+            throw new DataValidationException("Запрос уже был отклонён");
         }
         if (request.getStatus() == RequestStatus.ACCEPTED) {
-            throw new RuntimeException("Запрос уже принят, нельзя отклонить принятый запрос");
+            throw new DataValidationException("Запрос уже принят, нельзя отклонить принятый запрос");
         }
 
         request.setStatus(RequestStatus.REJECTED);
-        request.setRejectionReason(rejection.getReason());
+        request.setRejectionReason(rejection.reason());
         requestRepository.save(request);
     }
 
     private void validateRecommendationRequestDto(RecommendationRequestDto dto) {
-        Optional<User> requester = userRepository.findById(dto.getRequesterId());
+        Optional<User> requester = userRepository.findById(dto.requesterId());
         if (requester.isEmpty()) {
-            throw new RuntimeException("Requester отсутствует в базе данных");
+            throw new DataValidationException("Requester отсутствует в базе данных");
         }
-        Optional<User> receiver = userRepository.findById(dto.getReceiverId());
+        Optional<User> receiver = userRepository.findById(dto.receiverId());
         if (receiver.isEmpty()) {
-            throw new RuntimeException("Receiver отсутствует в базе данных");
+            throw new DataValidationException("Receiver отсутствует в базе данных");
         }
         Optional<RecommendationRequest> lastRequest = requestRepository.findLatestPendingRequest(
-                dto.getRequesterId(),
-                dto.getReceiverId()
+                dto.requesterId(),
+                dto.receiverId()
         );
         if(lastRequest.isPresent() && LocalDateTime.now().isBefore(lastRequest.get().getCreatedAt().plusMonths(6))) {
-            throw new RuntimeException("Запрос рекомендации можно отправлять не чаще, чем один раз в 6 месяцев");
+            throw new DataValidationException("Запрос рекомендации можно отправлять не чаще, чем один раз в 6 месяцев");
         }
-        List<SkillRequestDto> skillRequestDtos = dto.getSkills();
+        List<SkillRequestDto> skillRequestDtos = dto.skills();
         if (skillRequestDtos == null || skillRequestDtos.isEmpty()) {
-            throw new RuntimeException("Скиллы отсутствуют в запросе");
+            throw new DataValidationException("Скиллы отсутствуют в запросе");
         }
         List<Long> skillIds = skillRequestDtos.stream()
-                .map(SkillRequestDto::getSkillId)
+                .map(SkillRequestDto::skillId)
                 .toList();
         int countExistsSkill = skillRepository.countExisting(skillIds);
         if (countExistsSkill != skillIds.size()) {
-            throw new RuntimeException("Не все скиллы существуют в базе данных");
+            throw new DataValidationException("Не все скиллы существуют в базе данных");
         }
     }
 }

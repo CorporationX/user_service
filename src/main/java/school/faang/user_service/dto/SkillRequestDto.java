@@ -5,12 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class SkillRequestDto {
-    private Long id;
-    private Long requestId;
-    private Long skillId;
-}
+public record SkillRequestDto (
+    Long id,
+    Long requestId,
+    Long skillId
+) {}

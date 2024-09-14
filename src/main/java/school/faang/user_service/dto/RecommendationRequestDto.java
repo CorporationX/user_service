@@ -11,17 +11,14 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class RecommendationRequestDto {
-    Long id;
-    String message;
-    RequestStatus status;
-    List<SkillRequestDto> skills;
-    Long requesterId;
-    Long receiverId;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
-}
+
+public record RecommendationRequestDto (
+    Long id,
+    String message,
+    RequestStatus status,
+    List<SkillRequestDto> skills,
+    Long requesterId,
+    Long receiverId,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
+) {}

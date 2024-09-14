@@ -22,6 +22,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
 import school.faang.user_service.mapper.SkillRequestMapper;
@@ -59,7 +60,6 @@ public class RecommendationRequestServiceTest {
     ArgumentCaptor<Long> captorSkillId;
     @Captor
     ArgumentCaptor<RecommendationRequest> captorRequest;
-    @InjectMocks
     private RecommendationRequestService service;
     @Mock
     private UserRepository userRepository;
@@ -98,8 +98,8 @@ public class RecommendationRequestServiceTest {
                 "message",
                 RequestStatus.PENDING,
                 new ArrayList<>(List.of(
-                        SkillRequestDto.builder().id(1L).skillId(1L).requestId(2L).build(),
-                        SkillRequestDto.builder().id(2L).skillId(2L).requestId(2L).build()
+                        new SkillRequestDto(1L, 2L, 1L),
+                        new SkillRequestDto(2L, 2L, 2L)
                 )),
                 2L,
                 3L,
@@ -111,8 +111,8 @@ public class RecommendationRequestServiceTest {
                 "message",
                 RequestStatus.PENDING,
                 new ArrayList<>(List.of(
-                        SkillRequestDto.builder().id(1L).skillId(1L).requestId(2L).build(),
-                        SkillRequestDto.builder().id(2L).skillId(2L).requestId(2L).build()
+                        new SkillRequestDto(1L, 2L, 1L),
+                        new SkillRequestDto(2L, 2L, 2L)
                 )),
                 2L,
                 3L,
@@ -129,8 +129,8 @@ public class RecommendationRequestServiceTest {
                 )))
                 .requester(User.builder().id(2L).build())
                 .receiver(User.builder().id(3L).build())
-                .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
+                .createdAt(dto.createdAt())
+                .updatedAt(dto.updatedAt())
                 .build();
         expectedRequest = RecommendationRequest.builder()
                 .id(1L)
@@ -142,8 +142,8 @@ public class RecommendationRequestServiceTest {
                 )))
                 .requester(User.builder().id(2L).build())
                 .receiver(User.builder().id(3L).build())
-                .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
+                .createdAt(dto.createdAt())
+                .updatedAt(dto.updatedAt())
                 .build();
 
         id = 1L;
@@ -154,97 +154,116 @@ public class RecommendationRequestServiceTest {
     @Test
     public void testCreate_requesterThereIsNotDb() {
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.empty());
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.empty());
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.create(dto);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> service.create(dto));
         Assertions.assertEquals("Requester отсутствует в базе данных", exception.getMessage());
     }
 
     @Test
     public void testCreate_receiverThereIsNotDb() {
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.of(User.builder().id(dto.getRequesterId()).build()));
-        when(userRepository.findById(dto.getReceiverId())).thenReturn(Optional.empty());
+        User user = User.builder().id(dto.requesterId()).build();
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(dto.receiverId())).thenReturn(Optional.empty());
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.create(dto);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.create(dto);});
         Assertions.assertEquals("Receiver отсутствует в базе данных", exception.getMessage());
     }
 
     @Test
     public void testCreate_frequentRequest() {
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.of(User.builder().id(dto.getRequesterId()).build()));
-        when(userRepository.findById(dto.getReceiverId())).thenReturn(Optional.of(User.builder().id(dto.getReceiverId()).build()));
-        when(requestRepository.findLatestPendingRequest(dto.getRequesterId(), dto.getReceiverId()))
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
+        when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));
+        when(requestRepository.findLatestPendingRequest(dto.requesterId(), dto.receiverId()))
                 .thenReturn(Optional.of(RecommendationRequest.builder().createdAt(LocalDateTime.now().minusMonths(3)).build()));
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.create(dto);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.create(dto);});
         Assertions.assertEquals("Запрос рекомендации можно отправлять не чаще, чем один раз в 6 месяцев", exception.getMessage());
     }
 
     @Test
     public void testCreate_thereIsNotSkills() {
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.of(User.builder().id(dto.getRequesterId()).build()));
-        when(userRepository.findById(dto.getReceiverId())).thenReturn(Optional.of(User.builder().id(dto.getReceiverId()).build()));
-        when(requestRepository.findLatestPendingRequest(dto.getRequesterId(), dto.getReceiverId()))
+        dto = new RecommendationRequestDto(
+                1L,
+                "message",
+                RequestStatus.PENDING,
+                new ArrayList<>(),
+                2L,
+                3L,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
+        when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));
+        when(requestRepository.findLatestPendingRequest(dto.requesterId(), dto.receiverId()))
                 .thenReturn(Optional.of(RecommendationRequest.builder().createdAt(LocalDateTime.now().minusMonths(7)).build()));
-        dto.setSkills(new ArrayList<>());
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.create(dto);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.create(dto);});
         Assertions.assertEquals("Скиллы отсутствуют в запросе", exception.getMessage());
     }
 
     @Test
     public void testCreate_nullSkills() {
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.of(User.builder().id(dto.getRequesterId()).build()));
-        when(userRepository.findById(dto.getReceiverId())).thenReturn(Optional.of(User.builder().id(dto.getReceiverId()).build()));
-        when(requestRepository.findLatestPendingRequest(dto.getRequesterId(), dto.getReceiverId()))
+        dto = new RecommendationRequestDto(
+                1L,
+                "message",
+                RequestStatus.PENDING,
+                null,
+                2L,
+                3L,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
+        when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));
+        when(requestRepository.findLatestPendingRequest(dto.requesterId(), dto.receiverId()))
                 .thenReturn(Optional.of(RecommendationRequest.builder().createdAt(LocalDateTime.now().minusMonths(7)).build()));
-        dto.setSkills(null);
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.create(dto);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.create(dto);});
         Assertions.assertEquals("Скиллы отсутствуют в запросе", exception.getMessage());
     }
 
     @Test
     public void testCreate_thereIsNotSkillsInDb() {
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.of(User.builder().id(dto.getRequesterId()).build()));
-        when(userRepository.findById(dto.getReceiverId())).thenReturn(Optional.of(User.builder().id(dto.getReceiverId()).build()));
-        when(requestRepository.findLatestPendingRequest(dto.getRequesterId(), dto.getReceiverId()))
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
+        when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));
+        when(requestRepository.findLatestPendingRequest(dto.requesterId(), dto.receiverId()))
                 .thenReturn(Optional.of(RecommendationRequest.builder().createdAt(LocalDateTime.now().minusMonths(7)).build()));
-        when(skillRepository.countExisting(any())).thenReturn(dto.getSkills().size() - 1);
+        when(skillRepository.countExisting(any())).thenReturn(dto.skills().size() - 1);
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.create(dto);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.create(dto);});
         Assertions.assertEquals("Не все скиллы существуют в базе данных", exception.getMessage());
     }
 
     @Test
     public void testCreate(){
         // Arrange
-        when(userRepository.findById(dto.getRequesterId())).thenReturn(Optional.of(User.builder().id(dto.getRequesterId()).build()));
-        when(userRepository.findById(dto.getReceiverId())).thenReturn(Optional.of(User.builder().id(dto.getReceiverId()).build()));
-        when(requestRepository.findLatestPendingRequest(dto.getRequesterId(), dto.getReceiverId()))
+        when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
+        when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));
+        when(requestRepository.findLatestPendingRequest(dto.requesterId(), dto.receiverId()))
                 .thenReturn(Optional.of(RecommendationRequest.builder().createdAt(LocalDateTime.now().minusMonths(7)).build()));
-        when(skillRepository.countExisting(any())).thenReturn(dto.getSkills().size());
+        when(skillRepository.countExisting(any())).thenReturn(dto.skills().size());
         when(requestRepository.save(request)).thenReturn(expectedRequest);
 
         // Act and Assert
         RecommendationRequestDto returnDto = service.create(dto);
-        verify(skillRequestRepository, times(dto.getSkills().size())).create(captorRequesterId.capture(), captorSkillId.capture());
+        verify(skillRequestRepository, times(dto.skills().size())).create(captorRequesterId.capture(), captorSkillId.capture());
         List<Long> requesterIds = captorRequesterId.getAllValues();
         List<Long> skillIds = captorSkillId.getAllValues();
-        for (int i = 0; i < dto.getSkills().size(); i++) {
-            Assertions.assertEquals(dto.getRequesterId(), requesterIds.get(i));
-            Assertions.assertEquals(dto.getSkills().get(i).getId(), skillIds.get(i));
+        for (int i = 0; i < dto.skills().size(); i++) {
+            Assertions.assertEquals(dto.requesterId(), requesterIds.get(i));
+            Assertions.assertEquals(dto.skills().get(i).id(), skillIds.get(i));
         }
 
         verify(requestRepository, times(1)).save(captorRequest.capture());
@@ -266,7 +285,8 @@ public class RecommendationRequestServiceTest {
         when(requestRepository.findAll()).thenReturn(returnRequests);
         List<RecommendationRequestDto> expectedDtos = new ArrayList<>(
                 List.of(
-                        RecommendationRequestDto.builder().id(3L).message("message").status(RequestStatus.ACCEPTED).build()
+                        new RecommendationRequestDto(3L, "message", RequestStatus.ACCEPTED, null,
+                                null, null, null, null)
                 )
         );
         // Act
@@ -296,7 +316,7 @@ public class RecommendationRequestServiceTest {
         when(requestRepository.findById(id)).thenReturn(Optional.empty());
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.rejectRequest(id, rejection);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.rejectRequest(id, rejection);});
         Assertions.assertEquals("Запрашиваемого запроса нет в базе данных", exception.getMessage());
     }
 
@@ -307,7 +327,7 @@ public class RecommendationRequestServiceTest {
         when(requestRepository.findById(id)).thenReturn(Optional.of(expectedRequest));
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.rejectRequest(id, rejection);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.rejectRequest(id, rejection);});
         Assertions.assertEquals("Запрос уже был отклонён", exception.getMessage());
     }
 
@@ -318,7 +338,7 @@ public class RecommendationRequestServiceTest {
         when(requestRepository.findById(id)).thenReturn(Optional.of(expectedRequest));
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {service.rejectRequest(id, rejection);});
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> {service.rejectRequest(id, rejection);});
         Assertions.assertEquals("Запрос уже принят, нельзя отклонить принятый запрос", exception.getMessage());
     }
 

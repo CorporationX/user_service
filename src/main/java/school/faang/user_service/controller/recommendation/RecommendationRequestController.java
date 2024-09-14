@@ -1,28 +1,26 @@
 package school.faang.user_service.controller.recommendation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import school.faang.user_service.service.filter.recommendation.RequestFilterDto;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class RecommendationRequestController {
 
     private final RecommendationRequestService service;
 
-    @Autowired
-    public RecommendationRequestController(RecommendationRequestService service) {
-        this.service = service;
-    }
-
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto dto) {
-        if (dto.getMessage() == null) {
-            throw new RuntimeException("Сообщение не может быть пустым");
+        if (dto.message() == null) {
+            throw new DataValidationException("Сообщение не может быть пустым");
         }
         return service.create(dto);
     }

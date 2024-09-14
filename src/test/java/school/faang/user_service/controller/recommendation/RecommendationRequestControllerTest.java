@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import school.faang.user_service.service.filter.recommendation.RequestFilterDto;
 
@@ -29,7 +30,7 @@ public class RecommendationRequestControllerTest {
     private RecommendationRequestDto returnDto;
     private RecommendationRequestDto expectedDto;
     private long id;
-    Long expectedId;
+    private Long expectedId;
     @InjectMocks
     private RecommendationRequestController controller;
     @Mock
@@ -83,10 +84,19 @@ public class RecommendationRequestControllerTest {
     @Test
     public void testRequestRecommendation_messageNull() {
         // Arrange
-        dto.setMessage(null);
+        dto = new RecommendationRequestDto(
+                1L,
+                null,
+                null,
+                null,
+                2L,
+                3L,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
         // Act and Assert
-        Exception exception = Assertions.assertThrows(RuntimeException.class, () -> controller.requestRecommendation(dto));
+        Exception exception = Assertions.assertThrows(DataValidationException.class, () -> controller.requestRecommendation(dto));
         Assertions.assertEquals("Сообщение не может быть пустым", exception.getMessage());
     }
 
@@ -137,8 +147,8 @@ public class RecommendationRequestControllerTest {
                         null,
                         2L,
                         3L,
-                        LocalDateTime.now(),
-                        LocalDateTime.now()
+                        requests.get(0).createdAt(),
+                        requests.get(0).updatedAt()
                 ),
                 new RecommendationRequestDto(
                         10L,
@@ -147,8 +157,8 @@ public class RecommendationRequestControllerTest {
                         null,
                         20L,
                         30L,
-                        LocalDateTime.now(),
-                        LocalDateTime.now()
+                        requests.get(1).createdAt(),
+                        requests.get(1).updatedAt()
                 )
         );
         when(service.getRequests(filter)).thenReturn(requests);
@@ -179,10 +189,8 @@ public class RecommendationRequestControllerTest {
     @Test
     public void testRejectRequest() {
         // Arrange
-        RejectionDto rejectionDto = new RejectionDto();
-        rejectionDto.setReason("reason");
-        RejectionDto expectedRejectionDto = new RejectionDto();
-        expectedRejectionDto.setReason("reason");
+        RejectionDto rejectionDto = new RejectionDto("reason");
+        RejectionDto expectedRejectionDto = new RejectionDto("reason");
 
         // Act
         service.rejectRequest(id, rejectionDto);

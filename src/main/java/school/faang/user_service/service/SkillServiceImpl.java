@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 import school.faang.user_service.exceptions.DataValidationException;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.dto.SkillCandidateDto;
+import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
@@ -43,8 +43,8 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        List<Skill> skillCandidate = skillRepository.findSkillsOfferedToUser(userId);
-        return skillCandidateMapper.toListDto(skillCandidate);
+        List<Skill> skillCandidates = skillRepository.findSkillsOfferedToUser(userId);
+        return skillCandidateMapper.toListDto(skillCandidates);
     }
 
     @Override

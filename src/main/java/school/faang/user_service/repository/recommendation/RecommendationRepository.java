@@ -20,6 +20,18 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
     Long create(long authorId, long receiverId, String content);
 
     @Query(nativeQuery = true, value = """
+            WITH inserted_recommendation AS (
+            INSERT INTO recommendation (author_id, receiver_id, content)
+            VALUES (?1, ?2, ?3)
+            RETURNING id
+            )
+            INSERT INTO skill_offer (skill_id, recommendation_id)
+            VALUES (?4, (SELECT id FROM inserted_recommendation))
+            RETURNING id;
+            """)
+    void create2(long authorId, long receiverId, String content, long skillId);
+
+    @Query(nativeQuery = true, value = """
             UPDATE recommendation SET content = :content, updated_at = now()
             WHERE author_id = :authorId AND receiver_id = :receiverId
             """)

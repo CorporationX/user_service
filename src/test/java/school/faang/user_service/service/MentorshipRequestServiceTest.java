@@ -18,7 +18,7 @@ import school.faang.user_service.mapper.RequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.predicate.PredicateResult;
 import school.faang.user_service.validator.MentorshipRequestValidator;
-import school.faang.user_service.validator.Predicates;
+import school.faang.user_service.validator.RequestFilterPredicate;
 import school.faang.user_service.validator.validatorResult.NotValidated;
 import school.faang.user_service.validator.validatorResult.Validated;
 
@@ -45,7 +45,7 @@ public class MentorshipRequestServiceTest {
     MentorshipRequestRepository repository;
 
     @Spy
-    private Predicates predicates;
+    private RequestFilterPredicate predicates;
 
     @InjectMocks
     MentorshipRequestServiceImpl service;

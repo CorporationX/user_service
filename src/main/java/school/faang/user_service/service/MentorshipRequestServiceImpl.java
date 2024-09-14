@@ -10,7 +10,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.util.predicate.NotApplicable;
 import school.faang.user_service.util.predicate.PredicateTrue;
 import school.faang.user_service.validator.MentorshipRequestValidator;
-import school.faang.user_service.validator.Predicates;
+import school.faang.user_service.validator.RequestFilterPredicate;
 import school.faang.user_service.validator.validatorResult.NotValidated;
 import school.faang.user_service.validator.validatorResult.Validated;
 
@@ -25,7 +25,7 @@ import static school.faang.user_service.entity.RequestStatus.REJECTED;
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository repository;
-    private final Predicates predicates;
+    private final RequestFilterPredicate requestFilterPredicate;
 
     public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
 
@@ -41,7 +41,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     public List<MentorshipRequest> getRequests(RequestFilter filter) {
         return repository.findAll().stream().filter(mentReq -> {
-            return predicates.requestsFilterList.stream()
+            return requestFilterPredicate.getRequestsFilterList().stream()
                     .map(predicate -> predicate.apply(mentReq, filter))
                     .filter(result -> !(result instanceof NotApplicable)) // Исключаем NotApplicable
                     .map(result -> {

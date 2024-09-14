@@ -1,6 +1,5 @@
 package school.faang.user_service.validator;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RequestFilter;
@@ -17,11 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
-
 @Component
-//@NoArgsConstructor
-@RequiredArgsConstructor
-public class Predicates {
+public class PredicatesImpl implements RequestFilterPredicate, MentorshipFilterPredicate {
     public static final String REQUEST_AND_RECEIVER_HAS_SAME_ID = "user can not request mentorschihp to himself";
     public static final String USERS_NOT_EXIST_IN_DATABASE = "user are not exists in database";
     public static final String REQUEST_TIME_EXEEDED = "The request was updated within the last 3 months.";
@@ -66,9 +62,6 @@ public class Predicates {
         }
     };
 
-    public final List<BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult>>
-            mentorshipRequestPredicates = List.of(userExistsPredicate, requestTimeExceededPredicate, sameUserPredicate);
-
     public final BiFunction<MentorshipRequest, RequestFilter, PredicateResult> isDescriptionEmptyPredicate = (request, filter) -> {
         if (filter.getDescription() == null || filter.getDescription().isEmpty()) {
             return new NotApplicable();
@@ -110,8 +103,15 @@ public class Predicates {
         }
     };
 
-    public final List<BiFunction<MentorshipRequest, RequestFilter, PredicateResult>> requestsFilterList =
-            List.of(areAuthorsMatch, isRecieverMatch, isStatusMatch);
 
+    @Override
+    public List<BiFunction<MentorshipRequestRepository, MentorshipRequestDto, PredicateResult>> getMentorshipRequestPredicates() {
+        return List.of(userExistsPredicate, requestTimeExceededPredicate, sameUserPredicate);
+    }
 
+    @Override
+    public List<BiFunction<MentorshipRequest, RequestFilter, PredicateResult>> getRequestsFilterList() {
+        return List.of(areAuthorsMatch, isRecieverMatch, isStatusMatch);
+    }
 }
+

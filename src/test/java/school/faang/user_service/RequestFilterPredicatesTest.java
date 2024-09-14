@@ -12,17 +12,17 @@ import school.faang.user_service.util.predicate.NotApplicable;
 import school.faang.user_service.util.predicate.PredicateFalse;
 import school.faang.user_service.util.predicate.PredicateResult;
 import school.faang.user_service.util.predicate.PredicateTrue;
-import school.faang.user_service.validator.Predicates;
+import school.faang.user_service.validator.PredicatesImpl;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static school.faang.user_service.validator.Predicates.*;
+import static school.faang.user_service.validator.PredicatesImpl.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestFilterPredicatesTest {
     @Spy
-    private Predicates predicates;
+    private PredicatesImpl predicates;
 
     @Test
     void testAreAuthorsMatch_ShouldReturnTrue_WhenRequesterIdMatches() {

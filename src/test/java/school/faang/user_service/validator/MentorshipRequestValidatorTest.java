@@ -1,8 +1,8 @@
 package school.faang.user_service.validator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,15 +20,21 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.validator.PredicatesImpl.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestValidatorTest {
     @Mock
     private MentorshipRequestRepository repository;
-    @InjectMocks
-    private MentorshipRequestValidator validator;
     @Spy
-    private Predicates predicates;
+    private MentorshipFilterPredicate predicates;
+    private MentorshipRequestValidatorImpl validator;
+
+    @BeforeEach
+    public void setup() {
+        predicates = new PredicatesImpl();
+        validator = new MentorshipRequestValidatorImpl( repository, predicates);
+    }
 
 
     @Test
@@ -57,7 +63,7 @@ public class MentorshipRequestValidatorTest {
 
         NotValidated status = (NotValidated) validator.validate(dto);
 
-        assertEquals(status.getMessage(), predicates.REQUEST_TIME_EXEEDED);
+        assertEquals(status.getMessage(), REQUEST_TIME_EXEEDED);
 
     }
 
@@ -69,7 +75,7 @@ public class MentorshipRequestValidatorTest {
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(false);
 
         NotValidated status = (NotValidated) validator.validate(dto);
-        assertEquals(status.getMessage(), predicates.USERS_NOT_EXIST_IN_DATABASE);
+        assertEquals(status.getMessage(), USERS_NOT_EXIST_IN_DATABASE);
 
     }
 
@@ -80,7 +86,7 @@ public class MentorshipRequestValidatorTest {
         when(repository.existAcceptedRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(true);
 
         NotValidated status = (NotValidated) validator.validate(dto);
-        assertEquals(status.getMessage(), predicates.REQUEST_AND_RECEIVER_HAS_SAME_ID);
+        assertEquals(status.getMessage(), REQUEST_AND_RECEIVER_HAS_SAME_ID);
 
     }
 
@@ -96,7 +102,7 @@ public class MentorshipRequestValidatorTest {
                 .thenReturn(Optional.empty());
 
         NotValidated status = (NotValidated) validator.validate(dto);
-        assertEquals(status.getMessage(), predicates.REQUEST_WAS_NOT_FOUND);
+        assertEquals(status.getMessage(), REQUEST_WAS_NOT_FOUND);
 
     }
 }

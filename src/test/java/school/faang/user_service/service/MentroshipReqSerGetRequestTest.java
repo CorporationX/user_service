@@ -7,12 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RequestFilter;
-import school.faang.user_service.mapper.RequestMapper;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.RequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
-import school.faang.user_service.validator.Predicates;
+import school.faang.user_service.validator.PredicatesImpl;
+import school.faang.user_service.validator.RequestFilterPredicate;
 
 import java.util.List;
 
@@ -30,13 +31,13 @@ public class MentroshipReqSerGetRequestTest {
     @Mock
     MentorshipRequestRepository repository;
 
-    private Predicates predicates;
+    private RequestFilterPredicate predicates;
 
     MentorshipRequestService service;
 
     @BeforeEach
     public void setup() {
-        predicates = new Predicates();
+        predicates = new PredicatesImpl();
         service = new MentorshipRequestServiceImpl(mentorshipRequestValidator, repository, predicates);
     }
 

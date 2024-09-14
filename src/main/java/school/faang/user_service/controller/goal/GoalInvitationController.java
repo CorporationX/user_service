@@ -1,8 +1,8 @@
 package school.faang.user_service.controller.goal;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -27,7 +27,7 @@ public class GoalInvitationController {
 
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.CREATED)
-    public GoalInvitationDto createInvitation(@RequestBody @Validated GoalInvitationDto dto) {
+    public GoalInvitationDto createInvitation(@RequestBody @Valid GoalInvitationDto dto) {
         GoalInvitation toSave = mapper.toEntity(dto);
         System.out.println(toSave);
         GoalInvitation savedInvitation = goalInvitationService.createInvitation(toSave);

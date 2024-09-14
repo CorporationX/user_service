@@ -40,8 +40,10 @@ public class GoalInvitationService {
 
     @Transactional
     public GoalInvitation createInvitation(GoalInvitation invitation) {
-        User inviter = userRepository.findById(invitation.getInviter().getId()).orElseThrow();
-        User invited = userRepository.findById(invitation.getInvited().getId()).orElseThrow();
+        User inviter = userRepository.findById(invitation.getInviter().getId()).orElseThrow(
+                () -> new IllegalArgumentException(INVITER_MISSING));
+        User invited = userRepository.findById(invitation.getInvited().getId()).orElseThrow(
+                () -> new IllegalArgumentException(INVITED_MISSING));
 
         validateGoalExists(invitation.getGoal().getId());
         validateInviterInvitedDistinct(inviter.getId(), invited.getId());
@@ -50,14 +52,14 @@ public class GoalInvitationService {
         inviter.getSentGoalInvitations().add(saved);
         invited.getReceivedGoalInvitations().add(saved);
         userRepository.saveAll(List.of(inviter, invited));
-        log.info("Created goal invitation (id: {}, status: {})", saved.getId(), saved.getStatus());
-
+        log.info("Created goal invitation (id: {})", saved.getId());
         return saved;
     }
 
     @Transactional
     public void acceptGoalInvitation(long id) {
-        GoalInvitation invitation = goalInvitationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(INVITATION_MISSING));
+        GoalInvitation invitation = goalInvitationRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException(INVITATION_MISSING));
         Goal target = invitation.getGoal();
         User invited = invitation.getInvited();
 
@@ -73,16 +75,17 @@ public class GoalInvitationService {
 
         invitation.setStatus(RequestStatus.ACCEPTED);
         goalInvitationRepository.save(invitation);
-        log.info("Successfully accepted goal invitation: (goalId: {}, status: {}, userId: {})", id, invitation.getStatus(), invited.getId());
+        log.info("Accepted invitation: (goalId: {}, invitedId: {})", invitation.getId(), invited.getId());
     }
 
     public void rejectGoalInvitation(long id) {
-        GoalInvitation invitation = goalInvitationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(INVITATION_MISSING));
+        GoalInvitation invitation = goalInvitationRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException(INVITATION_MISSING));
         validateGoalExists(invitation.getGoal().getId());
 
         invitation.setStatus(RequestStatus.REJECTED);
-        GoalInvitation updated = goalInvitationRepository.save(invitation);
-        log.info("Successfully rejected goal invitation (id: {}, status: {})", id, updated.getStatus());
+        goalInvitationRepository.save(invitation);
+        log.info("Rejected invitation (id: {})", invitation.getId());
     }
 
     private void validateGoalExists(Long goalId) {

@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.AcceptationDto;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -140,55 +138,44 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testGetRequestsByFilter() {
-//        RequestFilterDto filterDto = new RequestFilterDto();
-//        filterDto.setDescription("test description");
-//
-//        MentorshipRequest mentorshipRequest = new MentorshipRequest();
-//        mentorshipRequest.setDescription("test description");
-//        //List<RequestFilter> filters = List.of(new RequestFilterByDescription());
-//
-//        Mockito.when(repository.findAll()).thenReturn(List.of(mentorshipRequest));
-//
-//        Mockito.when(requestFilters.stream()).thenReturn(Stream.of(
-//                new RequestFilterByDescription(),
-//                new RequestFilterByReceiver()
-//        ));
-//
-//        List<RequestFilterDto> requestsByFilter = service.getRequests(filterDto);
-//
-//        Assert.assertEquals(requestsByFilter.get(0).getDescription(), "test description");
+        RequestFilterDto filterDto = new RequestFilterDto();
+        filterDto.setDescription("test description");
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setDescription("test description");
+        Mockito.when(repository.findAll()).thenReturn(List.of(mentorshipRequest));
+
+        Mockito.when(requestFilters.stream()).thenReturn(Stream.of(
+                new RequestFilterByDescription(),
+                new RequestFilterByReceiver()
+        ));
+
+        List<MentorshipRequest> requestsByFilter = service.getRequests(filterDto);
+
+        Assert.assertEquals(requestsByFilter.get(0).getDescription(), "test description");
     }
 
     @Test
     public void testAcceptRequestCheckIdIsNull() {
-        AcceptationDto acceptDto = new AcceptationDto();
-
-        Assert.assertThrows(RuntimeException.class, () -> service.acceptRequest(acceptDto));
+        Assert.assertThrows(RuntimeException.class, () -> service.acceptRequest(null));
     }
 
     @Test
     public void testAcceptRequestExist() {
-        AcceptationDto acceptDto = new AcceptationDto();
-        acceptDto.setRequestId(1L);
+        Long requestId = 1L;
+        Mockito.when(repository.findById(requestId)).thenReturn(null);
 
-        Mockito.when(repository.findById(acceptDto.getRequestId())).thenReturn(null);
-
-        Assert.assertThrows(RuntimeException.class, () -> service.acceptRequest(acceptDto));
+        Assert.assertThrows(RuntimeException.class, () -> service.acceptRequest(requestId));
     }
 
     @Test
     public void testAcceptRequest() {
-        AcceptationDto acceptDto = new AcceptationDto();
-        acceptDto.setRequestId(1L);
-        acceptDto.setStatus(RequestStatus.ACCEPTED.toString());
+        Long requestId = 1L;
 
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setId(1);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
-        Mockito.when(repository.findById(acceptDto.getRequestId())).thenReturn(Optional.of(mentorshipRequest));
-
-        Assertions.assertEquals(mapper.toAcceptDto(mentorshipRequest), acceptDto);
+        Mockito.when(repository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
 
         repository.create(1, 2, "test");
 
@@ -199,34 +186,33 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRejectRequestCheckIdIsNull() {
         RejectionDto rejectionDto = new RejectionDto();
+        long id = 1;
+        String reason = "Test reason";
 
-        Assert.assertThrows(RuntimeException.class, () -> service.rejectRequest(rejectionDto));
+        Assert.assertThrows(RuntimeException.class, () -> service.rejectRequest(id, reason));
     }
 
     @Test
     public void testRejectRequestExist() {
         RejectionDto rejectionDto = new RejectionDto();
-        rejectionDto.setRequestId(1L);
+        long id = 1;
+        String reason = "test reason";
 
-        Mockito.when(repository.findById(rejectionDto.getRequestId())).thenReturn(null);
+        Mockito.when(repository.findById(id)).thenReturn(null);
 
-        Assert.assertThrows(RuntimeException.class, () -> service.rejectRequest(rejectionDto));
+        Assert.assertThrows(RuntimeException.class, () -> service.rejectRequest(id, reason));
     }
 
     @Test
     public void testRejectRequest() {
-        RejectionDto rejectionDto = new RejectionDto();
-        rejectionDto.setRequestId(1L);
-        rejectionDto.setStatus(RequestStatus.REJECTED.toString());
-        rejectionDto.setReason("I don't like you!");
+        long id = 1;
+        String reason = "test reason";
 
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setId(1);
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason("I don't like you!");
-        Mockito.when(repository.findById(rejectionDto.getRequestId())).thenReturn(Optional.of(mentorshipRequest));
-
-        Assertions.assertEquals(mapper.toRejectDto(mentorshipRequest), rejectionDto);
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
 
         repository.create(1, 2, "test");
 

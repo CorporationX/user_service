@@ -1,9 +1,9 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.AcceptationDto;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -21,24 +21,28 @@ public class MentorshipRequestController {
     private final MentorshipRequestMapper mapper;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public MentorshipRequestDto requestMentorship(@RequestBody @Validated MentorshipRequestDto requestDto) {
         MentorshipRequest mentorshipRequest = mapper.toEntity(requestDto);
         return mapper.toDto(service.requestMentorship(mentorshipRequest));
     }
 
     @GetMapping("/filters")
+    @ResponseStatus(HttpStatus.OK)
     public List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filter) {
         List<MentorshipRequest> mentorshipRequests = service.getRequests(filter);
         return mapper.toDto(mentorshipRequests);
     }
 
-    @PatchMapping(value = "/accept")
-    public AcceptationDto acceptRequest(@RequestBody AcceptationDto acceptationDto) {
-        return service.acceptRequest(acceptationDto);
+    @PatchMapping("/{requestId}/accept")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void acceptRequest(@PathVariable @Validated Long requestId) {
+        service.acceptRequest(requestId);
     }
 
-    @PatchMapping(value = "/reject")
-    public RejectionDto rejectRequest(@RequestBody RejectionDto rejectionDto) {
-        return service.rejectRequest(rejectionDto);
+    @PatchMapping("/{requestId}/reject")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void rejectRequest(@PathVariable Long requestId, @RequestBody @Validated RejectionDto rejectionDto) {
+        service.rejectRequest(requestId, rejectionDto.getReason());
     }
 }

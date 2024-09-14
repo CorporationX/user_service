@@ -5,9 +5,6 @@ import lombok.Data;
 
 @Data
 public class RejectionDto {
-    @NotNull(message = "Request id can't be null")
-    private Long requestId;
-
-    private String status;
+    @NotNull(message = "reason can't be null")
     private String reason;
 }

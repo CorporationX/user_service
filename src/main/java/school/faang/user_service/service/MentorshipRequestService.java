@@ -3,14 +3,10 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.AcceptationDto;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.filters.RequestFilter;
@@ -21,8 +17,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.apache.commons.lang3.ObjectUtils.anyNull;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -32,10 +26,10 @@ public class MentorshipRequestService {
     public final String IDENTICAL_USERS = "User requester and user receiver are identical";
     public final String USER_NOT_EXIST = "User is not exist in the database";
     public final String LATEST_REQUEST_LESS_THEN = "Latest request was less than 3 Months";
+    public final String REQUEST_NOT_EXIST = "Mentorship request does not exist";
 
     private final MentorshipRequestRepository requestRepository;
     private final UserRepository userRepository;
-    private final MentorshipRequestMapper mapper;
     private final List<RequestFilter> requestFilters;
 
     public MentorshipRequest requestMentorship(MentorshipRequest request) {
@@ -96,24 +90,25 @@ public class MentorshipRequestService {
                 .toList();
     }
 
-    public AcceptationDto acceptRequest(AcceptationDto acceptationDto) {
-//        if (acceptationDto.getRequestId() == null) {
-//            throw new RuntimeException("Request id is null!");
-//        }
-        MentorshipRequest request = requestRepository.findById(acceptationDto.getRequestId())
-                .orElseThrow(() -> new RuntimeException("Mentorship request does not exist!"));
+    public void acceptRequest(Long requestId) {
+        MentorshipRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> {
+                    log.error("Request with id = {}: {}", requestId, REQUEST_NOT_EXIST);
+                    return new RuntimeException(REQUEST_NOT_EXIST);
+                });
         request.setStatus(RequestStatus.ACCEPTED);
 
-        return mapper.toAcceptDto(requestRepository.save(request));
+        requestRepository.save(request);
     }
 
-    public RejectionDto rejectRequest(RejectionDto rejectionDto) {
-
-        MentorshipRequest request = requestRepository.findById(rejectionDto.getRequestId())
-                .orElseThrow(() -> new RuntimeException("Mentorship request does not exist!"));
+    public void rejectRequest(Long requestId, String reason) {
+        MentorshipRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> {
+                    log.error("Request with id = {}: {}", requestId, REQUEST_NOT_EXIST);
+                    return new RuntimeException(REQUEST_NOT_EXIST);
+                });
         request.setStatus(RequestStatus.REJECTED);
-        request.setRejectionReason("I don't like you!");
-        MentorshipRequest savedMentorshipRequest = requestRepository.save(request);
-        return mapper.toRejectDto(savedMentorshipRequest);
+        request.setRejectionReason(reason);
+        requestRepository.save(request);
     }
 }

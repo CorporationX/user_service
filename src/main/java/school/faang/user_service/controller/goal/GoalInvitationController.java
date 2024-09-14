@@ -19,7 +19,6 @@ public class GoalInvitationController {
     private final GoalInvitationMapper mapper;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<GoalInvitationDto> getInvitations(@RequestBody(required = false) InvitationFilterDto filter) {
         List<GoalInvitation> filteredInvitations = goalInvitationService.getInvitations(filter);
         return mapper.toDtoList(filteredInvitations);

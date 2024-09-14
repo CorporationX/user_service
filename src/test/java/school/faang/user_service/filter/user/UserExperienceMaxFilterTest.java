@@ -64,18 +64,14 @@ class UserExperienceMaxFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле experienceMax меньше нуля, тогда возвращаем false")
+        void whenUserFilterDtoExperienceMaxIsLessThanZeroThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .experienceMax(EXPERIENCE_ZERO)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле experienceMax меньше нуля, тогда возвращаем false")
-            void whenUserFilterDtoExperienceMaxIsLessThanZeroThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .experienceMax(EXPERIENCE_ZERO)
-                        .build();
-
-                assertFalse(userExperienceMaxFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userExperienceMaxFilter.isApplicable(userFilterDto));
         }
     }
 }

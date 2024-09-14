@@ -62,28 +62,24 @@ class UserEmailFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле emailPattern пустое, тогда возвращаем false")
+        void whenUserFilterDtoEmailPatternIsBlankThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .emailPattern("   ")
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле emailPattern пустое, тогда возвращаем false")
-            void whenUserFilterDtoEmailPatternIsBlankThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .emailPattern("   ")
-                        .build();
+            assertFalse(userEmailFilter.isApplicable(userFilterDto));
+        }
 
-                assertFalse(userEmailFilter.isApplicable(userFilterDto));
-            }
+        @Test
+        @DisplayName("Если у UserFilterDto поле emailPattern null, тогда возвращаем false")
+        void whenUserFilterDtoEmailPatternIsNullThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .emailPattern(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле emailPattern null, тогда возвращаем false")
-            void whenUserFilterDtoEmailPatternIsNullThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .emailPattern(null)
-                        .build();
-
-                assertFalse(userEmailFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userEmailFilter.isApplicable(userFilterDto));
         }
     }
 }

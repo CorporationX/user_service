@@ -68,28 +68,24 @@ class UserSkillFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле skillPattern пустое, тогда возвращаем false")
+        void whenUserFilterDtoSkillPatternIsBlankThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .skillPattern("   ")
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле skillPattern пустое, тогда возвращаем false")
-            void whenUserFilterDtoSkillPatternIsBlankThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .skillPattern("   ")
-                        .build();
+            assertFalse(userSkillFilter.isApplicable(userFilterDto));
+        }
 
-                assertFalse(userSkillFilter.isApplicable(userFilterDto));
-            }
+        @Test
+        @DisplayName("Если у UserFilterDto поле skillPattern null, тогда возвращаем false")
+        void whenUserFilterDtoSkillPatternIsNullThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .skillPattern(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле skillPattern null, тогда возвращаем false")
-            void whenUserFilterDtoSkillPatternIsNullThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .skillPattern(null)
-                        .build();
-
-                assertFalse(userSkillFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userSkillFilter.isApplicable(userFilterDto));
         }
     }
 }

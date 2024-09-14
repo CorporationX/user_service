@@ -64,18 +64,14 @@ class UserExperienceMinFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле experienceMin меньше нуля, тогда возвращаем false")
+        void whenUserFilterDtoExperienceMinIsLessThanZeroThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .experienceMax(EXPERIENCE_ZERO)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле experienceMin меньше нуля, тогда возвращаем false")
-            void whenUserFilterDtoExperienceMinIsLessThanZeroThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .experienceMax(EXPERIENCE_ZERO)
-                        .build();
-
-                assertFalse(userExperienceMinFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userExperienceMinFilter.isApplicable(userFilterDto));
         }
     }
 }

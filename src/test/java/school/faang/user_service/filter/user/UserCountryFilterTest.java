@@ -70,28 +70,24 @@ class UserCountryFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле countryPattern пустое, тогда возвращаем false")
+        void whenUserFilterDtoCountryPatternIsBlankThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .countryPattern("   ")
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле countryPattern пустое, тогда возвращаем false")
-            void whenUserFilterDtoCountryPatternIsBlankThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .countryPattern("   ")
-                        .build();
+            assertFalse(userCountryFilter.isApplicable(userFilterDto));
+        }
 
-                assertFalse(userCountryFilter.isApplicable(userFilterDto));
-            }
+        @Test
+        @DisplayName("Если у UserFilterDto поле countryPattern null, тогда возвращаем false")
+        void whenUserFilterDtoCountryPatternIsNullThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .countryPattern(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле countryPattern null, тогда возвращаем false")
-            void whenUserFilterDtoCountryPatternIsNullThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .countryPattern(null)
-                        .build();
-
-                assertFalse(userCountryFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userCountryFilter.isApplicable(userFilterDto));
         }
     }
 }

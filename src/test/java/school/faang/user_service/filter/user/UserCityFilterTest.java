@@ -62,28 +62,24 @@ class UserCityFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле cityPattern пустое, тогда возвращаем false")
+        void whenUserFilterDtoCityPatternIsBlankThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .cityPattern("   ")
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле cityPattern пустое, тогда возвращаем false")
-            void whenUserFilterDtoCityPatternIsBlankThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .cityPattern("   ")
-                        .build();
+            assertFalse(userCityFilter.isApplicable(userFilterDto));
+        }
 
-                assertFalse(userCityFilter.isApplicable(userFilterDto));
-            }
+        @Test
+        @DisplayName("Если у UserFilterDto поле cityPattern null, тогда возвращаем false")
+        void whenUserFilterDtoCityPatternIsNullThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .cityPattern(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле cityPattern null, тогда возвращаем false")
-            void whenUserFilterDtoCityPatternIsNullThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .cityPattern(null)
-                        .build();
-
-                assertFalse(userCityFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userCityFilter.isApplicable(userFilterDto));
         }
     }
 }

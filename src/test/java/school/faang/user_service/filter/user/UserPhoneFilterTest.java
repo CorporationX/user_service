@@ -62,29 +62,24 @@ class UserPhoneFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у UserFilterDto поле phonePattern пустое, тогда возвращаем false")
+        void whenUserFilterDtoPhonePatternIsBlankThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .phonePattern("   ")
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле phonePattern пустое, тогда возвращаем false")
-            void whenUserFilterDtoPhonePatternIsBlankThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .phonePattern("   ")
-                        .build();
+            assertFalse(userPhoneFilter.isApplicable(userFilterDto));
+        }
 
-                assertFalse(userPhoneFilter.isApplicable(userFilterDto));
-            }
+        @Test
+        @DisplayName("Если у UserFilterDto поле phonePattern null, тогда возвращаем false")
+        void whenUserFilterDtoPhonePatternIsNullThenReturnFalse() {
+            userFilterDto = UserFilterDto.builder()
+                    .phonePattern(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у UserFilterDto поле phonePattern null, тогда возвращаем false")
-            void whenUserFilterDtoPhonePatternIsNullThenReturnFalse() {
-                userFilterDto = UserFilterDto.builder()
-                        .phonePattern(null)
-                        .build();
-
-                assertFalse(userPhoneFilter.isApplicable(userFilterDto));
-            }
+            assertFalse(userPhoneFilter.isApplicable(userFilterDto));
         }
     }
-
 }

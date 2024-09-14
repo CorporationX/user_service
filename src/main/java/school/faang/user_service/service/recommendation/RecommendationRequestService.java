@@ -3,11 +3,10 @@ package school.faang.user_service.service.recommendation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exceptions.DataValidationException;
@@ -16,7 +15,6 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -64,7 +62,7 @@ public class RecommendationRequestService {
     }
 
     @Transactional
-    public List<RecommendationRequestDto> getFilteredRecommendationRequest(Long receiverId, RecommendationRequestFilterDto filters) {
+    public List<RecommendationRequestDto> getFilteredRecommendationRequest(Long receiverId, RequestFilterDto filters) {
         return null;
     }
 

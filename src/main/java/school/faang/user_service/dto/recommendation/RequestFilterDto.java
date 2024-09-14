@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class RecommendationRequestFilterDto {
+public class RequestFilterDto {
     private Long id;
     @NotNull(message = "Requester ID cannot be null.")
     private Long requesterId;

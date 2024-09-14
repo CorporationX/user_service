@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
@@ -28,19 +29,19 @@ public class RecommendationRequestController {
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
+    @GetMapping(REQUEST)
+    public RecommendationRequestDto getRecommendationRequest(@Positive Long id) {
+        return recommendationRequestService.getRequest(id);
+    }
+
     @GetMapping(FILTERED_REQUESTS)
     public List<RecommendationRequestDto> getRecommendationRequests(@Positive Long receiverId, @NotNull RecommendationRequestFilterDto filter) {
         return recommendationRequestService.getFilteredRecommendationRequest(receiverId, filter);
     }
 
-    @GetMapping(REQUEST)
-    public RecommendationRequestDto getRecommendationRequest(@Positive Long id) {
-        return recommendationRequestService.getRecommendationRequest(id);
-    }
-
     @PostMapping(REQUEST + "/{id}")
-    public RecommendationRequestDto rejectRecommendationRequest(@PathVariable("id") @Positive Long recommendationRequestId,
-                                                                @RequestParam @NotBlank String rejectionReason) throws DataValidationException {
-        return recommendationRequestService.rejectRecommendationRequest(recommendationRequestId, rejectionReason);
+    public RecommendationRequestDto rejectRequest(@PathVariable("id") @Positive Long recommendationRequestId,
+                                                                @RequestParam @NotBlank RejectionDto rejectionDto) throws DataValidationException {
+        return recommendationRequestService.rejectRequest(recommendationRequestId, rejectionDto);
     }
 }

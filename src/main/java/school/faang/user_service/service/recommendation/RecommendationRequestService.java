@@ -7,6 +7,7 @@ import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exceptions.DataValidationException;
@@ -28,15 +29,13 @@ public class RecommendationRequestService {
 
     @Transactional
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        LocalDateTime localDateTime = LocalDateTime.now();
-
         recommendationRequestValidator.validateRequesterAndReceiver(recommendationRequestDto);
-        recommendationRequestValidator.validateRequestAndCheckTimeLimit(recommendationRequestDto, localDateTime);
+        recommendationRequestValidator.validateRequestAndCheckTimeLimit(recommendationRequestDto);
+        recommendationRequestValidator.validateSkillRequest(recommendationRequestDto);
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
 
         recommendationRequest.getSkills().stream()
-                .filter(skill -> !skillRequestRepository.existsById(skill.getId()))
                 .forEach(skill -> skillRequestRepository.create(recommendationRequestDto.getId(), skill.getId()));
 
         RecommendationRequest createRequest = repository.save(recommendationRequest);
@@ -45,19 +44,19 @@ public class RecommendationRequestService {
     }
 
     @Transactional
-    public RecommendationRequestDto getRecommendationRequest(long id) {
+    public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Not found RequestRecommendation for id: " + id));
         return recommendationRequestMapper.toDto(request);
     }
 
     @Transactional
-    public RecommendationRequestDto rejectRecommendationRequest(Long id, String reason) throws DataValidationException {
-        RecommendationRequestDto recommendationRequestDto = getRecommendationRequest(id);
+    public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejectionDto) throws DataValidationException {
+        RecommendationRequestDto recommendationRequestDto = getRequest(id);
         if (recommendationRequestDto.getStatus() == RequestStatus.PENDING) {
             RecommendationRequest request = recommendationRequestMapper.toEntity(recommendationRequestDto);
             request.setStatus(RequestStatus.REJECTED);
-            request.setRejectionReason(reason);
+            request.setRejectionReason(rejectionDto.getReason());
             return recommendationRequestMapper.toDto(request);
         } else {
             throw new DataValidationException("It is impossible to refuse a request that is not in a pending state");

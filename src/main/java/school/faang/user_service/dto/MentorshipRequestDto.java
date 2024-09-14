@@ -1,12 +1,14 @@
 package school.faang.user_service.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import school.faang.user_service.entity.RequestStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+
+@Setter
 public class MentorshipRequestDto {
     private Long id;
 

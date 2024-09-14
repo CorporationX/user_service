@@ -1,8 +1,10 @@
 package school.faang.user_service.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class RequestFilterDto {
     private String description;
     private Long requesterId;

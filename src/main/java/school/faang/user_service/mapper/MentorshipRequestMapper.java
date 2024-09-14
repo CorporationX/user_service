@@ -5,7 +5,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -40,6 +39,4 @@ public interface MentorshipRequestMapper {
     @Mapping(source = "receiver.id", target = "receiverId")
     List<MentorshipRequestDto> toDto(List<MentorshipRequest> requests);
 
-    @Mapping(source = "rejectionReason", target = "reason")
-    RejectionDto toRejectDto(MentorshipRequest request);
 }

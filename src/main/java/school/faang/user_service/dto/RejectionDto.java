@@ -1,9 +1,11 @@
 package school.faang.user_service.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class RejectionDto {
     @NotNull(message = "reason can't be null")
     private String reason;

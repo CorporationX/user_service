@@ -48,10 +48,6 @@ public class MentorshipServiceImplTest {
         mentee = new User();
         mentee.setId(20L);
 
-        UserDto userDto = new UserDto();
-        userDto.setId(30L);
-        userDto.setEmail("Artem");
-
         mentor.setMentees(List.of(mentee));
         mentee.setMentors(List.of(mentor));
     }

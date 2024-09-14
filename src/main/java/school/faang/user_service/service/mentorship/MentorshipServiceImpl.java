@@ -1,12 +1,16 @@
 package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.Collections;
@@ -16,8 +20,11 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class MentorshipServiceImpl implements MentorshipService {
 
+    private final MentorshipRepository mentorshipRepository;
+    private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -78,5 +85,12 @@ public class MentorshipServiceImpl implements MentorshipService {
     private User findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d%n is not found", userId)));
+    }
+
+    public void stopMentorship(@NonNull Long id) {
+        log.info("Stop mentorship with id {}", id);
+        mentorshipRepository.deleteByMentorId(id);
+        goalRepository.updateMentorIdByMentorId(id, null);
+        log.info("Mentorship stopped with id {}", id);
     }
 }

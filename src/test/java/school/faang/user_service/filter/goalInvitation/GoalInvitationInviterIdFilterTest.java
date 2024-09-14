@@ -77,28 +77,24 @@ class GoalInvitationInviterIdFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto поле inviterId null тогда возвращаем false")
+        void whenGoalInvitationFilterDtoSpecifiedInviterIdIsNullThenReturnFalse() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .inviterId(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto поле inviterId null тогда возвращаем false")
-            void whenGoalInvitationFilterDtoSpecifiedInviterIdIsNullThenReturnFalse() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .inviterId(null)
-                        .build();
+            assertFalse(goalInvitationInviterIdFilter.isApplicable(goalInvitationFilterDto));
+        }
 
-                assertFalse(goalInvitationInviterIdFilter.isApplicable(goalInvitationFilterDto));
-            }
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto поле inviterId меньше нуля тогда возвращаем false")
+        void whenGoalInvitationFilterDtoSpecifiedInviterIdIsLessThanZeroThenReturnFalse() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .inviterId(INVITER_ID_NEGATIVE_PATTERN)
+                    .build();
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto поле inviterId меньше нуля тогда возвращаем false")
-            void whenGoalInvitationFilterDtoSpecifiedInviterIdIsLessThanZeroThenReturnFalse() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .inviterId(INVITER_ID_NEGATIVE_PATTERN)
-                        .build();
-
-                assertFalse(goalInvitationInviterIdFilter.isApplicable(goalInvitationFilterDto));
-            }
+            assertFalse(goalInvitationInviterIdFilter.isApplicable(goalInvitationFilterDto));
         }
     }
 }

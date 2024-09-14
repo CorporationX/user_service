@@ -75,28 +75,24 @@ class GoalInvitationInviterNameFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto поле inviterNamePattern null тогда возвращаем false")
+        void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsNullThenReturnFalse() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .inviterNamePattern(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto поле inviterNamePattern null тогда возвращаем false")
-            void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsNullThenReturnFalse() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .inviterNamePattern(null)
-                        .build();
+            assertFalse(goalInvitationInviterNameFilter.isApplicable(goalInvitationFilterDto));
+        }
 
-                assertFalse(goalInvitationInviterNameFilter.isApplicable(goalInvitationFilterDto));
-            }
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto поле inviterNamePattern пустое тогда возвращаем false")
+        void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsLessThanZeroThenReturnFalse() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .inviterNamePattern("   ")
+                    .build();
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto поле inviterNamePattern пустое тогда возвращаем false")
-            void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsLessThanZeroThenReturnFalse() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .inviterNamePattern("   ")
-                        .build();
-
-                assertFalse(goalInvitationInviterNameFilter.isApplicable(goalInvitationFilterDto));
-            }
+            assertFalse(goalInvitationInviterNameFilter.isApplicable(goalInvitationFilterDto));
         }
     }
 }

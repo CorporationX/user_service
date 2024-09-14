@@ -29,57 +29,53 @@ class GoalInvitationRequestStatusFilterTest {
     @Nested
     class PositiveTests {
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto заполнено поле status тогда возвращаем true")
-            void whenGoalInvitationFilterDtoSpecifiedStatusIsNotNullThenReturnTrue() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .status(REQUEST_PATTERN)
-                        .build();
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto заполнено поле status тогда возвращаем true")
+        void whenGoalInvitationFilterDtoSpecifiedStatusIsNotNullThenReturnTrue() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .status(REQUEST_PATTERN)
+                    .build();
 
-                assertTrue(goalInvitationRequestStatusFilter.isApplicable(goalInvitationFilterDto));
-            }
+            assertTrue(goalInvitationRequestStatusFilter.isApplicable(goalInvitationFilterDto));
+        }
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле status, " +
-                    "тогда возвращаем отфильтрованный список")
-            void whenGoalInvitationFilterDtoSpecifiedStatusThenReturnFilteredList() {
-                Stream<GoalInvitation> goalInvitations = Stream.of(
-                        GoalInvitation.builder()
-                                .status(REQUEST_PATTERN)
-                                .build(),
-                        GoalInvitation.builder()
-                                .status(RequestStatus.REJECTED)
-                                .build());
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле status, " +
+                "тогда возвращаем отфильтрованный список")
+        void whenGoalInvitationFilterDtoSpecifiedStatusThenReturnFilteredList() {
+            Stream<GoalInvitation> goalInvitations = Stream.of(
+                    GoalInvitation.builder()
+                            .status(REQUEST_PATTERN)
+                            .build(),
+                    GoalInvitation.builder()
+                            .status(RequestStatus.REJECTED)
+                            .build());
 
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .status(REQUEST_PATTERN)
-                        .build();
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .status(REQUEST_PATTERN)
+                    .build();
 
-                List<GoalInvitation> goalInvitationsAfterFilter = List.of(
-                        GoalInvitation.builder()
-                                .status(REQUEST_PATTERN)
-                                .build());
+            List<GoalInvitation> goalInvitationsAfterFilter = List.of(
+                    GoalInvitation.builder()
+                            .status(REQUEST_PATTERN)
+                            .build());
 
-                assertEquals(goalInvitationsAfterFilter, goalInvitationRequestStatusFilter.apply(goalInvitations,
-                        goalInvitationFilterDto).toList());
-            }
+            assertEquals(goalInvitationsAfterFilter, goalInvitationRequestStatusFilter.apply(goalInvitations,
+                    goalInvitationFilterDto).toList());
+        }
     }
 
     @Nested
     class NegativeTests {
 
-        @Nested
-        class IsApplicable {
+        @Test
+        @DisplayName("Если у GoalInvitationFilterDto поле status null тогда возвращаем false")
+        void whenGoalInvitationFilterDtoSpecifiedStatusIsNullThenReturnFalse() {
+            goalInvitationFilterDto = GoalInvitationFilterDto.builder()
+                    .status(null)
+                    .build();
 
-            @Test
-            @DisplayName("Если у GoalInvitationFilterDto поле status null тогда возвращаем false")
-            void whenGoalInvitationFilterDtoSpecifiedStatusIsNullThenReturnFalse() {
-                goalInvitationFilterDto = GoalInvitationFilterDto.builder()
-                        .status(null)
-                        .build();
-
-                assertFalse(goalInvitationRequestStatusFilter.isApplicable(goalInvitationFilterDto));
-            }
+            assertFalse(goalInvitationRequestStatusFilter.isApplicable(goalInvitationFilterDto));
         }
     }
 }

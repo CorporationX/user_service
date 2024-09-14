@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -37,7 +38,7 @@ public class RecommendationServiceTest {
     private SkillOfferRepository skillOfferRepository;
     @Mock
     private SkillRepository skillRepository;
-    @Mock
+    @Spy
     private RecommendationMapper recommendationMapper;
 
     @BeforeEach
@@ -132,12 +133,9 @@ public class RecommendationServiceTest {
     public void testGetAllUserRecommendationsRecommendation() {
         long receiverId = 1L;
         Recommendation recommendation = new Recommendation();
-        RecommendationDto dto = new RecommendationDto();
 
         when(recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged()))
                 .thenReturn(new PageImpl<>(List.of(recommendation)));
-
-        when(recommendationMapper.toDto(recommendation)).thenReturn(dto);
 
         recommendationService.getAllUserRecommendations(receiverId);
 
@@ -149,12 +147,9 @@ public class RecommendationServiceTest {
     public void testGetAllGivenRecommendationsRecommendation() {
         long authorId = 1L;
         Recommendation recommendation = new Recommendation();
-        RecommendationDto dto = new RecommendationDto();
 
         when(recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged()))
                 .thenReturn(new PageImpl<>(List.of(recommendation)));
-
-        when(recommendationMapper.toDto(recommendation)).thenReturn(dto);
 
         recommendationService.getAllGivenRecommendations(authorId);
 

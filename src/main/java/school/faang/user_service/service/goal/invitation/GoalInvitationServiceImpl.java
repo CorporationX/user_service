@@ -1,12 +1,9 @@
 package school.faang.user_service.service.goal.invitation;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -25,7 +22,6 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-@Validated
 @Slf4j
 public class GoalInvitationServiceImpl implements GoalInvitationService {
 
@@ -38,7 +34,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
 
     @Override
     @Transactional
-    public GoalInvitationDto createInvitation(@Valid GoalInvitationDto goalInvitationDto) {
+    public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
 
         if (goalInvitationDto.getInvitedUserId().equals(goalInvitationDto.getInviterId())) {
             throw new IllegalArgumentException("Invited user and inviter user are the same");
@@ -56,12 +52,12 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
 
     @Override
     @Transactional
-    public GoalInvitationDto acceptInvitation(@Positive long id) {
+    public GoalInvitationDto acceptInvitation(long id) {
         GoalInvitation goalInvitation = findGoalInvitationById(id);
         Goal goal = findGoalById(goalInvitation.getGoal().getId());
         User invitedUser = goalInvitation.getInvited();
 
-        if (checkIsGoalSuitableToAdd(invitedUser, goal)) {
+        if (checkIfGoalSuitableToAdd(invitedUser, goal)) {
             goal.getUsers().add(invitedUser);
             goalRepository.save(goal);
             goalInvitation.setStatus(RequestStatus.ACCEPTED);
@@ -74,7 +70,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
 
     @Override
     @Transactional
-    public GoalInvitationDto rejectInvitation(@Positive long id) {
+    public GoalInvitationDto rejectInvitation(long id) {
         GoalInvitation goalInvitation = findGoalInvitationById(id);
         goalInvitation.setStatus(RequestStatus.REJECTED);
         goalInvitation = goalInvitationRepository.save(goalInvitation);
@@ -84,7 +80,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     }
 
     @Override
-    public List<GoalInvitationDto> getInvitations(@Valid InvitationFilterDto invitationFilterDto) {
+    public List<GoalInvitationDto> getInvitations(InvitationFilterDto invitationFilterDto) {
         Stream<GoalInvitation> invitations = goalInvitationRepository.findAll().stream();
         return filters.stream()
                 .filter(filter -> filter.isApplicable(invitationFilterDto))
@@ -96,7 +92,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
                 .toList();
     }
 
-    private boolean checkIsGoalSuitableToAdd(User user, Goal goal) {
+    private boolean checkIfGoalSuitableToAdd(User user, Goal goal) {
         return !user.getGoals().contains(goal) && user.getGoals().size() < MAX_ACTIVE_GOALS;
     }
 

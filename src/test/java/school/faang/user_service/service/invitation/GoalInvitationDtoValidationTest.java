@@ -82,4 +82,16 @@ public class GoalInvitationDtoValidationTest {
 
         assertEquals("RequestStatus can't be null", constraintViolation.getMessage());
     }
+
+    @Test
+    @DisplayName("InviterId, invitedId and goalId are null")
+    public void testThatUsersIdsAndGoalIdAreNull() {
+        goalInvitationDto.setInviterId(null);
+        goalInvitationDto.setInvitedUserId(null);
+        goalInvitationDto.setGoalId(null);
+
+        Set<ConstraintViolation<GoalInvitationDto>> constraintViolations = validator.validate(goalInvitationDto);
+
+        assertEquals(3, constraintViolations.size());
+    }
 }

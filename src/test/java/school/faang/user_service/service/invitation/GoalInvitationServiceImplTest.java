@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -40,8 +42,8 @@ public class GoalInvitationServiceImplTest {
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
 
-    @Mock
-    private GoalInvitationMapper goalInvitationMapper;
+    @Spy
+    private GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
 
     @Mock
     private UserRepository userRepository;
@@ -89,9 +91,8 @@ public class GoalInvitationServiceImplTest {
                 .users(new ArrayList<>())
                 .build();
 
-        goalInvitation = new GoalInvitation();
-        goalInvitation.setId(1L);
-        goalInvitation.setStatus(RequestStatus.PENDING);
+        goalInvitation = goalInvitationMapper.fromGoalInvitationDto(goalInvitationDto);
+        goalInvitation.setInviter(inviterUser);
         goalInvitation.setGoal(goal);
         goalInvitation.setInvited(invitedUser);
 
@@ -132,7 +133,6 @@ public class GoalInvitationServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(inviterUser));
         when(userRepository.findById(2L)).thenReturn(Optional.of(invitedUser));
         when(goalRepository.findById(3L)).thenReturn(Optional.empty());
-        when(goalInvitationMapper.fromGoalInvitationDto(goalInvitationDto)).thenReturn(goalInvitation);
 
         assertThrows(EntityNotFoundException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
     }
@@ -143,13 +143,12 @@ public class GoalInvitationServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(inviterUser));
         when(userRepository.findById(2L)).thenReturn(Optional.of(invitedUser));
         when(goalRepository.findById(3L)).thenReturn(Optional.of(goal));
-        when(goalInvitationMapper.fromGoalInvitationDto(goalInvitationDto)).thenReturn(goalInvitation);
         when(goalInvitationRepository.save(any(GoalInvitation.class))).thenReturn(goalInvitation);
-        when(goalInvitationMapper.toGoalInvitationDto(goalInvitation)).thenReturn(goalInvitationDto);
 
-        goalInvitationService.createInvitation(goalInvitationDto);
+        goalInvitationDto = goalInvitationService.createInvitation(goalInvitationDto);
 
         verify(goalInvitationRepository).save(goalInvitation);
+        assertEquals(0, goalInvitationDto.getId());
     }
 
     @Test
@@ -233,7 +232,7 @@ public class GoalInvitationServiceImplTest {
         when(goalInvitationRepository.findAll()).thenReturn(invitationList);
         when(invitationFilter.isApplicable(invitationFilterDto)).thenReturn(true);
         when(invitationFilter.apply(any(), any(InvitationFilterDto.class))).thenReturn(invitationStream);
-        when(goalInvitationMapper.toGoalInvitationDto(goalInvitation)).thenReturn(goalInvitationDto);
+        goalInvitationDto = goalInvitationMapper.toGoalInvitationDto(goalInvitation);
 
         List<GoalInvitationDto> result = goalInvitationService.getInvitations(invitationFilterDto);
 
@@ -241,6 +240,6 @@ public class GoalInvitationServiceImplTest {
         verify(goalInvitationRepository).findAll();
         verify(invitationFilter).isApplicable(invitationFilterDto);
         verify(invitationFilter).apply(any(), any(InvitationFilterDto.class));
-        verify(goalInvitationMapper).toGoalInvitationDto(goalInvitation);
+        assertEquals(0, goalInvitationDto.getId());
     }
 }

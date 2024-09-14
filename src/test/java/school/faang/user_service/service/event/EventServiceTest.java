@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,12 +52,17 @@ public class EventServiceTest {
     @Mock
     SkillRepository skillRepository;
 
-    @Test
-    void testCreate() {
-        EventDto eventDto = new EventDto(20L, "title", LocalDateTime.now(),
+    private EventDto eventDto;
+
+    @BeforeEach
+    void setUp() {
+        eventDto = new EventDto(20L, "title", LocalDateTime.now(),
                 LocalDateTime.now(), 1L, "description",
                 List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
+    }
 
+    @Test
+    void testCreate() {
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(new User()));
         when(skillRepository.findAllById(eventDto.getRelatedSkillsIds())).thenReturn(new ArrayList<>());
         when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
@@ -77,10 +83,6 @@ public class EventServiceTest {
 
     @Test
     void testGetEvent() {
-        EventDto eventDto = new EventDto(22L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(new Event()));
 
         eventService.getEvent(eventDto.getId());
@@ -114,10 +116,6 @@ public class EventServiceTest {
 
     @Test
     void testDeleteEvent() {
-        EventDto eventDto = new EventDto(22L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         eventService.deleteEvent(eventDto.getId());
 
         verify(eventRepository).deleteById(eventDto.getId());
@@ -125,10 +123,6 @@ public class EventServiceTest {
 
     @Test
     void testUpdateEvent() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(new User()));
         when(skillRepository.findAllById(eventDto.getRelatedSkillsIds())).thenReturn(new ArrayList<>());
         when(eventMapper.toEntity(eventDto)).thenReturn(new Event());

@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.event;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,12 +29,17 @@ public class EventControllerTest {
     @InjectMocks
     EventController eventController;
 
-    @Test
-    public void testCreateIsSaved() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
+    private EventDto eventDto;
+
+    @BeforeEach
+    void setUp() {
+        eventDto = new EventDto(20L, "title", LocalDateTime.now(),
                 LocalDateTime.now(), 1L, "description",
                 List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
+    }
 
+    @Test
+    public void testCreateIsSaved() {
         eventController.create(eventDto);
 
         verify(eventService, times(1)).create(eventDto);
@@ -61,10 +67,6 @@ public class EventControllerTest {
 
     @Test
     void testGetEvent() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         eventController.getEvent(eventDto.getId());
 
         verify(eventService, times(1)).getEvent(eventDto.getId());
@@ -81,10 +83,6 @@ public class EventControllerTest {
 
     @Test
     void testDeleteEvent() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         eventController.deleteEvent(eventDto.getId());
 
         verify(eventService, times(1)).deleteEvent(eventDto.getId());
@@ -92,10 +90,6 @@ public class EventControllerTest {
 
     @Test
     void testUpdateEvent() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         eventController.updateEvent(eventDto);
 
         verify(eventService, times(1)).updateEvent(eventDto);
@@ -103,10 +97,6 @@ public class EventControllerTest {
 
     @Test
     void testGetOwnedEvents() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         eventController.getOwnedEvents(eventDto.getId());
 
         verify(eventService, times(1)).getOwnedEvents(eventDto.getId());
@@ -114,10 +104,6 @@ public class EventControllerTest {
 
     @Test
     void testGetParticipatedEvents() {
-        EventDto eventDto = new EventDto(98L, "title", LocalDateTime.now(),
-                LocalDateTime.now(), 1L, "description",
-                List.of(), "location", 10, EventType.WEBINAR, EventStatus.COMPLETED);
-
         eventController.getParticipatedEvents(eventDto.getId());
 
         verify(eventService, times(1)).getParticipatedEvents(eventDto.getId());

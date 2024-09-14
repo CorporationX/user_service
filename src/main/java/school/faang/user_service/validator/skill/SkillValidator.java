@@ -9,7 +9,10 @@ import school.faang.user_service.exceptions.DataValidationException;
 @RequiredArgsConstructor
 @Component
 public class SkillValidator {
-    public void validateSkill(Skill skill,boolean existsByTitle) throws DataValidationException {
+    public void validateSkill(Skill skill, boolean existsByTitle) throws DataValidationException {
+        if (skill.getTitle() == null) {
+            throw new DataValidationException("skill title is required");
+        }
         if (skill.getTitle().isBlank()) {
             throw new DataValidationException("Validation failed. Skill name is blank");
         }

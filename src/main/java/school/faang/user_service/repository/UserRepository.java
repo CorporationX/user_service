@@ -1,6 +1,7 @@
 package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(s.id) FROM users u
@@ -28,6 +29,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users u
+            JOIN user_promotion up ON up.user_id = u.id
+            WHERE up.remaining_shows > 0 AND up.promotion_target = 'profile'
+            """)
+    List<User> findProfilePromotedUsers();
 
     @Modifying
     @Query("update User u set u.goals = ?1 where u.id = ?2")

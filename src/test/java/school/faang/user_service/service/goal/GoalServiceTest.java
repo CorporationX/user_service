@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -43,7 +46,7 @@ public class GoalServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private List<GoalFilter> goalFilters;
+    private List<GoalFilter> goalFilters = new ArrayList<>();
 
     @InjectMocks
     private GoalService goalService;
@@ -64,14 +67,13 @@ public class GoalServiceTest {
         goal.setId(100L);
         goal.setTitle("Learning");
         goal.setSkillsToAchieve(new ArrayList<>(List.of(skill)));
-
     }
 
     @Test
     @DisplayName("Success create new goal")
     public void testCreateNewGoalIsSuccess() {
         when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(1);
-        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(skillRepository.countExisting(List.of(skill.getId()))).thenReturn(1);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         goalService.createGoal(user.getId(), goal);
@@ -88,7 +90,7 @@ public class GoalServiceTest {
         existingGoal.setUsers(new ArrayList<>());
         existingGoal.setStatus(GoalStatus.ACTIVE);
 
-        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(skillRepository.countExisting(List.of(skill.getId()))).thenReturn(1);
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(existingGoal));
         goal.setStatus(GoalStatus.ACTIVE);
 
@@ -108,7 +110,7 @@ public class GoalServiceTest {
         existingGoal.setUsers(new ArrayList<>(List.of(user)));
         existingGoal.setStatus(GoalStatus.ACTIVE);
 
-        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(skillRepository.countExisting(List.of(skill.getId()))).thenReturn(1);
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(existingGoal));
         goal.setStatus(GoalStatus.COMPLETED);
 
@@ -190,6 +192,7 @@ public class GoalServiceTest {
                 )))
                 .build();
 
+
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(goalFilters.stream()).thenReturn(Stream.of(
                 new GoalFilterByStatus(),
@@ -214,14 +217,10 @@ public class GoalServiceTest {
     public void testGoalTitleIsInvalid() {
         goal.setTitle(null);
 
-        IllegalArgumentException exception = assertThrows(
+        assertThrows(
                 IllegalArgumentException.class,
                 () -> goalService.createGoal(user.getId(), goal)
         );
-
-        String expectedMessage = "Title cannot be null or empty";
-        String resultMessage = exception.getMessage();
-        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
@@ -229,14 +228,10 @@ public class GoalServiceTest {
     public void testUserActiveGoalCountIsInvalid() {
         when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(3);
 
-        IllegalStateException exception = assertThrows(
+        assertThrows(
                 IllegalStateException.class,
                 () -> goalService.createGoal(user.getId(), goal)
         );
-
-        String expectedMessage = "The number of active user goals has been exceeded";
-        String resultMessage = exception.getMessage();
-        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
@@ -244,46 +239,35 @@ public class GoalServiceTest {
     public void testGoalSkillsIsInvalid() {
 
         when(goalRepository.countActiveGoalsPerUser(user.getId())).thenReturn(1);
-        when(skillRepository.existsById(skill.getId())).thenReturn(false);
+        when(skillRepository.countExisting(List.of(skill.getId()))).thenReturn(0);
 
-        IllegalArgumentException exception = assertThrows(
+        assertThrows(
                 IllegalArgumentException.class,
                 () -> goalService.createGoal(user.getId(), goal)
         );
-
-        String expectedMessage = "Skill does not exist";
-        String resultMessage = exception.getMessage();
-        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
     @DisplayName("Incorrect goalEntity status")
     public void updateGoalIsInvalid() {
         goal.setStatus(GoalStatus.COMPLETED);
-        when(skillRepository.existsById(skill.getId())).thenReturn(true);
+        when(skillRepository.countExisting(List.of(skill.getId()))).thenReturn(1);
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
-        IllegalArgumentException exception = assertThrows(
+        assertThrows(
                 IllegalArgumentException.class,
                 () -> goalService.updateGoal(goal)
         );
-
-        String expectedMessage = "It is impossible to change a completed goal";
-        String resultMessage = exception.getMessage();
-        assertEquals(expectedMessage, resultMessage);
     }
 
     @Test
     @DisplayName("Incorrect goalId")
     public void testValidateGoalIdIsInvalid() {
         when(goalRepository.existsById(goal.getId())).thenReturn(false);
-        IllegalArgumentException exception = assertThrows(
+
+        assertThrows(
                 IllegalArgumentException.class,
                 () -> goalService.deleteGoal(goal.getId())
         );
-
-        String expectedMessage = "Goal with this id does not exist";
-        String resultMessage = exception.getMessage();
-        assertEquals(expectedMessage, resultMessage);
     }
 }

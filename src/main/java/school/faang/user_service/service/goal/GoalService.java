@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +30,7 @@ public class GoalService {
     private final UserRepository userRepository;
     private final List<GoalFilter> goalFilters;
 
+    @Transactional
     public Goal createGoal(Long userId, Goal goal) {
         validateTitle(goal);
         validateUserActiveGoalCount(userId);
@@ -40,46 +43,35 @@ public class GoalService {
         return goalRepository.save(goal);
     }
 
+    @Transactional
     public Goal updateGoal(Goal goal) {
         validateTitle(goal);
         validateGoalSkillsExist(goal);
         validateExistingGoalStatus(goal);
 
-        Long goalId = goal.getId();
+        Goal existingGoal = goalRepository.findById(goal.getId())
+                .orElseThrow();
+
         if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
-            Goal existingGoal = goalRepository.findById(goalId)
-                    .orElseThrow();
-
-            existingGoal.setStatus(GoalStatus.COMPLETED);
-
-            List<Skill> existingSkills = existingGoal.getSkillsToAchieve();
-            List<User> existingUsers = existingGoal.getUsers();
-            existingSkills.forEach(skill -> skill.getUsers().addAll(existingUsers));
-
-            return goalRepository.save(existingGoal);
-
+            return completeGoal(existingGoal);
         } else {
-            Goal existingGoal = goalRepository.findById(goalId)
-                    .orElseThrow();
-            existingGoal.getSkillsToAchieve().clear();
-            List<Skill> newSkills = goal.getSkillsToAchieve();
-            existingGoal.getSkillsToAchieve().addAll(newSkills);
-            return goalRepository.save(existingGoal);
+            return updateGoalSkills(existingGoal, goal.getSkillsToAchieve());
         }
     }
 
+
+    @Transactional
     public void deleteGoal(Long goalId) {
         validateGoalId(goalId);
         goalRepository.deleteById(goalId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Goal> findSubtaskByGoalId(Long parentGoalId) {
         validateGoalId(parentGoalId);
         return goalRepository.findByParent(parentGoalId).toList();
     }
 
-    
     public List<Goal> findGoalsByUser(Long userId, GoalFilterDto filterDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow();
@@ -121,15 +113,14 @@ public class GoalService {
     }
 
     private void validateGoalSkillsExist(Goal goal) {
-        List<Skill> skills = goal.getSkillsToAchieve();
-        skills.stream()
+        List<Long> skillsIds = goal.getSkillsToAchieve().stream()
                 .map(Skill::getId)
-                .forEach(skillId -> {
-                    if (!skillRepository.existsById(skillId)) {
-                        log.error("Skill={} does not exist", skillId);
-                        throw new IllegalArgumentException("Skill does not exist");
-                    }
-                });
+                .toList();
+
+        int existingSkillCount = skillRepository.countExisting(skillsIds);
+        if (existingSkillCount != skillsIds.size()) {
+            throw new IllegalArgumentException("Some skill or skills do not exist");
+        }
     }
 
     private void validateExistingGoalStatus(Goal goal) {
@@ -141,5 +132,20 @@ public class GoalService {
         }
     }
 
+    private Goal updateGoalSkills(Goal existingGoal, List<Skill> newSkills) {
+        existingGoal.getSkillsToAchieve().clear();
+        existingGoal.getSkillsToAchieve().addAll(newSkills);
 
+        return goalRepository.save(existingGoal);
+    }
+
+    private Goal completeGoal(Goal existingGoal) {
+        existingGoal.setStatus(GoalStatus.COMPLETED);
+
+        List<Skill> existingSkills = existingGoal.getSkillsToAchieve();
+        List<User> existingUsers = existingGoal.getUsers();
+        existingSkills.forEach(skill -> skill.getUsers().addAll(existingUsers));
+
+        return goalRepository.save(existingGoal);
+    }
 }

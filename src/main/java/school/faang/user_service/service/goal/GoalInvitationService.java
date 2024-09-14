@@ -31,8 +31,8 @@ public class GoalInvitationService {
 
     @Transactional
     public void createInvitation(GoalInvitationDto goalInvitationDto) {
-        validateUsers(goalInvitationDto.getInviterUserId(), goalInvitationDto.getInvitedUserId());
-        checkGoal(goalInvitationDto.getGoalId());
+        validateUsersId(goalInvitationDto.getInviterUserId(), goalInvitationDto.getInvitedUserId());
+        validateGoalId(goalInvitationDto.getGoalId());
         userValidator.validateFirstUserIdAndSecondUserIdNotEquals(goalInvitationDto.getInviterUserId(),
                 goalInvitationDto.getInvitedUserId(),
                 "Inviter and invited cannot be equal");
@@ -44,7 +44,7 @@ public class GoalInvitationService {
     public void acceptGoalInvitation(long goalInvitationId) {
         GoalInvitation goalInvitation = getGoalInvitation(goalInvitationId);
 
-        checkGoal(goalInvitation.getGoal().getId());
+        validateGoalId(goalInvitation.getGoal().getId());
         goalValidator.validateUserActiveGoalsAreLessThenIncoming(goalInvitation.getInvited().getId(),
                 MAX_LIMIT_ACTIVE_GOALS_FOR_USER);
         goalValidator.validateUserNotWorkingWithGoal(goalInvitation.getInvited().getId(),
@@ -60,7 +60,7 @@ public class GoalInvitationService {
     public void rejectGoalInvitation(long goalInvitationId) {
         GoalInvitation goalInvitation = getGoalInvitation(goalInvitationId);
 
-        checkGoal(goalInvitation.getGoal().getId());
+        validateGoalId(goalInvitation.getGoal().getId());
 
         goalInvitation.setStatus(RequestStatus.REJECTED);
         goalInvitationRepository.save(goalInvitation);
@@ -84,17 +84,17 @@ public class GoalInvitationService {
                 .orElseThrow(() -> new ValidationException("No goal invitation with id " + goalInvitationId + " found"));
     }
 
-    private void validateUsers(Long firstUserId, Long secondUserId) {
-        validateUser(firstUserId);
-        validateUser(secondUserId);
+    private void validateUsersId(Long firstUserId, Long secondUserId) {
+        validateUserId(firstUserId);
+        validateUserId(secondUserId);
     }
 
-    private void validateUser(Long userId) {
+    private void validateUserId(Long userId) {
         userValidator.validateUserIdIsPositiveAndNotNull(userId);
         userValidator.validateUserIsExisted(userId);
     }
 
-    private void checkGoal(Long goalId) {
+    private void validateGoalId(Long goalId) {
         goalValidator.validateGoalIdIsPositiveAndNotNull(goalId);
         goalValidator.validateGoalWithIdIsExisted(goalId);
     }

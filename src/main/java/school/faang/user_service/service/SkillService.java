@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
@@ -7,9 +8,12 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,24 +22,41 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final UserRepository userRepository;
 
     public Skill createSkill(Skill skill) {
+        validateSkill(skill);
         if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException("Skill with this title already exists!");
         }
         return skillRepository.save(skill);
     }
 
+    private void validateSkill(Skill skill) {
+        if (Objects.isNull(skill.getTitle()) || skill.getTitle().trim().isEmpty()) {
+            throw new DataValidationException("Skill title cannot is empty!");
+        }
+    }
+
+    private void validateUserExists(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new DataValidationException("User is empty!");
+        }
+    }
+
     public List<Skill> getUserSkills(long userId) {
+        validateUserExists(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skills;
     }
 
     public List<Skill> getOfferedSkills(long userId) {
+        validateUserExists(userId);
         List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
         return offeredSkills;
     }
 
+    @Transactional
     public Skill acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = skillRepository.findById(skillId).orElseThrow(
                 () -> new DataValidationException("Skill with ID " + skillId + " not found"));

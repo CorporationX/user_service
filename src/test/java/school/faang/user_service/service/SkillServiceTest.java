@@ -18,14 +18,17 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.LongStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,8 +50,12 @@ class SkillServiceTest {
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
+
 
     private Skill skill;
     private long userId = 1L;
@@ -84,24 +91,23 @@ class SkillServiceTest {
     @Test
     public void testGetUserSkills() {
 
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(skillRepository.findAllByUserId(userId)).thenReturn(List.of(skill));
 
-        List<Skill> returnedSkill = skillService.getUserSkills(userId);
+        Skill returnedSkill = skillService.getUserSkills(userId).get(0);
 
         verify(skillRepository, times(1)).findAllByUserId(userId);
-        assertEquals(List.of(skill), returnedSkill);
+        assertEquals(skill, returnedSkill);
     }
 
     @Test
     public void testGetOfferedSkills() {
-        SkillMapper mapper = Mappers.getMapper(SkillMapper.class);
-
         List<SkillDto> skillDtos = LongStream.of(1L, 2L, 3L)
                 .mapToObj(l -> {
                     Skill s = new Skill();
                     s.setId(l);
                     s.setTitle("Skill" + l);
-                    return mapper.toDto(s);
+                    return skillMapper.toDto(s);
                 })
                 .toList();
 
@@ -120,10 +126,11 @@ class SkillServiceTest {
                 })
                 .toList();
 
-        when(skillRepository.findSkillsOfferedToUser(3)).thenReturn(skills);
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skills);
 
-        List<Skill> offeredSkills = skillService.getOfferedSkills(3);
-        List<SkillCandidateDto> resultList = new ArrayList<>(mapper.toCandidateDtoList(offeredSkills));
+        List<Skill> offeredSkills = skillService.getOfferedSkills(userId);
+        List<SkillCandidateDto> resultList = new ArrayList<>(skillMapper.toCandidateDtoList(offeredSkills));
 
         resultList.sort(Comparator.comparingLong(skill -> skill.getSkillDto().getId()));
 
@@ -131,7 +138,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void test() {
+    public void testCreateSkillFailingValidation() {
         User receiver = new User();
         receiver.setId(userId);
 
@@ -145,6 +152,7 @@ class SkillServiceTest {
         List<Recommendation> recommendations = users.stream()
                 .map(u -> {
                     Recommendation r = new Recommendation();
+                    r.setId(u.getId());
                     r.setAuthor(u);
                     r.setReceiver(receiver);
                     return r;

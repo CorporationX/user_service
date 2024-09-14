@@ -10,8 +10,9 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapperImpl;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.validator.candidate.skill.SkillCandidateValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
@@ -33,7 +34,7 @@ public class SkillServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapperImpl skillMapperImpl;
     @Spy
     private SkillCandidateMapperImpl skillCandidateMapperImpl;
     @Mock
@@ -42,17 +43,14 @@ public class SkillServiceImplTest {
     private SkillCandidateValidator skillCandidateValidator;
 
     @Test
-    public void testCreate() {
+    public void testCreate() throws DataValidationException {
         SkillDto dto = new SkillDto("title", 1L);
         Skill skill = new Skill();
         skill.setId(1L);
         skill.setTitle("title");
         when(skillRepository.save(skill)).thenReturn(skill);
-        when(skillMapper.toSkill(dto)).thenReturn(skill);
-        when(skillMapper.toDto(skill)).thenReturn(dto);
 
         assertEquals(dto.getTitle(), skillServiceImpl.create(skill).getTitle());
-
     }
 
     @Test
@@ -69,19 +67,18 @@ public class SkillServiceImplTest {
     }
 
     @Test
-    public void testEnoughOffersToAcquireSkillsFromOffers() {
+    public void testEnoughOffersToAcquireSkillsFromOffers() throws DataValidationException {
         long userId = 1L;
         long skillId = 2L;
         boolean existsByTitle = true;
         SkillDto dto1 = new SkillDto("Java", userId);
         Skill skill1 = new Skill();
-        List<SkillOffer> skillOfferList = List.of(new SkillOffer(), new SkillOffer(),new SkillOffer());
+        List<SkillOffer> skillOfferList = List.of(new SkillOffer(), new SkillOffer(), new SkillOffer());
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(skill1));
-        when(skillMapper.toDto(skill1)).thenReturn(dto1);
 
         SkillDto actualDto = skillServiceImpl.acquireSkillFromOffers(skillId, userId);
-        verify(skillValidator,times(1)).validateSkill(skill1,existsByTitle);
-        verify(skillCandidateValidator,times(1)).validateSkillOfferSize(skillOfferList);
+        verify(skillValidator, times(1)).validateSkill(skill1, existsByTitle);
+        verify(skillCandidateValidator, times(1)).validateSkillOfferSize(skillOfferList);
         assertEquals(dto1, actualDto);
     }
 }

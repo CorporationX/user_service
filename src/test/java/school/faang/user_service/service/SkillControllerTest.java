@@ -6,10 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.SkillController;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exceptions.DataValidationException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -22,7 +21,7 @@ public class SkillControllerTest {
     private SkillService skillService;
 
     @Test
-    public void testCreate() {
+    public void testCreate() throws DataValidationException {
         Skill skill = new Skill();
 
         skillController.create(skill);
@@ -46,7 +45,7 @@ public class SkillControllerTest {
         verify(skillService, times(1)).getOfferedSkills(userId);
     }
     @Test
-    public void testAcquireSkillFromOffers() {
+    public void testAcquireSkillFromOffers() throws DataValidationException {
         long userId = 1L;
         long skillId = 2L;
 

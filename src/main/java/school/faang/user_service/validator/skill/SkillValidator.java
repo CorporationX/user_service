@@ -1,10 +1,10 @@
 package school.faang.user_service.validator.skill;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
+
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.exceptions.DataValidationException;
 
 @RequiredArgsConstructor
 @Component

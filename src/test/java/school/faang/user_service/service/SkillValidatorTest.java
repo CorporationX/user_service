@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.validator.skill.SkillValidator;
 
@@ -21,17 +22,18 @@ public class SkillValidatorTest {
 
     @Test
     public void testValidateSkillWithBlankTitle() {
-        SkillDto dto = preparedData(false);
-        dto.setTitle(" ");
+        Skill skill = new Skill();
+        skill.setTitle("");
+        boolean existsByTitle = false;
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> skillValidator.validateSkill(dto));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> skillValidator.validateSkill(skill,existsByTitle));
     }
 
     @Test
     public void testValidateSkillWithExistingTitle() {
-        SkillDto dto = preparedData(true);
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> skillValidator.validateSkill(dto));
+        Skill skill = new Skill();
+        boolean existsByTitle = true;
+        Assertions.assertThrows(IllegalArgumentException.class, () -> skillValidator.validateSkill(skill,existsByTitle));
     }
 
     @Test

@@ -37,7 +37,7 @@ public class MentroshipReqSerGetRequestTest {
     @BeforeEach
     public void setup() {
         predicates = new Predicates();
-        service = new MentorshipRequestService(mentorshipRequestValidator, repository, predicates);
+        service = new MentorshipRequestServiceImpl(mentorshipRequestValidator, repository, predicates);
     }
 
     @Test

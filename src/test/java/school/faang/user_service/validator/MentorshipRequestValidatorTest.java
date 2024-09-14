@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MentorshipRequestValidatorTest {
+public class MentorshipRequestValidatorTest {
     @Mock
     private MentorshipRequestRepository repository;
     @InjectMocks

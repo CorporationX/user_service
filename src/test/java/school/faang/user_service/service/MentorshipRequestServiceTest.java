@@ -29,11 +29,11 @@ import java.util.function.BiFunction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static school.faang.user_service.service.MentorshipRequestService.MENTOR_IS_ALREADY_ACCEPTED;
+import static school.faang.user_service.service.MentorshipRequestServiceImpl.MENTOR_IS_ALREADY_ACCEPTED;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class MentorshipRequestServiceTest {
+public class MentorshipRequestServiceTest {
 
     @Mock
     MentorshipRequestValidator mentorshipRequestValidator;
@@ -43,11 +43,12 @@ class MentorshipRequestServiceTest {
 
     @Mock
     MentorshipRequestRepository repository;
+
     @Spy
     private Predicates predicates;
 
     @InjectMocks
-    MentorshipRequestService service;
+    MentorshipRequestServiceImpl service;
 
     @Test
     void test_service_method_called_() {

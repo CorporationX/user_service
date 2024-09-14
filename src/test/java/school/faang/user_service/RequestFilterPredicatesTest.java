@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static school.faang.user_service.validator.Predicates.*;
 
 @ExtendWith(MockitoExtension.class)
-class RequestFilterPredicatesTest {
+public class RequestFilterPredicatesTest {
     @Spy
     private Predicates predicates;
 

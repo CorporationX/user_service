@@ -10,8 +10,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +32,17 @@ class MentorshipServiceTest {
     @Spy
     private MentorshipMapper mentorshipMapper;
 
+    @Mock
+    MentorshipValidator validator;
+
     @InjectMocks
     private MentorshipService mentorshipService;
 
     User user;
     User menteeOrMentor;
     MentorshipDto mentorshipDto;
+    private int id;
+    private List<User> mentees;
 
     @BeforeEach
     void setUp() {
@@ -53,6 +60,14 @@ class MentorshipServiceTest {
                 .email("john@example.com")
                 .phone("123456789")
                 .aboutMe("About John")
+                .goals(List
+                        .of(Goal
+                                .builder()
+                                .mentor(User
+                                        .builder()
+                                        .id(2L)
+                                        .build())
+                                .build()))
                 .mentees(new ArrayList<>(List.of(menteeOrMentor)))
                 .mentors(new ArrayList<>(List.of(menteeOrMentor)))
                 .build();
@@ -64,6 +79,9 @@ class MentorshipServiceTest {
                 "123456789",
                 "About John Doe"
         );
+
+        id = 1;
+        mentees = List.of(user);
     }
 
     @Test
@@ -112,5 +130,13 @@ class MentorshipServiceTest {
         mentorshipService.deleteMentor(1, 2);
         verify(mentorshipRepository, times(1)).deleteMentorship(anyLong(), anyLong());
         verifyNoMoreInteractions(mentorshipRepository);
+    }
+
+    @Test
+    void testDeleteMentorFromMentees() {
+        mentorshipService.deleteMentorFromMentees(id, mentees);
+
+        verify(validator).validateMenteesList(mentees);
+        verify(mentorshipRepository).saveAll(mentees);
     }
 }

@@ -24,4 +24,11 @@ class UserControllerTest {
         userController.getPremiumUsers(any());
         verify(userService, times(1)).getPremiumUsers(any());
     }
+
+    @Test
+    void testDeactivateUserProfile() {
+        userController.deactivateUserProfile(1L);
+
+        verify(userService).deactivateUserProfile(1L);
+    }
 }

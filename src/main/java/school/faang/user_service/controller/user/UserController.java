@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +44,10 @@ public class UserController {
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(@ParameterObject UserFilterDto filter) {
         return userService.getPremiumUsers(filter);
+    }
+
+    @PatchMapping("/{id}")
+    public void deactivateUserProfile(@PathVariable long id) {
+        userService.deactivateUserProfile(id);
     }
 }

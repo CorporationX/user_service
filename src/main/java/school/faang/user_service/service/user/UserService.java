@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface UserService {
     List<UserDto> getPremiumUsers(UserFilterDto filter);
+
+    void deactivateUserProfile(long id);
 }

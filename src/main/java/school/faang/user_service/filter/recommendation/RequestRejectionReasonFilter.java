@@ -7,10 +7,10 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import java.util.stream.Stream;
 
 @Component
-public class RequestRejectionReasonFilter implements RequestFilter {
+class RequestRejectionReasonFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getRejectionReason() != null && !filters.getRejectionReason().isEmpty();
+        return filters.getRejectionReason() != null && !filters.getRejectionReason().isBlank();
     }
 
     @Override

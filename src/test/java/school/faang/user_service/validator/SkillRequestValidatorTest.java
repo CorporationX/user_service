@@ -1,18 +1,18 @@
 package school.faang.user_service.validator;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.exception.skill.SkillNotValidException;
+import school.faang.user_service.exception.skill.SkillRequestNotValidException;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.recommendation.SkillRequestValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,26 +26,36 @@ public class SkillRequestValidatorTest {
     private SkillRequestValidator skillRequestValidator;
     @Mock
     private SkillRequestRepository skillRequestRepository;
-    private List<SkillDto> skills;
+    private List<SkillRequest> skills;
+    private static final long SKILL_REQUEST_ID_ONE = 1L;
 
     @BeforeEach
-    void init() {
-        skills = new ArrayList<>();
-        skills.add(new SkillDto());
+    void setUp() {
+        skills = List.of(SkillRequest.builder()
+                .id(SKILL_REQUEST_ID_ONE)
+                .build());
     }
 
-    @Test
-    public void validateSkillsExistThrowExceptionTest() {
-        when(skillRequestRepository.findById(skills.get(0).getId())).thenReturn(Optional.empty());
+    @Nested
+    class PositiveTests {
+        @Test
+        @DisplayName("When Optional is present then no exception thrown")
+        public void validateSkillsExistPositiveTest() {
+            when(skillRequestRepository.findById(skills.get(0).getId()))
+                    .thenReturn(Optional.of(SkillRequest.builder().build()));
 
-        assertThrows(SkillNotValidException.class, () -> skillRequestValidator.validateSkillsExist(skills));
+            assertDoesNotThrow(() -> skillRequestValidator.validateSkillsExist(skills));
+        }
     }
 
-    @Test
-    public void validateSkillsExistPositiveTest() {
-        skills.get(0).setId(1L);
-        when(skillRequestRepository.findById(skills.get(0).getId())).thenReturn(Optional.of(new SkillRequest()));
+    @Nested
+    class NegativeTests {
+        @Test
+        @DisplayName("When Optional is null then exception thrown")
+        public void validateSkillsExistThrowExceptionTest() {
+            when(skillRequestRepository.findById(skills.get(0).getId())).thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() -> skillRequestValidator.validateSkillsExist(skills));
+            assertThrows(SkillRequestNotValidException.class, () -> skillRequestValidator.validateSkillsExist(skills));
+        }
     }
 }

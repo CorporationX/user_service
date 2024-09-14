@@ -3,12 +3,13 @@ package school.faang.user_service.service.recommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.filter.recommendation.RequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -32,18 +33,23 @@ public class RecommendationRequestService {
     private final List<RequestFilter> requestFilters;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        recommendationRequestValidator.validateRecommendationRequestMessageNotNull(recommendationRequestDto);
         recommendationRequestValidator.validateRequesterAndReceiverExists(recommendationRequestDto);
         recommendationRequestValidator.validatePreviousRequest(recommendationRequestDto);
-        RecommendationRequest rq = recommendationRequestRepository.
-                save(recommendationRequestMapper.toEntity(recommendationRequestDto));
-        skillRequestValidator.validateSkillsExist((recommendationRequestDto.getSkills()));
-        for (SkillDto skillDto : recommendationRequestDto.getSkills()) {
-            skillRequestRepository.create(recommendationRequestDto.getId(), skillDto.getId());
-        }
-        return recommendationRequestMapper.toDto(rq);
+        List<SkillRequest> skillRequests = getAllSkillRequests(recommendationRequestDto);
+        skillRequestValidator.validateSkillsExist(skillRequests);
+
+        RecommendationRequest rq = recommendationRequestMapper.toEntity(recommendationRequestDto);
+        rq.setSkills(skillRequests);
+
+        RecommendationRequest requestSavedResult = recommendationRequestRepository.save(rq);
+
+        createSkillRequestDtoBatchSave(recommendationRequestDto);
+        return recommendationRequestMapper.toDto(requestSavedResult);
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
+        recommendationRequestValidator.validateRequestDtoFilterFieldsNotNull(filters);
         Stream<RecommendationRequest> requests = recommendationRequestRepository.findAll().stream();
         Stream<RecommendationRequest> filteredRequests = requestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
@@ -64,5 +70,16 @@ public class RecommendationRequestService {
         rq.setStatus(RequestStatus.REJECTED);
         recommendationRequestRepository.save(rq);
         return recommendationRequestMapper.toDto(rq);
+    }
+
+    @Transactional
+    public void createSkillRequestDtoBatchSave(RecommendationRequestDto recommendationRequestDto) {
+        for (Long skillId : recommendationRequestDto.getSkillRequestIds()) {
+            skillRequestRepository.createBatch(recommendationRequestDto.getId(), skillId);
+        }
+    }
+
+    public List<SkillRequest> getAllSkillRequests(RecommendationRequestDto recommendationRequestDto) {
+        return skillRequestRepository.findAllById(recommendationRequestDto.getSkillRequestIds());
     }
 }

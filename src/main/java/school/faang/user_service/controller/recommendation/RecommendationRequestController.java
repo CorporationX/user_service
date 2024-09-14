@@ -8,7 +8,6 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
-import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.util.List;
 
@@ -18,10 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
-    private final RecommendationRequestValidator recommendationRequestValidator;
 
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
-        recommendationRequestValidator.isRecommendationRequestMessageNull(recommendationRequest);
         return recommendationRequestService.create(recommendationRequest);
     }
 

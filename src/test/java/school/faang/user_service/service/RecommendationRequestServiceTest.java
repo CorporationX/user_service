@@ -1,6 +1,8 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -10,9 +12,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.filter.recommendation.RequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -21,11 +23,11 @@ import school.faang.user_service.service.recommendation.RecommendationRequestSer
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 import school.faang.user_service.validator.recommendation.SkillRequestValidator;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -51,85 +53,143 @@ public class RecommendationRequestServiceTest {
     private RequestFilter requestFilter;
     @Mock
     private List<RequestFilter> requestFilters;
+    private static final long RECOMMENDATION_REQUEST_DTO_ID_ONE = 1L;
+    private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
+    private static final long SKILL_REQUEST_ID_ONE = 1L;
+    private static final long SKILL_REQUEST_ID_TWO = 2L;
+    private static final String TOO_SERIOUS = "Too serious!";
+    private static final RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
+    private static final RequestStatus REQUEST_STATUS_REJECTED = RequestStatus.REJECTED;
+
     private RecommendationRequestDto rqd;
+    private RecommendationRequest rq;
+    private RejectionDto rejection;
+    private RequestFilterDto filters;
+    private List<RecommendationRequest> requests;
 
     @BeforeEach
     void setUp() {
-        rqd = new RecommendationRequestDto();
+        rqd = RecommendationRequestDto.builder()
+                .id(RECOMMENDATION_REQUEST_DTO_ID_ONE)
+                .skillRequestIds(List.of(SKILL_REQUEST_ID_ONE, SKILL_REQUEST_ID_TWO))
+                .build();
+        rq = RecommendationRequest.builder()
+                .id(RECOMMENDATION_REQUEST_ID_ONE)
+                .skills(List.of(SkillRequest.builder()
+                                .id(SKILL_REQUEST_ID_ONE)
+                                .build(),
+                        SkillRequest.builder()
+                                .id(SKILL_REQUEST_ID_TWO)
+                                .build()))
+                .build();
+        rejection = RejectionDto.builder()
+                .reason(TOO_SERIOUS)
+                .build();
+
+        filters = RequestFilterDto.builder()
+                .status(REQUEST_STATUS_ACCEPTED)
+                .build();
+        requests = List.of(RecommendationRequest.builder()
+                        .status(REQUEST_STATUS_REJECTED)
+                        .skills(List.of(SkillRequest.builder()
+                                        .id(1L)
+                                        .build(),
+                                SkillRequest.builder()
+                                        .id(2L)
+                                        .build()))
+                        .build(),
+                RecommendationRequest.builder()
+                        .status(REQUEST_STATUS_ACCEPTED)
+                        .skills(List.of(SkillRequest.builder()
+                                        .id(3L)
+                                        .build(),
+                                SkillRequest.builder()
+                                        .id(4L)
+                                        .build()
+                        ))
+                        .build());
     }
 
-    @Test
-    public void createSaveReturnsDtoTest() {
-        rqd.setId(2L);
-        List<SkillDto> skills = Arrays.asList(new SkillDto(), new SkillDto());
-        rqd.setSkills(skills);
-        rqd.getSkills().get(0).setId(5L);
-        rqd.getSkills().get(1).setId(3L);
-        RecommendationRequest rq = recommendationRequestMapper.toEntity(rqd);
+    @Nested
+    class ServiceMethodsTest {
+        @Test
+        @DisplayName("Check for 5 calls of methods, and 3 returned Objects when service.create(rqd) called")
+        public void createSaveReturnsDtoTest() {
+            when(recommendationRequestRepository.save(rq))
+                    .thenReturn(rq);
+            when(recommendationRequestMapper.toEntity(rqd)).thenReturn(rq);
+            when(recommendationRequestService.getAllSkillRequests(rqd)).thenReturn(rq.getSkills());
 
-        when(recommendationRequestRepository.save(rq))
-                .thenReturn(rq);
-        recommendationRequestService.create(rqd);
-        verify(recommendationRequestValidator, times(1))
-                .validateRequesterAndReceiverExists(rqd);
-        verify(recommendationRequestValidator, times(1))
-                .validatePreviousRequest(rqd);
-        verify(skillRequestValidator, times(1))
-                .validateSkillsExist(rqd.getSkills());
-        verify(skillRequestRepository, times(rqd.getSkills().size()))
-                .create(anyLong(), anyLong());
-    }
+            recommendationRequestService.create(rqd);
 
-    @Test
-    public void getRequestTestReturnsDto() {
-        RecommendationRequest rq = recommendationRequestMapper.toEntity(rqd);
+            verify(recommendationRequestValidator)
+                    .validateRecommendationRequestMessageNotNull(rqd);
+            verify(recommendationRequestValidator)
+                    .validateRequesterAndReceiverExists(rqd);
+            verify(recommendationRequestValidator)
+                    .validatePreviousRequest(rqd);
+            verify(skillRequestValidator)
+                    .validateSkillsExist(rq.getSkills());
+            verify(recommendationRequestRepository)
+                    .save(rq);
+        }
 
-        when(recommendationRequestValidator.validateRecommendationRequestExists(anyLong()))
-                .thenReturn(rq);
-        recommendationRequestService.getRequest(anyLong());
-        verify(recommendationRequestValidator, times(1))
-                .validateRecommendationRequestExists(anyLong());
-    }
+        @Test
+        @DisplayName("Test that recommendationDto returns after calling service.getRequest")
+        public void getRequestTestReturnsDtoTest() {
+            rq = recommendationRequestMapper.toEntity(rqd);
+            when(recommendationRequestValidator.validateRecommendationRequestExists(RECOMMENDATION_REQUEST_ID_ONE))
+                    .thenReturn(rq);
+            recommendationRequestService.getRequest(RECOMMENDATION_REQUEST_ID_ONE);
+            verify(recommendationRequestValidator)
+                    .validateRecommendationRequestExists(RECOMMENDATION_REQUEST_ID_ONE);
+        }
 
-    @Test
-    public void rejectRequestReturnDtoTest() {
-        RecommendationRequest rq = new RecommendationRequest();
-        RejectionDto rejection = new RejectionDto();
-        rejection.setReason("Too serious!");
+        @Test
+        @DisplayName("Reject request by passing rejectionDto into method signature return rq")
+        public void rejectRequestReturnDtoTest() {
+            when(recommendationRequestValidator
+                    .validateRequestStatusNotAcceptedOrDeclined(RECOMMENDATION_REQUEST_ID_ONE)).thenReturn(rq);
+            recommendationRequestService.rejectRequest(RECOMMENDATION_REQUEST_ID_ONE, rejection);
+            verify(recommendationRequestRepository)
+                    .save(rq);
+        }
 
-        when(recommendationRequestValidator.validateRequestStatusNotAcceptedOrDeclined(anyLong()))
-                .thenReturn(rq);
-        recommendationRequestService.rejectRequest(anyLong(), rejection);
-        verify(recommendationRequestRepository, times(1))
-                .save(rq);
-    }
+        @Test
+        @DisplayName("Check if filters is applied and apply them to stream then return List of filtered rqd's")
+        public void getRequestsReturnFilteredDtoTest() {
+            customRecommendationRequestService();
+            when(recommendationRequestRepository.findAll())
+                    .thenReturn(requests);
+            when(requestFilter.isApplicable(filters))
+                    .thenReturn(true);
+            when(requestFilter.applyFilter(any(), eq(filters)))
+                    .thenReturn(requests.stream().filter(filter -> filter.getStatus() == REQUEST_STATUS_ACCEPTED));
+            List<RecommendationRequestDto> result = recommendationRequestService.getRequests(filters);
+            assertEquals(1, result.size());
+            verify(recommendationRequestValidator)
+                    .validateRequestDtoFilterFieldsNotNull(filters);
+            verify(recommendationRequestRepository)
+                    .findAll();
+        }
 
-    @Test
-    public void getRequestsReturnFilteredDtoTest() {
-        customRecommendationRequestService();
+        @Test
+        @DisplayName("Test that service.createSkillRequestDtoBatchSave" +
+                " calls for skillRequestRepo.createBatch and calls for specified times")
+        public void createSkillRequestDtoBatchSaveTest() {
+            recommendationRequestService.createSkillRequestDtoBatchSave(rqd);
+            verify(skillRequestRepository, times(rqd.getSkillRequestIds().size()))
+                    .createBatch(anyLong(), anyLong());
+        }
 
-        RequestFilterDto filters = new RequestFilterDto();
-        filters.setStatus(RequestStatus.ACCEPTED);
-
-        RecommendationRequest rq1 = new RecommendationRequest();
-        rq1.setStatus(RequestStatus.REJECTED);
-        RecommendationRequest rq2 = new RecommendationRequest();
-        rq2.setStatus(RequestStatus.ACCEPTED);
-
-        List<RecommendationRequest> requests = List.of(rq1, rq2);
-
-        when(recommendationRequestRepository.findAll())
-                .thenReturn(requests);
-        when(requestFilter.isApplicable(filters))
-                .thenReturn(true);
-        when(requestFilter.applyFilter(any(), eq(filters)))
-                .thenReturn(requests.stream().filter(x -> x.getStatus() == RequestStatus.ACCEPTED));
-        List<RecommendationRequestDto> result = recommendationRequestService.getRequests(filters);
-
-        assertEquals(1, result.size());
-        assertEquals(rq2.getStatus(), result.get(0).getStatus());
-        verify(recommendationRequestRepository, times(1))
-                .findAll();
+        @Test
+        @DisplayName("Test calls for skillRequestRepo.findAllById returns List of skillRequests")
+        public void getAllSkillRequestsAndReturnListTest() {
+            when(skillRequestRepository.findAllById(anyIterable())).thenReturn(List.of(SkillRequest.builder().build()));
+            recommendationRequestService.getAllSkillRequests(rqd);
+            verify(skillRequestRepository)
+                    .findAllById(anyIterable());
+        }
     }
 
     private void customRecommendationRequestService() {

@@ -1,5 +1,7 @@
 package school.faang.user_service.controller;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,12 +12,9 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
-import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,54 +24,59 @@ public class RecommendationRequestControllerTest {
     private RecommendationRequestController recommendationRequestController;
     @Mock
     private RecommendationRequestService recommendationRequestService;
-    @Mock
-    private RecommendationRequestValidator recommendationRequestValidator;
+    private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
+    private static final String NOT_VALID_STRING = "Not valid";
 
-    @Test
-    public void requestRecommendationSavesAndReturnsTest() {
-        RecommendationRequestDto rqdToSave = new RecommendationRequestDto();
+    @Nested
+    class ControllerCallsTests {
+        @Test
+        @DisplayName("Controller calls service.create method one time and returns savedEntity as Dto")
+        public void requestRecommendationSavesAndReturnsTest() {
+            RecommendationRequestDto rqdToSave = RecommendationRequestDto.builder().build();
 
-        when(recommendationRequestService.create(rqdToSave)).thenReturn(rqdToSave);
-        recommendationRequestController.requestRecommendation(rqdToSave);
-        verify(recommendationRequestValidator, times(1))
-                .isRecommendationRequestMessageNull(rqdToSave);
-        verify(recommendationRequestService, times(1))
-                .create(rqdToSave);
-    }
+            when(recommendationRequestService.create(rqdToSave)).thenReturn(rqdToSave);
+            recommendationRequestController.requestRecommendation(rqdToSave);
+            verify(recommendationRequestService).create(rqdToSave);
+        }
 
-    @Test
-    public void getRecommendationRequestsReturnFilteredListTest() {
-        RequestFilterDto filter = new RequestFilterDto();
-        List<RecommendationRequestDto> expectedList = Arrays.
-                asList(new RecommendationRequestDto(), new RecommendationRequestDto());
+        @Test
+        @DisplayName("Controller calls service.getRequests method one time and returns filtered list")
+        public void getRecommendationRequestsReturnFilteredListTest() {
+            RequestFilterDto filter = RequestFilterDto.builder().build();
 
-        when(recommendationRequestService.getRequests(filter)).thenReturn(expectedList);
-        recommendationRequestController.getRecommendationRequests(filter);
-        verify(recommendationRequestService, times(1))
-                .getRequests(filter);
-    }
+            List<RecommendationRequestDto> expectedList = List.of(RecommendationRequestDto.builder().build(),
+                    RecommendationRequestDto.builder().build());
 
-    @Test
-    public void getRecommendationRequestReturnDtoById() {
-        RecommendationRequestDto rqd = new RecommendationRequestDto();
-        rqd.setId(1L);
+            when(recommendationRequestService.getRequests(filter)).thenReturn(expectedList);
+            recommendationRequestController.getRecommendationRequests(filter);
+            verify(recommendationRequestService).getRequests(filter);
+        }
 
-        when(recommendationRequestService.getRequest(rqd.getId())).thenReturn(rqd);
-        recommendationRequestController.getRecommendationRequest(rqd.getId());
-        verify(recommendationRequestService, times(1))
-                .getRequest(rqd.getId());
-    }
+        @Test
+        @DisplayName("Controller calls service.getRequest method one time and returns RR dto")
+        public void getRecommendationRequestReturnDtoById() {
+            RecommendationRequestDto rqd = RecommendationRequestDto.builder()
+                    .id(RECOMMENDATION_REQUEST_ID_ONE)
+                    .build();
 
-    @Test
-    public void rejectRequestTestReturnDtoTest() {
-        RejectionDto rejection = new RejectionDto();
-        RecommendationRequestDto rqd = new RecommendationRequestDto();
-        rqd.setId(1L);
-        rejection.setReason("Not valid");
+            when(recommendationRequestService.getRequest(rqd.getId())).thenReturn(rqd);
+            recommendationRequestController.getRecommendationRequest(rqd.getId());
+            verify(recommendationRequestService).getRequest(rqd.getId());
+        }
 
-        when(recommendationRequestService.rejectRequest(rqd.getId(), rejection)).thenReturn(rqd);
-        recommendationRequestController.rejectRequest(rqd.getId(), rejection);
-        verify(recommendationRequestService, times(1))
-                .rejectRequest(rqd.getId(), rejection);
+        @Test
+        @DisplayName("Controller call service service.rejectRequest method one time and returns RR dto")
+        public void rejectRequestTestReturnDtoTest() {
+            RejectionDto rejection = RejectionDto.builder()
+                    .reason(NOT_VALID_STRING)
+                    .build();
+            RecommendationRequestDto rqd = RecommendationRequestDto.builder()
+                    .id(RECOMMENDATION_REQUEST_ID_ONE)
+                    .build();
+
+            when(recommendationRequestService.rejectRequest(rqd.getId(), rejection)).thenReturn(rqd);
+            recommendationRequestController.rejectRequest(rqd.getId(), rejection);
+            verify(recommendationRequestService).rejectRequest(rqd.getId(), rejection);
+        }
     }
 }

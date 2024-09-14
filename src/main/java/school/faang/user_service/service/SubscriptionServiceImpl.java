@@ -41,12 +41,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return filterUsers(followers, filter);
     }
 
-    public List<UserDto> filterUsers(List<UserDto> users, UserFilterDto filter) {
-        return users.stream()
-                .filter(user -> filters.stream().allMatch(f -> f.apply(user, filter)))
-                .toList();
-    }
-
     @Override
     public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
@@ -64,6 +58,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public int getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    private List<UserDto> filterUsers(List<UserDto> users, UserFilterDto filter) {
+        return users.stream()
+                .filter(user -> filters.stream().allMatch(f -> f.apply(user, filter)))
+                .toList();
     }
 }
 

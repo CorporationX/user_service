@@ -62,10 +62,7 @@ public class UserServiceImpl implements UserService {
         List<Event> eventsToRemove = userToDeactivate.getOwnedEvents()
                 .stream()
                 .filter(event -> event.getStatus() == EventStatus.PLANNED)
-                .map(event -> {
-                    event.setStatus(EventStatus.CANCELED);
-                    return event;
-                })
+                .peek(event -> event.setStatus(EventStatus.CANCELED))
                 .toList();
 
         eventService.removeEvents(eventsToRemove);
@@ -74,10 +71,7 @@ public class UserServiceImpl implements UserService {
     private void removeGoals(User userToDeactivate) {
         List<Goal> goalsToRemove = userToDeactivate.getGoals()
                 .stream()
-                .map(goal -> {
-                    goal.getUsers().removeIf(user -> user.getId().equals(userToDeactivate.getId()));
-                    return goal;
-                })
+                .peek(goal -> goal.getUsers().removeIf(user -> user.getId().equals(userToDeactivate.getId())))
                 .filter(goal -> goal.getUsers().isEmpty())
                 .toList();
 

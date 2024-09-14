@@ -7,16 +7,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.service.user.UserService;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
-
+class UserControllerTest {
     @Mock
     private UserService userService;
 
     @InjectMocks
     private UserController userController;
+
+    @Test
+    void testGetPremiumUsers() {
+        userController.getPremiumUsers(any());
+        verify(userService, times(1)).getPremiumUsers(any());
+    }
 
     @Test
     void testDeactivateUserProfile() {

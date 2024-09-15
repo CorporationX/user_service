@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class RequesterIdFilterTest {
+
     @InjectMocks
     private RequesterIdFilter requesterIdFilter;
     private RequestFilterDto filterDto;
@@ -31,7 +32,7 @@ public class RequesterIdFilterTest {
 
         @Test
         @DisplayName("If requesterId not null then true")
-        public void validateRequestFilterDtoRequesterIdNotNullTest() {
+        public void whenRequesterIdFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
                     .requesterId(REQUESTER_ID_ONE)
                     .build();
@@ -41,7 +42,7 @@ public class RequesterIdFilterTest {
 
         @Test
         @DisplayName("If RequesterId is valid then filtered list return")
-        public void validateRequestFilterDtoReturnsFilteredListTest() {
+        public void whenRequesterIdFilterWithValidParameterThenReturnFilteredDtoList() {
             User requesterOne = User.builder()
                     .id(REQUESTER_ID_ONE)
                     .build();
@@ -73,28 +74,25 @@ public class RequesterIdFilterTest {
 
     @Nested
     class NegativeTests {
-        @Nested
-        class isApplicable {
 
-            @Test
-            @DisplayName("If requesterId is null return false")
-            public void validateRequesterIdIsNullTest() {
-                filterDto = RequestFilterDto.builder()
-                        .requesterId(null)
-                        .build();
+        @Test
+        @DisplayName("If requesterId is null return false")
+        public void whenRequesterIdFilterParameterIsNullThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .requesterId(null)
+                    .build();
 
-                assertFalse(requesterIdFilter.isApplicable(filterDto));
-            }
+            assertFalse(requesterIdFilter.isApplicable(filterDto));
+        }
 
-            @Test
-            @DisplayName("If requesterId is negative return false")
-            public void validateRequesterIdIsNegativeTest() {
-                filterDto = RequestFilterDto.builder()
-                        .requesterId(REQUESTER_ID_NEGATIVE_ONE)
-                        .build();
+        @Test
+        @DisplayName("If requesterId is negative return false")
+        public void whenRequesterIdFilterParameterIsNegativeThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .requesterId(REQUESTER_ID_NEGATIVE_ONE)
+                    .build();
 
-                assertFalse(requesterIdFilter.isApplicable(filterDto));
-            }
+            assertFalse(requesterIdFilter.isApplicable(filterDto));
         }
     }
 }

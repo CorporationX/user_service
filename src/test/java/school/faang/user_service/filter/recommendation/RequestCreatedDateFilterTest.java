@@ -19,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestCreatedDateFilterTest {
+
     @InjectMocks
     private RequestCreatedDateFilter requestCreatedDateFilter;
     private RequestFilterDto filterDto;
-
     private static final LocalDateTime FIRST_DATE = LocalDateTime
             .of(2024, 5, 15, 12, 30);
     private static final LocalDateTime SECOND_DATE = LocalDateTime
@@ -30,9 +30,10 @@ public class RequestCreatedDateFilterTest {
 
     @Nested
     class PositiveTests {
+
         @Test
         @DisplayName("If createdAt not null then return true")
-        public void validateRequestFilterDtoCreatedAtNotNullTest() {
+        public void whenRequestCreatedDateFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
                     .createdDate(FIRST_DATE)
                     .build();
@@ -42,7 +43,7 @@ public class RequestCreatedDateFilterTest {
 
         @Test
         @DisplayName("If createdAt valid then return filtered list")
-        public void validateRequestFilterDtoCreatedAtReturnFilteredListTest() {
+        public void whenRequestCreatedDateFilterWithValidParameterThenReturnFilteredDtoList() {
             Stream<RecommendationRequest> requests = Stream.of(
                     RecommendationRequest.builder()
                             .createdAt(FIRST_DATE)
@@ -67,17 +68,15 @@ public class RequestCreatedDateFilterTest {
 
     @Nested
     class NegativeTests {
-        @Nested
-        class isApplicable {
-            @Test
-            @DisplayName("If createdAt is null then return false")
-            public void validateRequestFilterDtoCreatedAtisNullTest() {
-                filterDto = RequestFilterDto.builder()
-                        .createdDate(null)
-                        .build();
 
-                assertFalse(requestCreatedDateFilter.isApplicable(filterDto));
-            }
+        @Test
+        @DisplayName("If createdAt is null then return false")
+        public void whenRequestCreatedDateFilterParameterIsNullThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .createdDate(null)
+                    .build();
+
+            assertFalse(requestCreatedDateFilter.isApplicable(filterDto));
         }
     }
 }

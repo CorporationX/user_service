@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
+
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
     @Mock
@@ -57,6 +58,8 @@ public class RecommendationRequestServiceTest {
     private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
     private static final long SKILL_REQUEST_ID_ONE = 1L;
     private static final long SKILL_REQUEST_ID_TWO = 2L;
+    private static final long SKILL_REQUEST_ID_THREE = 3L;
+    private static final long SKILL_REQUEST_ID_FOUR = 4L;
     private static final String TOO_SERIOUS = "Too serious!";
     private static final RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
     private static final RequestStatus REQUEST_STATUS_REJECTED = RequestStatus.REJECTED;
@@ -92,19 +95,19 @@ public class RecommendationRequestServiceTest {
         requests = List.of(RecommendationRequest.builder()
                         .status(REQUEST_STATUS_REJECTED)
                         .skills(List.of(SkillRequest.builder()
-                                        .id(1L)
+                                        .id(SKILL_REQUEST_ID_ONE)
                                         .build(),
                                 SkillRequest.builder()
-                                        .id(2L)
+                                        .id(SKILL_REQUEST_ID_TWO)
                                         .build()))
                         .build(),
                 RecommendationRequest.builder()
                         .status(REQUEST_STATUS_ACCEPTED)
                         .skills(List.of(SkillRequest.builder()
-                                        .id(3L)
+                                        .id(SKILL_REQUEST_ID_THREE)
                                         .build(),
                                 SkillRequest.builder()
-                                        .id(4L)
+                                        .id(SKILL_REQUEST_ID_FOUR)
                                         .build()
                         ))
                         .build());
@@ -112,9 +115,10 @@ public class RecommendationRequestServiceTest {
 
     @Nested
     class ServiceMethodsTest {
+
         @Test
         @DisplayName("Check for 5 calls of methods, and 3 returned Objects when service.create(rqd) called")
-        public void createSaveReturnsDtoTest() {
+        public void whenValidDtoPassedItSavedWithItsSkillRequestsThenReturnDto() {
             when(recommendationRequestRepository.save(rq))
                     .thenReturn(rq);
             when(recommendationRequestMapper.toEntity(rqd)).thenReturn(rq);
@@ -136,7 +140,7 @@ public class RecommendationRequestServiceTest {
 
         @Test
         @DisplayName("Test that recommendationDto returns after calling service.getRequest")
-        public void getRequestTestReturnsDtoTest() {
+        public void whenValidIdPassedThenReturnFoundDto() {
             rq = recommendationRequestMapper.toEntity(rqd);
             when(recommendationRequestValidator.validateRecommendationRequestExists(RECOMMENDATION_REQUEST_ID_ONE))
                     .thenReturn(rq);
@@ -147,7 +151,7 @@ public class RecommendationRequestServiceTest {
 
         @Test
         @DisplayName("Reject request by passing rejectionDto into method signature return rq")
-        public void rejectRequestReturnDtoTest() {
+        public void whenValidRejectionRequestPassedRejectionReasonChangedAndSavedThenReturnDto() {
             when(recommendationRequestValidator
                     .validateRequestStatusNotAcceptedOrDeclined(RECOMMENDATION_REQUEST_ID_ONE)).thenReturn(rq);
             recommendationRequestService.rejectRequest(RECOMMENDATION_REQUEST_ID_ONE, rejection);
@@ -157,7 +161,7 @@ public class RecommendationRequestServiceTest {
 
         @Test
         @DisplayName("Check if filters is applied and apply them to stream then return List of filtered rqd's")
-        public void getRequestsReturnFilteredDtoTest() {
+        public void whenValidFilterPassedThenReturnFilteredDtoList() {
             customRecommendationRequestService();
             when(recommendationRequestRepository.findAll())
                     .thenReturn(requests);
@@ -167,8 +171,6 @@ public class RecommendationRequestServiceTest {
                     .thenReturn(requests.stream().filter(filter -> filter.getStatus() == REQUEST_STATUS_ACCEPTED));
             List<RecommendationRequestDto> result = recommendationRequestService.getRequests(filters);
             assertEquals(1, result.size());
-            verify(recommendationRequestValidator)
-                    .validateRequestDtoFilterFieldsNotNull(filters);
             verify(recommendationRequestRepository)
                     .findAll();
         }
@@ -176,7 +178,7 @@ public class RecommendationRequestServiceTest {
         @Test
         @DisplayName("Test that service.createSkillRequestDtoBatchSave" +
                 " calls for skillRequestRepo.createBatch and calls for specified times")
-        public void createSkillRequestDtoBatchSaveTest() {
+        public void whenDtoPassedThenSkillRequestsBatchSaved() {
             recommendationRequestService.createSkillRequestDtoBatchSave(rqd);
             verify(skillRequestRepository, times(rqd.getSkillRequestIds().size()))
                     .createBatch(anyLong(), anyLong());
@@ -184,7 +186,7 @@ public class RecommendationRequestServiceTest {
 
         @Test
         @DisplayName("Test calls for skillRequestRepo.findAllById returns List of skillRequests")
-        public void getAllSkillRequestsAndReturnListTest() {
+        public void whenDtoPassedThenReturnSkillRequestsList() {
             when(skillRequestRepository.findAllById(anyIterable())).thenReturn(List.of(SkillRequest.builder().build()));
             recommendationRequestService.getAllSkillRequests(rqd);
             verify(skillRequestRepository)

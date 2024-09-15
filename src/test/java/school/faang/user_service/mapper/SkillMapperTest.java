@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillMapperTest {
+
     @InjectMocks
     private SkillMapperImpl mapper;
     private static final long SKILL_ID_ONE = 1L;
@@ -37,15 +38,16 @@ public class SkillMapperTest {
 
     @Nested
     class ToEntity {
+
         @Test
         @DisplayName("If SkillDto is null then pass it further")
-        public void validateNullFromDtoIsPassedByMapper() {
+        public void whenDtoNullParameterMappedThenPassItToEntity() {
             assertNull(mapper.toEntity(null));
         }
 
         @Test
         @DisplayName("On enter SkillDto on exit Skill")
-        public void validateWhenDtoNotNullThenReturnEntityTest() {
+        public void whenDtoNotNullThenReturnEntity() {
             Skill skillResult = mapper.toEntity(skillDto);
 
             assertEquals(skill.getId(), skillResult.getId());
@@ -55,15 +57,16 @@ public class SkillMapperTest {
 
     @Nested
     class ToDto {
+
         @Test
         @DisplayName("If Skill is null then pass it further")
-        public void validateNullFromDtoIsPassedByMapper() {
+        public void whenEntityNullParameterMappedThenPassItToDto() {
             assertNull(mapper.toDto(null));
         }
 
         @Test
         @DisplayName("On enter Skill on exit SkillDto")
-        public void validateWhenEntityNotNullThenReturnDtoTest() {
+        public void whenEntityNotNullThenReturnDto() {
             SkillDto skillDtoResult = mapper.toDto(skill);
 
             assertEquals(skill.getId(), skillDtoResult.getId());

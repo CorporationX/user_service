@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestMapperTest {
+
     private RecommendationRequestMapperImpl mapper = new RecommendationRequestMapperImpl();
 
     private static final long RECOMMENDATION_REQUEST_ID = 1L;
@@ -37,7 +38,6 @@ public class RecommendationRequestMapperTest {
     private static final long SKILL_REQUEST_ID_TWO = 2L;
     private static final long SKILL_ID_ONE = 1L;
     private static final long SKILL_ID_TWO = 2L;
-    private static final String SOME_TITLE = "Hey ho skill to say hey ho";
     private RecommendationRequest rq;
     private RecommendationRequestDto rqd;
 
@@ -85,15 +85,16 @@ public class RecommendationRequestMapperTest {
 
     @Nested
     class ToEntity {
+
         @Test
         @DisplayName("If RecommendationRequestDto is null then pass it further")
-        public void validateNullFromDtoIsPassedByMapper() {
+        public void whenDtoNullParameterMappedThenPassItToEntity() {
             assertNull(mapper.toEntity(null));
         }
 
         @Test
         @DisplayName("On enter RecommendationRequestDto, on exit RecommendationRequest")
-        public void validateWhenDtoNotNullThenReturnEntityTest() {
+        public void whenDtoNotNullThenReturnEntity() {
             RecommendationRequest requestResult = mapper.toEntity(rqd);
 
             assertEquals(rqd.getId(), requestResult.getId());
@@ -108,15 +109,16 @@ public class RecommendationRequestMapperTest {
 
     @Nested
     class ToDto {
+
         @Test
         @DisplayName("If RecommendationRequest is null then pass it further")
-        public void validateNullFromEntityIsPassedByMapper() {
+        public void whenEntityNullParameterMappedThenPassItToDto() {
             assertNull(mapper.toDto(null));
         }
 
         @Test
         @DisplayName("On enter RecommendationRequest, on exit RecommendationRequestDto")
-        public void validateWhenEntityNotNullThenReturnDtoTest() {
+        public void whenEntityNotNullThenReturnDto() {
             RecommendationRequestDto dtoResult = mapper.toDto(rq);
 
             assertEquals(rq.getId(), dtoResult.getId());

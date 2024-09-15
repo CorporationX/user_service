@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestUpdatedDateFilterTest {
+
     @InjectMocks
     private RequestUpdatedDateFilter requestUpdatedDateFilter;
     private RequestFilterDto filterDto;
@@ -30,9 +31,10 @@ public class RequestUpdatedDateFilterTest {
 
     @Nested
     class PositiveTests {
+
         @Test
         @DisplayName("If updatedAt not null then return true")
-        public void validateRequestFilterDtoUpdatedAtNotNullTest() {
+        public void whenRequestUpdatedDateFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
                     .updatedAt(FIRST_DATE)
                     .build();
@@ -42,7 +44,7 @@ public class RequestUpdatedDateFilterTest {
 
         @Test
         @DisplayName("If updatedAt valid then return filtered list")
-        public void validateRequestFilterDtoUpdatedAtReturnFilteredListTest() {
+        public void whenRequestUpdatedDateFilterWithValidParameterThenReturnFilteredDtoList() {
             Stream<RecommendationRequest> requests = Stream.of(
                     RecommendationRequest.builder()
                             .updatedAt(FIRST_DATE)
@@ -67,17 +69,15 @@ public class RequestUpdatedDateFilterTest {
 
     @Nested
     class NegativeTests {
-        @Nested
-        class isApplicable {
-            @Test
-            @DisplayName("If updatedAt is null then return false")
-            public void validateRequestFilterDtoUpdatedAtisNullTest() {
-                filterDto = RequestFilterDto.builder()
-                        .updatedAt(null)
-                        .build();
 
-                assertFalse(requestUpdatedDateFilter.isApplicable(filterDto));
-            }
+        @Test
+        @DisplayName("If updatedAt is null then return false")
+        public void whenRequestUpdatedDateFilterParameterIsNullThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .updatedAt(null)
+                    .build();
+
+            assertFalse(requestUpdatedDateFilter.isApplicable(filterDto));
         }
     }
 }

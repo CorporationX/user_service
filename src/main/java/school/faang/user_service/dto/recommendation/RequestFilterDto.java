@@ -1,6 +1,7 @@
 package school.faang.user_service.dto.recommendation;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@NotNull
 public class RequestFilterDto {
     private Long requesterId;
     private Long receiverId;

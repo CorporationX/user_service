@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillRequestMapperTest {
+
     private SkillRequestMapperImpl mapper = new SkillRequestMapperImpl(new SkillMapperImpl());
     private static final long RECOMMENDATION_REQUEST_ID = 1L;
     private static final long SKILL_REQUEST_ID_ONE = 1L;
@@ -50,15 +51,16 @@ public class SkillRequestMapperTest {
 
     @Nested
     class ToEntity {
+
         @Test
         @DisplayName("If SkillRequest is null then pass it further")
-        public void validateNullFromDtoIsPassedByMapperTest() {
+        public void whenDtoNullParameterMappedThenPassItToEntity() {
             assertNull(mapper.toEntity(null));
         }
 
         @Test
         @DisplayName("On enter SkillRequestDto, on exit SkillRequest")
-        public void validateWhenDtoNotNullThenReturnEntityTest() {
+        public void whenDtoNotNullThenReturnEntity() {
             SkillRequest skillRequestResult = mapper.toEntity(skillRequestDto);
 
             assertEquals(skillRequest.getId(), skillRequestResult.getId());
@@ -69,15 +71,16 @@ public class SkillRequestMapperTest {
 
     @Nested
     class ToDto {
+
         @Test
         @DisplayName("If SkillRequestDto is null then pass it further")
-        public void validateNullFromEntityPassedByMapperTest() {
+        public void whenEntityNullParameterMappedThenPassItToDto() {
             assertNull(mapper.toDto(null));
         }
 
         @Test
         @DisplayName("On enter SkillRequest, on exit SkillRequestDto")
-        public void validateWhenEntityNotNullThenReturnDtoTest() {
+        public void whenEntityNotNullThenReturnDto() {
             SkillRequestDto skillRequestDtoResult = mapper.toDto(skillRequest);
 
             assertEquals(skillRequestDto.getId(), skillRequestDtoResult.getId());

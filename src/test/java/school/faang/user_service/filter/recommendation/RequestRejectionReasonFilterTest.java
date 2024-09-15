@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestRejectionReasonFilterTest {
+
     @InjectMocks
     private RequestRejectionReasonFilter requestRejectionReasonFilter;
     private RequestFilterDto filterDto;
@@ -30,7 +31,7 @@ public class RequestRejectionReasonFilterTest {
 
         @Test
         @DisplayName("If RequestFilterDto has rejectionReason field then true")
-        public void validateRequestRejectionReasonFilterHasValidRejectionFieldTest() {
+        public void whenRequestRejectionReasonFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
                     .rejectionReason(REJECTION_REASON)
                     .build();
@@ -40,7 +41,7 @@ public class RequestRejectionReasonFilterTest {
 
         @Test
         @DisplayName("If RequestFilterDto has valid rejectionReason then return filtered RQs list")
-        public void validateRequestRejectionFilterReturnsFilteredListTest() {
+        public void whenRequestRejectionReasonFilterWithValidParameterThenReturnFilteredDtoList() {
             Stream<RecommendationRequest> requests = Stream.of(
                     RecommendationRequest.builder()
                             .rejectionReason(TOO_GOOD)
@@ -66,29 +67,24 @@ public class RequestRejectionReasonFilterTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class isApplicable {
+        @Test
+        @DisplayName("If rejectionReason is null then return false")
+        public void whenRequestRejectionReasonFilterParameterIsNullThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .rejectionReason(null)
+                    .build();
 
-            @Test
-            @DisplayName("If rejectionReason is null then return false")
-            public void validateRequestFilterDtoRejectionReasonIsNullThenReturnFalseTest() {
-                filterDto = RequestFilterDto.builder()
-                        .rejectionReason(null)
-                        .build();
+            assertFalse(requestRejectionReasonFilter.isApplicable(filterDto));
+        }
 
-                assertFalse(requestRejectionReasonFilter.isApplicable(filterDto));
-            }
+        @Test
+        @DisplayName("If rejectionReason is blank then return false")
+        public void whenRequestRejectionReasonFilterParameterIsBlankThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .rejectionReason(" ")
+                    .build();
 
-            @Test
-            @DisplayName("If rejectionReason is blank then return false")
-            public void validateRequestFilterDtoRejectionReasonIsBlankThenReturnFalseTest() {
-                filterDto = RequestFilterDto.builder()
-                        .rejectionReason(" ")
-                        .build();
-
-                assertFalse(requestRejectionReasonFilter.isApplicable(filterDto));
-            }
-
+            assertFalse(requestRejectionReasonFilter.isApplicable(filterDto));
         }
     }
 }

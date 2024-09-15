@@ -49,7 +49,6 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
-        recommendationRequestValidator.validateRequestDtoFilterFieldsNotNull(filters);
         Stream<RecommendationRequest> requests = recommendationRequestRepository.findAll().stream();
         Stream<RecommendationRequest> filteredRequests = requestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))

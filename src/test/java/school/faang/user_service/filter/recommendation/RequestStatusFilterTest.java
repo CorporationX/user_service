@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestStatusFilterTest {
+
     @InjectMocks
     private RequestStatusFilter requestStatusFilter;
     private RequestFilterDto filterDto;
@@ -26,9 +27,10 @@ public class RequestStatusFilterTest {
 
     @Nested
     class PositiveTests {
+
         @Test
         @DisplayName("If filterDto status not null then true")
-        public void validateRequestFilterDtoStatusNotNullTest() {
+        public void whenRequestStatusFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
                     .status(REQUEST_STATUS_IS_ACCEPTED)
                     .build();
@@ -38,7 +40,7 @@ public class RequestStatusFilterTest {
 
         @Test
         @DisplayName("If filterDto got status then filtered list returns")
-        public void validateRequestFilterDtoReturnsFilteredListTest() {
+        public void whenRequestStatusFilterWithValidParameterThenReturnFilteredDtoList() {
             Stream<RecommendationRequest> recommendationRequests = Stream.of(
                     RecommendationRequest.builder()
                             .status(REQUEST_STATUS_IS_ACCEPTED)
@@ -64,19 +66,14 @@ public class RequestStatusFilterTest {
     @Nested
     class NegativeTest {
 
-        @Nested
-        class isApplicable {
+        @Test
+        @DisplayName("If status null return false")
+        public void whenRequestStatusFilterParameterIsNullThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .status(null)
+                    .build();
 
-            @Test
-            @DisplayName("If status null return false")
-            public void validateRequestFilterDtoStatusIsNullTest() {
-                filterDto = RequestFilterDto.builder()
-                        .status(null)
-                        .build();
-
-                assertFalse(requestStatusFilter.isApplicable(filterDto));
-            }
+            assertFalse(requestStatusFilter.isApplicable(filterDto));
         }
     }
-
 }

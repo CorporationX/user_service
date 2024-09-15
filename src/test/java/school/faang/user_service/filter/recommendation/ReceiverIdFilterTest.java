@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class ReceiverIdFilterTest {
+
     @InjectMocks
     private ReceiverIdFilter receiverIdFilter;
     private RequestFilterDto filterDto;
@@ -31,7 +32,7 @@ public class ReceiverIdFilterTest {
 
         @Test
         @DisplayName("If receiverId not null then true")
-        public void validateReceiverFilterDtoRequesterIdNotNullTest() {
+        public void whenReceiverIdFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
                     .receiverId(RECEIVER_ID_ONE)
                     .build();
@@ -41,7 +42,7 @@ public class ReceiverIdFilterTest {
 
         @Test
         @DisplayName("If receiverId is valid then filtered list return")
-        public void validateReceiverFilterDtoReturnsFilteredListTest() {
+        public void whenReceiverIdFilterWithValidParameterThenReturnFilteredDtoList() {
             User receiverOne = User.builder()
                     .id(RECEIVER_ID_ONE)
                     .build();
@@ -73,28 +74,25 @@ public class ReceiverIdFilterTest {
 
     @Nested
     class NegativeTests {
-        @Nested
-        class isApplicable {
 
-            @Test
-            @DisplayName("If receiverId is null return false")
-            public void validateReceiverIdIsNullTest() {
-                filterDto = RequestFilterDto.builder()
-                        .requesterId(null)
-                        .build();
+        @Test
+        @DisplayName("If receiverId is null return false")
+        public void whenReceiverIdFilterParameterIsNullThenReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .requesterId(null)
+                    .build();
 
-                assertFalse(receiverIdFilter.isApplicable(filterDto));
-            }
+            assertFalse(receiverIdFilter.isApplicable(filterDto));
+        }
 
-            @Test
-            @DisplayName("If receiverId is negative return false")
-            public void validateReceiverIdIsNegativeTest() {
-                filterDto = RequestFilterDto.builder()
-                        .receiverId(RECEIVER_ID_NEGATIVE_ONE)
-                        .build();
+        @Test
+        @DisplayName("If receiverId is negative return false")
+        public void whenReceiverIdFilterParameterIsNegativeReturnFalse() {
+            filterDto = RequestFilterDto.builder()
+                    .receiverId(RECEIVER_ID_NEGATIVE_ONE)
+                    .build();
 
-                assertFalse(receiverIdFilter.isApplicable(filterDto));
-            }
+            assertFalse(receiverIdFilter.isApplicable(filterDto));
         }
     }
 }

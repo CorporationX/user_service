@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
+
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
     @Mock
@@ -29,9 +30,10 @@ public class RecommendationRequestControllerTest {
 
     @Nested
     class ControllerCallsTests {
+
         @Test
         @DisplayName("Controller calls service.create method one time and returns savedEntity as Dto")
-        public void requestRecommendationSavesAndReturnsTest() {
+        public void whenControllerCallsServiceSaveThenReturnsDto() {
             RecommendationRequestDto rqdToSave = RecommendationRequestDto.builder().build();
 
             when(recommendationRequestService.create(rqdToSave)).thenReturn(rqdToSave);
@@ -41,7 +43,7 @@ public class RecommendationRequestControllerTest {
 
         @Test
         @DisplayName("Controller calls service.getRequests method one time and returns filtered list")
-        public void getRecommendationRequestsReturnFilteredListTest() {
+        public void whenControllerCallsServiceGetRequestsThenReturnsFilteredList() {
             RequestFilterDto filter = RequestFilterDto.builder().build();
 
             List<RecommendationRequestDto> expectedList = List.of(RecommendationRequestDto.builder().build(),
@@ -54,7 +56,7 @@ public class RecommendationRequestControllerTest {
 
         @Test
         @DisplayName("Controller calls service.getRequest method one time and returns RR dto")
-        public void getRecommendationRequestReturnDtoById() {
+        public void whenControllerCallsServiceGetRequestThenReturnsDto() {
             RecommendationRequestDto rqd = RecommendationRequestDto.builder()
                     .id(RECOMMENDATION_REQUEST_ID_ONE)
                     .build();
@@ -66,7 +68,7 @@ public class RecommendationRequestControllerTest {
 
         @Test
         @DisplayName("Controller call service service.rejectRequest method one time and returns RR dto")
-        public void rejectRequestTestReturnDtoTest() {
+        public void whenControllerCallsServiceRejectRequestThenReturnsDto() {
             RejectionDto rejection = RejectionDto.builder()
                     .reason(NOT_VALID_STRING)
                     .build();

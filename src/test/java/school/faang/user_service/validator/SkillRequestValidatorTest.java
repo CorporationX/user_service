@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillRequestValidatorTest {
+
     @InjectMocks
     private SkillRequestValidator skillRequestValidator;
     @Mock
@@ -38,9 +39,10 @@ public class SkillRequestValidatorTest {
 
     @Nested
     class PositiveTests {
+
         @Test
         @DisplayName("When Optional is present then no exception thrown")
-        public void validateSkillsExistPositiveTest() {
+        public void whenSkillRequestExistsThenDoNotThrowException() {
             when(skillRequestRepository.findById(skills.get(0).getId()))
                     .thenReturn(Optional.of(SkillRequest.builder().build()));
 
@@ -50,9 +52,10 @@ public class SkillRequestValidatorTest {
 
     @Nested
     class NegativeTests {
+
         @Test
         @DisplayName("When Optional is null then exception thrown")
-        public void validateSkillsExistThrowExceptionTest() {
+        public void whenSkillRequestDoesNotExistsThenThrowException() {
             when(skillRequestRepository.findById(skills.get(0).getId())).thenReturn(Optional.empty());
 
             assertThrows(SkillRequestNotValidException.class, () -> skillRequestValidator.validateSkillsExist(skills));

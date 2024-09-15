@@ -1,10 +1,15 @@
+app:
+  max-active-user-goals: 3
+
 spring:
+  mvc:
+    servlet:
+      path: /api/v1
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
-
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -22,10 +27,10 @@ spring:
       port: 6379
       host: localhost
       channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-            name: profile_view_channel
+        mentorship-channel:
+          name: mentorship_channel
+        follower-event-channel:
+          name: follower_event
 
 server:
   port: 8080
@@ -41,13 +46,3 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
-
-aws:
-  accessKey: access_key
-  secretKey: secret_key
-  region: bucket_region
-
-services:
-  s3:
-    bucket-name: user_backet
-    isMocked: true

@@ -44,18 +44,6 @@ public class GoalServiceImpl implements GoalService {
         return goalMapper.toDto(createdGoal);
     }
 
-    private void validateGoalsPerUser(Long userId) throws DataValidationException {
-        if (goalRepository.countActiveGoalsPerUser(userId) >= GOALS_PER_USER) {
-            throw new DataValidationException("There cannot be more than " + GOALS_PER_USER + " active goals per user");
-        }
-    }
-
-    private void validateGoalSkills(List<Long> skillIds) throws DataValidationException {
-        if (skillRepository.countExisting(skillIds) != skillIds.size()) {
-            throw new DataValidationException("Cannot create goal with non-existent skills");
-        }
-    }
-
     @Override
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         goalValidator.validateGoalTitle(goalDto);
@@ -77,6 +65,41 @@ public class GoalServiceImpl implements GoalService {
 
         goalToUpdate.setUpdatedAt(LocalDateTime.now());
         return goalMapper.toDto(goalRepository.save(goalToUpdate));
+    }
+
+    @Override
+    public void deleteGoal(Long goalId) {
+        goalRepository.deleteById(goalId);
+    }
+
+    @Override
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters) {
+        Stream<Goal> goals = goalRepository.findByParent(goalId);
+        goalFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(filters, goals));
+        return goals.map(goalMapper::toDto).toList();
+    }
+
+    @Override
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
+        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
+        goalFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(filters, goals));
+        return goals.map(goalMapper::toDto).toList();
+    }
+
+    private void validateGoalsPerUser(Long userId) throws DataValidationException {
+        if (goalRepository.countActiveGoalsPerUser(userId) >= GOALS_PER_USER) {
+            throw new DataValidationException("There cannot be more than " + GOALS_PER_USER + " active goals per user");
+        }
+    }
+
+    private void validateGoalSkills(List<Long> skillIds) throws DataValidationException {
+        if (skillRepository.countExisting(skillIds) != skillIds.size()) {
+            throw new DataValidationException("Cannot create goal with non-existent skills");
+        }
     }
 
     private boolean isToBeCompleted(Goal goalToUpdate, GoalDto goalDto) {
@@ -103,28 +126,5 @@ public class GoalServiceImpl implements GoalService {
                 .map(skillRepository::getReferenceById)
                 .toList());
         skillIds.forEach(id -> goalRepository.addSkillToGoal(id, goal.getId()));
-    }
-
-    @Override
-    public void deleteGoal(Long goalId) {
-        goalRepository.deleteById(goalId);
-    }
-
-    @Override
-    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters) {
-        Stream<Goal> goals = goalRepository.findByParent(goalId);
-        goalFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(filters, goals));
-        return goals.map(goalMapper::toDto).toList();
-    }
-
-    @Override
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
-        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
-        goalFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(filters, goals));
-        return goals.map(goalMapper::toDto).toList();
     }
 }

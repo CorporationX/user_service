@@ -1,6 +1,6 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserFilterDto;
@@ -39,27 +39,27 @@ public class SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<User> getFollowers(long followeeId, UserFilterDto filters) {
         verifyUserExists(followeeId);
         Stream<User> userStream = subscriptionRepository.findByFolloweeId(followeeId);
         return filter(userStream, filters).toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<User> getFollowing(long followerId, UserFilterDto filters) {
         verifyUserExists(followerId);
         Stream<User> userStream = subscriptionRepository.findByFollowerId(followerId);
         return filter(userStream, filters).toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getFollowersCount(long followeeId) {
         verifyUserExists(followeeId);
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getFollowingCount(long followerId) {
         verifyUserExists(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);

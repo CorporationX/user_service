@@ -19,7 +19,7 @@ public class UserPageFilter implements UserFilter {
         int page = filterDto.getPage();
         int size = filterDto.getPageSize();
 
-        return userStream.sorted(Comparator.comparing(User::getId))
+        return userStream.sorted(Comparator.comparing(User::getCreatedAt))
                 .skip(page  * size);
     }
 }

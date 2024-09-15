@@ -26,15 +26,15 @@ public class SubscriptionController {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    @GetMapping("/followers/{followeeId}")
+    @PostMapping("/followers/{followeeId}/filter")
     public List<UserDto> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
         List<UserDto> userDtos = userMapper.toDto(subscriptionService.getFollowers(followeeId, filter));
         return userDtos;
     }
 
 
-    @GetMapping("/following/{followerId}")
-    public List<UserDto> getFollowing(@PathVariable long followerId, UserFilterDto filter) {
+    @PostMapping("/following/{followerId}/filter")
+    public List<UserDto> getFollowing(@PathVariable long followerId, @RequestBody UserFilterDto filter) {
         List<UserDto> userDtos = userMapper.toDto(subscriptionService.getFollowing(followerId, filter));
         return userDtos;
     }

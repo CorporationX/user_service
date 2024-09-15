@@ -43,7 +43,8 @@ payment-service:
 
 springdoc:
   api-docs:
-    path: /swagger
+    path: /api-docs
   swagger-ui:
+    path: /swagger
     tagsSorter: alpha
     operationsSorter: alpha

@@ -193,8 +193,7 @@ public class EventServiceTest {
         verify(eventRepository, never()).deleteById(eventId);
         verify(eventRepository).existsById(eventId);
     }
-
-    // TODO:: TEST ERROR FIX
+    
     @Test
     void updateEvent_shouldReturnUpdatedEventDto() {
         // Arrange

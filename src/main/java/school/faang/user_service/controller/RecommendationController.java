@@ -20,6 +20,5 @@ public class RecommendationController {
         if (recommendation.getContent() == null || recommendation.getContent().isEmpty()) {
             throw new DataValidationException("Recommendation content cannot be empty.");
         }
-        // Additional validation logic can be added here
     }
 }

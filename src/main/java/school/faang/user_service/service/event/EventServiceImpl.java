@@ -1,3 +1,4 @@
+/*
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
@@ -22,3 +23,4 @@ public class EventServiceImpl implements EventService{
         eventRepository.deleteAll(events);
     }
 }
+*/

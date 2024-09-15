@@ -64,6 +64,15 @@ public class EventService {
         }
     }
 
+    public void deleteEvents(List<Event> events) {
+        List<EventDto> eventDtos = eventMapper.toListDto(events);
+        for (EventDto event : eventDtos) {
+            eventValidator.validateEvent(event);
+        }
+
+        eventRepository.deleteAll(events);
+    }
+
     public EventDto updateEvent(EventDto eventDto) {
         eventValidator.validateOwnerSkills(eventDto);
 

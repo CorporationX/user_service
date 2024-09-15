@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
                 .peek(event -> event.setStatus(EventStatus.CANCELED))
                 .toList();
 
-        eventService.removeEvents(eventsToRemove);
+        eventService.deleteEvents(eventsToRemove);
     }
 
     private void removeGoals(User userToDeactivate) {

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ class MentorshipServiceImplTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private MentorshipServiceImpl mentorshipService;
+    private MentorshipService mentorshipService;
 
     User user;
     User mentee;

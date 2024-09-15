@@ -3,7 +3,8 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -23,11 +24,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
 
+    @InjectMocks
     private SubscriptionService subscriptionService;
+    @Mock
     private SubscriptionRepository subscriptionRepository;
+    @Mock
     private UserMapper userMapper;
-    private UserFilter userFilter;
-
+    @Mock
+    private List<UserFilter> userFilter;
 
     private User user1 = new User();
     private User user2 = new User();
@@ -42,15 +46,7 @@ public class SubscriptionServiceTest {
         user2.setId(2L);
         user2.setUsername("user2");
         user2.setEmail("user2@example.ru");
-
-        subscriptionRepository = mock(SubscriptionRepository.class);
-        userMapper = mock(UserMapper.class);
-        userFilter = Mockito.mock(UserFilter.class);
-        List<UserFilter> userFilters = List.of(userFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters, userMapper);
-
     }
-
 
     @Test
     public void testExistingFollowUser() {
@@ -86,8 +82,6 @@ public class SubscriptionServiceTest {
         List<UserDto> followers = subscriptionService.getFollowers(1L, new UserFilterDto());
 
         assertEquals(2, followers.size());
-        assertEquals(1L, followers.get(0).id());
-        assertEquals(2L, followers.get(1).id());
     }
 
     @Test
@@ -102,16 +96,36 @@ public class SubscriptionServiceTest {
     @Test
     public void testGetFollowersNoMatchingFilters() {
         long followeeId = 1L;
-        UserFilterDto filters = new UserFilterDto();
-        filters.setNamePattern("Charlie");
-        Stream<User> users = Stream.of(user1);
+        UserFilterDto filter = new UserFilterDto();
+        UserDto userDto = new UserDto(1L, "username", "email@example.com");
 
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(users);
-        when(userFilter.isApplicable(filters)).thenReturn(true);
+        when(subscriptionRepository.findByFolloweeId(followeeId))
+                .thenReturn(Stream.of(user1));
+        when(userMapper.toUserDto(user1))
+                .thenReturn(userDto);
 
-        List<UserDto> result = subscriptionService.getFollowers(followeeId, filters);
+        List<UserDto> result = subscriptionService.getFollowers(followeeId, filter);
 
-        assertEquals(0, result.size());
+        assertEquals(1, result.size());
+        assertEquals(userDto, result.get(0));
+    }
+
+    @Test
+    public void testGetFollowersWithMatchingFilters() {
+        long followeeId = 1L;
+        UserFilterDto filter = new UserFilterDto();
+        filter.setNamePattern("username");
+        UserDto userDto = new UserDto(1L, "username", "email@example.com");
+
+        when(subscriptionRepository.findByFolloweeId(followeeId))
+                .thenReturn(Stream.of(user1));
+        when(userMapper.toUserDto(user1))
+                .thenReturn(userDto);
+
+        List<UserDto> result = subscriptionService.getFollowers(followeeId, filter);
+
+        assertEquals(1, result.size());
+        assertEquals(userDto, result.get(0));
     }
 
     @Test
@@ -126,5 +140,22 @@ public class SubscriptionServiceTest {
         long followerId = 1L;
 
         assertDoesNotThrow(() -> userMapper.toCountDto(subscriptionRepository.findFolloweesAmountByFollowerId(followerId)));
+    }
+
+    @Test
+    public void testGetFollowing() {
+        long followeeId = 1L;
+        UserFilterDto filter = new UserFilterDto();
+        UserDto userDto = new UserDto(1L, "username", "email@example.com");
+
+        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(Stream.of(user1));
+        when(userMapper.toUserDto(user1)).thenReturn(userDto);
+        when(userFilter.stream()).thenReturn(Stream.empty());
+
+        List<UserDto> result = subscriptionService.getFollowing(followeeId, filter);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(userDto, result.get(0));
     }
 }

@@ -7,7 +7,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-
 @Setter
 public class MentorshipRequestDto {
     private Long id;
@@ -26,5 +25,4 @@ public class MentorshipRequestDto {
 
     private String rejectionReason;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

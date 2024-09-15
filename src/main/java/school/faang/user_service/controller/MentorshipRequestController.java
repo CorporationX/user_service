@@ -24,23 +24,24 @@ public class MentorshipRequestController {
     @ResponseStatus(HttpStatus.CREATED)
     public MentorshipRequestDto requestMentorship(@RequestBody @Validated MentorshipRequestDto requestDto) {
         MentorshipRequest mentorshipRequest = mapper.toEntity(requestDto);
-        return mapper.toDto(service.requestMentorship(mentorshipRequest));
+        MentorshipRequest savedMentorshipRequest = service.requestMentorship(mentorshipRequest);
+        return mapper.toDto(savedMentorshipRequest);
     }
 
-    @GetMapping("/filters")
+    @PostMapping("/filters")
     @ResponseStatus(HttpStatus.OK)
     public List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filter) {
         List<MentorshipRequest> mentorshipRequests = service.getRequests(filter);
         return mapper.toDto(mentorshipRequests);
     }
 
-    @PatchMapping("/{requestId}/accept")
+    @PutMapping("/{requestId}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void acceptRequest(@PathVariable @Validated Long requestId) {
+    public void acceptRequest(@PathVariable Long requestId) {
         service.acceptRequest(requestId);
     }
 
-    @PatchMapping("/{requestId}/reject")
+    @PutMapping("/{requestId}/reject")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void rejectRequest(@PathVariable Long requestId, @RequestBody @Validated RejectionDto rejectionDto) {
         service.rejectRequest(requestId, rejectionDto.getReason());

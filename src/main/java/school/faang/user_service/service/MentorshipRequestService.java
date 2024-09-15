@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -11,6 +12,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.filters.RequestFilter;
 
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +34,7 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
     private final List<RequestFilter> requestFilters;
 
+    @Transactional
     public MentorshipRequest requestMentorship(MentorshipRequest request) {
         this.validateRequest(request);
 
@@ -65,19 +68,23 @@ public class MentorshipRequestService {
             throw new RuntimeException(USER_NOT_EXIST);
         }
 
-        Optional<MentorshipRequest> latestRequest = requestRepository.findLatestRequest(request.getRequester().getId(),
+        Optional<MentorshipRequest> latestRequest = requestRepository.findLatestRequest(
+                request.getRequester().getId(),
                 request.getReceiver().getId());
-        if (latestRequest.isPresent()) {
-            MentorshipRequest mentorshipRequest = latestRequest.get();
-            Period period = Period.between(mentorshipRequest.getCreatedAt().toLocalDate(),
-                    request.getCreatedAt().toLocalDate());
+
+        latestRequest.ifPresent((requestPresent) -> {
+            LocalDate lastDate = requestPresent.getCreatedAt().toLocalDate();
+            LocalDate currentDate = request.getCreatedAt().toLocalDate();
+            Period period = Period.between(lastDate, currentDate);
+
             if (period.getMonths() < 3) {
-                log.error("Latest request was {}: {}", mentorshipRequest.getCreatedAt().toLocalDate(), LATEST_REQUEST_LESS_THEN);
+                log.error("Latest request was {}: {}", requestPresent.getCreatedAt().toLocalDate(), LATEST_REQUEST_LESS_THEN);
                 throw new RuntimeException(LATEST_REQUEST_LESS_THEN);
             }
-        }
+        });
     }
 
+    @Transactional(readOnly = true)
     public List<MentorshipRequest> getRequests(RequestFilterDto dto) {
         Stream<MentorshipRequest> requests = requestRepository.findAll().stream();
 
@@ -90,6 +97,7 @@ public class MentorshipRequestService {
                 .toList();
     }
 
+    @Transactional
     public void acceptRequest(Long requestId) {
         MentorshipRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> {
@@ -101,6 +109,7 @@ public class MentorshipRequestService {
         requestRepository.save(request);
     }
 
+    @Transactional
     public void rejectRequest(Long requestId, String reason) {
         MentorshipRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> {

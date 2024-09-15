@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +10,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -19,6 +19,9 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.service.filters.RequestFilter;
 import school.faang.user_service.service.filters.RequestFilterByDescription;
 import school.faang.user_service.service.filters.RequestFilterByReceiver;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -44,6 +47,7 @@ public class MentorshipRequestServiceTest {
 
 
     @Test
+    @DisplayName("Create mentorshipRequest: check if description is blank")
     public void testMentorshipRequestDescriptionIsBlank() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setDescription(" ");
@@ -54,6 +58,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Create mentorshipRequest: check if receiver and requester are identical")
     public void testMentorshipRequestRequesterReceiverIdAreIdentical() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setDescription("Test description");
@@ -66,6 +71,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Create mentorshipRequest: check if the requester exist")
     public void testMentorshipRequestExistRequester() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setDescription("Test description");
@@ -82,6 +88,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Create mentorshipRequest: check if the receiver exist")
     public void testMentorshipRequestExistReceiver() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setDescription("Test description");
@@ -99,21 +106,21 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Create mentorshipRequest: check if latest request less then 3 month")
     public void testMentorshipRequestFindLatestRequest() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setDescription("Test description");
-        dto.setUserRequesterId(2L);
-        dto.setUserReceiverId(3L);
+        dto.setUserRequesterId(1L);
+        dto.setUserReceiverId(2L);
         dto.setStatus("PENDING");
         dto.setCreatedAt(LocalDateTime.of(2024, Month.OCTOBER, 9, 15, 30));
+
+        MentorshipRequest request = mapper.toEntity(dto);
+
         Mockito.when(userRepository.existsById(dto.getUserRequesterId()))
                 .thenReturn(true);
         Mockito.when(userRepository.existsById(dto.getUserReceiverId()))
                 .thenReturn(true);
-
-        MentorshipRequest request = new MentorshipRequest();
-        request.setId(1L);
-        request.setCreatedAt(LocalDateTime.of(2024, Month.SEPTEMBER, 9, 15, 30));
 
         Mockito.when(repository.findLatestRequest(dto.getUserRequesterId(), dto.getUserReceiverId()))
                 .thenReturn(Optional.of(request));
@@ -122,6 +129,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Create mentorshipRequest")
     public void testRepositoryCreate() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setDescription("Test description");
@@ -137,6 +145,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Filters mentorshipRequest")
     public void testGetRequestsByFilter() {
         RequestFilterDto filterDto = new RequestFilterDto();
         filterDto.setDescription("test description");
@@ -151,15 +160,19 @@ public class MentorshipRequestServiceTest {
 
         List<MentorshipRequest> requestsByFilter = service.getRequests(filterDto);
 
-        Assert.assertEquals(requestsByFilter.get(0).getDescription(), "test description");
+        assertThat(mentorshipRequest)
+                .usingRecursiveAssertion()
+                .isEqualTo(requestsByFilter.get(0));
     }
 
     @Test
+    @DisplayName("Accept: check if mentorshipRequest id is null")
     public void testAcceptRequestCheckIdIsNull() {
         Assert.assertThrows(RuntimeException.class, () -> service.acceptRequest(null));
     }
 
     @Test
+    @DisplayName("Accept: check if mentorshipRequest exist")
     public void testAcceptRequestExist() {
         Long requestId = 1L;
         Mockito.when(repository.findById(requestId)).thenReturn(null);
@@ -168,6 +181,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Accept")
     public void testAcceptRequest() {
         Long requestId = 1L;
 
@@ -177,15 +191,18 @@ public class MentorshipRequestServiceTest {
 
         Mockito.when(repository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
 
-        repository.create(1, 2, "test");
+        service.acceptRequest(requestId);
 
         Mockito.verify(repository, Mockito.times(1))
-                .create(1L, 2L, "test");
+                .save(mentorshipRequest);
+
+        assertNotNull(mentorshipRequest);
+        assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
     }
 
     @Test
+    @DisplayName("Reject: check if mentorshipRequest id is null")
     public void testRejectRequestCheckIdIsNull() {
-        RejectionDto rejectionDto = new RejectionDto();
         long id = 1;
         String reason = "Test reason";
 
@@ -193,8 +210,8 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Reject: check if mentorshipRequest exist")
     public void testRejectRequestExist() {
-        RejectionDto rejectionDto = new RejectionDto();
         long id = 1;
         String reason = "test reason";
 
@@ -204,19 +221,22 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Reject")
     public void testRejectRequest() {
         long id = 1;
-        String reason = "test reason";
 
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setId(1);
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
-        mentorshipRequest.setRejectionReason("I don't like you!");
+        mentorshipRequest.setRejectionReason("test reason");
         Mockito.when(repository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
 
-        repository.create(1, 2, "test");
+        service.rejectRequest(id, "test reason");
 
         Mockito.verify(repository, Mockito.times(1))
-                .create(1L, 2L, "test");
+                .save(mentorshipRequest);
+
+        assertNotNull(mentorshipRequest);
+        assertEquals(RequestStatus.REJECTED, mentorshipRequest.getStatus());
     }
 }

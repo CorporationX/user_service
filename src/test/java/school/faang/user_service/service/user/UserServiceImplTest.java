@@ -1,4 +1,4 @@
-package school.faang.user_service.service.User;
+package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,18 +10,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.Mentorship.MentorshipServiceImpl;
+import school.faang.user_service.service.mentorship.MentorshipServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 class UserServiceImplTest {
@@ -36,9 +36,6 @@ class UserServiceImplTest {
 
     @Mock
     private EventRepository eventRepository;
-
-    @Spy
-    private UserMapper userMapper;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -62,11 +59,37 @@ class UserServiceImplTest {
         event = new Event();
         event.setId(1L);
 
-        user.setOwnedEvents(List.of(event));
-        user.setMentees(List.of(user2));
-        user.setGoals(List.of(goal));
-        user2.setMentors(List.of(user));
-        user2.setGoals(List.of(goal));
+        List<Event> userEvents = new ArrayList<>();
+        List<User> userMentees = new ArrayList<>();
+        List<Goal> userGoals = new ArrayList<>();
+
+        List<User> user2Mentors = new ArrayList<>();
+        List<Goal> user2Goals = new ArrayList<>();
+        List<Event> user2Events = new ArrayList<>();
+
+        List<User> eventAttendees = new ArrayList<>();
+
+        userEvents.add(event);
+        userMentees.add(user2);
+        userGoals.add(goal);
+
+        user2Mentors.add(user);
+        user2Goals.add(goal);
+        user2Events.add(event);
+
+        eventAttendees.add(user2);
+        eventAttendees.add(user);
+
+        user.setOwnedEvents(userEvents);
+        user.setParticipatedEvents(userEvents);
+        user.setMentees(userMentees);
+        user.setGoals(userGoals);
+
+        user2.setMentors(user2Mentors);
+        user2.setGoals(user2Goals);
+        user2.setParticipatedEvents(user2Events);
+
+        event.setAttendees(eventAttendees);
     }
 
     @Test

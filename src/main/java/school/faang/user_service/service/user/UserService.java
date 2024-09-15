@@ -1,7 +1,7 @@
-package school.faang.user_service.service.User;
+package school.faang.user_service.service.user;
 
 import school.faang.user_service.dto.user.UserDto;
 
 public interface UserService {
-    UserDto deactivateUser(Long id);
+    void deactivateUser(Long id);
 }

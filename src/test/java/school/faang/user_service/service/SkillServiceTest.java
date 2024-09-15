@@ -20,7 +20,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.Skill.SkillServiceImpl;
+import school.faang.user_service.service.skill.SkillServiceImpl;
 
 import java.util.List;
 import java.util.NoSuchElementException;

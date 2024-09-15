@@ -1,8 +1,9 @@
-package school.faang.user_service.service.Mentorship;
+package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -13,10 +14,21 @@ public class MentorshipServiceImpl implements MentorshipService {
     private final UserRepository userRepository;
 
     public void stopMentorship(Long mentorId, Long menteeId) {
+        //комментарий о неверятном познании в sql
         User mentee = userRepository.findById(menteeId).orElseThrow();
         User mentor = userRepository.findById(mentorId).orElseThrow();
         List<User> mentorsMentees = mentor.getMentees();
         List<User> menteesMentors = mentee.getMentors();
+        List<Goal> changedMentorsGoals = mentee.getGoals().stream()
+                .peek(goal -> {
+                    if (goal.getMentor() == mentor)
+                    {
+                        goal.setMentor(mentee);
+                    }
+                })
+                .toList();
+
+        mentee.setGoals(changedMentorsGoals);
 
         menteesMentors.remove(mentor);
         mentorsMentees.remove(mentee);

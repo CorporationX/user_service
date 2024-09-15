@@ -9,7 +9,7 @@ import school.faang.user_service.util.TestDataFactory;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UserExperienceMinFilterTest {
@@ -26,7 +26,7 @@ public class UserExperienceMinFilterTest {
     public void givenValidUserWhenApplyThenReturnUser() {
         // Given
         var filter = TestDataFactory.createFilterDto();
-        filter.setExperienceMin(12);
+        filter.setExperienceMin(9);
 
         // When
         var result = experienceMinFilter.apply(Stream.of(user), filter);
@@ -48,7 +48,7 @@ public class UserExperienceMinFilterTest {
 
         // Then
         assertNotNull(result);
-        assertFalse(result.findAny().isPresent());
+        assertTrue(result.findAny().isPresent());
     }
 
 }

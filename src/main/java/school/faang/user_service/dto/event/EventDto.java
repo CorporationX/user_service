@@ -14,7 +14,8 @@ public record EventDto(
         @NotNull(message = "Event ID can't be null")
         @Positive
         Long id,
-        @NotBlank(message = "Event title can't be null or empty")
+        @NotBlank(message = "Event title can't be empty")
+        @NotNull(message = "Event title can't be null")
         String title,
         LocalDateTime startDate,
         LocalDateTime endDate,

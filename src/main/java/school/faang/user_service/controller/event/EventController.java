@@ -19,8 +19,8 @@ public class EventController {
     private final EventService eventService;
     private final EventValidator eventValidator;
 
-    public EventDto create(@Valid @RequestBody EventDto event) {
-        eventValidator.validateStartDate(event);
+    public EventDto create(@Valid EventDto event) {
+        eventValidator.validateEvent(event);
         return eventService.create(event);
     }
 
@@ -37,9 +37,7 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto event) {
-        eventValidator.validateTitlePresent(event);
-        eventValidator.validateStartDate(event);
-        eventValidator.validateOwnerPresent(event);
+        eventValidator.validateEvent(event);
 
         return eventService.updateEvent(event);
     }

@@ -20,6 +20,12 @@ public class EventValidator {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
 
+    public void validateEvent(EventDto eventDto) {
+        //validateTitlePresent(eventDto);
+        validateStartDate(eventDto);
+        validateOwnerPresent(eventDto);
+    }
+
     public void validateStartDate(EventDto eventDto) {
         Optional.ofNullable(eventDto.startDate())
                 .orElseThrow(() -> new DataValidationException("Event start date can not be null"));
@@ -46,9 +52,9 @@ public class EventValidator {
         }
     }
 
-    public void validateTitlePresent(EventDto eventDto) {
+    /*public void validateTitlePresent(EventDto eventDto) {
         if (eventDto.title() == null || eventDto.title().isBlank()) {
             throw new DataValidationException("Event title can not be null or empty");
         }
-    }
+    }*/
 }

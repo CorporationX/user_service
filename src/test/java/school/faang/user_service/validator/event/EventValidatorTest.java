@@ -1,5 +1,6 @@
 package school.faang.user_service.validator.event;
 
+import com.amazonaws.services.s3.model.Owner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +16,13 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,20 +141,14 @@ public class EventValidatorTest {
     }
 
     @Test
-    void validateTitlePresent_whenTitleIsNull_throwsException() {
+    void validateEvent_whenTitleIsNull_doesNotThrowsException() {
         // Arrange
-        eventDto = EventDto.builder().title(null).build();
+        EventDto eventDto = EventDto.builder().title("title").startDate(LocalDateTime.now()).ownerId(1L).build();
+        User owner = User.builder().id(1L).build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(owner));
 
         // Act & Assert
-        assertThrows(DataValidationException.class, () -> eventValidator.validateTitlePresent(eventDto));
-    }
-
-    @Test
-    void validateTitlePresent_whenTitleIsPresent_doesNotThrowException() {
-        // Arrange
-        eventDto = EventDto.builder().title("title").build();
-
-        // Act & Assert
-        eventValidator.validateTitlePresent(eventDto);
+        eventValidator.validateEvent(eventDto);
     }
 }

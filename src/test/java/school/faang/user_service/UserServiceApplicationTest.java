@@ -23,6 +23,7 @@ import school.faang.user_service.repository.event.filters.EventStatusFilter;
 import school.faang.user_service.repository.event.filters.EventTitleFilter;
 import school.faang.user_service.repository.event.filters.EventTypeFilter;
 import school.faang.user_service.service.GoalInvitationService;
+import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.service.event.EventServiceHelper;
 import school.faang.user_service.service.goal.GoalService;
 
@@ -150,6 +151,12 @@ class UserServiceApplicationTest {
     @Test
     public void testGoalInvitationServiceExists() {
         GoalInvitationService bean = context.getBean(GoalInvitationService.class);
+        assertThat(bean).isNotNull();
+    }
+
+    @Test
+    public void testMentorshipRequestServiceExists() {
+        MentorshipRequestService bean = context.getBean(MentorshipRequestService.class);
         assertThat(bean).isNotNull();
     }
 }

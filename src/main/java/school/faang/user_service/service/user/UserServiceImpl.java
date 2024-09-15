@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
@@ -23,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
@@ -52,6 +53,12 @@ public class UserServiceImpl implements UserService {
         stopMentorship(userToDeactivate);
 
         userRepository.save(userToDeactivate);
+    }
+
+    @Override
+    public User findUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalStateException(
+                "User with ID: %d does not exist.".formatted(userId)));
     }
 
     private void stopMentorship(User userToDeactivate) {

@@ -1,4 +1,4 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.validator.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -6,19 +6,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.goal.SkillService;
+import school.faang.user_service.validator.GoalServiceValidator;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceValidatorTest {
@@ -27,25 +23,16 @@ public class GoalServiceValidatorTest {
     private static final int ACTIVE_GOAL_COUNT_BELOW_LIMIT = 2;
     private static final GoalStatus COMPLETED_STATUS = GoalStatus.COMPLETED;
     private static final GoalStatus ACTIVE_STATUS = GoalStatus.ACTIVE;
-    private static final String SKILL_TITLE = "Test Skill";
 
     @InjectMocks
     private GoalServiceValidator goalServiceValidator;
 
-    @Mock
-    private SkillService skillService;
-
     private Goal goal;
-    private List<Skill> skills;
 
     @BeforeEach
     public void setUp() {
         goal = new Goal();
         goal.setStatus(ACTIVE_STATUS);
-
-        Skill skill = new Skill();
-        skill.setTitle(SKILL_TITLE);
-        skills = List.of(skill);
     }
 
     @Nested
@@ -53,7 +40,7 @@ public class GoalServiceValidatorTest {
     class UserGoalLimitTests {
 
         @Test
-        @DisplayName("whenUserExceedsGoalLimitThenThrowException")
+        @DisplayName("Throws exception when user exceeds goal limit")
         void whenUserExceedsGoalLimitThenThrowException() {
             assertThrows(DataValidationException.class, () ->
                             goalServiceValidator.validateUserGoalLimit(GOAL_LIMIT),
@@ -62,11 +49,9 @@ public class GoalServiceValidatorTest {
         }
 
         @Test
-        @DisplayName("whenUserDoesNotExceedGoalLimitThenDoNotThrowException")
+        @DisplayName("Does not throw exception when user does not exceed goal limit")
         void whenUserDoesNotExceedGoalLimitThenDoNotThrowException() {
             goalServiceValidator.validateUserGoalLimit(ACTIVE_GOAL_COUNT_BELOW_LIMIT);
-
-            verifyNoMoreInteractions(skillService);
         }
     }
 
@@ -75,7 +60,7 @@ public class GoalServiceValidatorTest {
     class GoalExistenceTests {
 
         @Test
-        @DisplayName("whenNoGoalsExistThenThrowException")
+        @DisplayName("Throws exception when no goals exist")
         void whenNoGoalsExistThenThrowException() {
             Stream<Goal> emptyGoalsStream = Stream.empty();
 
@@ -86,13 +71,11 @@ public class GoalServiceValidatorTest {
         }
 
         @Test
-        @DisplayName("whenGoalsExistThenDoNotThrowException")
+        @DisplayName("Does not throw exception when goals exist")
         void whenGoalsExistThenDoNotThrowException() {
             Stream<Goal> goalsStream = Stream.of(goal);
 
             goalServiceValidator.validateGoalsExist(goalsStream);
-
-            verifyNoMoreInteractions(skillService);
         }
     }
 
@@ -101,7 +84,7 @@ public class GoalServiceValidatorTest {
     class GoalStatusTests {
 
         @Test
-        @DisplayName("whenGoalIsCompletedThenThrowException")
+        @DisplayName("Throws exception when goal is completed")
         void whenGoalIsCompletedThenThrowException() {
             goal.setStatus(COMPLETED_STATUS);
 
@@ -112,39 +95,11 @@ public class GoalServiceValidatorTest {
         }
 
         @Test
-        @DisplayName("whenGoalIsNotCompletedThenDoNotThrowException")
+        @DisplayName("Does not throw exception when goal is not completed")
         void whenGoalIsNotCompletedThenDoNotThrowException() {
             goal.setStatus(ACTIVE_STATUS);
 
             goalServiceValidator.validateGoalStatusNotCompleted(goal);
-
-            verifyNoMoreInteractions(skillService);
-        }
-    }
-
-    @Nested
-    @DisplayName("Skills Existence Validation Tests")
-    class SkillsExistenceTests {
-
-        @Test
-        @DisplayName("whenSkillsDoNotExistThenThrowException")
-        void whenSkillsDoNotExistThenThrowException() {
-            when(skillService.existsByTitle(skills)).thenReturn(false);
-
-            assertThrows(DataValidationException.class,
-                    () -> goalServiceValidator.validateSkillsExistByTitle(skills),
-                    "There is no skill with this name"
-            );
-        }
-
-        @Test
-        @DisplayName("whenSkillsExistThenDoNotThrowException")
-        void whenSkillsExistThenDoNotThrowException() {
-            when(skillService.existsByTitle(skills)).thenReturn(true);
-
-            goalServiceValidator.validateSkillsExistByTitle(skills);
-
-            verify(skillService, times(1)).existsByTitle(skills);
         }
     }
 }

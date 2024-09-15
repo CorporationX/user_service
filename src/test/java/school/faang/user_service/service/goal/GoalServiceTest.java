@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,16 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.goal.SkillService;
 import school.faang.user_service.validator.GoalServiceValidator;
+import school.faang.user_service.validator.SkillServiceValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +31,7 @@ public class GoalServiceTest {
 
     private static final long GOAL_ID = 1L;
     private static final long USER_ID = 1L;
+    private static final long SKILL_ID = 1L;
     private static final String NEW_GOAL_TITLE = "New Goal";
     private static final String EXISTING_GOAL_TITLE = "Existing Goal";
     private static final String GOAL_DESCRIPTION = "Description";
@@ -55,6 +54,9 @@ public class GoalServiceTest {
     @Mock
     private GoalServiceValidator goalServiceValidator;
 
+    @Mock
+    private SkillServiceValidator skillServiceValidator;
+
     private GoalDto goalDto;
     private Goal goal;
 
@@ -65,11 +67,13 @@ public class GoalServiceTest {
                 .title(NEW_GOAL_TITLE)
                 .description(GOAL_DESCRIPTION)
                 .status(GoalStatus.ACTIVE)
+                .skillIds(List.of(SKILL_ID))
                 .build();
 
         goal = new Goal();
         goal.setId(GOAL_ID);
         goal.setTitle(EXISTING_GOAL_TITLE);
+        goal.setDescription(GOAL_DESCRIPTION);
         goal.setStatus(GoalStatus.ACTIVE);
     }
 
@@ -78,7 +82,7 @@ public class GoalServiceTest {
     class CreateGoalTests {
 
         @Test
-        @DisplayName("whenValidInputThenCreateGoalSuccessfully")
+        @DisplayName("Creates goal successfully when valid input is provided")
         @Transactional
         void whenValidInputThenCreateGoalSuccessfully() {
             when(goalRepository.countActiveGoalsPerUser(USER_ID)).thenReturn(0);
@@ -86,9 +90,9 @@ public class GoalServiceTest {
 
             GoalDto createdGoal = goalService.createGoal(USER_ID, goalDto);
 
-            verify(goalRepository, times(1)).create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
-            verify(skillService, times(1)).create(goal.getSkillsToAchieve(), USER_ID);
-            verify(goalServiceValidator, times(1)).validateUserGoalLimit(0);
+            verify(goalRepository).create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
+            verify(skillService).create(goal.getSkillsToAchieve(), USER_ID);
+            verify(goalServiceValidator).validateUserGoalLimit(0);
 
             assertEquals(goalDto, createdGoal);
         }
@@ -99,7 +103,7 @@ public class GoalServiceTest {
     class UpdateGoalTests {
 
         @Test
-        @DisplayName("whenGoalExistsThenUpdateSuccessfully")
+        @DisplayName("Updates goal successfully when the goal exists")
         @Transactional
         void whenGoalExistsThenUpdateSuccessfully() {
             when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.of(goal));
@@ -108,23 +112,23 @@ public class GoalServiceTest {
 
             GoalDto updatedGoal = goalService.updateGoal(GOAL_ID, goalDto);
 
-            verify(goalRepository, times(1)).save(goal);
-            verify(skillService, times(1)).addSkillToUsers(goalRepository.findUsersByGoalId(GOAL_ID), GOAL_ID);
-            verify(goalServiceValidator, times(1)).validateGoalStatusNotCompleted(goal);
-            verify(goalServiceValidator, times(1)).validateSkillsExistByTitle(goal.getSkillsToAchieve());
+            verify(goalRepository).save(goal);
+            verify(skillService).addSkillToUsers(goalRepository.findUsersByGoalId(GOAL_ID), GOAL_ID);
+            verify(goalServiceValidator).validateGoalStatusNotCompleted(goal);
+            verify(skillServiceValidator).validateExistByTitle(goal.getSkillsToAchieve());
 
             assertNotNull(updatedGoal);
             assertEquals(goalDto.getTitle(), updatedGoal.getTitle());
         }
 
         @Test
-        @DisplayName("whenGoalDoesNotExistThenThrowNotFoundException")
+        @DisplayName("Throws NotFoundException when the goal does not exist")
         @Transactional
         void whenGoalDoesNotExistThenThrowNotFoundException() {
             when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.empty());
 
             assertThrows(NotFoundException.class, () -> goalService.updateGoal(GOAL_ID, goalDto));
-            verify(goalRepository, times(0)).save(any(Goal.class));
+            verify(goalRepository, never()).save(any(Goal.class));
         }
     }
 
@@ -133,7 +137,7 @@ public class GoalServiceTest {
     class DeleteGoalTests {
 
         @Test
-        @DisplayName("whenGoalExistsThenDeleteSuccessfully")
+        @DisplayName("Deletes goal successfully when the goal exists")
         @Transactional
         void whenGoalExistsThenDeleteSuccessfully() {
             Stream<Goal> goalsStream = Stream.of(goal);
@@ -141,8 +145,8 @@ public class GoalServiceTest {
 
             goalService.deleteGoal(GOAL_ID);
 
-            verify(goalRepository, times(1)).deleteById(GOAL_ID);
-            verify(goalServiceValidator, times(1)).validateGoalsExist(goalsStream);
+            verify(goalRepository).deleteById(GOAL_ID);
+            verify(goalServiceValidator).validateGoalsExist(goalsStream);
         }
     }
 
@@ -151,19 +155,18 @@ public class GoalServiceTest {
     class FetchSubtasksTests {
 
         @Test
-        @DisplayName("whenGoalIdProvidedThenFetchSubtasksSuccessfully")
+        @DisplayName("Fetches subtasks successfully when goal ID is provided")
         @Transactional
         void whenGoalIdProvidedThenFetchSubtasksSuccessfully() {
-            GoalFilterDto filterDto = new GoalFilterDto();
             Stream<Goal> goalsStream = Stream.of(goal);
 
             when(goalRepository.findByParent(GOAL_ID)).thenReturn(goalsStream);
             when(goalFilters.stream()).thenReturn(Stream.of());
 
-            goalService.findSubtasksByGoalId(GOAL_ID, filterDto);
+            goalService.findSubtasksByGoalId(GOAL_ID, null, null, null, null);
 
-            verify(goalRepository, times(1)).findByParent(GOAL_ID);
-            verify(goalFilters, times(1)).stream();
+            verify(goalRepository).findByParent(GOAL_ID);
+            verify(goalFilters).stream();
         }
     }
 
@@ -172,19 +175,18 @@ public class GoalServiceTest {
     class FetchGoalsTests {
 
         @Test
-        @DisplayName("whenUserIdProvidedThenFetchGoalsSuccessfully")
+        @DisplayName("Fetches goals successfully when user ID is provided")
         @Transactional
         void whenUserIdProvidedThenFetchGoalsSuccessfully() {
-            GoalFilterDto filterDto = new GoalFilterDto();
             Stream<Goal> goalsStream = Stream.of(goal);
 
             when(goalRepository.findGoalsByUserId(USER_ID)).thenReturn(goalsStream);
             when(goalFilters.stream()).thenReturn(Stream.of());
 
-            goalService.getGoalsByUser(USER_ID, filterDto);
+            goalService.getGoalsByUser(USER_ID, null, null, null, null);
 
-            verify(goalRepository, times(1)).findGoalsByUserId(USER_ID);
-            verify(goalFilters, times(1)).stream();
+            verify(goalRepository).findGoalsByUserId(USER_ID);
+            verify(goalFilters).stream();
         }
     }
 }

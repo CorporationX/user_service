@@ -17,22 +17,30 @@ public class SkillService {
 
     @Transactional
     public boolean existsByTitle(List<Skill> skills) {
-        return skills.stream()
-                .map(Skill::getTitle)
-                .allMatch(skillRepository::existsByTitle);
+        if (skills == null || skills.isEmpty()) {
+            return false;
+        } else {
+            return skills.stream()
+                    .map(Skill::getTitle)
+                    .allMatch(skillRepository::existsByTitle);
+        }
     }
 
     @Transactional
     public void create(List<Skill> skills, Long userId) {
-        skills.stream()
-                .map(Skill::getId)
-                .forEach(skillId ->
-                        skillRepository.assignSkillToUser(skillId, userId));
+        if (skills != null && !skills.isEmpty()) {
+            skills.stream()
+                    .map(Skill::getId)
+                    .forEach(skillId ->
+                            skillRepository.assignSkillToUser(skillId, userId));
+        }
     }
 
     @Transactional
     public void addSkillToUsers(List<User> users, Long goalId) {
-        users.forEach(user ->
-                user.getSkills().addAll(skillRepository.findSkillsByGoalId(goalId)));
+        if (users != null && !users.isEmpty() && goalId != null) {
+            users.forEach(user ->
+                    user.getSkills().addAll(skillRepository.findSkillsByGoalId(goalId)));
+        }
     }
 }

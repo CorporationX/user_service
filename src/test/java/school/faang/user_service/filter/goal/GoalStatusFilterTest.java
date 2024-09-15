@@ -1,15 +1,15 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.filter.goal.GoalStatusFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,15 +19,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class GoalStatusFilterTest {
 
+    @InjectMocks
     private GoalStatusFilter goalStatusFilter;
+
     private GoalFilterDto goalFilterDto;
     private Goal activeGoal;
     private Goal completedGoal;
 
     @BeforeEach
     public void setUp() {
-        goalStatusFilter = new GoalStatusFilter();
-
         activeGoal = new Goal();
         activeGoal.setStatus(GoalStatus.ACTIVE);
 
@@ -42,7 +42,7 @@ public class GoalStatusFilterTest {
     class IsApplicableTests {
 
         @Test
-        @DisplayName("whenStatusIsPresentThenReturnTrue")
+        @DisplayName("Returns true when status is present")
         void whenStatusIsPresentThenReturnTrue() {
             goalFilterDto.setStatus(GoalStatus.ACTIVE);
 
@@ -52,7 +52,7 @@ public class GoalStatusFilterTest {
         }
 
         @Test
-        @DisplayName("whenStatusIsAbsentThenReturnFalse")
+        @DisplayName("Returns false when status is absent")
         void whenStatusIsAbsentThenReturnFalse() {
             boolean result = goalStatusFilter.isApplicable(goalFilterDto);
 
@@ -65,7 +65,7 @@ public class GoalStatusFilterTest {
     class ApplyTests {
 
         @Test
-        @DisplayName("whenActiveStatusProvidedThenFilterActiveGoals")
+        @DisplayName("Filters active goals when active status is provided")
         void whenActiveStatusProvidedThenFilterActiveGoals() {
             goalFilterDto.setStatus(GoalStatus.ACTIVE);
 
@@ -77,7 +77,7 @@ public class GoalStatusFilterTest {
         }
 
         @Test
-        @DisplayName("whenCompletedStatusProvidedThenFilterCompletedGoals")
+        @DisplayName("Filters completed goals when completed status is provided")
         void whenCompletedStatusProvidedThenFilterCompletedGoals() {
             goalFilterDto.setStatus(GoalStatus.COMPLETED);
 
@@ -89,4 +89,3 @@ public class GoalStatusFilterTest {
         }
     }
 }
-

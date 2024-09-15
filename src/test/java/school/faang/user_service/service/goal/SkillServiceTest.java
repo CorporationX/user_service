@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.service.goal.SkillService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,24 +55,24 @@ public class SkillServiceTest {
     class SkillExistenceTests {
 
         @Test
-        @DisplayName("whenAllSkillsExistThenReturnTrue")
+        @DisplayName("Returns true when all skills exist")
         void whenAllSkillsExistThenReturnTrue() {
             when(skillRepository.existsByTitle(SKILL_TITLE)).thenReturn(true);
 
             boolean result = skillService.existsByTitle(skills);
 
-            verify(skillRepository, times(1)).existsByTitle(SKILL_TITLE);
+            verify(skillRepository).existsByTitle(SKILL_TITLE);
             assertTrue(result, "All skills should exist by title");
         }
 
         @Test
-        @DisplayName("whenNotAllSkillsExistThenReturnFalse")
+        @DisplayName("Returns false when not all skills exist")
         void whenNotAllSkillsExistThenReturnFalse() {
             when(skillRepository.existsByTitle(SKILL_TITLE)).thenReturn(false);
 
             boolean result = skillService.existsByTitle(skills);
 
-            verify(skillRepository, times(1)).existsByTitle(SKILL_TITLE);
+            verify(skillRepository).existsByTitle(SKILL_TITLE);
             assertFalse(result, "Not all skills exist by title");
         }
     }
@@ -83,11 +82,11 @@ public class SkillServiceTest {
     class SkillCreationTests {
 
         @Test
-        @DisplayName("whenCreatingSkillsThenAssignThemToUser")
+        @DisplayName("Assigns skills to user when creating skills")
         void whenCreatingSkillsThenAssignThemToUser() {
             skillService.create(skills, USER_ID);
 
-            verify(skillRepository, times(1)).assignSkillToUser(SKILL_ID, USER_ID);
+            verify(skillRepository).assignSkillToUser(SKILL_ID, USER_ID);
         }
     }
 
@@ -96,13 +95,13 @@ public class SkillServiceTest {
     class AddSkillsToUsersTests {
 
         @Test
-        @DisplayName("whenGoalIdProvidedThenAddSkillsToUsers")
+        @DisplayName("Adds skills to users when goal ID is provided")
         void whenGoalIdProvidedThenAddSkillsToUsers() {
             when(skillRepository.findSkillsByGoalId(GOAL_ID)).thenReturn(skills);
 
             skillService.addSkillToUsers(users, GOAL_ID);
 
-            verify(skillRepository, times(1)).findSkillsByGoalId(GOAL_ID);
+            verify(skillRepository).findSkillsByGoalId(GOAL_ID);
             assertTrue(user.getSkills().containsAll(skills), "User should have the new skills added");
         }
     }

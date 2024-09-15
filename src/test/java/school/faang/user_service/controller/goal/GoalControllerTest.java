@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.goal.GoalController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -26,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GoalControllerTest {
 
     private static final String TITLE = "Test Goal";
+    private static final String DESCRIPTION = "Test description";
     private static final long GOAL_ID = 1L;
+    private static final long INVALID_GOAL_ID = 0L;
     private static final long USER_ID = 1L;
 
     @InjectMocks
@@ -45,9 +46,10 @@ public class GoalControllerTest {
         userId = USER_ID;
         goalDto = GoalDto.builder()
                 .id(GOAL_ID)
-                .description("Test description")
                 .title(TITLE)
+                .description(DESCRIPTION)
                 .status(GoalStatus.ACTIVE)
+                .skillIds(List.of())
                 .build();
     }
 
@@ -56,22 +58,28 @@ public class GoalControllerTest {
     class CreateGoalTests {
 
         @Test
-        @DisplayName("whenValidInputThenCreateGoalSuccessfully")
+        @DisplayName("Successfully create goal with valid input")
         void whenValidInputThenCreateGoalSuccessfully() {
             when(goalService.createGoal(anyLong(), any(GoalDto.class))).thenReturn(goalDto);
 
             GoalDto createdGoal = goalController.createGoal(userId, goalDto);
 
-            verify(goalService, times(1)).createGoal(userId, goalDto);
+            verify(goalService).createGoal(userId, goalDto);
             assertNotNull(createdGoal, "Created goal should not be null");
             assertEquals(goalDto.getId(), createdGoal.getId());
             assertEquals(TITLE, createdGoal.getTitle());
         }
 
         @Test
-        @DisplayName("whenInvalidInputThenThrowDataValidationException")
-        void whenInvalidInputThenThrowDataValidationException() {
-            GoalDto invalidGoalDto = GoalDto.builder().build();
+        @DisplayName("Throws DataValidationException for invalid input")
+        void shouldThrowDataValidationExceptionForInvalidInput() {
+            GoalDto invalidGoalDto = GoalDto.builder()
+                    .id(INVALID_GOAL_ID)
+                    .title("")
+                    .description("")
+                    .status(GoalStatus.ACTIVE)
+                    .skillIds(List.of())
+                    .build();
             String exceptionMessage = "Invalid input";
 
             doThrow(new DataValidationException(exceptionMessage))
@@ -84,7 +92,7 @@ public class GoalControllerTest {
             );
 
             assertEquals(exceptionMessage, exception.getMessage());
-            verify(goalService, times(1)).createGoal(userId, invalidGoalDto);
+            verify(goalService).createGoal(userId, invalidGoalDto);
         }
     }
 
@@ -93,20 +101,20 @@ public class GoalControllerTest {
     class UpdateGoalTests {
 
         @Test
-        @DisplayName("whenValidInputThenUpdateGoalSuccessfully")
+        @DisplayName("Successfully update goal with valid input")
         void whenValidInputThenUpdateGoalSuccessfully() {
             when(goalService.updateGoal(anyLong(), any(GoalDto.class))).thenReturn(goalDto);
 
             GoalDto updatedGoal = goalController.updateGoal(goalId, goalDto);
 
-            verify(goalService, times(1)).updateGoal(goalId, goalDto);
+            verify(goalService).updateGoal(goalId, goalDto);
             assertNotNull(updatedGoal, "Updated goal should not be null");
             assertEquals(goalDto.getId(), updatedGoal.getId());
             assertEquals(TITLE, updatedGoal.getTitle());
         }
 
         @Test
-        @DisplayName("whenGoalDoesNotExistThenThrowNotFoundException")
+        @DisplayName("Throws NotFoundException when the goal does not exist")
         void whenGoalDoesNotExistThenThrowNotFoundException() {
             String exceptionMessage = "Goal not found";
 
@@ -120,7 +128,7 @@ public class GoalControllerTest {
             );
 
             assertEquals(exceptionMessage, exception.getMessage());
-            verify(goalService, times(1)).updateGoal(goalId, goalDto);
+            verify(goalService).updateGoal(goalId, goalDto);
         }
     }
 
@@ -129,17 +137,17 @@ public class GoalControllerTest {
     class DeleteGoalTests {
 
         @Test
-        @DisplayName("whenGoalExistsThenDeleteSuccessfully")
+        @DisplayName("Successfully deletes goal when it exists")
         void whenGoalExistsThenDeleteSuccessfully() {
             doNothing().when(goalService).deleteGoal(goalId);
 
             goalController.deleteGoal(goalId);
 
-            verify(goalService, times(1)).deleteGoal(goalId);
+            verify(goalService).deleteGoal(goalId);
         }
 
         @Test
-        @DisplayName("whenGoalDoesNotExistThenThrowNotFoundException")
+        @DisplayName("Throws NotFoundException when the goal does not exist")
         void whenGoalDoesNotExistThenThrowNotFoundException() {
             String exceptionMessage = "Goal not found";
 
@@ -153,7 +161,7 @@ public class GoalControllerTest {
             );
 
             assertEquals(exceptionMessage, exception.getMessage());
-            verify(goalService, times(1)).deleteGoal(goalId);
+            verify(goalService).deleteGoal(goalId);
         }
     }
 
@@ -162,60 +170,54 @@ public class GoalControllerTest {
     class FetchGoalsTests {
 
         @Test
-        @DisplayName("whenGoalIdProvidedThenFetchSubtasks")
+        @DisplayName("Fetches subtasks when a goal ID is provided")
         void whenGoalIdProvidedThenFetchSubtasks() {
             List<GoalDto> subtasks = List.of(goalDto);
-            GoalFilterDto filter = new GoalFilterDto();
 
-            when(goalService.findSubtasksByGoalId(goalId, filter)).thenReturn(subtasks);
+            when(goalService.findSubtasksByGoalId(goalId, null, null, null, null)).thenReturn(subtasks);
 
-            List<GoalDto> result = goalController.findSubtasksByGoalId(goalId, filter);
+            List<GoalDto> result = goalController.findSubtasksByGoalId(goalId, null, null, null, null);
 
-            verify(goalService, times(1)).findSubtasksByGoalId(goalId, filter);
+            verify(goalService).findSubtasksByGoalId(goalId, null, null, null, null);
             assertNotNull(result, "Result should not be null");
             assertEquals(1, result.size());
             assertEquals(goalDto.getId(), result.get(0).getId());
         }
 
         @Test
-        @DisplayName("whenUserIdProvidedThenFetchGoals")
+        @DisplayName("Fetches goals when a user ID is provided")
         void whenUserIdProvidedThenFetchGoals() {
             List<GoalDto> goals = List.of(goalDto);
-            GoalFilterDto filter = new GoalFilterDto();
 
-            when(goalService.getGoalsByUser(userId, filter)).thenReturn(goals);
+            when(goalService.getGoalsByUser(userId, null, null, null, null)).thenReturn(goals);
 
-            List<GoalDto> result = goalController.getGoalsByUser(userId, filter);
+            List<GoalDto> result = goalController.getGoalsByUser(userId, null, null, null, null);
 
-            verify(goalService, times(1)).getGoalsByUser(userId, filter);
+            verify(goalService).getGoalsByUser(userId, null, null, null, null);
             assertNotNull(result, "Result should not be null");
             assertEquals(1, result.size());
             assertEquals(goalDto.getId(), result.get(0).getId());
         }
 
         @Test
-        @DisplayName("whenNoSubtasksFoundThenReturnEmptyList")
+        @DisplayName("Returns an empty list when no subtasks are found")
         void whenNoSubtasksFoundThenReturnEmptyList() {
-            GoalFilterDto filter = new GoalFilterDto();
+            when(goalService.findSubtasksByGoalId(goalId, null, null, null, null)).thenReturn(new ArrayList<>());
 
-            when(goalService.findSubtasksByGoalId(goalId, filter)).thenReturn(new ArrayList<>());
+            List<GoalDto> result = goalController.findSubtasksByGoalId(goalId, null, null, null, null);
 
-            List<GoalDto> result = goalController.findSubtasksByGoalId(goalId, filter);
-
-            verify(goalService, times(1)).findSubtasksByGoalId(goalId, filter);
+            verify(goalService).findSubtasksByGoalId(goalId, null, null, null, null);
             assertTrue(result.isEmpty(), "Expected empty list of subtasks");
         }
 
         @Test
-        @DisplayName("whenNoGoalsForUserFoundThenReturnEmptyList")
+        @DisplayName("Returns an empty list when no goals are found for the user")
         void whenNoGoalsForUserFoundThenReturnEmptyList() {
-            GoalFilterDto filter = new GoalFilterDto();
+            when(goalService.getGoalsByUser(userId, null, null, null, null)).thenReturn(new ArrayList<>());
 
-            when(goalService.getGoalsByUser(userId, filter)).thenReturn(new ArrayList<>());
+            List<GoalDto> result = goalController.getGoalsByUser(userId, null, null, null, null);
 
-            List<GoalDto> result = goalController.getGoalsByUser(userId, filter);
-
-            verify(goalService, times(1)).getGoalsByUser(userId, filter);
+            verify(goalService).getGoalsByUser(userId, null, null, null, null);
             assertTrue(result.isEmpty(), "Expected empty list of goals");
         }
     }

@@ -7,7 +7,7 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.stream.Stream;
 
 @Component
-public class GoalTitleFilter implements GoalFilter {
+class GoalTitleFilter implements GoalFilter {
 
     @Override
     public boolean isApplicable(GoalFilterDto filters) {

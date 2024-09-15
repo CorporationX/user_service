@@ -7,11 +7,13 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalServiceValidator;
+import school.faang.user_service.validator.SkillServiceValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,15 +27,18 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
     private final GoalServiceValidator goalServiceValidator;
+    private final SkillServiceValidator skillServiceValidator;
 
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         int userGoalsCount = goalRepository.countActiveGoalsPerUser(userId);
 
         goalServiceValidator.validateUserGoalLimit(userGoalsCount);
-
         goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
-        skillService.create(goalMapper.toGoal(goalDto).getSkillsToAchieve(), userId);
+
+        if (goalDto.getSkillIds() != null && !goalDto.getSkillIds().isEmpty()) {
+            skillService.create(goalMapper.toGoal(goalDto).getSkillsToAchieve(), userId);
+        }
 
         return goalDto;
     }
@@ -61,15 +66,25 @@ public class GoalService {
     }
 
     @Transactional
-    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filterDto) {
+    public List<GoalDto> findSubtasksByGoalId(long goalId,
+                                              String filterTitle,
+                                              String filterDescription,
+                                              GoalStatus filterStatus,
+                                              List<Long> filterSkills) {
         Stream<Goal> goals = goalRepository.findByParent(goalId);
+        GoalFilterDto filterDto = new GoalFilterDto(filterTitle, filterDescription, filterStatus, filterSkills);
 
         return filterGoals(goals, filterDto);
     }
 
     @Transactional
-    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filterDto) {
+    public List<GoalDto> getGoalsByUser(long userId,
+                                        String filterTitle,
+                                        String filterDescription,
+                                        GoalStatus filterStatus,
+                                        List<Long> filterSkills) {
         Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
+        GoalFilterDto filterDto = new GoalFilterDto(filterTitle, filterDescription, filterStatus, filterSkills);
 
         return filterGoals(goals, filterDto);
     }
@@ -78,7 +93,7 @@ public class GoalService {
         Goal updateGoal = goalMapper.toGoal(goalDto);
 
         goalServiceValidator.validateGoalStatusNotCompleted(existingGoal);
-        goalServiceValidator.validateSkillsExistByTitle(updateGoal.getSkillsToAchieve());
+        skillServiceValidator.validateExistByTitle(updateGoal.getSkillsToAchieve());
 
         existingGoal.setStatus(updateGoal.getStatus());
         existingGoal.setTitle(updateGoal.getTitle());

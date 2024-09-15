@@ -7,15 +7,15 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.stream.Stream;
 
 @Component
-class GoalStatusFilter implements GoalFilter {
+class GoalDescriptionFilter implements GoalFilter {
 
     @Override
     public boolean isApplicable(GoalFilterDto filters) {
-        return filters.getStatus() != null;
+        return filters.getDescription() != null;
     }
 
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto filter) {
-        return goals.filter(goal -> goal.getStatus() == filter.getStatus());
+        return goals.filter(goal -> goal.getDescription().contains(filter.getDescription()));
     }
 }

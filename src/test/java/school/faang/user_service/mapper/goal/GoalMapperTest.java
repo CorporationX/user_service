@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.mapper.GoalMapper;
 
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class GoalMapperTest {
     class ToGoalDtoTests {
 
         @Test
-        @DisplayName("whenGoalProvidedThenMapToGoalDtoCorrectly")
+        @DisplayName("Maps to GoalDto correctly when a goal is provided")
         void whenGoalProvidedThenMapToGoalDtoCorrectly() {
             Skill skill = new Skill();
             skill.setId(SKILL_ID_1);
@@ -52,6 +54,7 @@ public class GoalMapperTest {
             goal.setTitle(GOAL_TITLE);
             goal.setDescription(GOAL_DESCRIPTION);
             goal.setParent(parentGoal);
+            goal.setStatus(GoalStatus.ACTIVE);
             goal.setSkillsToAchieve(List.of(skill));
 
             GoalDto goalDto = goalMapper.toGoalDto(goal);
@@ -70,7 +73,7 @@ public class GoalMapperTest {
     class ToGoalTests {
 
         @Test
-        @DisplayName("whenGoalDtoProvidedThenMapToGoalCorrectly")
+        @DisplayName("Maps to Goal correctly when a GoalDto is provided")
         void whenGoalDtoProvidedThenMapToGoalCorrectly() {
             GoalDto goalDto = GoalDto.builder()
                     .id(GOAL_ID)
@@ -78,6 +81,7 @@ public class GoalMapperTest {
                     .description(GOAL_DESCRIPTION)
                     .parentId(PARENT_GOAL_ID)
                     .skillIds(List.of(SKILL_ID_1))
+                    .status(GoalStatus.ACTIVE)
                     .build();
 
             Goal goal = goalMapper.toGoal(goalDto);
@@ -96,7 +100,7 @@ public class GoalMapperTest {
     class MapSkillToSkillsIdTests {
 
         @Test
-        @DisplayName("whenSkillsProvidedThenMapToSkillIdsCorrectly")
+        @DisplayName("Maps to skill IDs correctly when skills are provided")
         void whenSkillsProvidedThenMapToSkillIdsCorrectly() {
             Skill skill1 = new Skill();
             skill1.setId(SKILL_ID_1);
@@ -117,7 +121,7 @@ public class GoalMapperTest {
     class MapIdToParentTests {
 
         @Test
-        @DisplayName("whenParentIdProvidedThenMapToParentGoalCorrectly")
+        @DisplayName("Maps to parent goal correctly when parent ID is provided")
         void whenParentIdProvidedThenMapToParentGoalCorrectly() {
             Long parentId = PARENT_GOAL_ID;
             Goal parentGoal = goalMapper.mapIdToParent(parentId);
@@ -132,7 +136,7 @@ public class GoalMapperTest {
     class MapSkillIdToListSkillTests {
 
         @Test
-        @DisplayName("whenSkillIdsProvidedThenMapToSkillsCorrectly")
+        @DisplayName("Maps to skills correctly when skill IDs are provided")
         void whenSkillIdsProvidedThenMapToSkillsCorrectly() {
             List<Long> skillIds = List.of(SKILL_ID_1, SKILL_ID_2);
 

@@ -1,14 +1,14 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.filter.goal.GoalTitleFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,15 +24,15 @@ public class GoalTitleFilterTest {
     private static final String TEST_GOAL_1 = TEST + " " + GOAL_1;
     private static final String TEST_GOAL_2 = TEST + " " + GOAL_2;
 
+    @InjectMocks
     private GoalTitleFilter goalTitleFilter;
+
     private GoalFilterDto goalFilterDto;
     private Goal goal1;
     private Goal goal2;
 
     @BeforeEach
     public void setUp() {
-        goalTitleFilter = new GoalTitleFilter();
-
         goal1 = new Goal();
         goal1.setTitle(TEST_GOAL_1);
 
@@ -47,7 +47,7 @@ public class GoalTitleFilterTest {
     class IsApplicableTests {
 
         @Test
-        @DisplayName("whenTitleIsPresentThenReturnTrue")
+        @DisplayName("Returns true when the title is present")
         void whenTitleIsPresentThenReturnTrue() {
             goalFilterDto.setTitle(TEST);
 
@@ -57,7 +57,7 @@ public class GoalTitleFilterTest {
         }
 
         @Test
-        @DisplayName("whenTitleIsAbsentThenReturnFalse")
+        @DisplayName("Returns false when the title is absent")
         void whenTitleIsAbsentThenReturnFalse() {
             boolean result = goalTitleFilter.isApplicable(goalFilterDto);
 
@@ -70,7 +70,7 @@ public class GoalTitleFilterTest {
     class ApplyTests {
 
         @Test
-        @DisplayName("whenExactTitleProvidedThenFilterByExactTitle")
+        @DisplayName("Filters by exact title when the exact title is provided")
         void whenExactTitleProvidedThenFilterByExactTitle() {
             goalFilterDto.setTitle(GOAL_1);
 
@@ -82,7 +82,7 @@ public class GoalTitleFilterTest {
         }
 
         @Test
-        @DisplayName("whenPartialTitleProvidedThenFilterByPartialTitle")
+        @DisplayName("Filters by partial title when a partial title is provided")
         void whenPartialTitleProvidedThenFilterByPartialTitle() {
             goalFilterDto.setTitle(TEST);
 
@@ -95,7 +95,7 @@ public class GoalTitleFilterTest {
         }
 
         @Test
-        @DisplayName("whenNoMatchThenReturnEmptyList")
+        @DisplayName("Returns an empty list when no match is found")
         void whenNoMatchThenReturnEmptyList() {
             goalFilterDto.setTitle("Unknown");
 
@@ -106,4 +106,3 @@ public class GoalTitleFilterTest {
         }
     }
 }
-

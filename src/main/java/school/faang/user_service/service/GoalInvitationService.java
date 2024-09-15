@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -12,6 +13,8 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.specification.GoalInvitationSpecification;
+
 import java.util.List;
 import java.util.Objects;
 import static school.faang.user_service.service.util.GoalInvitationUtil.*;
@@ -29,13 +32,15 @@ public class GoalInvitationService {
             return goalInvitationRepository.findAll();
         }
 
-        return goalInvitationRepository.getAllFiltered(
+        Specification<GoalInvitation> spec = GoalInvitationSpecification.getAllFiltered(
                 filter.getInviterId(),
                 filter.getInvitedId(),
                 filter.getInviterNamePattern(),
                 filter.getInvitedNamePattern(),
-                filter.getStatus().ordinal()
+                Objects.isNull(filter.getStatus()) ? null : filter.getStatus().ordinal()
         );
+
+        return goalInvitationRepository.findAll(spec);
     }
 
     @Transactional

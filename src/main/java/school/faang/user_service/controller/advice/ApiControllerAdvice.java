@@ -42,10 +42,11 @@ public class ApiControllerAdvice {
     // Internal exceptions, not caught by first two cases
     @ExceptionHandler({ Exception.class })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse genericExceptionHandler() {
+    public ErrorResponse genericExceptionHandler(Exception e) {
         return new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Something wrong on our end, contact IT support immediately."
+                e.getMessage()
+//                "Something wrong on our end, contact IT support immediately."
         );
     }
 }

@@ -7,7 +7,6 @@ import lombok.Setter;
 import school.faang.user_service.entity.RequestStatus;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class InvitationFilterDto {

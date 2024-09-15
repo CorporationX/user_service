@@ -125,7 +125,7 @@ public class RecommendationServiceTest {
 
         List<Long> skillIds = skillByIds(dto);
         for (Long skillId : skillIds) {
-            when(skillOfferRepository.create(skillId, dto.getId())).thenReturn(5L);
+            verify(skillOfferRepository).create(skillId, dto.getId());
         }
     }
 

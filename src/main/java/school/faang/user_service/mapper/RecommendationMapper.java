@@ -10,7 +10,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationMapper {
@@ -24,7 +23,7 @@ public interface RecommendationMapper {
     default List<SkillOfferDto> mapToSkillOfferDtoList(List<SkillOffer> skillOffers) {
         return skillOffers.stream()
                 .map(this::mapToSkillOfferDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private SkillOfferDto mapToSkillOfferDto(SkillOffer skillOffer) {

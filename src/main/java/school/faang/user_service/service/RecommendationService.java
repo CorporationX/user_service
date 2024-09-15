@@ -29,7 +29,6 @@ public class RecommendationService {
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
     private final RecommendationMapper recommendationMapper;
-    private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     public RecommendationDto create(RecommendationDto recommendation) {
         validateRecommendationContentIsBlank(recommendation);
@@ -57,21 +56,12 @@ public class RecommendationService {
                 recommendation.getContent());
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
 
-
         List<Long> skillIds = recommendation.getSkillOffers().stream()
                 .map(SkillOfferDto::getSkillId)
                 .distinct().toList();
 
         for (Long skillId : skillIds) {
             skillOfferRepository.create(skillId, recommendation.getId());
-
-//            Optional<Skill> skill = skillRepository.findById(skillId);
-
-//            if (skill.isPresent()) {
-//                if (receiverHasSkill(recommendation.getReceiverId(), skillId)) {
-//                    userSkillGuaranteeRepository.save(skill);
-//                }
-//            }
         }
         return recommendation;
     }

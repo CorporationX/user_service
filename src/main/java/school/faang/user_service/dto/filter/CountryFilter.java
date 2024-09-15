@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class CountryFilter implements UserFilter{
+public class CountryFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filter) {
         return filter.getCountryPattern() != null;
@@ -15,6 +15,6 @@ public class CountryFilter implements UserFilter{
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filter) {
-        return users.filter(user -> String.valueOf(user.getCountry()).equals(filter.getCountryPattern()));
+        return users.filter(user -> user.getCountry().getTitle().contains(filter.getCountryPattern()));
     }
 }

@@ -3,11 +3,13 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.CountDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.filter.UserFilter;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -22,17 +24,23 @@ public class SubscriptionService {
 
     private final List<UserFilter> userFilters;
 
+    private final UserMapper userMapper;
+
     @SneakyThrows
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Validation exception");
-        } else {
-            subscriptionRepository.followUser(followerId, followeeId);
         }
+        subscriptionRepository.followUser(followerId, followeeId);
     }
 
+    @SneakyThrows
     public void unFollowUser(long followerId, long followeeId) {
-        subscriptionRepository.unfollowUser(followerId, followeeId);
+        if (followerId != followeeId) {
+            subscriptionRepository.unfollowUser(followerId, followeeId);
+        } else {
+            throw new DataValidationException("You can't unfollow yourself.");
+        }
     }
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
@@ -40,12 +48,12 @@ public class SubscriptionService {
         userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
-        return users.map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
+        return users.map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
-    public void getFollowersCount(long followeeId) {
-        subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    public CountDto getFollowersCount(long followeeId) {
+        return userMapper.toCountDto(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId));
     }
 
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
@@ -53,11 +61,11 @@ public class SubscriptionService {
         userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
-        return users.map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
+        return users.map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
-    public void getFollowingCount(long followerId) {
-        subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    public CountDto getFollowingCount(long followerId) {
+        return userMapper.toCountDto(subscriptionRepository.findFolloweesAmountByFollowerId(followerId));
     }
 }

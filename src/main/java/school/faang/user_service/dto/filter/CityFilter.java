@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class CityFilter implements UserFilter{
+public class CityFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFilterDto filter) {

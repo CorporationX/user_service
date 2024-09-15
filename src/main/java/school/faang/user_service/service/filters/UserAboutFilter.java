@@ -5,6 +5,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Component
@@ -16,6 +17,8 @@ public class UserAboutFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto) {
-        return userStream.filter(user -> user.getAboutMe().contains(filterDto.getAboutPattern()));
+        Pattern pattern = Pattern.compile(filterDto.getAboutPattern(), Pattern.CASE_INSENSITIVE);
+
+        return userStream.filter(user -> pattern.matcher(user.getAboutMe()).find());
     }
 }

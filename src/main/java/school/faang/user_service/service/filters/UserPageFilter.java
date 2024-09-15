@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 @Component
@@ -18,6 +19,7 @@ public class UserPageFilter implements UserFilter {
         int page = filterDto.getPage();
         int size = filterDto.getPageSize();
 
-        return userStream.skip(page * size);
+        return userStream.sorted(Comparator.comparing(User::getId))
+                .skip(page  * size);
     }
 }

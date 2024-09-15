@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.SubscriptionRequirementsException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserAboutFilter;
@@ -18,6 +19,7 @@ import school.faang.user_service.service.filters.UserFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -41,6 +43,7 @@ public class SubscriptionServiceTest {
         MockitoAnnotations.openMocks(this);
         userFilters.add(mock(UserExperienceMinFilter.class));
         userFilters.add(mock(UserAboutFilter.class));
+        reset(userRepository);
     }
 
     @Test
@@ -57,21 +60,37 @@ public class SubscriptionServiceTest {
     @Test
     public void testFollowUserDoesntExist() {
         when(userRepository.existsById(firstUserId)).thenReturn(false);
-        Assert.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(firstUserId, secondUserId));
+        Assert.assertThrows(SubscriptionRequirementsException.class, () -> subscriptionService.followUser(firstUserId, secondUserId));
     }
 
 
     @Test
     public void testFollowUserThrowsExceptionWhenIdIsSame() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(firstUserId, firstUserId)).thenReturn(true);
-        Assert.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(firstUserId, firstUserId));
+        when(userRepository.existsById(firstUserId)).thenReturn(true);
+
+        DataValidationException thrown = Assert.assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.followUser(firstUserId, firstUserId)
+        );
+
+        Assert.assertEquals("You cannot subscribe to yourself", thrown.getMessage());
     }
+
 
     @Test
     public void testFollowUserThrowsExceptionWhenSubExist() {
+        when(userRepository.existsById(firstUserId)).thenReturn(true);
+        when(userRepository.existsById(secondUserId)).thenReturn(true);
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(firstUserId, secondUserId)).thenReturn(true);
-        Assert.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(firstUserId, firstUserId));
+
+        DataValidationException thrown = Assert.assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.followUser(firstUserId, secondUserId)
+        );
+
+        assertEquals("Already followed", thrown.getMessage());
     }
+
 
     @Test
     public void testUnfollowUserSuccessful() {
@@ -84,8 +103,16 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testUnfollowUserThrowsException() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(firstUserId, firstUserId)).thenReturn(false);
-        Assert.assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(firstUserId, firstUserId));
+        when(userRepository.existsById(firstUserId)).thenReturn(true);
+        when(userRepository.existsById(secondUserId)).thenReturn(true);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(firstUserId, secondUserId)).thenReturn(false);
+
+        DataValidationException thrown = Assert.assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.unfollowUser(firstUserId, secondUserId)
+        );
+
+        assertEquals("You are not following this user", thrown.getMessage());
     }
 
     @Test

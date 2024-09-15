@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.SubscriptionRequirementsException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
@@ -23,8 +24,8 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        userExistence(followerId);
-        userExistence(followeeId);
+        verifyUserExists(followerId);
+        verifyUserExists(followeeId);
         validateFollowUnfollow(followerId, followeeId, true);
 
         subscriptionRepository.followUser(followerId, followeeId);
@@ -32,33 +33,35 @@ public class SubscriptionService {
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
-        userExistence(followerId);
-        userExistence(followeeId);
+        verifyUserExists(followerId);
+        verifyUserExists(followeeId);
         validateFollowUnfollow(followerId, followeeId, false);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
     @Transactional
     public List<User> getFollowers(long followeeId, UserFilterDto filters) {
-        userExistence(followeeId);
+        verifyUserExists(followeeId);
         Stream<User> userStream = subscriptionRepository.findByFolloweeId(followeeId);
         return filter(userStream, filters).toList();
     }
 
     @Transactional
     public List<User> getFollowing(long followerId, UserFilterDto filters) {
-        userExistence(followerId);
+        verifyUserExists(followerId);
         Stream<User> userStream = subscriptionRepository.findByFollowerId(followerId);
         return filter(userStream, filters).toList();
     }
 
+    @Transactional
     public int getFollowersCount(long followeeId) {
-        userExistence(followeeId);
+        verifyUserExists(followeeId);
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
+    @Transactional
     public int getFollowingCount(long followerId) {
-        userExistence(followerId);
+        verifyUserExists(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
@@ -85,9 +88,9 @@ public class SubscriptionService {
         }
     }
 
-    public void userExistence(long userId) {
+    public void verifyUserExists(long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new DataValidationException("User with the ID " + userId + " doesn't exits");
+            throw new SubscriptionRequirementsException("User with the ID " + userId + " doesn't exits");
         }
     }
 }

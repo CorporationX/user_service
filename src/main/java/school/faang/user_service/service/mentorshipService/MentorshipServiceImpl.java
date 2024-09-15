@@ -26,13 +26,7 @@ public class MentorshipServiceImpl implements MentorshipService {
                 goal.setMentor(mentee);
             });
 
-//            remove mentor from every mentee mentor list
             List<User> userMentors = mentee.getMentors();
-
-            if(userMentors == null) {
-                return;
-            }
-
             userMentors.removeIf(mentor -> mentor.getId() == userId);
             mentee.setMentors(userMentors);
         });

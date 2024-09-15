@@ -24,7 +24,7 @@ public class EventValidator {
         private final SkillMapper skillMapper;
 
         public User ownerValidation(EventDto eventDto) {
-            return userRepository.findById(eventDto.getOwnerId())
+            return userRepository.findById(eventDto.getId())
                     .orElseThrow(() -> new DataValidationException("Ошибка: пользователь не найден"));
         }
 

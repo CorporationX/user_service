@@ -1,33 +1,31 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.thread.ThreadPoolDistributor;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Component
 @Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
     private final ThreadPoolDistributor threadPoolDistributor;
     private final EventMapper eventMapper;
-    private final List<EventFilter> eventFilters; //= List.of(new EventByOwnerFilter(), new EventTitleFilter());
+    private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
 
     public EventDto create(EventDto eventDto) {
@@ -59,9 +57,8 @@ public class EventService {
     public EventDto updateEvent(Long eventId, EventDto eventDto) {
         eventValidator.eventValidation(eventId);
         eventValidator.inputDataValidation(eventDto);
-        Event eventEntity = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Событие id" + eventId + " не найдено"));
-        eventEntity = eventMapper.toEntity(eventDto);
+        Event eventEntity = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException("Событие id" + eventId + " не найдено"));
         return eventMapper.toDto(eventRepository.save(eventEntity));
     }
 
@@ -82,6 +79,8 @@ public class EventService {
             });
             startIndex = endIndex;
         }
+    }
+
     public List<EventDto> getOwnedEvents(Long userId) {
         return eventMapper.toDtoList(eventRepository.findAllByUserId(userId));
     }

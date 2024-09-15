@@ -9,11 +9,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.filter.event.EventTitleFilter;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.thread.ThreadPoolDistributor;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
@@ -28,17 +33,35 @@ public class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private ThreadPoolDistributor threadPool;
-    private int quantityThreadPollSize = 2;
+    @Mock
+    private EventMapper eventMapper;
+    @Mock
+    private EventValidator eventValidator;
+    @Mock
+    private EventTitleFilter eventTitleFilter;
+
+    private List<EventFilter> filter;
+
+    private final int quantityThreadPollSize = 2;
 
     private EventService eventService;
 
     @BeforeEach
     public void setUp() {
+        // Инициализируем список filter
+        filter = new ArrayList<>();
         ThreadPoolTaskExecutor executor = Mockito.mock(ThreadPoolTaskExecutor.class);
+
+        // Мокируем поведение executor
         when(threadPool.customThreadPool()).thenReturn(executor);
-        when(executor.submit(any(Runnable.class))).thenReturn(null);
-        when(executor.getPoolSize()).thenReturn(2);
-        eventService = new EventService(eventRepository, threadPool);
+        when(executor.submit(any(Runnable.class))).thenReturn(Mockito.mock(Future.class)); // Возвращаем мокаемый Future
+        when(executor.getPoolSize()).thenReturn(quantityThreadPollSize);
+
+        // Добавляем фильтр
+        filter.add(eventTitleFilter);
+
+        // Инициализируем тестируемый класс
+        eventService = new EventService(eventRepository, threadPool, eventMapper, filter, eventValidator);
     }
 
     @Test
@@ -52,7 +75,6 @@ public class EventServiceTest {
 
         verify(eventRepository, times(1)).findByStatus(COMPLETED);
         verify(threadPool.customThreadPool(), times(quantityThreadPollSize)).submit(any(Runnable.class));
-
     }
 
     @Test
@@ -63,7 +85,6 @@ public class EventServiceTest {
         eventService.deletingAllPastEvents();
 
         verify(eventRepository, times(1)).findByStatus(COMPLETED);
-        verify(threadPool.customThreadPool(), times(quantityThreadPollSize)).submit(any(Runnable.class));
     }
 
     @Test

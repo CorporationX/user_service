@@ -4,6 +4,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static school.faang.user_service.entity.goal.GoalStatus.ACTIVE;
@@ -25,6 +26,10 @@ public abstract class CommonGoalTest {
             .title(GOAL_TITLE)
             .description(GOAL_DESCRIPTION)
             .status(ACTIVE)
+                .childrenGoals(new ArrayList<>(List.of(
+                        new Goal(),
+                        new Goal()
+                )))
             .build();
     }
 

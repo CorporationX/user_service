@@ -46,13 +46,13 @@ public class UserService {
     }
 
     private void removeUserGoals(User user) {
-        for (Goal goal : user.getGoals()) {
+        user.getGoals().forEach(goal -> {
             if (goal.getUsers().size() == 1) {
                 goalService.deleteGoalAndUnlinkChildren(goal);
             }
 
             goal.getUsers().remove(user);
-        }
+        });
 
         user.getGoals().clear();
     }
@@ -67,10 +67,10 @@ public class UserService {
                 .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
                 .toList();
 
-        for (Event event : plannedEvents) {
+        plannedEvents.forEach(event -> {
             event.setStatus(EventStatus.CANCELED);
             eventRepository.save(event);
             eventRepository.delete(event);
-        }
+        });
     }
 }

@@ -14,6 +14,7 @@ import school.faang.user_service.dto.promotion.PromotionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.entity.promotion.PromotionType;
+import school.faang.user_service.exception.ExistingPurchaseException;
 import school.faang.user_service.mapper.PromotionMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -29,19 +30,25 @@ public class PromotionService {
     private final PromotionMapper promotionMapper;
     private final PromotionRepository promotionRepository;
 
-
     @Transactional
     public PromotionDto buyPromotion(long userId, PromotionType type, String target) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User was not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        paymentPromotion(type);
+        promotionRepository.findByUserId(userId).ifPresent(promotion -> {
+            if (promotion.getPromotionTarget().equals(target)) {
+                throw new ExistingPurchaseException("User already has an active promotion subscription" +
+                        " with the same target");
+            }
+        });
 
-        Promotion savePromotion = savePromotionToRepository(user, type, target);
-        return promotionMapper.toPromotionDto(savePromotion);
+        payPromotion(type);
+
+        Promotion savedPromotion = savePromotion(user, type, target);
+        return promotionMapper.toPromotionDto(savedPromotion);
     }
 
-    private void paymentPromotion(PromotionType type) {
+    private void payPromotion(PromotionType type) {
         long paymentNumber = promotionRepository.getPromotionPaymentNumber();
         PaymentRequest paymentRequest =
                 new PaymentRequest(paymentNumber, new BigDecimal(type.getPrice()), Currency.USD);
@@ -55,7 +62,7 @@ public class PromotionService {
         }
     }
 
-    private Promotion savePromotionToRepository(User user, PromotionType type, String target) {
+    private Promotion savePromotion(User user, PromotionType type, String target) {
         Promotion promotion = new Promotion();
         promotion.setUser(user);
         promotion.setPriorityLevel(type.getPriorityLevel());

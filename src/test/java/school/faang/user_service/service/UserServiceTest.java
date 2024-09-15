@@ -1,10 +1,14 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import school.faang.user_service.dto.user.UserDto;
@@ -20,132 +24,100 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-    private User callingUser;
-    private UserDto callingUserDto;
-    private User userWithPromotion;
-    private UserDto userWithPromotionDto;
-    private UserFilterDto filterDto;
-    private Country usa;
-    private List<UserFilter> filters;
+
+    @Mock
+    PromotionRepository promotionRepository;
 
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private PromotionRepository promotionRepository;
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Mock
     private List<UserFilter> userFilters;
-
-    @Mock
-    private UserMapper mapper;
 
     @InjectMocks
     private UserService userService;
 
     @BeforeEach
     public void setUp() {
-        usa = new Country(1, "USA", List.of());
+    }
 
-        callingUser = new User();
+    @Test
+    @DisplayName("Should return users in correct order when users are found and filtered")
+    public void testGetFilteredUsers_FoundAndFiltered() {
+        Country usa = new Country(1, "USA", List.of());
+        Country uk = new Country(2, "UK", List.of());
+
+        User callingUser = new User();
         callingUser.setId(1L);
         callingUser.setUsername("John Doe");
         callingUser.setCountry(usa);
-        callingUserDto = new UserDto();
-        callingUserDto.setId(1L);
 
-        userWithPromotion = new User();
-        userWithPromotion.setId(2L);
-        userWithPromotion.setUsername("John Smith");
-        userWithPromotion.setPromotion(new Promotion());
-        userWithPromotion.getPromotion().setPromotionTarget("profile");
-        userWithPromotion.getPromotion().setRemainingShows(5);
-        userWithPromotion.getPromotion().setPriorityLevel(3);
-        userWithPromotion.setCountry(usa);
-        userWithPromotionDto = new UserDto();
-        userWithPromotionDto.setId(2L);
+        User promoted1 = new User();
+        promoted1.setId(2L);
+        promoted1.setUsername("John Smith");
+        promoted1.setCountry(uk);
+        promoted1.setPromotion(new Promotion());
+        promoted1.getPromotion().setPromotionTarget("profile");
+        promoted1.getPromotion().setRemainingShows(5);
+        promoted1.getPromotion().setPriorityLevel(3);
 
-        filterDto = new UserFilterDto();
-        filters = new ArrayList<>();
+        User promoted2 = new User();
+        promoted2.setId(3L);
+        promoted2.setUsername("John Smith");
+        promoted2.setCountry(usa);
+        promoted2.setPromotion(new Promotion());
+        promoted2.getPromotion().setPromotionTarget("profile");
+        promoted2.getPromotion().setRemainingShows(5);
+        promoted2.getPromotion().setPriorityLevel(3);
+
+        List<UserFilter> filters = new ArrayList<>();
         filters.add(new UserNameFilter());
-    }
-
-    @Test
-    public void testGetFilteredUsers_UserFound_Success() {
 
         UserFilterDto filterDto = new UserFilterDto();
         filterDto.setNamePattern("John");
 
-        List<User> filteredUsers = List.of(callingUser, userWithPromotion);
+        List<User> filteredUsers = List.of(callingUser, promoted1, promoted2);
 
         when(userFilters.stream()).thenReturn(filters.stream());
-        when(userRepository.findById(callingUser.getId())).thenReturn(java.util.Optional.of(callingUser));
-        when(userRepository.findAll(any(Specification.class))).thenReturn(filteredUsers);
-        when(mapper.toUserDto(callingUser)).thenReturn(callingUserDto);
-        when(mapper.toUserDto(userWithPromotion)).thenReturn(userWithPromotionDto);
+        when(userRepository.findById(callingUser.getId())).thenReturn(Optional.of(callingUser));
+        when(userRepository.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(filteredUsers);
 
         List<UserDto> result = userService.getFilteredUsers(filterDto, callingUser.getId());
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(2L, result.get(0).getId());
-        assertEquals(1L, result.get(1).getId());
+        verify(userMapper).toDto(callingUser);
+        verify(userMapper).toDto(promoted1);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals(3, result.size()),
+                () -> assertEquals(3L, result.get(0).getId()),
+                () -> assertEquals(2L, result.get(1).getId()),
+                () -> assertEquals(1L, result.get(2).getId())
+        );
     }
 
     @Test
-    public void testGetFilteredUsers_UserNotFound() {
-        when(userRepository.findById(callingUser.getId())).thenReturn(java.util.Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> userService.getFilteredUsers(filterDto, callingUser.getId()));
-    }
-
-    @Test
-    public void testGetFilteredUsers_NoExpiredPromotions() {
-        List<User> filteredUsers = List.of(userWithPromotion);
-        List<User> priorityFilteredUsers = List.of(userWithPromotion);
-
-        when(userRepository.findById(callingUser.getId())).thenReturn(java.util.Optional.of(callingUser));
-        when(userFilters.stream()).thenReturn(filters.stream());
-        when(userRepository.findAll(any(Specification.class))).thenReturn(filteredUsers);
-        when(mapper.toUserDto(userWithPromotion)).thenReturn(new UserDto());
-
-        List<UserDto> result = userService.getFilteredUsers(filterDto, callingUser.getId());
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(promotionRepository, times(1)).decreaseRemainingShows(anyList(), eq("profile"));
-        verify(promotionRepository, never()).deleteAll(anyList()); // No expired promotions
-    }
-
-    @Test
-    public void testGetFilteredUsersFromRepository_FilterApplies_Success() {
+    @DisplayName("Should throw IllegalArgumentException when calling user is not found")
+    public void testGetFilteredUsers_CallingUserNotFound() {
         UserFilterDto filterDto = new UserFilterDto();
-        filterDto.setNamePattern("John");
 
-        when(userFilters.stream()).thenReturn(filters.stream());
-        when(userRepository.findAll(any(Specification.class))).thenReturn(List.of(callingUser, userWithPromotion));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        List<User> result = userService.getFilteredUsersFromRepository(filterDto);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("John Doe", result.get(0).getUsername());
-        assertEquals("John Smith", result.get(1).getUsername());
+        assertThrows(IllegalArgumentException.class, () -> userService.getFilteredUsers(filterDto, 1L));
     }
 }

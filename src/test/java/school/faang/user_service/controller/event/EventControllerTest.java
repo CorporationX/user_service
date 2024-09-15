@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,58 +12,57 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.service.UserService;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class EventControllerTest {
     private ObjectMapper objectMapper;
     private MockMvc mockMvc;
-    private UserDto userDto;
-    private UserDto anotherUserDto;
-    private UserFilterDto userFilterDto;
+    private EventDto eventDto;
+    private EventDto anotherEventDto;
+    private EventFilterDto eventFilterDto;
 
     @Mock
-    private UserService userService;
+    private EventService userService;
 
     @Mock
     private UserContext userContext;
 
     @InjectMocks
-    private UserController userController;
+    private EventController eventController;
 
     @BeforeEach
     public void setUp() {
-        userDto = new UserDto();
-        userDto.setId(2L);
-        anotherUserDto = new UserDto();
-        anotherUserDto.setId(3L);
+        eventDto = new EventDto();
+        eventDto.setId(2L);
+        anotherEventDto = new EventDto();
+        anotherEventDto.setId(3L);
 
-        userFilterDto = new UserFilterDto();
+        eventFilterDto = new EventFilterDto();
 
         objectMapper = new ObjectMapper();
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
     }
 
     @Test
-    @DisplayName("Should return filtered users successfully with correct user ID and filters")
+    @DisplayName("Should return filtered events successfully with correct user ID and filters")
     public void testGetFilteredUsers_Success() throws Exception {
         Long userId = 1L;
-        String requestBody = objectMapper.writeValueAsString(userFilterDto);
+        String requestBody = objectMapper.writeValueAsString(eventFilterDto);
 
         when(userContext.getUserId()).thenReturn(userId);
-        when(userService.getFilteredUsers(userFilterDto, userId)).thenReturn(List.of(userDto, anotherUserDto));
+        when(userService.getFilteredEvents(eventFilterDto, userId)).thenReturn(List.of(eventDto, anotherEventDto));
 
-        mockMvc.perform(get("/users/filtered")
+        mockMvc.perform(get("/events/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -77,7 +76,7 @@ public class UserControllerTest {
     public void testGetFilteredUsers_InvalidRequest() throws Exception {
         String invalidJson = "{invalid json}";
 
-        mockMvc.perform(get("/users/filtered")
+        mockMvc.perform(get("/events/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());

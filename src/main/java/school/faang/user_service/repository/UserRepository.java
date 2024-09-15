@@ -30,13 +30,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             """)
     Stream<User> findPremiumUsers();
 
-    @Query(nativeQuery = true, value = """
-            SELECT u.* FROM users u
-            JOIN user_promotion up ON up.user_id = u.id
-            WHERE up.remaining_shows > 0 AND up.promotion_target = 'profile'
-            """)
-    List<User> findProfilePromotedUsers();
-
     @Modifying
     @Query("update User u set u.goals = ?1 where u.id = ?2")
     int updateGoalsById(@NonNull Goal goals, @NonNull Long id);

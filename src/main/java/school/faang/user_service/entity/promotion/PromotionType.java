@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum PromotionType {
     GENERAL(1, 100, 10),
     ADVANCED(2, 500, 50),
-    PREMIUM(3, 1000, 85);
+    PREMIUM(3, 750, 85);
 
     private final int priorityLevel;
     private final int numberOfShows;

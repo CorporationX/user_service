@@ -8,24 +8,23 @@ import school.faang.user_service.entity.event.Event;
 import java.util.stream.Stream;
 
 @Component
-public class EventTitleFilter implements EventFilter {
-
+public class EventMaxAttendeesFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getTitlePattern() != null;
+        return filters.getMaxAttendees() != null;
     }
 
     @Override
-    public Stream<Event> apply(Stream<Event> users, EventFilterDto filters) {
-        return users.filter(g -> g.getTitle().contains(filters.getTitlePattern()));
+    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+        return events.filter(g -> g.getMaxAttendees() >= filters.getMaxAttendees());
     }
 
     @Override
     public Specification<Event> toSpecification(EventFilterDto filters) {
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(
-                        criteriaBuilder.lower(root.get("title")),
-                        "%" + filters.getTitlePattern().toLowerCase() + "%"
+                criteriaBuilder.greaterThanOrEqualTo(
+                        root.get("maxAttendees"),
+                        filters.getMaxAttendees()
                 );
     }
 }

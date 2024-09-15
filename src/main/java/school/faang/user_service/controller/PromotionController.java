@@ -22,7 +22,7 @@ public class PromotionController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public PromotionDto buyPromotion(@RequestParam PromotionType type,
-                                     @RequestParam(required = false, defaultValue = "PROFILE") String target) {
+                                     @RequestParam String target) {
         long userId = userContext.getUserId();
         return promotionService.buyPromotion(userId, type, target);
     }

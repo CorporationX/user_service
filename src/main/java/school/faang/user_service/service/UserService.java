@@ -20,6 +20,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final static String PROMOTION_TARGET = "profile";
+
     private final UserRepository userRepository;
     private final PromotionRepository promotionRepository;
     private final List<UserFilter> userFilters;
@@ -34,14 +36,14 @@ public class UserService {
         List<User> priorityFilteredUsers = getPriorityFilteredUsers(filteredUsers, callingUser);
 
         decrementRemainingShows(priorityFilteredUsers);
-        deleteExpiredProfilePromotions("profile");
+        deleteExpiredProfilePromotions();
 
         return priorityFilteredUsers.stream()
                 .map(mapper::toDto)
                 .toList();
     }
 
-    List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {
+    private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .map(filter -> filter.toSpecification(filterDto))
@@ -51,19 +53,25 @@ public class UserService {
     }
 
     private List<User> getPriorityFilteredUsers(List<User> filteredUsers, User callingUser) {
+
+        Comparator<User> countryAndPriorityComparator = Comparator.comparing((User user) -> {
+            if (user.getPromotion() != null &&
+                    user.getPromotion().getPriorityLevel() == 3 &&
+                    !user.getCountry().equals(callingUser.getCountry())) {
+                return 1;
+            }
+
+            if (user.getPromotion() != null &&
+                    !user.getPromotion().getPromotionTarget().equals(PROMOTION_TARGET)) {
+                return 1;
+            }
+
+            return user.getPromotion() != null ? 0 : 1;
+        }).thenComparing(user -> user.getPromotion() != null &&
+                user.getPromotion().getPromotionTarget().equals(PROMOTION_TARGET) ? -user.getPromotion().getPriorityLevel() : 0);
+
         return filteredUsers.stream()
-                .filter(user -> user.getPromotion() == null ||
-                        (user.getPromotion().getPromotionTarget().equals("profile")) &&
-                                user.getPromotion().getRemainingShows() > 0)
-                .sorted(Comparator.comparing(
-                                (User user) -> {
-                                    if (user.getPromotion() != null && user.getPromotion().getPriorityLevel() == 3
-                                            && !user.getCountry().equals(callingUser.getCountry())) {
-                                        return 1;
-                                    }
-                                    return user.getPromotion() != null ? 0 : 1;
-                                })
-                        .thenComparing(user -> user.getPromotion() != null ? -user.getPromotion().getPriorityLevel() : 0))
+                .sorted(countryAndPriorityComparator)
                 .toList();
     }
 
@@ -74,12 +82,12 @@ public class UserService {
                 .toList();
 
         if (!promotionIds.isEmpty()) {
-            promotionRepository.decreaseRemainingShows(promotionIds, "profile");
+            promotionRepository.decreaseRemainingShows(promotionIds, PROMOTION_TARGET);
         }
     }
 
-    private void deleteExpiredProfilePromotions(String promotionTarget) {
-        List<Promotion> expiredPromotions = promotionRepository.findAllExpiredPromotions(promotionTarget);
+    private void deleteExpiredProfilePromotions() {
+        List<Promotion> expiredPromotions = promotionRepository.findAllExpiredPromotions(UserService.PROMOTION_TARGET);
         if (!expiredPromotions.isEmpty()) {
             promotionRepository.deleteAll(expiredPromotions);
         }

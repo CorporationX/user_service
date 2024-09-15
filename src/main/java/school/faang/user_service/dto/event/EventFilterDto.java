@@ -7,5 +7,5 @@ import lombok.Data;
 @NotNull
 public class EventFilterDto {
     private String titlePattern;
-
+    private Integer maxAttendees;
 }

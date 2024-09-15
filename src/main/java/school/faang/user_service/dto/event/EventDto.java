@@ -12,4 +12,5 @@ public class EventDto {
     @NotNull
     private Long id;
     private String title;
+    private Integer maxAttendees;
 }

@@ -16,6 +16,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V008__BJS2-27196_insert_goals.sql
   - include:
-      file: db/changelog/changeset/user_V009_BJS2-27199_create_payment_sequence.xml
-  - include:
-      file: db/changelog/changeset/user_V010_BJS2-27199_create_promotion_table.sql
+      file: db/changelog/changeset/user_V010_BJS2-27199.sql

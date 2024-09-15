@@ -1,7 +1,6 @@
 package school.faang.user_service.dto.premium;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 public record PaymentResponse(
         PaymentStatus status,

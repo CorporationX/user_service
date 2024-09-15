@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.promotion.Promotion;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PromotionRepository extends CrudRepository<Promotion, Long> {
 
@@ -25,4 +26,6 @@ public interface PromotionRepository extends CrudRepository<Promotion, Long> {
 
     @Query("SELECT p FROM Promotion p WHERE p.remainingShows = 0 AND p.promotionTarget = :promotionTarget")
     List<Promotion> findAllExpiredPromotions(@Param("promotionTarget") String promotionTarget);
+
+    Optional<Promotion> findByUserId(long userId);
 }

@@ -38,7 +38,8 @@ public class RecommendationService {
         validateRecommendationSkillInSystem(recommendation);
 
         List<Long> skillIds = recommendation.getSkillOffers().stream()
-                .map(SkillOfferDto::getSkillId).toList();
+                .map(SkillOfferDto::getSkillId)
+                .toList();
 
         Long recommendationId = recommendationRepository.create(recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
         saveSkillOffers(recommendationId, skillIds);
@@ -74,14 +75,18 @@ public class RecommendationService {
         Page<Recommendation> pageRequest = recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
         List<Recommendation> recommendations = pageRequest.getContent();
 
-        return recommendations.stream().map(recommendation -> recommendationMapper.toDto(recommendation)).toList();
+        return recommendations.stream()
+                .map(recommendation -> recommendationMapper.toDto(recommendation))
+                .toList();
     }
 
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         Page<Recommendation> pageRequest = recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
         List<Recommendation> recommendations = pageRequest.getContent();
 
-        return recommendations.stream().map(recommendationMapper::toDto).toList();
+        return recommendations.stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 
     private void validateRecommendationContentIsBlank(RecommendationDto recommendation) {

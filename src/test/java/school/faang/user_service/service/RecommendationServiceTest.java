@@ -159,7 +159,8 @@ public class RecommendationServiceTest {
 
     private List<Long> skillByIds(RecommendationDto dto) {
         return dto.getSkillOffers().stream()
-                .map(SkillOfferDto::getSkillId).toList();
+                .map(SkillOfferDto::getSkillId)
+                .toList();
     }
 
     private RecommendationDto prepareData(String correctContent) {

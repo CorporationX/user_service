@@ -120,7 +120,7 @@ class UserServiceTest {
 
         verify(userRepository).findById(id);
         verify(goalService).removeGoals(List.of());
-        verify(eventService).removeEvents(List.of());
+        verify(eventService).deleteEvents(List.of());
         verify(mentorshipService).deleteMentorFromMentees(anyLong(), any());
         verify(userRepository).save(any());
     }

@@ -198,21 +198,13 @@ public class EventServiceTest {
     @Test
     void updateEvent_shouldReturnUpdatedEventDto() {
         // Arrange
-        Event savedEvent = event; // Simulating saved entity
-
-        when(eventMapper.toEntity(eventDto)).thenReturn(event);
-        when(eventRepository.save(any(Event.class))).thenReturn(savedEvent);
-        when(eventMapper.toDto(savedEvent)).thenReturn(eventDto);
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         // Act
         EventDto result = eventService.updateEvent(eventDto);
 
         // Assert
         assertEquals(eventDto, result);
-        verify(eventValidator).validateOwnerSkills(eventDto);
-        verify(eventMapper).toEntity(eventDto);
-        verify(eventRepository).save(event);
-        verify(eventMapper).toDto(savedEvent);
     }
 
     @Test

@@ -21,13 +21,13 @@ public class GoalInvitationController {
         goalInvitationService.createInvitation(invitation);
         return ResponseEntity.ok("Приглашение создано.");
     }
-    @PostMapping("/accept")
+    @PostMapping("/accept/id")
     public ResponseEntity<String> acceptGoalInvitation(@PathVariable long id){
         goalInvitationService.acceptGoalInvitation(id);
         return ResponseEntity.ok("Приглашение принято.");
     }
 
-    @DeleteMapping("/reject")
+    @DeleteMapping("/reject/id")
     public ResponseEntity<String> rejectGoalInvitation(@PathVariable long id){
         goalInvitationService.rejectGoalInvitation(id);
         return ResponseEntity.ok("Приглашение отклонено.");

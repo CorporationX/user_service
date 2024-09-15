@@ -5,23 +5,26 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final RecommendationRequestValidator recommendationRequestValidator;
+    private final List<RecommendationRequestFilter> recommendationRequestFilters;
     private final RecommendationRequestRepository repository;
     private final SkillRequestRepository skillRequestRepository;
 
@@ -30,14 +33,10 @@ public class RecommendationRequestService {
         recommendationRequestValidator.validateRequesterAndReceiver(recommendationRequestDto);
         recommendationRequestValidator.validateRequestAndCheckTimeLimit(recommendationRequestDto);
         recommendationRequestValidator.validateSkillRequest(recommendationRequestDto);
-
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
-
         recommendationRequest.getSkills().stream()
                 .forEach(skill -> skillRequestRepository.create(recommendationRequestDto.getId(), skill.getId()));
-
         RecommendationRequest createRequest = repository.save(recommendationRequest);
-
         return recommendationRequestMapper.toDto(createRequest);
     }
 
@@ -62,8 +61,12 @@ public class RecommendationRequestService {
     }
 
     @Transactional
-    public List<RecommendationRequestDto> getFilteredRecommendationRequest(Long receiverId, RequestFilterDto filters) {
-        return null;
+    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filters) {
+        Stream<RecommendationRequest> recommendationRequests = repository.findAll().stream();
+        return recommendationRequestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(recommendationRequests, filters))
+                .map(recommendationRequestMapper::toDto)
+                .toList();
     }
-
 }

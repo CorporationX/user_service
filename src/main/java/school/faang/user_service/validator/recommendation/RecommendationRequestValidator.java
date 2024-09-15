@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -25,10 +24,10 @@ public class RecommendationRequestValidator {
             throw new IllegalArgumentException("Requester and receiver cannot be the same person.");
         }
         if (!userRepository.existsById(recommendationRequestDto.getRequesterId())) {
-            throw new IllegalArgumentException("Requester does not exist.");
+            throw new IllegalArgumentException("Requester with ID " + recommendationRequestDto.getRequesterId() + " does not exist.");
         }
         if (!userRepository.existsById(recommendationRequestDto.getReceiverId())) {
-            throw new IllegalArgumentException("Receiver does not exist.");
+            throw new IllegalArgumentException("Receiver with ID " + recommendationRequestDto.getReceiverId() + " does not exist.");
         }
     }
 
@@ -44,11 +43,12 @@ public class RecommendationRequestValidator {
     }
 
     public void validateSkillRequest(RecommendationRequestDto recommendationRequestDto) {
-        recommendationRequestDto.getSkillsId().stream().forEach(skill -> {
-            if (!skillRequestRepository.existsById(skill)) {
-                throw new IllegalArgumentException("Skill with ID " + skill + " does not exist.");
-            }
-        });
+        recommendationRequestDto.getSkillsId().stream()
+                .forEach(skillId -> {
+                    if (!skillRequestRepository.existsById(skillId)) {
+                        throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");
+                    }
+                });
     }
 
 }

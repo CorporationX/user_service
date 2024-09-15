@@ -107,7 +107,8 @@ public class RecommendationService {
     private void validateRecommendationSkillInSystem(RecommendationDto recommendation) {
         List<Long> skillIds = recommendation.getSkillOffers().stream()
                 .map(SkillOfferDto::getSkillId)
-                .distinct().toList();
+                .distinct()
+                .toList();
         List<Skill> skillsFromDb = skillRepository.findAllById(skillIds);
 
         if (skillsFromDb.size() != skillIds.size()) {

@@ -48,3 +48,7 @@ springdoc:
     path: /swagger
     tagsSorter: alpha
     operationsSorter: alpha
+
+app:
+  goal:
+    max-active-per-user: 3

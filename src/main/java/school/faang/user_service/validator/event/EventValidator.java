@@ -51,10 +51,4 @@ public class EventValidator {
             throw new DataValidationException("Event owner does not have skills related to this event");
         }
     }
-
-    /*public void validateTitlePresent(EventDto eventDto) {
-        if (eventDto.title() == null || eventDto.title().isBlank()) {
-            throw new DataValidationException("Event title can not be null or empty");
-        }
-    }*/
 }

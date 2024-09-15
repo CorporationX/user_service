@@ -72,6 +72,16 @@ dicebear:
   avatars: Adventurer, Adventurer Neutral, Avataaars, Avataaars Neutral, Big Ears, Big Ears Neutral, Big Smile, Bottts, Bottts Neutral, Croodles, Croodles Neutral, Dylan, Fun Emoji, Glass, Icons, Identicon, Initials, Lorelei, Lorelei Neutral, Micah, Miniavs, Notionists, Notionists Neutral, Open Peeps, Personas, Pixel Art, Pixel Art Neutral, Rings, Shapes, Thumbs
   type: jpeg
 
+scheduler:
+  cron:
+    expression: 0 0 0 * * 0
+
+thread:
+  pool:
+    coreSize: 10
+    maxSize: 15
+    keepAliveTimeMillisecond: 500000
+    maxNumberQueues: 50000
 number-months:
   new:
     request: 6

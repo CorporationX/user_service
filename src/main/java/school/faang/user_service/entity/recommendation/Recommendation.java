@@ -46,10 +46,6 @@ public class Recommendation {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Recommendation(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")

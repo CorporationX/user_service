@@ -91,6 +91,10 @@ jsonSchema2Pojo {
     setSourceType("jsonschema")
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }
 
 tasks.bootJar {
@@ -101,17 +105,14 @@ tasks.bootJar {
  * JaCoCo settings
  */
 val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
+        "**/controller/**",
+        "**/service/**",
+        "**/validator/**",
+        "**/mapper/**"
 )
 jacoco {
     toolVersion = "0.8.9"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
-}
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
@@ -126,9 +127,9 @@ tasks.jacocoTestReport {
     }
 
     classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include(jacocoInclude)
-        }
+            sourceSets.main.get().output.asFileTree.matching {
+                include(jacocoInclude)
+            }
     )
 }
 tasks.jacocoTestCoverageVerification {
@@ -136,9 +137,9 @@ tasks.jacocoTestCoverageVerification {
         rule {
             element = "CLASS"
             classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
+                    sourceSets.main.get().output.asFileTree.matching {
+                        include(jacocoInclude)
+                    }
             )
             enabled = true
             limit {

@@ -36,5 +36,5 @@ public interface SkillOfferRepository extends CrudRepository<SkillOffer, Long> {
             """)
     List<SkillOffer> findAllByUserId(long userId);
 
-    boolean existsBySkillIdAndRecommendationId(long id, long id1);
+    boolean existsBySkillIdAndRecommendationId(long skillId, long recommendationId);
 }

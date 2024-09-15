@@ -41,8 +41,7 @@ public class RecommendationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return recommendationService.getAllUserRecommendations(
-                receiverId, pageable);
+        return recommendationService.getAllUserRecommendations(receiverId, pageable);
     }
 
     /**

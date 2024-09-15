@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 public class RecommendationServiceImpl implements RecommendationService {
@@ -36,14 +38,13 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public RecommendationDto createRecommendation(RecommendationDto recommendationDto) {
-        validateId(recommendationDto.authorId(), "Author ID");
-        validateId(recommendationDto.receiverId(), "Receiver ID");
-
         User author = userRepository.findById(recommendationDto.authorId())
-                .orElseThrow(() -> new DataValidationException("Author with id " + recommendationDto.authorId() + " not found"));
+                .orElseThrow(() -> new DataValidationException(
+                        "Author with id " + recommendationDto.authorId() + " not found"));
 
         User receiver = userRepository.findById(recommendationDto.receiverId())
-                .orElseThrow(() -> new DataValidationException("Receiver with id " + recommendationDto.receiverId() + " not found"));
+                .orElseThrow(() -> new DataValidationException(
+                        "Receiver with id " + recommendationDto.receiverId() + " not found"));
 
         Recommendation recommendation = recommendationMapper.toRecommendation(recommendationDto);
         recommendation.setAuthor(author);
@@ -59,27 +60,23 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public List<RecommendationDto> getAllUserRecommendations(long receiverId, Pageable pageable) {
-        validateId(receiverId, "Receiver ID");
         return recommendationRepository.findAllByReceiverId(receiverId, pageable)
                 .stream()
                 .map(recommendationMapper::toRecommendationDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
     public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
-        validateId(authorId, "Author ID");
         return recommendationRepository.findAllByAuthorId(authorId, pageable)
                 .stream()
                 .map(recommendationMapper::toRecommendationDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
     @Transactional
     public RecommendationDto updateRecommendation(long id, RecommendationDto recommendationDto) {
-        validateId(id, "Recommendation ID");
-
         Recommendation recommendation = recommendationRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Recommendation with id " + id + " not found"));
 
@@ -96,8 +93,6 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public void deleteRecommendation(long id) {
-        validateId(id, "Recommendation ID");
-
         Recommendation recommendation = recommendationRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Recommendation with id " + id + " not found"));
         recommendationRepository.delete(recommendation);
@@ -106,32 +101,24 @@ public class RecommendationServiceImpl implements RecommendationService {
     private void handleSkillOffers(Recommendation recommendation, List<SkillOfferDto> skillOffers) {
         List<Long> skillIds = skillOffers.stream()
                 .map(SkillOfferDto::skillId)
-                .collect(Collectors.toList());
+                .collect(toList());
 
         List<Skill> skills = skillRepository.findAllById(skillIds);
 
         Map<Long, Skill> skillsMap = skills.stream().collect(Collectors.toMap(Skill::getId, skill -> skill));
 
-        for (SkillOfferDto skillOfferDto : skillOffers) {
-            validateId(skillOfferDto.skillId(), "Skill ID");
-
+        List<SkillOffer> skillOffersToSave = skillOffers.stream().map(skillOfferDto -> {
             Skill skill = skillsMap.get(skillOfferDto.skillId());
             if (skill == null) {
                 throw new DataValidationException("Skill with id " + skillOfferDto.skillId() + " not found");
             }
 
-            SkillOffer skillOffer = SkillOffer.builder()
+            return SkillOffer.builder()
                     .skill(skill)
                     .recommendation(recommendation)
                     .build();
-            skillOfferRepository.save(skillOffer);
-        }
-    }
+        }).collect(toList());
 
-    // TODO в Util перенести? видел что в других классах тоже есть
-    private void validateId(Long id, String idType) {
-        if (id == null || id < 0) {
-            throw new DataValidationException(idType + " has incorrect value: " + id);
-        }
+        skillOfferRepository.saveAll(skillOffersToSave);
     }
 }

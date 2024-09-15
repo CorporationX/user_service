@@ -21,7 +21,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.recommendation.impl.RecommendationServiceImpl;
@@ -33,6 +32,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,13 +48,10 @@ public class RecommendationServiceImplTest {
     private RecommendationRepository recommendationRepository;
 
     @Mock
-    private SkillRepository skillRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private SkillOfferRepository skillOfferRepository;
+
+    @Mock
+    private SkillRepository skillRepository;
 
     @Spy
     private RecommendationMapper recommendationMapper = Mappers.getMapper(RecommendationMapper.class);
@@ -64,19 +61,16 @@ public class RecommendationServiceImplTest {
 
     private RecommendationDto recommendationDto;
     private Recommendation recommendation;
-    private User author;
-    private User receiver;
     private Skill skill;
+
 
     @BeforeEach
     void setUp() {
         recommendationDto = new RecommendationDto(RECOMMENDATION_ID, RECEIVER_ID, AUTHOR_ID,
                 "Recommendation content", List.of(new SkillOfferDto(SKILL_ID, RECOMMENDATION_ID, SKILL_ID)), LocalDateTime.now());
 
-        author = User.builder().id(AUTHOR_ID).build();
-        receiver = User.builder().id(RECEIVER_ID).build();
-        skill = Skill.builder().id(SKILL_ID).build();
         recommendation = Recommendation.builder().build();
+        skill = Skill.builder().id(SKILL_ID).build();
     }
 
     @Test
@@ -91,17 +85,7 @@ public class RecommendationServiceImplTest {
     }
 
     @Test
-    @DisplayName("Удаление рекомендации с корректным ID")
-    void deleteRecommendation_ShouldDeleteSuccessfully() {
-        when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.of(recommendation));
-
-        recommendationService.deleteRecommendation(RECOMMENDATION_ID);
-
-        verify(recommendationRepository).delete(recommendation);
-    }
-
-    @Test
-    @DisplayName("Получение всех рекомендаций для получателя")
+    @DisplayName("Получение всех рекомендаций для получателя с непустым ответом")
     void getAllUserRecommendations_ShouldReturnRecommendations_WhenValid() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Recommendation> recommendationPage = new PageImpl<>(List.of(recommendation));
@@ -111,11 +95,12 @@ public class RecommendationServiceImplTest {
         List<RecommendationDto> result = recommendationService.getAllUserRecommendations(RECEIVER_ID, pageable);
 
         assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
         verify(recommendationRepository).findAllByReceiverId(RECEIVER_ID, pageable);
     }
 
     @Test
-    @DisplayName("Получение всех рекомендаций от автора")
+    @DisplayName("Получение всех рекомендаций от автора с непустым ответом")
     void getAllGivenRecommendations_ShouldReturnRecommendations_WhenValid() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Recommendation> recommendationPage = new PageImpl<>(List.of(recommendation));
@@ -125,12 +110,42 @@ public class RecommendationServiceImplTest {
         List<RecommendationDto> result = recommendationService.getAllGivenRecommendations(AUTHOR_ID, pageable);
 
         assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
         verify(recommendationRepository).findAllByAuthorId(AUTHOR_ID, pageable);
     }
 
     @Test
+    @DisplayName("Обновление рекомендации: успешное обновление")
+    void updateRecommendation_ShouldUpdateSuccessfully() {
+        recommendation.setId(RECOMMENDATION_ID);
+        when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.of(recommendation));
+        when(skillRepository.findAllById(List.of(SKILL_ID))).thenReturn(List.of(skill));
+
+        doAnswer(invocation -> {
+            RecommendationDto dto = invocation.getArgument(0);
+            recommendation.setContent(dto.content());
+            recommendation.setReceiver(User.builder().id(dto.receiverId()).build());
+            recommendation.setAuthor(User.builder().id(dto.authorId()).build());
+            return null;
+        }).when(recommendationMapper).updateFromDto(recommendationDto, recommendation);
+
+        when(recommendationMapper.toRecommendationDto(recommendation)).thenReturn(recommendationDto);
+
+        RecommendationDto result = recommendationService.updateRecommendation(RECOMMENDATION_ID, recommendationDto);
+
+        assertEquals(recommendationDto, result);
+        assertEquals(recommendationDto.content(), recommendation.getContent());
+        assertEquals(recommendationDto.authorId(), recommendation.getAuthor().getId());
+        assertEquals(recommendationDto.receiverId(), recommendation.getReceiver().getId());
+
+        verify(recommendationRepository).save(recommendation);
+
+        verify(skillOfferRepository).deleteAllByRecommendationId(RECOMMENDATION_ID);
+    }
+
+    @Test
     @DisplayName("Удаление рекомендации с корректным ID")
-    void deleteRecommendation_ShouldDeleteRecommendation_WhenValid() {
+    void deleteRecommendation_ShouldDeleteSuccessfully() {
         when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.of(recommendation));
 
         recommendationService.deleteRecommendation(RECOMMENDATION_ID);

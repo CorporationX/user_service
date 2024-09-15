@@ -18,7 +18,7 @@ public class RecommendationDtoValidator {
 
     public void validateIfRecommendationContentIsBlank(RecommendationDto recommendation) {
         if (recommendation.getContent() == null || recommendation.getContent().isBlank()) {
-            throw new DataValidationException("Текст рекомендации не может быть пустым!");
+            throw new DataValidationException("The content of the recommendation cannot be empty!");
         }
     }
 
@@ -26,12 +26,13 @@ public class RecommendationDtoValidator {
         Recommendation existedRecommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                         recommendation.getAuthorId(), recommendation.getReceiverId())
-                .orElseThrow(() -> new DataValidationException("Рекомендации нет в БД"));
+                .orElseThrow(() -> new DataValidationException("Recommendation does not exist"));
 
         long month = ChronoUnit.MONTHS.between(existedRecommendation.getCreatedAt(), recommendation.getCreatedAt());
 
         if (month <= MIN_MONTH_COUNT) {
-            throw new DataValidationException("Этот автор не может дать рекомендацию этому юзеру");
+            throw new DataValidationException("Author with id " + recommendation.getAuthorId() +
+                    " can not give recommendation to user with id" + recommendation.getReceiverId());
         }
     }
 }

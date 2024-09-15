@@ -84,7 +84,7 @@ class RecommendationDtoValidatorTest {
 
             recommendationDtoValidator.validateIfRecommendationCreatedTimeIsShort(recommendationDto);
 
-            verify(recommendationRepository, times(1))
+            verify(recommendationRepository)
                     .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(),
                             recommendationDto.getReceiverId());
         }

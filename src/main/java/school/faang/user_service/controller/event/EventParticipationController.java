@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.CountDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mappers.UserMapper;
@@ -20,24 +23,25 @@ public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
     private final UserMapper userMapper;
 
-    @PostMapping(path = "/{eventId}/register/{userId}")
-    public void registerParticipant(@PathVariable("eventId") long eventId, @PathVariable("userId") long userId) {
-        eventParticipationService.registerParticipant(eventId, userId);
+    @PutMapping("/{eventId}/register")
+    public void registerParticipant(@PathVariable("eventId") long eventId, @RequestBody UserDto userDto) {
+        eventParticipationService.registerParticipant(eventId, userDto.getId());
     }
 
-    @PostMapping(path = "/{eventId}/unregister/{userId}")
-    public void unregisterParticipant(@PathVariable("eventId") long eventId, @PathVariable("userId") long userId) {
-        eventParticipationService.unregisterParticipant(eventId, userId);
+    @PutMapping("/{eventId}/unregister")
+    public void unregisterParticipant(@PathVariable("eventId") long eventId, @RequestBody UserDto userDto) {
+        eventParticipationService.unregisterParticipant(eventId, userDto.getId());
     }
 
-    @GetMapping(path = "/{eventId}/participants")
+    @GetMapping("/{eventId}/participants")
     public List<UserDto> getParticipants(@PathVariable("eventId") long eventId) {
         List<User> users = eventParticipationService.getParticipants(eventId);
         return userMapper.toDto(users);
     }
 
-    @GetMapping(path = "/{eventId}/participants-count")
-    public int getParticipantsCount(@PathVariable("eventId") long eventId) {
-        return eventParticipationService.getParticipantsCount(eventId);
+    @GetMapping("/{eventId}/participants-count")
+    public CountDto getParticipantsCount(@PathVariable("eventId") long eventId) {
+        int count = eventParticipationService.getParticipantsCount(eventId);
+        return CountDto.builder().eventId(eventId).participantsCount(count).build();
     }
 }

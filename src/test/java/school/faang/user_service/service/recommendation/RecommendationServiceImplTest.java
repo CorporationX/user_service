@@ -94,7 +94,6 @@ public class RecommendationServiceImplTest {
 
         List<RecommendationDto> result = recommendationService.getAllUserRecommendations(RECEIVER_ID, pageable);
 
-        assertFalse(result.isEmpty());
         assertEquals(1, result.size());
         verify(recommendationRepository).findAllByReceiverId(RECEIVER_ID, pageable);
     }

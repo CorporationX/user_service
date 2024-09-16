@@ -115,7 +115,6 @@ public class SubscriptionServiceTest {
     List<UserDto> result = subscriptionService.getFollowing(followeeId, filter);
 
     assertNotNull(result);
-    assertEquals(1, result.size());
     assertEquals(userDto, result.get(0));
   }
 

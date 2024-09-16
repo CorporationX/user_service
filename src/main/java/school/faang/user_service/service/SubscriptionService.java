@@ -13,7 +13,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -45,11 +44,13 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
-        userFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(users, filters));
-        return users.map(userMapper::toUserDto)
-                .collect(Collectors.toList());
+        return userFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(filters))
+                .reduce(users,
+                        ((userStream, userFilter) -> userFilter.apply(userStream, filters)),
+                        ((userStream, newUserStream) -> newUserStream))
+                .map(userMapper::toUserDto)
+                .toList();
     }
 
     public CountDto getFollowersCount(long followeeId) {
@@ -57,12 +58,14 @@ public class SubscriptionService {
     }
 
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
-        Stream<User> users = subscriptionRepository.findByFollowerId(followerId);
-        userFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(users, filters));
-        return users.map(userMapper::toUserDto)
-                .collect(Collectors.toList());
+        Stream<User> following = subscriptionRepository.findByFollowerId(followerId);
+        return userFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(filters))
+                .reduce(following,
+                        ((userStream, userFilter) -> userFilter.apply(userStream, filters)),
+                        ((userStream, newUserStream) -> newUserStream))
+                .map(userMapper::toUserDto)
+                .toList();
     }
 
     public CountDto getFollowingCount(long followerId) {

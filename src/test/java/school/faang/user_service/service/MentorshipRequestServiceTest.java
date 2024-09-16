@@ -3,35 +3,27 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto_mentorship.MentorshipRequestDto;
-import school.faang.user_service.dto_mentorship.RejectionDto;
-import school.faang.user_service.dto_mentorship.RequestFilterDto;
+import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.filter.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.filter.DescriptionFilter;
 import school.faang.user_service.filter.mentorship.filter.MentorshipRequestFilter;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.repository.MentorshipRequestRepository;
+import school.faang.user_service.repository.UserRepository;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,11 +40,7 @@ public class MentorshipRequestServiceTest {
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
 
-    private AutoCloseable autoCloseable;
     private MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
-
-    @Captor
-    private ArgumentCaptor<MentorshipRequest> argumentCaptor;
 
     @Test
     public void testRequestMentorshipGetDescriptionNotNull() {

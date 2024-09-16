@@ -28,6 +28,9 @@ public class MentorshipController {
     public void deleteMentee(
             @PathVariable("mentorId") @Min(1) long mentorId,
             @PathVariable("menteeId") @Min(1) long menteeId) {
+        if (mentorId == menteeId) {
+            throw new IllegalArgumentException("Mentor and mentee cannot be the same");
+        }
         mentorshipService.deleteMenteeOfMentor(mentorId, menteeId);
 
     }
@@ -43,6 +46,9 @@ public class MentorshipController {
     public void deleteMentor(
             @PathVariable("mentorId") @Min(1) long mentorId,
             @PathVariable("menteeId") @Min(1) long menteeId) {
+        if (mentorId == menteeId) {
+            throw new IllegalArgumentException("Mentor and mentee cannot be the same");
+        }
         mentorshipService.deleteMentorOfMentee(mentorId, menteeId);
     }
 

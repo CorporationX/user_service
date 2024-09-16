@@ -31,19 +31,17 @@ public class MentorshipServiceTest {
     private static final User USER_2 = new User();
     private static final User USER_3 = new User();
 
-    @Mock
-    private MockMvc mockMvc;
-    @Mock
-    private static MentorshipRepository mentorshipRepository;
-    @InjectMocks
-    private static MentorshipService mentorshipService;
 
+    @Mock
+    private MentorshipRepository mentorshipRepository;
+    @InjectMocks
+    private MentorshipService mentorshipService;
     @Spy
     private UserMapper userMapper;
 
     @DisplayName("Each user is a mentor and mentee of each other")
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         USER_1.setId(ID_1);
         USER_2.setId(ID_2);
         USER_3.setId(ID_3);
@@ -57,6 +55,10 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.findMenteesByMentorId(ID_1)).thenReturn(List.of(USER_2, USER_3));
         when(mentorshipRepository.findMenteesByMentorId(ID_2)).thenReturn(List.of(USER_1, USER_3));
         when(mentorshipRepository.findMenteesByMentorId(ID_3)).thenReturn(List.of(USER_1, USER_2));
+
+        when(mentorshipRepository.existsById(ID_1)).thenReturn(true);
+        when(mentorshipRepository.existsById(ID_2)).thenReturn(true);
+        when(mentorshipRepository.existsById(ID_3)).thenReturn(true);
 
         mentorshipService.getMentees(ID_1);
         verify(userMapper, times(1)).toDtos(usersCaptor.capture());
@@ -87,6 +89,10 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.findMentorsByMenteeId(ID_2)).thenReturn(List.of(USER_1, USER_3));
         when(mentorshipRepository.findMentorsByMenteeId(ID_3)).thenReturn(List.of(USER_1, USER_2));
 
+        when(mentorshipRepository.existsById(ID_1)).thenReturn(true);
+        when(mentorshipRepository.existsById(ID_2)).thenReturn(true);
+        when(mentorshipRepository.existsById(ID_3)).thenReturn(true);
+
         mentorshipService.getMentors(ID_1);
         verify(userMapper, times(1)).toDtos(usersCaptor.capture());
         List<User> first_result = usersCaptor.getValue();
@@ -109,67 +115,75 @@ public class MentorshipServiceTest {
 
     }
 
-    @DisplayName("Return emptyList if id not exist or incorrect ")
+    @Test
+    public void testGetMenteesWithIncorrectMentorId() {
+        long zeroMentorId = 0L;
+        long negativeMentorId = -1L;
+        when(mentorshipRepository.existsById(zeroMentorId)).thenReturn(false);
+        when(mentorshipRepository.existsById(negativeMentorId)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentees(zeroMentorId));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentees(negativeMentorId));
+
+        verify(mentorshipRepository, times(1)).existsById(zeroMentorId);
+        verify(mentorshipRepository, times(1)).existsById(negativeMentorId);
+    }
+
+
     @Test
     public void testGetMentorsWithIncorrectMenteeId() {
         long zeroMenteeId = 0L;
         long negativeMenteeId = -1L;
+        when(mentorshipRepository.existsById(zeroMenteeId)).thenReturn(false);
+        when(mentorshipRepository.existsById(negativeMenteeId)).thenReturn(false);
 
-        when(mentorshipRepository.findMentorsByMenteeId(zeroMenteeId))
-                .thenReturn(Collections.emptyList());
-        when(mentorshipRepository.findMentorsByMenteeId(negativeMenteeId))
-                .thenReturn(Collections.emptyList());
-        when(userMapper.toDtos(anyList()))
-                .thenReturn(Collections.emptyList());
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentors(zeroMenteeId));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentors(negativeMenteeId));
 
-        List<UserDto> resultWithZeroID = mentorshipService.getMentors(zeroMenteeId);
-        List<UserDto> resultWithNegativeID = mentorshipService.getMentors(negativeMenteeId);
-
-        assertNotNull(resultWithZeroID);
-        assertNotNull(resultWithNegativeID);
-
-        assertTrue(resultWithZeroID.isEmpty(), "Результат должен быть пустым, если menteeId равен 0");
-        assertTrue(resultWithNegativeID.isEmpty(), "Результат должен быть пустым, если menteeId отрицательный");
-
-        verify(mentorshipRepository, times(1)).findMentorsByMenteeId(zeroMenteeId);
-        verify(mentorshipRepository, times(1)).findMentorsByMenteeId(negativeMenteeId);
-        verify(userMapper, times(2)).toDtos(anyList());
+        verify(mentorshipRepository, times(1)).existsById(zeroMenteeId);
+        verify(mentorshipRepository, times(1)).existsById(negativeMenteeId);
     }
 
 
-    @DisplayName("Return emptyList if id not exist or incorrect ")
+
+    @DisplayName("Delete mentor of mentee")
     @Test
-    public void deleteMentor_ValidRequest_ShouldReturnNoContent() throws Exception {
-        long menteeId = 1L;
-        long mentorId = 2L;
+    public void deleteMentorOfMentee_ShouldCallRepository() {
+        long mentorId = 1L;
+        long menteeId = 2L;
+        when(mentorshipRepository.existsById(mentorId)).thenReturn(true);
+        when(mentorshipRepository.existsById(menteeId)).thenReturn(true);
+        mentorshipService.deleteMentorOfMentee(mentorId, menteeId);
 
-
-        mockMvc.perform(delete("/mentees/{menteeId}/mentors/{mentorId}", menteeId, mentorId))
-                .andExpect(status().isNoContent());
-
-        Mockito.verify(mentorshipService).deleteMentorOfMentee(mentorId, menteeId);
+        Mockito.verify(mentorshipRepository).deleteMentorOfMentee(mentorId, menteeId);
     }
 
-    @DisplayName("Выполняем DELETE запрос и ожидаем статус 400 Bad Request из-за отрицательного id")
+    @DisplayName("Delete mentee of mentor when only one exists")
     @Test
-    public void deleteMentor_InvalidMenteeId_ShouldReturnBadRequest() throws Exception {
-        long menteeId = -1L;
-        long mentorId = 2L;
+    public void deleteMenteeOfMentor_ShouldCallRepository() {
+        long mentorId = 1L;
+        long menteeId = 2L;
 
+        when(mentorshipRepository.existsById(mentorId)).thenReturn(true);
+        when(mentorshipRepository.existsById(menteeId)).thenReturn(true);
 
-        mockMvc.perform(delete("/mentees/{menteeId}/mentors/{mentorId}", menteeId, mentorId))
-                .andExpect(status().isBadRequest());
+        mentorshipService.deleteMenteeOfMentor(mentorId, menteeId);
+
+        verify(mentorshipRepository).deleteMenteeOfMentor(mentorId, menteeId);
     }
 
-    @DisplayName("Выполняем DELETE запрос и ожидаем статус 400 Bad Request из-за id=0")
+    @DisplayName("Throw exception if mentor or mentee does not exist when deleting mentee of mentor")
     @Test
-    public void deleteMentor_InvalidMentorId_ShouldReturnBadRequest() throws Exception {
-        long menteeId = 1L;
-        long mentorId = 0L;
+    public void deleteMenteeOfMentor_ShouldThrowException() {
+        long mentorId = 1L;
+        long menteeId = 2L;
 
+        when(mentorshipRepository.existsById(mentorId)).thenReturn(true);
+        when(mentorshipRepository.existsById(menteeId)).thenReturn(false);
 
-        mockMvc.perform(delete("/mentees/{menteeId}/mentors/{mentorId}", menteeId, mentorId))
-                .andExpect(status().isBadRequest());
+        assertThrows(IllegalArgumentException.class, () ->
+                mentorshipService.deleteMenteeOfMentor(mentorId, menteeId)
+        );
     }
 
 }

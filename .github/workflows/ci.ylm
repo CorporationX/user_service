@@ -1,9 +1,6 @@
 name: build & test unit
 
 on:
-  push:
-    branches:
-      - chimera-master-stream6
   pull_request:
     branches:
       - chimera-master-stream6

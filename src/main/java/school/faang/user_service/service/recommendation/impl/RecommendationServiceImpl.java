@@ -2,6 +2,7 @@ package school.faang.user_service.service.recommendation.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationDto;
@@ -23,10 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationServiceImpl implements RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
@@ -38,13 +38,22 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public RecommendationDto createRecommendation(RecommendationDto recommendationDto) {
+        log.info("Начало создания рекомендации от пользователя с id {} для пользователя с id {}",
+                recommendationDto.authorId(), recommendationDto.receiverId());
+
         User author = userRepository.findById(recommendationDto.authorId())
-                .orElseThrow(() -> new DataValidationException(
-                        "Author with id " + recommendationDto.authorId() + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Автор с id {} не найден", recommendationDto.authorId());
+                    return new DataValidationException(
+                            "Author with id " + recommendationDto.authorId() + " not found");
+                });
 
         User receiver = userRepository.findById(recommendationDto.receiverId())
-                .orElseThrow(() -> new DataValidationException(
-                        "Receiver with id " + recommendationDto.receiverId() + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Получатель с id {} не найден", recommendationDto.receiverId());
+                    return new DataValidationException(
+                            "Receiver with id " + recommendationDto.receiverId() + " not found");
+                });
 
         Recommendation recommendation = recommendationMapper.toRecommendation(recommendationDto);
         recommendation.setAuthor(author);
@@ -52,6 +61,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendation.setCreatedAt(LocalDateTime.now());
 
         recommendationRepository.save(recommendation);
+        log.debug("Рекомендация с id {} успешно сохранена", recommendation.getId());
 
         handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
@@ -60,31 +70,50 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public List<RecommendationDto> getAllUserRecommendations(long receiverId, Pageable pageable) {
-        return recommendationRepository.findAllByReceiverId(receiverId, pageable)
+        log.info("Получение всех рекомендаций для пользователя с id {}", receiverId);
+
+        List<RecommendationDto> recommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable)
                 .stream()
                 .map(recommendationMapper::toRecommendationDto)
-                .collect(toList());
+                .toList();
+
+        log.debug("Найдено {} рекомендаций для пользователя с id {}", recommendations.size(), receiverId);
+        return recommendations;
     }
 
     @Override
     public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
-        return recommendationRepository.findAllByAuthorId(authorId, pageable)
+        log.info("Получение всех рекомендаций, созданных пользователем с id {}", authorId);
+
+        List<RecommendationDto> recommendations = recommendationRepository.findAllByAuthorId(authorId, pageable)
                 .stream()
                 .map(recommendationMapper::toRecommendationDto)
-                .collect(toList());
+                .toList();
+
+        log.debug("Пользователь с id {} создал {} рекомендаций", authorId, recommendations.size());
+        return recommendations;
     }
 
     @Override
     @Transactional
     public RecommendationDto updateRecommendation(long id, RecommendationDto recommendationDto) {
+        log.info("Обновление рекомендации с id {}", id);
+
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Recommendation with id " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Рекомендация с id {} не найдена", id);
+                    return new DataValidationException("Recommendation with id " + id + " not found");
+                });
 
         recommendationMapper.updateFromDto(recommendationDto, recommendation);
         recommendation.setUpdatedAt(LocalDateTime.now());
 
         recommendationRepository.save(recommendation);
+        log.debug("Рекомендация с id {} успешно обновлена", id);
+
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        log.debug("Предложения по навыкам для рекомендации с id {} удалены", id);
+
         handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
         return recommendationMapper.toRecommendationDto(recommendation);
@@ -93,23 +122,34 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public void deleteRecommendation(long id) {
+        log.info("Удаление рекомендации с id {}", id);
+
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Recommendation with id " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.error("Рекомендация с id {} не найдена", id);
+                    return new DataValidationException("Recommendation with id " + id + " not found");
+                });
+
         recommendationRepository.delete(recommendation);
+        log.debug("Рекомендация с id {} успешно удалена", id);
     }
 
     private void handleSkillOffers(Recommendation recommendation, List<SkillOfferDto> skillOffers) {
+        log.debug("Обработка предложений по навыкам для рекомендации с id {}", recommendation.getId());
+
         List<Long> skillIds = skillOffers.stream()
                 .map(SkillOfferDto::skillId)
-                .collect(toList());
+                .toList();
 
         List<Skill> skills = skillRepository.findAllById(skillIds);
 
-        Map<Long, Skill> skillsMap = skills.stream().collect(Collectors.toMap(Skill::getId, skill -> skill));
+        Map<Long, Skill> skillsMap = skills.stream()
+                .collect(Collectors.toMap(Skill::getId, skill -> skill));
 
         List<SkillOffer> skillOffersToSave = skillOffers.stream().map(skillOfferDto -> {
             Skill skill = skillsMap.get(skillOfferDto.skillId());
             if (skill == null) {
+                log.error("Навык с id {} не найден", skillOfferDto.skillId());
                 throw new DataValidationException("Skill with id " + skillOfferDto.skillId() + " not found");
             }
 
@@ -117,8 +157,9 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .skill(skill)
                     .recommendation(recommendation)
                     .build();
-        }).collect(toList());
+        }).toList();
 
         skillOfferRepository.saveAll(skillOffersToSave);
+        log.debug("Предложения по навыкам для рекомендации с id {} успешно сохранены", recommendation.getId());
     }
 }

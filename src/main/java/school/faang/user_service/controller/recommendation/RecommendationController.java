@@ -53,8 +53,7 @@ public class RecommendationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return recommendationService.getAllGivenRecommendations(
-                authorId, pageable);
+        return recommendationService.getAllGivenRecommendations(authorId, pageable);
     }
 
     /**
@@ -64,8 +63,7 @@ public class RecommendationController {
     public RecommendationDto updateRecommendation(
             @PathVariable long id,
             @RequestBody @Valid RecommendationDto recommendationDto) {
-        return recommendationService.updateRecommendation(
-                id, recommendationDto);
+        return recommendationService.updateRecommendation(id, recommendationDto);
     }
 
     /**

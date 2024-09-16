@@ -69,8 +69,10 @@ public class RecommendationServiceTest {
         dto.setReceiverId(2L);
         dto.setContent("content");
         dto.setCreatedAt(lastDate);
+        Recommendation recommendation = new Recommendation();
+        recommendation.setCreatedAt(lastDate);
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L))
-                .thenReturn(Optional.of(new Recommendation(lastDate)));
+                .thenReturn(Optional.of(recommendation));
 
         Throwable exception = assertThrows(DataValidationException.class, () -> recommendationService.create(dto));
         assertEquals("It is impossible to make a recommendation before 6 months have passed", exception.getMessage());

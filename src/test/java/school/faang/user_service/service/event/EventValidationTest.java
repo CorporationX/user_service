@@ -133,7 +133,7 @@ class EventValidationTest {
 
     @Test
     void testValidateEventDtoToValidArgs() {
-        eventValidation.validateEventDto(validEventDto);
+        assertDoesNotThrow(() -> eventValidation.validateEventDto(validEventDto));
     }
 
     @Test

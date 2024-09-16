@@ -47,7 +47,7 @@ public class EventServiceTest {
     EventMapper eventMapper;
 
     @Mock
-    List<EventFilter> eventFilters;
+    List<EventServiceImpl.EventFilter> eventFilters;
 
     @Mock
     SkillRepository skillRepository;

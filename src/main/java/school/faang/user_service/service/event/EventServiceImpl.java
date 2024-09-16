@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
-import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
@@ -12,6 +13,7 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.filter.EventFilter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
@@ -38,14 +40,14 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toDto(event);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public EventDto getEvent(long eventId) {
          return eventMapper.toDtoOp(eventRepository.findById(eventId));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
-        Stream<Event> eventList = new ArrayList<>(eventRepository.findAll()).stream();
+        Stream<Event> eventList = eventRepository.findAll().stream();
         return eventMapper.toDtoList(eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .reduce(eventList,
@@ -62,35 +64,36 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void updateEvent(EventDto eventDto) {
         skillCheck(eventDto);
-        var event = eventMapper.toEntity(eventDto);
-        eventRepository.deleteById(event.getId());
         eventRepository.save(eventMapper.toEntity(eventDto));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<EventDto> getOwnedEvents(long userId) {
         List<Event> eventList = eventRepository.findAllByUserId(userId);
         return eventMapper.toDtoList(eventList);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<EventDto> getParticipatedEvents(long userId) {
         List<Event> events = eventRepository.findParticipatedEventsByUserId(userId);
         return events.stream().map(eventMapper::toDto).toList();
     }
 
     private void skillCheck(EventDto eventDto) {
-        List<Long> userSkill = skillRepository.findSkillsOfferedToUser(eventDto.getOwnerId()).stream().map(Skill::getId).toList();
+        List<Long> eventSkill = eventDto.getRelatedSkillsIds();
 
-        Set<Long> userSkillSet = new HashSet<>(userSkill);
-
-        List<Long> eventSill = eventDto.getRelatedSkillsIds();
-
-        if (eventSill == null) {
+        if (eventSkill == null) {
             throw new DataValidationException("Список связанных навыков не может быть пустым");
         }
 
-        if (!userSkillSet.containsAll(eventSill)) {
+        List<Long> userSkill = skillRepository.findSkillsOfferedToUser(eventDto.getOwnerId())
+                .stream()
+                .map(Skill::getId)
+                .toList();
+
+        Set<Long> userSkillSet = new HashSet<>(userSkill);
+
+        if (!userSkillSet.containsAll(eventSkill)) {
             throw new DataValidationException("Пользователь не имеет всех необходимых навыков");
         }
     }

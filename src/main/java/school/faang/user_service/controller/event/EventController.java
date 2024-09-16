@@ -1,7 +1,7 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -9,14 +9,14 @@ import school.faang.user_service.service.event.EventServiceImpl;
 
 import java.util.List;
 
-@Component
+@Controller
 @RequiredArgsConstructor
 public class EventController {
 
     private final EventServiceImpl eventServiceImpl;
 
     public EventDto create(EventDto event) {
-        validateForCreate(event);
+        validate(event);
         eventServiceImpl.create(event);
         return event;
     }
@@ -34,7 +34,7 @@ public class EventController {
     }
 
     public void updateEvent(EventDto event) {
-        validateForUpdate(event);
+        validate(event);
         eventServiceImpl.updateEvent(event);
     }
 
@@ -46,13 +46,7 @@ public class EventController {
        return eventServiceImpl.getParticipatedEvents(userId);
     }
 
-    private void validateForCreate(EventDto event) {
-        if (event.getTitle() == null || event.getTitle().isBlank() || event.getOwnerId() == null || event.getStartDate() == null) {
-            throw new DataValidationException("Обязательный поля пустые");
-        }
-    }
-
-    private void validateForUpdate(EventDto event) {
+    private void validate(EventDto event) {
         if (event.getTitle() == null || event.getTitle().isBlank() || event.getOwnerId() == null || event.getStartDate() == null) {
             throw new DataValidationException("Обязательный поля пустые");
         }

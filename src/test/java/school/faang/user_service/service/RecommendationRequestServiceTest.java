@@ -116,8 +116,8 @@ public class RecommendationRequestServiceTest {
                 )),
                 2L,
                 3L,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                dto.createdAt(),
+                dto.updatedAt()
         );
         request = RecommendationRequest.builder()
                 .id(1L)

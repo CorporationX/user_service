@@ -1,0 +1,29 @@
+name: build & test unit
+
+on:
+  push:
+    branches:
+      - chimera-master-stream6
+  pull_request:
+    branches:
+      - chimera-master-stream6
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: build with Gradle
+        run: ./gradlew build test

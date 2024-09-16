@@ -196,8 +196,8 @@ public class RecommendationRequestServiceTest {
                 new ArrayList<>(),
                 2L,
                 3L,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                dto.createdAt(),
+                dto.updatedAt()
         );
         when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
         when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));
@@ -219,8 +219,8 @@ public class RecommendationRequestServiceTest {
                 null,
                 2L,
                 3L,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                dto.createdAt(),
+                dto.updatedAt()
         );
         when(userRepository.findById(dto.requesterId())).thenReturn(Optional.of(User.builder().id(dto.requesterId()).build()));
         when(userRepository.findById(dto.receiverId())).thenReturn(Optional.of(User.builder().id(dto.receiverId()).build()));

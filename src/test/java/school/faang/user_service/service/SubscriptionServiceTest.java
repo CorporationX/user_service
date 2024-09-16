@@ -82,6 +82,8 @@ public class SubscriptionServiceTest {
         List<UserDto> followers = subscriptionService.getFollowers(1L, new UserFilterDto());
 
         assertEquals(2, followers.size());
+        assertEquals(1L,followers.get(0).id());
+        assertEquals(2L,followers.get(1).id());
     }
 
     @Test

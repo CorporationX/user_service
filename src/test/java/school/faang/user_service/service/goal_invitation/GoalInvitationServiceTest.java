@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal_invitation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +15,8 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.GoalInvitationService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -153,7 +155,7 @@ public class GoalInvitationServiceTest {
     @Test
     @DisplayName("+ Accept")
     public void testAcceptInvitation() {
-        acceptPrepareData(true, true, true);
+        acceptPrepareData(true, true, true, false);
         int goalUsersInitial = testGoal.getUsers().size();
         int userGoalsInitial = invited.getGoals().size();
 
@@ -181,7 +183,7 @@ public class GoalInvitationServiceTest {
     @Test
     @DisplayName("- Accept: invalid invitation")
     public void testAcceptInvitation_invalidId() {
-        acceptPrepareData(false, false, false);
+        acceptPrepareData(false, false, false, false);
         assertThrows(IllegalArgumentException.class,
                 () -> goalInvitationService.acceptGoalInvitation(testInvitation.getId()));
     }
@@ -189,7 +191,7 @@ public class GoalInvitationServiceTest {
     @Test
     @DisplayName("- Accept: invalid goal")
     public void testAcceptInvitation_invalidGoal() {
-        acceptPrepareData(true, false, false);
+        acceptPrepareData(true, false, false, false);
         assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(testInvitation.getId()));
     }
@@ -197,7 +199,7 @@ public class GoalInvitationServiceTest {
     @Test
     @DisplayName("- Accept: invited working on goal")
     public void testAcceptInvitation_invitedWorkingOnGoal() {
-        acceptPrepareData(true, true, false);
+        acceptPrepareData(true, true, false, false);
         invited.getGoals().add(testGoal);
         assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(testInvitation.getId()));
@@ -206,12 +208,15 @@ public class GoalInvitationServiceTest {
     @Test
     @DisplayName("- Accept: invited max active goals count")
     public void testAcceptInvitation_maxActiveGoalsCount() {
-        acceptPrepareData(true, true, true);
+        acceptPrepareData(true, true, true, true);
         assertThrows(IllegalStateException.class,
                 () -> goalInvitationService.acceptGoalInvitation(testInvitation.getId()));
     }
 
-    private void acceptPrepareData(boolean invValid, boolean goalValid, boolean activeGoalsActive) {
+    private void acceptPrepareData(boolean invValid,
+                                   boolean goalValid,
+                                   boolean activeGoalsActive,
+                                   boolean maxActiveGoalsReached) {
         if (invValid) {
             when(goalInvitationRepository.findById(testInvitation.getId()))
                     .thenReturn(Optional.of(testInvitation));
@@ -222,7 +227,7 @@ public class GoalInvitationServiceTest {
         }
         if (activeGoalsActive) {
             when(goalRepository.countActiveGoalsPerUser(invited.getId()))
-                    .thenReturn(2);
+                    .thenReturn(maxActiveGoalsReached ? 3 : 2);
         }
     }
 

@@ -3,10 +3,10 @@ name: unicorn-ci-user-service
 on:
   push:
     branches:
-      - unicorn-master-stream6
+      - pipline-BC-26087
   pull_request:
     branches:
-      - unicorn-master-stream6
+      - pipline-BC-26087
 
 permissions:
   pull-requests: write

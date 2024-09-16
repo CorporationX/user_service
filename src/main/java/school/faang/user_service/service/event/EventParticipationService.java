@@ -17,39 +17,36 @@ public class EventParticipationService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void registerParticipant(long eventId, long userId) {
-        if (!eventParticipationRepository.existsById(eventId)) {
-            throw new RuntimeException("Event does not exist");
-        }
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
-        List<User> allParticipants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        if (allParticipants.contains(user)) {
-            throw new RuntimeException("User already registered");
-        }
+    public void registerParticipant(Long eventId, Long userId) {
+        validateEventAndUserIds(eventId, userId);
         eventParticipationRepository.register(eventId, userId);
     }
 
     @Transactional
-    public void unregisterParticipant(long eventId, long userId) {
-        if (!eventParticipationRepository.existsById(eventId)) {
-            throw new RuntimeException("Event does not exist");
-        }
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
-        List<User> allParticipants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        if (!allParticipants.contains(user)) {
-            throw new RuntimeException("User was not registered");
-        }
+    public void unregisterParticipant(Long eventId, Long userId) {
+        validateEventAndUserIds(eventId, userId);
         eventParticipationRepository.unregister(eventId, userId);
     }
 
-    public List<User> getParticipant(long eventId) {
+    public List<User> getParticipant(Long eventId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 
-    public long getParticipantsCount(long eventId) {
+    public long getParticipantsCount(Long eventId) {
         return eventParticipationRepository
                 .findAllParticipantsByEventId(eventId)
                 .stream()
                 .count();
+    }
+
+    public void validateEventAndUserIds(Long eventId, Long userId){
+        if (!eventParticipationRepository.existsById(eventId)) {
+            throw new IllegalArgumentException("Event does not exist");
+        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User does not exist"));
+        List<User> allParticipants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        if (allParticipants.contains(user)) {
+            throw new IllegalArgumentException("User already registered");
+        }
     }
 }

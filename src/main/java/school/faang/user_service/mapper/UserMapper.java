@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-    UserDto toDTO(User user);
+    UserDto toDto(User user);
 
-    List<UserDto> toDTOs(List<User> users);
+    List<UserDto> toDtos(List<User> users);
 }

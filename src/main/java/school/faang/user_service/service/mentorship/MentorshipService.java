@@ -20,12 +20,12 @@ public class MentorshipService {
 
     public List<UserDto> getMentees(long mentorId) {
         List<User> mentees = mentorshipRepository.findMenteesByMentorId(mentorId);
-        return userMapper.toDTOs(mentees);
+        return userMapper.toDtos(mentees);
     }
 
     public List<UserDto> getMentors(long menteeId) {
-        List<User> mentees = mentorshipRepository.findMentorsByMenteeId(menteeId);
-        return userMapper.toDTOs(mentees);
+        List<User> mentors = mentorshipRepository.findMentorsByMenteeId(menteeId);
+        return userMapper.toDtos(mentors);
     }
 
     @Transactional

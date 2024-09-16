@@ -3,6 +3,7 @@ package school.faang.user_service.controller.mentorship;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
@@ -17,13 +18,12 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
 
     @GetMapping("/mentors/{mentorId}/mentees")
-    public ResponseEntity<List<UserDto>> getMentees(
+    public List<UserDto> getMentees(
             @PathVariable("mentorId") @Min(1) long mentorId) {
-        List<UserDto> mentees = mentorshipService.getMentees(mentorId);
-        return ResponseEntity.ok(mentees);
+        return mentorshipService.getMentees(mentorId);
     }
 
-    @ResponseStatus
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/mentors/{mentorId}/mentees/{menteeId}")
     public void deleteMentee(
             @PathVariable("mentorId") @Min(1) long mentorId,
@@ -33,13 +33,12 @@ public class MentorshipController {
     }
 
     @GetMapping("/mentees/{menteeId}/mentors")
-    public ResponseEntity<List<UserDto>> getMentors(
+    public List<UserDto> getMentors(
             @PathVariable("menteeId") @Min(1) long menteeId) {
-        List<UserDto> mentors = mentorshipService.getMentors(menteeId);
-        return ResponseEntity.ok(mentors);
+        return mentorshipService.getMentors(menteeId);
     }
 
-    @ResponseStatus
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/mentees/{menteeId}/mentors/{mentorId}")
     public void deleteMentor(
             @PathVariable("mentorId") @Min(1) long mentorId,

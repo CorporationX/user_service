@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
+    private final int MONTHS = 3;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
@@ -26,23 +27,20 @@ public class MentorshipRequestValidator {
         }
     }
 
-    public MentorshipRequest checkingUsersInRepository(MentorshipRequestDto mentorshipRequestDto) {
-        MentorshipRequest requestEntity = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
-
-        requestEntity.setRequester(userRepository.findById(mentorshipRequestDto.getRequesterId())
+    public MentorshipRequestDto checkingUsersInRepository(MentorshipRequestDto mentorshipRequestDto) {
+        mentorshipRequestDto.setRequesterId(userRepository.findById(mentorshipRequestDto.getRequesterId())
                 .orElseThrow(() -> new NoSuchElementException("Requester %s not found".formatted(mentorshipRequestDto
-                        .getRequesterId()))));
+                        .getRequesterId()))).getId());
 
-        requestEntity.setReceiver(userRepository.findById(mentorshipRequestDto.getReceiverId())
+        mentorshipRequestDto.setReceiverId(userRepository.findById(mentorshipRequestDto.getReceiverId())
                 .orElseThrow(() -> new NoSuchElementException("Receiver %s not found".formatted(mentorshipRequestDto
-                        .getRequesterId()))));
+                        .getRequesterId()))).getId());
 
-        return requestEntity;
+        return mentorshipRequestDto;
     }
 
-    public void checkingForIdenticalIdsUsers(MentorshipRequest requestEntity) {
-        if (requestEntity.getRequester()
-                .equals(requestEntity.getReceiver())) {
+    public void checkingForIdenticalIdsUsers(MentorshipRequestDto requestDto) {
+        if (requestDto.getRequesterId().equals(requestDto.getReceiverId())) {
             throw new NoSuchElementException("Your request cannot be accepted");
         }
     }
@@ -52,11 +50,13 @@ public class MentorshipRequestValidator {
                 .findAllByRequesterId(mentorshipRequestDto.getRequesterId());
 
         MentorshipRequest lastMentorshipRequest = mentorshipRequestList.stream()
-                .sorted(Comparator.comparing(MentorshipRequest::getCreatedAt)).findFirst().get();
+                .sorted(Comparator.comparing(MentorshipRequest::getCreatedAt))
+                .findFirst()
+                .get();
 
         LocalDateTime lastRequestDate = lastMentorshipRequest.getCreatedAt();
 
-        if (!LocalDateTime.now().isAfter(lastRequestDate.plusMonths(3))) {
+        if (!LocalDateTime.now().isAfter(lastRequestDate.plusMonths(MONTHS))) {
             throw new RuntimeException("Request limit exceeded");
         }
     }

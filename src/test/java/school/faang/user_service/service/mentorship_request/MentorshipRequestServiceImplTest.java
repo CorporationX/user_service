@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship_request;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,95 +16,40 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.mentorship.filter.DescriptionFilter;
 import school.faang.user_service.filter.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.RejectionMapper;
 import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipRequestServiceTest {
+public class MentorshipRequestServiceImplTest {
     @InjectMocks
-    private MentorshipRequestService mentorshipRequestService;
+    private MentorshipRequestServiceImpl mentorshipRequestService;
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private MentorshipRequestValidator validator;
+    @Spy
+    private RejectionMapper rejectionMapper = Mappers.getMapper(RejectionMapper.class);
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
 
     private MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+    private final Long ID = 1l;
 
     @Test
-    public void testRequestMentorshipGetDescriptionNotNull() {
-        prepareData(null);
-    }
-
-    @Test
-    public void testRequestMentorshipWithExistingDescription() {
-        prepareData("  ");
-    }
-
-    private void prepareData(String string) {
-        mentorshipRequestDto.setDescription(string);
-
-        assertThrows(NoSuchElementException.class,
-                () -> mentorshipRequestService.mentorshipRequestValidation(mentorshipRequestDto));
-    }
-
-    @Test
-    public void testRequestMentorshipFindByIdRequester() {
-        when(userRepository.findById(mentorshipRequestDto.getRequesterId())).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class,
-                () ->  mentorshipRequestService.requestMentorship(mentorshipRequestDto));
-    }
-
-    @Test
-    public void testGivenNonExistReceiverWhenFindByIdThenThrowException() {
-        mentorshipRequestDto.setDescription("Description");
-
-        when(userRepository.findById(mentorshipRequestDto.getRequesterId())).thenReturn(Optional.of(mock(User.class)));
-        when(userRepository.findById(mentorshipRequestDto.getReceiverId())).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class,
-                () ->  mentorshipRequestService.requestMentorship(mentorshipRequestDto));
-    }
-
-    @Test
-    public void testCheckingForIdenticalIdsUsers() {
-        User user1 = new User();
-        User user2 = new User();
-        user1.setId(1l);
-        user2.setId(1l);
-        MentorshipRequest requestEntity = mock(MentorshipRequest.class);
-
-        when(requestEntity.getRequester()).thenReturn(user1);
-        when(requestEntity.getReceiver()).thenReturn(user2);
-
-        assertThrows(NoSuchElementException.class, () ->
-                        mentorshipRequestService.checkingForIdenticalIdsUsers(requestEntity));
-
-    }
-
-    @Test
-    public void testCheckingForIdenticalIdsUsersDoesNotThrowException() {
-        User user1 = new User();
-        User user2 = new User();
-        user1.setId(1l);
-        user2.setId(2l);
-        MentorshipRequest requestEntity = mock(MentorshipRequest.class);
-
-        when(requestEntity.getRequester()).thenReturn(user1);
-        when(requestEntity.getReceiver()).thenReturn(user2);
-
-        assertDoesNotThrow(() ->
-                        mentorshipRequestService.checkingForIdenticalIdsUsers(requestEntity));
+    public void testRequestMentorship() {
+        when(validator.checkingUsersInRepository(mentorshipRequestDto)).thenReturn(mentorshipRequestDto);
+        assertThat(mentorshipRequestService.requestMentorship(mentorshipRequestDto)).isNotNull();
     }
 
     @Test
@@ -126,42 +71,12 @@ public class MentorshipRequestServiceTest {
         expected.setRequesterId(1l);
         expected.setReceiverId(2l);
 
-        mentorshipRequestService = new MentorshipRequestService(mentorshipRequestRepository, userRepository,
-                mentorshipRequestMapper, filters);
+        mentorshipRequestService = new MentorshipRequestServiceImpl(mentorshipRequestRepository,
+                mentorshipRequestMapper, filters, validator, rejectionMapper);
 
         List<MentorshipRequestDto> result = mentorshipRequestService.getRequests(filterDto);
 
         assertThat(result).isEqualTo(List.of(expected));
-    }
-
-    @Test
-    public void testSpamCheckNoRequestWithinThreeMonths() {
-        mentorshipRequestDto.setRequesterId(1L);
-
-        MentorshipRequest oldRequest = new MentorshipRequest();
-        oldRequest.setCreatedAt(LocalDateTime.now().minusMonths(4));
-
-        when(mentorshipRequestRepository.findAllByRequesterId(1L)).thenReturn(Collections.singletonList(oldRequest));
-        assertDoesNotThrow(() -> mentorshipRequestService.spamCheck(mentorshipRequestDto));
-    }
-
-    @Test
-    public void testSpamCheckRequestWithinThreeMonths() {
-        mentorshipRequestDto.setRequesterId(1L);
-
-        MentorshipRequest recentRequest = new MentorshipRequest();
-        recentRequest.setCreatedAt(LocalDateTime.now().minusMonths(2));
-
-        when(mentorshipRequestRepository.findAllByRequesterId(1L)).thenReturn(Collections.singletonList(recentRequest));
-        assertThrows(RuntimeException.class, () -> mentorshipRequestService.spamCheck(mentorshipRequestDto));
-    }
-
-    @Test
-    public void testSpamCheckNoRequestsFound() {
-        mentorshipRequestDto.setRequesterId(1L);
-
-        when(mentorshipRequestRepository.findAllByRequesterId(1L)).thenReturn(Collections.emptyList());
-        assertThrows(RuntimeException.class, () -> mentorshipRequestService.spamCheck(mentorshipRequestDto));
     }
 
     private List<MentorshipRequest> prepareRequests() {
@@ -200,34 +115,32 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testGetRequestByIdDoesNotException() {
-        long id = 1l;
-        MentorshipRequest mentorshipRequest = new MentorshipRequest();
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
 
-        assertDoesNotThrow(() -> mentorshipRequestService.getRequestById(id));
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.of(mentorshipRequest));
+
+        assertDoesNotThrow(() -> mentorshipRequestService.getRequestById(ID));
     }
 
     @Test
     public void testGetRequestByIdException() {
-        long id = 1l;
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> mentorshipRequestService.getRequestById(id));
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> mentorshipRequestService.getRequestById(ID));
     }
 
     @Test
     public void testAcceptRequest() {
-        long id = 1l;
         List<MentorshipRequest> requests = prepareRequests();
         MentorshipRequest request = requests.get(0);
         request.setStatus(RequestStatus.PENDING);
         User requester = request.getRequester();
         requester.setMentors(new ArrayList<>());
 
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(request));
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.of(request));
         when(mentorshipRequestRepository.existAcceptedRequest(request.getRequester().getId(),
                 request.getReceiver().getId())).thenReturn(false);
 
-        mentorshipRequestService.acceptRequest(id);
+        mentorshipRequestService.acceptRequest(ID);
 
         assertTrue(request.getRequester().getMentors().contains(request.getReceiver()));
         assertEquals(RequestStatus.ACCEPTED, request.getStatus());
@@ -253,21 +166,20 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void rejectRequestSuccess() {
-        long id = 1L;
         String rejectionReason = "The request was not suitable.";
         RejectionDto rejectionDto = new RejectionDto();
         rejectionDto.setRejectionReason(rejectionReason);
 
         MentorshipRequest entity = new MentorshipRequest();
         entity.setDescription("A valid description");
+        entity.setStatus(RequestStatus.PENDING);
 
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.of(entity));
 
-        RejectionDto expectedDto = new RejectionDto();
-        expectedDto.setRejectionReason(rejectionReason);
-        when(mentorshipRequestMapper.toDto(id, entity)).thenReturn(expectedDto);
+        mentorshipRequestDto.setRejectionReason(rejectionReason);
+        mentorshipRequestDto.setStatus(RequestStatus.REJECTED);
 
-        RejectionDto result = mentorshipRequestService.rejectRequest(id, rejectionDto);
+        RejectionDto result = mentorshipRequestService.rejectRequest(ID, rejectionDto);
 
         assertNotNull(result);
         assertEquals(rejectionReason, result.getRejectionReason());
@@ -277,40 +189,37 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void rejectRequestNoDescription() {
-        long id = 1L;
         RejectionDto rejectionDto = new RejectionDto();
         rejectionDto.setRejectionReason("Some reason");
 
         MentorshipRequest entity = new MentorshipRequest();
         entity.setDescription(null);
 
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.of(entity));
 
         assertThrows(NoSuchElementException.class, () ->
-            mentorshipRequestService.rejectRequest(id, rejectionDto));
+                mentorshipRequestService.rejectRequest(ID, rejectionDto));
     }
 
     @Test
     void rejectRequestEmptyDescription() {
-        long id = 1L;
         RejectionDto rejectionDto = new RejectionDto();
         rejectionDto.setRejectionReason("Some reason");
 
         MentorshipRequest entity = new MentorshipRequest();
         entity.setDescription(" ");
 
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.of(entity));
         assertThrows(NoSuchElementException.class, () ->
-            mentorshipRequestService.rejectRequest(id, rejectionDto));
+                mentorshipRequestService.rejectRequest(ID, rejectionDto));
     }
 
     @Test
     void rejectRequestRequestNotFound() {
-        long id = 1L;
         RejectionDto rejectionDto = new RejectionDto();
         rejectionDto.setRejectionReason("Some reason");
 
-        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> mentorshipRequestService.rejectRequest(id, rejectionDto));
+        when(mentorshipRequestRepository.findById(ID)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> mentorshipRequestService.rejectRequest(ID, rejectionDto));
     }
 }

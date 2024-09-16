@@ -14,7 +14,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -68,6 +67,7 @@ class SubscriptionServiceImplTest {
         user2.setEmail("email2@email.com");
 
         userDto1 = new UserDto(1L, "username1", "email1@email.com");
+
         userDto2 = new UserDto(2L, "username2", "email2@email.com");
 
         when(subscriptionRepository.findByFollowerId(anyLong())).thenReturn(Stream.of(user1, user2));

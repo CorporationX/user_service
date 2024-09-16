@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
@@ -43,6 +42,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         Stream<User> followers = subscriptionRepository.findByFollowerId(followeeId);
@@ -51,6 +51,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filters) {
         Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);

@@ -63,8 +63,8 @@ public class RecommendationRequestControllerTest {
                 null,
                 2L,
                 3L,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                dto.createdAt(),
+                dto.updatedAt()
         );
         expectedDto = new RecommendationRequestDto(
                 1L,
@@ -73,8 +73,8 @@ public class RecommendationRequestControllerTest {
                 null,
                 2L,
                 3L,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                dto.createdAt(),
+                dto.updatedAt()
         );
 
         id = 1;
@@ -91,8 +91,8 @@ public class RecommendationRequestControllerTest {
                 null,
                 2L,
                 3L,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                dto.createdAt(),
+                dto.updatedAt()
         );
 
         // Act and Assert

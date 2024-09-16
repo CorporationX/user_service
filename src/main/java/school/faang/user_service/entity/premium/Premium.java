@@ -1,4 +1,4 @@
-package school.faang.user_service.service.premium.util;
+package school.faang.user_service.entity.premium;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

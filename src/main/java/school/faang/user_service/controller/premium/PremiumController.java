@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.premium.ResponsePremiumDto;
-import school.faang.user_service.service.premium.util.Premium;
+import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.ResponsePremiumMapper;
 import school.faang.user_service.service.premium.PremiumService;

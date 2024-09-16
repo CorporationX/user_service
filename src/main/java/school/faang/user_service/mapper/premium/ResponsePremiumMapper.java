@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.premium.ResponsePremiumDto;
-import school.faang.user_service.service.premium.util.Premium;
+import school.faang.user_service.entity.premium.Premium;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ResponsePremiumMapper {

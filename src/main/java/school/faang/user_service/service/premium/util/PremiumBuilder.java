@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium.util;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 
 import java.time.LocalDateTime;

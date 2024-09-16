@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -176,6 +177,9 @@ class SkillServiceTest {
         when(userSkillGuaranteeRepository.saveAll(guarantees)).thenReturn(guarantees);
 
         Skill skill1 = skillService.acquireSkillFromOffers(skillId, userId);
-        assertEquals(skill.getId(), skill1.getId());
+        Assertions.assertThat(skill)
+                .usingRecursiveComparison()
+                .ignoringFields("createdAt", "updatedAt")
+                .isEqualTo(skill1);
     }
 }

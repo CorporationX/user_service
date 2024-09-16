@@ -32,18 +32,6 @@ public class SkillService {
         return skillRepository.save(skill);
     }
 
-    private void validateSkill(Skill skill) {
-        if (Objects.isNull(skill.getTitle()) || skill.getTitle().trim().isEmpty()) {
-            throw new DataValidationException("Skill title cannot is empty!");
-        }
-    }
-
-    private void validateUserExists(long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new DataValidationException("User is empty!");
-        }
-    }
-
     public List<Skill> getUserSkills(long userId) {
         validateUserExists(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
@@ -84,5 +72,17 @@ public class SkillService {
         userSkillGuaranteeRepository.saveAll(userSkillGuarantees);
 
         return skill;
+    }
+
+    private void validateSkill(Skill skill) {
+        if (Objects.isNull(skill.getTitle()) || skill.getTitle().trim().isEmpty()) {
+            throw new DataValidationException("Skill title cannot is empty!");
+        }
+    }
+
+    private void validateUserExists(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new DataValidationException("User is empty!");
+        }
     }
 }

@@ -104,13 +104,19 @@ tasks.bootJar {
 /**
  * JaCoCo settings
  */
+val jacocoInclude = listOf(
+    "**/controller/**",
+    "**/service/**",
+    "**/validator/**",
+    "**/mapper/**"
+)
+
 jacoco {
     version = "0.8.12"
 }
 
 tasks.test {
-    useJUnitPlatform()
-    jvmArgs = listOf("-XX:-UseSplitVerifier")
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {

@@ -19,8 +19,8 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Build
+        run: ./gradlew build --no-daemon
 
-      - name: build with Gradle
-        run: ./gradlew build test
+      - name: Build and Run Tests with Gradle
+        run: ./gradlew test --no-daemon

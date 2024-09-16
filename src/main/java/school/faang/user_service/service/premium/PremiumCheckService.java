@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
-import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.service.premium.util.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.payment.UnSuccessPaymentException;
 import school.faang.user_service.exception.premium.PremiumCheckFailureException;
@@ -40,7 +40,7 @@ public class PremiumCheckService {
 
     public void checkPaymentResponse(PaymentResponse paymentResponse, long userId, PremiumPeriod period) {
         log.info("Check payment response: {}", paymentResponse);
-        if (!paymentResponse.status().equals(PaymentStatus.SUCCESS)) {
+        if (paymentResponse.status().equals(PaymentStatus.NOT_SUCCESS)) {
             throw new UnSuccessPaymentException(UNSUCCESSFUL_PREMIUM_PAYMENT, userId, period.getDays());
         }
     }

@@ -20,8 +20,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_NOT_FOUND;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.EVENT_ALREADY_HAS_PROMOTION;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.EVENT_NOT_FOUND_PROMOTION;
-import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT;
-import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.UNSUCCESSFUL_USER_PROMOTION_PAYMENT;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.USER_ALREADY_HAS_PROMOTION;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.USER_NOT_OWNER_OF_EVENT;
 
@@ -57,21 +55,11 @@ public class PromotionCheckService {
         return event;
     }
 
-    public void checkUserPromotionPaymentResponse(PaymentResponse paymentResponse, long userId,
-                                                   PromotionTariff tariff) {
-        log.info("Check user promotion payment response: {}", paymentResponse);
+    public void checkPromotionPaymentResponse(PaymentResponse paymentResponse, long id, PromotionTariff tariff,
+                                              String errorMessage) {
+        log.info("Check promotion payment response: {}", paymentResponse);
         if (!paymentResponse.status().equals(PaymentStatus.SUCCESS)) {
-            throw new UnSuccessPaymentException(UNSUCCESSFUL_USER_PROMOTION_PAYMENT, tariff.getNumberOfViews(), userId,
-                    paymentResponse.message());
-        }
-    }
-
-    public void checkEventPromotionPaymentResponse(PaymentResponse paymentResponse, long eventId,
-                                                    PromotionTariff tariff) {
-        log.info("Check event promotion payment response: {}", paymentResponse);
-        if (!paymentResponse.status().equals(PaymentStatus.SUCCESS)) {
-            throw new UnSuccessPaymentException(UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT, tariff.getNumberOfViews(), eventId,
-                    paymentResponse.message());
+            throw new UnSuccessPaymentException(errorMessage, tariff.getNumberOfViews(), id, paymentResponse.message());
         }
     }
 }

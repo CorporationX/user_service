@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.client.payment.PaymentServiceClient;
-import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -16,12 +14,15 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.promotion.EventPromotionRepository;
 import school.faang.user_service.repository.promotion.UserPromotionRepository;
+import school.faang.user_service.service.payment.PaymentService;
+import school.faang.user_service.service.promotion.util.PromotionBuilder;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT;
+import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.UNSUCCESSFUL_USER_PROMOTION_PAYMENT;
 
 @Slf4j
 @Service
@@ -33,18 +34,20 @@ public class PromotionService {
     private final EventPromotionRepository eventPromotionRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
-    private final PaymentServiceClient paymentServiceClient;
+    private final PaymentService paymentService;
     private final PromotionTaskService promotionTaskService;
     private final PromotionCheckService promotionCheckService;
+    private final PromotionBuilder promotionBuilder;
     private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     @Transactional
     public UserPromotion buyPromotion(long userId, PromotionTariff tariff) {
+        log.info("User with id: {} buy promotion tariff: {}", userId, tariff.toString());
         User user = promotionCheckService.checkUserForPromotion(userId);
-        PaymentResponse paymentResponse = sendPayment(tariff);
-        promotionCheckService.checkUserPromotionPaymentResponse(paymentResponse, userId, tariff);
-        var promotion = new UserPromotion(null, tariff, tariff.getCoefficient(), user,
-                tariff.getNumberOfViews(), tariff.getAudienceReach(), LocalDateTime.now());
+        PaymentResponse paymentResponse = paymentService.sendPayment(tariff);
+        promotionCheckService
+                .checkPromotionPaymentResponse(paymentResponse, userId, tariff, UNSUCCESSFUL_USER_PROMOTION_PAYMENT);
+        UserPromotion promotion = promotionBuilder.getUserPromotion(user, tariff);
         if (user.getPromotion() != null) {
             userPromotionRepository.delete(user.getPromotion());
         }
@@ -53,11 +56,12 @@ public class PromotionService {
 
     @Transactional
     public EventPromotion buyEventPromotion(long userId, long eventId, PromotionTariff tariff) {
+        log.info("User with id: {} buy promotion tariff: {} for event id: {}", userId, tariff.toString(), eventId);
         Event event = promotionCheckService.checkEventForUserAndPromotion(userId, eventId);
-        PaymentResponse paymentResponse = sendPayment(tariff);
-        promotionCheckService.checkEventPromotionPaymentResponse(paymentResponse, eventId, tariff);
-        var eventPromotion = new EventPromotion(null, tariff, tariff.getCoefficient(), event,
-                tariff.getNumberOfViews(), tariff.getAudienceReach(), LocalDateTime.now());
+        PaymentResponse paymentResponse = paymentService.sendPayment(tariff);
+        promotionCheckService
+                .checkPromotionPaymentResponse(paymentResponse, eventId, tariff, UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT);
+        EventPromotion eventPromotion = promotionBuilder.getEventPromotion(event, tariff);
         if (event.getPromotion() != null) {
             eventPromotionRepository.delete(event.getPromotion());
         }
@@ -66,6 +70,7 @@ public class PromotionService {
 
     @Transactional
     public List<User> getPromotedUsersBeforeAllPerPage(int limit, int offset) {
+        log.info("Get promoted users before all per page: {} - {}", limit, offset);
         List<User> users = userRepository.findAllSortedByPromotedUsersPerPage(limit, offset);
         executorService.execute(() -> promotionTaskService.decrementUserPromotionViews(users));
         return users;
@@ -73,18 +78,9 @@ public class PromotionService {
 
     @Transactional
     public List<Event> getPromotedEventsBeforeAllPerPage(int limit, int offset) {
+        log.info("Get promoted events before all per page: {} - {}", limit, offset);
         List<Event> events = eventRepository.findAllSortedByPromotedEventsPerPage(limit, offset);
         executorService.execute(() -> promotionTaskService.decrementEventPromotionViews(events));
         return events;
-    }
-
-    private PaymentResponse sendPayment(PromotionTariff tariff) {
-        var paymentRequest = PaymentRequest
-                .builder()
-                .paymentNumber(System.currentTimeMillis())
-                .amount(BigDecimal.valueOf(tariff.getCost()))
-                .currency(tariff.getCurrency())
-                .build();
-        return paymentServiceClient.sendPayment(paymentRequest);
     }
 }

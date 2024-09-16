@@ -26,8 +26,6 @@ import static org.mockito.Mockito.when;
 import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_NOT_FOUND;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.EVENT_ALREADY_HAS_PROMOTION;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.EVENT_NOT_FOUND_PROMOTION;
-import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT;
-import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.UNSUCCESSFUL_USER_PROMOTION_PAYMENT;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.USER_ALREADY_HAS_PROMOTION;
 import static school.faang.user_service.service.promotion.util.PromotionErrorMessages.USER_NOT_OWNER_OF_EVENT;
 import static school.faang.user_service.util.premium.PremiumFabric.getPaymentResponse;
@@ -114,23 +112,12 @@ class PromotionCheckServiceTest {
 
     @Test
     @DisplayName("Given unsuccessful payment response when check then throw exception")
-    void testCheckUserPromotionPaymentResponseUnsuccessfulPayment() {
+    void testCheckPromotionPaymentResponseUnsuccessfulPayment() {
         PaymentResponse paymentResponse = getPaymentResponse(PaymentStatus.NOT_SUCCESS, MESSAGE);
 
         assertThatThrownBy(() ->
-                promotionCheckService.checkUserPromotionPaymentResponse(paymentResponse, USER_ID, TARIFF))
+                promotionCheckService.checkPromotionPaymentResponse(paymentResponse, USER_ID, TARIFF, MESSAGE))
                 .isInstanceOf(UnSuccessPaymentException.class)
-                .hasMessageContaining(UNSUCCESSFUL_USER_PROMOTION_PAYMENT, TARIFF.getNumberOfViews(), USER_ID, MESSAGE);
-    }
-
-    @Test
-    @DisplayName("Given unsuccessful event payment response when check then throw exception")
-    void checkEventPromotionPaymentResponseUnsuccessfulPayment() {
-        PaymentResponse paymentResponse = getPaymentResponse(PaymentStatus.NOT_SUCCESS, MESSAGE);
-
-        assertThatThrownBy(() ->
-                promotionCheckService.checkEventPromotionPaymentResponse(paymentResponse, EVENT_ID, TARIFF))
-                .isInstanceOf(UnSuccessPaymentException.class)
-                .hasMessageContaining(UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT, TARIFF.getNumberOfViews(), EVENT_ID, MESSAGE);
+                .hasMessageContaining(MESSAGE, TARIFF.getNumberOfViews(), USER_ID, MESSAGE);
     }
 }

@@ -21,7 +21,7 @@ class EventPromotionMapperTest {
     private static final int AUDIENCE_REACH = PromotionTariff.STANDARD.getAudienceReach();
     private static final LocalDateTime DATE = LocalDateTime.now();
 
-    private final EventPromotionMapper eventPromotionMapper = Mappers.getMapper(EventPromotionMapper.class);
+    private final ResponseEventPromotionMapper eventPromotionMapper = Mappers.getMapper(ResponseEventPromotionMapper.class);
 
     @Test
     @DisplayName("Given dto and successful map")

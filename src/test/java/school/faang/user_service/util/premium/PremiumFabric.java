@@ -4,7 +4,7 @@ import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.premium.ResponsePremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
-import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.service.premium.util.Premium;
 
 import java.time.LocalDateTime;
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.premium.ResponsePremiumDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.service.premium.util.Premium;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +20,7 @@ class PremiumMapperTest {
     private static final LocalDateTime START_DATE = LocalDateTime.now();
     private static final LocalDateTime END_DATE = START_DATE.plusDays(31);
 
-    private final PremiumMapper premiumMapper = Mappers.getMapper(PremiumMapper.class);
+    private final ResponsePremiumMapper premiumMapper = Mappers.getMapper(ResponsePremiumMapper.class);
 
     @Test
     @DisplayName("Given dto and successful map")

@@ -7,7 +7,7 @@ import school.faang.user_service.dto.promotion.ResponseEventPromotionDto;
 import school.faang.user_service.entity.promotion.EventPromotion;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface EventPromotionMapper {
+public interface ResponseEventPromotionMapper {
     @Mapping(source = "event.id", target = "eventId")
     ResponseEventPromotionDto toDto(EventPromotion promotion);
 }

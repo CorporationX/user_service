@@ -5,15 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.client.payment.PaymentServiceClient;
-import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
-import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.payment.PaymentService;
+import school.faang.user_service.service.premium.util.Premium;
+import school.faang.user_service.service.premium.util.PremiumBuilder;
 
 import java.time.LocalDateTime;
 
@@ -37,10 +38,13 @@ class PremiumServiceTest {
     private PremiumRepository premiumRepository;
 
     @Mock
-    private PaymentServiceClient paymentServiceClient;
+    private PremiumCheckService premiumCheckService;
 
     @Mock
-    private PremiumCheckService premiumCheckService;
+    private PaymentService paymentService;
+
+    @Spy
+    private PremiumBuilder premiumBuilder;
 
     @InjectMocks
     private PremiumService premiumService;
@@ -52,7 +56,7 @@ class PremiumServiceTest {
         User user = getUser(USER_ID, premium);
         PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
         when(premiumCheckService.checkUserForSubPeriod(USER_ID)).thenReturn(user);
-        when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(successResponse);
+        when(paymentService.sendPayment(PERIOD)).thenReturn(successResponse);
         premiumService.buyPremium(USER_ID, PremiumPeriod.MONTH);
 
         verify(premiumRepository).delete(premium);
@@ -64,7 +68,7 @@ class PremiumServiceTest {
         User user = getUser(USER_ID, null);
         PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
         when(premiumCheckService.checkUserForSubPeriod(USER_ID)).thenReturn(user);
-        when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(successResponse);
+        when(paymentService.sendPayment(PERIOD)).thenReturn(successResponse);
         premiumService.buyPremium(USER_ID, PERIOD);
 
         verify(premiumRepository).save(any(Premium.class));

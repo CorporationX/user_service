@@ -34,5 +34,4 @@ class PromotionTariffTest {
                 .hasMessageContaining(PROMOTION_NOT_FOUND, tariff.getNumberOfViews() + 1,
                         PromotionTariff.viewsOption());
     }
-
 }

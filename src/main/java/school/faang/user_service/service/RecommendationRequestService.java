@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -26,11 +27,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationRequestService {
+
+    private static final int HALF_YEAR = 6;
 
     private final RecommendationRequestRepository requestRepository;
     private final UserRepository userRepository;
@@ -44,27 +49,29 @@ public class RecommendationRequestService {
 
         dto.skills().forEach(skill -> skillRequestRepository.create(skill.requestId(), skill.skillId()));
 
-        RecommendationRequest request = mapper.toEntity(dto);
-        return mapper.toDto(requestRepository.save(request));
+        RecommendationRequest request = requestRepository.save(mapper.toEntity(dto));
+        log.info("create - " + request);
+        return mapper.toDto(request);
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filterDto) {
         List<RecommendationRequest> recommendationRequests = requestRepository.findAll();
-        List<RequestFilter> filters = new ArrayList<>();
-        for (RequestFilter filter: requestFilters) {
-            if (filter.isApplicable(filterDto)) {
-                filters.add(filter);
-            }
-        }
-        System.out.println(requestFilters);
+        Stream<RecommendationRequest> stream = recommendationRequests.stream();
+        List<RequestFilter> filters = requestFilters.stream()
+                .filter(flt -> flt.isApplicable(filterDto))
+                .toList();
+
         for (RequestFilter filter : filters) {
-            recommendationRequests = filter.apply(filterDto, recommendationRequests);
+            stream = filter.apply(filterDto, stream);
         }
-        return mapper.toDto(recommendationRequests);
+        List<RecommendationRequest> requests = stream.toList();
+        log.info("getRequests - " + requests);
+        return mapper.toDto(requests);
     }
 
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = requestRepository.findById(id).orElse(null);
+        log.info("getRequest - " + request);
         return mapper.toDto(request);
     }
 
@@ -83,6 +90,7 @@ public class RecommendationRequestService {
 
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.reason());
+        log.info("rejectRequest - " + request);
         requestRepository.save(request);
     }
 
@@ -99,8 +107,8 @@ public class RecommendationRequestService {
                 dto.requesterId(),
                 dto.receiverId()
         );
-        if(lastRequest.isPresent() && LocalDateTime.now().isBefore(lastRequest.get().getCreatedAt().plusMonths(6))) {
-            throw new DataValidationException("Запрос рекомендации можно отправлять не чаще, чем один раз в 6 месяцев");
+        if (lastRequest.isPresent() && LocalDateTime.now().isBefore(lastRequest.get().getCreatedAt().plusMonths(HALF_YEAR))) {
+            throw new DataValidationException("Запрос рекомендации можно отправлять не чаще, чем один раз в "+ HALF_YEAR + " месяцев");
         }
         List<SkillRequestDto> skillRequestDtos = dto.skills();
         if (skillRequestDtos == null || skillRequestDtos.isEmpty()) {

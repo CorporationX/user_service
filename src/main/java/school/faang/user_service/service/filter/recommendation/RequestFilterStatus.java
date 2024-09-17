@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class RequestFilterStatus implements RequestFilter{
@@ -14,9 +15,8 @@ public class RequestFilterStatus implements RequestFilter{
     }
 
     @Override
-    public List<RecommendationRequest> apply(RequestFilterDto dto, List<RecommendationRequest> recommendationRequests) {
-        return recommendationRequests.stream()
-                .filter(request -> request.getStatus() == dto.status())
-                .toList();
+    public Stream<RecommendationRequest> apply(RequestFilterDto dto, Stream<RecommendationRequest> recommendationRequests) {
+        return recommendationRequests
+                .filter(request -> request.getStatus() == dto.status());
     }
 }

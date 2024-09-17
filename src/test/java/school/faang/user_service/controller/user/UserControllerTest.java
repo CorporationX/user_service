@@ -99,7 +99,7 @@ public class UserControllerTest {
     @DisplayName("Should return users for given list of IDs")
     public void testGetUsersByIds_Success() throws Exception {
         List<UserDto> dtos = Arrays.asList(userDto, anotherUserDto);
-        userIds = Arrays.asList(1L, 2L);
+        userIds = Arrays.asList(2L, 3L);
 
         when(userService.getUsersByIds(userIds)).thenReturn(dtos);
 

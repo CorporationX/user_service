@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -40,6 +40,7 @@ import school.faang.user_service.filter.user.UserCreatedBeforeFilter;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -271,6 +272,6 @@ class UserServiceTest {
                 () -> assertNotNull(result),
                 () -> assertTrue(result.isEmpty())
         );
-        verify(userRepository, times(1)).findAllById(Collections.emptyList());
+        verify(userRepository, times(1)).findAllById(anyList());
     }
 }

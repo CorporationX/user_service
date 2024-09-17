@@ -33,8 +33,11 @@ public class UserController {
         return userService.getPremiumUsers(filter);
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID: " + userId);
+        }
         return userService.getUser(userId);
     }
 

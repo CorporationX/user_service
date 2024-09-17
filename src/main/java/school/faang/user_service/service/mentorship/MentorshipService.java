@@ -11,6 +11,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -40,6 +41,19 @@ public class MentorshipService {
         var mentee = findById(menteeId);
         var mentor = checkMentorOrMentee(mentee.getMentors(), menteeId, mentorId, "mentor");
         mentorshipRepository.delete(menteeId, mentor.getId());
+    }
+
+    @Transactional
+    public void deleteMentorFromMentees(Long mentorId, List<User> mentees) {
+        mentees.forEach(mentee -> {
+            mentee.getMentors().removeIf(mentor -> mentor.getId().equals(mentorId));
+            mentee.getGoals()
+                    .stream()
+                    .filter(goal -> goal.getMentor().getId().equals(mentorId))
+                    .forEach(goal -> goal.setMentor(mentee));
+        });
+
+        mentorshipRepository.saveAll(mentees);
     }
 
     private User findById(Long userId) {

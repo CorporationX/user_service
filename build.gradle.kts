@@ -67,6 +67,8 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
     implementation ("net.coobird:thumbnailator:0.4.1")
 
+    implementation("org.apache.commons:commons-collections4:4.5.0-M2")
+
     /**
      * Test containers
      */
@@ -82,6 +84,8 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation(kotlin("stdlib-jdk8"))
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 jsonSchema2Pojo {
@@ -123,6 +127,7 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(false)
         csv.required.set(false)
+        html.required.set(true)
         //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 

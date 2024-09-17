@@ -6,10 +6,13 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,6 +32,8 @@ public class MentorshipServiceTest {
 
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private UserRepository userRepository;
     @InjectMocks
     private MentorshipService mentorshipService;
     @Spy
@@ -146,9 +151,28 @@ public class MentorshipServiceTest {
     public void deleteMentorOfMentee_ShouldCallRepository() {
         long mentorId = 1L;
         long menteeId = 2L;
-        when(mentorshipRepository.existsById(mentorId)).thenReturn(true);
-        when(mentorshipRepository.existsById(menteeId)).thenReturn(true);
+
+        User mentee = USER_1;
+        User mentor = USER_2;
+
+
+
+
+        when(userRepository.findById(menteeId)).thenReturn(Optional.of(mentee));
+        when(userRepository.findById(mentorId)).thenReturn(Optional.of(mentor));
+
+        List<User> mentors = new ArrayList<>();
+        mentors.add(mentor);
+        mentee.setMentors(mentors);
+
+
         mentorshipService.deleteMentorOfMentee(mentorId, menteeId);
+
+
+        assertFalse(mentee.getMentors().contains(mentor));
+
+
+        verify(userRepository).save(mentee);
 
     }
 
@@ -158,10 +182,27 @@ public class MentorshipServiceTest {
         long mentorId = 1L;
         long menteeId = 2L;
 
-        when(mentorshipRepository.existsById(mentorId)).thenReturn(true);
-        when(mentorshipRepository.existsById(menteeId)).thenReturn(true);
+
+        User mentor = USER_1;
+        User mentee = USER_2;
+
+
+        when(userRepository.findById(mentorId)).thenReturn(Optional.of(mentor));
+        when(userRepository.findById(menteeId)).thenReturn(Optional.of(mentee));
+
+
+        List<User> mentees = new ArrayList<>();
+        mentees.add(mentee);
+        mentor.setMentees(mentees);
+
 
         mentorshipService.deleteMenteeOfMentor(mentorId, menteeId);
+
+
+        assertFalse(mentor.getMentees().contains(mentee));
+
+
+        verify(userRepository).save(mentor);
 
     }
 
@@ -171,8 +212,8 @@ public class MentorshipServiceTest {
         long mentorId = 1L;
         long menteeId = 2L;
 
-        when(mentorshipRepository.existsById(mentorId)).thenReturn(true);
-        when(mentorshipRepository.existsById(menteeId)).thenReturn(false);
+        when(userRepository.findById(mentorId)).thenReturn(Optional.of(USER_1));
+        when(userRepository.findById(menteeId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () ->
                 mentorshipService.deleteMenteeOfMentor(mentorId, menteeId)

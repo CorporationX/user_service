@@ -52,12 +52,16 @@ public class MentorshipService {
         log.info("Deleting mentee with ID {} for mentor with ID {}", menteeId, mentorId);
 
         User mentor = userRepository.findById(mentorId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentor not found with id: " + mentorId));
-        log.error("Mentor with ID {} does not exist", mentorId);
+                .orElseThrow(() -> {
+                    log.error("Mentor with ID {} does not exist", mentorId);
+                    return new IllegalArgumentException("Mentor not found with id: " + mentorId);
+                });
 
         User mentee = userRepository.findById(menteeId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentee not found with id: " + menteeId));
-        log.error("Mentee with ID {} does not exist", menteeId);
+                .orElseThrow(() -> {
+                    log.error("Mentee with ID {} does not exist", menteeId);
+                    return new IllegalArgumentException("Mentee not found with id: " + menteeId);
+                });
 
         if (!mentor.getMentees().contains(mentee)) {
             log.error("Mentee with ID {} is not assigned to mentor with ID {}", menteeId, mentorId);
@@ -69,17 +73,22 @@ public class MentorshipService {
         log.info("Successfully deleted mentee with ID {} for mentor with ID {}", menteeId, mentorId);
     }
 
+
     @Transactional
     public void deleteMentorOfMentee(long mentorId, long menteeId) {
         log.info("Deleting mentor with ID {} for mentee with ID {}", mentorId, menteeId);
 
         User mentee = userRepository.findById(menteeId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentee not found with id: " + menteeId));
-        log.error("Mentee with ID {} does not exist", menteeId);
+                .orElseThrow(() -> {
+                    log.error("Mentee with ID {} does not exist", menteeId);
+                    return new IllegalArgumentException("Mentee not found with id: " + menteeId);
+                });
 
         User mentor = userRepository.findById(mentorId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentor not found with id: " + mentorId));
-        log.error("Mentor with ID {} does not exist", mentorId);
+                .orElseThrow(() -> {
+                    log.error("Mentor with ID {} does not exist", mentorId);
+                    return new IllegalArgumentException("Mentor not found with id: " + mentorId);
+                });
 
         if (!mentee.getMentors().contains(mentor)) {
             log.error("Mentor with ID {} is not assigned to mentee with ID {}", mentorId, menteeId);

@@ -28,7 +28,7 @@ public class MentorshipService {
             throw new IllegalArgumentException("Mentor does not exist");
         }
         List<User> mentees = mentorshipRepository.findMenteesByMentorId(mentorId);
-        List<UserDto> menteesDtos = userMapper.toDtos(mentees);
+        List<UserDto> menteesDtos = userMapper.toUsersDtos(mentees);
 
         log.info("Found {} mentees for mentor with ID: {}", menteesDtos.size(), mentorId);
         return menteesDtos;
@@ -41,7 +41,7 @@ public class MentorshipService {
             throw new IllegalArgumentException("Mentee does not exist");
         }
         List<User> mentors = mentorshipRepository.findMentorsByMenteeId(menteeId);
-        List<UserDto> mentorDtos = userMapper.toDtos(mentors);
+        List<UserDto> mentorDtos = userMapper.toUsersDtos(mentors);
 
         log.info("Found {} mentors for mentee with ID: {}", mentorDtos.size(), menteeId);
         return mentorDtos;

@@ -4,22 +4,17 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -61,15 +56,15 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.existsById(ID_3)).thenReturn(true);
 
         mentorshipService.getMentees(ID_1);
-        verify(userMapper, times(1)).toDtos(usersCaptor.capture());
+        verify(userMapper, times(1)).toUsersDtos(usersCaptor.capture());
         List<User> first_result = usersCaptor.getValue();
 
         mentorshipService.getMentees(ID_2);
-        verify(userMapper, times(2)).toDtos(usersCaptor.capture());
+        verify(userMapper, times(2)).toUsersDtos(usersCaptor.capture());
         List<User> second_result = usersCaptor.getValue();
 
         mentorshipService.getMentees(ID_3);
-        verify(userMapper, times(3)).toDtos(usersCaptor.capture());
+        verify(userMapper, times(3)).toUsersDtos(usersCaptor.capture());
         List<User> third_result = usersCaptor.getValue();
 
         verify(mentorshipRepository, times(1)).findMenteesByMentorId(ID_1);
@@ -94,15 +89,15 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.existsById(ID_3)).thenReturn(true);
 
         mentorshipService.getMentors(ID_1);
-        verify(userMapper, times(1)).toDtos(usersCaptor.capture());
+        verify(userMapper, times(1)).toUsersDtos(usersCaptor.capture());
         List<User> first_result = usersCaptor.getValue();
 
         mentorshipService.getMentors(ID_2);
-        verify(userMapper, times(2)).toDtos(usersCaptor.capture());
+        verify(userMapper, times(2)).toUsersDtos(usersCaptor.capture());
         List<User> second_result = usersCaptor.getValue();
 
         mentorshipService.getMentors(ID_3);
-        verify(userMapper, times(3)).toDtos(usersCaptor.capture());
+        verify(userMapper, times(3)).toUsersDtos(usersCaptor.capture());
         List<User> third_result = usersCaptor.getValue();
 
         verify(mentorshipRepository, times(1)).findMentorsByMenteeId(ID_1);

@@ -3,12 +3,12 @@ package school.faang.user_service.client.payment;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import school.faang.user_service.dto.payment.PaymentRequest;
-import school.faang.user_service.dto.payment.PaymentResponse;
+import school.faang.user_service.dto.payment.PaymentRequestDto;
+import school.faang.user_service.dto.payment.PaymentResponseDto;
 
-@FeignClient(name = "payment-service", url = "${payment-service.host}:${payment-service.port}")
+@FeignClient(name = "payment-service", url = "${payment-service.url}")
 public interface PaymentServiceClient {
 
-    @PostMapping("/api/payment")
-    PaymentResponse sendPayment(PaymentRequest requestDto);
+    @PostMapping("/payment")
+    PaymentResponseDto sendPayment(PaymentRequestDto requestDto);
 }

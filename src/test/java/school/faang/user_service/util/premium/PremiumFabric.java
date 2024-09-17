@@ -1,7 +1,7 @@
 package school.faang.user_service.util.premium;
 
-import school.faang.user_service.dto.payment.PaymentResponse;
-import school.faang.user_service.dto.premium.ResponsePremiumDto;
+import school.faang.user_service.dto.payment.PaymentResponseDto;
+import school.faang.user_service.dto.premium.PremiumResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
@@ -44,9 +44,9 @@ public class PremiumFabric {
                 .build();
     }
 
-    public static ResponsePremiumDto getResponsePremiumDto(Long id, Long userId,
-                                                    LocalDateTime startDate, LocalDateTime endDate) {
-        return ResponsePremiumDto
+    public static PremiumResponseDto getResponsePremiumDto(Long id, Long userId,
+                                                           LocalDateTime startDate, LocalDateTime endDate) {
+        return PremiumResponseDto
                 .builder()
                 .id(id)
                 .userId(userId)
@@ -55,8 +55,8 @@ public class PremiumFabric {
                 .build();
     }
 
-    public static PaymentResponse getPaymentResponse(PaymentStatus status, String message) {
-        return PaymentResponse
+    public static PaymentResponseDto getPaymentResponse(PaymentStatus status, String message) {
+        return PaymentResponseDto
                 .builder()
                 .status(status)
                 .message(message)

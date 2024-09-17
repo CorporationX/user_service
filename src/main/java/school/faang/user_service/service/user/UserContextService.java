@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.exception.premium.PremiumCheckFailureException;
+import school.faang.user_service.exception.user.UserContextException;
 
 @Slf4j
 @Component
@@ -16,7 +16,7 @@ public class UserContextService {
         try {
             return userContext.getUserId();
         } catch (IllegalArgumentException exception) {
-            throw new PremiumCheckFailureException(exception.getMessage());
+            throw new UserContextException(exception.getMessage());
         }
     }
 }

@@ -40,3 +40,5 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  base-path: /api
+  url: http://${payment-service.host}:${payment-service.port}${payment-service.base-path}

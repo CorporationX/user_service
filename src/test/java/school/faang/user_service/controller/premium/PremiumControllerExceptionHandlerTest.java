@@ -1,38 +1,40 @@
-package school.faang.user_service.controller.promotion;
+package school.faang.user_service.controller.premium;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import school.faang.user_service.exception.promotion.PromotionValidationException;
-import school.faang.user_service.exception.promotion.PromotionNotFoundException;
+import school.faang.user_service.exception.premium.PremiumValidationFailureException;
+import school.faang.user_service.exception.premium.PremiumNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class PromotionControllerAdviceTest {
+class PremiumControllerExceptionHandlerTest {
     private static final String TEST_MESSAGE = "test message";
 
-    private final PromotionControllerExceptionHandler promotionControllerAdvice = new PromotionControllerExceptionHandler();
+    @InjectMocks
+    private PremiumControllerExceptionHandler premiumControllerExceptionHandler;
 
     @Test
-    @DisplayName("Test promotion check exception handler")
-    void testPromotionCheckExceptionHandlerSuccessful() {
-        var promotionValidationException = new PromotionValidationException(TEST_MESSAGE);
-        ResponseEntity<ProblemDetail> response = promotionControllerAdvice
-                .handlePromotionValidationException(promotionValidationException);
+    @DisplayName("Test premium check failure exception handler")
+    void testPremiumCheckFailureExceptionSuccessful() {
+        var premiumValidationFailureException = new PremiumValidationFailureException(TEST_MESSAGE);
+        ResponseEntity<ProblemDetail> response = premiumControllerExceptionHandler
+                .handlePremiumValidationFailureException(premiumValidationFailureException);
         assertResponse(response, HttpStatus.BAD_REQUEST);
     }
 
     @Test
-    @DisplayName("Test promotion not found exception handler")
-    void testPromotionNotFoundExceptionHandlerSuccessful() {
-        var promotionNotFoundException = new PromotionNotFoundException(TEST_MESSAGE);
-        ResponseEntity<ProblemDetail> response = promotionControllerAdvice
-                .handlePromotionNotFoundException(promotionNotFoundException);
+    @DisplayName("Test premium not found exception handler")
+    void testPremiumNotFoundExceptionHandlerSuccessful() {
+        var premiumNotFoundException = new PremiumNotFoundException(TEST_MESSAGE);
+        ResponseEntity<ProblemDetail> response = premiumControllerExceptionHandler
+                .premiumNotFoundExceptionHandler(premiumNotFoundException);
         assertResponse(response, HttpStatus.NOT_FOUND);
     }
 

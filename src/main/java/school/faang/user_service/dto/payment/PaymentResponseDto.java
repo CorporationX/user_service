@@ -7,7 +7,7 @@ import school.faang.user_service.entity.payment.PaymentStatus;
 import java.math.BigDecimal;
 
 @Builder
-public record PaymentResponse(
+public record PaymentResponseDto(
         PaymentStatus status,
         int verificationCode,
         long paymentNumber,

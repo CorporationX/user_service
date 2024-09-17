@@ -4,16 +4,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.promotion.ResponseUserDto;
+import school.faang.user_service.dto.promotion.UserResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.UserPromotion;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ResponseUserMapper {
+public interface UserMapperPromotion {
 
     @Mapping(source = "promotion", target = "promotionTariff", qualifiedByName = "mapTariff")
     @Mapping(source = "promotion", target = "numberOfViews", qualifiedByName = "mapNumberOfViews")
-    ResponseUserDto toDto(User user);
+    UserResponseDto toUserResponseDto(User user);
 
     @Named("mapTariff")
     default String mapTariff(UserPromotion userPromotion) {

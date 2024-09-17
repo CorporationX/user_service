@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.payment.PaymentResponse;
+import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.EventPromotion;
@@ -36,16 +36,16 @@ public class PromotionService {
     private final EventRepository eventRepository;
     private final PaymentService paymentService;
     private final PromotionTaskService promotionTaskService;
-    private final PromotionCheckService promotionCheckService;
+    private final PromotionValidationService promotionValidationService;
     private final PromotionBuilder promotionBuilder;
     private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     @Transactional
     public UserPromotion buyPromotion(long userId, PromotionTariff tariff) {
         log.info("User with id: {} buy promotion tariff: {}", userId, tariff.toString());
-        User user = promotionCheckService.checkUserForPromotion(userId);
-        PaymentResponse paymentResponse = paymentService.sendPayment(tariff);
-        promotionCheckService
+        User user = promotionValidationService.checkUserForPromotion(userId);
+        PaymentResponseDto paymentResponse = paymentService.sendPayment(tariff);
+        promotionValidationService
                 .checkPromotionPaymentResponse(paymentResponse, userId, tariff, UNSUCCESSFUL_USER_PROMOTION_PAYMENT);
         UserPromotion promotion = promotionBuilder.getUserPromotion(user, tariff);
         if (user.getPromotion() != null) {
@@ -57,9 +57,9 @@ public class PromotionService {
     @Transactional
     public EventPromotion buyEventPromotion(long userId, long eventId, PromotionTariff tariff) {
         log.info("User with id: {} buy promotion tariff: {} for event id: {}", userId, tariff.toString(), eventId);
-        Event event = promotionCheckService.checkEventForUserAndPromotion(userId, eventId);
-        PaymentResponse paymentResponse = paymentService.sendPayment(tariff);
-        promotionCheckService
+        Event event = promotionValidationService.checkEventForUserAndPromotion(userId, eventId);
+        PaymentResponseDto paymentResponse = paymentService.sendPayment(tariff);
+        promotionValidationService
                 .checkPromotionPaymentResponse(paymentResponse, eventId, tariff, UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT);
         EventPromotion eventPromotion = promotionBuilder.getEventPromotion(event, tariff);
         if (event.getPromotion() != null) {

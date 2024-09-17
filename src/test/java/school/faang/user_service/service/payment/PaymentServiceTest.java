@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.payment.PaymentServiceClient;
-import school.faang.user_service.dto.payment.PaymentRequest;
+import school.faang.user_service.dto.payment.PaymentRequestDto;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.entity.promotion.PromotionTariff;
 
@@ -27,12 +27,12 @@ class PaymentServiceTest {
     @Test
     void testSendPaymentPremiumPeriodSuccessful() {
         paymentService.sendPayment(PREMIUM_PERIOD);
-        verify(paymentServiceClient).sendPayment(any(PaymentRequest.class));
+        verify(paymentServiceClient).sendPayment(any(PaymentRequestDto.class));
     }
 
     @Test
     void testSendPaymentPromotionTariffSuccessful() {
         paymentService.sendPayment(PROMOTION_TARIFF);
-        verify(paymentServiceClient).sendPayment(any(PaymentRequest.class));
+        verify(paymentServiceClient).sendPayment(any(PaymentRequestDto.class));
     }
 }

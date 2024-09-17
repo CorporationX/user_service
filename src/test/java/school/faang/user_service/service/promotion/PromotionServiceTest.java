@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.payment.PaymentResponse;
+import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.payment.PaymentStatus;
@@ -66,7 +66,7 @@ class PromotionServiceTest {
     private PromotionTaskService promotionTaskService;
 
     @Mock
-    private PromotionCheckService promotionCheckService;
+    private PromotionValidationService promotionValidationService;
 
     @Mock
     private PaymentService paymentService;
@@ -82,8 +82,8 @@ class PromotionServiceTest {
     void testBuyPromotionDeleteNotValidPromotion() {
         UserPromotion userPromotion = getUserPromotion(PROMOTION_ID, NOT_ENOUGH_VIEWS);
         User user = getUser(USER_ID, userPromotion);
-        PaymentResponse paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(promotionCheckService.checkUserForPromotion(USER_ID)).thenReturn(user);
+        PaymentResponseDto paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(promotionValidationService.checkUserForPromotion(USER_ID)).thenReturn(user);
         when(paymentService.sendPayment(TARIFF)).thenReturn(paymentResponse);
         promotionService.buyPromotion(USER_ID, TARIFF);
 
@@ -94,8 +94,8 @@ class PromotionServiceTest {
     @DisplayName("Successful buy promotion")
     void testBuyPromotionSuccessful() {
         User user = getUser(USER_ID, null);
-        PaymentResponse paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(promotionCheckService.checkUserForPromotion(USER_ID)).thenReturn(user);
+        PaymentResponseDto paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(promotionValidationService.checkUserForPromotion(USER_ID)).thenReturn(user);
         when(paymentService.sendPayment(TARIFF)).thenReturn(paymentResponse);
         promotionService.buyPromotion(USER_ID, TARIFF);
 
@@ -108,8 +108,8 @@ class PromotionServiceTest {
         User user = getUser(USER_ID);
         EventPromotion eventPromotion = getEventPromotion(EVENT_ID, NOT_ENOUGH_VIEWS);
         Event event = getEvent(user, eventPromotion);
-        PaymentResponse paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(promotionCheckService.checkEventForUserAndPromotion(USER_ID, EVENT_ID)).thenReturn(event);
+        PaymentResponseDto paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(promotionValidationService.checkEventForUserAndPromotion(USER_ID, EVENT_ID)).thenReturn(event);
         when(paymentService.sendPayment(TARIFF)).thenReturn(paymentResponse);
         promotionService.buyEventPromotion(USER_ID, EVENT_ID, TARIFF);
 
@@ -121,8 +121,8 @@ class PromotionServiceTest {
     void testBuyEventPromotionSuccessful() {
         User user = getUser(USER_ID);
         Event event = getEvent(user, null);
-        PaymentResponse paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(promotionCheckService.checkEventForUserAndPromotion(USER_ID, EVENT_ID)).thenReturn(event);
+        PaymentResponseDto paymentResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(promotionValidationService.checkEventForUserAndPromotion(USER_ID, EVENT_ID)).thenReturn(event);
         when(paymentService.sendPayment(TARIFF)).thenReturn(paymentResponse);
         promotionService.buyEventPromotion(USER_ID, EVENT_ID, TARIFF);
 

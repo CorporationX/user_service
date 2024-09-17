@@ -5,9 +5,9 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record ResponseUserPromotionDto(
+public record EventPromotionResponseDto(
         long id,
-        long userId,
+        long eventId,
         int numberOfViews,
         int audienceReach,
         LocalDateTime creationDate

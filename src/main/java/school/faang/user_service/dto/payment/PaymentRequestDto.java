@@ -8,7 +8,7 @@ import school.faang.user_service.entity.payment.Currency;
 import java.math.BigDecimal;
 
 @Builder
-public record PaymentRequest(
+public record PaymentRequestDto(
         @NotNull
         long paymentNumber,
 

@@ -5,22 +5,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.payment.PaymentResponse;
+import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
+import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.exception.premium.PremiumNotFoundException;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.payment.PaymentService;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.service.premium.util.PremiumBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_NOT_FOUND_PREMIUM;
 import static school.faang.user_service.util.premium.PremiumFabric.getPaymentResponse;
 import static school.faang.user_service.util.premium.PremiumFabric.getPremium;
 import static school.faang.user_service.util.premium.PremiumFabric.getUser;
@@ -38,24 +41,33 @@ class PremiumServiceTest {
     private PremiumRepository premiumRepository;
 
     @Mock
-    private PremiumCheckService premiumCheckService;
+    private PremiumValidationService premiumValidationService;
 
     @Mock
     private PaymentService paymentService;
 
-    @Spy
-    private PremiumBuilder premiumBuilder;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private PremiumService premiumService;
+
+    @Test
+    @DisplayName("Given user with non exist id when validate then throw exception")
+    void testBuyPremiumDeleteUserNotFound() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> premiumService.buyPremium(USER_ID, PERIOD))
+                .isInstanceOf(PremiumNotFoundException.class)
+                .hasMessageContaining(USER_NOT_FOUND_PREMIUM, USER_ID);
+    }
 
     @Test
     @DisplayName("Given user with expired premium when buy then delete expired premium")
     void testBuyPremiumDeleteExpiredPremium() {
         Premium premium = getPremium(PREMIUM_ID, START_DATE, EXPIRED_DATE);
         User user = getUser(USER_ID, premium);
-        PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(premiumCheckService.checkUserForSubPeriod(USER_ID)).thenReturn(user);
+        PaymentResponseDto successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(paymentService.sendPayment(PERIOD)).thenReturn(successResponse);
         premiumService.buyPremium(USER_ID, PremiumPeriod.MONTH);
 
@@ -66,8 +78,8 @@ class PremiumServiceTest {
     @DisplayName("Buy premium successful")
     void testBuyPremiumSuccessful() {
         User user = getUser(USER_ID, null);
-        PaymentResponse successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(premiumCheckService.checkUserForSubPeriod(USER_ID)).thenReturn(user);
+        PaymentResponseDto successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(paymentService.sendPayment(PERIOD)).thenReturn(successResponse);
         premiumService.buyPremium(USER_ID, PERIOD);
 

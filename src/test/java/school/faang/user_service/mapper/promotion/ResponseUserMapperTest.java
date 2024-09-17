@@ -3,7 +3,7 @@ package school.faang.user_service.mapper.promotion;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import school.faang.user_service.dto.promotion.ResponseUserDto;
+import school.faang.user_service.dto.promotion.UserResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.PromotionTariff;
 import school.faang.user_service.entity.promotion.UserPromotion;
@@ -17,15 +17,15 @@ class ResponseUserMapperTest {
     private static final String USERNAME = "username";
     private static final PromotionTariff TARIFF = PromotionTariff.STANDARD;
 
-    private final ResponseUserMapper responseUserMapper = Mappers.getMapper(ResponseUserMapper.class);
+    private final UserMapperPromotion responseUserMapper = Mappers.getMapper(UserMapperPromotion.class);
 
     @Test
     @DisplayName("Test conver event to response event")
     void testToDto() {
         UserPromotion userPromotion = getUserPromotion(TARIFF, TARIFF.getNumberOfViews());
         User user = getUser(USER_ID, USERNAME, userPromotion);
-        var responseDto = new ResponseUserDto(USER_ID, USERNAME, TARIFF.toString(), TARIFF.getNumberOfViews());
+        var responseDto = new UserResponseDto(USER_ID, USERNAME, TARIFF.toString(), TARIFF.getNumberOfViews());
 
-        assertThat(responseUserMapper.toDto(user)).isEqualTo(responseDto);
+        assertThat(responseUserMapper.toUserResponseDto(user)).isEqualTo(responseDto);
     }
 }

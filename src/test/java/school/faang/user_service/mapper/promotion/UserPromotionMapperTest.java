@@ -3,7 +3,7 @@ package school.faang.user_service.mapper.promotion;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import school.faang.user_service.dto.promotion.ResponseUserPromotionDto;
+import school.faang.user_service.dto.promotion.UserPromotionResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.PromotionTariff;
 import school.faang.user_service.entity.promotion.UserPromotion;
@@ -23,7 +23,7 @@ class UserPromotionMapperTest {
     private static final int AUDIENCE_REACH = PromotionTariff.STANDARD.getAudienceReach();
     private static final LocalDateTime DATE = LocalDateTime.now();
 
-    private final ResponseUserPromotionMapper userPromotionMapper = Mappers.getMapper(ResponseUserPromotionMapper.class);
+    private final UserPromotionMapper userPromotionMapper = Mappers.getMapper(UserPromotionMapper.class);
 
     @Test
     @DisplayName("Given dto and successful map")
@@ -31,9 +31,9 @@ class UserPromotionMapperTest {
         User user = getUser(USER_ID);
         UserPromotion userPromotion = getUserPromotion(EVENT_PROMOTION_ID, user, NUMBER_OF_VIEWS,
                 AUDIENCE_REACH, DATE);
-        var responseDto = new ResponseUserPromotionDto(EVENT_PROMOTION_ID, USER_ID, NUMBER_OF_VIEWS,
+        var responseDto = new UserPromotionResponseDto(EVENT_PROMOTION_ID, USER_ID, NUMBER_OF_VIEWS,
                 AUDIENCE_REACH, DATE);
 
-        assertThat(userPromotionMapper.toDto(userPromotion)).isEqualTo(responseDto);
+        assertThat(userPromotionMapper.toUserPromotionResponseDto(userPromotion)).isEqualTo(responseDto);
     }
 }

@@ -1,16 +1,16 @@
 package school.faang.user_service.service.premium.util;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 
 import java.time.LocalDateTime;
 
-@Component
+@UtilityClass
 public class PremiumBuilder {
 
-    public Premium getPremium(User user, PremiumPeriod period) {
+    public static Premium buildPremium(User user, PremiumPeriod period) {
         return Premium
                 .builder()
                 .user(user)

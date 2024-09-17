@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.premium;
+package school.faang.user_service.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import school.faang.user_service.exception.premium.PremiumCheckFailureException;
-import school.faang.user_service.exception.premium.PremiumNotFoundException;
 
 import java.io.IOException;
 
@@ -22,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PremiumControllerAdviceTest {
+class FeignExceptionHandlerTest {
     private static final String TEST_MESSAGE = "test message";
     private static final String RESPONSE_JSON = "{\"message\":\"We only accept [USD, EUR]\"}";
 
@@ -30,25 +28,7 @@ class PremiumControllerAdviceTest {
     private ObjectMapper objectMapper;
 
     @InjectMocks
-    private PremiumControllerAdvice premiumControllerAdvice;
-
-    @Test
-    @DisplayName("Test premium check failure exception handler")
-    void testPremiumCheckFailureExceptionSuccessful() {
-        var premiumCheckFailureException = new PremiumCheckFailureException(TEST_MESSAGE);
-        ResponseEntity<ProblemDetail> response = premiumControllerAdvice
-                .premiumCheckFailureExceptionHandler(premiumCheckFailureException);
-        assertResponse(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    @DisplayName("Test premium not found exception handler")
-    void testPremiumNotFoundExceptionHandlerSuccessful() {
-        var premiumNotFoundException = new PremiumNotFoundException(TEST_MESSAGE);
-        ResponseEntity<ProblemDetail> response = premiumControllerAdvice
-                .premiumNotFoundExceptionHandler(premiumNotFoundException);
-        assertResponse(response, HttpStatus.NOT_FOUND);
-    }
+    private FeignExceptionHandler feignExceptionHandler;
 
     @Test
     @DisplayName("Test http client error exception handler")
@@ -62,7 +42,7 @@ class PremiumControllerAdviceTest {
         when(jsonNode.get("message")).thenReturn(jsonNode);
         when(jsonNode.asText()).thenReturn(TEST_MESSAGE);
 
-        ResponseEntity<ProblemDetail> response = premiumControllerAdvice.feignExceptionHandler(feignException);
+        ResponseEntity<ProblemDetail> response = feignExceptionHandler.handleFeignException(feignException);
         assertResponse(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -79,4 +59,5 @@ class PremiumControllerAdviceTest {
                 .extracting(ProblemDetail::getDetail)
                 .isEqualTo(TEST_MESSAGE);
     }
+
 }

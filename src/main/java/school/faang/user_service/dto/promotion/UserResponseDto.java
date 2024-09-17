@@ -3,10 +3,9 @@ package school.faang.user_service.dto.promotion;
 import lombok.Builder;
 
 @Builder
-public record ResponseEventDto(
+public record UserResponseDto(
         long id,
-        String title,
-        long ownerId,
+        String username,
         String promotionTariff,
         Integer numberOfViews
 ) {

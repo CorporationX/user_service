@@ -27,7 +27,9 @@ public class EventService {
                 .forEach(event -> {
                     event.setStatus(EventStatus.CANCELED);
                     eventParticipationService.deleteParticipantsFromEvent(event);
-                    event.getAttendees().clear();
+                    if (event.getAttendees() != null) {
+                        event.getAttendees().clear();
+                    }
                     eventRepository.deleteById(event.getId());
                     removedEvents.add(event);
                 });

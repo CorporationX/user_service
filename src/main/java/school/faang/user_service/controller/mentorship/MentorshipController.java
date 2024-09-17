@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.mentorship.UserMentorshipDto;
+import school.faang.user_service.dto.mentorship.UserMentorshipDtoResponse;
 import school.faang.user_service.mapper.UserMentorshipMapper;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
@@ -22,13 +22,15 @@ public class MentorshipController {
 
 
     @GetMapping("/{userId}/mentees")
-    public Collection<UserMentorshipDto> getMentees(@PathVariable("userId") Long userId) {
-        return userMentorshipMapper.toDtos(mentorshipService.getMentees(userId));
+    public Collection<UserMentorshipDtoResponse> getMentees(@PathVariable("userId") Long userId) {
+        var mentees = mentorshipService.getMentees(userId);
+        return userMentorshipMapper.toDtos(mentees);
     }
 
     @GetMapping("/{userId}/mentors")
-    public Collection<UserMentorshipDto> getMentors(@PathVariable("userId") Long userId) {
-        return userMentorshipMapper.toDtos(mentorshipService.getMentors(userId));
+    public Collection<UserMentorshipDtoResponse> getMentors(@PathVariable("userId") Long userId) {
+        var mentors = mentorshipService.getMentors(userId);
+        return userMentorshipMapper.toDtos(mentors);
     }
 
     @DeleteMapping("/{mentorId}/mentees")

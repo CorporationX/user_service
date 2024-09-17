@@ -67,9 +67,10 @@ class MentorshipServiceImplTest {
         var result = mentorshipService.getMentees(userId);
 
         verify(userRepository, times(1)).findById(userId);
-        assertTrue(result.containsAll(user.getMentees())
-                && user.getMentees().containsAll(result)
-        );
+
+        var mentees = user.getMentees();
+        assertTrue(result.containsAll(mentees));
+        assertTrue(mentees.containsAll(result));
     }
 
     @Test
@@ -96,9 +97,10 @@ class MentorshipServiceImplTest {
         var result = mentorshipService.getMentors(userId);
 
         verify(userRepository, times(1)).findById(userId);
-        assertTrue(user.getMentors().containsAll(result)
-                && result.containsAll(user.getMentors())
-        );
+
+        var mentors = user.getMentors();
+        assertTrue(mentors.containsAll(result));
+        assertTrue(result.containsAll(mentors));
     }
 
     @Test
@@ -155,7 +157,8 @@ class MentorshipServiceImplTest {
         );
 
         assertEquals(
-                String.format("User with id = [%d] is not a mentee of user with id = [%d].", notExistingId, userId),
+                String.format("User with id = [%d] is not a mentee of user with id = [%d].",
+                        notExistingId, userId),
                 result.getMessage()
         );
     }
@@ -198,7 +201,8 @@ class MentorshipServiceImplTest {
         );
 
         assertEquals(
-                String.format("User with id = [%d] is not a mentor of user with id = [%d].", notExistingId, userId),
+                String.format("User with id = [%d] is not a mentor of user with id = [%d].",
+                        notExistingId, userId),
                 result.getMessage()
         );
     }

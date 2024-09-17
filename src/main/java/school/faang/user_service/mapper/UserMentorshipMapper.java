@@ -3,7 +3,7 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.mentorship.UserMentorshipDto;
+import school.faang.user_service.dto.mentorship.UserMentorshipDtoResponse;
 import school.faang.user_service.entity.User;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Collection;
 )
 public interface UserMentorshipMapper {
     @Mapping(source = "country.id", target = "countryId")
-    UserMentorshipDto toDto(User user);
+    UserMentorshipDtoResponse toDto(User user);
 
-    Collection<UserMentorshipDto> toDtos(Collection<User> users);
+    Collection<UserMentorshipDtoResponse> toDtos(Collection<User> users);
 }

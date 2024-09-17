@@ -44,7 +44,7 @@ public class SubscriptionServiceTest {
   @BeforeEach
   void setUp() {
     user = new User();
-    userDto = new UserDto();
+    userDto = new UserDto(1L, "username", "email");
   }
 
   @Test

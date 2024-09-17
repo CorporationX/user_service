@@ -3,17 +3,21 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.UserAlreadyExistsException;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,6 +27,17 @@ public class UserService {
     private final GoalService goalService;
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
+    private final AvatarService avatarService;
+
+    @Transactional
+    public User registerUser(User user) {
+        validateUser(user);
+        UserProfilePic userProfilePic = avatarService.generateAndSaveAvatar(AvatarStyle.BOTTTTS);
+        user.setUserProfilePic(userProfilePic);
+        user.setCreatedAt(LocalDateTime.now());
+
+        return userRepository.save(user);
+    }
 
     @Transactional
     public void deactivateUser(Long userId) {
@@ -72,5 +87,14 @@ public class UserService {
             eventRepository.save(event);
             eventRepository.delete(event);
         });
+    }
+    private void validateUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("User with this email already exists");
+        }
+
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new UserAlreadyExistsException("User with this username already exists");
+        }
     }
 }

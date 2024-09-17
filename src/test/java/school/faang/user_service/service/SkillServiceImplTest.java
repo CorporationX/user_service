@@ -75,28 +75,27 @@ public class SkillServiceImplTest {
     public void testEnoughOffersToAcquireSkillsFromOffers() throws DataValidationException {
         long userId = 1L;
         long skillId = 2L;
-        SkillDto dto1 = new SkillDto("Java", userId);
-        Skill skill1 = new Skill();
-        SkillOffer skillOffer1 = SkillOffer.builder()
-                .id(1L)
-                .skill(Skill.builder().id(1L).title("Java").build())
-                .recommendation(Recommendation.builder().id(1L).build())
-                .build();
-        SkillOffer skillOffer2 = SkillOffer.builder()
-                .id(2L)
-                .skill(Skill.builder().id(2L).title("Python").build())
-                .recommendation(Recommendation.builder().id(2L).build())
-                .build();
-        SkillOffer skillOffer3 = SkillOffer.builder()
-                .id(3L)
-                .skill(Skill.builder().id(3L).title("JavaScript").build())
-                .recommendation(Recommendation.builder().id(3L).build())
-                .build();
-        List<SkillOffer> skillOfferList = List.of(skillOffer1,skillOffer2,skillOffer3);
-        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(skill1));
-        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOfferList);
+        SkillDto expectedDto = new SkillDto("Java", userId);
+        Skill skill = new Skill();
+        skill.setId(2L);
+        skill.setTitle("Java");
+        User user = new User();
+        user.setId(2L);
+        skill.setUsers(List.of(user));
+        List<SkillOffer> skillOffers = List.of(new SkillOffer(), new SkillOffer(), new SkillOffer());
+        when(skillRepository.findUserSkill(skillId, userId))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(skill));
+        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
+
 
         SkillDto actualDto = skillServiceImpl.acquireSkillFromOffers(skillId, userId);
-        assertEquals(dto1, actualDto);
+
+        verify(skillCandidateValidator, times(1)).validateSkillOfferSize(skillOffers);
+        verify(skillRepository, times(1)).assignSkillToUser(skillId, userId);
+        for (SkillOffer skillOffer : skillOffers) {
+            verify(skillRepository,times(3)).assignGuarantorToUserSkill(userId, skillId, skillOffer.getId());
+        }
+        assertEquals(expectedDto, actualDto);
     }
 }

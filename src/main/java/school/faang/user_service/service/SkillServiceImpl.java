@@ -49,20 +49,21 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public SkillDto acquireSkillFromOffers(long skillId, long userId) throws DataValidationException {
-        Skill skillFromOffers = skillRepository.findUserSkill(skillId, userId)
-                .orElseThrow(() -> new DataValidationException("Skill not found"));
-        boolean existByTitle = existByTitle(skillFromOffers);
-        skillValidator.validateSkill(skillFromOffers, existByTitle);
+        if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
+            throw new DataValidationException("Skill already exists");
+        }
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         skillCandidateValidator.validateSkillOfferSize(skillOffers);
         skillRepository.assignSkillToUser(skillId, userId);
         for (SkillOffer skillOffer : skillOffers) {
             skillRepository.assignGuarantorToUserSkill(userId, skillId, skillOffer.getId());
-            return skillMapper.toDto(skillFromOffers);
         }
-        return skillMapper.toDto(skillFromOffers);
+        Skill skillOfUser = skillRepository.findUserSkill(skillId, userId)
+                .orElseThrow(() -> new DataValidationException("SKill does not assigned"));
+        return new SkillDto(skillOfUser.getTitle(), userId);
     }
-        private boolean existByTitle (Skill skill){
-            return skillRepository.existsByTitle(skill.getTitle());
-        }
+
+    private boolean existByTitle(Skill skill) {
+        return skillRepository.existsByTitle(skill.getTitle());
     }
+}

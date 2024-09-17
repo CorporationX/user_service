@@ -13,10 +13,10 @@ import java.util.List;
 @Repository
 public interface MentorshipRepository extends CrudRepository<User, Long> {
 
-    @Query("SELECT m.mentee FROM Mentorship m WHERE m.mentor.id = :mentorId")
+    @Query("SELECT u.mentees FROM User u WHERE u.id = :mentorId")
     List<User> findMenteesByMentorId(@Param("mentorId") long mentorId);
 
-    @Query("SELECT m.mentor FROM Mentorship m WHERE m.mentee.id = :menteeId")
+    @Query("SELECT u.mentors FROM User u WHERE u.id = :menteeId")
     List<User> findMentorsByMenteeId(@Param("menteeId") long menteeId);
 
     @Modifying

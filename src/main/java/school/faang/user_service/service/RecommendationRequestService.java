@@ -50,8 +50,10 @@ public class RecommendationRequestService {
         dto.skills().forEach(skill -> skillRequestRepository.create(skill.requestId(), skill.skillId()));
 
         RecommendationRequest request = requestRepository.save(mapper.toEntity(dto));
-        log.info("create - " + request);
-        return mapper.toDto(request);
+        RecommendationRequestDto returnDto = mapper.toDto(request);
+        log.info("Create request with id = " + returnDto.id() + ", requesterId = " + returnDto.requesterId() +
+                ", receiverId = " + returnDto.receiverId());
+        return returnDto;
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filterDto) {
@@ -65,13 +67,20 @@ public class RecommendationRequestService {
             stream = filter.apply(filterDto, stream);
         }
         List<RecommendationRequest> requests = stream.toList();
-        log.info("getRequests - " + requests);
+        List<Long> requestIds = requests.stream()
+                        .map(RecommendationRequest::getId)
+                        .toList();
+        log.info("Returning filtered requests: " + requestIds);
         return mapper.toDto(requests);
     }
 
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = requestRepository.findById(id).orElse(null);
-        log.info("getRequest - " + request);
+        if (request != null) {
+            log.info("Returning request with id = " + request.getId());
+        } else {
+            log.info("Returning empty request");
+        }
         return mapper.toDto(request);
     }
 
@@ -90,7 +99,7 @@ public class RecommendationRequestService {
 
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.reason());
-        log.info("rejectRequest - " + request);
+        log.info("Rejected request with id =  " + request.getId() + " and reason = " + request.getRejectionReason());
         requestRepository.save(request);
     }
 

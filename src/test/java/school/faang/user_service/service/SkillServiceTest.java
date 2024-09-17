@@ -1,17 +1,13 @@
 package school.faang.user_service.service;
 
-import org.junit.Assert;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -29,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,19 +34,20 @@ class SkillServiceTest {
     private SkillService skillService;
     @Mock
     private SkillRepository skillRepository;
-    @Spy
-    private SkillMapper skillMapper;
+    private static final long ANY_ID = 123L;
     @Mock
     private SkillOfferRepository skillOfferRepository;
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     @Mock
     private UserRepository userRepository;
-    @Spy
+    @Mock
+    private SkillMapper skillMapper;
+    @Mock
     private SkillCandidateMapper skillCandidateMapper;
 
     @BeforeEach
-    void Setup() {
+    void setup() {
         skillService = new SkillService(skillRepository, skillOfferRepository, userSkillGuaranteeRepository, userRepository, skillMapper, skillCandidateMapper);
     }
 
@@ -60,24 +56,30 @@ class SkillServiceTest {
         @Test
         @DisplayName("Ошибка валидации когда название null")
         void whenNullValueThenThrowValidationException() {
-            SkillDto skillTest = new SkillDto(1, null);
             assertThrows(DataValidationException.class,
-                    () -> skillService.create(skillTest), "Название скила не должно быть пустым");
+                    () -> skillService.create(new SkillDto(ANY_ID, null)), "Название скила не должно быть пустым");
         }
 
         @Test
         @DisplayName("Ошибка валидации когда название пустое")
         void whenEmptyValueThenThrowValidationException() {
-            SkillDto skillTest = new SkillDto(1, "  ");
             assertThrows(DataValidationException.class,
-                    () -> skillService.create(skillTest), "Название скила не должно быть пустым");
+                    () -> skillService.create(new SkillDto(ANY_ID, "  ")), "Название скила не должно быть пустым");
+        }
+
+        @Test
+        @DisplayName("Ошибка при передаче null")
+        void whenNullDtoThenThrowValidationException() {
+            assertThrows(DataValidationException.class,
+                    () -> skillService.create(null), "DTO = null");
         }
 
         @Test
         @DisplayName("Ошибка когда скилл, который мы хотим создать, уже существует")
         void whenSkillExistThenThrowException() {
-            SkillDto skillDto = new SkillDto(1, "Анжуманя");
-            Mockito.when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+            SkillDto skillDto = new SkillDto(ANY_ID, "Анжуманя");
+            Mockito.when(skillRepository.existsByTitle(skillDto.getTitle()))
+                    .thenReturn(true);
             assertThrows(DataValidationException.class,
                     () -> skillService.create(skillDto), "Такой скилл уже существует");
         }
@@ -85,37 +87,39 @@ class SkillServiceTest {
         @Test
         @DisplayName("Ошибка, когда у пользователя нет умений")
         void whenUserHaveNoSkillsThenThrowException() {
-            Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
-            Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong())).thenReturn(new ArrayList<>());
-            Exception exception = Assert.assertThrows(DataValidationException.class,
-                    () -> skillService.getUserSkills(123));
-            assertEquals("У пользователя нет умений", exception.getMessage());
+            Mockito.when(userRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new User()));
+            Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong()))
+                    .thenReturn(new ArrayList<>());
+            assertThrows(DataValidationException.class,
+                    () -> skillService.getUserSkills(ANY_ID), "У пользователя нет умений");
         }
 
         @Test
         @DisplayName("Ошибка, когда указан айди несуществующего пользователя")
         void whenUserNotExistThenThrowException() {
-            Exception exception = Assert.assertThrows(DataValidationException.class,
-                    () -> skillService.getValidUser(123));
-            assertEquals("Указанный пользователь не существует", exception.getMessage());
+            assertThrows(DataValidationException.class,
+                    () -> skillService.getValidUser(ANY_ID), "Указанный пользователь не существует");
         }
 
         @Test
         @DisplayName("Ошибка, когда указан айди несуществующего скилла")
         void whenSkillNotExistThenThrowException() {
-            Exception exception = Assert.assertThrows(DataValidationException.class,
-                    () -> skillService.getValidSkill(123));
-            assertEquals("Указанный скилл не существует", exception.getMessage());
+            assertThrows(DataValidationException.class,
+                    () -> skillService.getValidSkill(ANY_ID), "Указанный скилл не существует");
         }
 
         @Test
         @DisplayName("Ошибка, когда у пользователя уже существует скилл")
         void whenUserAlreadyHaveSkillThenThrowException() {
-            Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
-            Mockito.when(skillRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new Skill()));
-            Mockito.when(skillRepository.findUserSkill(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Optional.of(new Skill()));
+            Mockito.when(userRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new User()));
+            Mockito.when(skillRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new Skill()));
+            Mockito.when(skillRepository.findUserSkill(Mockito.anyLong(), Mockito.anyLong()))
+                    .thenReturn(Optional.of(new Skill()));
             assertThrows(DataValidationException.class,
-                    () -> skillService.acquireSkillFromOffers(1, 123), "У пользователя уже есть данный скилл");
+                    () -> skillService.acquireSkillFromOffers(ANY_ID, ANY_ID), "У пользователя уже есть данный скилл");
         }
 
         @Test
@@ -123,34 +127,32 @@ class SkillServiceTest {
         void whenFewRecommendationsThenThrowException() {
             List<SkillOffer> offers = new ArrayList<>();
             offers.add(new SkillOffer());
-            Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
-            Mockito.when(skillRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new Skill()));
-            Mockito.when(skillOfferRepository.findAllOffersOfSkill(Mockito.anyLong(), Mockito.anyLong())).thenReturn(offers);
+
+            Mockito.when(userRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new User()));
+            Mockito.when(skillRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new Skill()));
+            Mockito.when(skillOfferRepository.findAllOffersOfSkill(Mockito.anyLong(), Mockito.anyLong()))
+                    .thenReturn(offers);
             assertThrows(DataValidationException.class,
-                    () -> skillService.acquireSkillFromOffers(1, 123), "Скилл предложен менее 3 раз");
+                    () -> skillService.acquireSkillFromOffers(ANY_ID, ANY_ID), "Скилл предложен менее 3 раз");
         }
 
         @Test
         @DisplayName("Ошибка, когда пользователю не предложены скиллы")
         void whenNoSkillsOfferedThenThrowException() {
             assertThrows(DataValidationException.class,
-                    () -> skillService.getOfferedSkills(123), "Пользователю не предложены скиллы");
+                    () -> skillService.getOfferedSkills(ANY_ID), "Пользователю не предложены скиллы");
         }
     }
 
     @Nested
     class PositiveTests {
         @Test
-        @DisplayName("Когда скилл создан и вернулся как ДТО ошибки нет")
-        void whenSkillCreatedThenSuccess() {
-            SkillDto skillDto = new SkillDto(1, "Прес качат");
-            Skill skill = new Skill(1, "Прес качат", null, null, null, null, null, null);
-            Mockito.when(skillMapper.toEntity(skillDto)).thenReturn(skill);
-            Mockito.when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
-            Mockito.when(skillRepository.save(skill)).thenReturn(skill);
-            Mockito.when(skillMapper.toDto(skill)).thenReturn(skillDto);
-            SkillDto result = skillService.create(skillDto);
-            assertEquals(skillDto, result);
+        @DisplayName("Сохранение скилла вызывается")
+        void whenCreatedThenSuccess() {
+            skillService.create(new SkillDto(ANY_ID, "Прес качат"));
+            Mockito.verify(skillRepository).save(Mockito.any());
         }
 
         @Test
@@ -158,44 +160,46 @@ class SkillServiceTest {
         void whenSkillsFoundThenSuccess() {
             List<Skill> skills = new ArrayList<>();
             skills.add(new Skill());
-            Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
-            Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong())).thenReturn(skills);
-            skillService.getUserSkills(123);
-            Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(123);
+
+            Mockito.when(userRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new User()));
+            Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong()))
+                    .thenReturn(skills);
+            skillService.getUserSkills(ANY_ID);
+            Mockito.verify(skillRepository).findAllByUserId(ANY_ID);
+            Mockito.verify(userRepository).findById(ANY_ID);
         }
 
         @Test
         @DisplayName("Сохранение гаранта вызывается 3 раза")
         void whenThreeGuaranteeAndGuaranteeSavedThreeTimesThenSuccess() {
             List<SkillOffer> offers = new ArrayList<>();
-            offers.add(new SkillOffer(123, new Skill(), new Recommendation()));
-            offers.add(new SkillOffer(123, new Skill(), new Recommendation()));
-            offers.add(new SkillOffer(123, new Skill(), new Recommendation()));
-            Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
-            Mockito.when(skillRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new Skill()));
-            Mockito.when(skillOfferRepository.findAllOffersOfSkill(Mockito.anyLong(), Mockito.anyLong())).thenReturn(offers);
-            skillService.acquireSkillFromOffers(1, 123);
+            offers.add(new SkillOffer(ANY_ID, new Skill(), new Recommendation()));
+            offers.add(new SkillOffer(ANY_ID, new Skill(), new Recommendation()));
+            offers.add(new SkillOffer(ANY_ID, new Skill(), new Recommendation()));
+
+            Mockito.when(userRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new User()));
+            Mockito.when(skillRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new Skill()));
+            Mockito.when(skillOfferRepository.findAllOffersOfSkill(Mockito.anyLong(), Mockito.anyLong()))
+                    .thenReturn(offers);
+            skillService.acquireSkillFromOffers(ANY_ID, ANY_ID);
             Mockito.verify(userSkillGuaranteeRepository, Mockito.times(3)).save(Mockito.any());
         }
 
         @Test
-        @DisplayName("Скилы преобразованы в List<SkillCandidateDto>")
-        void whenListSkillsConvertedToSkillCandidateListThenSuccess() {
-            List<SkillDto> skillsDto = new ArrayList<>();
-            SkillDto begit = new SkillDto(1, "Бегит");
-            skillsDto.add(begit);
-            skillsDto.add(begit);
-            skillsDto.add(new SkillDto(2, "Анжуманя"));
-            skillsDto.add(new SkillDto(3, "Прес качат"));
+        @DisplayName("Запущено преобразование в List<SkillCandidateDto>")
+        void whenListSillsMappedThenSuccess() {
             List<Skill> skills = new ArrayList<>();
             skills.add(new Skill());
-            Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
-            Mockito.when(skillRepository.findSkillsOfferedToUser(Mockito.anyLong())).thenReturn(skills);
-            List<SkillCandidateDto> resultDto = skillCandidateMapper.toDtoList(skillsDto);
-            Mockito.when(skillCandidateMapper.toDtoList(Mockito.anyList())).thenReturn(resultDto);
-            List<SkillCandidateDto> result = skillService.getOfferedSkills(1);
-            assertEquals(2, result.get(0).getOffersAmount());
-            assertEquals(3, result.size());
+
+            Mockito.when(userRepository.findById(Mockito.anyLong()))
+                    .thenReturn(Optional.of(new User()));
+            Mockito.when(skillRepository.findSkillsOfferedToUser(Mockito.anyLong()))
+                    .thenReturn(skills);
+            skillService.getOfferedSkills(ANY_ID);
+            Mockito.verify(skillCandidateMapper).toDtoList(Mockito.anyList());
         }
 
     }

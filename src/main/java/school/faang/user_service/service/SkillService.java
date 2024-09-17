@@ -28,15 +28,19 @@ public class SkillService {
     private final UserRepository userRepository;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
-
+    private static final int MINIMUM_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         Skill skillToAdd = skillMapper.toEntity(skill);
-        return skillMapper.toDto(skillRepository.save(skillToAdd));
+        skillRepository.save(skillToAdd);
+        return skillMapper.toDto(skillToAdd);
     }
 
     private void validateSkill(SkillDto skill) {
+        if (skill == null) {
+            throw new DataValidationException("DTO = null");
+        }
         if (skill.getTitle() == null || skill.getTitle().isBlank()) {
             throw new DataValidationException("Название скила не должно быть пустым");
         }
@@ -46,7 +50,7 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        User user = getValidUser(userId);
+        getValidUser(userId);
         List<SkillDto> skills = skillRepository.findAllByUserId(userId).stream().map(skillMapper::toDto).toList();
         if (!skills.isEmpty()) {
             return skills;
@@ -84,31 +88,35 @@ public class SkillService {
         User user = getValidUser(userId);
         checkUserSkill(skillId, userId);
         List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-        if (offers.size() >= 3) {
-            skillRepository.assignSkillToUser(skillId, userId);
-            for (SkillOffer offer : offers) {
-                UserSkillGuarantee guarantee = new UserSkillGuarantee();
-                guarantee.setSkill(skill);
-                guarantee.setUser(user);
-                guarantee.setGuarantor(offer.getRecommendation().getAuthor());
-                userSkillGuaranteeRepository.save(guarantee);
-            }
-            return skillMapper.toDto(skill);
-        } else {
+        validateOffers(offers);
+        skillRepository.assignSkillToUser(skillId, userId);
+        for (SkillOffer offer : offers) {
+            UserSkillGuarantee guarantee = new UserSkillGuarantee();
+            guarantee.setSkill(skill);
+            guarantee.setUser(user);
+            guarantee.setGuarantor(offer.getRecommendation().getAuthor());
+            userSkillGuaranteeRepository.save(guarantee);
+        }
+        return skillMapper.toDto(skill);
+
+    }
+
+    private void validateOffers(List<SkillOffer> offers) {
+        if (offers.size() < MINIMUM_OFFERS) {
             throw new DataValidationException("Скилл предложен менее 3 раз");
         }
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        User user = getValidUser(userId);
+        getValidUser(userId);
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
         validateOfferedSkills(skills);
         List<SkillDto> skillsDto = skills.stream().map(skillMapper::toDto).toList();
         return skillCandidateMapper.toDtoList(skillsDto);
     }
 
-    private void validateOfferedSkills (List<Skill> skills){
-        if(skills.isEmpty()){
+    private void validateOfferedSkills(List<Skill> skills) {
+        if (skills.isEmpty()) {
             throw new DataValidationException("Пользователю не предложены скиллы");
         }
     }

@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -217,7 +218,7 @@ public class EventServiceTest {
     }
 
     @Test
-    void testClearPastEvents() {
+    void testClearPastEvents() throws InterruptedException {
         Event pastEvent1 = new Event(1L, LocalDateTime.now().minusDays(1));
         Event pastEvent2 = new Event(2L, LocalDateTime.now().minusDays(2));
         Event futureEvent = new Event(3L, LocalDateTime.now().plusDays(1));
@@ -225,10 +226,18 @@ public class EventServiceTest {
 
         when(eventRepository.findAll()).thenReturn(allEvents);
 
+        CountDownLatch latch = new CountDownLatch(1);
+
+        doAnswer(invocationOnMock ->{
+            latch.countDown();
+            return null;
+        }).when(eventRepository).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
 
         eventService.clearPastEvents();
 
+        latch.await();
+
         verify(eventRepository, times(1)).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
-        verify(eventRepository, never()).deleteAllByIdInBatch(Arrays.asList(3L));
+        verify(eventRepository, never()).deleteAllByIdInBatch(List.of(3L));
     }
 }

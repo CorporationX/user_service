@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
-import school.faang.user_service.dto.FollowerEvent;
+import school.faang.user_service.dto.event.FollowerEvent;
 
 import java.time.LocalDateTime;
 

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.premium;
 
 import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +29,9 @@ import java.util.Random;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumServiceTest {
@@ -39,6 +44,8 @@ class PremiumServiceTest {
     private PremiumMapper mapper;
     @Mock
     private PaymentServiceClient serviceClient;
+    @Mock
+    private PremiumValidator validator;
 
     @InjectMocks
     private PremiumService premiumService;
@@ -54,20 +61,26 @@ class PremiumServiceTest {
     private Premium premium = Premium.builder().id(0).user(user).startDate(LocalDateTime.now()).startDate(LocalDateTime.now().plusDays(period.getDays())).build();
     private PremiumDto premiumDto = new PremiumDto(0, user.getId(), LocalDateTime.now(), LocalDateTime.now().plusDays(period.getDays()));
 
+    @BeforeEach
+    void setUp(){
+        lenient().doNothing().when(validator).validate(anyLong());
+    }
+
     @Test
     void buyPremiumForUserWithPremium() {
-        Mockito.when(premiumRepository.existsByUserId(id)).thenReturn(true);
+//        Mockito.when(premiumRepository.existsByUserId(id)).thenReturn(true);
+        doThrow(DataValidationException.class).when(validator).validate(anyLong());
 
         assertThrows(DataValidationException.class, () -> premiumService.buyPremium(id, period));
     }
 
     @Test
     void buyPremiumSuccess() {
-        Mockito.when(premiumRepository.existsByUserId(id)).thenReturn(false);
-        Mockito.when(serviceClient.sendPayment(Mockito.any())).thenReturn(responseSuccess);
+//        Mockito.when(premiumRepository.existsByUserId(id)).thenReturn(false);
+        Mockito.when(serviceClient.sendPayment(any())).thenReturn(responseSuccess);
         Mockito.when(userService.findUserById(id)).thenReturn(user);
-        Mockito.when(premiumRepository.save(Mockito.any())).thenReturn(premium);
-        Mockito.when(mapper.toDto(Mockito.any())).thenReturn(premiumDto);
+        Mockito.when(premiumRepository.save(any())).thenReturn(premium);
+        Mockito.when(mapper.toDto(any())).thenReturn(premiumDto);
         PremiumDto actualResult = premiumService.buyPremium(id, period);
         MatcherAssert.assertThat(actualResult, hasProperty("premiumId", equalTo(0L)));
         MatcherAssert.assertThat(actualResult, hasProperty("userId", equalTo(1L)));
@@ -75,8 +88,8 @@ class PremiumServiceTest {
 
     @Test
     void buyPremiumError() {
-        Mockito.when(premiumRepository.existsByUserId(id)).thenReturn(false);
-        Mockito.when(serviceClient.sendPayment(Mockito.any())).thenReturn(responseFail);
+//        Mockito.when(premiumRepository.existsByUserId(id)).thenReturn(false);
+        Mockito.when(serviceClient.sendPayment(any())).thenReturn(responseFail);
         assertThrows(RuntimeException.class, () -> premiumService.buyPremium(id, period));
     }
 }

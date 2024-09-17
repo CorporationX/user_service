@@ -2,13 +2,17 @@ package school.faang.user_service.service.recommendation.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.event.RecommendationEvent;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.service.recommendation.request.filter.Filter;
 import school.faang.user_service.validator.requestvalidator.CreateRequestDtoValidator;
 import school.faang.user_service.validator.requestvalidator.RejectRequestValidator;
@@ -27,6 +31,7 @@ public class RecommendationRequestService {
     private final SkillRequestRepository skillReqRep;
     private final CreateRequestDtoValidator createRequestValidator;
     private final RejectRequestValidator rejectRequestValidator;
+    private final RecommendationEventPublisher recommendationEventPublisher;
     private final List<Filter<RecommendationRequestFilter, RecommendationRequestDto>> recommendationFilter;
     private final RecommendationRequestMapper requestMapper;
 
@@ -35,11 +40,31 @@ public class RecommendationRequestService {
         createRequestValidator.validate(recommendationRequestDto);
 
         CompletableFuture<RecommendationRequestDto> createRequestFuture = CompletableFuture.supplyAsync(
-                () -> recommendationReqRep.create(
-                        recommendationRequestDto.getRequesterId(),
-                        recommendationRequestDto.getReceiverId(),
-                        recommendationRequestDto.getMessage()
-                )
+                () -> {
+
+                    var recommendation = recommendationReqRep.save(
+                            RecommendationRequest.builder()
+                                    .requester(User.builder().id(
+                                            recommendationRequestDto.getRequesterId()
+                                    ).build())
+                                    .receiver(User.builder().id(
+                                            recommendationRequestDto.getReceiverId()
+                                    ).build())
+                                    .message(recommendationRequestDto.getMessage())
+                                    .status(RequestStatus.PENDING)
+                                    .build()
+                    );
+
+                    recommendationEventPublisher.publish(
+                            RecommendationEvent.builder()
+                                    .recommenderId(recommendationRequestDto.getRequesterId())
+                                    .recommendedId(recommendationRequestDto.getReceiverId())
+                                    .recommendationText(recommendationRequestDto.getMessage())
+                                    .build()
+                    );
+
+                    return recommendation;
+                }
         ).thenApply(requestMapper::toDto);
 
         CompletableFuture<Void> createSkillsRequestFuture = CompletableFuture.runAsync(

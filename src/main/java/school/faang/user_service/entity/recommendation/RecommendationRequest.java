@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "recommendation_request")
-@Builder
+@Builder(toBuilder = true)
 public class RecommendationRequest {
 
     @Id

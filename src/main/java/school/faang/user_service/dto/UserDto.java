@@ -1,8 +1,4 @@
 package school.faang.user_service.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-
 public record UserDto(Long id, String username, String email) {
 }

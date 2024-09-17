@@ -2,7 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -37,14 +37,14 @@ public class SubscriptionService {
     subscriptionRepository.unfollowUser(followerId, followeeId);
   }
 
-  public List<UserDTO> getFollowers(long followeeId) {
+  public List<UserDto> getFollowers(long followeeId) {
     List<User> users =  subscriptionRepository.findByFollowerId(followeeId).toList();
     return users.stream()
       .map(userMapper::toDto)
       .toList();
   }
 
-  private List<UserDTO> filterUsers(Stream<User> users, UserFilterDto filters) {
+  private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
     userFilters.stream()
       .filter(filter -> filter.isApplicable(filters))
       .forEach(filter -> filter.apply(users, filters));
@@ -55,7 +55,7 @@ public class SubscriptionService {
     return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
   }
 
-  public List<UserDTO> getFollowing(long followeeId, UserFilterDto filter) {
+  public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
     Stream<User> users =  subscriptionRepository.findByFollowerId(followeeId);
     return filterUsers(users, filter);
   }

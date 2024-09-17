@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -39,12 +39,12 @@ public class SubscriptionServiceTest {
   private SubscriptionService subscriptionService;
 
   private User user;
-  private UserDTO userDto;
+  private UserDto userDto;
 
   @BeforeEach
   void setUp() {
     user = new User();
-    userDto = new UserDTO();
+    userDto = new UserDto();
   }
 
   @Test
@@ -86,7 +86,7 @@ public class SubscriptionServiceTest {
     when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(users.stream());
     when(userMapper.toDto(user)).thenReturn(userDto);
 
-    List<UserDTO> result = subscriptionService.getFollowers(followeeId);
+    List<UserDto> result = subscriptionService.getFollowers(followeeId);
 
     assertEquals(1, result.size());
     assertEquals(userDto, result.get(0));
@@ -112,7 +112,7 @@ public class SubscriptionServiceTest {
     when(userMapper.toDto(user)).thenReturn(userDto);
     when(userFilters.stream()).thenReturn(Stream.empty());
 
-    List<UserDTO> result = subscriptionService.getFollowing(followeeId, filter);
+    List<UserDto> result = subscriptionService.getFollowing(followeeId, filter);
 
     assertNotNull(result);
     assertEquals(1, result.size());

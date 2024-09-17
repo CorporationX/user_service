@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MentorshipServiceImplTest {
+class MentorshipServiceTest {
     @Mock
     UserRepository userRepository;
     @Mock
     MentorshipRepository mentorshipRepository;
     @InjectMocks
-    MentorshipServiceImpl mentorshipService;
+    MentorshipService mentorshipService;
     private User user;
     private static final Long userId = 10L;
     private static final Long menteeId = 1L;

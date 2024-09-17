@@ -23,6 +23,7 @@ class UserValidatorTest {
 
     @InjectMocks
     private UserValidator userValidator;
+
     @Mock
     private UserRepository userRepository;
 
@@ -35,9 +36,8 @@ class UserValidatorTest {
 
         @Nested
         class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
-
             @Test
-            @DisplayName("Ошибка валидации если переданный id = null")
+            @DisplayName("Ошибка валидации если переданное число null")
             void whenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
@@ -45,7 +45,7 @@ class UserValidatorTest {
             }
 
             @Test
-            @DisplayName("Ошибка валидации если переданный id отрицательный")
+            @DisplayName("Ошибка валидации если переданное число отрицательное")
             void whenNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator

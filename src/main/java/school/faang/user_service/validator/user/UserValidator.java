@@ -27,9 +27,7 @@ public class UserValidator {
 
     public void validateFirstUserIdAndSecondUserIdNotEquals(long firstUserId,
                                                             long secondUserId,
-                                                            String exceptionMsg)
-            throws ValidationException {
-
+                                                            String exceptionMsg) {
         if (firstUserId == secondUserId) {
             throw new ValidationException(exceptionMsg);
         }

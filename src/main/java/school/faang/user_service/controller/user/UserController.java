@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.user;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.service.user.UserService;
 
+@Tag(name = "User Management", description = "Operations related to user management")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -23,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
+    @Operation(summary = "Register a new user", description = "Registers a new user and returns the created user data.")
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -31,6 +35,7 @@ public class UserController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(summary = "Deactivate a user", description = "Deactivates a user by their ID.")
     @PutMapping("/{userId}/deactivate")
     public ResponseEntity<Void> deactivatedUser(@PathVariable Long userId) {
         userService.deactivateUser(userId);

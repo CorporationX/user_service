@@ -79,11 +79,16 @@ public class SubscriptionServiceTest {
     @Test
     public void testGetFollowersWithNoFilter() {
         when(subscriptionRepository.findByFolloweeId(1L)).thenReturn(Stream.of(user1, user2));
+        UserDto userDto1 = new UserDto(1L, "user1","user1@example.ru");
+        UserDto userDto2 = new UserDto(2L, "user2","user2@example.ru");
+        when(userMapper.toUserDto(user1)).thenReturn(userDto1);
+        when(userMapper.toUserDto(user2)).thenReturn(userDto2);
         List<UserDto> followers = subscriptionService.getFollowers(1L, new UserFilterDto());
 
         assertEquals(2, followers.size());
-        assertEquals(1L,followers.get(0).id());
-        assertEquals(2L,followers.get(1).id());
+        assertEquals(1L, followers.get(0).id());
+        assertEquals(2L, followers.get(1).id());
+
     }
 
     @Test

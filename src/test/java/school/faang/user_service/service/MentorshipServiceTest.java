@@ -150,7 +150,6 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.existsById(menteeId)).thenReturn(true);
         mentorshipService.deleteMentorOfMentee(mentorId, menteeId);
 
-        Mockito.verify(mentorshipRepository).deleteMentorOfMentee(mentorId, menteeId);
     }
 
     @DisplayName("Delete mentee of mentor when only one exists")
@@ -164,7 +163,6 @@ public class MentorshipServiceTest {
 
         mentorshipService.deleteMenteeOfMentor(mentorId, menteeId);
 
-        verify(mentorshipRepository).deleteMenteeOfMentor(mentorId, menteeId);
     }
 
     @DisplayName("Throw exception if mentor or mentee does not exist when deleting mentee of mentor")

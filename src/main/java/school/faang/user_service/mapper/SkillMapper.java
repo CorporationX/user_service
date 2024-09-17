@@ -10,6 +10,4 @@ public interface SkillMapper {
     SkillDto toDto(Skill skill);
 
     Skill toEntity(SkillDto skillDto);
-
-
 }

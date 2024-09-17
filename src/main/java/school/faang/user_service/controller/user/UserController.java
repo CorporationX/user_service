@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 

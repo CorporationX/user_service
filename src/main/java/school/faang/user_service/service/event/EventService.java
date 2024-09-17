@@ -18,6 +18,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -39,14 +40,14 @@ public class EventService {
         List<Event> priorityFilteredEvents = getPriorityFilteredEvents(filteredEvents, callingUser);
 
         decrementRemainingShows(priorityFilteredEvents);
-        deleteExpiredProfilePromotions();
+        deleteExpiredEventPromotions();
 
         return priorityFilteredEvents.stream()
                 .map(mapper::toDto)
                 .toList();
     }
 
-    List<Event> getFilteredEventsFromRepository(EventFilterDto filterDto) {
+    private List<Event> getFilteredEventsFromRepository(EventFilterDto filterDto) {
         return eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .map(filter -> filter.toSpecification(filterDto))
@@ -56,22 +57,32 @@ public class EventService {
     }
 
     private List<Event> getPriorityFilteredEvents(List<Event> filteredEvents, User callingUser) {
+
         Comparator<Event> countryAndPriorityComparator = Comparator.comparing((Event event) -> {
-            if (event.getOwner().getPromotion() != null &&
-                    event.getOwner().getPromotion().getPriorityLevel() == 3 &&
+            if (event.getOwner().getPromotions() == null || event.getOwner().getPromotions().isEmpty()) {
+                return 1;
+            }
+
+            Promotion targetPromotion = getTargetPromotion(event);
+
+            if (targetPromotion != null &&
+                    targetPromotion.getPriorityLevel() == 3 &&
                     !event.getOwner().getCountry().equals(callingUser.getCountry())) {
                 return 1;
             }
 
-            if (event.getOwner().getPromotion() != null &&
-                    !event.getOwner().getPromotion().getPromotionTarget().equals(PROMOTION_TARGET)) {
+            if (targetPromotion == null) {
                 return 1;
             }
 
-            return event.getOwner().getPromotion() != null ? 0 : 1;
-        }).thenComparing(event -> event.getOwner().getPromotion() != null &&
-                event.getOwner().getPromotion().getPromotionTarget().equals(PROMOTION_TARGET)
-                ? -event.getOwner().getPromotion().getPriorityLevel() : 0);
+            return 0;
+        }).thenComparing(event -> {
+            if (event.getOwner().getPromotions() == null || event.getOwner().getPromotions().isEmpty()) {
+                return 0;
+            }
+            Promotion targetPromotion = getTargetPromotion(event);
+            return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
+        });
 
         return filteredEvents.stream()
                 .sorted(countryAndPriorityComparator)
@@ -80,9 +91,16 @@ public class EventService {
 
     private void decrementRemainingShows(List<Event> priorityFilteredEvents) {
         List<Long> promotionIds = priorityFilteredEvents.stream()
-                .filter(event -> event.getOwner().getPromotion() != null &&
-                        event.getOwner().getPromotion().getRemainingShows() > 0)
-                .map(event -> event.getOwner().getPromotion().getId())
+                .flatMap(event -> {
+                    List<Promotion> promotions = event.getOwner().getPromotions();
+                    if (promotions == null) {
+                        return Stream.empty();
+                    }
+                    return promotions.stream()
+                            .filter(promotion -> PROMOTION_TARGET.equals(promotion.getPromotionTarget()) &&
+                                    promotion.getRemainingShows() > 0)
+                            .map(Promotion::getId);
+                })
                 .toList();
 
         if (!promotionIds.isEmpty()) {
@@ -90,10 +108,17 @@ public class EventService {
         }
     }
 
-    private void deleteExpiredProfilePromotions() {
-        List<Promotion> expiredPromotions = promotionRepository.findAllExpiredPromotions(EventService.PROMOTION_TARGET);
+    private void deleteExpiredEventPromotions() {
+        List<Promotion> expiredPromotions = promotionRepository.findAllExpiredPromotions(PROMOTION_TARGET);
         if (!expiredPromotions.isEmpty()) {
             promotionRepository.deleteAll(expiredPromotions);
         }
+    }
+
+    private Promotion getTargetPromotion(Event event) {
+        return event.getOwner().getPromotions().stream()
+                .filter(promotion -> PROMOTION_TARGET.equals(promotion.getPromotionTarget()))
+                .findFirst()
+                .orElse(null);
     }
 }

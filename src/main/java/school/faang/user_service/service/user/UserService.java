@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import school.faang.user_service.repository.UserRepository;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -55,20 +56,32 @@ public class UserService {
     private List<User> getPriorityFilteredUsers(List<User> filteredUsers, User callingUser) {
 
         Comparator<User> countryAndPriorityComparator = Comparator.comparing((User user) -> {
-            if (user.getPromotion() != null &&
-                    user.getPromotion().getPriorityLevel() == 3 &&
+            if (user.getPromotions() == null || user.getPromotions().isEmpty()) {
+                return 1;
+            }
+
+            Promotion targetPromotion = getTargetPromotion(user);
+
+            if (targetPromotion != null &&
+                    targetPromotion.getPriorityLevel() == 3 &&
                     !user.getCountry().equals(callingUser.getCountry())) {
                 return 1;
             }
 
-            if (user.getPromotion() != null &&
-                    !user.getPromotion().getPromotionTarget().equals(PROMOTION_TARGET)) {
+            if (targetPromotion == null) {
                 return 1;
             }
 
-            return user.getPromotion() != null ? 0 : 1;
-        }).thenComparing(user -> user.getPromotion() != null &&
-                user.getPromotion().getPromotionTarget().equals(PROMOTION_TARGET) ? -user.getPromotion().getPriorityLevel() : 0);
+            return 0;
+        }).thenComparing(user -> {
+            if (user.getPromotions() == null || user.getPromotions().isEmpty()) {
+                return 0;
+            }
+
+            Promotion targetPromotion = getTargetPromotion(user);
+
+            return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
+        });
 
         return filteredUsers.stream()
                 .sorted(countryAndPriorityComparator)
@@ -77,8 +90,16 @@ public class UserService {
 
     private void decrementRemainingShows(List<User> priorityFilteredUsers) {
         List<Long> promotionIds = priorityFilteredUsers.stream()
-                .filter(user -> user.getPromotion() != null && user.getPromotion().getRemainingShows() > 0)
-                .map(user -> user.getPromotion().getId())
+                .flatMap(user -> {
+                    List<Promotion> promotions = user.getPromotions();
+                    if (promotions == null) {
+                        return Stream.empty();
+                    }
+                    return promotions.stream()
+                            .filter(promotion -> PROMOTION_TARGET.equals(promotion.getPromotionTarget()) &&
+                                    promotion.getRemainingShows() > 0)
+                            .map(Promotion::getId);
+                })
                 .toList();
 
         if (!promotionIds.isEmpty()) {
@@ -91,5 +112,12 @@ public class UserService {
         if (!expiredPromotions.isEmpty()) {
             promotionRepository.deleteAll(expiredPromotions);
         }
+    }
+
+    private Promotion getTargetPromotion(User user) {
+        return user.getPromotions().stream()
+                .filter(promotion -> PROMOTION_TARGET.equals(promotion.getPromotionTarget()))
+                .findFirst()
+                .orElse(null);
     }
 }

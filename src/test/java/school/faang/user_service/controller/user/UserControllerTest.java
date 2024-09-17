@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 

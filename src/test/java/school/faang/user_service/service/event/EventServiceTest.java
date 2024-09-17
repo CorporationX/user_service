@@ -76,13 +76,16 @@ public class EventServiceTest {
         event1.setTitle("Event 1");
         event1.setMaxAttendees(100);
         event1.setOwner(owner1);
-        event1.getOwner().setPromotion(new Promotion());
-        event1.getOwner().getPromotion().setPromotionTarget("event");
-        event1.getOwner().getPromotion().setRemainingShows(5);
-        event1.getOwner().getPromotion().setPriorityLevel(3);
+
+        Promotion promotion1 = new Promotion();
+        promotion1.setPromotionTarget("event");
+        promotion1.setRemainingShows(5);
+        promotion1.setPriorityLevel(3);
+
+        owner1.setPromotions(new ArrayList<>(List.of(promotion1)));
 
         User owner2 = new User();
-        owner2.setId(2L);
+        owner2.setId(3L);
         owner2.setCountry(usa);
 
         Event event2 = new Event();
@@ -90,10 +93,13 @@ public class EventServiceTest {
         event2.setTitle("Event 2");
         event2.setMaxAttendees(200);
         event2.setOwner(owner2);
-        event2.getOwner().setPromotion(new Promotion());
-        event2.getOwner().getPromotion().setPromotionTarget("event");
-        event2.getOwner().getPromotion().setRemainingShows(5);
-        event2.getOwner().getPromotion().setPriorityLevel(3);
+
+        Promotion promotion2 = new Promotion();
+        promotion2.setPromotionTarget("event");
+        promotion2.setRemainingShows(5);
+        promotion2.setPriorityLevel(3);
+
+        owner2.setPromotions(new ArrayList<>(List.of(promotion2)));
 
         List<EventFilter> filters = new ArrayList<>();
         filters.add(new EventTitleFilter());
@@ -117,8 +123,8 @@ public class EventServiceTest {
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(2, result.size()),
-                () -> assertEquals(2L, result.get(0).getId()),
-                () -> assertEquals(1L, result.get(1).getId())
+                () -> assertEquals(2L, result.get(0).getId(), "First event should be event2"),
+                () -> assertEquals(1L, result.get(1).getId(), "Second event should be event1")
         );
     }
 

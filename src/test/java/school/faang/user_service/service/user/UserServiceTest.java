@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -71,19 +71,36 @@ public class UserServiceTest {
         promoted1.setId(2L);
         promoted1.setUsername("John Smith");
         promoted1.setCountry(uk);
-        promoted1.setPromotion(new Promotion());
-        promoted1.getPromotion().setPromotionTarget("profile");
-        promoted1.getPromotion().setRemainingShows(5);
-        promoted1.getPromotion().setPriorityLevel(3);
+
+        Promotion promotion1_1 = new Promotion();
+        promotion1_1.setPromotionTarget("profile");
+        promotion1_1.setRemainingShows(5);
+        promotion1_1.setPriorityLevel(3);
+
+        Promotion promotion1_2 = new Promotion();
+        promotion1_2.setPromotionTarget("event");
+        promotion1_2.setRemainingShows(2);
+        promotion1_2.setPriorityLevel(1);
+
+        promoted1.setPromotions(new ArrayList<>(List.of(promotion1_1, promotion1_2)));
 
         User promoted2 = new User();
         promoted2.setId(3L);
         promoted2.setUsername("John Smith");
         promoted2.setCountry(usa);
-        promoted2.setPromotion(new Promotion());
-        promoted2.getPromotion().setPromotionTarget("profile");
-        promoted2.getPromotion().setRemainingShows(5);
-        promoted2.getPromotion().setPriorityLevel(3);
+        promoted2.setPromotions(new ArrayList<>());
+
+        Promotion promotion2_1 = new Promotion();
+        promotion2_1.setPromotionTarget("profile");
+        promotion2_1.setRemainingShows(5);
+        promotion2_1.setPriorityLevel(3);
+
+        Promotion promotion2_2 = new Promotion();
+        promotion2_2.setPromotionTarget("event");
+        promotion2_2.setRemainingShows(3);
+        promotion2_2.setPriorityLevel(2);
+
+        promoted2.setPromotions(new ArrayList<>(List.of(promotion2_1, promotion2_2)));
 
         List<UserFilter> filters = new ArrayList<>();
         filters.add(new UserNameFilter());
@@ -101,6 +118,7 @@ public class UserServiceTest {
 
         verify(userMapper).toDto(callingUser);
         verify(userMapper).toDto(promoted1);
+        verify(userMapper).toDto(promoted2);
 
         assertAll(
                 () -> assertNotNull(result),

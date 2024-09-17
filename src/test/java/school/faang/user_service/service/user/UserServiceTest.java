@@ -15,7 +15,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.validatior.user.UserValidator;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,13 +89,11 @@ class UserServiceTest {
             userService.deactivateAccount(USER_ID_IS_ONE);
 
             verify(userValidator)
-                    .validateUserIdIsPositiveAndNotNull(USER_ID_IS_ONE);
-            verify(userValidator)
-                    .validateUserIsExisted(USER_ID_IS_ONE);
+                    .validateUser(USER_ID_IS_ONE);
             verify(userRepository)
                     .findById(USER_ID_IS_ONE);
             verify(goalService)
-                    .deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user);
+                    .deactivateActiveUserGoals(user);
             verify(eventService)
                     .deactivatePlanningUserEventsAndDeleteEvent(user);
             verify(mentorshipService)

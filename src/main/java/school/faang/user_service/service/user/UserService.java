@@ -9,7 +9,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.validatior.user.UserValidator;
+import school.faang.user_service.validator.user.UserValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +24,13 @@ public class UserService {
 
     @Transactional
     public void deactivateAccount(Long userId) {
-        validateUser(userId);
+        userValidator.validateUser(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " not existed"));
 
         if (!user.getGoals().isEmpty()) {
-            goalService.deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user);
+            goalService.deactivateActiveUserGoals(user);
         }
         eventService.deactivatePlanningUserEventsAndDeleteEvent(user);
         user.setActive(false);
@@ -38,10 +38,4 @@ public class UserService {
         mentorshipService.removeUserFromListHisMentees(user);
         user.getMentees().clear();
     }
-
-    private void validateUser(Long userId) {
-        userValidator.validateUserIdIsPositiveAndNotNull(userId);
-        userValidator.validateUserIsExisted(userId);
-    }
-
 }

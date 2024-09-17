@@ -35,4 +35,8 @@ public class UserValidator {
         }
     }
 
+    public void validateUser(Long userId) {
+        validateUserIdIsPositiveAndNotNull(userId);
+        validateUserIsExisted(userId);
+    }
 }

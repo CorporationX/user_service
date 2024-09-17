@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +44,7 @@ class GoalInvitationServiceTest {
     @Mock
     private GoalInvitationFilter goalInvitationFilter;
 
+    private final static int ONE_TIMES_CALL_METHOD = 1;
     private final static int TWO_TIMES_CALL_METHOD = 2;
 
     private final static Long GOAL_INVITATION_ID_IS_ONE = 1L;
@@ -110,21 +111,21 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteById должен вызваться 2 раза")
+        @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteAllById должен вызваться 1 раз")
         void whenGoalInvitationsSizeIsTwoThenTwoTimesUsesRepository() {
             goalInvitationService.deleteGoalInvitations(goalInvitations);
 
-            verify(goalInvitationRepository, times(TWO_TIMES_CALL_METHOD))
-                    .deleteById(anyLong());
+            verify(goalInvitationRepository, times(ONE_TIMES_CALL_METHOD))
+                    .deleteAllById(anyCollection());
         }
 
         @Test
-        @DisplayName("Если в фильтре подходит одно из значений входного листа то deleteById вызывается один раз")
+        @DisplayName("Если в фильтре подходит одно из значений входного листа то deleteAllById вызывается 1 раз")
         void whenUserExistsThenSuccess() {
             goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
 
             verify(goalInvitationRepository)
-                    .deleteById(anyLong());
+                    .deleteAllById(anyCollection());
         }
 
 

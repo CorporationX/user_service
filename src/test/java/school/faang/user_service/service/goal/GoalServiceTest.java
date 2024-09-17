@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -257,7 +257,7 @@ public class GoalServiceTest {
 
             assertEquals(ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO, activeGoal.getUsers().size());
 
-            goalService.deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user1);
+            goalService.deactivateActiveUserGoals(user1);
 
             verify(goalInvitationService)
                     .deleteGoalInvitationForUser(goalInvitations, user1);
@@ -277,7 +277,7 @@ public class GoalServiceTest {
 
             assertEquals(ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ONE, activeGoal.getUsers().size());
 
-            goalService.deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(user1);
+            goalService.deactivateActiveUserGoals(user1);
 
             verify(goalRepository)
                     .deleteById(any());

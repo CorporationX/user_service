@@ -31,8 +31,6 @@ public class GoalService {
     private final GoalServiceValidator goalServiceValidator;
     private final SkillServiceValidator skillServiceValidator;
 
-    private final GoalStatus ACTIVE_GOAL_STATUS = GoalStatus.ACTIVE;
-
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         int userGoalsCount = goalRepository.countActiveGoalsPerUser(userId);
@@ -119,9 +117,9 @@ public class GoalService {
         }
     }
 
-    public void deactivateActiveUserGoalsAndDeleteIfNoOneIsWorkingWith(User user) {
+    public void deactivateActiveUserGoals(User user) {
         user.getGoals().stream()
-                .filter(goal -> goal.getStatus().equals(ACTIVE_GOAL_STATUS))
+                .filter(goal -> goal.getStatus().equals(GoalStatus.ACTIVE))
                 .forEach(goal -> {
                     List<GoalInvitation> goalInvitations = goal.getInvitations();
 

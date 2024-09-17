@@ -19,11 +19,4 @@ public interface MentorshipRepository extends CrudRepository<User, Long> {
     @Query("SELECT u.mentors FROM User u WHERE u.id = :menteeId")
     List<User> findMentorsByMenteeId(@Param("menteeId") long menteeId);
 
-    @Modifying
-    @Query("DELETE FROM Mentorship m WHERE m.mentor.id = :mentorId AND m.mentee.id = :menteeId")
-    void deleteMenteeOfMentor(@Param("mentorId") long mentorId, @Param("menteeId") long menteeId);
-
-    @Modifying
-    @Query("DELETE FROM Mentorship m WHERE m.mentor.id = :mentorId AND m.mentee.id = :menteeId")
-    void deleteMentorOfMentee(@Param("mentorId") long mentorId, @Param("menteeId") long menteeId);
 }

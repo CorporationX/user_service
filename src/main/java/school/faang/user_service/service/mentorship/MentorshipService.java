@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     public List<UserDto> getMentees(long mentorId) {
@@ -52,7 +54,18 @@ public class MentorshipService {
             log.error("Mentor with ID {} or mentee with ID {} does not exist", mentorId, menteeId);
             throw new IllegalArgumentException("Mentor or mentee does not exist");
         }
-        mentorshipRepository.deleteMenteeOfMentor(mentorId, menteeId);
+        User mentee = userRepository.findById(menteeId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentee not found with id: " + menteeId));
+
+        User mentor = userRepository.findById(mentorId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor not found with id: " + mentorId));
+
+        if (!mentor.getMentees().contains(mentee)) {
+            throw new IllegalArgumentException("Mentee is not assigned to this mentor.");
+        }
+
+        mentor.getMentees().remove(mentee);
+        userRepository.save(mentor);
         log.info("Successfully deleted mentee with ID {} for mentor with ID {}", menteeId, mentorId);
     }
 
@@ -63,7 +76,18 @@ public class MentorshipService {
             log.error("Mentor with ID {} or mentee with ID {} does not exist", mentorId, menteeId);
             throw new IllegalArgumentException("Mentor or mentee does not exist");
         }
-        mentorshipRepository.deleteMentorOfMentee(mentorId, menteeId);
+        User mentee = userRepository.findById(menteeId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentee not found with id: " + menteeId));
+
+        User mentor = userRepository.findById(mentorId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor not found with id: " + mentorId));
+
+        if (!mentee.getMentors().contains(mentor)) {
+            throw new IllegalArgumentException("Mentor is not assigned to this mentee.");
+        }
+
+        mentee.getMentors().remove(mentor);
+        userRepository.save(mentee);
         log.info("Successfully deleted mentor with ID {} for mentee with ID {}", mentorId, menteeId);
     }
 

@@ -172,4 +172,9 @@ public class SubscriptionServiceTest {
         when(subscriptionRepository.findByFollowerId(user1.getId())).thenReturn(following.stream());
         Assert.assertEquals(following, subscriptionService.getFollowing(user1.getId(), filter));
     }
+
+    @Test
+    public void testForCI() {
+
+    }
 }

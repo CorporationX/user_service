@@ -1,6 +1,7 @@
 package school.faang.user_service.repository.goal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
 public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
-            SELECT * FROM goal g
+            SELECT g.* FROM goal g
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)
@@ -21,7 +22,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
-            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
+            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning *
             """)
     Goal create(String title, String description, Long parent);
 
@@ -49,4 +50,20 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            DELETE FROM goal
+            WHERE goal.mentor_id = :mentorId AND
+                  goal.id NOT IN
+                  (SELECT DISTINCT user_goal.goal_id FROM user_goal)
+            """)
+    void deleteUnusedGoalsByMentorId(long mentorId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE goal SET mentor_id = :newMentorId
+            WHERE goal.mentor_id = :mentorId
+            """)
+    void updateMentorIdByMentorId(long mentorId, Long newMentorId);
 }

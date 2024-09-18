@@ -1,6 +1,7 @@
 package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
@@ -25,4 +26,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE users SET active = :active
+            WHERE id = :id
+            """)
+    void updateUserActive(long id, boolean active);
 }

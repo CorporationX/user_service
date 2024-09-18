@@ -11,7 +11,6 @@ import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -25,8 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
-        Stream<User> premiumUsersStream = Optional.ofNullable(userRepository.findPremiumUsers())
-                .orElse(Stream.empty());
+        Stream<User> premiumUsersStream = userRepository.findPremiumUsers();
 
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))

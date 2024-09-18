@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -27,6 +29,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class SubscriptionServiceTest {
     @Mock
     private final List<UserFilter> userFilters = new ArrayList<>();

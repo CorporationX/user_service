@@ -15,6 +15,4 @@ public interface EventMapper {
     Event toEntity(EventDto eventDto);
 
     List<EventDto> toDtoList(List<Event> events);
-
-    EventDto toDtoOp(Optional<Event> event);
 }

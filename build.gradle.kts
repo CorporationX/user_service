@@ -115,7 +115,7 @@ val jacocoInclude = listOf(
     "**/mapper/**"
 )
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {

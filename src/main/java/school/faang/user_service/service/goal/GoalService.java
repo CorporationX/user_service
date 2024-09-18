@@ -9,10 +9,12 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
 
@@ -91,12 +93,15 @@ public class GoalService {
         existingGoal.setTitle(goalDto.getTitle());
         existingGoal.setDescription(goalDto.getDescription());
 
-        if (goalDto.getStatus() != null) {
-            existingGoal.setStatus(goalDto.getStatus());
+        GoalStatus status = goalDto.getStatus();
+        if (status != null) {
+            existingGoal.setStatus(status);
         }
 
-        if (goalDto.getParentId() != null) {
-            goalRepository.findById(goalDto.getParentId()).ifPresent(existingGoal::setParent);
+        Long parentId = goalDto.getParentId();
+        if (parentId != null) {
+            Goal parentGoal = getGoalById(parentId);
+            existingGoal.setParent(parentGoal);
         }
 
         setSkillsToGoal(goalDto.getSkillIds(), existingGoal);

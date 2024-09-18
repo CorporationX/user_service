@@ -3,12 +3,14 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.RecommendationServiceImpl;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class RecommendationController {
-    private final RecommendationService recommendationService;
+    private final RecommendationServiceImpl recommendationService;
 
     public void giveRecommendation(RecommendationDto recommendation) {
         recommendationService.create(recommendation);
@@ -22,12 +24,12 @@ public class RecommendationController {
         recommendationService.delete(id);
     }
 
-    public void getAllUserRecommendations(long receiverId) {
-        recommendationService.getAllUserRecommendations(receiverId);
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+        return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    public void getAllGivenRecommendations(long authorId) {
-        recommendationService.getAllGivenRecommendations(authorId);
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        return recommendationService.getAllGivenRecommendations(authorId);
     }
 
 }

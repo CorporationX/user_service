@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class RecommendationServiceTest {
 
     @InjectMocks
-    private RecommendationService recommendationService;
+    private RecommendationServiceImpl recommendationService;
     @Mock
     private RecommendationRepository recommendationRepository;
     @Mock
@@ -69,6 +69,9 @@ public class RecommendationServiceTest {
         dto.setReceiverId(2L);
         dto.setContent("content");
         dto.setCreatedAt(lastDate);
+        dto.setSkillOffers(List.of(new SkillOfferDto(1L, 2L), new SkillOfferDto(2L, 3L)));
+        List<Long> skillIds = skillByIds(dto);
+        when(skillRepository.findAllById(skillIds)).thenReturn(List.of(new Skill(), new Skill()));
         Recommendation recommendation = new Recommendation();
         recommendation.setCreatedAt(lastDate);
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L))

@@ -17,8 +17,6 @@ public interface RecommendationMapper {
     @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "mapToSkillOfferDtoList")
     RecommendationDto toDto(Recommendation recommendation);
 
-    Recommendation toEntity(RecommendationDto recommendationDto);
-
     @Named("mapToSkillOfferDtoList")
     default List<SkillOfferDto> mapToSkillOfferDtoList(List<SkillOffer> skillOffers) {
         return skillOffers.stream()

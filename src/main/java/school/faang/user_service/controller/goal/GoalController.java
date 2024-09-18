@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.service.goal.GoalService;
 
@@ -45,7 +46,9 @@ public class GoalController {
                                               @RequestParam(value = "filterDescription", required = false) String filterDescription,
                                               @RequestParam(value = "filterStatus", required = false) GoalStatus filterStatus,
                                               @RequestParam(value = "filterSkills", required = false) List<Long> filterSkills) {
-        return goalService.findSubtasksByGoalId(goalId, filterTitle, filterDescription, filterStatus, filterSkills);
+        GoalFilterDto filterDto = new GoalFilterDto(filterTitle, filterDescription, filterStatus, filterSkills);
+
+        return goalService.findSubtasksByGoalId(goalId, filterDto);
     }
 
     @GetMapping("/users/{userId}")
@@ -55,6 +58,8 @@ public class GoalController {
                                         @RequestParam(value = "filterDescription", required = false) String filterDescription,
                                         @RequestParam(value = "filterStatus", required = false) GoalStatus filterStatus,
                                         @RequestParam(value = "filterSkills", required = false) List<Long> filterSkills) {
-        return goalService.getGoalsByUser(userId, filterTitle, filterDescription, filterStatus, filterSkills);
+        GoalFilterDto filterDto = new GoalFilterDto(filterTitle, filterDescription, filterStatus, filterSkills);
+
+        return goalService.getGoalsByUser(userId, filterDto);
     }
 }

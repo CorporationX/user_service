@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
@@ -56,7 +56,7 @@ public class UserServiceTest {
         void whenUserDoesNotExistThenThrowNotFoundException() {
             when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
 
-            assertThrows(NotFoundException.class, () -> userService.getUserById(USER_ID));
+            assertThrows(EntityNotFoundException.class, () -> userService.getUserById(USER_ID));
             verify(userRepository).findById(USER_ID);
         }
     }

@@ -33,7 +33,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query(value = """
             SELECT u.id FROM User u 
-            JOIN u.followers f WHERE f.id = :userId
+            JOIN u.followees f WHERE f.id = :userId
             """)
     List<Long> findFollowerIdsByUserId(long userId);
 }

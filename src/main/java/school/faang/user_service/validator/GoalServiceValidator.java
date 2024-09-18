@@ -6,8 +6,6 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 
-import java.util.stream.Stream;
-
 @Component
 @RequiredArgsConstructor
 public class GoalServiceValidator {
@@ -19,10 +17,6 @@ public class GoalServiceValidator {
                 activeGoalCount >= MAX_USER_GOALS_LIMIT,
                 "This user has exceeded the goal limit"
         );
-    }
-
-    public void validateGoalsExist(final Stream<Goal> goals) {
-        validateCondition(goals.toList().isEmpty(), "A goal with this ID does not exist");
     }
 
     public void validateGoalStatusNotCompleted(final Goal goal) {

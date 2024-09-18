@@ -12,7 +12,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.validator.GoalServiceValidator;
 
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -52,30 +51,6 @@ public class GoalServiceValidatorTest {
         @DisplayName("Does not throw exception when user does not exceed goal limit")
         void whenUserDoesNotExceedGoalLimitThenDoNotThrowException() {
             goalServiceValidator.validateUserGoalLimit(ACTIVE_GOAL_COUNT_BELOW_LIMIT);
-        }
-    }
-
-    @Nested
-    @DisplayName("Goal Existence Validation Tests")
-    class GoalExistenceTests {
-
-        @Test
-        @DisplayName("Throws exception when no goals exist")
-        void whenNoGoalsExistThenThrowException() {
-            Stream<Goal> emptyGoalsStream = Stream.empty();
-
-            assertThrows(DataValidationException.class,
-                    () -> goalServiceValidator.validateGoalsExist(emptyGoalsStream),
-                    "A goal with this ID does not exist"
-            );
-        }
-
-        @Test
-        @DisplayName("Does not throw exception when goals exist")
-        void whenGoalsExistThenDoNotThrowException() {
-            Stream<Goal> goalsStream = Stream.of(goal);
-
-            goalServiceValidator.validateGoalsExist(goalsStream);
         }
     }
 

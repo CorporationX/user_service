@@ -25,7 +25,7 @@ public class GoalController {
         return goalService.createGoal(userId, goalDto);
     }
 
-    @PutMapping("/{goalId}")
+    @PatchMapping("/{goalId}")
     @ResponseStatus(HttpStatus.OK)
     public GoalDto updateGoal(@PathVariable("goalId") @Positive long goalId,
                               @RequestBody @Valid GoalDto goal) {

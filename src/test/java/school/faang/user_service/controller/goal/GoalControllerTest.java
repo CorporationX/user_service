@@ -23,6 +23,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class GoalControllerTest {
 
+    private static final String TITLE = "Test Goal";
+    private static final String DESCRIPTION = "Test description";
     private static final long GOAL_ID = 1L;
     private static final long USER_ID = 1L;
 
@@ -38,8 +40,8 @@ public class GoalControllerTest {
     public void setUp() {
         goalDto = GoalDto.builder()
                 .id(GOAL_ID)
-                .title("New Goal")
-                .description("Goal Description")
+                .title(TITLE)
+                .description(DESCRIPTION)
                 .status(GoalStatus.ACTIVE)
                 .skillIds(List.of())
                 .build();

@@ -30,4 +30,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     Optional<User> findByPhone(String phone);
+
+    @Query(value = """
+            SELECT u.id FROM User u 
+            JOIN u.followers f WHERE f.id = :userId
+            """)
+    List<Long> findFollowerIdsByUserId(long userId);
 }

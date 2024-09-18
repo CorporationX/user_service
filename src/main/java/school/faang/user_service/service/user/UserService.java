@@ -144,6 +144,10 @@ public class UserService {
         return allOf;
     }
 
+    public List<Long> getFollowerIds(Long userId) {
+        return userRepository.findFollowerIdsByUserId(userId);
+    }
+
     private List<Person> readPersonsFromCSV(InputStream file) throws IOException {
         ObjectReader csvOpenReader = new CsvMapper()
                 .readerFor(Person.class)

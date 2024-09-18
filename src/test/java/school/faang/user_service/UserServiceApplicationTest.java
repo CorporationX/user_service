@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.mapper.SkillMapper;
@@ -30,6 +31,7 @@ import school.faang.user_service.service.goal.GoalService;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 class UserServiceApplicationTest {
     @Autowired

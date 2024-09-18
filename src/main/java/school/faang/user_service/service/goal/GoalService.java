@@ -9,6 +9,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
@@ -32,6 +33,7 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final SkillValidator skillValidator;
     private final UserService userService;
+    private final GoalInvitationService goalInvitationService;
 
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
@@ -125,6 +127,24 @@ public class GoalService {
                 .reduce(goals, (currentGoals, filter) -> filter.apply(currentGoals, filterDto), (s1, s2) -> s1)
                 .map(goalMapper::toGoalDto)
                 .toList();
+    }
+
+    public void deactivateActiveUserGoals(User user) {
+        user.getGoals().stream()
+                .filter(goal -> goal.getStatus().equals(GoalStatus.ACTIVE))
+                .forEach(goal -> {
+                    List<GoalInvitation> goalInvitations = goal.getInvitations();
+
+                    goal.getUsers().remove(user);
+                    if (goal.getUsers().isEmpty()) {
+                        goalInvitationService.deleteGoalInvitations(goalInvitations);
+                        goalRepository.deleteById(goal.getId());
+                    } else {
+                        goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
+                    }
+                });
+
+        user.getGoals().clear();
     }
 }
 

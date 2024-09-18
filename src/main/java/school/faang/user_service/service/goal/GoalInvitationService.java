@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.filter.goalInvitation.GoalInvitationFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
@@ -15,6 +16,7 @@ import school.faang.user_service.validator.goal.GoalValidator;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
@@ -28,6 +30,20 @@ public class GoalInvitationService {
     private final List<GoalInvitationFilter> goalInvitationFilters;
 
     private final static int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
+
+    public void deleteGoalInvitations(List<GoalInvitation> goalInvitations) {
+        goalInvitationRepository.deleteAll(goalInvitations);
+    }
+
+    public void deleteGoalInvitationForUser(List<GoalInvitation> goalInvitations, User user) {
+        List<Long> goalInvitationIds = goalInvitations.stream()
+                .filter(invitation -> (Objects.equals(invitation.getInvited().getId(), user.getId()) ||
+                        Objects.equals(invitation.getInviter().getId(), user.getId())))
+                .map(GoalInvitation::getId)
+                .toList();
+
+        goalInvitationRepository.deleteAllById(goalInvitationIds);
+    }
 
     @Transactional
     public void createInvitation(GoalInvitationDto goalInvitationDto) {

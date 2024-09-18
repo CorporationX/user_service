@@ -10,11 +10,13 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
 import school.faang.user_service.dto.premium.PaymentRequest;
 import school.faang.user_service.dto.premium.PaymentResponse;
+import school.faang.user_service.dto.premium.PaymentStatus;
 import school.faang.user_service.dto.promotion.PromotionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.entity.promotion.PromotionType;
 import school.faang.user_service.exception.ExistingPurchaseException;
+import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PromotionMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -42,24 +44,31 @@ public class PromotionService {
             }
         });
 
-        payPromotion(type);
+        payPromotion(type, user, target);
 
         Promotion savedPromotion = savePromotion(user, type, target);
         return promotionMapper.toPromotionDto(savedPromotion);
     }
 
-    private void payPromotion(PromotionType type) {
+    private void payPromotion(PromotionType type, User user, String target) {
         long paymentNumber = promotionRepository.getPromotionPaymentNumber();
         PaymentRequest paymentRequest =
                 new PaymentRequest(paymentNumber, new BigDecimal(type.getPrice()), Currency.USD);
         ResponseEntity<PaymentResponse> paymentResponseEntity = paymentServiceClient.sendPayment(paymentRequest);
         PaymentResponse response = paymentResponseEntity.getBody();
 
-        if (response != null) {
-            log.info("Payment response received: {}", response.message());
-        } else {
-            log.warn("No response from payment service.");
+        if (response == null) {
+            log.error("No response received from payment service for user {}.", user.getUsername());
+            throw new PaymentFailureException("No response from payment service.");
         }
+
+        if (response.status() == PaymentStatus.FAIL) {
+            log.error("Payment for {} promotion failed for user {}.", target, user.getUsername());
+            throw new PaymentFailureException(String.format("Failure to effect %s promotion payment for user %s.",
+                    target, user.getUsername()));
+        }
+
+        log.info("Payment response received for user {}: {}", user.getUsername(), response.message());
     }
 
     private Promotion savePromotion(User user, PromotionType type, String target) {

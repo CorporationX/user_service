@@ -10,11 +10,13 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
 import school.faang.user_service.dto.premium.PaymentRequest;
 import school.faang.user_service.dto.premium.PaymentResponse;
+import school.faang.user_service.dto.premium.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.ExistingPurchaseException;
+import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -40,24 +42,32 @@ public class PremiumService {
             throw new ExistingPurchaseException("User already has an active premium subscription");
         }
 
-        payPremium(premiumPeriod);
+        payPremium(premiumPeriod, user);
 
         Premium savedPremium = savePremium(premiumPeriod, user);
         return premiumMapper.toPremiumDto(savedPremium);
     }
 
-    private void payPremium(PremiumPeriod premiumPeriod) {
+    private void payPremium(PremiumPeriod premiumPeriod, User user) {
         long paymentNumber = premiumRepository.getPremiumPaymentNumber();
         PaymentRequest paymentRequest =
                 new PaymentRequest(paymentNumber, new BigDecimal(premiumPeriod.getPrice()), Currency.USD);
         ResponseEntity<PaymentResponse> paymentResponseEntity = paymentServiceClient.sendPayment(paymentRequest);
         PaymentResponse response = paymentResponseEntity.getBody();
 
-        if (response != null) {
-            log.info("Payment response received: {}", response.message());
-        } else {
-            log.warn("No response from payment service.");
+        if (response == null) {
+            log.error("No response received from payment service for user {}.", user.getUsername());
+            throw new PaymentFailureException("No response from payment service.");
         }
+
+        if (response.status() == PaymentStatus.FAIL) {
+            log.error("Payment failed for user {} for the period of {} days.",
+                    user.getUsername(), premiumPeriod.getDays());
+            throw new PaymentFailureException(String.format("Failure to effect premium payment" +
+            " for user %s for requested period of %d days.", user.getUsername(), premiumPeriod.getDays()));
+        }
+
+        log.info("Payment response received for user {}: {}", user.getUsername(), response.message());
     }
 
     private Premium savePremium(PremiumPeriod premiumPeriod, User user) {

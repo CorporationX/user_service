@@ -57,35 +57,10 @@ public class EventService {
     }
 
     private List<Event> getPriorityFilteredEvents(List<Event> filteredEvents, User callingUser) {
-
-        Comparator<Event> countryAndPriorityComparator = Comparator.comparing((Event event) -> {
-            if (event.getOwner().getPromotions() == null || event.getOwner().getPromotions().isEmpty()) {
-                return 1;
-            }
-
-            Promotion targetPromotion = getTargetPromotion(event);
-
-            if (targetPromotion != null &&
-                    targetPromotion.getPriorityLevel() == 3 &&
-                    !event.getOwner().getCountry().equals(callingUser.getCountry())) {
-                return 1;
-            }
-
-            if (targetPromotion == null) {
-                return 1;
-            }
-
-            return 0;
-        }).thenComparing(event -> {
-            if (event.getOwner().getPromotions() == null || event.getOwner().getPromotions().isEmpty()) {
-                return 0;
-            }
-            Promotion targetPromotion = getTargetPromotion(event);
-            return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
-        });
-
         return filteredEvents.stream()
-                .sorted(countryAndPriorityComparator)
+                .sorted((Comparator
+                        .comparing((Event event) -> calculateCountryPriority(event, callingUser))
+                        .thenComparing(this::calculatePriorityLevel)))
                 .toList();
     }
 
@@ -120,5 +95,30 @@ public class EventService {
                 .filter(promotion -> PROMOTION_TARGET.equals(promotion.getPromotionTarget()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private int calculateCountryPriority(Event event, User callingUser) {
+        User eventOwner = event.getOwner();
+        if (eventOwner.getPromotions() == null || eventOwner.getPromotions().isEmpty()) {
+            return 1;
+        }
+
+        Promotion targetPromotion = getTargetPromotion(event);
+        if (targetPromotion == null || (targetPromotion.getPriorityLevel() == 3
+                && !eventOwner.getCountry().equals(callingUser.getCountry()))) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private int calculatePriorityLevel(Event event) {
+        User eventOwner = event.getOwner();
+        if (eventOwner.getPromotions() == null || eventOwner.getPromotions().isEmpty()) {
+            return 0;
+        }
+
+        Promotion targetPromotion = getTargetPromotion(event);
+        return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
     }
 }

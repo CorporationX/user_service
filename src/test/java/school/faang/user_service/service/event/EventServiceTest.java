@@ -1,11 +1,11 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
+    private List<EventFilter> eventFilters;
 
     @Mock
     PromotionRepository promotionRepository;
@@ -52,10 +53,21 @@ public class EventServiceTest {
     private EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
 
     @Mock
-    private List<EventFilter> eventFilters;
+    private EventTitleFilter eventTitleFilter;
 
-    @InjectMocks
+    @Mock
+    private EventMaxAttendeesFilter eventMaxAttendeesFilter;
+
     private EventService eventService;
+
+    @BeforeEach
+    public void setUp() {
+        eventFilters = new ArrayList<>();
+        eventFilters.add(eventTitleFilter);
+        eventFilters.add(eventMaxAttendeesFilter);
+
+        eventService = new EventService(eventRepository, userRepository, promotionRepository, eventFilters, eventMapper);
+    }
 
     @Test
     @DisplayName("Should return events in correct order when events are found and filtered")
@@ -101,17 +113,24 @@ public class EventServiceTest {
 
         owner2.setPromotions(new ArrayList<>(List.of(promotion2)));
 
-        List<EventFilter> filters = new ArrayList<>();
-        filters.add(new EventTitleFilter());
-        filters.add(new EventMaxAttendeesFilter());
-
         EventFilterDto filterDto = new EventFilterDto();
         filterDto.setTitlePattern("Event");
         filterDto.setMaxAttendees(100);
 
         List<Event> filteredEvents = List.of(event2, event1);
 
-        when(eventFilters.stream()).thenReturn(filters.stream());
+        Specification<Event> mockTitleSpecification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%event%");
+
+        when(eventFilters.get(0).isApplicable(filterDto)).thenReturn(true);
+        when(eventFilters.get(0).toSpecification(filterDto)).thenReturn(mockTitleSpecification);
+
+        Specification<Event> mockMaxAttendeesSpecification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThanOrEqualTo(root.get("maxAttendees"), 100);
+
+        when(eventFilters.get(1).isApplicable(filterDto)).thenReturn(true);
+        when(eventFilters.get(1).toSpecification(filterDto)).thenReturn(mockMaxAttendeesSpecification);
+
         when(userRepository.findById(callingUser.getId())).thenReturn(Optional.of(callingUser));
         when(eventRepository.findAll(ArgumentMatchers.<Specification<Event>>any())).thenReturn(filteredEvents);
 

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
@@ -19,6 +20,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.ExistingPurchaseException;
+import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -32,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -42,6 +45,7 @@ public class PremiumServiceTest {
     private User user;
     private PremiumPeriod premiumPeriod;
     private PaymentResponse paymentResponse;
+    private PaymentResponse unsuccessfulPaymentResponse;
     private Premium premium;
     private PremiumDto premiumDto;
 
@@ -72,6 +76,13 @@ public class PremiumServiceTest {
                 new BigDecimal("10.00"),
                 Currency.USD,
                 "Payment successful");
+        unsuccessfulPaymentResponse = new PaymentResponse(
+                PaymentStatus.FAIL,
+                12345,
+                67890L,
+                new BigDecimal("10.00"),
+                Currency.USD,
+                "Payment unsuccessful");
         premiumDto = PremiumDto.builder()
                 .id(1L)
                 .userId(user.getId())
@@ -128,5 +139,26 @@ public class PremiumServiceTest {
         verify(userRepository).findById(1L);
         verify(premiumRepository).existsByUserId(1L);
         verifyNoMoreInteractions(paymentServiceClient, premiumMapper, premiumRepository);
+    }
+
+    @Test
+    @DisplayName("Should throw PaymentFailureException when payment fails")
+    void testBuyPremium_Failure() {
+        user.setUsername("testUser");
+
+        ResponseEntity<PaymentResponse> failedResponseEntity = new ResponseEntity<>(unsuccessfulPaymentResponse, HttpStatus.OK);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(failedResponseEntity);
+        when(premiumRepository.getPremiumPaymentNumber()).thenReturn(12345L);
+
+        PaymentFailureException exception = assertThrows(PaymentFailureException.class, () ->
+                premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH));
+
+        assertEquals("Failure to effect premium payment for user testUser for requested period of 30 days.",
+                exception.getMessage());
+
+        verify(premiumRepository, never()).save(any(Premium.class));
+        verify(premiumMapper, never()).toPremiumDto(any(Premium.class));
     }
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
@@ -19,6 +20,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.entity.promotion.PromotionType;
 import school.faang.user_service.exception.ExistingPurchaseException;
+import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PromotionMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -31,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -43,6 +46,7 @@ public class PromotionServiceTest {
     private final String promotionTarget = "profile";
 
     private PaymentResponse paymentResponse;
+    private PaymentResponse unsuccessfulPaymentResponse;
     private Promotion promotion;
     private PromotionDto promotionDto;
 
@@ -73,6 +77,13 @@ public class PromotionServiceTest {
                 new BigDecimal("10.00"),
                 Currency.USD,
                 "Payment successful");
+        unsuccessfulPaymentResponse = new PaymentResponse(
+                PaymentStatus.FAIL,
+                12345,
+                67890L,
+                new BigDecimal("10.00"),
+                Currency.USD,
+                "Payment unsuccessful");
         promotionDto = PromotionDto.builder()
                 .id(1L)
                 .promotedUserId(user.getId())
@@ -134,5 +145,25 @@ public class PromotionServiceTest {
         verify(promotionRepository).findByUserId(1L);
         verifyNoMoreInteractions(paymentServiceClient, promotionMapper, promotionRepository);
     }
-}
 
+    @Test
+    @DisplayName("Should throw PaymentFailureException when payment fails")
+    void testBuyPromotion_Failure() {
+        user.setUsername("testUser");
+
+        ResponseEntity<PaymentResponse> failedResponseEntity = new ResponseEntity<>(unsuccessfulPaymentResponse, HttpStatus.OK);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(failedResponseEntity);
+        when(promotionRepository.getPromotionPaymentNumber()).thenReturn(12345L);
+
+        PaymentFailureException exception = assertThrows(PaymentFailureException.class, () ->
+                promotionService.buyPromotion(1L, promotionType, promotionTarget));
+
+        assertEquals("Failure to effect profile promotion payment for user testUser.",
+                exception.getMessage());
+
+        verify(promotionRepository, never()).save(any(Promotion.class));
+        verify(promotionMapper, never()).toPromotionDto(any(Promotion.class));
+    }
+}

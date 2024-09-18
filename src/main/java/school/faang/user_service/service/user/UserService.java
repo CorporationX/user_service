@@ -54,37 +54,10 @@ public class UserService {
     }
 
     private List<User> getPriorityFilteredUsers(List<User> filteredUsers, User callingUser) {
-
-        Comparator<User> countryAndPriorityComparator = Comparator.comparing((User user) -> {
-            if (user.getPromotions() == null || user.getPromotions().isEmpty()) {
-                return 1;
-            }
-
-            Promotion targetPromotion = getTargetPromotion(user);
-
-            if (targetPromotion != null &&
-                    targetPromotion.getPriorityLevel() == 3 &&
-                    !user.getCountry().equals(callingUser.getCountry())) {
-                return 1;
-            }
-
-            if (targetPromotion == null) {
-                return 1;
-            }
-
-            return 0;
-        }).thenComparing(user -> {
-            if (user.getPromotions() == null || user.getPromotions().isEmpty()) {
-                return 0;
-            }
-
-            Promotion targetPromotion = getTargetPromotion(user);
-
-            return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
-        });
-
         return filteredUsers.stream()
-                .sorted(countryAndPriorityComparator)
+                .sorted((Comparator
+                        .comparing((User user) -> calculateCountryPriority(user, callingUser))
+                        .thenComparing(this::calculatePriorityLevel)))
                 .toList();
     }
 
@@ -119,5 +92,35 @@ public class UserService {
                 .filter(promotion -> PROMOTION_TARGET.equals(promotion.getPromotionTarget()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private int calculateCountryPriority(User user, User callingUser) {
+        if (user.getPromotions() == null || user.getPromotions().isEmpty()) {
+            return 1;
+        }
+
+        Promotion targetPromotion = getTargetPromotion(user);
+
+        if (targetPromotion != null &&
+                targetPromotion.getPriorityLevel() == 3 &&
+                !user.getCountry().equals(callingUser.getCountry())) {
+            return 1;
+        }
+
+        if (targetPromotion == null) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private int calculatePriorityLevel(User user) {
+        if (user.getPromotions() == null || user.getPromotions().isEmpty()) {
+            return 0;
+        }
+
+        Promotion targetPromotion = getTargetPromotion(user);
+
+        return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +21,7 @@ import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;

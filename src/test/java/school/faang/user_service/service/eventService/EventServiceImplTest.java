@@ -10,12 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.event.EventService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceImplTest {
@@ -23,7 +24,7 @@ class EventServiceImplTest {
     @Mock
     private EventRepository eventRepository;
     @InjectMocks
-    private EventServiceImpl eventService;
+    private EventService eventService;
 
     User user;
 

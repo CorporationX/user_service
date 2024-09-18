@@ -20,8 +20,6 @@ public class GoalService {
         List<Goal> userGoals = goalRepository.findGoalsByUserId(userId).toList();
         List<Long> goalIdsToBeDeleted = new ArrayList<>();
 
-//        Get list of all user and then remove one we want to deactivate. Then if resulted list of users is empty
-//        goal is done by that person and remove, otherwise just update list
         userGoals.forEach(goal -> {
             List<User> goalUsers = goal.getUsers();
 

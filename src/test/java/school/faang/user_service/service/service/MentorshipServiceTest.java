@@ -10,19 +10,22 @@ import school.faang.user_service.dto.mentorship.MentorshipUserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipMapperImpl;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.goal.GoalService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private GoalService goalService;
     @Mock
     private MentorshipRepository mentorshipRepository;
     @InjectMocks
@@ -125,5 +128,81 @@ class MentorshipServiceTest {
         when(mentorshipRepository.findById(MENTOR_ID)).thenReturn(Optional.of(userMentee));
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentorshipRelations(MENTOR_ID, anyLong()));
+    }
+
+    @Test
+    @DisplayName("Should deactivate mentorship and remove mentor from mentee successfully")
+    void testDeactivateMentorshipSuccess() {
+        // Arrange
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+
+        // Act
+        mentorshipService.deactivateMentorship(USER_ID);
+
+        // Assert
+        verify(userRepository).findById(USER_ID); // Verify repository interaction
+        verify(goalService).setUserGoalsToSelf(userMentee); // Verify goal service call for each mentee
+
+        // Ensure the mentor was removed from the mentee
+        assertFalse(userMentee.getMentors().contains(user), "Mentee should no longer have the mentor");
+        assertTrue(userMentee.getMentors().isEmpty(), "Mentee's mentor list should be empty");
+
+        // Ensure that the mentee list of the user is intact
+        assertTrue(user.getMentees().contains(userMentee), "Mentor should still reference the mentee");
+    }
+
+    @Test
+    @DisplayName("Should throw EntityNotFoundException if user is not found when deactivating mentorship")
+    void testDeactivateMentorshipUserNotFound() {
+        // Arrange
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                                                         () -> mentorshipService.deactivateMentorship(USER_ID),
+                                                         "Expected NoSuchElementException to be thrown");
+
+        // Verify that the exception is thrown due to user not being found
+        assertEquals(NoSuchElementException.class, exception.getClass(), "Exception should be NoSuchElementException");
+        verify(userRepository).findById(USER_ID); // Ensure repository was called
+        verifyNoInteractions(goalService); // No goalService interaction
+    }
+
+    @Test
+    @DisplayName("Should handle multiple mentees and remove mentor from each mentee")
+    void testDeactivateMentorshipWithMultipleMentees() {
+        // Arrange
+        User secondMentee = User.builder().id(3L).mentors(new ArrayList<>(Collections.singletonList(user))).build();
+        user.getMentees().add(secondMentee);
+
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+
+        // Act
+        mentorshipService.deactivateMentorship(USER_ID);
+
+        // Assert
+        verify(goalService).setUserGoalsToSelf(userMentee);
+        verify(goalService).setUserGoalsToSelf(secondMentee);
+
+        // Verify mentors are removed from both mentees
+        assertTrue(userMentee.getMentors().isEmpty(), "First mentee should have no mentors left");
+        assertTrue(secondMentee.getMentors().isEmpty(), "Second mentee should have no mentors left");
+    }
+
+    @Test
+    @DisplayName("Should not modify other mentees or mentors outside the scope")
+    void testDeactivateMentorshipDoesNotAffectUnrelatedEntities() {
+        // Arrange
+        User unrelatedMentee = User.builder().id(4L).mentors(new ArrayList<>()).build();
+        user.getMentees().add(unrelatedMentee);
+
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+
+        // Act
+        mentorshipService.deactivateMentorship(USER_ID);
+
+        // Assert
+        verify(goalService).setUserGoalsToSelf(userMentee);
+        assertTrue(unrelatedMentee.getMentors().isEmpty(), "Unrelated mentee should remain unaffected");
     }
 }

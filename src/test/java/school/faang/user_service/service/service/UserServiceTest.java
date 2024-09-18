@@ -28,6 +28,7 @@ import school.faang.user_service.validator.user.UserFilterValidation;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -277,5 +278,28 @@ public class UserServiceTest {
         assertArrayEquals(avatarBytes, avatar);
         verify(userRepository, times(1)).findById(1L);
         verify(avatarService, times(1)).get(any(String.class));
+    }
+
+    @Test
+    @DisplayName("User is successfully deactivated and goals removed")
+    void testDeactivateUserSuccess() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.deactivateUser(user.getId());
+
+        assertFalse(user.isActive());
+
+        verify(userRepository).save(user);
+        verify(goalService).removeUserGoals(user.getId());
+    }
+
+    @Test
+    @DisplayName("Throws NoSuchElementException when user not found")
+    void testDeactivateUserNotFound() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> userService.deactivateUser(user.getId()));
+
+        verify(userRepository, never()).save(any(User.class));
+        verify(goalService, never()).removeUserGoals(anyLong());
     }
 }

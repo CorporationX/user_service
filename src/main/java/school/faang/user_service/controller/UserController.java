@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.service.eventService.EventService;
+import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;

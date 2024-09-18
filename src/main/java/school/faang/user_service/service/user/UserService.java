@@ -8,13 +8,12 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
-import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
@@ -72,9 +71,9 @@ public class UserService {
         }
 
         List<Event> plannedEvents = user.getOwnedEvents()
-                .stream()
-                .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
-                .toList();
+            .stream()
+            .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
+            .toList();
 
         plannedEvents.forEach(event -> {
             event.setStatus(EventStatus.CANCELED);
@@ -86,8 +85,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
         log.info("Find premium users by filter: {}", userFilterDto.toString());
-        Stream<Premium> premiums = premiumRepository.findPremiumUsers();
-        Stream<User> users = premiums.map(Premium::getUser);
+        List<Premium> premiums = premiumRepository.findAll();
+        Stream<User> users = premiums.stream().map(Premium::getUser);
         return filterUsers(users, userFilterDto);
     }
 

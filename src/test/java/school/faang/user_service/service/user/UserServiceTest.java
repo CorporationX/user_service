@@ -15,9 +15,9 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.user.UserDeactivatedException;
-import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserEmailFilter;
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -135,9 +134,9 @@ class UserServiceTest extends AbstractUserServiceTest {
         Premium premiumToNotFind = Premium.builder()
             .user(createUser("", ""))
             .build();
-        Stream<Premium> premiums = Stream.of(premiumToFind, premiumToNotFind);
+        List<Premium> premiums = List.of(premiumToFind, premiumToNotFind);
 
-        when(premiumRepository.findPremiumUsers()).thenReturn(premiums);
+        when(premiumRepository.findAll()).thenReturn(premiums);
 
         List<User> result = userService.getPremiumUsers(userFilterDto);
 

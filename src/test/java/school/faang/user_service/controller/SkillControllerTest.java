@@ -17,6 +17,7 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
+import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.SkillValidator;
 
@@ -72,7 +73,9 @@ public class SkillControllerTest {
         SkillValidator skillValidator = new SkillValidator();
         ReflectionTestUtils.setField(skillController, "validator", skillValidator);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(skillController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(skillController)
+                .setControllerAdvice(new GlobalRestExceptionHandler())
+                .build();
     }
 
     @AfterEach

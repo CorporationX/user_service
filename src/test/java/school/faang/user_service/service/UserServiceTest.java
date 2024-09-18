@@ -1,18 +1,23 @@
 package school.faang.user_service.service;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,13 +34,13 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.filter.user.UserCreatedAfterFilter;
 import school.faang.user_service.filter.user.UserCreatedBeforeFilter;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -159,7 +164,8 @@ class UserServiceTest {
         assertTrue(user.getParticipatedEvents().isEmpty());
         verify(eventRepository, times(1)).deleteAllById(any());
     }
-     @Test
+
+    @Test
     void testGetPremiumUsers_positiveWithoutFilters() {
         User user1 = new User();
         User user2 = new User();
@@ -203,5 +209,69 @@ class UserServiceTest {
         List<UserDto> users = userService.getPremiumUsers(filterDto);
 
         assertEquals(1, users.size());
+    }
+
+    @Test
+    @DisplayName("Should return a certain user when user exists by id")
+    public void testGetUser_Success() {
+        userDto.setActive(true);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        UserDto resultDto = userService.getUser(user.getId());
+
+        assertAll(
+                () -> assertNotNull(resultDto),
+                () -> assertEquals(1L, resultDto.getId()),
+                () -> assertTrue(resultDto.isActive())
+        );
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Should throw EntityNotFoundException when user is not found by id")
+    public void testGetUser_UserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.getUser(42L));
+
+        verify(userRepository, times(1)).findById(anyLong());
+        verifyNoInteractions(userMapper);
+    }
+
+    @Test
+    @DisplayName("Should return list of certain users when users exist by id")
+    public void testGetUsersByIds_Success() {
+        List<Long> ids = Arrays.asList(1L, 2L);
+        User anotherUser = new User();
+        UserDto anotherUserDto = new UserDto();
+
+        List<UserDto> dtos = Arrays.asList(userDto, anotherUserDto);
+        List<User> users = Arrays.asList(user, anotherUser);
+
+        when(userRepository.findAllById(anyList())).thenReturn(users);
+        when(userMapper.toListUserDto(users)).thenReturn(dtos);
+
+        List<UserDto> resultDtoList = userService.getUsersByIds(ids);
+
+        assertAll(
+                () -> assertEquals(2, resultDtoList.size()),
+                () -> assertTrue(resultDtoList.contains(userDto)),
+                () -> assertTrue(resultDtoList.contains(anotherUserDto))
+        );
+        verify(userRepository, times(1)).findAllById(anyList());
+    }
+
+    @Test
+    @DisplayName("Should return an empty list when ids list is empty")
+    public void testGetUsersByIds_EmptyIdsList() {
+        List<UserDto> result = userService.getUsersByIds(Collections.emptyList());
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertTrue(result.isEmpty())
+        );
+        verify(userRepository, times(1)).findAllById(anyList());
     }
 }

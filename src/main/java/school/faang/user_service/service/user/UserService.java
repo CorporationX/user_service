@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,5 +106,20 @@ public class UserService {
         }
         log.info("Участие пользователя с ID: {} в событиях было очищено", user.getId());
         return user;
+    }
+
+    public UserDto getUser(long userId) {
+
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        return userMapper.toDto(user);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+
+        final List<User> users = userRepository.findAllById(ids);
+
+        return userMapper.toListUserDto(users);
     }
 }

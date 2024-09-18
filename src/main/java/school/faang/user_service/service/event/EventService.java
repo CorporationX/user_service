@@ -67,4 +67,9 @@ public class EventService {
     public List<EventDto> getParticipatedEvents(Long userId) {
         return eventMapper.toDtoList(eventRepository.findParticipatedEventsByUserId(userId));
     }
+
+    public void deleteEventByUserId(long userId){
+        List<Event> userEvents = eventRepository.findAllByUserId(userId);
+        eventRepository.deleteAllById(userEvents.stream().map(Event::getId).toList());
+    }
 }

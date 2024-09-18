@@ -4,10 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -19,6 +19,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.randomAvatar.AvatarService;
 import school.faang.user_service.service.s3Service.S3Service;
 import school.faang.user_service.service.user.UserService;
@@ -27,24 +28,14 @@ import school.faang.user_service.validator.user.UserFilterValidation;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -55,11 +46,14 @@ public class UserServiceTest {
     @Mock
     private CountryRepository countryRepository;
 
+    @Mock
     private UserFilterValidation userFilterValidation;
 
+    @Mock
     private UserMapper userMapper;
 
-    private final UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
+    @Mock
+    private List<UserFilter> userFilters;
 
     @Mock
     private S3Service s3Service;
@@ -70,9 +64,14 @@ public class UserServiceTest {
     @Mock
     private UserValidator userValidator;
 
+    @Mock
+    private GoalService goalService;
+
+    @InjectMocks
     private UserService userService;
 
-    private List<UserFilter> filters;
+    private final UserFilter nameUserFilter = Mockito.mock(UserFilter.class);
+    private final List<UserFilter> filters = List.of(nameUserFilter);
 
     private User user;
     private UserDto userDto;
@@ -92,19 +91,10 @@ public class UserServiceTest {
         userDto = UserDto.builder()
                 .id(1L)
                 .countryId(1L)
-                .userProfilePic(UserProfilePic.builder()
-                        .smallFileId("fileId")
-                        .build())
+                .userProfilePic(UserProfilePic.builder().smallFileId("fileId").build())
                 .build();
         userFilterDto = UserFilterDto.builder().build();
 
-        filters = List.of(nameUserFilter/*, emailUserFilter*/);
-        userRepository = Mockito.mock(UserRepository.class);
-        userFilterValidation = Mockito.mock(UserFilterValidation.class);
-        userMapper = Mockito.mock(UserMapper.class);
-        //avatar = new MockMultipartFile("avatar", "avatar", "jpeg", new byte[]{});
-        avatar = mock(MockMultipartFile.class);
-        //avatar = new File("randomPhoto.svg");
         userProfilePic = new UserProfilePic();
         userProfilePic.setFileId("avatarId");
         user.setUserProfilePic(userProfilePic);
@@ -112,7 +102,8 @@ public class UserServiceTest {
         country = Country.builder().id(1L).build();
         avatarBytes = new byte[100];
 
-        userService = new UserService(userRepository, filters, userFilterValidation, userMapper, avatarService, countryRepository, userValidator);
+        userService = new UserService(userRepository, filters, userFilterValidation, userMapper, avatarService,
+                                      countryRepository, goalService, userValidator);
     }
 
     @Test
@@ -287,5 +278,28 @@ public class UserServiceTest {
         assertArrayEquals(avatarBytes, avatar);
         verify(userRepository, times(1)).findById(1L);
         verify(avatarService, times(1)).get(any(String.class));
+    }
+
+    @Test
+    @DisplayName("User is successfully deactivated and goals removed")
+    void testDeactivateUserSuccess() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.deactivateUser(user.getId());
+
+        assertFalse(user.isActive());
+
+        verify(userRepository).save(user);
+        verify(goalService).removeUserGoals(user.getId());
+    }
+
+    @Test
+    @DisplayName("Throws NoSuchElementException when user not found")
+    void testDeactivateUserNotFound() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> userService.deactivateUser(user.getId()));
+
+        verify(userRepository, never()).save(any(User.class));
+        verify(goalService, never()).removeUserGoals(anyLong());
     }
 }

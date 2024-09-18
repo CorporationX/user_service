@@ -9,16 +9,20 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.randomAvatar.AvatarService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserFilterValidation;
 import school.faang.user_service.validator.user.UserValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,6 +37,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final CountryRepository countryRepository;
+    private final GoalService goalService;
 
     private final UserValidator userValidator;
 
@@ -126,5 +131,15 @@ public class UserService {
         String avatarId = userById.getUserProfilePic().getSmallFileId();
 
         return avatarService.get(avatarId);
+    }
+
+    @Transactional
+    public void deactivateUser(long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setActive(false);
+        userRepository.save(user);
+        goalService.removeUserGoals(userId);
+
     }
 }

@@ -7,6 +7,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -24,6 +25,7 @@ public class GoalService {
 
     private final GoalRepository goalRepository;
     private final SkillService skillService;
+    private final GoalInvitationService goalInvitationService;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
     private final GoalServiceValidator goalServiceValidator;
@@ -114,5 +116,22 @@ public class GoalService {
                     .toList();
         }
     }
-}
 
+    public void deactivateActiveUserGoals(User user) {
+        user.getGoals().stream()
+                .filter(goal -> goal.getStatus().equals(GoalStatus.ACTIVE))
+                .forEach(goal -> {
+                    List<GoalInvitation> goalInvitations = goal.getInvitations();
+
+                    goal.getUsers().remove(user);
+                    if (goal.getUsers().isEmpty()) {
+                        goalInvitationService.deleteGoalInvitations(goalInvitations);
+                        goalRepository.deleteById(goal.getId());
+                    } else {
+                        goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
+                    }
+                });
+
+        user.getGoals().clear();
+    }
+}

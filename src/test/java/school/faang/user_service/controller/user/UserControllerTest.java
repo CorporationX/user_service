@@ -21,12 +21,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.Arrays;
 import java.util.Collections;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -41,9 +44,13 @@ public class UserControllerTest {
     private UserDto userDto;
     private UserDto anotherUserDto;
     private List<Long> userIds;
+    private UserFilterDto userFilterDto;
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private UserController userController;
@@ -54,6 +61,8 @@ public class UserControllerTest {
         userDto.setId(2L);
         anotherUserDto = new UserDto();
         anotherUserDto.setId(3L);
+
+        userFilterDto = new UserFilterDto();
 
         objectMapper = new ObjectMapper();
 
@@ -128,5 +137,34 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$").isEmpty());
 
         verify(userService).getUsersByIds(userIds);
+    }
+
+    @Test
+    @DisplayName("Should return filtered users successfully with correct user ID and filters")
+    public void testGetFilteredUsers_Success() throws Exception {
+        Long userId = 1L;
+        String requestBody = objectMapper.writeValueAsString(userFilterDto);
+
+        when(userContext.getUserId()).thenReturn(userId);
+        when(userService.getFilteredUsers(userFilterDto, userId)).thenReturn(List.of(userDto, anotherUserDto));
+
+        mockMvc.perform(get("/users/filtered")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(2L))
+                .andExpect(jsonPath("$[1].id").value(3L));
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when invalid json is provided")
+    public void testGetFilteredUsers_InvalidRequest() throws Exception {
+        String invalidJson = "{invalid json}";
+
+        mockMvc.perform(get("/users/filtered")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
     }
 }

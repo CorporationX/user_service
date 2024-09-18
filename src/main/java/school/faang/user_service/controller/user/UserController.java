@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
@@ -22,10 +23,17 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserContext userContext;
 
     @PutMapping("/deactivate")
     public UserDto deactivateUser(@RequestBody UserDto userDto) {
         return userService.deactivateUser(userDto);
+    }
+
+    @GetMapping(value = "/filtered")
+    public List<UserDto> getFilteredUsers(@RequestBody UserFilterDto filter) {
+        long userId = userContext.getUserId();
+        return userService.getFilteredUsers(filter, userId);
     }
 
     @GetMapping(value = "/premium")

@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.user;
+package school.faang.user_service.dto.event;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class EventDto {
     @NotNull
     private Long id;
-    private boolean active;
-    private String email;
-    private String username;
+    private String title;
+    private Integer maxAttendees;
 }

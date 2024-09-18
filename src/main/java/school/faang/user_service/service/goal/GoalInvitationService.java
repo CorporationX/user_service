@@ -32,10 +32,7 @@ public class GoalInvitationService {
     private final static int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
 
     public void deleteGoalInvitations(List<GoalInvitation> goalInvitations) {
-        List<Long> goalInvitationIds = goalInvitations.stream()
-                .map(GoalInvitation::getId)
-                .toList();
-        goalInvitationRepository.deleteAllById(goalInvitationIds);
+        goalInvitationRepository.deleteAll(goalInvitations);
     }
 
     public void deleteGoalInvitationForUser(List<GoalInvitation> goalInvitations, User user) {

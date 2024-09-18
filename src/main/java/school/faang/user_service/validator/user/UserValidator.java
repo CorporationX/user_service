@@ -32,9 +32,4 @@ public class UserValidator {
             throw new ValidationException(exceptionMsg);
         }
     }
-
-    public void validateUser(Long userId) {
-        validateUserIdIsPositiveAndNotNull(userId);
-        validateUserIsExisted(userId);
-    }
 }

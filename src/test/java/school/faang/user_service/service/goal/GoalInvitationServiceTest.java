@@ -111,12 +111,12 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteAllById должен вызваться 1 раз")
+        @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteAll должен вызваться 1 раз")
         void whenGoalInvitationsSizeIsTwoThenTwoTimesUsesRepository() {
             goalInvitationService.deleteGoalInvitations(goalInvitations);
 
             verify(goalInvitationRepository, times(ONE_TIMES_CALL_METHOD))
-                    .deleteAllById(anyCollection());
+                    .deleteAll(goalInvitations);
         }
 
         @Test

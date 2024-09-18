@@ -1,6 +1,6 @@
 package school.faang.user_service.service.user;
 
-import jakarta.validation.ValidationException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +24,10 @@ public class UserService {
 
     @Transactional
     public void deactivateAccount(Long userId) {
-        userValidator.validateUser(userId);
+        userValidator.validateUserIdIsPositiveAndNotNull(userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("User with id " + userId + " not existed"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not existed"));
 
         if (!user.getGoals().isEmpty()) {
             goalService.deactivateActiveUserGoals(user);

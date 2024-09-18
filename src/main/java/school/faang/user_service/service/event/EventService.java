@@ -17,13 +17,11 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventParticipationService eventParticipationService;
 
-    private final EventStatus PLANNED_EVENT_STATUS = EventStatus.PLANNED;
-
     public void deactivatePlanningUserEventsAndDeleteEvent(User user) {
         List<Event> removedEvents = new ArrayList<>();
 
         user.getOwnedEvents().stream()
-                .filter(event -> event.getStatus().equals(PLANNED_EVENT_STATUS))
+                .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
                 .forEach(event -> {
                     event.setStatus(EventStatus.CANCELED);
                     eventParticipationService.deleteParticipantsFromEvent(event);

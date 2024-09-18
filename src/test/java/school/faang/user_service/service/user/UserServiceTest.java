@@ -1,6 +1,6 @@
 package school.faang.user_service.service.user;
 
-import jakarta.validation.ValidationException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -55,7 +55,7 @@ class UserServiceTest {
             when(userRepository.findById(anyLong()))
                     .thenReturn(Optional.empty());
 
-            assertThrows(ValidationException.class,
+            assertThrows(EntityNotFoundException.class,
                     () -> userService.deactivateAccount(anyLong()));
         }
     }
@@ -89,7 +89,7 @@ class UserServiceTest {
             userService.deactivateAccount(USER_ID_IS_ONE);
 
             verify(userValidator)
-                    .validateUser(USER_ID_IS_ONE);
+                    .validateUserIdIsPositiveAndNotNull(USER_ID_IS_ONE);
             verify(userRepository)
                     .findById(USER_ID_IS_ONE);
             verify(goalService)

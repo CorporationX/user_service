@@ -15,6 +15,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -47,7 +48,7 @@ public class EventServiceTest {
     EventMapper eventMapper;
 
     @Mock
-    List<EventServiceImpl.EventFilter> eventFilters;
+    List<EventFilter> eventFilters;
 
     @Mock
     SkillRepository skillRepository;

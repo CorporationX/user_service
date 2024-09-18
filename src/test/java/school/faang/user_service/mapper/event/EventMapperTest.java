@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
@@ -19,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
 class EventMapperTest {
     @Mock
     private SkillMapper skillCustomMapper;

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -21,6 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
 class EventControllerTest {
     @Mock
     private EventService eventService;

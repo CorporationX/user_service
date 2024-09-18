@@ -14,15 +14,13 @@ public class MentorshipServiceImpl implements MentorshipService {
     private final UserRepository userRepository;
 
     public void stopMentorship(Long mentorId, Long menteeId) {
-        //комментарий о неверятном познании в sql
         User mentee = userRepository.findById(menteeId).orElseThrow();
         User mentor = userRepository.findById(mentorId).orElseThrow();
         List<User> mentorsMentees = mentor.getMentees();
         List<User> menteesMentors = mentee.getMentors();
         List<Goal> changedMentorsGoals = mentee.getGoals().stream()
                 .peek(goal -> {
-                    if (goal.getMentor() == mentor)
-                    {
+                    if (goal.getMentor().equals(mentor)) {
                         goal.setMentor(mentee);
                     }
                 })

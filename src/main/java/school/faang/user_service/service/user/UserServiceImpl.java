@@ -44,10 +44,6 @@ public class UserServiceImpl implements UserService {
         eventRepository.deleteAll(userToDeactivateOwnedEvents);
 
         userToDeactivate.setGoals(new ArrayList<>());
-        //как я понял по заданию, что если цель есть не только у аккаунта который деактивируется, то тогда она остаётся
-        //в БД (но не у деактивируемого). Если она есть только у аккаунта который деактивируется, то тогда нужно удалить цель из бд.
-        //Пустой список ставится только у деактивиранного аккаунта в любом случае, потому что для этого аккаунта
-        //целей не будет. (тк он деактивирован)
         userToDeactivate.setOwnedEvents(new ArrayList<>());
     }
 }

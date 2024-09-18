@@ -9,7 +9,6 @@ import school.faang.user_service.entity.Skill;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillCandidateMapper {
-
     SkillDto toDto(Skill skill);
 
     @Mapping(target = "offersAmount", expression = "java(0L)")

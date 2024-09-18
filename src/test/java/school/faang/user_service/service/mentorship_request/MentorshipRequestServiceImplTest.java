@@ -13,12 +13,12 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship.filter.DescriptionFilter;
-import school.faang.user_service.filter.mentorship.filter.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship.DescriptionFilter;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.RejectionMapper;
 import school.faang.user_service.repository.MentorshipRequestRepository;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class MentorshipRequestServiceImplTest {
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
 
     private MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
-    private final Long ID = 1l;
+    private final Long ID = 1L;
 
     @Test
     public void testRequestMentorship() {

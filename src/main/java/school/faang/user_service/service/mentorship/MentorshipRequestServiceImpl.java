@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mentorship_request;
+package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,7 +8,7 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship.filter.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.RejectionMapper;
 import school.faang.user_service.repository.MentorshipRequestRepository;

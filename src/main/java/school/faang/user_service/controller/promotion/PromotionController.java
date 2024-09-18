@@ -17,7 +17,6 @@ import school.faang.user_service.entity.promotion.EventPromotion;
 import school.faang.user_service.entity.promotion.PromotionTariff;
 import school.faang.user_service.entity.promotion.UserPromotion;
 import school.faang.user_service.mapper.event.EventMapper;
-import school.faang.user_service.mapper.promotion.EventMapperProm;
 import school.faang.user_service.mapper.promotion.EventPromotionMapper;
 import school.faang.user_service.mapper.promotion.UserMapper;
 import school.faang.user_service.mapper.promotion.UserPromotionMapper;

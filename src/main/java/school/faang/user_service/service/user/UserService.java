@@ -31,7 +31,7 @@ public class UserService {
 
     @Transactional
     public User registerUser(User user) {
-        validateUser(user);
+        validateUsernameAndEmail(user);
         UserProfilePic userProfilePic = avatarService.generateAndSaveAvatar(AvatarStyle.BOTTTTS);
         user.setUserProfilePic(userProfilePic);
         user.setCreatedAt(LocalDateTime.now());
@@ -88,7 +88,7 @@ public class UserService {
             eventRepository.delete(event);
         });
     }
-    private void validateUser(User user) {
+    private void validateUsernameAndEmail(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException("User with this email already exists");
         }

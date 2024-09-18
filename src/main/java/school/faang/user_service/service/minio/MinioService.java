@@ -13,14 +13,12 @@ import school.faang.user_service.exception.MinioUploadException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-
 @Getter
 @Setter
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class MinioService {
-
     private final MinioClient minioClient;
 
     @Value("${minio.bucketName}")

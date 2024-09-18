@@ -13,7 +13,6 @@ import school.faang.user_service.service.minio.MinioService;
 
 import java.util.UUID;
 
-
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -28,8 +27,8 @@ public class AvatarService {
     public UserProfilePic generateAndSaveAvatar(AvatarStyle style) {
         log.info("Generating avatar for style: {}", style.getStyleName());
 
-        String largeAvatarFileName = saveAvatar(style, LARGE_AVATAR_SIZE, AVATAR_CONTENT_TYPE);
-        String smallAvatarFileName = saveAvatar(style, SMALL_AVATAR_SIZE, AVATAR_CONTENT_TYPE);
+        String largeAvatarFileName = uploadAvatar(style, LARGE_AVATAR_SIZE, AVATAR_CONTENT_TYPE);
+        String smallAvatarFileName = uploadAvatar(style, SMALL_AVATAR_SIZE, AVATAR_CONTENT_TYPE);
 
         UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setFileId(largeAvatarFileName);
@@ -38,7 +37,7 @@ public class AvatarService {
         return userProfilePic;
     }
 
-    private String saveAvatar(AvatarStyle style, int size, String contentType) {
+    private String uploadAvatar(AvatarStyle style, int size, String contentType) {
         byte[] avatarData = getRandomAvatar(style, "png", size);
         String avatarFileName = UUID.randomUUID() + ".png";
 
@@ -60,9 +59,8 @@ public class AvatarService {
         if (response.getStatusCode().is2xxSuccessful()) {
             log.info("Avatar successfully fetched from DiceBear API for style {}", style.getStyleName());
             return response.getBody();
-        } else {
-            log.error("Failed to fetch avatar from DiceBear API for style {}", style.getStyleName());
-            throw new AvatarFetchException("Failed to fetch avatar from DiceBear API for style " + style.getStyleName());
         }
+        log.error("Failed to fetch avatar from DiceBear API for style {}", style.getStyleName());
+        throw new AvatarFetchException("Failed to fetch avatar from DiceBear API for style " + style.getStyleName());
     }
 }

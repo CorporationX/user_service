@@ -75,7 +75,9 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     public GoalInvitationDto rejectGoalInvitation(Long goalInvitationId, Long invitedId) {
         GoalInvitation goalInvitation = goalInvitationRepository.findById(goalInvitationId)
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "goalInvitation", goalInvitationId)));
-        validationInvitation.rejectGoalInvitation(goalInvitation, invitedId);
+        userRepository.findById(invitedId)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "invited", invitedId)));
+        validationInvitation.rejectGoalInvitation(goalInvitation);
         return goalInvitationMapper.toDto(goalInvitationRepository.save(goalInvitation));
     }
 

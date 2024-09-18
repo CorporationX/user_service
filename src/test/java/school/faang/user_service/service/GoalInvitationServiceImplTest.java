@@ -1,4 +1,4 @@
-package school.faang.user_service.service.impl.goalInvitation.service;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.service.impl.GoalInvitationServiceImpl;
 import school.faang.user_service.validator.ValidationInvitation;
 
@@ -37,40 +36,18 @@ class GoalInvitationServiceImplTest {
     private GoalInvitationRepository goalInvitationRepository;
     private GoalInvitationMapper goalInvitationMapper;
     private GoalInvitationService goalInvitationService;
-    private ValidationInvitation validationInvitation;
+    private ValidationInvitation validationInvitation = new ValidationInvitation();
 
-    Goal goal = Goal.builder()
-            .id(2L)
-            .build();
-
-    User inviter = User.builder()
-            .id(1L)
-            .aboutMe("AboutMe")
-            .city("Moscow")
-            .username("MiguelHernandez")
-            .build();
-
-    User invited = User.builder()
-            .id(3L)
-            .aboutMe("AboutMe")
-            .city("Moscow")
-            .username("MiguelHernandez")
-            .goals(new ArrayList<>())
-            .build();
-
-    GoalInvitationDto invitationDto = new GoalInvitationDto(3L, 2L);
-
-    GoalInvitationDto resultDto = new GoalInvitationDto(3L, 2L);
-
-    GoalInvitation goalInvitationEntity = GoalInvitation.builder()
-            .id(10L)
-            .goal(goal)
-            .invited(invited)
-            .build();
-
+    private Goal goal;
+    private User inviter;
+    private User invited;
+    private GoalInvitationDto invitationDto;
+    private GoalInvitationDto resultDto;
+    private GoalInvitation goalInvitationEntity;
 
     @BeforeEach
     void beforeEach() {
+        initialization();
         goalRepository = mock(GoalRepository.class);
         userRepository = mock(UserRepository.class);
         goalInvitationRepository = mock(GoalInvitationRepository.class);
@@ -195,6 +172,7 @@ class GoalInvitationServiceImplTest {
         when(goalInvitationRepository.findById(10L)).thenReturn(Optional.of(goalInvitationEntity));
         when(goalInvitationMapper.toDto(goalInvitationEntity)).thenReturn(resultDto);
         when(goalInvitationRepository.save(goalInvitationEntity)).thenReturn(goalInvitationEntity);
+        when(userRepository.findById(any())).thenReturn(Optional.of(invited));
 
         GoalInvitationDto result = goalInvitationService.rejectGoalInvitation(10L, invited.getId());
 
@@ -204,5 +182,36 @@ class GoalInvitationServiceImplTest {
         verify(goalInvitationRepository).findById(10L);
         verify(goalInvitationRepository).save(goalInvitationEntity);
         verify(goalInvitationMapper).toDto(goalInvitationEntity);
+    }
+
+    private void initialization() {
+        goal = Goal.builder()
+                .id(2L)
+                .build();
+
+        inviter = User.builder()
+                .id(1L)
+                .aboutMe("AboutMe")
+                .city("Moscow")
+                .username("MiguelHernandez")
+                .build();
+
+        invited = User.builder()
+                .id(3L)
+                .aboutMe("AboutMe")
+                .city("Moscow")
+                .username("MiguelHernandez")
+                .goals(new ArrayList<>())
+                .build();
+
+        invitationDto = new GoalInvitationDto(3L, 2L);
+
+        resultDto = new GoalInvitationDto(3L, 2L);
+
+        goalInvitationEntity = GoalInvitation.builder()
+                .id(10L)
+                .goal(goal)
+                .invited(invited)
+                .build();
     }
 }

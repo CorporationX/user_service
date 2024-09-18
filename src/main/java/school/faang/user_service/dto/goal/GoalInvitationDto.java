@@ -33,7 +33,6 @@ public class GoalInvitationDto {
     public GoalInvitationDto(Long invitedUserId, Long goalId) {
         this.invitedUserId = invitedUserId;
         this.goalId = goalId;
-        this.id = null;
         this.status = RequestStatus.PENDING;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();

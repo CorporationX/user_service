@@ -1,33 +1,20 @@
 package school.faang.user_service.validator;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.webjars.NotFoundException;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class ValidationInvitationTest {
 
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private ValidationInvitation validationInvitation;
+    private final ValidationInvitation validationInvitation = new ValidationInvitation();
 
     Goal goal = Goal.builder()
             .id(2L)
@@ -71,16 +58,8 @@ class ValidationInvitationTest {
     }
 
     @Test
-    void testRejectGoalInvitation_invitedNotFound_throwsNotFoundException() {
-        when(userRepository.findById(invited.getId())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () ->
-                validationInvitation.rejectGoalInvitation(goalInvitationEntity, invited.getId()));
-    }
-
-    @Test
     void testRejectGoalInvitation_statusNotPending_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
-                validationInvitation.rejectGoalInvitation(goalInvitationEntity, 2L));
+                validationInvitation.rejectGoalInvitation(goalInvitationEntity));
     }
 }

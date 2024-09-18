@@ -2,20 +2,15 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.webjars.NotFoundException;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.repository.UserRepository;
 
 @Component
 @RequiredArgsConstructor
 public class ValidationInvitation {
     private static final int MAX_GOALS_SIZE = 3;
-    private static final String NOT_FOUND = "Not found %s by id %d";
-
-    private final UserRepository userRepository;
 
     public void createInvitation(Long inviterId, GoalInvitationDto invitation) {
         if (inviterId.equals(invitation.getInvitedUserId())) {
@@ -36,9 +31,7 @@ public class ValidationInvitation {
         }
     }
 
-    public void rejectGoalInvitation(GoalInvitation goalInvitation, Long invitedId) {
-        userRepository.findById(invitedId)
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "invited", invitedId)));
+    public void rejectGoalInvitation(GoalInvitation goalInvitation) {
         if (goalInvitation.getStatus() == RequestStatus.PENDING) {
             goalInvitation.setStatus(RequestStatus.REJECTED);
         } else {

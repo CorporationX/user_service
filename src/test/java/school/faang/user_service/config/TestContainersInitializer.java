@@ -10,7 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public class TestContainersInitializer implements
         ApplicationContextInitializer<ConfigurableApplicationContext>, AfterAllCallback {
 
-    private static final PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer(
+    private static final PostgreSQLContainer POSTGRES_SQL_CONTAINER = new PostgreSQLContainer(
             "postgres:14.1")
             .withDatabaseName("testdb")
             .withUsername("testuser")
@@ -19,20 +19,17 @@ public class TestContainersInitializer implements
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        postgreSQLContainer.start();
+        POSTGRES_SQL_CONTAINER.start();
 
         TestPropertyValues.of(
-                "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
-                "spring.datasource.username=" + postgreSQLContainer.getUsername(),
-                "spring.datasource.password=" + postgreSQLContainer.getPassword()
+                "spring.datasource.url=" + POSTGRES_SQL_CONTAINER.getJdbcUrl(),
+                "spring.datasource.username=" + POSTGRES_SQL_CONTAINER.getUsername(),
+                "spring.datasource.password=" + POSTGRES_SQL_CONTAINER.getPassword()
         ).applyTo(applicationContext.getEnvironment());
     }
 
     @Override
     public void afterAll(ExtensionContext context) throws Exception {
-        if (postgreSQLContainer == null) {
-            return;
-        }
-        postgreSQLContainer.close();
+        POSTGRES_SQL_CONTAINER.close();
     }
 }

@@ -40,7 +40,7 @@ class PremiumValidationServiceTest {
         Premium premium = getPremium(PREMIUM_ID, START_DATE, END_DATE);
         User user = getUser(USER_ID, premium);
 
-        assertThatThrownBy(() -> premiumValidationService.validateUserForSubPeriod(USER_ID, user.getPremium()))
+        assertThatThrownBy(() -> premiumValidationService.validateUserForSubPeriod(USER_ID, user))
                 .isInstanceOf(PremiumValidationFailureException.class)
                 .hasMessageContaining(USER_ALREADY_HAS_PREMIUM, USER_ID, END_DATE);
     }

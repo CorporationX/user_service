@@ -141,8 +141,8 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ContactPreference contactPreference;
 
-    @OneToOne(mappedBy = "user")
-    private Premium premium;
+    @OneToMany(mappedBy = "user")
+    private List<Premium> premiums;
 
     @OneToOne(mappedBy = "user")
     private UserPromotion promotion;

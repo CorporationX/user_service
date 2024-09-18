@@ -7,6 +7,7 @@ import school.faang.user_service.entity.payment.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class PremiumFabric {
 
@@ -33,7 +34,7 @@ public class PremiumFabric {
         return User
                 .builder()
                 .id(id)
-                .premium(premium)
+                .premiums(List.of(premium))
                 .build();
     }
 

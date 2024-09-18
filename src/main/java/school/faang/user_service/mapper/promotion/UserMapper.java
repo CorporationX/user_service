@@ -9,7 +9,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.UserPromotion;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface UserMapperPromotion {
+public interface UserMapper {
 
     @Mapping(source = "promotion", target = "promotionTariff", qualifiedByName = "mapTariff")
     @Mapping(source = "promotion", target = "numberOfViews", qualifiedByName = "mapNumberOfViews")
@@ -18,7 +18,7 @@ public interface UserMapperPromotion {
     @Named("mapTariff")
     default String mapTariff(UserPromotion userPromotion) {
         if (userPromotion == null) {
-            return "Don't have promotion";
+            return null;
         }
         return userPromotion.getPromotionTariff().toString();
     }

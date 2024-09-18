@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.promotion.BuyPromotionDto;
 import school.faang.user_service.dto.promotion.EventPromotionResponseDto;
-import school.faang.user_service.dto.promotion.EventResponseDto;
+import school.faang.user_service.dto.promotion.PromotedEventResponseDto;
 import school.faang.user_service.dto.promotion.UserPromotionResponseDto;
 import school.faang.user_service.dto.promotion.UserResponseDto;
 import school.faang.user_service.entity.promotion.EventPromotion;
 import school.faang.user_service.entity.promotion.PromotionTariff;
 import school.faang.user_service.entity.promotion.UserPromotion;
-import school.faang.user_service.mapper.promotion.EventMapperPromotion;
+import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.promotion.EventMapperProm;
 import school.faang.user_service.mapper.promotion.EventPromotionMapper;
-import school.faang.user_service.mapper.promotion.UserMapperPromotion;
+import school.faang.user_service.mapper.promotion.UserMapper;
 import school.faang.user_service.mapper.promotion.UserPromotionMapper;
 import school.faang.user_service.service.promotion.PromotionService;
 import school.faang.user_service.service.user.UserContextService;
@@ -33,8 +34,8 @@ public class PromotionController {
     private final UserContextService userContextService;
     private final UserPromotionMapper userPromotionMapper;
     private final EventPromotionMapper eventPromotionMapper;
-    private final UserMapperPromotion userMapper;
-    private final EventMapperPromotion eventMapper;
+    private final UserMapper userMapper;
+    private final EventMapper eventMapper;
 
     @PostMapping("/buy")
     public UserPromotionResponseDto buyPromotion(@RequestBody BuyPromotionDto buyPromotionDto) {
@@ -63,11 +64,11 @@ public class PromotionController {
     }
 
     @GetMapping("/events/per-page")
-    public List<EventResponseDto> getPromotedEventsBeforeAllPerPage(@RequestParam(name = "limit") int limit,
-                                                                    @RequestParam(name = "offset") int offset) {
+    public List<PromotedEventResponseDto> getPromotedEventsBeforeAllPerPage(@RequestParam(name = "limit") int limit,
+                                                                            @RequestParam(name = "offset") int offset) {
         return promotionService.getPromotedEventsBeforeAllPerPage(limit, offset)
                 .stream()
-                .map(eventMapper::toEventResponseDto)
+                .map(eventMapper::toPromotedEventResponseDto)
                 .toList();
     }
 }

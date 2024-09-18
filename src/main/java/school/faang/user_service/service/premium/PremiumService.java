@@ -30,14 +30,11 @@ public class PremiumService {
         log.info("User with id: {} buy a premium {} days subscription", userId, period.getDays());
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new PremiumNotFoundException(USER_NOT_FOUND_PREMIUM, userId));
-        premiumValidationService.validateUserForSubPeriod(userId, user.getPremium());
+        premiumValidationService.validateUserForSubPeriod(userId, user);
         PaymentResponseDto paymentResponse = paymentService.sendPayment(period);
         premiumValidationService.checkPaymentResponse(paymentResponse, userId, period);
 
         Premium premium = buildPremium(user, period);
-        if (user.getPremium() != null) {
-            premiumRepository.delete(user.getPremium());
-        }
         return premiumRepository.save(premium);
     }
 }

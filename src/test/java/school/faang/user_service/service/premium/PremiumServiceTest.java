@@ -16,7 +16,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.payment.PaymentService;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,16 +24,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_NOT_FOUND_PREMIUM;
 import static school.faang.user_service.util.premium.PremiumFabric.getPaymentResponse;
-import static school.faang.user_service.util.premium.PremiumFabric.getPremium;
 import static school.faang.user_service.util.premium.PremiumFabric.getUser;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumServiceTest {
     private static final long USER_ID = 1L;
-    private static final long PREMIUM_ID = 1L;
     private static final PremiumPeriod PERIOD = PremiumPeriod.MONTH;
-    private static final LocalDateTime START_DATE = LocalDateTime.now();
-    private static final LocalDateTime EXPIRED_DATE = START_DATE.minusDays(1);
     private static final String MESSAGE = "test message";
 
     @Mock
@@ -62,27 +57,17 @@ class PremiumServiceTest {
     }
 
     @Test
-    @DisplayName("Given user with expired premium when buy then delete expired premium")
-    void testBuyPremiumDeleteExpiredPremium() {
-        Premium premium = getPremium(PREMIUM_ID, START_DATE, EXPIRED_DATE);
-        User user = getUser(USER_ID, premium);
-        PaymentResponseDto successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
-        when(paymentService.sendPayment(PERIOD)).thenReturn(successResponse);
-        premiumService.buyPremium(USER_ID, PremiumPeriod.MONTH);
-
-        verify(premiumRepository).delete(premium);
-    }
-
-    @Test
     @DisplayName("Buy premium successful")
     void testBuyPremiumSuccessful() {
-        User user = getUser(USER_ID, null);
+        User user = getUser(USER_ID);
         PaymentResponseDto successResponse = getPaymentResponse(PaymentStatus.SUCCESS, MESSAGE);
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(paymentService.sendPayment(PERIOD)).thenReturn(successResponse);
         premiumService.buyPremium(USER_ID, PERIOD);
 
         verify(premiumRepository).save(any(Premium.class));
+        verify(premiumValidationService).validateUserForSubPeriod(USER_ID, user);
+        verify(premiumValidationService)
+                .checkPaymentResponse(any(PaymentResponseDto.class), any(Long.class), any(PremiumPeriod.class));
     }
 }

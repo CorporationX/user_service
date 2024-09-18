@@ -17,7 +17,7 @@ class ResponseUserMapperTest {
     private static final String USERNAME = "username";
     private static final PromotionTariff TARIFF = PromotionTariff.STANDARD;
 
-    private final UserMapperPromotion responseUserMapper = Mappers.getMapper(UserMapperPromotion.class);
+    private final UserMapper responseUserMapper = Mappers.getMapper(UserMapper.class);
 
     @Test
     @DisplayName("Test conver event to response event")

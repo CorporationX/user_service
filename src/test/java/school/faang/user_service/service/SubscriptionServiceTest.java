@@ -28,9 +28,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
-
-@SpringBootTest
-@ActiveProfiles("test")
 public class SubscriptionServiceTest {
     @Mock
     private final List<UserFilter> userFilters = new ArrayList<>();

@@ -27,8 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
 public class GoalInvitationServiceTest {
     @InjectMocks
     private GoalInvitationService goalInvitationService;

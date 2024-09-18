@@ -32,8 +32,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
 public class MentorshipRequestServiceTest {
 
     @InjectMocks

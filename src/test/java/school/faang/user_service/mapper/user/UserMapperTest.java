@@ -4,23 +4,31 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
-    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    @InjectMocks
+    private UserMapperImpl userMapper;
 
     private static final long USER_ID_ONE = 1L;
     private static final long USER_ID_TWO = 2L;
     private static final String USER_NAME_ONE = "name";
     private static final String USER_NAME_TWO = "Name";
     private static final int USER_DTOS_SIZE = 2;
+
+    private final static int SIZE_USER_DTO_LIST = 2;
 
     private User userOne;
     private User userTwo;
@@ -37,12 +45,17 @@ class UserMapperTest {
                 .id(USER_ID_TWO)
                 .username(USER_NAME_TWO)
                 .build();
-
         users = List.of(userOne, userTwo);
     }
 
     @Nested
     class ToDto {
+
+        @Test
+        @DisplayName("Если передали null, на выходе получим null")
+        void whenListUsersIsNullThenGetNull() {
+            assertNull(userMapper.toDtos(null));
+        }
 
         @Test
         @DisplayName("Успех маппинга User в UserDto")
@@ -52,6 +65,27 @@ class UserMapperTest {
             assertNotNull(userDto);
             assertEquals(userOne.getId(), userDto.getId());
             assertEquals(userOne.getUsername(), userDto.getUsername());
+        }
+
+        @Test
+        @DisplayName("При передаче 2 элементов List<User> на выходе получим размер List<UserDto> равным 2")
+        void whenListOfUsersIsNotNullThenGetListOfUserDtos() {
+            List<User> users = List.of(
+                    User.builder()
+                            .id(USER_ID_ONE)
+                            .username("User")
+                            .email("Email")
+                            .build(),
+                    User.builder()
+                            .id(USER_ID_TWO)
+                            .username("User1")
+                            .email("Email1")
+                            .active(true)
+                            .build());
+
+            List<UserDto> userDtos = userMapper.toDtos(users);
+
+            assertEquals(SIZE_USER_DTO_LIST, userDtos.size());
         }
 
         @Test

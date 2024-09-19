@@ -1,0 +1,70 @@
+name: unicorn-ci-user-service
+
+on:
+  push:
+    branches:
+      - unicorn-master-stream6
+  pull_request:
+    branches:
+      - unicorn-master-stream6
+
+permissions:
+  pull-requests: write
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
+
+      - name: Build
+        run: ./gradlew build -x test -x jacocoTestReport -x check --no-daemon
+
+      - name: Test
+        run: ./gradlew test --no-daemon --continue
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-reports
+          path: build/reports/
+
+      - name: Comment on PR if tests fail
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          #          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const message = "⚠️ Some tests have failed. Please check the logs!";
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                issue_number: context.payload.pull_request.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: message
+              });
+            } else {
+              console.log("This is not a pull request.");
+            }

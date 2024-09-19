@@ -40,7 +40,7 @@ class EventParticipationServiceTest {
 
         @Test
         @DisplayName("Ошибка при регистрации если пользователь уже зарегистрирован")
-        void testRegisterParticipantIfUserExists() {
+        void whenRegisterParticipantIfUserExistsThenException() {
             doThrow(new ValidationException("Пользователь уже зарегистрирован")).
                     when(eventParticipationValidator).validateUserRegister(ID);
 
@@ -50,7 +50,7 @@ class EventParticipationServiceTest {
 
         @Test
         @DisplayName("Ошибка при отмене регистрации если пользователь уже зарегистрирован")
-        void testUnregisterParticipantIfUserNoExists() {
+        void whenUnregisterParticipantIfUserNoExistsThenException() {
             doThrow(new ValidationException("Пользователь ещё не зарегистрирован")).
                     when(eventParticipationValidator).validateUserUnregister(ID);
 
@@ -73,7 +73,7 @@ class EventParticipationServiceTest {
 
         @Test
         @DisplayName("Успешная отмена регистрации")
-        void testUnregisterParticipantThenSuccess() {
+        void whenUnregisterParticipantThenSuccess() {
             eventParticipationService.unregisterParticipant(ID, ID);
 
             verify(eventParticipationValidator).validateUserUnregister(ID);

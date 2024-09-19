@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -21,18 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationMapperTest {
 
-    @Spy
+    private static final long USER_ID_ONE = 1L;
+    private static final long USER_ID_TWO = 2L;
+    private static final long GOAL_ID_ONE = 1L;
+    private static final long GOAL_INVITATION_ID_ONE = 1L;
+    private static final long GOAL_INVITATION_ID_TWO = 2L;
+
+    private static final int SIZE_OF_GOAL_INVITATION_DTOS = 2;
+
+    private static final RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
+
+    @InjectMocks
     private GoalInvitationMapperImpl mapper;
 
-    private final static long USER_ID_ONE = 1L;
-    private final static long USER_ID_TWO = 2L;
-    private final static long GOAL_ID_ONE = 1L;
-    private final static long GOAL_INVITATION_ID_ONE = 1L;
-    private final static long GOAL_INVITATION_ID_TWO = 2L;
-
-    private final static int SIZE_OF_GOAL_INVITATION_DTOS = 2;
-
-    private final static RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
 
     private GoalInvitation goalInvitation;
     private GoalInvitationDto goalInvitationDto;
@@ -58,13 +59,13 @@ class GoalInvitationMapperTest {
     class ToEntity {
 
         @Test
-        @DisplayName("Если передали null, на выходе получим null")
+        @DisplayName("If get null than return null")
         void whenDtoIsNullThenReturnNull() {
             assertNull(mapper.toEntity(null));
         }
 
         @Test
-        @DisplayName("Если передали GoalInvitationDto dto, на выходе получим GoalInvitation entity")
+        @DisplayName("Convert GoalInvitationDto dto to GoalInvitation entity")
         void whenDtoIsNotNullThenReturnEntity() {
             goalInvitationDto = GoalInvitationDto.builder()
                     .id(GOAL_INVITATION_ID_ONE)
@@ -86,13 +87,13 @@ class GoalInvitationMapperTest {
     class ToDtos {
 
         @Test
-        @DisplayName("Если передали null, на выходе получим null")
+        @DisplayName("If gets null than return null")
         void whenListUsersIsNullThenGetNull() {
             assertNull(mapper.toDtos(null));
         }
 
         @Test
-        @DisplayName("При передаче 2 элементов List<GoalInvitation> на выходе получим размер List<GoalInvitationDto> равным 2")
+        @DisplayName("If List<GoalInvitation> size is 2 than List<GoalInvitationDto> size is 2")
         void whenListOfGoalInvitationIsNotNullThenReturnListOfGoalInvitationDtos() {
             List<GoalInvitation> goalInvitations = List.of(
                     goalInvitation,

@@ -18,18 +18,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserSkillFilterTest {
 
+    private final static String SKILL_PATTERN = "skill";
+
     @InjectMocks
     private UserSkillFilter userSkillFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String SKILL_PATTERN = "skill";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле skillPattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto skillPattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedSkillPatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .skillPattern(SKILL_PATTERN)
@@ -39,7 +39,7 @@ class UserSkillFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле skillPattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto skillPattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedSkillPatternThenReturnFilteredList() {
             List<Skill> skillsWithPattern = List.of(Skill.builder()
                     .title(SKILL_PATTERN)
@@ -69,7 +69,7 @@ class UserSkillFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле skillPattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto skillPattern is blank than return false")
         void whenUserFilterDtoSkillPatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .skillPattern("   ")
@@ -79,7 +79,7 @@ class UserSkillFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле skillPattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto skillPattern is null than return false")
         void whenUserFilterDtoSkillPatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .skillPattern(null)

@@ -16,18 +16,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserAboutFilterTest {
 
+    private final static String ABOUT_PATTERN = "about";
+
     @InjectMocks
     private UserAboutFilter userAboutFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String ABOUT_PATTERN = "about";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле aboutPattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto aboutPattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedAboutPatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .aboutPattern(ABOUT_PATTERN)
@@ -37,7 +37,7 @@ class UserAboutFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле aboutPattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto aboutPattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedAboutPatternThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -63,7 +63,7 @@ class UserAboutFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле aboutPattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto aboutPattern is blank than return false")
         void whenUserFilterDtoAboutPatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .aboutPattern("   ")
@@ -73,7 +73,7 @@ class UserAboutFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле aboutPattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto aboutPattern is null than return false")
         void whenUserFilterDtoAboutPatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .aboutPattern(null)

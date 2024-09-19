@@ -31,28 +31,33 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
 
+    private static final int ONE_TIMES_CALL_METHOD = 1;
+    private static final int TWO_TIMES_CALL_METHOD = 2;
+
+    private static final Long GOAL_INVITATION_ID_IS_ONE = 1L;
+    private static final Long GOAL_INVITATION_ID_IS_TWO = 2L;
+    private static final Long USER_ID_IS_ONE = 1L;
+    private static final Long USER_ID_IS_TWO = 2L;
+    private static final Long GOAL_ID_IS_ONE = 1L;
+    private static final Long GOAL_ID_IS_TWO = 2L;
+
     @InjectMocks
     private GoalInvitationService goalInvitationService;
+
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
+
     @Mock
     private GoalValidator goalValidator;
+
     @Mock
     private UserValidator userValidator;
+
     @Mock
     private GoalInvitationMapper goalInvitationMapper;
+
     @Mock
     private GoalInvitationFilter goalInvitationFilter;
-
-    private final static int ONE_TIMES_CALL_METHOD = 1;
-    private final static int TWO_TIMES_CALL_METHOD = 2;
-
-    private final static Long GOAL_INVITATION_ID_IS_ONE = 1L;
-    private final static Long GOAL_INVITATION_ID_IS_TWO = 2L;
-    private final static Long USER_ID_IS_ONE = 1L;
-    private final static Long USER_ID_IS_TWO = 2L;
-    private final static Long GOAL_ID_IS_ONE = 1L;
-    private final static Long GOAL_ID_IS_TWO = 2L;
 
     private GoalInvitation goalInvitation;
     private GoalInvitationDto goalInvitationDto;
@@ -111,7 +116,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Если передали лист из 2х приглашений к цели, то метод deleteAll должен вызваться 1 раз")
+        @DisplayName("DeleteAll cals ones if list size is 2")
         void whenGoalInvitationsSizeIsTwoThenTwoTimesUsesRepository() {
             goalInvitationService.deleteGoalInvitations(goalInvitations);
 
@@ -120,7 +125,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Если в фильтре подходит одно из значений входного листа то deleteAllById вызывается 1 раз")
+        @DisplayName("DeleteAllById calls ones if one of the input sheet values matches the filter")
         void whenUserExistsThenSuccess() {
             goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
 
@@ -130,7 +135,7 @@ class GoalInvitationServiceTest {
 
 
         @Test
-        @DisplayName("Успех если приглашаемый и приглашенный имеют разные id в передаваемом Dto")
+        @DisplayName("Success if inviter and invented have different ids")
         void whenInviterAndInvitedAreNotEqualsThenSuccess() {
             when(goalInvitationMapper.toEntity(goalInvitationDto))
                     .thenReturn(goalInvitation);
@@ -157,7 +162,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Обновляем сущность если цель существует")
+        @DisplayName("Update entity if goal existed")
         void whenGoalExistsThenSuccessAccept() {
             when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
                     .thenReturn(Optional.of(goalInvitation));
@@ -179,7 +184,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Обновляем сущность если цель существует")
+        @DisplayName("Update entity if goal existed")
         void whenGoalExistsThenSuccessReject() {
             when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
                     .thenReturn(Optional.of(goalInvitation));
@@ -222,7 +227,7 @@ class GoalInvitationServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передаем null в фильтре")
+            @DisplayName("Success if filter is null")
             void whenFilterIsNullThenSuccess() {
                 when(goalInvitationRepository.findAll())
                         .thenReturn(goalInvitations);
@@ -236,7 +241,7 @@ class GoalInvitationServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передаем не null в фильтр")
+            @DisplayName("Success if filter not null")
             void whenFilterIsNotNullThenSuccess() {
                 when(goalInvitationRepository.findAll())
                         .thenReturn(goalInvitations);
@@ -260,7 +265,7 @@ class GoalInvitationServiceTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Ошибка валидации если цели не существует")
+        @DisplayName("Throws ValidationException if goal doesn't exist")
         void whenGoalNotExistsInAcceptGoalInvitationThenThrowValidationException() {
             when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
                     .thenReturn(Optional.empty());
@@ -271,7 +276,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Ошибка валидации если цели не существует")
+        @DisplayName("Throws ValidationException if goal doesn't exist")
         void whenGoalNotExistsInRejectGoalInvitationThenThrowValidationException() {
             when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
                     .thenReturn(Optional.empty());

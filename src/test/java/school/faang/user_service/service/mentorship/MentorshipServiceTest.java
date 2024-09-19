@@ -16,21 +16,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
 
+    private static final int SIZE_OF_MENTORS_IS_ONE = 1;
+    private static final int SIZE_OF_MENTORS_IS_EMPTY = 0;
+
+    private static final long USER_ID_IS_ONE = 1L;
+    private static final long USER_ID_IS_TWO = 2L;
+    private static final long USER_ID_IS_THREE = 3L;
+
     @InjectMocks
     private MentorshipService mentorshipService;
-
-    private final static int SIZE_OF_MENTORS_IS_ONE = 1;
-    private final static int SIZE_OF_MENTORS_IS_EMPTY = 0;
-
-    private final static long USER_ID_IS_ONE = 1L;
-    private final static long USER_ID_IS_TWO = 2L;
-    private final static long USER_ID_IS_THREE = 3L;
 
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("После выполнения метода, список менторов у пользователей сократился с 1 до 0")
+        @DisplayName("Mentors size decrease from 1 to 0")
         void whenUsersMenteesContainsUserThenSizeOfUserMenteesDecreesOnOne() {
             User user = User.builder()
                     .id(USER_ID_IS_THREE)

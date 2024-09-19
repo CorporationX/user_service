@@ -17,18 +17,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserCountryFilterTest {
 
+    private final static String COUNTRY_PATTERN = "country";
+
     @InjectMocks
     private UserCountryFilter userCountryFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String COUNTRY_PATTERN = "country";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле countryPattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto countryPattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedCountryPatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .countryPattern(COUNTRY_PATTERN)
@@ -38,7 +38,7 @@ class UserCountryFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле countryPattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto countryPattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedCountryPatternThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -71,7 +71,7 @@ class UserCountryFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле countryPattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto countryPattern is blank than return false")
         void whenUserFilterDtoCountryPatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .countryPattern("   ")
@@ -81,7 +81,7 @@ class UserCountryFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле countryPattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto countryPattern is null than return false")
         void whenUserFilterDtoCountryPatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .countryPattern(null)

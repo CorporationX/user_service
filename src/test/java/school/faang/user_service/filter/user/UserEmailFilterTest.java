@@ -16,18 +16,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserEmailFilterTest {
 
+    private final static String EMAIL_PATTERN = "email";
+
     @InjectMocks
     private UserEmailFilter userEmailFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String EMAIL_PATTERN = "email";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле emailPattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto emailPattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedEmailPatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .emailPattern(EMAIL_PATTERN)
@@ -37,7 +37,7 @@ class UserEmailFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле emailPattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto emailPattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedEmailPatternThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -63,7 +63,7 @@ class UserEmailFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле emailPattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto emailPattern is blank than return false")
         void whenUserFilterDtoEmailPatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .emailPattern("   ")
@@ -73,7 +73,7 @@ class UserEmailFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле emailPattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto emailPattern is null than return false")
         void whenUserFilterDtoEmailPatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .emailPattern(null)

@@ -31,14 +31,16 @@ import static org.mockito.Mockito.*;
 public class GoalServiceTest {
 
     private static final long USER_ID_ONE = 1L;
-    private final static long USER_ID_TWO = 2L;
+    private static final long USER_ID_TWO = 2L;
     private static final Long GOAL_ID = 1L;
+
     private static final String NEW_GOAL_TITLE = "New Goal";
     private static final String GOAL_DESCRIPTION = "Description";
-    private final static int USER_ACTIVE_GOALS_FINAL_SIZE_IS_ZERO = 0;
-    private final static int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ZERO = 0;
-    private final static int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ONE = 1;
-    private final static int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO = 2;
+
+    private static final int USER_ACTIVE_GOALS_FINAL_SIZE_IS_ZERO = 0;
+    private static final int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ZERO = 0;
+    private static final int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_ONE = 1;
+    private static final int ACTIVE_GOAL_USERS_FINAL_SIZE_IS_TWO = 2;
 
     @InjectMocks
     private GoalService goalService;
@@ -156,7 +158,7 @@ public class GoalServiceTest {
     }
 
     @Nested
-    class GoalTestWhileInactiveUser{
+    class GoalTestWhileInactiveUser {
 
         @BeforeEach
         void init() {
@@ -194,8 +196,8 @@ public class GoalServiceTest {
         }
 
         @Test
-        @DisplayName("Удаляем у юзера активные цели и если у цели остались пользователи, " +
-                "кто работает над этой целью, то удаляем приглашения присоединения к цели для этого юзера")
+        @DisplayName("Delete users active goals and if somebody working with goals than " +
+                "delete goal invitations for this user")
         void whenUserHasActiveGoalsAndSomebodyWorkWithThisGoalThenDeleteUserAndInvitationsFromGoal() {
             List<User> users = new ArrayList<>();
             users.add(user1);
@@ -215,8 +217,7 @@ public class GoalServiceTest {
         }
 
         @Test
-        @DisplayName("Удаляем у юзера активные цели и если у цели не остались пользователи работающие над ней," +
-                " то удаляем эту цель и все приглашения к этой цели")
+        @DisplayName("Delete users active goals and if nobody working with goals than delete goal and invitations")
         void whenUserHasActiveGoalsAndNobodyWorkingWithThenDeleteGoalAndInvitationsToGoal() {
             List<User> users = new ArrayList<>();
             users.add(user1);

@@ -53,6 +53,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
         recommendationRequest.getSkills().stream()
+                .filter(skill -> !skillRequestRepository.existsById(skill.getId()))
                 .forEach(skill -> skillRequestRepository.create(recommendationRequestDto.getId(), skill.getId()));
         RecommendationRequest createRequest = repository.save(recommendationRequest);
 

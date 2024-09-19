@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.EventParticipationValidator.EventParticipationValidator;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -20,10 +22,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
 
+    private static final long ID = 1L;
     private static final long ID = 1L;
     private static final long EVENT_ID_IS_ONE = 1L;
     private static final long EVENT_ID_IS_TWO = 2L;

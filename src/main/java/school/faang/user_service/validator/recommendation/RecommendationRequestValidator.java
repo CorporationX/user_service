@@ -14,7 +14,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class RecommendationRequestValidator {
-    private long MONTH_FOR_SEARCH_REQUEST = 6;
+    private final static long MONTH_FOR_SEARCH_REQUEST = 6;
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final UserRepository userRepository;
     private final SkillRequestRepository skillRequestRepository;
@@ -43,7 +43,7 @@ public class RecommendationRequestValidator {
     }
 
     public void validateSkillRequest(RecommendationRequestDto recommendationRequestDto) {
-        recommendationRequestDto.getSkillsId().stream()
+        recommendationRequestDto.getSkillsId()
                 .forEach(skillId -> {
                     if (!skillRequestRepository.existsById(skillId)) {
                         throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");

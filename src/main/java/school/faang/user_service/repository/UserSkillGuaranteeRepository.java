@@ -9,5 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface UserSkillGuaranteeRepository extends JpaRepository<UserSkillGuarantee, Long> {
-    Optional<UserSkillGuarantee> findByReceiverIdAndSkillIdAndAuthorId(long receiverId, long skillId, long authorId);
 }

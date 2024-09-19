@@ -1,5 +1,6 @@
 package school.faang.user_service.validator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.dto.RecommendationDto;
+import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
@@ -17,7 +18,6 @@ import java.time.Month;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,38 +29,53 @@ class RecommendationDtoValidatorTest {
     @Mock
     private RecommendationRepository recommendationRepository;
 
-    private static final long USER_ID = 1;
+    private static final long USER_ID = 1L;
+    private static final String CONTENT = "content";
+    private RecommendationDto recommendationDto;
+    private Recommendation recommendation;
+
+    @BeforeEach
+    public void init() {
+        recommendationDto = RecommendationDto.builder()
+                .content(CONTENT)
+                .authorId(USER_ID)
+                .receiverId(USER_ID)
+                .createdAt(LocalDateTime.now())
+                .build();
+        recommendation = new Recommendation();
+    }
 
     @Nested
     class NegativeTests {
 
         @Test
-        @DisplayName("Ошибка если контент пустой")
-        public void testValidateIfRecommendationContentIsBlank() {
-            RecommendationDto recommendationDto = new RecommendationDto();
+        @DisplayName("Ошибка если content пустой")
+        public void whenValidateContentIsBlankThenException() {
             recommendationDto.setContent(" ");
 
             assertThrows(DataValidationException.class,
-                    () -> recommendationDtoValidator.validateIfRecommendationContentIsBlank(recommendationDto));
+                    () -> recommendationDtoValidator.validateRecommendation(recommendationDto));
+        }
+
+        @Test
+        @DisplayName("Ошибка если content равен null")
+        public void whenValidateContentIsNullThenException() {
+            recommendationDto.setContent(null);
+
+            assertThrows(DataValidationException.class,
+                    () -> recommendationDtoValidator.validateRecommendation(recommendationDto));
         }
 
         @Test
         @DisplayName("Ошибка если рекомендация дается раньше, чем через 6 месяцев")
-        public void testValidateIfRecommendationCreatedTimeIsShort() {
-            RecommendationDto recommendationDto = new RecommendationDto();
-            recommendationDto.setContent("content");
-            recommendationDto.setAuthorId(USER_ID);
-            recommendationDto.setReceiverId(USER_ID);
-            recommendationDto.setCreatedAt(LocalDateTime.now());
-
-            Recommendation recommendation = new Recommendation();
+        public void whenValidateDateWithShortInternalThenException() {
             recommendation.setCreatedAt(LocalDateTime.now());
             when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                     recommendationDto.getAuthorId(), recommendationDto.getReceiverId()))
                     .thenReturn(Optional.of(recommendation));
 
             assertThrows(DataValidationException.class,
-                    () -> recommendationDtoValidator.validateIfRecommendationCreatedTimeIsShort(recommendationDto));
+                    () -> recommendationDtoValidator.validateRecommendation(recommendationDto));
         }
     }
 
@@ -69,20 +84,13 @@ class RecommendationDtoValidatorTest {
 
         @Test
         @DisplayName("Успех если рекомендация дается больше, чем через 6 месяцев")
-        public void testValidateIfRecommendationCreatedTimeIsShort() {
-            RecommendationDto recommendationDto = new RecommendationDto();
-            recommendationDto.setContent("content");
-            recommendationDto.setAuthorId(USER_ID);
-            recommendationDto.setReceiverId(USER_ID);
-            recommendationDto.setCreatedAt(LocalDateTime.now());
-
-            Recommendation recommendation = new Recommendation();
-            recommendation.setCreatedAt(LocalDateTime.of(2014, Month.JULY, 2 , 15, 30));
+        public void whenValidateDateWithNormalInternalThenSuccess() {
+            recommendation.setCreatedAt(LocalDateTime.of(2014, Month.JULY, 2, 15, 30));
             when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                     recommendationDto.getAuthorId(), recommendationDto.getReceiverId()))
                     .thenReturn(Optional.of(recommendation));
 
-            recommendationDtoValidator.validateIfRecommendationCreatedTimeIsShort(recommendationDto);
+            recommendationDtoValidator.validateRecommendation(recommendationDto);
 
             verify(recommendationRepository)
                     .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(),

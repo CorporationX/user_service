@@ -25,21 +25,26 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
 
+    private static final long USER_ID_IS_ONE = 1L;
+    private static final long USER_ID_IS_TWO = 2L;
+
     @InjectMocks
     private SubscriptionService subscriptionService;
+
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
     @Mock
     private SubscriptionValidator subscriptionValidator;
+
     @Mock
     private UserValidator userValidator;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private UserFilter userFilter;
-
-    private final static long USER_ID_IS_ONE = 1L;
-    private final static long USER_ID_IS_TWO = 2L;
 
     private User user;
     private List<User> users;
@@ -53,7 +58,7 @@ class SubscriptionServiceTest {
         class FollowUserMethod {
 
             @Test
-            @DisplayName("Ошибка валидации при подписке, если метод принимает 2 одинаковых id пользователей")
+            @DisplayName("Throws ValidationException when users id are equals")
             void whenSubscriptionUsersIdAreEqualsThenThrowValidationException() {
                 String exceptionMsg = "User can't subscribe to himself";
 
@@ -69,7 +74,7 @@ class SubscriptionServiceTest {
             }
 
             @Test
-            @DisplayName("Ошибка валидации при подписке, если подписка уже существует")
+            @DisplayName("Throws ValidationException when subscription already exists")
             void whenSubscriptionAlreadyExistsThenThrowValidationException() {
                 String exceptionMsg = "Already subscribed";
 
@@ -90,7 +95,7 @@ class SubscriptionServiceTest {
         class UnfollowUserMethod {
 
             @Test
-            @DisplayName("Ошибка валидации при отписке, если метод принимает 2 одинаковых id пользователей")
+            @DisplayName("Throws ValidationException when users id are equals")
             void whenUnsubscribeUsersIdAreEqualsThenThrowValidationException() {
                 String exceptionMsg = "User can't unsubscribe to himself";
 
@@ -106,7 +111,7 @@ class SubscriptionServiceTest {
             }
 
             @Test
-            @DisplayName("Ошибка валидации при отписке, если такой подписки не существует")
+            @DisplayName("Throws ValidationException when subscription doesn't exists")
             void whenSubscriptionNotExistsThenThrowValidationException() {
                 String exceptionMsg = "Already unsubscribed";
 
@@ -128,7 +133,7 @@ class SubscriptionServiceTest {
     class PositiveTests {
 
         @Test
-        @DisplayName("Успех если передали корректные значения в методе подписки")
+        @DisplayName("Success if values are correct in subscription method")
         void whenCorrectValuesInFollowUserThenSuccess() {
             subscriptionService.followUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
 
@@ -145,7 +150,7 @@ class SubscriptionServiceTest {
         }
 
         @Test
-        @DisplayName("Успех если передали корректные значения в методе отписки")
+        @DisplayName("Success if values are correct in unfollow method")
         void whenCorrectValuesInUnfollowUserThenSuccess() {
             subscriptionService.unfollowUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
 
@@ -162,21 +167,23 @@ class SubscriptionServiceTest {
         }
 
         @Test
-        @DisplayName("Успех если передали корректные значения в методе получения количества подписчиков")
+        @DisplayName("Success if values are correct in findFollowersAmountByFolloweeId method")
         void whenCorrectValuesInGetFollowersCountThenSuccess() {
             subscriptionService.getFollowersCount(USER_ID_IS_TWO);
 
             verifyUser(USER_ID_IS_TWO);
+
             verify(subscriptionRepository)
                     .findFollowersAmountByFolloweeId(USER_ID_IS_TWO);
         }
 
         @Test
-        @DisplayName("Успех если передали корректные значения в методе получения количества подписок")
+        @DisplayName("Success if values are correct in findFolloweesAmountByFollowerId method")
         void whenCorrectValuesInGetFollowingCountThenSuccess() {
             subscriptionService.getFollowingCount(USER_ID_IS_ONE);
 
             verifyUser(USER_ID_IS_ONE);
+
             verify(subscriptionRepository)
                     .findFolloweesAmountByFollowerId(USER_ID_IS_ONE);
         }
@@ -190,7 +197,7 @@ class SubscriptionServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передали положительное значение id и null фильтр в методе получения подписок")
+            @DisplayName("Success if userId not null and filter is null")
             void whenCorrectValuesAndFilterIsNullInGetFollowersThenSuccess() {
                 List<User> userList = List.of(User.builder()
                         .id(USER_ID_IS_TWO)
@@ -209,8 +216,7 @@ class SubscriptionServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передано положительное значение id и фильтр по имени" +
-                    " в методе просмотра своих подписчиков")
+            @DisplayName("Success if userId not null and filter is userFilterName")
             void whenCorrectValuesAndFilterIsFilterNameInGetFollowersThenSuccess() {
                 when(subscriptionRepository.findByFollowerId(USER_ID_IS_ONE))
                         .thenReturn(users.stream());
@@ -238,8 +244,7 @@ class SubscriptionServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передано положительное значение id и фильтр null " +
-                    "в методе просмотра своих подписчиков")
+            @DisplayName("Success if userId not null and filter is null")
             void whenCorrectValuesAndFilterIsNullInGetFollowingThenSuccess() {
                 when(subscriptionRepository.findByFolloweeId(USER_ID_IS_TWO))
                         .thenReturn(users.stream());
@@ -254,8 +259,7 @@ class SubscriptionServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передано положительное значение id и фильтр по имени" +
-                    " в методе просмотра своих подписок")
+            @DisplayName("Success if userId not null and filter is userFilterName")
             void whenCorrectValuesAndFilterIsFilterNameInGetFollowingThenSuccess() {
                 when(subscriptionRepository.findByFolloweeId(USER_ID_IS_TWO))
                         .thenReturn(users.stream());

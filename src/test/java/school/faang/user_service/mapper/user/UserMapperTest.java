@@ -16,22 +16,22 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
+    private static final long USER_ID_ONE = 1L;
+    private static final long USER_ID_TWO = 2L;
+
+    private static final int SIZE_USER_DTO_LIST = 2;
+
     @InjectMocks
     private UserMapperImpl userMapper;
 
-    private final static long USER_ID_ONE = 1L;
-    private final static long USER_ID_TWO = 2L;
-
-    private final static int SIZE_USER_DTO_LIST = 2;
-
     @Test
-    @DisplayName("Если передали null, на выходе получим null")
+    @DisplayName("If gets null than return null")
     void whenListUsersIsNullThenGetNull() {
         assertNull(userMapper.toDtos(null));
     }
 
     @Test
-    @DisplayName("При передаче 2 элементов List<User> на выходе получим размер List<UserDto> равным 2")
+    @DisplayName("When gets List<User> with size 2 than return List<UserDto> with size 2")
     void whenListOfUsersIsNotNullThenGetListOfUserDtos() {
         List<User> users = List.of(
                 User.builder()

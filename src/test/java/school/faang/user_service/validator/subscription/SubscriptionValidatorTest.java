@@ -17,18 +17,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionValidatorTest {
 
+    private static final long USER_ID_IS_ONE = 1L;
+    private static final long USER_ID_IS_TWO = 2L;
+
     @InjectMocks
     private SubscriptionValidator subscriptionValidator;
+
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
-    private final static long USER_ID_IS_ONE = 1L;
-    private final static long USER_ID_IS_TWO = 2L;
-
     @Nested
     class NegativeTests {
+
         @Test
-        @DisplayName("Если существует подписка и она равна параметру shouldExist то выбрасывается ошибка")
+        @DisplayName("Throws ValidationException when subscription is exists and equals shouldExist")
         void whenSubscriptionIsExistAndEqualsShouldExistThenThrowValidationException() {
             String exceptionMessage = "Exception";
             boolean isExistTrue = Boolean.TRUE;
@@ -50,7 +52,7 @@ class SubscriptionValidatorTest {
     class PositiveTests {
 
         @Test
-        @DisplayName("Если существует подписка и она не равна параметру shouldExist то метод ничего не возвращает")
+        @DisplayName("Success if subscription is exists and not equals shouldExist")
         void whenSubscriptionIsExistAndNotEqualsShouldExistThenNotThrowValidationException() {
             String exceptionMessage = "Exception";
 

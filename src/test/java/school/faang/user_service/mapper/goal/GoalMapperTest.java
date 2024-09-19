@@ -24,6 +24,7 @@ public class GoalMapperTest {
     private static final Long PARENT_GOAL_ID = 2L;
     private static final Long SKILL_ID_1 = 1L;
     private static final Long SKILL_ID_2 = 2L;
+
     private static final String GOAL_TITLE = "Test Goal";
     private static final String GOAL_DESCRIPTION = "Test Description";
     private static final String SKILL_TITLE = "Test Skill";

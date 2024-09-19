@@ -16,17 +16,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
 
+    private static final long EVENT_ID_IS_ONE = 1L;
+    private static final long EVENT_ID_IS_TWO = 2L;
+    private static final long USER_ID_IS_ONE = 1L;
+    private static final long USER_ID_IS_TWO = 2L;
+
+    private static final int ONE_FINAL_EVENTS = 1;
+
     @InjectMocks
     private EventParticipationService eventParticipationService;
 
-    private final static long EVENT_ID_IS_ONE = 1L;
-    private final static long EVENT_ID_IS_TWO = 2L;
-    private final static long USER_ID_IS_ONE = 1L;
-    private final static long USER_ID_IS_TWO = 2L;
-    private final static int ONE_FINAL_EVENTS = 1;
-
     @Test
-    @DisplayName("Проверяем что у каждого участника удалится один ивент из списка к посещению и один останется")
+    @DisplayName("Check that one event was deleted and one remains")
     void whenListParticipantsSizeIsTwoThenSuccess() {
         Event event = Event.builder()
                 .id(EVENT_ID_IS_ONE)

@@ -18,22 +18,21 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationInvitedIdFilterTest {
 
-    @InjectMocks
-    private GoalInvitationInvitedIdFilter goalInvitationInvitedIdFilter;
-
-    private GoalInvitationFilterDto goalInvitationFilterDto;
-
     private final static Long INVITED_ID_NEGATIVE_PATTERN = -1L;
     private final static Long INVITED_ID_PATTERN = 1L;
     private final static Long INVITED_USER_ID_ONE = 1L;
     private final static Long INVITED_USER_ID_TWO = 2L;
 
+    @InjectMocks
+    private GoalInvitationInvitedIdFilter goalInvitationInvitedIdFilter;
+
+    private GoalInvitationFilterDto goalInvitationFilterDto;
+
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto заполнено поле invitedId не null и оно больше нуля, " +
-                "тогда возвращаем true")
+        @DisplayName("If GoalInvitationFilterDto invitedId not null and positive than return true")
         void whenGoalInvitationFilterDtoSpecifiedInvitedIdISNotNullAndMoreThanZeroThenReturnTrue() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .invitedId(INVITED_ID_PATTERN)
@@ -43,8 +42,7 @@ class GoalInvitationInvitedIdFilterTest {
         }
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле invitedId, " +
-                "тогда возвращаем отфильтрованный список")
+        @DisplayName("If GoalInvitationFilterDto invitedId not null and positive than return sorted list")
         void whenGoalInvitationFilterDtoSpecifiedInvitedIdThenReturnFilteredList() {
             Stream<GoalInvitation> goalInvitations = Stream.of(
                     GoalInvitation.builder()
@@ -79,7 +77,7 @@ class GoalInvitationInvitedIdFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto поле invitedId null тогда возвращаем false")
+        @DisplayName("If GoalInvitationFilterDto invitedId is null than return false")
         void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsNullThenReturnFalse() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .invitedId(null)
@@ -89,7 +87,7 @@ class GoalInvitationInvitedIdFilterTest {
         }
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto поле invitedId меньше нуля тогда возвращаем false")
+        @DisplayName("If GoalInvitationFilterDto invitedId is less than zero than return false")
         void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsLessThanZeroThenReturnFalse() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .invitedId(INVITED_ID_NEGATIVE_PATTERN)

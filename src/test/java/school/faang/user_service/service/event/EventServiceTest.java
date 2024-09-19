@@ -22,17 +22,18 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
 
+    private static final long EVENT_ID_ONE = 1L;
+    private static final long EVENT_ID_TWO = 2L;
+    private static final long USER_ID_IS_ONE = 1L;
+
     @InjectMocks
     private EventService eventService;
+
     @Mock
     private EventRepository eventRepository;
+
     @Mock
     private EventParticipationService eventParticipationService;
-
-    private final static long EVENT_ID_ONE = 1L;
-    private final static long EVENT_ID_TWO = 2L;
-
-    private final static long USER_ID_IS_ONE = 1L;
 
     @Nested
     class PositiveTests {
@@ -64,7 +65,7 @@ class EventServiceTest {
         }
 
         @Test
-        @DisplayName("Если у юзера есть запланированный ивент в списке, тогда удаляем его")
+        @DisplayName("If user has planned event than delete this event")
         void whenUserHasPlannedEventThenCancelItAndDeleteFromListUserEvents() {
             eventService.deactivatePlanningUserEventsAndDeleteEvent(user);
 

@@ -27,6 +27,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserDeactivationServiceTest {
 
+    private static final long USER_ID_IS_ONE = 1L;
+
+    private static final int USER_MENTEES_SIZE_IS_ZERO = 0;
+    private static final int USER_MENTEES_SIZE_IS_ONE = 1;
+
     @InjectMocks
     private UserDeactivationService userDeactivationService;
 
@@ -44,11 +49,6 @@ class UserDeactivationServiceTest {
 
     @Mock
     private UserValidator userValidator;
-
-    private static final long USER_ID_IS_ONE = 1L;
-
-    private static final int USER_MENTEES_SIZE_IS_ZERO = 0;
-    private static final int USER_MENTEES_SIZE_IS_ONE = 1;
 
     @Nested
     class NegativeTests {

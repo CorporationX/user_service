@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ import school.faang.user_service.service.specification.GoalInvitationSpecificati
 
 import java.util.List;
 import java.util.Objects;
+
 import static school.faang.user_service.service.util.GoalInvitationUtil.*;
 
 @Slf4j

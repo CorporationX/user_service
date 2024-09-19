@@ -1,10 +1,9 @@
 name: CI for user_service
 
 on:
-#  push:
-#    branches: 'cerberus-master-stream6'
   pull_request:
-    branches: 'feature/pipline-BJS2-26653'
+    branches:
+      - 'feature/pipline-BJS2-26653'
 
 jobs:
   build:

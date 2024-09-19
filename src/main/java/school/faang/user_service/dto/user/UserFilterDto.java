@@ -1,15 +1,16 @@
 package school.faang.user_service.dto.user;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import school.faang.user_service.dto.skill.SkillDto;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class UserFilterDto {
     private List<String> country;
     private List<String> cities;
-    private List<SkillDto> skills;
+    private List<Long> skillIds;
 }

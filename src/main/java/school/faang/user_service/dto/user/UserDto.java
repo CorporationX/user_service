@@ -1,13 +1,14 @@
 package school.faang.user_service.dto.user;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import school.faang.user_service.dto.skill.SkillDto;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class UserDto {
     private Long id;
     private String username;
@@ -16,5 +17,5 @@ public class UserDto {
     private String country;
     private String city;
     private Integer experience;
-    private List<SkillDto> skills;
+    private List<Long> skillIds;
 }

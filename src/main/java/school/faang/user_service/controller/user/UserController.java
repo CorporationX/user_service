@@ -1,14 +1,13 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.user.UserService;
@@ -22,10 +21,9 @@ public class UserController {
     private final UserService userService;
     private final UserMapper mapper;
 
-    @GetMapping("/premium")
-    @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getPremiumUser(@RequestBody UserFilterDto filterDto) {
+    @PostMapping("/premium")
+    public List<UserDto> getPremiumUser(@RequestBody @Valid UserFilterDto filterDto) {
         List<User> premiumUsers = userService.findPremiumUser(filterDto);
-        return mapper.toDtoList(premiumUsers);
+        return mapper.toDto(premiumUsers);
     }
 }

@@ -1,13 +1,12 @@
 package school.faang.user_service.service.user.filter;
 
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface UserFilter {
+    boolean isApplicable(UserFilterDto userFilterDto);
 
-    boolean isApplicable(UserFilterDto filterDto);
-
-    List<User> filterUsers(List<User> users, UserFilterDto filterDto);
+    Stream<User> apply(Stream<User> userStream, UserFilterDto filterDto);
 }

@@ -7,14 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user.filter.UserCityPattern;
 import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.service.user.filter.UserFilterByCities;
-import school.faang.user_service.service.user.filter.UserFilterBySkills;
+import school.faang.user_service.service.user.filter.UserSkillPattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,21 +74,17 @@ public class UserServiceTest {
                 .skills(List.of(skillOne, skillThree))
                 .build();
 
-
-        UserFilterDto filterDto = UserFilterDto.builder()
-                .cities(List.of("SPb"))
-                .skillIds(List.of(10L))
-                .build();
+        UserFilterDto userFilterDto = new UserFilterDto();
+        userFilterDto.setCityPattern("SPb");
+        userFilterDto.setSkillPattern("Java");
 
         when(userRepository.findPremiumUsers()).thenReturn(Stream.of(userOne, userTwo, userThree));
         when(userFilter.stream()).thenReturn(Stream.of(
-                new UserFilterByCities(),
-                new UserFilterBySkills()
+                new UserCityPattern(),
+                new UserSkillPattern()
         ));
 
-        List<User> premiumUsers = userService.findPremiumUser(filterDto);
-        Assertions.assertThat(premiumUsers.get(0))
-                .usingRecursiveComparison()
-                .isEqualTo(userThree);
+        List<User> premiumUsers = userService.findPremiumUser(userFilterDto);
+        Assertions.assertThat(premiumUsers.get(0)).usingRecursiveComparison().isEqualTo(userThree);
     }
 }

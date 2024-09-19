@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,14 +22,5 @@ public class RecommendationRequestValidator {
             throw new IllegalArgumentException("Not enough time has passed since the last request.");
         }
     }
-
-//    public void validateSkillRequests(List<Long> skillIds, List<Long> existingSkillIds) {
-//        skillIds.forEach(skillId -> {
-//            if (!existingSkillIds.contains(skillId)) {
-//                throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");
-//            }
-//        });
-//    }
-
 }
 

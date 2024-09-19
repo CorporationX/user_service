@@ -3,10 +3,10 @@ name: CI for user_service
 on:
   push:
     branches:
-      - cerberus-master-stream6
+      - '**'
   pull_request:
     branches:
-      - cerberus-master-stream6
+      - '**'
 
 jobs:
   build:

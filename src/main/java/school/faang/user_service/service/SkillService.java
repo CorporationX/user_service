@@ -1,8 +1,9 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
@@ -24,6 +25,7 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public Skill createSkill(Skill skill) {
         validateSkill(skill);
         if (skillRepository.existsByTitle(skill.getTitle())) {
@@ -31,13 +33,13 @@ public class SkillService {
         }
         return skillRepository.save(skill);
     }
-
+    @Transactional(readOnly = true)
     public List<Skill> getUserSkills(long userId) {
         validateUserExists(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skills;
     }
-
+    @Transactional(readOnly = true)
     public List<Skill> getOfferedSkills(long userId) {
         validateUserExists(userId);
         List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);

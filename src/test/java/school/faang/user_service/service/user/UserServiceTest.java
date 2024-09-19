@@ -107,7 +107,7 @@ class UserServiceTest {
         }
     }
 
-        @Nested
+    @Nested
     class NegativeTests {
 
         @Test

@@ -46,8 +46,6 @@ public class UserService {
     }
 
     public UserDto getUser(long userId) {
-        userValidator.validateUserIdIsPositiveAndNotNull(userId);
-
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
 

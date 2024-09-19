@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.user;
+package school.faang.user_service.EventParticipationValidator;
 
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserValidatorTest {
+class EventParticipationValidatorTest {
 
     @InjectMocks
-    private UserValidator userValidator;
+    private EventParticipationValidator eventParticipationValidator;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -25,25 +25,17 @@ class UserValidatorTest {
 
     @Test
     @DisplayName("Ошибка валидации если id пользователя уже существует")
-    void testCheckIfRegisterParticipantThenThrowException() {
+    void whenCheckIfRegisterParticipantThenThrowException() {
         when(eventParticipationRepository.existsById(ID)).thenReturn(true);
         assertThrows(ValidationException.class,
-                () -> userValidator.validateUserRegister(ID));
+                () -> eventParticipationValidator.validateUserRegister(ID));
     }
 
     @Test
     @DisplayName("Ошибка валидации если id пользователя ещё не существует")
-    void testCheckIfUnregisterParticipantThenThrowException() {
+    void whenCheckIfUnregisterParticipantThenThrowException() {
         when(!eventParticipationRepository.existsById(ID)).thenReturn(false);
         assertThrows(ValidationException.class,
-                () -> userValidator.validateUserUnregister(ID));
-    }
-
-    @Test
-    @DisplayName("Ошибка валидации если вместо id передели null")
-    void testUserIdIsNullOrElseThrowValidationException() {
-        assertThrows(ValidationException.class,
-                () -> userValidator.validateUserId(null),
-                "User id can't be null");
+                () -> eventParticipationValidator.validateUserUnregister(ID));
     }
 }

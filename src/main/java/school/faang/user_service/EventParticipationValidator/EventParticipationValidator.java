@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.user;
+package school.faang.user_service.EventParticipationValidator;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 
 @Component
 @RequiredArgsConstructor
-public class UserValidator {
+public class EventParticipationValidator {
 
     private final EventParticipationRepository eventParticipationRepository;
 
@@ -20,12 +20,6 @@ public class UserValidator {
     public void validateUserUnregister(long userId) throws ValidationException {
         if (!eventParticipationRepository.existsById(userId)) {
             throw new ValidationException("Пользователь ещё не зарегистрирован");
-        }
-    }
-
-    public void validateUserId(Long userId) {
-        if (userId == null) {
-            throw new ValidationException("User id can't be null");
         }
     }
 }

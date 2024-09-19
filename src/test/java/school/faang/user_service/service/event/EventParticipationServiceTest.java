@@ -8,11 +8,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.EventParticipationValidator.EventParticipationValidator;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 
@@ -31,10 +30,7 @@ class EventParticipationServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private UserValidator userValidator;
-
-    @Mock
-    private EventValidator eventValidator;
+    private EventParticipationValidator eventParticipationValidator;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -46,7 +42,7 @@ class EventParticipationServiceTest {
         @DisplayName("Ошибка при регистрации если пользователь уже зарегистрирован")
         void testRegisterParticipantIfUserExists() {
             doThrow(new ValidationException("Пользователь уже зарегистрирован")).
-                    when(userValidator).validateUserId(ID);
+                    when(eventParticipationValidator).validateUserRegister(ID);
 
             assertThrows(ValidationException.class,
                     () -> eventParticipationService.registerParticipant(ID, ID));
@@ -56,7 +52,7 @@ class EventParticipationServiceTest {
         @DisplayName("Ошибка при отмене регистрации если пользователь уже зарегистрирован")
         void testUnregisterParticipantIfUserNoExists() {
             doThrow(new ValidationException("Пользователь ещё не зарегистрирован")).
-                    when(userValidator).validateUserId(ID);
+                    when(eventParticipationValidator).validateUserUnregister(ID);
 
             assertThrows(ValidationException.class,
                     () -> eventParticipationService.unregisterParticipant(ID, ID));
@@ -71,8 +67,7 @@ class EventParticipationServiceTest {
         void whenRegisterParticipantThenSuccess() {
             eventParticipationService.registerParticipant(ID, ID);
 
-            verify(userValidator).validateUserId(ID);
-            verify(userValidator).validateUserRegister(ID);
+            verify(eventParticipationValidator).validateUserRegister(ID);
             verify(eventParticipationRepository).register(ID, ID);
         }
 
@@ -81,9 +76,7 @@ class EventParticipationServiceTest {
         void testUnregisterParticipantThenSuccess() {
             eventParticipationService.unregisterParticipant(ID, ID);
 
-            verify(userValidator).validateUserId(ID);
-            verify(eventValidator).validateEventId(ID);
-            verify(userValidator).validateUserUnregister(ID);
+            verify(eventParticipationValidator).validateUserUnregister(ID);
             verify(eventParticipationRepository).unregister(ID, ID);
         }
 
@@ -99,17 +92,15 @@ class EventParticipationServiceTest {
 
             eventParticipationService.getParticipant(ID);
 
-            verify(eventValidator).validateEventId(ID);
             verify(eventParticipationRepository).findAllParticipantsByEventId(ID);
             verify(userMapper).toDtos(users);
         }
 
         @Test
         @DisplayName("Успешное получение количества участников события")
-        void testGetParticipantCount() {
+        void whenGetParticipantCountThenSuccess() {
             eventParticipationService.getParticipantCount(ID);
 
-            verify(eventValidator).validateEventId(ID);
             verify(eventParticipationRepository).countParticipants(ID);
         }
     }

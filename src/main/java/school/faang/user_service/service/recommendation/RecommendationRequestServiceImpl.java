@@ -17,7 +17,9 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -33,18 +35,27 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     @Override
     @Transactional
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-//        Long receiverId = recommendationRequestDto.getReceiverId();
-//        Long requesterId = recommendationRequestDto.getRequesterId();
-//        boolean existsReceiver = userRepository.existsById(receiverId);
-//        boolean existsRequester = userRepository.existsById(requesterId);
-//        boolean equalsReceiverAndRequester = receiverId.equals(requesterId);
-        recommendationRequestValidator.validateRequesterAndReceiver(recommendationRequestDto);
-        recommendationRequestValidator.validateRequestAndCheckTimeLimit(recommendationRequestDto);
-        recommendationRequestValidator.validateSkillRequest(recommendationRequestDto);
+        Long receiverId = recommendationRequestDto.getReceiverId();
+        Long requesterId = recommendationRequestDto.getRequesterId();
+
+        if (!userRepository.existsById(receiverId)) {
+            throw new IllegalArgumentException("Receiver with ID " + receiverId + " does not exist.");
+        }
+        if (!userRepository.existsById(requesterId)) {
+            throw new IllegalArgumentException("Requester with ID " + requesterId + " does not exist.");
+        }
+
+        Optional<RecommendationRequest> latestPendingRequest = repository.findLatestPendingRequest(requesterId, receiverId);
+        LocalDateTime lastRequestTime = latestPendingRequest.map(RecommendationRequest::getUpdatedAt).orElse(null);
+
+        recommendationRequestValidator.validateRequesterAndReceiver(requesterId, receiverId);
+        recommendationRequestValidator.validateRequestAndCheckTimeLimit(lastRequestTime);
+
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
-        recommendationRequest.getSkills()
+        recommendationRequest.getSkills().stream()
                 .forEach(skill -> skillRequestRepository.create(recommendationRequestDto.getId(), skill.getId()));
         RecommendationRequest createRequest = repository.save(recommendationRequest);
+
         return recommendationRequestMapper.toDto(createRequest);
     }
 

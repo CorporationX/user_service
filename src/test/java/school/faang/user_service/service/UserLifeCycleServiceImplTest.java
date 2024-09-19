@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.user.UserServiceImpl;
+import school.faang.user_service.service.user.UserLifeCycleServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceImplTest {
+class UserLifeCycleServiceImplTest {
 
     @Mock
     private MentorshipService mentorshipService;
@@ -31,7 +31,7 @@ class UserServiceImplTest {
     private GoalRepository goalRepository;
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserLifeCycleServiceImpl userService;
 
     @Test
     void deactivateUser_WithValidId() {

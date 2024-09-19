@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface DiceBearClient {
 
     @GetMapping("/svg")
-    byte[] getSvgAvatar(@RequestParam String seed);
+    byte[] getSvgAvatar(@RequestParam String seed, @RequestParam int size);
 }

@@ -29,6 +29,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
+    private static final long USER_ID_IS_ONE = 1L;
+    private static final int USER_MENTEES_SIZE_IS_ZERO = 0;
+    private static final int USER_MENTEES_SIZE_IS_ONE = 1;
+
     @InjectMocks
     private UserService userService;
     @Mock
@@ -41,10 +45,6 @@ class UserServiceTest {
     private EventService eventService;
     @Mock
     private MentorshipService mentorshipService;
-
-    private static long USER_ID_IS_ONE = 1L;
-    private static int USER_MENTEES_SIZE_IS_ZERO = 0;
-    private static int USER_MENTEES_SIZE_IS_ONE = 1;
 
     @Nested
     class NegativeTests {

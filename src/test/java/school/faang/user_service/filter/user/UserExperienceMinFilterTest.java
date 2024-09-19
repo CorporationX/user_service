@@ -16,20 +16,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserExperienceMinFilterTest {
 
+    private final static int EXPERIENCE_MIN_PATTERN = 2;
+    private final static int EXPERIENCE_LESS_THAN_MIN_PATTERN = 1;
+    private final static int EXPERIENCE_ZERO = 0;
+
     @InjectMocks
     private UserExperienceMinFilter userExperienceMinFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static int EXPERIENCE_MIN_PATTERN = 2;
-    private final static int EXPERIENCE_LESS_THAN_MIN_PATTERN = 1;
-    private final static int EXPERIENCE_ZERO = 0;
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле experienceMin больше нуля, тогда возвращаем true")
+        @DisplayName("If UserFilterDto experienceMin positive than return true")
         void whenUserFilterDtoSpecifiedExperienceMinMoreZanZeroThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .experienceMin(EXPERIENCE_MIN_PATTERN)
@@ -39,7 +39,7 @@ class UserExperienceMinFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле experienceMin, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto experienceMin positive than return sorted list")
         void whenUserFilterDtoSpecifiedExperienceMinThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -65,7 +65,7 @@ class UserExperienceMinFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле experienceMin меньше нуля, тогда возвращаем false")
+        @DisplayName("If UserFilterDto experienceMin less than zero than return false")
         void whenUserFilterDtoExperienceMinIsLessThanZeroThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .experienceMax(EXPERIENCE_ZERO)

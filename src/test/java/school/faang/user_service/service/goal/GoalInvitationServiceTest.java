@@ -25,32 +25,39 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
 
+    private static final int ONE_TIMES_CALL_METHOD = 1;
+    private static final int TWO_TIMES_CALL_METHOD = 2;
+
+    private static final Long GOAL_INVITATION_ID_IS_ONE = 1L;
+    private static final Long GOAL_INVITATION_ID_IS_TWO = 2L;
+    private static final Long USER_ID_IS_ONE = 1L;
+    private static final Long USER_ID_IS_TWO = 2L;
+    private static final Long GOAL_ID_IS_ONE = 1L;
+    private static final Long GOAL_ID_IS_TWO = 2L;
+
     @InjectMocks
     private GoalInvitationService goalInvitationService;
+
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
+
     @Mock
     private GoalValidator goalValidator;
+
     @Mock
     private UserValidator userValidator;
+
     @Mock
     private GoalInvitationMapper goalInvitationMapper;
+
     @Mock
     private GoalInvitationFilter goalInvitationFilter;
-
-    private final static int TWO_TIMES_CALL_METHOD = 2;
-
-    private final static Long GOAL_INVITATION_ID_IS_ONE = 1L;
-    private final static Long GOAL_INVITATION_ID_IS_TWO = 2L;
-    private final static Long USER_ID_IS_ONE = 1L;
-    private final static Long USER_ID_IS_TWO = 2L;
-    private final static Long GOAL_ID_IS_ONE = 1L;
-    private final static Long GOAL_ID_IS_TWO = 2L;
 
     private GoalInvitation goalInvitation;
     private GoalInvitationDto goalInvitationDto;
@@ -58,36 +65,29 @@ class GoalInvitationServiceTest {
     private List<GoalInvitationFilter> goalInvitationFilterList;
 
     @Nested
-    class NegativeTests {
-
-        @Test
-        @DisplayName("Ошибка валидации если цели не существует")
-        void whenGoalNotExistsInAcceptGoalInvitationThenThrowValidationException() {
-            when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
-                    .thenReturn(Optional.empty());
-
-            assertThrows(ValidationException.class,
-                    () -> goalInvitationService.acceptGoalInvitation(GOAL_ID_IS_ONE),
-                    "No goal with id " + GOAL_ID_IS_ONE + " found");
-        }
-
-        @Test
-        @DisplayName("Ошибка валидации если цели не существует")
-        void whenGoalNotExistsInRejectGoalInvitationThenThrowValidationException() {
-            when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
-                    .thenReturn(Optional.empty());
-
-            assertThrows(ValidationException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(GOAL_ID_IS_ONE),
-                    "No goal with id " + GOAL_ID_IS_ONE + " found");
-        }
-    }
-
-    @Nested
     class PositiveTests {
+
+        private User user;
+        private List<GoalInvitation> goalInvitations;
 
         @BeforeEach
         void init() {
+            user = User.builder()
+                    .id(USER_ID_IS_ONE)
+                    .build();
+            User userWithIdTwo = User.builder()
+                    .id(USER_ID_IS_TWO)
+                    .build();
+
+            goalInvitations = List.of(
+                    GoalInvitation.builder()
+                            .invited(user)
+                            .inviter(user)
+                            .build(),
+                    GoalInvitation.builder()
+                            .invited(userWithIdTwo)
+                            .inviter(userWithIdTwo)
+                            .build());
             List<User> users = new ArrayList<>();
             users.add(User.builder()
                     .id(USER_ID_IS_ONE)
@@ -112,10 +112,30 @@ class GoalInvitationServiceTest {
                             .users(users)
                             .build())
                     .build();
+
         }
 
         @Test
-        @DisplayName("Успех если приглашаемый и приглашенный имеют разные id в передаваемом Dto")
+        @DisplayName("DeleteAll cals ones if list size is 2")
+        void whenGoalInvitationsSizeIsTwoThenTwoTimesUsesRepository() {
+            goalInvitationService.deleteGoalInvitations(goalInvitations);
+
+            verify(goalInvitationRepository, times(ONE_TIMES_CALL_METHOD))
+                    .deleteAll(goalInvitations);
+        }
+
+        @Test
+        @DisplayName("DeleteAllById calls ones if one of the input sheet values matches the filter")
+        void whenUserExistsThenSuccess() {
+            goalInvitationService.deleteGoalInvitationForUser(goalInvitations, user);
+
+            verify(goalInvitationRepository)
+                    .deleteAllById(anyCollection());
+        }
+
+
+        @Test
+        @DisplayName("Success if inviter and invented have different ids")
         void whenInviterAndInvitedAreNotEqualsThenSuccess() {
             when(goalInvitationMapper.toEntity(goalInvitationDto))
                     .thenReturn(goalInvitation);
@@ -142,7 +162,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Обновляем сущность если цель существует")
+        @DisplayName("Update entity if goal existed")
         void whenGoalExistsThenSuccessAccept() {
             when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
                     .thenReturn(Optional.of(goalInvitation));
@@ -164,7 +184,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        @DisplayName("Обновляем сущность если цель существует")
+        @DisplayName("Update entity if goal existed")
         void whenGoalExistsThenSuccessReject() {
             when(goalInvitationRepository.findById(GOAL_INVITATION_ID_IS_ONE))
                     .thenReturn(Optional.of(goalInvitation));
@@ -207,7 +227,7 @@ class GoalInvitationServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передаем null в фильтре")
+            @DisplayName("Success if filter is null")
             void whenFilterIsNullThenSuccess() {
                 when(goalInvitationRepository.findAll())
                         .thenReturn(goalInvitations);
@@ -221,7 +241,7 @@ class GoalInvitationServiceTest {
             }
 
             @Test
-            @DisplayName("Успех если передаем не null в фильтр")
+            @DisplayName("Success if filter not null")
             void whenFilterIsNotNullThenSuccess() {
                 when(goalInvitationRepository.findAll())
                         .thenReturn(goalInvitations);
@@ -238,6 +258,32 @@ class GoalInvitationServiceTest {
                 verify(goalInvitationMapper)
                         .toDtos(List.of(goalInvitation));
             }
+        }
+    }
+
+    @Nested
+    class NegativeTests {
+
+        @Test
+        @DisplayName("Throws ValidationException if goal doesn't exist")
+        void whenGoalNotExistsInAcceptGoalInvitationThenThrowValidationException() {
+            when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
+                    .thenReturn(Optional.empty());
+
+            assertThrows(ValidationException.class,
+                    () -> goalInvitationService.acceptGoalInvitation(GOAL_ID_IS_ONE),
+                    "No goal with id " + GOAL_ID_IS_ONE + " found");
+        }
+
+        @Test
+        @DisplayName("Throws ValidationException if goal doesn't exist")
+        void whenGoalNotExistsInRejectGoalInvitationThenThrowValidationException() {
+            when(goalInvitationRepository.findById(GOAL_ID_IS_ONE))
+                    .thenReturn(Optional.empty());
+
+            assertThrows(ValidationException.class,
+                    () -> goalInvitationService.rejectGoalInvitation(GOAL_ID_IS_ONE),
+                    "No goal with id " + GOAL_ID_IS_ONE + " found");
         }
     }
 }

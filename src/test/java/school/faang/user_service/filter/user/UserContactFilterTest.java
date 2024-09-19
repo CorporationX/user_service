@@ -18,18 +18,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserContactFilterTest {
 
+    private final static String CONTACT_PATTERN = "contact";
+
     @InjectMocks
     private UserContactFilter userContactFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String CONTACT_PATTERN = "contact";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле contactPattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto contactPattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedContactPatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .contactPattern(CONTACT_PATTERN)
@@ -39,7 +39,7 @@ class UserContactFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле contactPattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto contactPattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedContactPatternThenReturnFilteredList() {
             List<Contact> contactsWithPattern = List.of(Contact.builder()
                     .contact(CONTACT_PATTERN)
@@ -69,7 +69,7 @@ class UserContactFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле contactPattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto contactPattern is blank than return false")
         void whenUserFilterDtoContactPatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .contactPattern("   ")
@@ -79,7 +79,7 @@ class UserContactFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле contactPattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto contactPattern is null than return false")
         void whenUserFilterDtoContactPatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .contactPattern(null)

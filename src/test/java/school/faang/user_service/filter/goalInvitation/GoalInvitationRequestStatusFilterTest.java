@@ -18,19 +18,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationRequestStatusFilterTest {
 
+    private final static RequestStatus REQUEST_PATTERN = RequestStatus.ACCEPTED;
+
     @InjectMocks
     private GoalInvitationRequestStatusFilter goalInvitationRequestStatusFilter;
 
     private GoalInvitationFilterDto goalInvitationFilterDto;
 
-    private final static RequestStatus REQUEST_PATTERN = RequestStatus.ACCEPTED;
-
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto заполнено поле status тогда возвращаем true")
+        @DisplayName("If GoalInvitationFilterDto status not null and not blank than return true")
         void whenGoalInvitationFilterDtoSpecifiedStatusIsNotNullThenReturnTrue() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .status(REQUEST_PATTERN)
@@ -40,8 +39,7 @@ class GoalInvitationRequestStatusFilterTest {
         }
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле status, " +
-                "тогда возвращаем отфильтрованный список")
+        @DisplayName("If GoalInvitationFilterDto status not null and not blank than return sorted list")
         void whenGoalInvitationFilterDtoSpecifiedStatusThenReturnFilteredList() {
             Stream<GoalInvitation> goalInvitations = Stream.of(
                     GoalInvitation.builder()
@@ -69,7 +67,7 @@ class GoalInvitationRequestStatusFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto поле status null тогда возвращаем false")
+        @DisplayName("If GoalInvitationFilterDto status is null than return false")
         void whenGoalInvitationFilterDtoSpecifiedStatusIsNullThenReturnFalse() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .status(null)

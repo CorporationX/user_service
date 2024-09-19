@@ -16,18 +16,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserPhoneFilterTest {
 
+    private final static String PHONE_PATTERN = "phone";
+
     @InjectMocks
     private UserPhoneFilter userPhoneFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String PHONE_PATTERN = "phone";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле phonePattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto phonePattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedPhonePatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .phonePattern(PHONE_PATTERN)
@@ -37,7 +37,7 @@ class UserPhoneFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле phonePattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto phonePattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedPhonePatternThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -63,7 +63,7 @@ class UserPhoneFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле phonePattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto phonePattern is blank than return false")
         void whenUserFilterDtoPhonePatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .phonePattern("   ")
@@ -73,7 +73,7 @@ class UserPhoneFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле phonePattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto phonePattern is null than return false")
         void whenUserFilterDtoPhonePatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .phonePattern(null)

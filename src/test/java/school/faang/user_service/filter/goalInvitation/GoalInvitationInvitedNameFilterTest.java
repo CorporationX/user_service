@@ -18,20 +18,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationInvitedNameFilterTest {
 
+    private final static String INVENTED_NAME_PATTERN = "inventedName";
+
     @InjectMocks
     private GoalInvitationInvitedNameFilter goalInvitationInvitedNameFilter;
 
     private GoalInvitationFilterDto goalInvitationFilterDto;
 
-    private final static String INVENTED_NAME_PATTERN = "inventedName";
-
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto заполнено поле invitedNamePattern не null и оно больше нуля, " +
-                "тогда возвращаем true")
+        @DisplayName("If GoalInvitationFilterDto invitedNamePattern not null and not blank than return true")
         void whenGoalInvitationFilterDtoSpecifiedInvitedNamePatternISNotNullAndMoreThanZeroThenReturnTrue() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .invitedNamePattern(INVENTED_NAME_PATTERN)
@@ -41,8 +39,7 @@ class GoalInvitationInvitedNameFilterTest {
         }
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto корректно заполнено поле invitedNamePattern, " +
-                "тогда возвращаем отфильтрованный список")
+        @DisplayName("If GoalInvitationFilterDto invitedNamePattern not null and not blank than return sorted list")
         void whenGoalInvitationFilterDtoSpecifiedInvitedNamePatternThenReturnFilteredList() {
             Stream<GoalInvitation> goalInvitations = Stream.of(
                     GoalInvitation.builder()
@@ -76,7 +73,7 @@ class GoalInvitationInvitedNameFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto поле invitedNamePattern null тогда возвращаем false")
+        @DisplayName("If GoalInvitationFilterDto invitedNamePattern is null than return false")
         void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsNullThenReturnFalse() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .invitedNamePattern(null)
@@ -86,7 +83,7 @@ class GoalInvitationInvitedNameFilterTest {
         }
 
         @Test
-        @DisplayName("Если у GoalInvitationFilterDto поле invitedNamePattern пустое тогда возвращаем false")
+        @DisplayName("If GoalInvitationFilterDto invitedNamePattern is blank than return false")
         void whenGoalInvitationFilterDtoSpecifiedInvitedIdIsLessThanZeroThenReturnFalse() {
             goalInvitationFilterDto = GoalInvitationFilterDto.builder()
                     .invitedNamePattern("   ")

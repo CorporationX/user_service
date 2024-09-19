@@ -21,23 +21,24 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserValidatorTest {
 
+    private static final long USER_ID_IS_NEGATIVE_ONE = -1L;
+    private static final long USER_ID_IS_ONE = 1L;
+    private static final long USER_ID_IS_TWO = 2L;
+
     @InjectMocks
     private UserValidator userValidator;
 
     @Mock
     private UserRepository userRepository;
 
-    private final static long USER_ID_IS_NEGATIVE_ONE = -1L;
-    private final static long USER_ID_IS_ONE = 1L;
-    private final static long USER_ID_IS_TWO = 2L;
-
     @Nested
     class NegativeTests {
 
         @Nested
         class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
             @Test
-            @DisplayName("Ошибка валидации если переданное число null")
+            @DisplayName("Throws ValidationException when userId is null")
             void whenNullValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
@@ -45,7 +46,7 @@ class UserValidatorTest {
             }
 
             @Test
-            @DisplayName("Ошибка валидации если переданное число отрицательное")
+            @DisplayName("Throws ValidationException when userId is negative")
             void whenNegativeValueThenThrowValidationException() {
                 assertThrows(ValidationException.class,
                         () -> userValidator
@@ -55,7 +56,7 @@ class UserValidatorTest {
         }
 
         @Test
-        @DisplayName("Ошибка валидации если пользователя с переданным id не существует")
+        @DisplayName("Throws ValidationException when user not exists in DB")
         void whenUserNotExistsThenThrowValidationException() {
             when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -65,7 +66,7 @@ class UserValidatorTest {
         }
 
         @Test
-        @DisplayName("Ошибка валидации если переданные id у пользователей одинаковые")
+        @DisplayName("Throws ValidationException when users id are equals")
         void whenId1AndId2EqualsThenThrowValidationExceptionWithMessage() {
             String exceptionMessage = "Exception";
 
@@ -82,13 +83,13 @@ class UserValidatorTest {
     class PositiveTests {
 
         @Test
-        @DisplayName("Если переданный id пользователя не null и больше нуля то метод ничего не возвращает")
+        @DisplayName("Success if userId is not null and positive")
         void whenUserIdNotNullValueAndMoreThanZeroThenSuccess() {
             userValidator.validateUserIdIsPositiveAndNotNull(USER_ID_IS_ONE);
         }
 
         @Test
-        @DisplayName("Если пользователь с переданным id существует то метод ничего не возвращает")
+        @DisplayName("Success if user is exists")
         void whenUserExistsThenSuccess() {
             when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
 
@@ -98,7 +99,7 @@ class UserValidatorTest {
         }
 
         @Test
-        @DisplayName("Если переданные id у пользователей разные то метод ничего не возвращает")
+        @DisplayName("Success if users id aren't equals")
         void whenId1AndId2EqualsThenNotThrowValidationException() {
             String exceptionMessage = "Exception";
 

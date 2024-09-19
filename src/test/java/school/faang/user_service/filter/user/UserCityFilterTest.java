@@ -16,18 +16,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserCityFilterTest {
 
+    private final static String CITY_PATTERN = "city";
+
     @InjectMocks
     private UserCityFilter userCityFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String CITY_PATTERN = "city";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле cityPattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto cityPattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedCityPatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .cityPattern(CITY_PATTERN)
@@ -37,7 +37,7 @@ class UserCityFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле cityPattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto cityPattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedCityPatternThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -63,7 +63,7 @@ class UserCityFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле cityPattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto cityPattern is blank than return false")
         void whenUserFilterDtoCityPatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .cityPattern("   ")
@@ -73,7 +73,7 @@ class UserCityFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле cityPattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto cityPattern is null than return false")
         void whenUserFilterDtoCityPatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .cityPattern(null)

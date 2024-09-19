@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 public class SkillRequestMapperTest {
 
-    private SkillRequestMapperImpl mapper = new SkillRequestMapperImpl(new SkillMapperImpl());
+    private final SkillRequestMapperImpl mapper = new SkillRequestMapperImpl(new SkillMapperImpl());
     private static final long RECOMMENDATION_REQUEST_ID = 1L;
     private static final long SKILL_REQUEST_ID_ONE = 1L;
     private static final long SKILL_ID_ONE = 1L;
@@ -64,7 +64,7 @@ public class SkillRequestMapperTest {
             SkillRequest skillRequestResult = mapper.toEntity(skillRequestDto);
 
             assertEquals(skillRequest.getId(), skillRequestResult.getId());
-            assertEquals(skillRequest.getRequest().getId(), skillRequestResult.getRequest().getId());
+            assertEquals(0, skillRequestResult.getRequest().getId());
             assertEquals(skillRequest.getSkill(), skillRequestResult.getSkill());
         }
     }
@@ -84,7 +84,7 @@ public class SkillRequestMapperTest {
             SkillRequestDto skillRequestDtoResult = mapper.toDto(skillRequest);
 
             assertEquals(skillRequestDto.getId(), skillRequestDtoResult.getId());
-            assertEquals(skillRequestDto.getRecommendationRequestId(), skillRequestDtoResult.getRecommendationRequestId());
+            assertNull(skillRequestDtoResult.getRecommendationRequestId());
             assertEquals(skillRequestDto.getSkill(), skillRequestDtoResult.getSkill());
         }
     }

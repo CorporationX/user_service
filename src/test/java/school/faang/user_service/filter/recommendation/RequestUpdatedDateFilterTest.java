@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ public class RequestUpdatedDateFilterTest {
         @DisplayName("If updatedAt not null then return true")
         public void whenRequestUpdatedDateFilterParameterNotNullThenReturnTrue() {
             filterDto = RequestFilterDto.builder()
-                    .updatedAt(FIRST_DATE)
+                    .updatedAt(LocalDate.from(FIRST_DATE))
                     .build();
 
             assertTrue(requestUpdatedDateFilter.isApplicable(filterDto));
@@ -54,7 +55,7 @@ public class RequestUpdatedDateFilterTest {
                             .build());
 
             filterDto = RequestFilterDto.builder()
-                    .updatedAt(SECOND_DATE)
+                    .updatedAt(LocalDate.from(SECOND_DATE))
                     .build();
 
             List<RecommendationRequest> filteredRequests = List.of(

@@ -15,6 +15,7 @@ class RequestUpdatedDateFilter implements RequestFilter {
 
     @Override
     public Stream<RecommendationRequest> applyFilter(Stream<RecommendationRequest> requests, RequestFilterDto filters) {
-        return requests.filter(request -> request.getUpdatedAt().isEqual(filters.getUpdatedAt()));
+        return requests.filter(request -> request.getUpdatedAt().toLocalDate()
+                .isEqual(filters.getUpdatedAt()));
     }
 }

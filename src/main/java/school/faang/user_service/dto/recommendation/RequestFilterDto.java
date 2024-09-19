@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -19,7 +19,7 @@ public class RequestFilterDto {
     private Long requesterId;
     private Long receiverId;
     private RequestStatus status;
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedAt;
+    private LocalDate createdDate;
+    private LocalDate updatedAt;
     private String rejectionReason;
 }

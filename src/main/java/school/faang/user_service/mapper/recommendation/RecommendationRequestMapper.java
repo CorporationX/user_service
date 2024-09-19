@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 public interface RecommendationRequestMapper {
     @Mapping(source = "receiver.id", target = "receiverId")
     @Mapping(source = "requester.id", target = "requesterId")
-    @Mapping(source = "skills", target = "skillRequestIds", qualifiedByName = "mapToIds")
+    @Mapping(source = "skills", target = "skillIds", qualifiedByName = "mapToIds")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
-    @Mapping(source = "receiverId", target = "receiver.id")
-    @Mapping(source = "requesterId", target = "requester.id")
+    @Mapping(target = "receiver.id", ignore = true)
+    @Mapping(target = "requester.id", ignore = true)
     @Mapping(target = "skills", ignore = true)
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 

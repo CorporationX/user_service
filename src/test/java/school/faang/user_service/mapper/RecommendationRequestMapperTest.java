@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestMapperTest {
 
-    private RecommendationRequestMapperImpl mapper = new RecommendationRequestMapperImpl();
+    private final RecommendationRequestMapperImpl mapper = new RecommendationRequestMapperImpl();
 
     private static final long RECOMMENDATION_REQUEST_ID = 1L;
     private static final String MESSAGE = "Test message";
@@ -75,7 +75,7 @@ public class RecommendationRequestMapperTest {
                 .id(RECOMMENDATION_REQUEST_ID)
                 .message(MESSAGE)
                 .status(REQUEST_STATUS)
-                .skillRequestIds(List.of(SKILL_REQUEST_ID_ONE, SKILL_REQUEST_ID_TWO))
+                .skillIds(List.of(SKILL_ID_ONE, SKILL_ID_TWO))
                 .requesterId(REQUESTER_ID)
                 .receiverId(RECEIVER_ID)
                 .createdAt(CREATED_AT)
@@ -100,8 +100,8 @@ public class RecommendationRequestMapperTest {
             assertEquals(rqd.getId(), requestResult.getId());
             assertEquals(rqd.getMessage(), requestResult.getMessage());
             assertEquals(rqd.getStatus(), requestResult.getStatus());
-            assertEquals(rqd.getRequesterId(), requestResult.getRequester().getId());
-            assertEquals(rqd.getReceiverId(), requestResult.getReceiver().getId());
+            assertNull(requestResult.getRequester().getId());
+            assertNull(requestResult.getReceiver().getId());
             assertEquals(rqd.getCreatedAt(), requestResult.getCreatedAt());
             assertEquals(rqd.getUpdatedAt(), requestResult.getUpdatedAt());
         }
@@ -124,7 +124,7 @@ public class RecommendationRequestMapperTest {
             assertEquals(rq.getId(), dtoResult.getId());
             assertEquals(rq.getMessage(), dtoResult.getMessage());
             assertEquals(rq.getStatus(), dtoResult.getStatus());
-            assertEquals(rq.getSkills().size(), dtoResult.getSkillRequestIds().size());
+            assertEquals(rq.getSkills().size(), dtoResult.getSkillIds().size());
             assertEquals(rq.getRequester().getId(), dtoResult.getRequesterId());
             assertEquals(rq.getReceiver().getId(), dtoResult.getReceiverId());
             assertEquals(rq.getCreatedAt(), dtoResult.getCreatedAt());

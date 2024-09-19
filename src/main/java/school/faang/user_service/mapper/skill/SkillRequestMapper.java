@@ -10,9 +10,9 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = SkillMapper.class, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface SkillRequestMapper {
-    @Mapping(source = "request.id", target = "recommendationRequestId")
+    @Mapping(target = "recommendationRequestId", ignore = true)
     SkillRequestDto toDto(SkillRequest skillRequest);
 
-    @Mapping(source = "recommendationRequestId", target = "request.id")
+    @Mapping(target = "request.id", ignore = true)
     SkillRequest toEntity(SkillRequestDto skillRequestDto);
 }

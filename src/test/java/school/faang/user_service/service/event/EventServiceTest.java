@@ -27,7 +27,11 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -44,12 +48,12 @@ class EventServiceTest {
 
     @BeforeEach
     void setUp() {
-        eventRepository = Mockito.mock(EventRepository.class);
-        eventMapper = Mockito.mock(EventMapper.class);
-        eventValidator = Mockito.mock(EventServiceHelper.class);
-        userRepository = Mockito.mock(UserRepository.class);
-        SkillRepository skillRepository = Mockito.mock(SkillRepository.class);
-        SkillMapper skillMapper = Mockito.mock(SkillMapper.class);
+        eventRepository = mock(EventRepository.class);
+        eventMapper = mock(EventMapper.class);
+        eventValidator = mock(EventServiceHelper.class);
+        userRepository = mock(UserRepository.class);
+        SkillRepository skillRepository = mock(SkillRepository.class);
+        SkillMapper skillMapper = mock(SkillMapper.class);
         List<EventFilter> filters = List.of(mock(EventFilter.class));
 
         eventService = new EventService(

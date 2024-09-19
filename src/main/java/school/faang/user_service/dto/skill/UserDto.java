@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+
+@AllArgsConstructor
 @Data
 @Builder
-@AllArgsConstructor
-public class SkillDto {
-    private long id;
-    private String title;
+public class UserDto {
+
+    private Long id;
+
+    private String username;
 }

@@ -13,19 +13,19 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    SkillDto create(SkillDto skill) {
+    public SkillDto create(SkillDto skill) {
         return skillService.create(skill);
     }
 
-    List<SkillDto> getUserSkills(long userId) {
+    public List<SkillDto> getUserSkills(long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    SkillDto acquireSkillFromOffers(long skillId, long userId) {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 
-    List<SkillCandidateDto> getOfferedSkills(long userId) {
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
         return skillService.getOfferedSkills(userId);
     }
 }

@@ -12,9 +12,9 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.service.user.filter.UserCityPattern;
-import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.service.user.filter.UserSkillPattern;
+import school.faang.user_service.service.filters.UserCityPattern;
+import school.faang.user_service.service.filters.UserFilter;
+import school.faang.user_service.service.filters.UserSkillPattern;
 
 import java.util.ArrayList;
 import java.util.List;

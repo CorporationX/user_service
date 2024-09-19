@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.service.filters.UserFilter;
 
 import java.util.List;
 import java.util.stream.Stream;

@@ -22,10 +22,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
-
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SubscriptionServiceTest {
     @Mock
@@ -171,5 +170,10 @@ public class SubscriptionServiceTest {
         when(userRepository.existsById(firstUserId)).thenReturn(true);
         when(subscriptionRepository.findByFollowerId(user1.getId())).thenReturn(following.stream());
         Assert.assertEquals(following, subscriptionService.getFollowing(user1.getId(), filter));
+    }
+
+    @Test
+    public void testForCI() {
+
     }
 }

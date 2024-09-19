@@ -20,14 +20,15 @@ import school.faang.user_service.service.filters.RequestFilter;
 import school.faang.user_service.service.filters.RequestFilterByDescription;
 import school.faang.user_service.service.filters.RequestFilterByReceiver;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {

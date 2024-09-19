@@ -61,7 +61,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendation.setCreatedAt(LocalDateTime.now());
 
         recommendationRepository.save(recommendation);
-        log.debug("Рекомендация с id {} успешно сохранена", recommendation.getId());
+        log.info("Рекомендация с id {} успешно сохранена", recommendation.getId());
 
         handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
@@ -109,10 +109,10 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendation.setUpdatedAt(LocalDateTime.now());
 
         recommendationRepository.save(recommendation);
-        log.debug("Рекомендация с id {} успешно обновлена", id);
+        log.info("Рекомендация с id {} успешно обновлена", id);
 
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-        log.debug("Предложения по навыкам для рекомендации с id {} удалены", id);
+        log.info("Предложения по навыкам для рекомендации с id {} удалены", id);
 
         handleSkillOffers(recommendation, recommendationDto.skillOffers());
 
@@ -131,11 +131,11 @@ public class RecommendationServiceImpl implements RecommendationService {
                 });
 
         recommendationRepository.delete(recommendation);
-        log.debug("Рекомендация с id {} успешно удалена", id);
+        log.info("Рекомендация с id {} успешно удалена", id);
     }
 
     private void handleSkillOffers(Recommendation recommendation, List<SkillOfferDto> skillOffers) {
-        log.debug("Обработка предложений по навыкам для рекомендации с id {}", recommendation.getId());
+        log.info("Обработка предложений по навыкам для рекомендации с id {}", recommendation.getId());
 
         List<Long> skillIds = skillOffers.stream()
                 .map(SkillOfferDto::skillId)
@@ -160,6 +160,6 @@ public class RecommendationServiceImpl implements RecommendationService {
         }).toList();
 
         skillOfferRepository.saveAll(skillOffersToSave);
-        log.debug("Предложения по навыкам для рекомендации с id {} успешно сохранены", recommendation.getId());
+        log.info("Предложения по навыкам для рекомендации с id {} успешно сохранены", recommendation.getId());
     }
 }

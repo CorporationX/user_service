@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -13,8 +14,16 @@ import org.springframework.context.annotation.Bean;
 @EnableFeignClients("school.faang.user_service.client")
 @OpenAPIDefinition(
         info = @Info(
-                title = "User Service",
-                version = "1.0.0")
+                title = "User Service API",
+                version = "1.0.0",
+                description = """
+                    A user-service API, managing user related actions in CorporationX project,
+                    managed by the Kraken team.
+                """,
+                license = @License(
+                        name = "Proprietary License"
+                )
+        )
 )
 public class UserServiceApplication {
 

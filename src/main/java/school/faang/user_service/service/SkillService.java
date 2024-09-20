@@ -12,7 +12,8 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.validation.SkillValidation;
+import school.faang.user_service.validation.SkillOfferValidator;
+import school.faang.user_service.validation.SkillValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,12 @@ public class SkillService {
     private final UserService userService;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
-    private final SkillValidation skillValidation;
+    private final SkillValidator skillValidator;
+    private final SkillOfferValidator skillOfferValidator;
 
 
     public SkillDto create(SkillDto skill) {
-        skillValidation.validateSkill(skill);
+        skillValidator.validateSkill(skill);
         Skill skillToAdd = skillMapper.toEntity(skill);
         skillRepository.save(skillToAdd);
         return skillMapper.toDto(skillToAdd);
@@ -38,19 +40,21 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills(long userId) {
         userService.getUser(userId);
-        return skillRepository.findAllByUserId(userId).stream().map(skillMapper::toDto).toList();
+        List<Skill> skills = skillRepository.findAllByUserId(userId);
+        return skillMapper.toSkillDtoList(skills);
     }
 
     public Skill getSkill(long skillId) {
         return skillRepository.findById(skillId)
-                .orElseThrow(() -> new EntityNotFoundException("Skill with such id doesn't exist"));
+                .orElseThrow(() -> new EntityNotFoundException("Skill with id " + skillId + " doesn't exist"));
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = getSkill(skillId);
         User user = userService.getUser(userId);
-        skillValidation.checkUserSkill(skillId, userId);
+        skillValidator.checkUserSkill(skillId, userId);
         List<SkillOffer> offers = skillOfferService.findAllOffersOfSkill(skill, user);
+        skillOfferValidator.validateOffers(offers, skill, user);
         skillRepository.assignSkillToUser(skillId, userId);
         List<UserSkillGuarantee> guaranteeList = new ArrayList<>();
         for (SkillOffer offer : offers) {
@@ -65,9 +69,8 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        userService.getUser(userId);
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
-        List<SkillDto> skillsDto = skills.stream().map(skillMapper::toDto).toList();
-        return skillCandidateMapper.toDtoList(skillsDto);
+        List<SkillDto> skillsDto = skillMapper.toSkillDtoList(skills);
+        return skillCandidateMapper.toSkillCandidateDtoList(skillsDto);
     }
 }

@@ -13,7 +13,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.validation.SkillValidation;
+import school.faang.user_service.validation.SkillValidator;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ class SkillServiceTest {
     @Mock
     private UserService userService;
     @Mock
-    private SkillValidation skillValidation;
+    private SkillValidator skillValidator;
     private SkillDto skillDto;
     private List<SkillOffer> skillOfferList;
     private SkillOffer skillOffer;
@@ -72,7 +72,7 @@ class SkillServiceTest {
             when(skillRepository.findById(ANY_ID)).thenReturn(null);
 
             assertThrows(NullPointerException.class,
-                    () -> skillService.getSkill(ANY_ID), "Skill with such id doesn't exist");
+                    () -> skillService.getSkill(ANY_ID), "Skill with id " + ANY_ID + " doesn't exist");
         }
 
 
@@ -114,7 +114,7 @@ class SkillServiceTest {
         void whenListSillsMappedThenSuccess() {
             skillService.getOfferedSkills(ANY_ID);
 
-            verify(skillCandidateMapper).toDtoList(anyList());
+            verify(skillCandidateMapper).toSkillCandidateDtoList(anyList());
         }
 
     }

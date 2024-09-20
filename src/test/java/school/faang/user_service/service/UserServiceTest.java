@@ -25,6 +25,6 @@ class UserServiceTest {
     void whenUserNotExistThenThrowException() {
         when(userRepository.findById(ANY_ID)).thenReturn(null);
         assertThrows(NullPointerException.class,
-                () -> userService.getUser(ANY_ID), "User with such id doesn't exist");
+                () -> userService.getUser(ANY_ID), "User with id " + ANY_ID + " doesn't exist");
     }
 }

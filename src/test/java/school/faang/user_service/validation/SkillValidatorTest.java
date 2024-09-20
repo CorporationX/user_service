@@ -18,12 +18,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SkillValidationTest {
+class SkillValidatorTest {
     private final long ANY_ID = 123L;
     private final String BLANK_STRING = "  ";
     private final String SKILL_TITLE = "squat";
     @InjectMocks
-    private SkillValidation skillValidation;
+    private SkillValidator skillValidator;
     @Mock
     private SkillRepository skillRepository;
     private SkillDto skillDto;
@@ -38,7 +38,7 @@ class SkillValidationTest {
                 .build();
 
         assertThrows(DataValidationException.class,
-                () -> skillValidation.validateSkill(skillDto), "Skill title can't be blank or null");
+                () -> skillValidator.validateSkill(skillDto), "Skill title can't be blank or null");
     }
 
     @Test
@@ -50,7 +50,7 @@ class SkillValidationTest {
                 .build();
 
         assertThrows(DataValidationException.class,
-                () -> skillValidation.validateSkill(skillDto), "Skill title can't be blank or null");
+                () -> skillValidator.validateSkill(skillDto), "Skill title can't be blank or null");
     }
 
     @Test
@@ -65,14 +65,14 @@ class SkillValidationTest {
                 .thenReturn(true);
 
         assertThrows(DataValidationException.class,
-                () -> skillValidation.validateSkill(skillDto), "Skill \"" + skillDto.getTitle() + "\" already exist");
+                () -> skillValidator.validateSkill(skillDto), "Skill \"" + skillDto.getTitle() + "\" already exist");
     }
 
     @Test
     @DisplayName("Data validation exception when SKillDto is null")
     void whenNullDtoThenThrowValidationException() {
         assertThrows(DataValidationException.class,
-                () -> skillValidation.validateSkill(null), "SkillDto can't be null");
+                () -> skillValidator.validateSkill(null), "SkillDto can't be null");
     }
 
     @Test
@@ -82,7 +82,7 @@ class SkillValidationTest {
                 .thenReturn(Optional.of(new Skill()));
 
         assertThrows(DataValidationException.class,
-                () -> skillValidation.checkUserSkill(ANY_ID, ANY_ID), "User with id:" + ANY_ID + " already have skill with id" + ANY_ID);
+                () -> skillValidator.checkUserSkill(ANY_ID, ANY_ID), "User with id:" + ANY_ID + " already have skill with id" + ANY_ID);
     }
 
 }

@@ -9,7 +9,7 @@ import school.faang.user_service.repository.SkillRepository;
 
 @Component
 @RequiredArgsConstructor
-public class SkillValidation {
+public class SkillValidator {
 
     private final SkillRepository skillRepository;
 

@@ -44,7 +44,7 @@ class SkillCandidateMapperTest {
     @Test
     @DisplayName("Testing mapping")
     void whenSkillDtoListMappedToSkillCandidateDtoListThenSuccess() {
-        List<SkillCandidateDto> result = skillCandidateMapper.toDtoList(skillDtos);
+        List<SkillCandidateDto> result = skillCandidateMapper.toSkillCandidateDtoList(skillDtos);
 
         assertEquals(2, result.get(0).getOffersAmount());
         assertEquals(3, result.size());
@@ -56,7 +56,7 @@ class SkillCandidateMapperTest {
     void whenEmptySkillDtoListMappedToEmptySkillCandidateDtoListThenSuccess() {
         List<SkillDto> emptySkillsDto = new ArrayList<>();
 
-        List<SkillCandidateDto> result = skillCandidateMapper.toDtoList(emptySkillsDto);
+        List<SkillCandidateDto> result = skillCandidateMapper.toSkillCandidateDtoList(emptySkillsDto);
 
         assertTrue(result.isEmpty());
     }

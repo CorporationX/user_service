@@ -12,7 +12,7 @@ import java.util.Map;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillCandidateMapper {
 
-    default List<SkillCandidateDto> toDtoList(List<SkillDto> skills) {
+    default List<SkillCandidateDto> toSkillCandidateDtoList(List<SkillDto> skills) {
         Map<SkillDto, SkillCandidateDto> skillsMap = new HashMap<>();
         for (SkillDto skillDto : skills) {
             if (skillsMap.containsKey(skillDto)) {

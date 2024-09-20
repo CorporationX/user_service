@@ -19,17 +19,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(MockitoExtension.class)
-class SkillOfferValidationTest {
+class SkillOfferValidatorTest {
     private final long ANY_ID = 123L;
     private final String ANY_TITLE = "squat";
     private final String ANY_USERNAME = "username";
-    @InjectMocks
-    private SkillOfferValidation skillOfferValidation;
+    private static final int MINIMUM_OFFERS = 3;
     @Mock
     private SkillOfferRepository skillOfferRepository;
     private Skill skill;
     private User user;
     private List<SkillOffer> skillOfferList;
+    @InjectMocks
+    private SkillOfferValidator skillOfferValidator;
+
 
     @BeforeEach
     public void init() {
@@ -47,9 +49,9 @@ class SkillOfferValidationTest {
     }
 
     @Test
-    @DisplayName("Exception when the skill recommended less then 3 times")
+    @DisplayName("Exception when the skill recommended less then MINIMUM_OFFERS times")
     void whenFewRecommendationsThenThrowException() {
         assertThrows(DataValidationException.class,
-                () -> skillOfferValidation.validateOffers(skillOfferList, skill, user), "The skill \"" + skill.getTitle() + "\" has been recommended to user " + user.getUsername() + " less than 3 times");
+                () -> skillOfferValidator.validateOffers(skillOfferList, skill, user), "The skill \"" + skill.getTitle() + "\" has been recommended to user " + user.getUsername() + " less than " + MINIMUM_OFFERS + " times");
     }
 }

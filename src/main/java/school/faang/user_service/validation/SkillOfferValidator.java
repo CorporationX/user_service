@@ -11,12 +11,12 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class SkillOfferValidation {
+public class SkillOfferValidator {
     private static final int MINIMUM_OFFERS = 3;
 
     public void validateOffers(List<SkillOffer> offers, Skill skill, User user) {
         if (offers.size() < MINIMUM_OFFERS) {
-            throw new DataValidationException("The skill \"" + skill.getTitle() + "\" has been recommended to user " + user.getUsername() + " less than 3 times");
+            throw new DataValidationException("The skill \"" + skill.getTitle() + "\" has been recommended to user " + user.getUsername() + " less than " + MINIMUM_OFFERS + " times");
         }
     }
 }

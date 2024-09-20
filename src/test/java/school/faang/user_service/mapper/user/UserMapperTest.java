@@ -101,3 +101,4 @@ class UserMapperTest {
             assertEquals(userTwo.getUsername(), userDtos.get(1).getUsername());
         }
     }
+}

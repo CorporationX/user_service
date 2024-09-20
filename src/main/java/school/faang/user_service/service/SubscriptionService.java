@@ -82,6 +82,7 @@ public class SubscriptionService {
         return followers.stream().map(User::getId).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<Long> getFollowingIds(long followeeId) {
         return subscriptionRepository.findByFolloweeId(followeeId).map(User::getId).toList();
     }

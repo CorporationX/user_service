@@ -145,7 +145,7 @@ public class RecommendationRequestServiceTest {
 
             recommendationRequestService.create(rqd);
 
-            verify(recommendationRequestValidator).validateRecommendationRequest(rqd);
+            verify(recommendationRequestValidator).validateRecommendationRequestMessageNotNull(rqd);
             verify(skillService).getAllSkills(rqd.getSkillIds());
             verify(skillValidator).validateSkillsExist(rqd.getSkillIds(), skills);
         }
@@ -165,7 +165,7 @@ public class RecommendationRequestServiceTest {
             when(recommendationRequestRepository.findById(rqd.getId())).thenReturn(Optional.of(rq));
             recommendationRequestService.rejectRequest(RECOMMENDATION_REQUEST_ID_ONE, rejection);
             verify(recommendationRequestValidator)
-                    .validateRequestStatusNotAcceptedOrDeclined(rq);
+                    .validateRequestStatus(rq);
             verify(recommendationRequestRepository)
                     .save(rq);
             assertEquals(rq.getRejectionReason(), rejection.getReason());
@@ -185,15 +185,6 @@ public class RecommendationRequestServiceTest {
             assertEquals(1, result.size());
             verify(recommendationRequestRepository)
                     .findAll();
-        }
-
-        @Test
-        @DisplayName("When findLatestPendingRequest find request don't throw exception")
-        public void whenPreviousRequestIsExistThenReturnPreviousRequest() {
-            when(recommendationRequestRepository
-                    .findLatestPendingRequest(REQUESTER_ID_ONE, RECEIVER_ID_TWO))
-                    .thenReturn(Optional.of(rq));
-            assertDoesNotThrow(() -> recommendationRequestService.getLastPendingRequest(rq));
         }
     }
 
@@ -218,16 +209,6 @@ public class RecommendationRequestServiceTest {
             filters = null;
             assertThrows(DataValidationException.class, () ->
                     recommendationRequestService.getRequests(filters));
-        }
-
-        @Test
-        @DisplayName("When no previous request found then throw exception")
-        public void whenNoPreviousRequestFoundThenThrowException() {
-            when(recommendationRequestRepository
-                    .findLatestPendingRequest(REQUESTER_ID_ONE, RECEIVER_ID_TWO))
-                    .thenReturn(Optional.empty());
-            assertThrows(DataValidationException.class, () ->
-                    recommendationRequestService.getLastPendingRequest(rq));
         }
     }
 

@@ -2,6 +2,7 @@ package school.faang.user_service.validator.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.recomendation.DataValidationException;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
+@Component
 public class SkillValidator {
 
     public void validateSkillsExist(List<Long> skillIds, List<Skill> skills) {

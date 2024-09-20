@@ -1,15 +1,15 @@
 package school.faang.user_service.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.recomendation.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
 
-@Controller
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
@@ -21,7 +21,7 @@ public class UserService {
             return user.get();
         } else {
             log.error("User with {} id doesn't exist!", id);
-            throw new DataValidationException("User doesn't exist!");
+            throw new EntityNotFoundException("User with id " + id + " doesn't exist!");
         }
     }
 }

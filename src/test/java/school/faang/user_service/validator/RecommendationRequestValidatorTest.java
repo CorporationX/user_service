@@ -20,7 +20,6 @@ import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestValidatorTest {
@@ -49,20 +48,13 @@ public class RecommendationRequestValidatorTest {
 
         @Test
         @DisplayName("Validating rqd message not null and previous request time is valid to be more than 6 months")
-        public void whenValidDtoMessageAndPreviousRequestIsInTimeRanksThenDoesNotThrowException() {
+        public void whenValidDtoMessageThenDoesNotThrowException() {
             rqd = RecommendationRequestDto.builder()
                     .message(VALID_MESSAGE)
                     .createdAt(VALID_TIME)
                     .build();
-
-            rq = RecommendationRequest.builder()
-                    .message(VALID_MESSAGE)
-                    .createdAt(VALID_TIME)
-                    .build();
-            when(recommendationRequestMapper.toEntity(rqd)).thenReturn(rq);
-            when(service.getLastPendingRequest(rq)).thenReturn(rq);
-            recommendationRequestValidator.validateRecommendationRequest(rqd);
-            assertDoesNotThrow(() -> recommendationRequestValidator.validateRecommendationRequest(rqd));
+            recommendationRequestValidator.validateRecommendationRequestMessageNotNull(rqd);
+            assertDoesNotThrow(() -> recommendationRequestValidator.validateRecommendationRequestMessageNotNull(rqd));
         }
 
         @Test
@@ -72,7 +64,18 @@ public class RecommendationRequestValidatorTest {
                     .status(REQUEST_STATUS_PENDING)
                     .build();
             assertDoesNotThrow(() ->
-                    recommendationRequestValidator.validateRequestStatusNotAcceptedOrDeclined(rq));
+                    recommendationRequestValidator.validateRequestStatus(rq));
+        }
+
+        @Test
+        @DisplayName("When previous request is exist and was made more than six months ago then don't throw exception")
+        public void whenPreviousRequestIsValidThenDoesNotThrowException() {
+            rq = RecommendationRequest.builder()
+                    .createdAt(VALID_TIME)
+                    .status(REQUEST_STATUS_PENDING)
+                    .build();
+            assertDoesNotThrow(() ->
+                    recommendationRequestValidator.validatePreviousRequest(rq));
         }
 
     }
@@ -91,28 +94,21 @@ public class RecommendationRequestValidatorTest {
                     .build();
 
             assertThrows(DataValidationException.class, () -> recommendationRequestValidator
-                    .validateRecommendationRequest(rqd));
+                    .validateRecommendationRequestMessageNotNull(rqd));
             assertThrows(DataValidationException.class, () -> recommendationRequestValidator
-                    .validateRecommendationRequest(rqd2));
+                    .validateRecommendationRequestMessageNotNull(rqd2));
         }
 
         @Test
         @DisplayName("Validate that from previous request hasn't passed 6 months throws exception")
-        public void whenPreviousRequestIsInvalidThenThrowException() {
-            rqd = RecommendationRequestDto.builder()
-                    .message(VALID_MESSAGE)
-                    .createdAt(NOT_VALID_TIME)
-                    .build();
-
+        public void whenPreviousRequestTimeIsLessThanSixMonthsThenThrowException() {
             rq = RecommendationRequest.builder()
                     .message(VALID_MESSAGE)
                     .createdAt(NOT_VALID_TIME)
                     .build();
-            when(recommendationRequestMapper.toEntity(rqd)).thenReturn(rq);
-            when(service.getLastPendingRequest(rq)).thenReturn(rq);
 
             assertThrows(DataValidationException.class, () ->
-                    recommendationRequestValidator.validateRecommendationRequest(rqd));
+                    recommendationRequestValidator.validatePreviousRequest(rq));
         }
 
         @Test
@@ -122,7 +118,7 @@ public class RecommendationRequestValidatorTest {
                     .status(REQUEST_STATUS_REJECTED)
                     .build();
             assertThrows(DataValidationException.class, () ->
-                    recommendationRequestValidator.validateRequestStatusNotAcceptedOrDeclined(rq));
+                    recommendationRequestValidator.validateRequestStatus(rq));
         }
     }
 }

@@ -21,6 +21,7 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 import school.faang.user_service.validator.recommendation.SkillValidator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,12 +39,13 @@ public class RecommendationRequestService {
     private static final String RECOMMENDATION_REQUEST_NOT_FOUND_MESSAGE = "No recommendation request exist with id ";
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        recommendationRequestValidator.validateRecommendationRequestMessageNotNull(recommendationRequestDto);
+        Optional<RecommendationRequest> lastRequest = getLastPendingRequest(recommendationRequestDto);
+        lastRequest.ifPresent(recommendationRequestValidator::validatePreviousRequest);
         User requester = userService.getUser(recommendationRequestDto.getRequesterId());
         User receiver = userService.getUser(recommendationRequestDto.getReceiverId());
-        recommendationRequestValidator.validateRecommendationRequest(recommendationRequestDto);
         List<Skill> skills = skillService.getAllSkills(recommendationRequestDto.getSkillIds());
         skillValidator.validateSkillsExist(recommendationRequestDto.getSkillIds(), skills);
-
         RecommendationRequest rq = recommendationRequestMapper.toEntity(recommendationRequestDto);
         rq.setRequester(requester);
         rq.setReceiver(receiver);
@@ -58,37 +60,38 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
         if (filters == null) {
-            log.error("Null passed to filterDto!");
+            log.error("Filters cannot be null or empty!");
             throw new DataValidationException("RequestFilterDto can't be null!");
         }
         Stream<RecommendationRequest> requests = recommendationRequestRepository.findAll().stream();
-        Stream<RecommendationRequest> filteredRequests = requestFilters.stream()
+        return requestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .flatMap(filter -> filter.applyFilter(requests, filters));
-        return filteredRequests
+                .flatMap(filter -> filter.applyFilter(requests, filters))
                 .map(recommendationRequestMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public RecommendationRequestDto getRequest(long id) {
-        RecommendationRequest rqToFind = recommendationRequestRepository.findById(id).orElseThrow(() ->
-                new DataValidationException(RECOMMENDATION_REQUEST_NOT_FOUND_MESSAGE + id));
+        RecommendationRequest rqToFind = findExistingRecommendationRequest(id);
         return recommendationRequestMapper.toDto(rqToFind);
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        RecommendationRequest rq = recommendationRequestRepository.findById(id).orElseThrow(() ->
-                new DataValidationException(RECOMMENDATION_REQUEST_NOT_FOUND_MESSAGE + id));
-        recommendationRequestValidator.validateRequestStatusNotAcceptedOrDeclined(rq);
+        RecommendationRequest rq = findExistingRecommendationRequest(id);
+        recommendationRequestValidator.validateRequestStatus(rq);
         rq.setRejectionReason(rejection.getReason());
         rq.setStatus(RequestStatus.REJECTED);
         recommendationRequestRepository.save(rq);
         return recommendationRequestMapper.toDto(rq);
     }
 
-    public RecommendationRequest getLastPendingRequest(RecommendationRequest request) {
-        return recommendationRequestRepository.findLatestPendingRequest(request.getRequester().getId(),
-                request.getReceiver().getId()).orElseThrow(() ->
-                new DataValidationException("No previous request were made!"));
+    private Optional<RecommendationRequest> getLastPendingRequest(RecommendationRequestDto recommendationRequestDto) {
+        return recommendationRequestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
+                recommendationRequestDto.getReceiverId());
+    }
+
+    private RecommendationRequest findExistingRecommendationRequest(long id) {
+        return recommendationRequestRepository.findById(id).orElseThrow(() ->
+                new DataValidationException(RECOMMENDATION_REQUEST_NOT_FOUND_MESSAGE + id));
     }
 }

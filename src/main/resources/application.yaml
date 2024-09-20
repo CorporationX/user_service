@@ -32,6 +32,21 @@ spring:
           DiceBear:
             connectTimeout: 5000
             readTimeout: 10000
+services:
+  payment-service:
+    host: localhost
+    port: 9080
+
+  project-service:
+    host: localhost
+    port: 8082
+
+  s3:
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    region: us-east-1
+    bucketName: userbucket
 
 server:
   port: 8080
@@ -40,21 +55,10 @@ logging:
   level:
     root: info
 
-project-service:
-  host: localhost
-  port: 8082
-
-payment-service:
-  host: localhost
-  port: 9080
-
-services:
-  s3:
-    endpoint: http://192.168.1.100:9000
-    accessKey: user
-    secretKey: password
-    bucketName: userbucket
-
 profile-picture:
-  size: 320
-  small-size: 110
+  normal:
+    path: image/default-profile-picture.svg
+    size: 320
+  small:
+    path: image/default-small-profile-picture.svg
+    small-size: 110

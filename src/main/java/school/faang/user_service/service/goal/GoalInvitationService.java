@@ -14,8 +14,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.specification.GoalInvitationSpecification;
+
 import java.util.List;
 import java.util.Objects;
+
 import static school.faang.user_service.service.util.GoalInvitationUtil.GOAL_MISSING;
 import static school.faang.user_service.service.util.GoalInvitationUtil.INVITATION_MISSING;
 import static school.faang.user_service.service.util.GoalInvitationUtil.INVITED_ALREADY_WORKING_ON_GOAL;
@@ -24,7 +26,6 @@ import static school.faang.user_service.service.util.GoalInvitationUtil.INVITED_
 import static school.faang.user_service.service.util.GoalInvitationUtil.INVITER_INVITED_SAME;
 import static school.faang.user_service.service.util.GoalInvitationUtil.INVITER_MISSING;
 import static school.faang.user_service.service.util.GoalInvitationUtil.MAX_ACTIVE_GOALS;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor

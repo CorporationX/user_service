@@ -10,7 +10,7 @@ import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperCustom;
 import school.faang.user_service.test_data.event.TestDataEvent;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class EventMapperTest {
     @Mock
-    private SkillMapper skillCustomMapper;
+    private SkillMapperCustom skillCustomMapper;
     @InjectMocks
     private EventMapper eventCustomMapper;
     private TestDataEvent testDataEvent;

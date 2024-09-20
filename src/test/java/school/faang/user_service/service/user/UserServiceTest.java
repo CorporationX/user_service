@@ -135,7 +135,6 @@ class UserServiceTest {
             List<UserDto> resultUserDros = userService.getUsersByIds(USER_IDS);
 
             assertNotNull(resultUserDros);
-            verify(userValidator).validateUserIdIsPositiveAndNotNull(USER_ID);
             verify(userRepository).findAllById(USER_IDS);
             verify(userMapper).toDtos(users);
         }

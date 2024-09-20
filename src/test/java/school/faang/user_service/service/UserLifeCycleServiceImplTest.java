@@ -165,13 +165,13 @@ class UserLifeCycleServiceImplTest {
         String invalidDataMessage = "Username/email/phone already in use";
 
         if (existsUsername) {
-            when(userRepository.existsByUsername(registrationDto.username())).thenReturn(true);
+            when(userRepository.existsByUsername(registrationDto.username())).thenReturn(existsUsername);
         }
         if (existsEmail) {
-            when(userRepository.existsByEmail(registrationDto.email())).thenReturn(true);
+            when(userRepository.existsByEmail(registrationDto.email())).thenReturn(existsEmail);
         }
         if (existsPhone) {
-            when(userRepository.existsByPhone(registrationDto.phone())).thenReturn(true);
+            when(userRepository.existsByPhone(registrationDto.phone())).thenReturn(existsPhone);
         }
 
         Throwable exception = assertThrows(DataValidationException.class,

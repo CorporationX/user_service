@@ -13,8 +13,7 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestStatusFilterTest {
@@ -32,6 +31,7 @@ public class RecommendationRequestStatusFilterTest {
         recommendationRequest = new RecommendationRequest();
     }
 
+    // Tests for isApplicable method
     @Test
     void isApplicable_ShouldReturnFalse_WhenFilterIsNull() {
         boolean result = recommendationRequestStatusFilter.isApplicable(null);
@@ -40,15 +40,15 @@ public class RecommendationRequestStatusFilterTest {
     }
 
     @Test
-    void isApplicable_ShouldReturnFalse_WhenFilterReceiverIdIsNull() {
-        filter.setRequesterId(null);
+    void isApplicable_ShouldReturnFalse_WhenFilterStatusIsNull() {
+        filter.setStatus(null);
         boolean result = recommendationRequestStatusFilter.isApplicable(filter);
 
         assertFalse(result);
     }
 
     @Test
-    void isApplicable_ShouldReturnTrue_WhenFilterHasReceiverId() {
+    void isApplicable_ShouldReturnTrue_WhenFilterHasStatus() {
         filter.setStatus(RequestStatus.ACCEPTED);
 
         boolean result = recommendationRequestStatusFilter.isApplicable(filter);
@@ -56,13 +56,50 @@ public class RecommendationRequestStatusFilterTest {
         assertTrue(result);
     }
 
+    // Tests for apply method
     @Test
-    void apply_ShouldReturnTrue_WhenUserUsernameMatchesPattern() {
+    void apply_ShouldReturnFilteredEmptyStream_WhenNoRecommendationRequestMatchesStatus() {
+        Stream<RecommendationRequest> recommendationRequests = prepareData();
+        filter.setStatus(RequestStatus.REJECTED);
+
+        List<RecommendationRequest> result = recommendationRequestStatusFilter.apply(recommendationRequests, filter).toList();
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void apply_ShouldReturnFilteredStream_WhenRecommendationRequestStatusMatchesStatus() {
+        Stream<RecommendationRequest> recommendationRequests = prepareData();
         filter.setStatus(RequestStatus.ACCEPTED);
 
-        List<RecommendationRequest> recommendationRequests = List.of(recommendationRequest);
-        Stream<RecommendationRequest> result = recommendationRequestStatusFilter.apply(recommendationRequests.stream(), filter);
+        List<RecommendationRequest> result = recommendationRequestStatusFilter.apply(recommendationRequests, filter).toList();
 
-//        asse
+        assertEquals(1, result.size());
+        assertEquals(RequestStatus.ACCEPTED, result.get(0).getStatus());
+    }
+
+    @Test
+    void apply_ShouldReturnAllMatchingRequests_WhenMultipleRequestsMatchStatus() {
+        Stream<RecommendationRequest> recommendationRequests = prepareData();
+        filter.setStatus(RequestStatus.PENDING);
+
+        List<RecommendationRequest> result = recommendationRequestStatusFilter.apply(recommendationRequests, filter).toList();
+
+        assertEquals(2, result.size());
+        assertTrue(result.stream().allMatch(req -> req.getStatus().equals(RequestStatus.PENDING)));
+    }
+
+
+    private Stream<RecommendationRequest> prepareData() {
+        RecommendationRequest acceptedRequest = new RecommendationRequest();
+        acceptedRequest.setStatus(RequestStatus.ACCEPTED);
+        RecommendationRequest pendingRequest1 = new RecommendationRequest();
+        pendingRequest1.setStatus(RequestStatus.PENDING);
+        RecommendationRequest pendingRequest2 = new RecommendationRequest();
+        pendingRequest2.setStatus(RequestStatus.PENDING);
+
+        List<RecommendationRequest> recommendationRequests = List.of(acceptedRequest, pendingRequest1, pendingRequest2);
+
+        return recommendationRequests.stream();
     }
 }

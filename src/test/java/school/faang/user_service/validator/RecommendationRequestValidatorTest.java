@@ -5,14 +5,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.recomendation.DataValidationException;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-import school.faang.user_service.service.recommendation.RecommendationRequestService;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.time.LocalDateTime;

@@ -7,29 +7,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserRegistrationDto;
+import school.faang.user_service.exception.FileUploadException;
 import school.faang.user_service.service.AmazonS3Service;
-import school.faang.user_service.service.HelperAmazonS3Service;
 
 import java.io.ByteArrayInputStream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AmazonS3UserProfilePictureService implements AmazonS3Service<UserRegistrationDto> {
+public class AmazonS3UserProfilePictureService implements AmazonS3Service {
 
-    private final HelperAmazonS3Service helper;
     private final AmazonS3 s3Client;
 
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
     @Override
-    public String uploadFileAndGetKey(byte[] picture, UserRegistrationDto user) {
-        log.info("Upload file for user: {}", user.username());
-
-        ObjectMetadata metadata = helper.getMetadata(picture);
-        String key = helper.getKey(picture, user.username(), user.email());
+    public void uploadFile(byte[] picture, ObjectMetadata metadata, String key) {
+        log.info("Upload profile picture");
 
         PutObjectRequest request = new PutObjectRequest(
                 bucketName,
@@ -37,9 +32,16 @@ public class AmazonS3UserProfilePictureService implements AmazonS3Service<UserRe
                 new ByteArrayInputStream(picture),
                 metadata
         );
-        s3Client.putObject(request);
+        putObject(request);
 
-        log.info("Uploaded file for user: {}", user.username());
-        return key;
+        log.info("Uploaded profile picture");
+    }
+
+    private void putObject(PutObjectRequest request) {
+        try {
+            s3Client.putObject(request);
+        } catch (Exception exception) {
+            throw new FileUploadException(exception.getMessage(), exception);
+        }
     }
 }

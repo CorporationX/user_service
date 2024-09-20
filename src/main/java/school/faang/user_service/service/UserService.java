@@ -145,6 +145,11 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<UserDto> getAllUsers() {
+        return userMapper.toDtoList(userRepository.findAll());
+    }
+
     private void stopUserGoalActivities(User user) {
         List<Goal> goalsToDelete = user.getGoals().stream()
                 .peek(goal -> goal.getUsers().remove(user))

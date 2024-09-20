@@ -75,6 +75,17 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
+    @Transactional(readOnly = true)
+    public List<Long> getFollowersIds(long followeeId) {
+        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
+
+        return followers.stream().map(User::getId).toList();
+    }
+
+    public List<Long> getFollowingIds(long followeeId) {
+        return subscriptionRepository.findByFolloweeId(followeeId).map(User::getId).toList();
+    }
+
     private void sendToRedisPublisher(Long followerId, Long followeeId) {
         FollowerEventDto followerEventDto = FollowerEventDto.builder()
                 .subscribedDateTime(LocalDateTime.now())

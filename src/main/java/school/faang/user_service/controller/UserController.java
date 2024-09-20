@@ -98,4 +98,9 @@ public class UserController {
                            @RequestHeader(value = "x-user-id") long authorId) {
         return userService.getUser(userId, authorId);
     }
+
+    @GetMapping("/all")
+    public List<UserDto> getAllUsers() {
+        return  userService.getAllUsers();
+    }
 }

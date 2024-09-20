@@ -1,10 +1,8 @@
 package school.faang.user_service.service;
 
+import java.util.List;
+
 public interface GeneratorPictureService {
 
-    byte[] generatePicture(String seed);
-
-    byte[] generateSmallPicture(String seed);
-
-    String getSeed();
+    List<byte[]> getProfilePictures(String seed);
 }

@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 public class RecommendationRequestStatusFilter implements RecommendationRequestFilter {
     @Override
-    public boolean isApplicable(RecommendationRequestFilterDto filters) {
-        return filters.getStatus() != null;
+    public boolean isApplicable(RecommendationRequestFilterDto filter) {
+        return filter != null && filter.getStatus() != null;
     }
 
     @Override

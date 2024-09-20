@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 public class RecommendationRequestReceiverFilter implements RecommendationRequestFilter {
 
     @Override
-    public boolean isApplicable(RecommendationRequestFilterDto filters) {
-        return filters.getReceiverId() != null;
+    public boolean isApplicable(RecommendationRequestFilterDto filter) {
+        return filter != null && filter.getReceiverId() != null;
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,13 +55,10 @@ public class GoalController {
     @GetMapping("/{userId}/goals")
     public ResponseEntity<List<GoalDto>> getGoalsByUser(
             @PathVariable Long userId,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) GoalStatus status,
-            @RequestParam(required = false) Long skillId) {
-
-        GoalFilterDto filter = new GoalFilterDto(title, status, skillId);
+            @ModelAttribute GoalFilterDto filter) {
 
         List<GoalDto> goals = goalService.findGoalsByUserId(userId, filter);
         return ResponseEntity.ok(goals);
     }
+
 }

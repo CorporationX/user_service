@@ -31,6 +31,8 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final GoalValidator goalValidator;
 
+    private static final int MAX_ACTIVE_GOALS_PER_USER = 3;
+
     @Transactional
     public void createGoal(Long userId, GoalDto goalDto) {
         Goal goal = goalMapper.goalDtoToGoal(goalDto);
@@ -39,19 +41,22 @@ public class GoalService {
 
         // Проверка на максимальное количество активных целей
         int activeGoals = goalRepository.countActiveGoalsPerUser(userId);
-        if (activeGoals >= 3) {
-            throw new IllegalArgumentException("Пользователь не может иметь более 3 активных целей");
+        if (activeGoals >= MAX_ACTIVE_GOALS_PER_USER) {
+            throw new IllegalArgumentException("Пользователь не может иметь более " + MAX_ACTIVE_GOALS_PER_USER + " активных целей");
+
         }
 
         // Проверка существования навыков
         List<Long> skillIds = goalDto.getSkillIds();
-        if (skillIds != null && !skillIds.isEmpty()) {
-            List<Skill> skills = skillRepository.findAllById(skillIds);
-            if (skills.size() != skillIds.size()) {
-                throw new IllegalArgumentException("Некоторые навыки не существуют");
-            }
-            goal.setSkillsToAchieve(skills);
+        if (skillIds == null || skillIds.isEmpty()) {
+            throw new IllegalArgumentException("Навыки не могут быть пустыми");
         }
+
+        List<Skill> skills = skillRepository.findAllById(skillIds);
+        if (skills.size() != skillIds.size()) {
+            throw new IllegalArgumentException("Некоторые навыки не существуют");
+        }
+        goal.setSkillsToAchieve(skills);
 
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
@@ -74,14 +79,17 @@ public class GoalService {
 
         // Проверка существования навыков
         List<Long> skillIds = goalDto.getSkillIds();
-        if (skillIds != null && !skillIds.isEmpty()) {
+        if (skillIds == null || skillIds.isEmpty()) {
+            // Если список навыков пустой или null, очищаем текущий список навыков цели
+            existingGoal.getSkillsToAchieve().clear();
+        } else {
             List<Skill> skills = skillRepository.findAllById(skillIds);
             if (skills.size() != skillIds.size()) {
                 throw new IllegalArgumentException("Некоторые навыки не существуют");
             }
-            existingGoal.setSkillsToAchieve(skills);
-        } else {
-            existingGoal.setSkillsToAchieve(new ArrayList<>());
+            // Очищаем текущий список навыков и добавляем новые
+            existingGoal.getSkillsToAchieve().clear();
+            existingGoal.getSkillsToAchieve().addAll(skills);
         }
 
         // Обновление полей цели
@@ -95,10 +103,8 @@ public class GoalService {
             // Присвоение навыков всем участникам
             List<User> users = goalRepository.findUsersByGoalId(goalId);
             List<Skill> skills = existingGoal.getSkillsToAchieve();
-            for (User user : users) {
-                user.getSkills().addAll(skills);
-                userRepository.save(user);
-            }
+            users.forEach(user -> user.getSkills().addAll(skills));
+            userRepository.saveAll(users);
         } else {
             existingGoal.setStatus(goalDto.getStatus());
         }
@@ -110,7 +116,6 @@ public class GoalService {
     public void deleteGoal(long goalId) {
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new IllegalArgumentException("Цель с ID " + goalId + " не найдена"));
-        goal.getUsers().clear();
         goalRepository.delete(goal);
     }
 
@@ -132,27 +137,32 @@ public class GoalService {
     @Transactional(readOnly = true)
     public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter) {
 
-        final GoalFilterDto effectiveFilter = (filter != null) ? filter : new GoalFilterDto();
-
-
         List<Goal> goalList = goalRepository.findGoalsByUserId(userId);
 
-        Stream<Goal> goals = goalList.stream();
-        if (effectiveFilter.getTitle() != null) {
-            goals = goals.filter(goal ->
-                    goal.getTitle() != null && goal.getTitle().contains(effectiveFilter.getTitle())
-            );
-        }
-        if (effectiveFilter.getStatus() != null) {
-            goals = goals.filter(goal -> goal.getStatus() == effectiveFilter.getStatus());
-        }
-        if (effectiveFilter.getSkillId() != null) {
-            goals = goals.filter(goal -> goal.getSkillsToAchieve().stream()
-                    .anyMatch(skill -> Objects.equals(skill.getId(), effectiveFilter.getSkillId())));
+        if (filter == null) {
+            // Если фильтр отсутствует, возвращаем все цели пользователя
+            return goalList.stream()
+                    .map(goalMapper::goalToGoalDto)
+                    .collect(Collectors.toList());
         }
 
-        return goals
+        return goalList.stream()
+                .filter(goal -> applyFilter(goal, filter))
                 .map(goalMapper::goalToGoalDto)
                 .collect(Collectors.toList());
+    }
+
+    private boolean applyFilter(Goal goal, GoalFilterDto filter) {
+        if (filter.getTitle() != null && (goal.getTitle() == null || !goal.getTitle().contains(filter.getTitle()))) {
+            return false;
+        }
+        if (filter.getStatus() != null && goal.getStatus() != filter.getStatus()) {
+            return false;
+        }
+        if (filter.getSkillId() != null && goal.getSkillsToAchieve().stream()
+                .noneMatch(skill -> Objects.equals(skill.getId(), filter.getSkillId()))) {
+            return false;
+        }
+        return true;
     }
 }

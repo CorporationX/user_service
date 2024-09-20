@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class SkillMapperTest {
     @InjectMocks
-    private SkillMapper skillCustomMapper;
+    private SkillMapperCustom skillMapperCustom;
     private TestDataEvent testDataEvent;
     private Skill skill;
     private SkillDto skillDto;
@@ -30,7 +30,7 @@ class SkillMapperTest {
         skill = testDataEvent.getSkill1();
         skillDto = new SkillDto();
 
-        skillDto = skillCustomMapper.toDto(skill);
+        skillDto = skillMapperCustom.toDto(skill);
 
         assertNotNull(skillDto);
         assertThat(skillDto).usingRecursiveComparison()
@@ -43,7 +43,7 @@ class SkillMapperTest {
         skill = new Skill();
         skillDto = testDataEvent.getSkillDto1();
 
-        skill = skillCustomMapper.toEntity(skillDto);
+        skill = skillMapperCustom.toEntity(skillDto);
 
         assertNotNull(skill);
         assertThat(skill).usingRecursiveComparison()

@@ -7,14 +7,14 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperCustom;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class EventMapper {
-    private final SkillMapper skillMapper;
+    private final SkillMapperCustom skillMapper;
 
     public EventDto toDto(Event event) {
         Long ownerId = event.getOwner().getId();

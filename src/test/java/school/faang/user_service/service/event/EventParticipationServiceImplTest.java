@@ -49,7 +49,7 @@ class EventParticipationServiceImplTest {
         Mockito.when(repository.findAllParticipantsByEventId(1))
                 .thenReturn(List.of(user));
 
-        Assertions.assertEquals(List.of(new UserDto(user.getId(), user.getUsername(), user.getEmail())),
+        Assertions.assertEquals(List.of(new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getPhone())),
                 service.getParticipant(1L));
 
         Mockito.verify(repository, Mockito.times(1))

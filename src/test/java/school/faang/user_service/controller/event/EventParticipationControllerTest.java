@@ -21,7 +21,7 @@ class EventParticipationControllerTest {
 
     @BeforeEach
     void init() {
-        userDto = new UserDto(1L, "1", "1");
+        userDto = new UserDto(1L, "1", "1", "1");
     }
 
     @Test

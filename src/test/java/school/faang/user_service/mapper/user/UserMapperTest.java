@@ -22,8 +22,8 @@ class UserMapperTest {
     @InjectMocks
     private UserMapperImpl userMapper;
 
-    private static final long USER_ID_ONE = 1L;
-    private static final long USER_ID_TWO = 2L;
+    private final static long USER_ID_ONE = 1L;
+    private final static long USER_ID_TWO = 2L;
     private static final String USER_NAME_ONE = "name";
     private static final String USER_NAME_TWO = "Name";
     private static final int USER_DTOS_SIZE = 2;
@@ -52,7 +52,7 @@ class UserMapperTest {
     class ToDto {
 
         @Test
-        @DisplayName("Если передали null, на выходе получим null")
+        @DisplayName("If gets null than return null")
         void whenListUsersIsNullThenGetNull() {
             assertNull(userMapper.toDtos(null));
         }
@@ -68,7 +68,7 @@ class UserMapperTest {
         }
 
         @Test
-        @DisplayName("При передаче 2 элементов List<User> на выходе получим размер List<UserDto> равным 2")
+        @DisplayName("When gets List<User> with size 2 than return List<UserDto> with size 2")
         void whenListOfUsersIsNotNullThenGetListOfUserDtos() {
             List<User> users = List.of(
                     User.builder()
@@ -101,4 +101,3 @@ class UserMapperTest {
             assertEquals(userTwo.getUsername(), userDtos.get(1).getUsername());
         }
     }
-}

@@ -16,18 +16,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserNameFilterTest {
 
+    private final static String NAME_PATTERN = "name";
+
     @InjectMocks
     private UserNameFilter userNameFilter;
 
     private UserFilterDto userFilterDto;
 
-    private final static String NAME_PATTERN = "name";
-
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле namePattern не null и не пустое, тогда возвращаем true")
+        @DisplayName("If UserFilterDto namePattern not null and not blank than return true")
         void whenUserFilterDtoSpecifiedNamePatternNotNullAndNotBlankThenReturnTrue() {
             userFilterDto = UserFilterDto.builder()
                     .namePattern(NAME_PATTERN)
@@ -37,7 +37,7 @@ class UserNameFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto заполнено поле namePattern, тогда возвращаем отфильтрованный список")
+        @DisplayName("If UserFilterDto namePattern not null and not blank than return sorted list")
         void whenUserFilterDtoSpecifiedNamePatternThenReturnFilteredList() {
             Stream<User> userStream = Stream.of(
                     User.builder()
@@ -63,7 +63,7 @@ class UserNameFilterTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("Если у UserFilterDto поле namePattern пустое, тогда возвращаем false")
+        @DisplayName("If UserFilterDto namePattern is blank than return false")
         void whenUserFilterDtoNamePatternIsBlankThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .aboutPattern("   ")
@@ -73,7 +73,7 @@ class UserNameFilterTest {
         }
 
         @Test
-        @DisplayName("Если у UserFilterDto поле namePattern null, тогда возвращаем false")
+        @DisplayName("If UserFilterDto namePattern is null than return false")
         void whenUserFilterDtoNamePatternIsNullThenReturnFalse() {
             userFilterDto = UserFilterDto.builder()
                     .namePattern(null)

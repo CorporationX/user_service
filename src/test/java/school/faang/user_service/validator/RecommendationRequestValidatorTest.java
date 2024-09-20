@@ -26,10 +26,6 @@ public class RecommendationRequestValidatorTest {
 
     @InjectMocks
     private RecommendationRequestValidator recommendationRequestValidator;
-    @Mock
-    private RecommendationRequestMapper recommendationRequestMapper;
-    @Mock
-    private RecommendationRequestService service;
     private RecommendationRequestDto rqd;
     private RecommendationRequestDto rqd2;
     private RecommendationRequest rq;

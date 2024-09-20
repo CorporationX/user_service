@@ -33,4 +33,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE id = :id
             """)
     void updateUserActive(long id, boolean active);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByPhone(String phone);
 }

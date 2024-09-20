@@ -10,12 +10,14 @@ import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.ProfilePictureService;
 import school.faang.user_service.service.UserLifeCycleService;
 
 @Slf4j
@@ -24,6 +26,7 @@ import school.faang.user_service.service.UserLifeCycleService;
 public class UserLifeCycleServiceImpl implements UserLifeCycleService {
 
     private final MentorshipService mentorshipService;
+    private final ProfilePictureService profilePictureService;
 
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
@@ -46,29 +49,27 @@ public class UserLifeCycleServiceImpl implements UserLifeCycleService {
     @Override
     @Transactional
     public UserDto registrationUser(UserRegistrationDto userRegistrationDto) {
-        String seed = profilePictureService.getSeed();
+        validateUserRegistrationDto(userRegistrationDto);
+        Country country = countryRepository.findById(userRegistrationDto.countryId())
+                .orElseThrow(() -> new DataValidationException("Country not found"));
 
-        byte[] picture = profilePictureService.generatePicture(seed);
-        byte[] smallPicture = profilePictureService.generateSmallPicture(seed);
-
-        String pictureKey = s3Service.uploadFileAndGetKey(picture, userRegistrationDto);
-        String smallPictureKey = s3Service.uploadFileAndGetKey(smallPicture, userRegistrationDto);
-        User user = configureUser(userRegistrationDto, pictureKey, smallPictureKey);
-
-        log.info("Saving user: {}", userRegistrationDto.username());
+        UserProfilePic userProfilePic = profilePictureService.saveProfilePictures(userRegistrationDto);
+        User user = configureUser(userRegistrationDto, userProfilePic, country);
         return userMapper.toDto(userRepository.save(user));
     }
 
-    private User configureUser(UserRegistrationDto userRegistrationDto, String pictureKey, String smallPictureKey) {
-        log.info("Configuring user: {}", userRegistrationDto.username());
+    private void validateUserRegistrationDto(UserRegistrationDto dto) {
+        if (userRepository.existsByUsername(dto.username())
+                || userRepository.existsByEmail(dto.email())
+                || userRepository.existsByPhone(dto.phone())) {
+            throw new DataValidationException("Username/email/phone already in use");
+        }
+    }
 
-        Country country = countryRepository.findById(userRegistrationDto.countryId()).orElseThrow();
-        UserProfilePic userProfilePic = userMapper.mapUserProfilePic(pictureKey, smallPictureKey);
-
-        User user = userMapper.toEntity(userRegistrationDto);
+    private User configureUser(UserRegistrationDto dto, UserProfilePic profilePic, Country country) {
+        User user = userMapper.toEntity(dto);
         user.setCountry(country);
-        user.setUserProfilePic(userProfilePic);
-
+        user.setUserProfilePic(profilePic);
         return user;
     }
 }

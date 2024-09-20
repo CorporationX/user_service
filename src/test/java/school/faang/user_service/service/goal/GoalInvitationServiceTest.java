@@ -15,14 +15,18 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTest {

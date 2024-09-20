@@ -2,12 +2,12 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 
-import school.faang.user_service.exceptions.DataValidationException;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -48,7 +48,7 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public SkillDto acquireSkillFromOffers(long skillId, long userId) throws DataValidationException {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
             throw new DataValidationException("Skill already exists");
         }

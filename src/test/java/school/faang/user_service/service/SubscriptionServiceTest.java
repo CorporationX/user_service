@@ -17,6 +17,7 @@ import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -28,6 +29,9 @@ public class SubscriptionServiceTest {
     private long followerId;
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
+    @Mock
+    PremiumRepository premiumRepository;
 
     @Mock
     private UserMapper userMapper;

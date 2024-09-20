@@ -67,9 +67,9 @@ class SubscriptionServiceImplTest {
         user2.setUsername("username2");
         user2.setEmail("email2@email.com");
 
-        userDto1 = new UserDto(1L, "username1", "email1@email.com");
+        userDto1 = new UserDto(1L, "username1", "email1@email.com", "+123");
 
-        userDto2 = new UserDto(2L, "username2", "email2@email.com");
+        userDto2 = new UserDto(2L, "username2", "email2@email.com", "+123");
 
         when(subscriptionRepository.findByFollowerId(anyLong())).thenReturn(Stream.of(user1, user2));
         when(subscriptionRepository.findByFolloweeId(anyLong())).thenReturn(Stream.of(user1, user2));

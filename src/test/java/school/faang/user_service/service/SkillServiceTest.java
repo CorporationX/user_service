@@ -13,6 +13,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.validation.SkillOfferValidator;
 import school.faang.user_service.validation.SkillValidator;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,8 @@ class SkillServiceTest {
     private UserService userService;
     @Mock
     private SkillValidator skillValidator;
+    @Mock
+    private SkillOfferValidator skillOfferValidator;
     private SkillDto skillDto;
     private List<SkillOffer> skillOfferList;
     private SkillOffer skillOffer;

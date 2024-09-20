@@ -1,12 +1,11 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -27,9 +26,16 @@ public class UserService {
         return userRepository.findAllById(userIds);
     }
 
+    public User getUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(()
+                -> new EntityNotFoundException("User not found"));
+    }
+
     public void save(User user) {
         userRepository.save(user);
     }
 
-    public boolean existsById(Long userId) { return userRepository.existsById(userId); }
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }

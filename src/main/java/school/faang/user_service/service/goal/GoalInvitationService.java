@@ -26,6 +26,7 @@ import static school.faang.user_service.service.util.GoalInvitationUtil.INVITED_
 import static school.faang.user_service.service.util.GoalInvitationUtil.INVITER_INVITED_SAME;
 import static school.faang.user_service.service.util.GoalInvitationUtil.INVITER_MISSING;
 import static school.faang.user_service.service.util.GoalInvitationUtil.MAX_ACTIVE_GOALS;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

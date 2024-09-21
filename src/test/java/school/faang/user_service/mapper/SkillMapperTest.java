@@ -11,29 +11,47 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SkillMapperTest {
+class SkillMapperTest {
+
+    private static final long SKILL_ID_ONE = 1L;
+    private static final String SOME_TITLE = "Some title";
 
     @InjectMocks
     private SkillMapperImpl mapper;
-    private static final long SKILL_ID_ONE = 1L;
-    private static final String SOME_TITLE = "Some title";
-    private SkillDto skillDto;
+
     private Skill skill;
+    private SkillDto skillDto;
+    private List<Skill> skills;
 
     @BeforeEach
-    void setUp() {
-        skill = Skill.builder()
-                .id(SKILL_ID_ONE)
-                .title(SOME_TITLE)
-                .build();
+    public void init() {
         skillDto = SkillDto.builder()
                 .id(SKILL_ID_ONE)
                 .title(SOME_TITLE)
                 .build();
+
+        skill = Skill.builder()
+                .id(SKILL_ID_ONE)
+                .title(SOME_TITLE)
+                .build();
+
+        skills = List.of(skill, skill, skill);
+    }
+
+    @Test
+    @DisplayName("Testing mapping List entitys to List dtos")
+    void whenListSkillsMappedToListSkillDtoThenSuccess() {
+        List<SkillDto> skillDtoList = mapper.toSkillDtoList(skills);
+
+        assertNotNull(skillDtoList);
+        assertEquals(skills.size(), skillDtoList.size());
+        assertEquals(skills.get(0).getTitle(), skillDtoList.get(0).getTitle());
+        assertEquals(skills.get(2).getId(), skillDtoList.get(2).getId());
     }
 
     @Nested
@@ -46,12 +64,13 @@ public class SkillMapperTest {
         }
 
         @Test
-        @DisplayName("On enter SkillDto on exit Skill")
-        public void whenDtoNotNullThenReturnEntity() {
+        @DisplayName("Testing mapping dto to entity")
+        void whenDtoMappedToEntityThenSuccess() {
             Skill skillResult = mapper.toEntity(skillDto);
 
-            assertEquals(skill.getId(), skillResult.getId());
-            assertEquals(skill.getTitle(), skillResult.getTitle());
+            assertNotNull(skill);
+            assertEquals(skillDto.getId(), skillResult.getId());
+            assertEquals(skillDto.getTitle(), skillResult.getTitle());
         }
     }
 
@@ -65,10 +84,11 @@ public class SkillMapperTest {
         }
 
         @Test
-        @DisplayName("On enter Skill on exit SkillDto")
-        public void whenEntityNotNullThenReturnDto() {
+        @DisplayName("Testing mapping entity to dto")
+        void whenEntityMappedToDtoThenSuccess() {
             SkillDto skillDtoResult = mapper.toDto(skill);
 
+            assertNotNull(skillDtoResult);
             assertEquals(skill.getId(), skillDtoResult.getId());
             assertEquals(skill.getTitle(), skillDtoResult.getTitle());
         }

@@ -59,9 +59,7 @@ public class UserLifeCycleServiceImpl implements UserLifeCycleService {
     }
 
     private void validateUserRegistrationDto(UserRegistrationDto dto) {
-        if (userRepository.existsByUsername(dto.username())
-                || userRepository.existsByEmail(dto.email())
-                || userRepository.existsByPhone(dto.phone())) {
+        if (userRepository.existsByUsernameAndEmailAndPhone(dto.username(), dto.email(), dto.phone())) {
             throw new DataValidationException("Username/email/phone already in use");
         }
     }

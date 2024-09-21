@@ -2,8 +2,6 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -69,7 +67,6 @@ class UserLifeCycleServiceImplTest {
             .phone(phone)
             .countryId(countryId)
             .build();
-    ;
 
     @Test
     void deactivateUser_WithValidId() {
@@ -119,9 +116,7 @@ class UserLifeCycleServiceImplTest {
                 .phone(phone)
                 .build();
 
-        when(userRepository.existsByUsername(username)).thenReturn(false);
-        when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(userRepository.existsByPhone(phone)).thenReturn(false);
+        when(userRepository.existsByUsernameAndEmailAndPhone(username, email, phone)).thenReturn(false);
         when(countryRepository.findById(countryId)).thenReturn(Optional.of(country));
         when(profilePictureService.saveProfilePictures(registrationDto)).thenReturn(profilePic);
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -129,9 +124,7 @@ class UserLifeCycleServiceImplTest {
         UserDto result = userService.registrationUser(registrationDto);
 
         assertEquals(correctDto, result);
-        verify(userRepository).existsByUsername(username);
-        verify(userRepository).existsByEmail(email);
-        verify(userRepository).existsByPhone(phone);
+        verify(userRepository).existsByUsernameAndEmailAndPhone(username, email, phone);
         verify(countryRepository).findById(countryId);
         verify(profilePictureService).saveProfilePictures(registrationDto);
         verify(userRepository).save(user);
@@ -148,31 +141,15 @@ class UserLifeCycleServiceImplTest {
 
         assertEquals(correctMessage, exception.getMessage());
         verify(countryRepository).findById(countryId);
-        verify(userRepository).existsByUsername(username);
-        verify(userRepository).existsByEmail(email);
-        verify(userRepository).existsByPhone(phone);
+        verify(userRepository).existsByUsernameAndEmailAndPhone(username, email, phone);
         verify(profilePictureService, never()).saveProfilePictures(registrationDto);
         verify(userRepository, never()).save(any(User.class));
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "true, false, false",
-            "false, true, false",
-            "false, false, true",
-    })
-    void registrationUser_InvalidData(boolean existsUsername, boolean existsEmail, boolean existsPhone) {
+    @Test
+    void registrationUser_InvalidData() {
         String invalidDataMessage = "Username/email/phone already in use";
-
-        if (existsUsername) {
-            when(userRepository.existsByUsername(registrationDto.username())).thenReturn(existsUsername);
-        }
-        if (existsEmail) {
-            when(userRepository.existsByEmail(registrationDto.email())).thenReturn(existsEmail);
-        }
-        if (existsPhone) {
-            when(userRepository.existsByPhone(registrationDto.phone())).thenReturn(existsPhone);
-        }
+        when(userRepository.existsByUsernameAndEmailAndPhone(username, email, phone)).thenReturn(true);
 
         Throwable exception = assertThrows(DataValidationException.class,
                 () -> userService.registrationUser(registrationDto));

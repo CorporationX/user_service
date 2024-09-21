@@ -10,3 +10,7 @@ spring:
       ddl-auto: create-drop
   liquibase:
     enabled: false
+
+services:
+  user-service:
+    name: User service

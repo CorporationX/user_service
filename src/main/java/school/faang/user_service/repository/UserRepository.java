@@ -34,9 +34,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     void updateUserActive(long id, boolean active);
 
-    boolean existsByUsername(String username);
-
-    boolean existsByEmail(String email);
-
-    boolean existsByPhone(String phone);
+    boolean existsByUsernameAndEmailAndPhone(String username, String email, String phone);
 }

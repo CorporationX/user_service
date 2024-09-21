@@ -28,19 +28,26 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties', '**/src/main/**/*.java') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
-
-      - name: Build with Gradle
-        run: ./gradlew build --info
 
       - name: Cache build outputs
         uses: actions/cache@v4
         with:
-          path: build
-          key: ${{ runner.os }}-build-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties', '**/src/main/**/*.java') }}
-
+          path: |
+            build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/src/main/**/*.java', '**/src/test/**/*.java', '**/*.gradle', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-build-
+
+      - name: Cache test results
+        uses: actions/cache@v4
+        with:
+          path: build/test-results
+          key: ${{ runner.os }}-test-results-${{ hashFiles('**/src/test/**/*.java', '**/*.gradle', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-test-results-
+
+      - name: Build with Gradle
+        run: ./gradlew build --info
 
       - name: Run tests
         run: ./gradlew test --no-daemon --continue

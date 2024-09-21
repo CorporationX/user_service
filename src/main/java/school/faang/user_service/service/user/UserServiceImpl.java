@@ -32,13 +32,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByIds(List<Long> userIds) {
+        log.debug("Trying to find users with ids %s"
+                .formatted(String.join(", ", userIds.stream().map(Object::toString).toList())));
         List<User> users = userRepository.findAllById(userIds);
         if (users.isEmpty()) {
             throw new EntityNotFoundException("There are no users with such ids");
         }
-        List<UserDto> userDtos = userMapper.usersToUserDtos(users);
+        List<Long> foundUserIds = users.stream().map(User::getId).toList();
         log.debug("Users with ids %s found"
-                .formatted(String.join(", ", userIds.stream().map(Object::toString).toList())));
+                .formatted(String.join(", ", foundUserIds.stream().map(Object::toString).toList())));
+        List<UserDto> userDtos = userMapper.usersToUserDtos(users);
         return userDtos;
     }
 }

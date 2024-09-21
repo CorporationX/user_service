@@ -58,7 +58,7 @@ public class UserServiceImplTest {
 
     @Test
     public void getUsersByIds_Success() {
-        List<Long> ids = List.of(1L, 2L);
+        List<Long> ids = List.of(1L, 2L, 3L, 4L);
         List<User> users = createUsers();
         UserDto userDto1 = new UserDto(1L, "user1", "email1");
         UserDto userDto2 = new UserDto(2L, "user2", "email2");

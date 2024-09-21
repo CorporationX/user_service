@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.skill;
+package school.faang.user_service.dto.recommendation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkillDto {
-    private Long id;
-    private String title;
+public class RejectionDto {
+    private String reason;
 }

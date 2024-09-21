@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkillDto {
+public class SkillRequestDto {
     private Long id;
-    private String title;
+    private Long recommendationRequestId;
+    private SkillDto skill;
 }

@@ -28,7 +28,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties', '**/src/main/**/*.java') }}
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
@@ -38,7 +38,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build
-          key: ${{ runner.os }}-build-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties', '**/src/main/**/*.java') }}
+
           restore-keys: ${{ runner.os }}-build-
 
       - name: Run tests

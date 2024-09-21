@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping
-    public void registrationUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+    public void registrationUser(@RequestBody @Validated UserRegistrationDto userRegistrationDto) {
         log.info("Register user: {}", userRegistrationDto);
         userLifeCycleService.registrationUser(userRegistrationDto);
         log.info("User registration successful");

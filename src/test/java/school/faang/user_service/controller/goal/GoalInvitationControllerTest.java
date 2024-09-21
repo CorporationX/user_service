@@ -46,7 +46,7 @@ class GoalInvitationControllerTest {
 
         Mockito.verify(service).createInvitation(goalInvitationDto);
     }
-//
+
 //    @Test
 //    void testCreateInvitation_inviterIdIsNull() {
 //        goalInvitationDto.setInviterId(null);

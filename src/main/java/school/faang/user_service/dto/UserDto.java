@@ -1,13 +1,8 @@
 package school.faang.user_service.dto;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 
-@Data
-@RequiredArgsConstructor
-public class UserDto {
+@Builder
+public record UserDto(long id, String username, String email) {
 
-    private Long id;
-    private String username;
-    private String email;
 }

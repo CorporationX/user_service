@@ -25,23 +25,19 @@ public class UserServiceImpl implements UserService {
         if (user.isEmpty()) {
             throw new EntityNotFoundException("User with id %s not found".formatted(userId));
         }
-        UserDto userDto = userMapper.userToUserDto(user.get());
         log.debug("User with id %s found".formatted(userId));
-        return userDto;
+        return userMapper.userToUserDto(user.get());
     }
 
     @Override
     public List<UserDto> getUsersByIds(List<Long> userIds) {
-        log.debug("Trying to find users with ids %s"
-                .formatted(String.join(", ", userIds.stream().map(Object::toString).toList())));
         List<User> users = userRepository.findAllById(userIds);
-        if (users.isEmpty()) {
-            throw new EntityNotFoundException("There are no users with such ids");
-        }
         List<Long> foundUserIds = users.stream().map(User::getId).toList();
-        log.debug("Users with ids %s found"
-                .formatted(String.join(", ", foundUserIds.stream().map(Object::toString).toList())));
-        List<UserDto> userDtos = userMapper.usersToUserDtos(users);
-        return userDtos;
+        List<Long> notFoundUserIds = userIds.stream()
+                .filter(userId -> !foundUserIds.contains(userId))
+                .toList();
+        log.debug("Users with ids %s not found"
+                .formatted(String.join(", ", notFoundUserIds.stream().map(Object::toString).toList())));
+        return userMapper.usersToUserDtos(users);
     }
 }

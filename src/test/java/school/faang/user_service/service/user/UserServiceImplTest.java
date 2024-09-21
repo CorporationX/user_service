@@ -13,6 +13,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,12 +74,16 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void getUsersByIds_UsersNotFound() {
-        List<Long> ids = List.of(1L, 2L);
+    public void getUsersByIds_SuccessButUsersNotFound() {
+        List<Long> ids = new ArrayList<>();
+        List<UserDto> userDtos = new ArrayList<>();
 
-        doThrow(new EntityNotFoundException("Users not found")).when(repository).findAllById(ids);
+        when(repository.findAllById(ids)).thenReturn(new ArrayList<>());
 
-        assertThrows(EntityNotFoundException.class, () -> service.getUsersByIds(ids));
+        List<UserDto> result = service.getUsersByIds(ids);
+
+        assertEquals(result, userDtos);
+        verify(repository, times(1)).findAllById(ids);
     }
 
     private User createUser() {

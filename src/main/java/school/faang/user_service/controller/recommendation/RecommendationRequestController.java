@@ -21,6 +21,8 @@ import java.util.List;
 public class RecommendationRequestController {
     private static final String REQUEST = "/request";
     private static final String FILTERED_REQUESTS = "/requests";
+    private static final String REJECT = "/reject";
+
     private final RecommendationRequestService recommendationRequestService;
 
     @PostMapping(REQUEST)
@@ -38,9 +40,9 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRequests(filter);
     }
 
-    @PostMapping(REQUEST)
-    public RecommendationRequestDto rejectRequest(@Positive Long recommendationRequestId,
-                                                  @RequestParam @NotBlank RejectionDto rejectionDto) throws DataValidationException {
+    @PostMapping(REJECT + "/{id}")
+    public RecommendationRequestDto rejectRequest(@PathVariable("id") @Positive Long recommendationRequestId,
+                                                  @RequestBody @NotNull RejectionDto rejectionDto) throws DataValidationException {
         return recommendationRequestService.rejectRequest(recommendationRequestId, rejectionDto);
     }
 }

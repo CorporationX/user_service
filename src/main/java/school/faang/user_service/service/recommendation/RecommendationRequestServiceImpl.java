@@ -48,8 +48,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         Optional<RecommendationRequest> latestPendingRequest = repository.findLatestPendingRequest(requesterId, receiverId);
         LocalDateTime lastRequestTime = latestPendingRequest.map(RecommendationRequest::getUpdatedAt).orElse(null);
 
-        recommendationRequestValidator.validateRequesterAndReceiver(requesterId, receiverId);
-        recommendationRequestValidator.validateRequestAndCheckTimeLimit(lastRequestTime);
+        validations(requesterId, receiverId, lastRequestTime);
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
         recommendationRequest.getSkills().stream()
@@ -58,6 +57,11 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         RecommendationRequest createRequest = repository.save(recommendationRequest);
 
         return recommendationRequestMapper.toDto(createRequest);
+    }
+
+    private void validations(Long requesterId, Long receiverId, LocalDateTime lastRequestTime) {
+        recommendationRequestValidator.validateRequesterAndReceiver(requesterId, receiverId);
+        recommendationRequestValidator.validateRequestAndCheckTimeLimit(lastRequestTime);
     }
 
     @Override

@@ -8,4 +8,5 @@ public class RecommendationRequestFilterDto {
     private Long requesterId;
     private Long receiverId;
     private RequestStatus status;
+
 }

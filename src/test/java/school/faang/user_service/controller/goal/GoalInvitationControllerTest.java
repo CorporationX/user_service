@@ -40,12 +40,12 @@ class GoalInvitationControllerTest {
         goalInvitationDto = new GoalInvitationDto(null, 1L, 1L, 1L, null);
     }
 
-//    @Test
-//    void testCreateInvitation_positive() {
-//        goalInvitationController.createInvitation(goalInvitationDto);
-//
-//        Mockito.verify(service).createInvitation(goalInvitationDto);
-//    }
+    @Test
+    void testCreateInvitation_positive() {
+        goalInvitationController.createInvitation(goalInvitationDto);
+
+        Mockito.verify(service).createInvitation(goalInvitationDto);
+    }
 //
 //    @Test
 //    void testCreateInvitation_inviterIdIsNull() {

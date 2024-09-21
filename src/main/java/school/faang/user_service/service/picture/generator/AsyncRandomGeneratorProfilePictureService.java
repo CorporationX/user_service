@@ -10,9 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.dice.bear.DiceBearClient;
 import school.faang.user_service.service.GeneratorPictureService;
-import school.faang.user_service.util.FileReader;
+import school.faang.user_service.util.BinaryFileReader;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class AsyncRandomGeneratorProfilePictureService implements GeneratorPictureService {
 
     private final DiceBearClient diceBearClient;
-    private final FileReader profilePictureReader;
+    private final BinaryFileReader profilePictureReader;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(12);
     private List<byte[]> defaultProfilePictures;

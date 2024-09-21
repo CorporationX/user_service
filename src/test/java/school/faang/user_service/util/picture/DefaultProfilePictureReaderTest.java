@@ -1,14 +1,14 @@
 package school.faang.user_service.util.picture;
 
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.util.FileReader;
+import school.faang.user_service.util.BinaryFileReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DefaultProfilePictureReaderTest {
 
-    private final FileReader fileReader = new DefaultProfilePictureReader();
+    private final BinaryFileReader fileReader = new DefaultProfilePictureReader();
 
     @Test
     void readFile_ExistsProfilePicture() {

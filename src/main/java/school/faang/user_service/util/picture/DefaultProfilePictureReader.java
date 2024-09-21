@@ -2,14 +2,14 @@ package school.faang.user_service.util.picture;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.util.FileReader;
+import school.faang.user_service.util.BinaryFileReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
-public class DefaultProfilePictureReader implements FileReader {
+public class DefaultProfilePictureReader implements BinaryFileReader {
 
     @Override
     public byte[] readFile(String fileName) {

@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.client.dice.bear.DiceBearClient;
-import school.faang.user_service.util.FileReader;
+import school.faang.user_service.util.BinaryFileReader;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ class AsyncRandomGeneratorProfilePictureServiceTest {
     private DiceBearClient diceBearClient;
 
     @Mock
-    private FileReader profilePictureReader;
+    private BinaryFileReader profilePictureReader;
 
     @InjectMocks
     private AsyncRandomGeneratorProfilePictureService service;

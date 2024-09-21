@@ -19,6 +19,8 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -105,5 +107,15 @@ public class UserService {
         }
         log.info("Участие пользователя с ID: {} в событиях было очищено", user.getId());
         return user;
+    }
+
+    public UserDto getUser(long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        return optionalUser.map(userMapper::toDto).orElse(null);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> usersByIds = userRepository.findAllById(ids);
+        return usersByIds.stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 }

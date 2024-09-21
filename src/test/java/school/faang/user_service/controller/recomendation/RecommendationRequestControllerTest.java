@@ -20,39 +20,39 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
-//   private RecommendationRequestDto recommendationRequestDto;
-//    @Mock
-//   private RequestValidator requestValidator;
-//
-//    @Mock
-//    private RecommendationRequestService recommendationRequestService;
-//
-//    @InjectMocks
-//    private RecommendationRequestController recommendationRequestController;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        recommendationRequestDto = new RecommendationRequestDto();
-//        requestValidator = new RequestValidator();
-//        recommendationRequestDto.setReceiverId(3L);
-//        recommendationRequestDto.setId(10L);
-//        recommendationRequestDto.setCreatedAt(LocalDateTime.now());
-//        recommendationRequestDto.setRequesterId(55L);
-//        recommendationRequestDto.setMessage("");
-//        recommendationRequestDto.setStatus(RequestStatus.PENDING);
-//    }
-//
-//    @Test
-//    public void testRequestValidatorUnSuccess() {
-//        assertThrows(IllegalArgumentException.class, () -> {
-//            requestValidator.validateRecomendationRequest(recommendationRequestDto);
-//        });
-//    }
-//
-//    @Test
-//    public void testRequestRecommendationSuccess() {
-//        when(recommendationRequestController.requestRecommendation(recommendationRequestDto)).thenReturn(recommendationRequestDto);
-//        recommendationRequestController.requestRecommendation(recommendationRequestDto);
-//        verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequestDto);
-//    }
+   private RecommendationRequestDto recommendationRequestDto;
+    @Mock
+   private RequestValidator requestValidator;
+
+    @Mock
+    private RecommendationRequestService recommendationRequestService;
+
+    @InjectMocks
+    private RecommendationRequestController recommendationRequestController;
+
+    @BeforeEach
+    public void setUp() {
+        recommendationRequestDto = new RecommendationRequestDto();
+        requestValidator = new RequestValidator();
+        recommendationRequestDto.setReceiverId(3L);
+        recommendationRequestDto.setId(10L);
+        recommendationRequestDto.setCreatedAt(LocalDateTime.now());
+        recommendationRequestDto.setRequesterId(55L);
+        recommendationRequestDto.setMessage("");
+        recommendationRequestDto.setStatus(RequestStatus.PENDING);
+    }
+
+    @Test
+    public void testRequestValidatorUnSuccess() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            requestValidator.validateRecomendationRequest(recommendationRequestDto);
+        });
+    }
+
+    @Test
+    public void testRequestRecommendationSuccess() {
+        when(recommendationRequestController.requestRecommendation(recommendationRequestDto)).thenReturn(recommendationRequestDto);
+        recommendationRequestController.requestRecommendation(recommendationRequestDto);
+        verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequestDto);
+    }
 }

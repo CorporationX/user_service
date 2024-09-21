@@ -8,7 +8,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -40,3 +40,11 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    defaultProfilePicture: defaultAvatar.png

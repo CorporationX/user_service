@@ -42,8 +42,8 @@ public class RecommendationRequestService {
         recommendationRequestValidator.validateRecommendationRequestMessageNotNull(recommendationRequestDto);
         Optional<RecommendationRequest> lastRequest = getLastPendingRequest(recommendationRequestDto);
         lastRequest.ifPresent(recommendationRequestValidator::validatePreviousRequest);
-        User requester = userService.getUser(recommendationRequestDto.getRequesterId());
-        User receiver = userService.getUser(recommendationRequestDto.getReceiverId());
+        User requester = userService.getUserById(recommendationRequestDto.getRequesterId());
+        User receiver = userService.getUserById(recommendationRequestDto.getReceiverId());
         List<Skill> skills = skillService.getAllSkills(recommendationRequestDto.getSkillIds());
         skillValidator.validateSkillsExist(recommendationRequestDto.getSkillIds(), skills);
         RecommendationRequest rq = recommendationRequestMapper.toEntity(recommendationRequestDto);

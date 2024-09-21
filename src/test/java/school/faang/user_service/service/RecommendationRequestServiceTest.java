@@ -138,8 +138,8 @@ public class RecommendationRequestServiceTest {
                 "set requester and receiver and make skill requests list set to Recommendation request" +
                 "then save it return dto back")
         public void whenValidDtoPassedItSavedWithItsSkillRequestsThenReturnDto() {
-            when(userService.getUser(rqd.getRequesterId())).thenReturn(User.builder().id(REQUESTER_ID_ONE).build());
-            when(userService.getUser(rqd.getRequesterId())).thenReturn(User.builder().id(RECEIVER_ID_TWO).build());
+            when(userService.getUserById(rqd.getRequesterId())).thenReturn(User.builder().id(REQUESTER_ID_ONE).build());
+            when(userService.getUserById(rqd.getRequesterId())).thenReturn(User.builder().id(RECEIVER_ID_TWO).build());
             when(skillService.getAllSkills(rqd.getSkillIds())).thenReturn(skills);
             when(recommendationRequestMapper.toEntity(rqd)).thenReturn(rq);
 

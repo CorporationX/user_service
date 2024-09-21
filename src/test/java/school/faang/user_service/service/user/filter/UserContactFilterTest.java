@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactType;
@@ -31,7 +31,7 @@ public class UserContactFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledContact() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setContactPattern(contactTest);
         boolean isApplicable = userContactFilter.isApplicable(userFilterDto);
 
@@ -40,7 +40,7 @@ public class UserContactFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledContact() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userContactFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -48,7 +48,7 @@ public class UserContactFilterTest {
 
     @Test
     void testGetPredicate_successContactValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setContactPattern(contactTest);
 
         User user = new User();
@@ -68,7 +68,7 @@ public class UserContactFilterTest {
                 new Contact(2L, new User(), ContactType.TELEGRAM.name(), ContactType.TELEGRAM)
         );
 
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setContactPattern(contactTest);
 
         User user = new User();

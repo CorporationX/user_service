@@ -7,16 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.constant.ErrorMessages;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.constant.TestConst;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserFilter;
+import school.faang.user_service.util.user.UserTestUtil;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -33,9 +32,6 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
 
     @Mock
-    private UserMapper userMapper;
-
-    @Mock
     private List<UserFilter> userFilters;
 
     @Mock
@@ -46,10 +42,7 @@ public class SubscriptionServiceTest {
 
     private long followerId;
     private long followeeId;
-    private UserDto userDto1;
-    private UserDto userDto2;
-    private UserDto userDto3;
-    private UserFilterDto userFilterDto;
+    private UserExtendedFilterDto userFilterDto;
 
     private List<User> users;
 
@@ -59,42 +52,11 @@ public class SubscriptionServiceTest {
     public void setUp() {
         followeeId = 1L;
         followerId = 2L;
+        email = 1 + TestConst.TEST_EMAIL;
 
-        email = "john@test.com";
+        users = UserTestUtil.getUsersWithIdUsernameEmail(5);
 
-        User user1 = new User();
-        user1.setId(followeeId);
-        user1.setUsername("John");
-        user1.setEmail(email);
-
-        User user2 = new User();
-        user2.setId(followeeId);
-        user2.setUsername("Dan");
-        user2.setEmail("dan@test.com");
-
-        User user3 = new User();
-        user3.setId(3L);
-        user3.setUsername("Tolik");
-        user3.setEmail("tolik@test.com");
-
-        users = List.of(user1, user2, user3);
-
-        userDto1 = new UserDto();
-        userDto1.setId(followerId);
-        userDto1.setUsername(user1.getUsername());
-        userDto1.setEmail(email);
-
-        userDto2 = new UserDto();
-        userDto2.setId(user1.getId());
-        userDto2.setUsername(user2.getUsername());
-        userDto2.setEmail(user1.getEmail());
-
-        userDto3 = new UserDto();
-        userDto3.setId(user3.getId());
-        userDto3.setUsername(user3.getUsername());
-        userDto3.setEmail(user1.getEmail());
-
-        userFilterDto = new UserFilterDto();
+        userFilterDto = new UserExtendedFilterDto();
     }
 
     @Test
@@ -151,14 +113,12 @@ public class SubscriptionServiceTest {
     @Test
     public void testGetFollowers_returnFilteredUserDto() {
         when(subscriptionRepository.findByFolloweeId(followeeId))
-                .thenReturn(users.stream());
+                .thenReturn(users);
 
-        List<User> expected = List.of(users.get(0), users.get(1), users.get(2));
-        List<User> actual = subscriptionService.getFollowers(followeeId, userFilterDto);
+        List<User> result = subscriptionService.getFollowers(followeeId, userFilterDto);
 
-        assertEquals(expected, actual);
-
-        verify(subscriptionRepository).findByFolloweeId(followeeId);
+        assertEquals(users, result);
+        verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
     }
 
     @Test
@@ -166,24 +126,16 @@ public class SubscriptionServiceTest {
         int page = 1;
         int pageSize = 3;
 
-        UserFilterDto filterDto = new UserFilterDto();
+        UserExtendedFilterDto filterDto = new UserExtendedFilterDto();
         filterDto.setPage(page);
         filterDto.setPageSize(pageSize);
 
-        User user1 = new User();
-        User user2 = new User();
-        User user3 = new User();
-        User user4 = new User();
-        User user5 = new User();
-        User user6 = new User();
-
-        Stream<User> userStream = Stream.of(user1, user2, user3, user4, user5, user6);
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(users);
 
         List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
-        assertEquals(pageSize, result.size());
+        assertEquals(2, result.size());
     }
 
     @Test
@@ -192,19 +144,11 @@ public class SubscriptionServiceTest {
         int pageSize = 3;
         int notCorrectPageSize = 4;
 
-        UserFilterDto filterDto = new UserFilterDto();
+        UserExtendedFilterDto filterDto = new UserExtendedFilterDto();
         filterDto.setPage(page);
         filterDto.setPageSize(pageSize);
 
-        User user1 = new User();
-        User user2 = new User();
-        User user3 = new User();
-        User user4 = new User();
-        User user5 = new User();
-        User user6 = new User();
-
-        Stream<User> userStream = Stream.of(user1, user2, user3, user4, user5, user6);
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(users);
 
         List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 
@@ -214,11 +158,11 @@ public class SubscriptionServiceTest {
 
     @Test
     void testFilterUsers() {
-        UserFilterDto filterDto = new UserFilterDto();
+        UserExtendedFilterDto filterDto = new UserExtendedFilterDto();
         filterDto.setEmailPattern(email);
         when(subscriptionRepository.findByFolloweeId(followeeId))
-                .thenReturn(users.stream());
-
+                .thenReturn(users);
+        System.out.println(users);
         when(userFilter.isApplicable(filterDto)).thenReturn(true);
         when(userFilter.getPredicate(filterDto)).thenReturn(user -> user.getEmail().contains(email));
 
@@ -262,14 +206,13 @@ public class SubscriptionServiceTest {
     @Test
     public void testGetFollowing_returnFilteredUsers() {
         when(subscriptionRepository.findByFollowerId(followerId))
-                .thenReturn(users.stream());
+                .thenReturn(users);
 
-        List<User> expected = List.of(users.get(0), users.get(1), users.get(2));
+        List<User> expected = List.of(users.get(0), users.get(1), users.get(2), users.get(3), users.get(4));
         List<User> actual = subscriptionService.getFollowing(followerId, userFilterDto);
 
         verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
 
         assertEquals(expected, actual);
     }
-
 }

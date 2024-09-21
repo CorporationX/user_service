@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -23,7 +23,7 @@ public class UserCityFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledCity() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setCityPattern(cityTest);
         boolean isApplicable = userCityFilter.isApplicable(userFilterDto);
 
@@ -32,7 +32,7 @@ public class UserCityFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledCity() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userCityFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -40,7 +40,7 @@ public class UserCityFilterTest {
 
     @Test
     void testGetPredicate_successCityValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setCityPattern(cityTest);
 
         User user = new User();
@@ -55,7 +55,7 @@ public class UserCityFilterTest {
 
     @Test
     void testGetPredicate_failedCityValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setCityPattern(cityTest);
 
         User user = new User();

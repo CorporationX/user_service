@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 @Repository
@@ -27,7 +28,7 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
             join subscription as subs on u.id = subs.follower_id
             where subs.followee_id = :followeeId
             """)
-    Stream<User> findByFolloweeId(long followeeId);
+    List<User> findByFolloweeId(long followeeId);
 
     @Query(nativeQuery = true, value = "select count(id) from subscription where followee_id = :followeeId")
     int findFollowersAmountByFolloweeId(long followeeId);
@@ -37,7 +38,7 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
             join subscription as subs on u.id = subs.followee_id
             where subs.follower_id = :followerId
             """)
-    Stream<User> findByFollowerId(long followerId);
+    List<User> findByFollowerId(long followerId);
 
     @Query(nativeQuery = true, value = "select count(id) from subscription where follower_id = :followerId")
     int findFolloweesAmountByFollowerId(long followerId);

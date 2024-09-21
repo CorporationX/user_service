@@ -1,9 +1,8 @@
 package school.faang.user_service.constant;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public final class ErrorMessages {
     public static final String CANNOT_SUBSCRIBE_OR_UNSUBSCRIBE_TO_SELF = "You cannot subscribe / unsubscribe to yourself.";
     public static final String ALREADY_SUBSCRIBE = "You have been already subscribed to the following user";

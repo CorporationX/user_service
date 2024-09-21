@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
@@ -34,7 +34,7 @@ public class UserSkillFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledSkill() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setSkillPattern(skillTest);
         boolean isApplicable = userSkillFilter.isApplicable(userFilterDto);
 
@@ -43,7 +43,7 @@ public class UserSkillFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledSkill() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userSkillFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -51,7 +51,7 @@ public class UserSkillFilterTest {
 
     @Test
     void testGetPredicate_successSkillValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setSkillPattern(skillTest);
 
         User user = new User();
@@ -70,7 +70,7 @@ public class UserSkillFilterTest {
         skill2.setTitle("Driving");
         List<Skill> skills1 = List.of(skill2);
 
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setSkillPattern(skillTest);
 
         User user = new User();

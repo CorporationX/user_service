@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
@@ -27,7 +27,7 @@ public class UserCountryFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledCountry() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setCountryPattern(countryTest);
         boolean isApplicable = userCountryFilter.isApplicable(userFilterDto);
 
@@ -36,7 +36,7 @@ public class UserCountryFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledCountry() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userCountryFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -44,7 +44,7 @@ public class UserCountryFilterTest {
 
     @Test
     void testGetPredicate_successCountryValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setCountryPattern(countryTest);
 
         User user = new User();
@@ -62,7 +62,7 @@ public class UserCountryFilterTest {
         Country country1 = new Country();
         country1.setTitle("America");
 
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setCountryPattern(countryTest);
 
         User user = new User();

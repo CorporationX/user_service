@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -23,7 +23,7 @@ public class UserPhoneFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledPhone() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setPhonePattern(phoneTest);
         boolean isApplicable = userPhoneFilter.isApplicable(userFilterDto);
 
@@ -32,7 +32,7 @@ public class UserPhoneFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledPhone() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userPhoneFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -40,7 +40,7 @@ public class UserPhoneFilterTest {
 
     @Test
     void testGetPredicate_successValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setPhonePattern(phoneTest);
 
         User user = new User();
@@ -55,7 +55,7 @@ public class UserPhoneFilterTest {
 
     @Test
     void testGetPredicate_failedValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setPhonePattern(phoneTest);
 
         User user = new User();

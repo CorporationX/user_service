@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -27,7 +27,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledExperienceMin() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMin(experienceMin);
         boolean isApplicable = userExperienceFilter.isApplicable(userFilterDto);
 
@@ -36,7 +36,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledExperienceMax() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMin(experienceMax);
         boolean isApplicable = userExperienceFilter.isApplicable(userFilterDto);
 
@@ -45,7 +45,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testIsApplicable_patternWithFilledExperienceMinMax() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMin(experienceMin);
         userFilterDto.setExperienceMin(experienceMax);
         boolean isApplicable = userExperienceFilter.isApplicable(userFilterDto);
@@ -55,7 +55,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledExperience() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userExperienceFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -63,7 +63,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testGetPredicate_successValidationWithFilledExperienceMin() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMin(experienceMin);
 
         User user = new User();
@@ -78,7 +78,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testGetPredicate_successValidationWithFilledExperienceMax() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMax(experienceMax);
 
         User user = new User();
@@ -93,7 +93,7 @@ public class UserExperienceFilterTest {
 
     @Test
     void testGetPredicate_successValidationWithFilledExperienceMinMax() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMin(experienceMin);
         userFilterDto.setExperienceMax(experienceMax);
 
@@ -111,7 +111,7 @@ public class UserExperienceFilterTest {
     void testGetPredicate_failedValidationValueLowerThanMin() {
         int customMin = 5;
 
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMin(customMin);
 
         User user = new User();
@@ -128,7 +128,7 @@ public class UserExperienceFilterTest {
     void testGetPredicate_failedValidationValueGreaterThanMax() {
         int customMax = 3;
 
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setExperienceMax(customMax);
 
         User user = new User();

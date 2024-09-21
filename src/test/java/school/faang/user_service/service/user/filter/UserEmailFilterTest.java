@@ -2,7 +2,7 @@ package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -17,13 +17,13 @@ public class UserEmailFilterTest {
 
     @BeforeEach
     void setUp() {
-        userEmailFilter = new UserEmailFilter();
+        userEmailFilter = new EmailFilter();
         emailTest = "test@test.com";
     }
 
     @Test
     void testIsApplicable_patternWithFilledEmail() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setEmailPattern(emailTest);
         boolean isApplicable = userEmailFilter.isApplicable(userFilterDto);
 
@@ -32,7 +32,7 @@ public class UserEmailFilterTest {
 
     @Test
     void testIsApplicable_patternWithNotFilledEmail() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         boolean isApplicable = userEmailFilter.isApplicable(userFilterDto);
 
         assertFalse(isApplicable);
@@ -40,7 +40,7 @@ public class UserEmailFilterTest {
 
     @Test
     void testGetPredicate_successValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setEmailPattern(emailTest);
 
         User user = new User();
@@ -55,7 +55,7 @@ public class UserEmailFilterTest {
 
     @Test
     void testGetPredicate_failedValidation() {
-        UserFilterDto userFilterDto = new UserFilterDto();
+        UserExtendedFilterDto userFilterDto = new UserExtendedFilterDto();
         userFilterDto.setEmailPattern(emailTest);
 
         User user = new User();

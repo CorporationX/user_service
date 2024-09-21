@@ -6,14 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -27,7 +23,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,7 +77,7 @@ public class RecommendationRequestServiceImplTest {
         assertEquals("Requester with ID 2 does not exist.", exception.getMessage());
     }
 
-    private RecommendationRequestDto prepareData(){
+    private RecommendationRequestDto prepareData() {
         RecommendationRequestDto dto = new RecommendationRequestDto();
         dto.setReceiverId(1L);
         dto.setRequesterId(2L);

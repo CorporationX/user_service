@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface RecommendationRequestService {
     RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto);
+
     RecommendationRequestDto getRequest(long id);
+
     RecommendationRequestDto rejectRequest(Long id, RejectionDto rejectionDto) throws DataValidationException;
+
     List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filters);
 }

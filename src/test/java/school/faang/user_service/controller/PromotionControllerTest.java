@@ -28,50 +28,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 public class PromotionControllerTest {
-//    private User user;
-//    private PromotionDto promotionDto;
-//    private ObjectMapper objectMapper;
-//    private MockMvc mockMvc;
-//
-//    @Mock
-//    private PromotionService promotionService;
-//
-//    @Mock
-//    private UserContext userContext;
-//
-//    @InjectMocks
-//    private PromotionController promotionController;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        user = new User();
-//        user.setId(1L);
-//
-//        promotionDto = PromotionDto.builder()
-//                .id(1L)
-//                .promotedUserId(user.getId())
-//                .priorityLevel(1)
-//                .remainingShows(10)
-//                .promotionTarget("profile")
-//                .build();
-//
-//        mockMvc = MockMvcBuilders.standaloneSetup(promotionController).build();
-//
-//        objectMapper = new ObjectMapper();
-//    }
-//
-//    @Test
-//    @DisplayName("Should return PromotionDto with status CREATED when buyPromotion is successful")
-//    public void testBuyPromotion_Success() throws Exception {
-//        when(promotionService.buyPromotion(anyLong(), any(PromotionType.class), anyString())).thenReturn(promotionDto);
-//        when(userContext.getUserId()).thenReturn(user.getId());
-//
-//        mockMvc.perform(post("/promotion")
-//                        .param("type", String.valueOf(PromotionType.GENERAL))
-//                        .param("target", "profile"))
-//                .andExpect(status().isCreated())
-//                .andExpect(content().json(objectMapper.writeValueAsString(promotionDto)));
-//
-//        verify(promotionService, times(1)).buyPromotion(anyLong(), any(PromotionType.class), anyString());
-//    }
+    private User user;
+    private PromotionDto promotionDto;
+    private ObjectMapper objectMapper;
+    private MockMvc mockMvc;
+
+    @Mock
+    private PromotionService promotionService;
+
+    @Mock
+    private UserContext userContext;
+
+    @InjectMocks
+    private PromotionController promotionController;
+
+    @BeforeEach
+    public void setUp() {
+        user = new User();
+        user.setId(1L);
+
+        promotionDto = PromotionDto.builder()
+                .id(1L)
+                .promotedUserId(user.getId())
+                .priorityLevel(1)
+                .remainingShows(10)
+                .promotionTarget("profile")
+                .build();
+
+        mockMvc = MockMvcBuilders.standaloneSetup(promotionController).build();
+
+        objectMapper = new ObjectMapper();
+    }
+
+    @Test
+    @DisplayName("Should return PromotionDto with status CREATED when buyPromotion is successful")
+    public void testBuyPromotion_Success() throws Exception {
+        when(promotionService.buyPromotion(anyLong(), any(PromotionType.class), anyString())).thenReturn(promotionDto);
+        when(userContext.getUserId()).thenReturn(user.getId());
+
+        mockMvc.perform(post("/promotion")
+                        .param("type", String.valueOf(PromotionType.GENERAL))
+                        .param("target", "profile"))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(promotionDto)));
+
+        verify(promotionService, times(1)).buyPromotion(anyLong(), any(PromotionType.class), anyString());
+    }
 }

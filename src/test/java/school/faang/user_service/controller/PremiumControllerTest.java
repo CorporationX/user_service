@@ -30,54 +30,54 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 public class PremiumControllerTest {
-//    private static final PremiumPeriod PREMIUM_PERIOD = PremiumPeriod.THREE_MONTHS;
-//    private static final LocalDateTime START_DATE = LocalDateTime.of(2024, 9, 15, 0, 0);
-//    private static final LocalDateTime END_DATE = START_DATE.plusDays(PREMIUM_PERIOD.getDays());
-//
-//    private User user;
-//    private PremiumDto premiumDto;
-//    private ObjectMapper objectMapper;
-//    private MockMvc mockMvc;
-//
-//    @Mock
-//    private PremiumService premiumService;
-//
-//    @Mock
-//    private UserContext userContext;
-//
-//    @InjectMocks
-//    private PremiumController premiumController;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        user = new User();
-//        user.setId(1L);
-//
-//        premiumDto = PremiumDto.builder()
-//                .id(1L)
-//                .userId(user.getId())
-//                .startDate(START_DATE)
-//                .endDate(END_DATE)
-//                .build();
-//
-//        mockMvc = MockMvcBuilders.standaloneSetup(premiumController).build();
-//
-//        objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new JavaTimeModule());
-//    }
-//
-//    @Test
-//    @DisplayName("Should return PremiumDto with status CREATED when buyPremium is successful")
-//    public void testBuyPremium_Success() throws Exception {
-//        when(premiumService.buyPremium(anyLong(), eq(PREMIUM_PERIOD))).thenReturn(premiumDto);
-//        when(userContext.getUserId()).thenReturn(user.getId());
-//
-//        mockMvc.perform(post("/premium")
-//                        .param("days", String.valueOf(PREMIUM_PERIOD.getDays())))
-//                .andExpect(status().isCreated())
-//                .andExpect(content().json(objectMapper.writeValueAsString(premiumDto)));
-//
-//        verify(premiumService, times(1)).buyPremium(user.getId(),
-//                PremiumPeriod.fromDays(PREMIUM_PERIOD.getDays()));
-//    }
+    private static final PremiumPeriod PREMIUM_PERIOD = PremiumPeriod.THREE_MONTHS;
+    private static final LocalDateTime START_DATE = LocalDateTime.of(2024, 9, 15, 0, 0);
+    private static final LocalDateTime END_DATE = START_DATE.plusDays(PREMIUM_PERIOD.getDays());
+
+    private User user;
+    private PremiumDto premiumDto;
+    private ObjectMapper objectMapper;
+    private MockMvc mockMvc;
+
+    @Mock
+    private PremiumService premiumService;
+
+    @Mock
+    private UserContext userContext;
+
+    @InjectMocks
+    private PremiumController premiumController;
+
+    @BeforeEach
+    public void setUp() {
+        user = new User();
+        user.setId(1L);
+
+        premiumDto = PremiumDto.builder()
+                .id(1L)
+                .userId(user.getId())
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .build();
+
+        mockMvc = MockMvcBuilders.standaloneSetup(premiumController).build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+    }
+
+    @Test
+    @DisplayName("Should return PremiumDto with status CREATED when buyPremium is successful")
+    public void testBuyPremium_Success() throws Exception {
+        when(premiumService.buyPremium(anyLong(), eq(PREMIUM_PERIOD))).thenReturn(premiumDto);
+        when(userContext.getUserId()).thenReturn(user.getId());
+
+        mockMvc.perform(post("/premium")
+                        .param("days", String.valueOf(PREMIUM_PERIOD.getDays())))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(premiumDto)));
+
+        verify(premiumService, times(1)).buyPremium(user.getId(),
+                PremiumPeriod.fromDays(PREMIUM_PERIOD.getDays()));
+    }
 }

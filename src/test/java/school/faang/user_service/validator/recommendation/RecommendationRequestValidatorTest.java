@@ -85,7 +85,7 @@ class RecommendationRequestValidatorTest {
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
             recommendationRequestValidator.isUsersInDb(recommendationRequestDto);
         });
-        assertEquals("Requester id or receiver id is wrong", exception.getMessage());
+        assertEquals("Requeste id or receiver id is wrong", exception.getMessage());
     }
 
     @Test

@@ -74,7 +74,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6")
-
+    testImplementation("com.h2database:h2")
     /**
      * Tests
      */
@@ -105,10 +105,16 @@ tasks.bootJar {
  * JaCoCo settings
  */
 val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
+        "**/controller/**",
+        "**/service/**",
+        "**/validator/**",
+        "**/mapper/**",
+)
+val jacocoExclude = listOf(
+        "**/dto/**",
+        "**/config/**",
+        "**/exception/**",
+        "**/entity/**"
 )
 jacoco {
     toolVersion = "0.8.9"
@@ -117,37 +123,50 @@ jacoco {
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
 
     reports {
-        xml.required.set(false)
-        csv.required.set(false)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
     }
 
     classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include(jacocoInclude)
-        }
+            sourceSets.main.get().output.asFileTree.matching {
+                include(jacocoInclude)
+                exclude(jacocoExclude)
+            }
     )
 }
+
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
             element = "CLASS"
+            includes = listOf("com.faang.school.*")
             classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
+                    sourceSets.main.get().output.asFileTree.matching {
+                        include(jacocoInclude)
+                    }
             )
-            enabled = true
+
             limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = "0.70".toBigDecimal()
             }
         }
     }
 }
+
 kotlin {
     jvmToolchain(17)
 }

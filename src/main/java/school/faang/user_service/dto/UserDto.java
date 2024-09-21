@@ -3,16 +3,16 @@ package school.faang.user_service.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@NoArgsConstructor
 public class UserDto {
-    @Positive(message = "ID must be positive!")
-    private long id;
-
-    @NotBlank(message = "Username cannot be blank!")
+    @Positive(message = "Id must be a positive number")
+    private Long id;
+    @NotBlank
     private String username;
-
-    @Email(message = "Email should be valid!")
+    @Email
     private String email;
 }

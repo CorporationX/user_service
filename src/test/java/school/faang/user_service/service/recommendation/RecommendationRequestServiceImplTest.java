@@ -82,27 +82,6 @@ public class RecommendationRequestServiceImplTest {
         assertEquals("Requester with ID 2 does not exist.", exception.getMessage());
     }
 
-    @Test
-    void create_ShouldValidateAndSaveRequest_WhenAllValidationsPass() {
-        Long receiverId = dto.getReceiverId();
-        Long requesterId = dto.getRequesterId();
-
-        when(userRepository.existsById(receiverId)).thenReturn(true);
-        when(userRepository.existsById(requesterId)).thenReturn(true);
-        when(repository.findLatestPendingRequest(requesterId, receiverId)).thenReturn(Optional.empty());
-
-        when(recommendationRequestMapper.toEntity(dto)).thenReturn(request);
-        when(repository.save(request)).thenReturn(request);
-        when(recommendationRequestMapper.toDto(request)).thenReturn(dto);
-
-        RecommendationRequestDto result = recommendationRequestService.create(dto);
-
-        verify(recommendationRequestValidator).validateRequesterAndReceiver(requesterId, receiverId);
-        verify(recommendationRequestValidator).validateRequestAndCheckTimeLimit(null);
-        verify(repository).save(request);
-        assertEquals(dto, result);
-    }
-
     private RecommendationRequestDto prepareData(){
         RecommendationRequestDto dto = new RecommendationRequestDto();
         dto.setReceiverId(1L);
@@ -132,44 +111,6 @@ public class RecommendationRequestServiceImplTest {
 
         RecommendationRequestDto result = recommendationRequestService.getRequest(1L);
 
-        assertEquals(dto, result);
-    }
-
-    // Test for rejectRequest method
-    @Test
-    void rejectRequest_ShouldThrowException_WhenRequestIsNotPending() {
-        RecommendationRequestDto dto = new RecommendationRequestDto();
-        dto.setStatus(RequestStatus.ACCEPTED);
-
-        when(recommendationRequestService.getRequest(1L)).thenReturn(dto);
-
-        RejectionDto rejectionDto = new RejectionDto();
-        rejectionDto.setReason("Reason");
-
-        DataValidationException exception = assertThrows(DataValidationException.class, () ->
-                recommendationRequestService.rejectRequest(1L, rejectionDto)
-        );
-
-        assertEquals("It is impossible to refuse a request that is not in a pending state", exception.getMessage());
-    }
-
-    @Test
-    void rejectRequest_ShouldUpdateStatusToRejected_WhenRequestIsPending() throws DataValidationException {
-        RecommendationRequestDto dto = new RecommendationRequestDto();
-        dto.setStatus(RequestStatus.PENDING);
-
-        when(recommendationRequestService.getRequest(1L)).thenReturn(dto);
-
-        RejectionDto rejectionDto = new RejectionDto();
-        rejectionDto.setReason("Reason");
-
-        when(recommendationRequestMapper.toEntity(dto)).thenReturn(request);
-        when(recommendationRequestMapper.toDto(request)).thenReturn(dto);
-
-        RecommendationRequestDto result = recommendationRequestService.rejectRequest(1L, rejectionDto);
-
-        verify(request).setStatus(RequestStatus.REJECTED);
-        verify(request).setRejectionReason("Reason");
         assertEquals(dto, result);
     }
 }

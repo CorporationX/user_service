@@ -10,7 +10,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

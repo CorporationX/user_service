@@ -29,7 +29,7 @@ class EventParticipationControllerTest {
         controller.registerParticipant(1L, userDto);
 
         Mockito.verify(service, Mockito.times(1))
-                .registerParticipant(1L, userDto.id());
+                .registerParticipant(1L, userDto.getId());
     }
 
     @Test
@@ -37,7 +37,7 @@ class EventParticipationControllerTest {
         controller.unregisterParticipant(1L, userDto);
 
         Mockito.verify(service, Mockito.times(1))
-                .unregisterParticipant(1L, userDto.id());
+                .unregisterParticipant(1L, userDto.getId());
     }
 
     @Test

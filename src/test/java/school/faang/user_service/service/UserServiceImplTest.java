@@ -5,15 +5,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserServiceImpl;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -29,6 +34,8 @@ class UserServiceImplTest {
 
     @Mock
     private GoalRepository goalRepository;
+    @Mock
+    private UserMapper mapper;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -62,5 +69,35 @@ class UserServiceImplTest {
         verify(eventRepository, never()).deleteAllByOwnerId(id);
         verify(mentorshipService, never()).stopMentorship(id);
         verify(userRepository, never()).updateUserActive(id, active);
+    }
+
+    @Test
+    void getUsersByIds_whenOk() {
+        List<Long> ids = List.of(1L, 2L, 3L);
+
+        when(userRepository.findAllById(ids))
+                .thenReturn(null);
+
+        userService.getUsersByIds(ids);
+
+        verify(userRepository, times(1))
+                .findAllById(ids);
+        verify(mapper, times(1))
+                .toDtoList(null);
+    }
+
+    @Test
+    void getUser_whenOk() {
+        long id = 1L;
+
+        when(userRepository.getReferenceById(1L))
+                .thenReturn(null);
+
+        userService.getUser(id);
+
+        verify(userRepository, times(1))
+                .getReferenceById(id);
+        verify(mapper, times(1))
+                .toDto(null);
     }
 }

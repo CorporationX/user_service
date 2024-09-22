@@ -4,12 +4,13 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.EventRegistrationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventRepository;
@@ -31,7 +32,7 @@ public class EventParticipationService {
     }
 
     private boolean isRegistered(long eventId, long userId) {
-        return eventRepository.findAllParticipantsByEventId(eventId).stream().anyMatch(e -> userId == e.getId());
+        return !eventRepository.findAllParticipantsByEventAndUserId(eventId, userId).isEmpty();
     }
 
     @Transactional(readOnly = true)

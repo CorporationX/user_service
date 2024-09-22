@@ -30,6 +30,9 @@ public class Goal {
     @JoinColumn(name="parent_goal_id")
     private Goal parent;
 
+    @OneToMany(mappedBy = "parent")
+    private List<Goal> childrenGoals;
+
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
 

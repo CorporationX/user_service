@@ -132,6 +132,17 @@ public class GoalServiceImpl implements GoalService {
             .orElseThrow(() -> new ResourceNotFoundException(field, goalId));
     }
 
+    @Transactional
+    public void deleteGoalAndUnlinkChildren(Goal goal) {
+        goal.getChildrenGoals()
+                .forEach(child -> {
+                    child.setParent(null);
+                    goalRepository.save(child);
+                });
+
+        goalRepository.delete(goal);
+    }
+
     private void validateExistingSkills(List<Long> skillIds) {
         if (skillIds != null && skillIds.size() != skillRepository.countExisting(skillIds)) {
             throw new BadRequestException("Skills from request are not presented in DB");

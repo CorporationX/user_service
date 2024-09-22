@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.EventParticipantsDto;
-import school.faang.user_service.dto.EventUserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.EventParticipationRegistrationException;
@@ -135,14 +135,14 @@ public class EventParticipationServiceImplTest {
         setUpCheckEventExistsResult(false);
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(users);
 
-        List<EventUserDto> result = eventParticipationService.getParticipants(eventId);
+        List<UserDto> result = eventParticipationService.getParticipants(eventId);
 
         verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).findAllParticipantsByEventId(eventId);
         verify(userMapper, times(1)).usersToUserDtos(anyList());
 
         List<Long> resultIds = result.stream()
-                .map(EventUserDto::id)
+                .map(UserDto::id)
                 .toList();
         List<Long> expectedIds = users.stream()
                 .map(User::getId)
@@ -153,13 +153,13 @@ public class EventParticipationServiceImplTest {
     @Test
     public void testGetParticipants_EmptyParticipantsDto() {
         List<User> users = List.of();
-        List<EventUserDto> participantsDto = List.of();
+        List<UserDto> participantsDto = List.of();
 
         setUpCheckEventExistsResult(false);
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(users);
         when(userMapper.usersToUserDtos(users)).thenReturn(participantsDto);
 
-        List<EventUserDto> result = eventParticipationService.getParticipants(eventId);
+        List<UserDto> result = eventParticipationService.getParticipants(eventId);
 
         verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).findAllParticipantsByEventId(eventId);

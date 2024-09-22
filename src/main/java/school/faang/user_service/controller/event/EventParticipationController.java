@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.EventParticipantsDto;
-import school.faang.user_service.dto.EventUserDto;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class EventParticipationController {
     }
 
     @GetMapping("/{eventId}/participants")
-    public List<EventUserDto> getParticipants(@PathVariable @Positive long eventId) {
+    public List<UserDto> getParticipants(@PathVariable @Positive long eventId) {
         return eventParticipationService.getParticipants(eventId);
     }
 

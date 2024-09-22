@@ -3,8 +3,8 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.EventParticipantsDto;
-import school.faang.user_service.dto.EventUserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -39,10 +39,10 @@ public class EventParticipationServiceImpl implements EventParticipationService 
     }
 
     @Override
-    public List<EventUserDto> getParticipants(long eventId) {
+    public List<UserDto> getParticipants(long eventId) {
         eventParticipationValidator.checkEventExists(eventId);
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        List<EventUserDto> participantsDto = userMapper.usersToUserDtos(participants);
+        List<UserDto> participantsDto = userMapper.usersToUserDtos(participants);
         log.info("Participants of event {}:", eventId);
         return participantsDto;
     }

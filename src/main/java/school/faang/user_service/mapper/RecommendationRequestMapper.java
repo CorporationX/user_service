@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper.recommendation;
+package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,11 +17,6 @@ public interface RecommendationRequestMapper {
     @Mapping(target = "skillsId", source = "skills", qualifiedByName = "skillsToIds")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
-    @Mapping(target = "requesterId", source = "requester.id")
-    @Mapping(target = "receiverId", source = "receiver.id")
-    @Mapping(target = "skillsId", source = "skills", qualifiedByName = "skillsToIds")
-    List<RecommendationRequestDto> toDtoList(List<RecommendationRequest> recommendationRequestDto);
-
     @Named("skillsToIds")
     default List<Long> skillsToIds(List<SkillRequest> skills) {
         if (skills == null) {
@@ -35,6 +30,4 @@ public interface RecommendationRequestMapper {
 
 
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
-
-    List<RecommendationRequest> toListEntity(List<RecommendationRequestDto> recommendationRequestDto);
 }

@@ -3,29 +3,30 @@ package school.faang.user_service.service.recommendation;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
+import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.RecommendationRequestServiceImpl;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceImplTest {
 
     @InjectMocks
@@ -33,79 +34,56 @@ public class RecommendationRequestServiceImplTest {
 
     @Spy
     private RecommendationRequestMapper recommendationRequestMapper;
+
     @Mock
     private RecommendationRequestValidator recommendationRequestValidator;
+
     @Mock
-    private List<RecommendationRequestFilter> recommendationRequestFilters;
-    @Mock
-    private RecommendationRequestRepository repository;
+    private RecommendationRequestRepository recommendationRequestRepository;
+
     @Mock
     private SkillRequestRepository skillRequestRepository;
+
     @Mock
     private UserRepository userRepository;
 
-    private RecommendationRequest request;
-    private RecommendationRequestDto dto;
+    private RecommendationRequestDto recommendationRequestDto;
+    private RecommendationRequest recommendationRequest;
+    private SkillRequest skillRequest;
 
     @BeforeEach
     void setUp() {
-        request = new RecommendationRequest();
-        dto = prepareData();
-    }
+        MockitoAnnotations.openMocks(this);
 
-    // Test for create method
-    @Test
-    void create_ShouldThrowException_WhenReceiverDoesNotExist() {
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(false);
+        recommendationRequestDto = new RecommendationRequestDto();
+        recommendationRequestDto.setReceiverId(1L);
+        recommendationRequestDto.setRequesterId(2L);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                recommendationRequestService.create(dto)
-        );
+        recommendationRequest = new RecommendationRequest();
+        recommendationRequest.setId(1L);
+        recommendationRequest.setStatus(RequestStatus.PENDING);
 
-        assertEquals("Receiver with ID 1 does not exist.", exception.getMessage());
-    }
-
-    @Test
-    void create_ShouldThrowException_WhenRequesterDoesNotExist() {
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                recommendationRequestService.create(dto)
-        );
-
-        assertEquals("Requester with ID 2 does not exist.", exception.getMessage());
-    }
-
-    private RecommendationRequestDto prepareData() {
-        RecommendationRequestDto dto = new RecommendationRequestDto();
-        dto.setReceiverId(1L);
-        dto.setRequesterId(2L);
-
-        return dto;
-    }
-
-    // Test for getRequest method
-    @Test
-    void getRequest_ShouldThrowException_WhenRequestDoesNotExist() {
-        when(repository.findById(anyLong())).thenReturn(Optional.empty());
-
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                recommendationRequestService.getRequest(1L)
-        );
-
-        assertEquals("Not found RequestRecommendation for id: 1", exception.getMessage());
+        skillRequest = new SkillRequest();
+        skillRequest.setId(1L);
     }
 
     @Test
-    void getRequest_ShouldReturnRequest_WhenExists() {
-        RecommendationRequestDto dto = new RecommendationRequestDto();
-
-        when(repository.findById(1L)).thenReturn(Optional.of(request));
-        when(recommendationRequestMapper.toDto(request)).thenReturn(dto);
+    void getRequest_ShouldReturnRequest_WhenFound() {
+        when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.of(recommendationRequest));
+        when(recommendationRequestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
 
         RecommendationRequestDto result = recommendationRequestService.getRequest(1L);
 
-        assertEquals(dto, result);
+        assertEquals(recommendationRequestDto, result);
+    }
+
+    @Test
+    void getRequest_ShouldThrowException_WhenRequestNotFound() {
+        when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
+                recommendationRequestService.getRequest(1L));
+
+        assertEquals("Not found RequestRecommendation for id: 1", exception.getMessage());
     }
 }

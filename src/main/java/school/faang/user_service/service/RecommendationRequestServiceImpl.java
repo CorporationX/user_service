@@ -1,17 +1,18 @@
-package school.faang.user_service.service.recommendation;
+package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -20,6 +21,8 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -28,7 +31,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final RecommendationRequestValidator recommendationRequestValidator;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
-    private final RecommendationRequestRepository repository;
+    private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final UserRepository userRepository;
 
@@ -38,23 +41,33 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         Long receiverId = recommendationRequestDto.getReceiverId();
         Long requesterId = recommendationRequestDto.getRequesterId();
 
-        if (!userRepository.existsById(receiverId)) {
-            throw new IllegalArgumentException("Receiver with ID " + receiverId + " does not exist.");
-        }
-        if (!userRepository.existsById(requesterId)) {
-            throw new IllegalArgumentException("Requester with ID " + requesterId + " does not exist.");
-        }
+        recommendationRequestValidator.validateUserExistence(userRepository.existsById(receiverId), receiverId);
+        recommendationRequestValidator.validateUserExistence(userRepository.existsById(requesterId), requesterId);
 
-        Optional<RecommendationRequest> latestPendingRequest = repository.findLatestPendingRequest(requesterId, receiverId);
-        LocalDateTime lastRequestTime = latestPendingRequest.map(RecommendationRequest::getUpdatedAt).orElse(null);
+        Optional<RecommendationRequest> latestPendingRequest = recommendationRequestRepository
+                .findLatestPendingRequest(requesterId, receiverId);
+        LocalDateTime lastRequestTime = latestPendingRequest.map(RecommendationRequest::getUpdatedAt)
+                .orElse(null);
 
         validations(requesterId, receiverId, lastRequestTime);
 
-        RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
-        recommendationRequest.getSkills().stream()
-                .filter(skill -> !skillRequestRepository.existsById(skill.getId()))
+        RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.toEntity(recommendationRequestDto);
+
+        List<Long> skillIds = recommendationRequestEntity.getSkills().stream()
+                .map(SkillRequest::getId)
+                .toList();
+
+        List<SkillRequest> existingSkills = skillRequestRepository.findAllById(skillIds);
+
+        Set<Long> existingSkillIds = existingSkills.stream()
+                .map(SkillRequest::getId)
+                .collect(Collectors.toSet());
+
+        recommendationRequestEntity.getSkills().stream()
+                .filter(skill -> !existingSkillIds.contains(skill.getId()))
                 .forEach(skill -> skillRequestRepository.create(recommendationRequestDto.getId(), skill.getId()));
-        RecommendationRequest createRequest = repository.save(recommendationRequest);
+
+        RecommendationRequest createRequest = recommendationRequestRepository.save(recommendationRequestEntity);
 
         return recommendationRequestMapper.toDto(createRequest);
     }
@@ -65,11 +78,12 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public RecommendationRequestDto getRequest(long id) {
-        RecommendationRequest request = repository.findById(id)
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Not found RequestRecommendation for id: " + id));
-        return recommendationRequestMapper.toDto(request);
+
+        return recommendationRequestMapper.toDto(recommendationRequest);
     }
 
     @Override
@@ -77,10 +91,13 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejectionDto) throws DataValidationException {
         RecommendationRequestDto recommendationRequestDto = getRequest(id);
         if (recommendationRequestDto.getStatus() == RequestStatus.PENDING) {
-            RecommendationRequest request = recommendationRequestMapper.toEntity(recommendationRequestDto);
-            request.setStatus(RequestStatus.REJECTED);
-            request.setRejectionReason(rejectionDto.getReason());
-            return recommendationRequestMapper.toDto(request);
+            RecommendationRequest recommendationRequestEntity = recommendationRequestMapper
+                    .toEntity(recommendationRequestDto);
+            recommendationRequestEntity.setStatus(RequestStatus.REJECTED);
+            recommendationRequestEntity.setRejectionReason(rejectionDto.getReason());
+            recommendationRequestRepository.save(recommendationRequestEntity);
+
+            return recommendationRequestMapper.toDto(recommendationRequestEntity);
         } else {
             throw new DataValidationException("It is impossible to refuse a request that is not in a pending state");
         }
@@ -89,7 +106,8 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     @Override
     @Transactional
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filters) {
-        Stream<RecommendationRequest> recommendationRequests = repository.findAll().stream();
+        Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
+
         return recommendationRequestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .flatMap(filter -> filter.apply(recommendationRequests, filters))

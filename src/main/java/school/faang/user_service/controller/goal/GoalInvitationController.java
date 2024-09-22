@@ -16,7 +16,7 @@ import school.faang.user_service.service.goal.GoalInvitationService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/goals_invitations")
+@RequestMapping("/api/v1/goal_invitations")
 @RequiredArgsConstructor
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;

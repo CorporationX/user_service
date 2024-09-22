@@ -40,7 +40,7 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRequest(id);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         if (rejection == null || rejection.getReason().isBlank()) {
             throw new IllegalArgumentException("Rejection information is incorrect");

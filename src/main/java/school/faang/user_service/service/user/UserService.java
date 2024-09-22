@@ -13,6 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
+import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.randomAvatar.AvatarService;
 import school.faang.user_service.service.user.filter.UserFilter;
@@ -21,6 +22,7 @@ import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -33,6 +35,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final CountryRepository countryRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     private final UserValidator userValidator;
 
@@ -126,5 +129,17 @@ public class UserService {
         String avatarId = userById.getUserProfilePic().getSmallFileId();
 
         return avatarService.get(avatarId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getUserFollows(Long userId) {
+        return subscriptionRepository.findByFollowerId(userId).map(userMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getUsersByIds(List<Long> usersIds) {
+        return StreamSupport.stream(userRepository.findAllById(usersIds).spliterator(), false)
+                .map(userMapper::toDto)
+                .toList();
     }
 }

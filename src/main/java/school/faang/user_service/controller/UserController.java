@@ -57,4 +57,16 @@ public class UserController {
     public byte[] getAvatar(@PathVariable Long userId) {
           return userService.getAvatar(userId);
     }
+
+    @GetMapping("/{userId}/follows")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getUserFollowers(@PathVariable Long userId) {
+        return userService.getUserFollows(userId);
+    }
+
+    @PostMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getByUsersIds(@RequestBody List<Long> usersIds) {
+        return userService.getUsersByIds(usersIds);
+    }
 }

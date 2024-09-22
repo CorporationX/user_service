@@ -18,6 +18,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
+import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.randomAvatar.AvatarService;
 import school.faang.user_service.service.s3Service.S3Service;
@@ -54,6 +55,9 @@ public class UserServiceTest {
 
     @Mock
     private CountryRepository countryRepository;
+
+    @Mock
+    private SubscriptionRepository subscriptionRepository;
 
     private UserFilterValidation userFilterValidation;
 
@@ -112,7 +116,7 @@ public class UserServiceTest {
         country = Country.builder().id(1L).build();
         avatarBytes = new byte[100];
 
-        userService = new UserService(userRepository, filters, userFilterValidation, userMapper, avatarService, countryRepository, userValidator);
+        userService = new UserService(userRepository, filters, userFilterValidation, userMapper, avatarService, countryRepository, subscriptionRepository, userValidator);
     }
 
     @Test

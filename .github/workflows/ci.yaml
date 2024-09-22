@@ -35,5 +35,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
-          path: target/surefire-reports
+          name: User service tests logs
+          path: target/user-service-logs

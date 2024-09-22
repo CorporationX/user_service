@@ -1,9 +1,12 @@
 package school.faang.user_service.service.s3;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +19,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Data
+@Getter
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,8 +27,8 @@ public class S3Service {
 
     private final AmazonS3 s3Client;
 
-    @Value("${services.s3.bucketName}")
-    private String bucketName;
+    @Value("${services.s3.bucketDefaultAvatarsName}")
+    private String bucketDefaultAvatarsName;
 
     @Value("${services.s3.defaultProfilePicture}")
     private String defaultPictureName;
@@ -38,10 +41,14 @@ public class S3Service {
 
             String key = String.format("%s%d%s", folder, System.currentTimeMillis(), getFileName(data.getHeaders()));
 
-            log.info("Trying to save httpResponseData in s3 {}", bucketName);
+            if (!isBucketExists(bucketDefaultAvatarsName)) {
+                createBucket(bucketDefaultAvatarsName);
+            }
+
+            log.info("Trying to save httpResponseData in s3 {}", bucketDefaultAvatarsName);
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(
-                    bucketName, key, new ByteArrayInputStream(data.getContent()), objectMetadata);
+                    bucketDefaultAvatarsName, key, new ByteArrayInputStream(data.getContent()), objectMetadata);
             s3Client.putObject(putObjectRequest);
 
             return key;
@@ -52,7 +59,7 @@ public class S3Service {
     }
 
     public boolean isDefaultPictureExistsOnCloud() {
-        return s3Client.doesObjectExist(bucketName, defaultPictureName);
+        return s3Client.doesObjectExist(bucketDefaultAvatarsName.toLowerCase(), defaultPictureName);
     }
 
     private String getFileName(Map<String, List<String>> headers) {
@@ -70,4 +77,29 @@ public class S3Service {
 
         return filename;
     }
+
+    public boolean isBucketExists(String bucketName) {
+        try {
+            log.info("Check does bucket with name {} exists", bucketName);
+
+            s3Client.doesBucketExistV2(bucketName);
+            log.info("Bucket with name {} exists", bucketName);
+
+            return true;
+        } catch (AmazonS3Exception e) {
+            log.info("Bucket with name {} doesn't exists", bucketName);
+            return false;
+        }
+    }
+
+    public void createBucket(String bucketName) {
+        try {
+            log.info("Creating bucket with name {}", bucketName);
+            s3Client.createBucket(new CreateBucketRequest(bucketName.toLowerCase()));
+        } catch (AmazonServiceException a) {
+            log.error("Error while creating new bucket");
+        }
+    }
+
+
 }

@@ -46,5 +46,5 @@ services:
     endpoint: http://localhost:9000
     accessKey: user
     secretKey: password
-    bucketName: corpbucket
+    bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
     defaultProfilePicture: defaultAvatar.png

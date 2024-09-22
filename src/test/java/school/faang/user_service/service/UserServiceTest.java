@@ -24,6 +24,7 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    private static final long ANY_ID = 123L;
     private static final long ID = 1L;
 
     @Test
@@ -47,5 +48,13 @@ class UserServiceTest {
 
         assertThrows(DataValidationException.class, () -> userService.findById(ID));
         verify(userRepository).findById(ID);
+    }
+
+    @Test
+    @DisplayName("Exception when the user with this ID doesn't exist")
+    void whenUserNotExistThenThrowException() {
+        when(userRepository.findById(ANY_ID)).thenReturn(null);
+        assertThrows(NullPointerException.class,
+                () -> userService.getUser(ANY_ID), "User with id " + ANY_ID + " doesn't exist");
     }
 }

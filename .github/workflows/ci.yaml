@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'oracle'
 
       - name: Cache Gradle packages
         uses: actions/cache@v2
@@ -36,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: User service tests logs
-          path: target/user-service-logs
+          path: target/user-service-logs/

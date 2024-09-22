@@ -36,19 +36,18 @@ public class RecommendationService {
         return recommendationMapper.toDto(getRecommendation(recommendationId));
     }
 
-    public RecommendationDto update(RecommendationDto recommendation) {
+    public RecommendationDto update(long id, RecommendationDto recommendation) {
         recommendationDtoValidator.validateRecommendation(recommendation);
         List<Skill> skills = getSkills(recommendation);
 
         recommendationRepository
                 .update(recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
-        Recommendation existedRecommendation = getRecommendation(recommendation.getId());
 
-        skillOfferService.deleteAllByRecommendationId(existedRecommendation.getId());
+        skillOfferService.deleteAllByRecommendationId(id);
 
-        skillOfferService.addSkillsWithGuarantees(skills, existedRecommendation.getId(), recommendation);
+        skillOfferService.addSkillsWithGuarantees(skills, id, recommendation);
 
-        return recommendationMapper.toDto(existedRecommendation);
+        return recommendationMapper.toDto(getRecommendation(id));
     }
 
     public void delete(long id) {

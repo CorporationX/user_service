@@ -29,9 +29,9 @@ public class RecommendationController {
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping("/recommendation") // TODO тут напрашивается {id} + @PathVariable в параметре
-    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
-        return recommendationService.update(updated);
+    @PutMapping("/recommendation/{id}")
+    public RecommendationDto updateRecommendation(@PathVariable long id, @RequestBody RecommendationDto updated) {
+        return recommendationService.update(id, updated);
     }
 
     @DeleteMapping("/{id}")

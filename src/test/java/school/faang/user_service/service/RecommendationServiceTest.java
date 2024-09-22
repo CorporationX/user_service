@@ -49,8 +49,10 @@ public class RecommendationServiceTest {
 
     private static final long ID = 1L;
     private static final String CONTENT = "content";
+    private static final String UPDATED_CONTENT = "update";
 
     private RecommendationDto recommendationDto;
+    private RecommendationDto updatedRecommendationDto;
     private Recommendation recommendation;
     private List<Recommendation> recommendations;
     private List<RecommendationDto> recommendationDtos;
@@ -61,6 +63,16 @@ public class RecommendationServiceTest {
         recommendationDto = RecommendationDto.builder()
                 .id(ID)
                 .content(CONTENT)
+                .authorId(ID)
+                .receiverId(ID)
+                .skillOffers(List.of(SkillOfferDto.builder()
+                        .id(ID)
+                        .build()))
+                .createdAt(LocalDateTime.of(2014, Month.JULY, 2, 15, 30))
+                .build();
+        updatedRecommendationDto = RecommendationDto.builder()
+                .id(ID)
+                .content(UPDATED_CONTENT)
                 .authorId(ID)
                 .receiverId(ID)
                 .skillOffers(List.of(SkillOfferDto.builder()
@@ -120,18 +132,18 @@ public class RecommendationServiceTest {
         @DisplayName("Успешное обновление рекомендации")
         public void whenUpdateRecommendationThenSuccess() {
             when(skillService.getSkillByIds(anyList())).thenReturn(skills);
-            when(recommendationRepository.findById(recommendationDto.getId()))
-                    .thenReturn(Optional.ofNullable(recommendation));
-            when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+            when(recommendationRepository.findById(ID)).thenReturn(Optional.ofNullable(recommendation));
+            when(recommendationMapper.toDto(recommendation)).thenReturn(updatedRecommendationDto);
 
-            RecommendationDto resultRecommendationDto = recommendationService.update(recommendationDto);
+            RecommendationDto resultRecommendationDto = recommendationService.update(ID, updatedRecommendationDto);
 
             assertNotNull(resultRecommendationDto);
-            verify(recommendationDtoValidator).validateRecommendation(recommendationDto);
+            assertEquals(updatedRecommendationDto.getContent(), resultRecommendationDto.getContent());
+            verify(recommendationDtoValidator).validateRecommendation(updatedRecommendationDto);
             verify(skillService).getSkillByIds(anyList());
-            verify(recommendationRepository).update(recommendationDto.getAuthorId(),
-                    recommendationDto.getReceiverId(), recommendationDto.getContent());
-            verify(recommendationRepository).findById(recommendationDto.getId());
+            verify(recommendationRepository).update(updatedRecommendationDto.getAuthorId(),
+                    updatedRecommendationDto.getReceiverId(), updatedRecommendationDto.getContent());
+            verify(recommendationRepository).findById(ID);
             verify(skillOfferService).deleteAllByRecommendationId(recommendation.getId());
             verify(skillOfferService)
                     .addSkillsWithGuarantees(skills, recommendation.getId(), resultRecommendationDto);

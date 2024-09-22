@@ -15,6 +15,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.user.UserDeactivatedException;
+import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -26,6 +27,7 @@ import school.faang.user_service.service.user.filter.UserUsernameFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,16 +126,16 @@ class UserServiceTest extends AbstractUserServiceTest {
     @Test
     void testGetPremiumUsers() {
         UserFilterDto userFilterDto = UserFilterDto.builder()
-            .username(USERNAME)
-            .email(EMAIL)
-            .build();
+                .username(USERNAME)
+                .email(EMAIL)
+                .build();
 
         Premium premiumToFind = Premium.builder()
-            .user(createUser(USERNAME, EMAIL))
-            .build();
+                .user(createUser(USERNAME, EMAIL))
+                .build();
         Premium premiumToNotFind = Premium.builder()
-            .user(createUser("", ""))
-            .build();
+                .user(createUser("", ""))
+                .build();
         List<Premium> premiums = List.of(premiumToFind, premiumToNotFind);
 
         when(premiumRepository.findAll()).thenReturn(premiums);
@@ -143,5 +145,41 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(1, result.size());
         assertEquals(USERNAME, result.get(0).getUsername());
         assertEquals(EMAIL, result.get(0).getEmail());
+    }
+
+
+    @Test
+    void testGetUser() {
+        long foundId = 1L;
+        long notFoundId = 100L;
+        User user = createUser(USERNAME, EMAIL);
+
+        when(userRepository.findById(foundId)).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findById(notFoundId)).thenReturn(Optional.empty());
+
+        User resultFound = userService.getUser(foundId);
+        assertEquals(USERNAME, resultFound.getUsername());
+        assertEquals(EMAIL, resultFound.getEmail());
+
+        assertThrows(UserNotFoundException.class, () -> userService.getUser(notFoundId));
+    }
+
+    @Test
+    void testGetUsers() {
+        List<Long> idsFound = Arrays.asList(1L, 2L);
+        List<Long> idsNotFound = Arrays.asList(100L, 200L);
+        List<User> users = List.of(createUser(USERNAME, EMAIL), createUser(USERNAME, EMAIL));
+
+        when(userRepository.findAllById(idsFound)).thenReturn(users);
+        when(userRepository.findAllById(idsNotFound)).thenReturn(Collections.emptyList());
+
+        List<User> resultFound = userService.getUsers(idsFound);
+        List<User> resultNotFound = userService.getUsers(idsNotFound);
+
+        assertEquals(2, resultFound.size());
+        assertEquals(USERNAME, resultFound.get(0).getUsername());
+        assertEquals(EMAIL, resultFound.get(0).getEmail());
+
+        assertEquals(0, resultNotFound.size());
     }
 }

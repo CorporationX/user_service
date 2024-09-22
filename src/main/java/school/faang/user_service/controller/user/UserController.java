@@ -43,9 +43,8 @@ public class UserController {
         return userMapper.toDto(user);
     }
 
-    @PostMapping("/all")
+    @PostMapping()
     List<UserResponseDto> getUsersByIds(@RequestBody List<Long> ids) {
-        System.out.println("hello");
         List<User> users = userService.getUsers(ids);
         return userMapper.toDtos(users);
     }

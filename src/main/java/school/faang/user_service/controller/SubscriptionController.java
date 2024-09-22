@@ -56,10 +56,10 @@ public class SubscriptionController {
 
     @Operation(summary = "Получить всех подписчиков пользователя",
             description = "Позволяет получить всех подписчиков пользователя с id={followeeId}, " +
-                    "согласно переданному обязательному фильтру"
+                    "согласно переданному фильтру"
     )
     @GetMapping
-    public List<UserDto> getFollowers(@PathVariable("userId") @Positive long followeeId, @RequestBody UserFilterDto filter) {
+    public List<UserDto> getFollowers(@PathVariable("userId") @Positive long followeeId, @RequestBody(required = false) UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 

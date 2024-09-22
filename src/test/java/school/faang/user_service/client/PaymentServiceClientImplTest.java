@@ -1,20 +1,15 @@
 package school.faang.user_service.client;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.client.PaymentRequest;
 import school.faang.user_service.dto.client.PaymentResponse;
@@ -27,18 +22,17 @@ import school.faang.user_service.validator.PaymentValidator;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceClientImplTest {
 
     @Mock
     private RestTemplate restTemplate;
-
-    @Mock
-    private PaymentValidator validator;
 
     @InjectMocks
     private PaymentServiceClientImpl paymentServiceClient;
@@ -66,11 +60,12 @@ public class PaymentServiceClientImplTest {
                 .status(PaymentStatus.SUCCESS)
                 .verificationCode(123)
                 .build();
+        paymentServiceClient.setPAYMENT_SERVICE_URL("http://localhost:9080/api/payment");
     }
 
     @Test
     void processPayment_Success() {
-        ResponseEntity<PaymentResponse> responseEntity = ResponseEntity.ok(paymentResponse);
+        ResponseEntity<PaymentResponse> responseEntity = ResponseEntity.ok().body(paymentResponse);
         when(restTemplate.exchange(
                 eq("http://localhost:9080/api/payment"),
                 eq(HttpMethod.POST),
@@ -78,10 +73,9 @@ public class PaymentServiceClientImplTest {
                 eq(PaymentResponse.class))
         ).thenReturn(responseEntity);
 
-        PaymentResponse response = paymentServiceClient.processPayment(paymentRequest);
+        ResponseEntity<PaymentResponse> response = paymentServiceClient.processPayment(paymentRequest);
 
-        assertEquals(paymentResponse, response);
-        verify(validator).verifyPayment(responseEntity);
+        assertEquals(paymentResponse, response.getBody());
     }
 
     @Test

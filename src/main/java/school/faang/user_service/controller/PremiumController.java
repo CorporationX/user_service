@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class PremiumController {
     private final PremiumService premiumService;
 
     @PostMapping("/buy/{id}")
-    public PremiumDto buyPremium(@PathVariable long id, @RequestBody PremiumRequest request) {
-        return premiumService.buyPremium(id, request.days(), request.currency());
+    public PremiumDto buyPremium(@PathVariable long id, @RequestBody @Valid PremiumRequest request) {
+        return premiumService.buyPremium(request, id);
     }
 }

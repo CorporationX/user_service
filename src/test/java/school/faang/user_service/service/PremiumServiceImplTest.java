@@ -13,13 +13,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.client.PaymentRequest;
 import school.faang.user_service.dto.premiun.PremiumDto;
+import school.faang.user_service.dto.premiun.PremiumRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Currency;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.validator.PremiumValidator;
+import school.faang.user_service.validator.PaymentValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,8 +28,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +48,7 @@ class PremiumServiceImplTest {
     private PremiumMapper mapper = Mappers.getMapper(PremiumMapper.class);
 
     @Mock
-    private PremiumValidator validator;
+    private PaymentValidator paymentValidator;
 
     @InjectMocks
     private PremiumServiceImpl service;
@@ -61,9 +61,9 @@ class PremiumServiceImplTest {
 
     private final long userId = 1L;
     private final long premiumId = 2L;
-    private final int days = 30;
     private User user;
     private Premium premium;
+    private PremiumRequest premiumRequest;
 
     @BeforeEach
     void setUp() {
@@ -76,23 +76,37 @@ class PremiumServiceImplTest {
                 .endDate(LocalDateTime.now().plusDays(30))
                 .user(user)
                 .build();
-
-        when(premiumRepository.existsByUserId(userId)).thenReturn(true);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(premiumRepository.save(any(Premium.class))).thenReturn(premium);
+        premiumRequest = PremiumRequest.builder()
+                .days(30)
+                .currency(Currency.USD)
+                .build();
     }
 
     @Test
-    void buyPremium() {
+    void buyPremium_AvailablePremium() {
         PremiumDto correctPremiumDto = new PremiumDto(premiumId, userId);
         PaymentRequest correctPaymentRequest = new PaymentRequest(userId, new BigDecimal(10), Currency.USD);
+        when(premiumRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(premiumRepository.save(any(Premium.class))).thenReturn(premium);
 
-        PremiumDto result = service.buyPremium(userId, days, Currency.USD);
+        PremiumDto result = service.buyPremium(premiumRequest, userId);
 
         verifyAll();
         assertEquals(correctPremiumDto, result);
         assertEquals(correctPaymentRequest, premiumRequestCaptor.getValue());
         assertPremium(premiumCaptor.getValue());
+    }
+
+    @Test
+    void buyPremium_NotAvailablePremium() {
+        PremiumDto correctPremiumDto = new PremiumDto(premiumId, userId);
+        when(premiumRepository.findByUserId(userId)).thenReturn(Optional.of(premium));
+
+        PremiumDto result = service.buyPremium(premiumRequest, userId);
+
+        neverVerifyAll();
+        assertEquals(correctPremiumDto, result);
     }
 
     private void assertPremium(Premium premium) {
@@ -105,11 +119,15 @@ class PremiumServiceImplTest {
     }
 
     private void verifyAll() {
-        verify(premiumRepository).existsByUserId(userId);
-        verify(validator).validate(eq(userId), anyBoolean());
         verify(userRepository).findById(userId);
         verify(paymentServiceClient).processPayment(premiumRequestCaptor.capture());
         verify(premiumRepository).save(premiumCaptor.capture());
         verify(mapper).toDto(any(Premium.class));
+    }
+
+    private void neverVerifyAll() {
+        verify(userRepository, never()).findById(userId);
+        verify(paymentServiceClient, never()).processPayment(premiumRequestCaptor.capture());
+        verify(premiumRepository, never()).save(premiumCaptor.capture());
     }
 }

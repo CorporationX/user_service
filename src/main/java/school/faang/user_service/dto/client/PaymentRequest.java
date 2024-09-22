@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 
 @Builder
 public record PaymentRequest(
-        @NotNull
         long userId,
 
         @Min(1)

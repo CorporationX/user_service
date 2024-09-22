@@ -30,3 +30,10 @@ jobs:
 
       - name: Run Tests
         run: ./gradlew test --no-daemon
+
+      - name: Tests logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: target/log-reports

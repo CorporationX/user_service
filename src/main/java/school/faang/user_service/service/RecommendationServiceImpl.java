@@ -2,6 +2,8 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -85,13 +87,30 @@ public class RecommendationServiceImpl implements RecommendationService{
     }
 
     @Override
+    @Transactional
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
-        return List.of();
+        Page<Recommendation> recommendationPage = recommendationRepository.findAllByReceiverId(
+                receiverId,
+                PageRequest.of(0, Integer.MAX_VALUE));
+
+        return recommendationPage.getContent()
+                .stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 
     @Override
+    @Transactional
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
-        return List.of();
+        Page<Recommendation> recommendationPage = recommendationRepository
+                .findAllByAuthorId(
+                        authorId,
+                        PageRequest.of(0, Integer.MAX_VALUE));
+
+        return recommendationPage
+                .stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 
     public void processSkillsAndGuarantees(RecommendationDto recommendationDto) {

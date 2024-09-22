@@ -148,6 +148,35 @@ class SubscriptionServiceTest {
     }
 
     @Test
+    void testGetFollowers_valid_nullFilter() {
+        UserMapper userMapper = new UserMapperImpl();
+        ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
+
+        long followeeId = 1;
+        User user1 = User.builder()
+                .id(1L)
+                .username("name1")
+                .email("mail1.ru")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .username("name2")
+                .email("mail2.ru")
+                .build();
+        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
+                .thenReturn(Stream.of(user1, user2));
+
+        List<UserDto> resultList = subscriptionService.getFollowers(followeeId, null);
+
+        assertEquals(userMapper.toDto(user1), resultList.get(0));
+        assertEquals(userMapper.toDto(user2), resultList.get(1));
+        assertEquals(2, resultList.size());
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .findByFolloweeId(followeeId);
+        Mockito.verifyNoMoreInteractions(subscriptionRepository);
+    }
+
+    @Test
     void testGetFollowers_valid_nameFilter() {
         UserMapper userMapper = new UserMapperImpl();
         ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);

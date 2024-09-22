@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.goal;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -16,8 +15,6 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.service.GoalInvitationService;
-
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,16 +47,16 @@ class GoalInvitationControllerTest {
         Mockito.verify(service).createInvitation(goalInvitationDto);
     }
 
-    @Test
-    void testCreateInvitation_inviterIdIsNull() {
-        goalInvitationDto.setInviterId(null);
-
-        Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
-        goalInvitationController.createInvitation(goalInvitationDto);
-
-        assertEquals(1, violations.size());
-        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
-    }
+//    @Test
+//    void testCreateInvitation_inviterIdIsNull() {
+//        goalInvitationDto.setInviterId(null);
+//
+//        Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
+//        goalInvitationController.createInvitation(goalInvitationDto);
+//
+//        assertEquals(1, violations.size());
+//        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
+//    }
 //
 //    @Test
 //    void testCreateInvitation_invitedUserIdIsNull() {

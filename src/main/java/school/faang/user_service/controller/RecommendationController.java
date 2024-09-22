@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.service.RecommendationServiceImpl;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class RecommendationController {
-    private final RecommendationServiceImpl recommendationService;
+    private final RecommendationService recommendationService;
 
     public void giveRecommendation(RecommendationDto recommendation) {
         recommendationService.create(recommendation);

@@ -1,12 +1,16 @@
 package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -29,12 +33,9 @@ public class RecommendationService {
     public RecommendationDto createRecommendation(RecommendationDto recommendationDto) {
         User author = getUserById(recommendationDto.getAuthorId());
         User receiver = getUserById(recommendationDto.getReceiverId());
-        recommendationServiceHandler.selfRecommendationValidation(author, receiver);
-        recommendationServiceHandler.recommendationIntervalValidation(author, receiver);
-
         List<Long> skillOfferDtoIds = getSkillOfferDtoIds(recommendationDto);
-        List<Long> allSkillsIds = getAllSkillsIds(skillOfferDtoIds);
-        recommendationServiceHandler.skillOffersValidation(skillOfferDtoIds, allSkillsIds);
+
+        createUpdateRecommendationValidation(author, receiver, skillOfferDtoIds);
 
         skillOfferDtoIds.forEach(skillId -> createRecommendationWithSkillOfferAndSkillGuarantee(
                 author.getId(),
@@ -45,32 +46,13 @@ public class RecommendationService {
         return recommendationDto;
     }
 
-    private void createRecommendationWithSkillOfferAndSkillGuarantee(Long authorId, Long receiverId, String content, Long skillId) {
-        if (recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, receiverId).isEmpty()) {
-            recommendationRepository.createRecommendationWithSkillOffer(
-                    authorId,
-                    receiverId,
-                    content,
-                    skillId
-            );
-        }
-        if (!userSkillGuaranteeRepository.existsUserSkillGuaranteeByUserIdAndSkillId(receiverId, skillId)) {
-            userSkillGuaranteeRepository.create(authorId, receiverId, skillId);
-        } else {
-            throw new DataValidationException("Recommendation or Guarantee for this SkillOffer: " + skillId +
-                    " from this Author: " + authorId + " already exist");
-        }
-    }
-
+    @Transactional
     public RecommendationDto updateRecommendation(RecommendationDto recommendationDto) {
         User author = getUserById(recommendationDto.getAuthorId());
         User receiver = getUserById(recommendationDto.getReceiverId());
-        recommendationServiceHandler.selfRecommendationValidation(author, receiver);
-        recommendationServiceHandler.recommendationIntervalValidation(author, receiver);
-
         List<Long> skillOfferDtoIds = getSkillOfferDtoIds(recommendationDto);
-        List<Long> allSkillsIds = getAllSkillsIds(skillOfferDtoIds);
-        recommendationServiceHandler.skillOffersValidation(skillOfferDtoIds, allSkillsIds);
+
+        createUpdateRecommendationValidation(author, receiver, skillOfferDtoIds);
 
         skillOfferDtoIds.forEach(skillId -> updateRecommendationWithSkillOfferAndSkillGuarantee(
                 author.getId(),
@@ -78,25 +60,73 @@ public class RecommendationService {
                 recommendationDto.getContent(),
                 skillId)
         );
-
         return recommendationDto;
     }
 
+    @Transactional
+    public void deleteRecommendation(long recommendationId) {
+        recommendationRepository.deleteById(recommendationId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Recommendation> getAllUserRecommendations(Long receiverId, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        return recommendationRepository.findAllByReceiverId(receiverId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Recommendation> getAllGivenRecommendations(long authorId, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        return recommendationRepository.findAllByAuthorId(authorId, pageable);
+    }
+
+
+    private void createRecommendationWithSkillOfferAndSkillGuarantee(Long authorId, Long receiverId, String content, Long skillId) {
+        if (recommendationRepository.recommendationExistCheck(receiverId, skillId) < 1) {
+            recommendationRepository.createRecommendationWithSkillOffer(
+                    authorId,
+                    receiverId,
+                    content,
+                    skillId
+            );
+        } else {
+            if (userSkillGuaranteeRepository.findFirstByGuarantorIdAndUserIdAndSkillIdOrderById(authorId, receiverId, skillId).isEmpty()) {
+                userSkillGuaranteeRepository.create(authorId, receiverId, skillId);
+            } else {
+                throw new DataValidationException("Guarantee for SkillOffer with ID: " + skillId +
+                        " for User with ID: " + receiverId +
+                        " from Guarantor with ID: " + authorId +
+                        " already exist");
+            }
+        }
+    }
+
     private void updateRecommendationWithSkillOfferAndSkillGuarantee(Long authorId, Long receiverId, String content, Long skillId) {
-        if (recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, receiverId).isEmpty()) {
+        if (recommendationRepository.recommendationExistCheck(receiverId, skillId) == 1) {
             recommendationRepository.updateRecommendationWithSkillOffer(
                     authorId,
                     receiverId,
                     content,
                     skillId
             );
-            if (!userSkillGuaranteeRepository.existsUserSkillGuaranteeByUserIdAndSkillId(receiverId, skillId)) {
+        } else {
+            if (userSkillGuaranteeRepository.findFirstByGuarantorIdAndUserIdAndSkillIdOrderById(authorId, receiverId, skillId).isEmpty()) {
                 userSkillGuaranteeRepository.create(authorId, receiverId, skillId);
             } else {
-                throw new DataValidationException("Recommendation or Guarantee for this SkillOffer: " + skillId +
-                        " from this Author: " + authorId + " already exist");
+                throw new DataValidationException("Guarantee for SkillOffer with ID: " + skillId +
+                        " for User with ID: " + receiverId +
+                        " from Guarantor with ID: " + authorId +
+                        " already exist");
             }
         }
+    }
+
+    private void createUpdateRecommendationValidation(User author, User receiver, List<Long> skillOfferDtoIds) {
+        recommendationServiceHandler.selfRecommendationValidation(author, receiver);
+        recommendationServiceHandler.recommendationIntervalValidation(author, receiver);
+
+        List<Long> allSkillsIds = getAllSkillsIds(skillOfferDtoIds);
+        recommendationServiceHandler.skillOffersValidation(skillOfferDtoIds, allSkillsIds);
     }
 
     private User getUserById(Long userId) {

@@ -20,13 +20,13 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
     Long create(long authorId, long receiverId, String content);
 
     @Query(nativeQuery = true, value = """
-            WITH inserted_recommendation AS (
+            WITH created_recommendation AS (
             INSERT INTO recommendation (author_id, receiver_id, content)
             VALUES (?1, ?2, ?3)
             RETURNING id
             )
             INSERT INTO skill_offer (skill_id, recommendation_id)
-            VALUES (?4, (SELECT id FROM inserted_recommendation))
+            VALUES (?4, (SELECT id FROM created_recommendation))
             RETURNING id;
             """)
     void createRecommendationWithSkillOffer(long authorId, long receiverId, String content, long skillId);
@@ -57,4 +57,13 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
     Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
 
     Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(long authorId, long receiverId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(*)
+            FROM recommendation
+            JOIN skill_offer ON recommendation.id = skill_offer.recommendation_id
+            WHERE recommendation.receiver_id = ?1
+            AND skill_offer.skill_id = ?2
+            """)
+    int recommendationExistCheck(long receiverId, long skillId);
 }

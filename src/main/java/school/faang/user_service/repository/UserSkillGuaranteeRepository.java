@@ -5,9 +5,13 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.UserSkillGuarantee;
 
+import java.util.Optional;
+
 @Repository
 public interface UserSkillGuaranteeRepository extends CrudRepository<UserSkillGuarantee, Long> {
     boolean existsUserSkillGuaranteeByUserIdAndSkillId(long userId, long skillId);
+
+    Optional<UserSkillGuarantee> findFirstByGuarantorIdAndUserIdAndSkillIdOrderById(long guarantorId, long userId, long skillId);
 
     @Query(nativeQuery = true, value = """
             INSERT INTO user_skill_guarantee (guarantor_id, user_id, skill_id)

@@ -21,5 +21,5 @@ public class EventDto {
     private int maxAttendees;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private List<SkillDto> relatedSkills;
+    private List<Long> relatedSkills;
 }

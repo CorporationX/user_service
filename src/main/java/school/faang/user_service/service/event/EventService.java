@@ -2,19 +2,18 @@ package school.faang.user_service.service.event;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.mapper.EventMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Data
@@ -24,76 +23,81 @@ public class EventService {
 
     private final EventMapper eventMapper;
     private final EventRepository eventRepository;
-    private final SkillRepository skillRepository;
     private final List<EventFilter> eventFilters;
-    private final EventValidation eventValidation;
-    private final EventSaving eventSaving;
+    private final EventValidator eventValidator;
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private Event getEventOrThrow(long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("Event not found with id: " + eventId));
+    }
 
     public EventDto create(EventDto eventDto) {
-        eventValidation.validateEventDto(eventDto);
-        eventValidation.validateOwnerSkills(eventDto);
-        return eventSaving.saveEventInDB(eventDto);
+        eventValidator.validateEventDto(eventDto);
+        eventValidator.validateOwnerSkills(eventDto);
+        Event event = eventMapper.toEvent(eventDto);
+        event = eventRepository.save(event);
+        return eventMapper.toDto(event);
     }
 
     public EventDto getEvent(long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    LOGGER.warn("Event not found with id {}:", eventId);
-                    return new NoSuchElementException("Event not found with id: " + eventId);
-                });
-        return eventMapper.eventToDto(event);
+        Event event = getEventOrThrow(eventId);
+        return eventMapper.toDto(event);
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
+        if (filters == null) {
+            throw new DataValidationException("filters is null");
+        }
+
         Stream<Event> events = eventRepository.findAll().stream();
         return eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .flatMap(filter -> filter.apply(events, filters))
-                .map(eventMapper::eventToDto)
+                .map(eventMapper::toDto)
                 .toList();
+
+//        а такой метод не сработает?
+//        return eventRepository.findAll().stream()
+//                .map(eventMapper::eventToEventFilterDto)
+//                .filter(event -> event.equals(filter))
+//                .map(eventMapper::eventFilterDtoToEvent)
+//                .map(eventMapper::eventToDto)
+//                .toList();
     }
 
     public void deleteEvent(long eventId) {
-        if (!eventRepository.findById(eventId).isPresent()) {
-            LOGGER.warn("The deletion event was not found with id {}:", eventId);
-            throw new NoSuchElementException("Event not found with id: " + eventId);
-        }
-
+        getEventOrThrow(eventId);
         eventRepository.deleteById(eventId);
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        if (!eventRepository.findById(eventDto.getId()).isPresent()) {
-            LOGGER.warn("The update event was not found with id {}:", eventDto.getId());
-            throw new NoSuchElementException("Event not found with id: " + eventDto.getId());
+        Event eventFromDB = getEventOrThrow(eventDto.getId());
+        boolean equalityId = Objects.equals(eventFromDB.getOwner().getId(), eventDto.getOwnerId());
+
+        if (!equalityId) {
+            throw new DataValidationException("the user is not the creator of the event with id: " + eventDto.getId());
         }
 
-        eventValidation.validateEventDto(eventDto);
-        eventValidation.validateOwnerSkills(eventDto);
-        return eventSaving.saveEventInDB(eventDto);
+        eventValidator.validateEventDto(eventDto);
+        eventValidator.validateOwnerSkills(eventDto);
+        Event event = eventMapper.toEvent(eventDto);
+        event = eventRepository.save(event);
+        return eventMapper.toDto(event);
     }
 
     public List<EventDto> getOwnedEvents(long userId) {
-        if (eventRepository.findAllByUserId(userId).isEmpty()) {
-            LOGGER.warn("Список событий пуст у user id {}:", userId);
-            throw new NoSuchElementException("Список событий пуст у user id: " + userId);
-        }
+        List<Event> eventsOwned = eventRepository.findAllByUserId(userId);
 
-        return eventRepository.findAllByUserId(userId).stream()
-                .map(eventMapper::eventToDto)
+        return eventsOwned.stream()
+                .map(eventMapper::toDto)
                 .toList();
     }
 
     public List<EventDto> getParticipatedEvents(long userId) {
-        if (eventRepository.findParticipatedEventsByUserId(userId).isEmpty()) {
-            LOGGER.warn("Пользователь с id {}, не участвует ни в одном событии:", userId);
-            throw new NoSuchElementException("Пользователь не участвует ни в одном событии, user id: " + userId);
-        }
+        List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(userId);
 
-        return eventRepository.findParticipatedEventsByUserId(userId).stream()
-                .map(eventMapper::eventToDto)
+        return participatedEvents.stream()
+                .map(eventMapper::toDto)
                 .toList();
     }
 }

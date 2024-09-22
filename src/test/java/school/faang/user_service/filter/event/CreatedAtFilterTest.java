@@ -20,59 +20,59 @@ class CreatedAtFilterTest {
     @InjectMocks
     private CreatedAtFilter createdAtFilter;
 
-    private final LocalDateTime createdAt = LocalDateTime.now();
+    private final LocalDateTime createdAt = LocalDateTime.of(2022, 9, 1, 12, 2);
 
     private EventFilterDto eventFilterDto;
 
     @Nested
     class PositiveTests {
 
-            @Test
-            @DisplayName("Если у EventFilterDto поле createdAt не null тогда возвращаем true")
-            void whenFieldNotNullThenReturnTrue() {
+        @Test
+        @DisplayName("Если у EventFilterDto поле createdAt не null тогда возвращаем true")
+        void whenFieldNotNullThenReturnTrue() {
 
-                eventFilterDto = EventFilterDto.builder()
-                        .createdAt(createdAt)
-                        .build();
+            eventFilterDto = EventFilterDto.builder()
+                    .createdAt(createdAt.toLocalDate())
+                    .build();
 
-                assertTrue(createdAtFilter.isApplicable(eventFilterDto));
-            }
+            assertTrue(createdAtFilter.isApplicable(eventFilterDto));
+        }
 
-            @Test
-            @DisplayName("Если у EventFilterDto заполнено поле createdAt, тогда возвращаем отфильтрованный список")
-            void whenFieldFilledThenReturnFilteredList() {
-                Stream<Event> eventStream = Stream.of(
-                        Event.builder()
-                                .createdAt(createdAt)
-                                .build(),
-                        Event.builder()
-                                .createdAt(LocalDateTime.of(2024, 10, 1, 12, 2))
-                                .build());
+        @Test
+        @DisplayName("Если у EventFilterDto заполнено поле createdAt, тогда возвращаем отфильтрованный список")
+        void whenFieldFilledThenReturnFilteredList() {
+            Stream<Event> eventStream = Stream.of(
+                    Event.builder()
+                            .createdAt(createdAt)
+                            .build(),
+                    Event.builder()
+                            .createdAt(LocalDateTime.of(2024, 10, 1, 12, 2))
+                            .build());
 
-                eventFilterDto = EventFilterDto.builder()
-                        .createdAt(createdAt)
-                        .build();
+            eventFilterDto = EventFilterDto.builder()
+                    .createdAt(createdAt.toLocalDate())
+                    .build();
 
-                Stream<Event> resultEventStream = Stream.of(
-                        Event.builder()
-                                .createdAt(createdAt)
-                                .build());
-                assertEquals(resultEventStream.toList(), createdAtFilter.apply(eventStream, eventFilterDto).toList());
-            }
+            Stream<Event> resultEventStream = Stream.of(
+                    Event.builder()
+                            .createdAt(createdAt)
+                            .build());
+            assertEquals(resultEventStream.toList(), createdAtFilter.apply(eventStream, eventFilterDto).toList());
+        }
     }
 
     @Nested
     class NegativeTests {
 
-            @Test
-            @DisplayName("Если у EventFilterDto поле createdAt null тогда возвращаем false")
-            void whenFieldNullThenReturnFalse() {
+        @Test
+        @DisplayName("Если у EventFilterDto поле createdAt null тогда возвращаем false")
+        void whenFieldNullThenReturnFalse() {
 
-                eventFilterDto = EventFilterDto.builder()
-                        .createdAt(null)
-                        .build();
+            eventFilterDto = EventFilterDto.builder()
+                    .createdAt(null)
+                    .build();
 
-                assertFalse(createdAtFilter.isApplicable(eventFilterDto));
-            }
+            assertFalse(createdAtFilter.isApplicable(eventFilterDto));
+        }
     }
 }

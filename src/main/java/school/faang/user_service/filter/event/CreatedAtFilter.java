@@ -16,7 +16,7 @@ class CreatedAtFilter implements EventFilter {
 
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
-        return events.filter(event -> event.getCreatedAt().equals(filters.getCreatedAt()));
+        return events.filter(event -> event.getCreatedAt().toLocalDate().equals(filters.getCreatedAt()));
     }
 
 }

@@ -32,7 +32,7 @@ class StartDateFilterTest {
         void whenFieldNotNullThenReturnTrue() {
 
             eventFilterDto = eventFilterDto.builder()
-                    .startDate(startDate)
+                    .startDate(startDate.toLocalDate())
                     .build();
 
             assertTrue(startDateFilter.isApplicable(eventFilterDto));
@@ -50,7 +50,7 @@ class StartDateFilterTest {
                             .build());
 
             eventFilterDto = EventFilterDto.builder()
-                    .startDate(startDate)
+                    .startDate(startDate.toLocalDate())
                     .build();
 
             Stream<Event> resultEventStream = Stream.of(

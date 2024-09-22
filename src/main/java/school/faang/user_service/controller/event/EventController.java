@@ -15,29 +15,42 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping("/create")
+    //??? добавил базовый URL-шаблон для всех обработчиков запросов @RequestMapping("/v1/events"), чтоб сократить код,
+    //но теперь это не сосем сематически правильно, например мы создаем событие (одно, т.е event) по "/v1/events",
+    //нужно это исправить и явно везде прописать? или я сейчас сделал правильно?
+
+    @PostMapping
     public EventDto create(@RequestBody EventDto event) {
         return eventService.create(event);
     }
 
-    @GetMapping("/events")
-    public EventDto getEvent(@RequestParam("eventId") long eventId) {
+    @GetMapping("/{eventId}")
+    public EventDto getEvent(@PathVariable long eventId) {
         return eventService.getEvent(eventId);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+    @GetMapping
+    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
-    public void deleteEvent(long eventId) {
+    @DeleteMapping("/{eventId}")
+    public void deleteEvent(@PathVariable long eventId) {
         eventService.deleteEvent(eventId);
     }
 
-    public List<EventDto> getOwnedEvents(long userId) {
+    @PutMapping
+    public EventDto updateEvent(@RequestBody EventDto event) {
+        return eventService.updateEvent(event);
+    }
+
+    @GetMapping("/owned/{userId}")
+    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    public List<EventDto> getParticipatedEvents(long userId) {
+    @GetMapping("/participated/{userId}")
+    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
         return eventService.getParticipatedEvents(userId);
     }
 }

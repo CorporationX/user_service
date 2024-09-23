@@ -60,7 +60,12 @@ public class MentorshipServiceTest {
             @DisplayName("Должен вернуть список менти для ментора")
             void shouldReturnListOfMenteesForMentor() {
                 when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(mentor));
-                when(userMapper.toDto(mentee)).thenReturn(new UserDto(2L, "Mentee Name", "mentee@example.com"));
+                when(userMapper.toDto(mentee)).thenReturn(
+                        UserDto.builder()
+                                .id(2L)
+                                .username("Mentee Name")
+                                .email("mentee@example.com")
+                                .build());
 
                 List<UserDto> mentees = mentorshipService.getMentees(1L);
 
@@ -102,7 +107,12 @@ public class MentorshipServiceTest {
             void shouldDeleteMenteeForMentor() {
                 when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(mentor));
                 when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(mentee));
-                when(userMapper.toDto(mentee)).thenReturn(new UserDto(2L, "Mentee Name", "mentee@example.com"));
+                when(userMapper.toDto(mentee)).thenReturn(
+                        UserDto.builder()
+                                .id(2L)
+                                .username("Mentee Name")
+                                .email("mentee@example.com")
+                                .build());
 
                 assertTrue(mentor.getMentees().contains(mentee));
 
@@ -145,7 +155,12 @@ public class MentorshipServiceTest {
             void shouldReturnListOfMentorsForMentee() {
                 when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(mentee));
                 mentee.setMentors(new ArrayList<>(List.of(mentor)));
-                when(userMapper.toDto(mentor)).thenReturn(new UserDto(1L, "Mentor Name", "mentor@example.com"));
+                when(userMapper.toDto(mentor)).thenReturn(
+                        UserDto.builder()
+                                .id(1L)
+                                .username("Mentee Name")
+                                .email("mentee@example.com")
+                                .build());
 
                 List<UserDto> mentors = mentorshipService.getMentors(2L);
 
@@ -187,7 +202,12 @@ public class MentorshipServiceTest {
             void shouldDeleteMentorForMentee() {
                 when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(mentee));
                 when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(mentor));
-                when(userMapper.toDto(mentor)).thenReturn(new UserDto(1L, "Mentor Name", "mentor@example.com"));
+                when(userMapper.toDto(mentor)).thenReturn(
+                        UserDto.builder()
+                                .id(1L)
+                                .username("Mentee Name")
+                                .email("mentee@example.com")
+                                .build());
 
                 assertTrue(mentee.getMentors().contains(mentor));
 

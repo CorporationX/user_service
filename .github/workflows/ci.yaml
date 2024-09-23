@@ -3,7 +3,7 @@ name: Check unit tests
 on:
   pull_request:
     branches:
-      - feature-pipeline-BJS2-27218
+      - werewolf-master-stream6
 
 jobs:
   job_unit_tests:

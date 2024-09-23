@@ -69,7 +69,7 @@ class GoalInvitationControllerTest {
         Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
         goalInvitationController.createInvitation(goalInvitationDto);
 
-        assertEquals(1, violations.size());
+        assertEquals(2, violations.size());
         assertEquals("не должно равняться null", violations.iterator().next().getMessage());
     }
 

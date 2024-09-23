@@ -17,17 +17,6 @@ jobs:
           java-version: '17'
           distribution: 'oracle'
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
-
       - name: Install required locales
         run: |
           sudo apt-get update
@@ -41,6 +30,17 @@ jobs:
           sudo update-locale LANG=ru_RU.UTF-8
           export LANG=ru_RU.UTF-8
           locale
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
 
       - name: Run Tests
         run: ./gradlew test --no-daemon

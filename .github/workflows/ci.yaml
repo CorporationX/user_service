@@ -43,7 +43,10 @@ jobs:
 
       - name: Run Tests
         if: always()
-        run: ./gradlew test --no-daemon --info
+        run: |
+          sudo update-locale LANG=ru_RU.UTF-8
+          export LANG=ru_RU.UTF-8
+          ./gradlew test --no-daemon --info
 
       - name: Save logs
         if: failure() || success()

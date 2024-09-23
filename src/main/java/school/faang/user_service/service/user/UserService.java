@@ -87,6 +87,7 @@ public class UserService {
             eventRepository.save(event);
             eventRepository.delete(event);
         });
+
     }
     private void validateUsernameAndEmail(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {

@@ -17,6 +17,7 @@ import java.util.List;
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
     private final UserDeactivationService userDeactivationService;
 
@@ -36,12 +37,11 @@ public class UserController {
         userDeactivationService.deactivateAccount(userId);
     }
 
-    @PostMapping("/registration")
+    @PutMapping("/registration")
     public UserDto createUserAccount(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         log.info("Registration user {} started", userRegistrationDto);
         UserDto userDto = userService.registerUser(userRegistrationDto);
         log.info("Registration user {} completed", userDto);
         return userDto;
     }
-
 }

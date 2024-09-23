@@ -48,3 +48,11 @@ services:
     secretKey: password
     bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
     defaultProfilePicture: defaultAvatar.png
+
+external:
+  apis:
+    urls:
+      remoteAvatars: https://api.dicebear.com/9.x
+      externalUrl: https://external.api #example how to add external url
+    paths:
+      getRemoteAvatars: adventurer-neutral/png

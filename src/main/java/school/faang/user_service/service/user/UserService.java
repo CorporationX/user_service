@@ -5,8 +5,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.httpResponse.HttpResponseData;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
@@ -94,11 +94,10 @@ public class UserService {
         String pictureKey;
 
         try {
-            HttpResponseData pictureHttpContent = remoteImageService.getUserProfileImageFromRemoteService();
+            ResponseEntity<byte[]> pictureContent = remoteImageService.getUserProfileImageFromRemoteService();
 
             String s3Folder = user.getUsername() + user.getId() + "profilePic";
-            pictureKey = s3Service.uploadHttpData(pictureHttpContent, s3Folder);
-
+            pictureKey = s3Service.uploadHttpData(pictureContent, s3Folder);
         } catch (IOException e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);

@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.httpResponse.HttpResponseData;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -33,11 +33,11 @@ public class S3Service {
     @Value("${services.s3.defaultProfilePicture}")
     private String defaultPictureName;
 
-    public String uploadHttpData(HttpResponseData data, String folder) throws RuntimeException {
+    public String uploadHttpData(ResponseEntity<byte[]> data, String folder) throws RuntimeException {
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(Long.parseLong(data.getHeaders().get("Content-Length").get(0)));
-            objectMetadata.setContentType(data.getHeaders().get("Content-Type").get(0));
+            objectMetadata.setContentLength(data.getHeaders().getContentLength());
+            objectMetadata.setContentType(data.getHeaders().getContentType().toString());
 
             String key = String.format("%s%d%s", folder, System.currentTimeMillis(), getFileName(data.getHeaders()));
 
@@ -45,10 +45,10 @@ public class S3Service {
                 createBucket(bucketDefaultAvatarsName);
             }
 
-            log.info("Trying to save httpResponseData in s3 {}", bucketDefaultAvatarsName);
+            log.info("Trying to save data in s3 {}", bucketDefaultAvatarsName);
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(
-                    bucketDefaultAvatarsName, key, new ByteArrayInputStream(data.getContent()), objectMetadata);
+                    bucketDefaultAvatarsName, key, new ByteArrayInputStream(data.getBody()), objectMetadata);
             s3Client.putObject(putObjectRequest);
 
             return key;
@@ -100,6 +100,4 @@ public class S3Service {
             log.error("Error while creating new bucket");
         }
     }
-
-
 }

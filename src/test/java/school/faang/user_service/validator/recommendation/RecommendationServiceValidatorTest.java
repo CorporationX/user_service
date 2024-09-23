@@ -89,4 +89,37 @@ public class RecommendationServiceValidatorTest {
 
         assertDoesNotThrow(() -> validator.validateSkillOffers(recommendationDto));
     }
+
+    @Test
+    void testGiveRecommendationThrowsExceptionWithNullContent() {
+        assertThrows(DataValidationException.class,
+                () -> validator.validateRecommendation(RecommendationDto.builder().id(1L).build()));
+    }
+
+    @Test
+    void testGiveRecommendationThrowsExceptionWithEmptyContent() {
+        assertThrows(DataValidationException.class,
+                () -> validator.validateRecommendation(RecommendationDto.builder()
+                        .id(id)
+                        .content("")
+                        .build()));
+    }
+
+    @Test
+    void testGiveRecommendationThrowsExceptionWithNullAuthor() {
+        assertThrows(DataValidationException.class,
+                () -> validator.validateRecommendation(RecommendationDto.builder()
+                        .id(id)
+                        .content("asd")
+                        .build()));
+    }
+
+    @Test
+    void testGiveRecommendationThrowsExceptionWithNullReceiver() {
+        assertThrows(DataValidationException.class,
+                () -> validator.validateRecommendation(RecommendationDto.builder()
+                        .id(id)
+                        .content("asd")
+                        .authorId(4L).build()));
+    }
 }

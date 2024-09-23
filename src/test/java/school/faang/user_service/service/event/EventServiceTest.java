@@ -4,12 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -30,8 +28,12 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -153,7 +155,7 @@ public class EventServiceTest {
         when(eventFilter.isApplicable(filterDto)).thenReturn(true);
         when(eventFilter.apply(any(Stream.class), any(EventFilterDto.class))).thenReturn(events.stream());
 
-        eventService = new EventService(eventRepository, eventMapper, eventValidator, List.of(eventFilter), userRepository);
+        eventService = new EventService(eventRepository, eventMapper, eventValidator, List.of(eventFilter));
 
         // Act
         List<EventDto> result = eventService.getEventsByFilter(filterDto);

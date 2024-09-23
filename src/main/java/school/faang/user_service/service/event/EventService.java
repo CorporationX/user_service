@@ -10,7 +10,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
@@ -25,7 +24,6 @@ public class EventService {
     private final EventMapper eventMapper;
     private final EventValidator eventValidator;
     private final List<EventFilter> eventFilters;
-    private final UserRepository userRepository;
 
     @Transactional
     public EventDto create(EventDto event) {

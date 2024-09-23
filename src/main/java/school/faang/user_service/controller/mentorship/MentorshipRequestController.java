@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.MentorshipRequestDto;
@@ -23,7 +24,7 @@ public class MentorshipRequestController {
     private final RejectionMapper rejectionMapper;
 
     @PostMapping
-    public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    public void requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
@@ -38,7 +39,7 @@ public class MentorshipRequestController {
     }
 
     @PutMapping("/{id}")
-    public void rejectRequest(@PathVariable long id, RejectionDto rejectionDto) {
+    public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejectionDto) {
         mentorshipRequestService.rejectRequest(id, rejectionMapper.toEntity(rejectionDto));
     }
 }

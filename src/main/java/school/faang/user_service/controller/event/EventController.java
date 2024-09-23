@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventDto create(@Validated EventDto event) {
+    public EventDto create(@Validated @RequestBody EventDto event) {
         eventValidator.validateEvent(event);
         return eventService.create(event);
     }
@@ -49,7 +50,7 @@ public class EventController {
     }
 
     @PutMapping
-    public EventDto updateEvent(@Validated EventDto event) {
+    public EventDto updateEvent(@Validated @RequestBody EventDto event) {
         eventValidator.validateEvent(event);
         return eventService.updateEvent(event);
     }

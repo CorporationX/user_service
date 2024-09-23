@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserFilter;
-import school.faang.user_service.util.user.UserTestUtil;
+import school.faang.user_service.util.users.UserTestUtil;
 
 import java.util.List;
 

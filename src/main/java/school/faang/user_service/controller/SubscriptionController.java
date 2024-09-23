@@ -43,7 +43,7 @@ public class SubscriptionController {
     @PostMapping("/{followeeId}/followers")
     public List<UserDto> getFollowers(@PathVariable long followeeId, @RequestBody UserExtendedFilterDto filter) {
         List<User> followers = subscriptionService.getFollowers(followeeId, filter);
-        return userMapper.toDtos(followers);
+        return userMapper.toListUserDtos(followers);
     }
 
     @GetMapping("/{followeeId}/followers/count")
@@ -56,7 +56,7 @@ public class SubscriptionController {
     @PostMapping("/{followerId}/following")
     public List<UserDto> getFollowing(@PathVariable long followerId, @RequestBody UserExtendedFilterDto filter) {
         List<User> following = subscriptionService.getFollowing(followerId, filter);
-        return userMapper.toDtos(following);
+        return userMapper.toListUserDtos(following);
     }
 
     @GetMapping("/{followerId}/following/count")

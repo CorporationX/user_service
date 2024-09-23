@@ -1,6 +1,5 @@
-package school.faang.user_service.util.user;
+package school.faang.user_service.util.users;
 
-import school.faang.user_service.builder.user.UserBuilder;
 import school.faang.user_service.constant.TestConst;
 import school.faang.user_service.entity.User;
 
@@ -9,7 +8,7 @@ import java.util.stream.LongStream;
 
 public class UserTestUtil {
     public static User getUser(long id, String username, String email) {
-        return new UserBuilder()
+        return User.builder()
                 .id(id)
                 .username(username)
                 .email(email)

@@ -30,8 +30,8 @@ public class UserMapperTest {
     }
 
     @Test
-    void testToDto() {
-        UserDto userDto = userMapper.toDto(user1);
+    void testToUserDto() {
+        UserDto userDto = userMapper.toUserDto(user1);
 
         assertEquals(user1.getId(), userDto.getId());
         assertEquals(user1.getUsername(), userDto.getUsername());
@@ -39,10 +39,10 @@ public class UserMapperTest {
     }
 
     @Test
-    void testToDtos() {
+    void testToListUserDtos() {
         List<User> users = List.of(user1, user2);
 
-        List<UserDto> userDtos = userMapper.toDtos(users);
+        List<UserDto> userDtos = userMapper.toListUserDtos(users);
 
         assertEquals(users.size(), userDtos.size());
         assertEquals(user1.getUsername(), userDtos.get(0).getUsername());

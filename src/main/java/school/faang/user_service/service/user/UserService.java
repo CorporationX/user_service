@@ -1,9 +1,11 @@
 package school.faang.user_service.service.user;
 
-import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.User;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public interface UserService {
@@ -13,4 +15,6 @@ public interface UserService {
     User findUserById(long userId);
 
     void deactivateUserProfile(long id);
+
+    void addUsersFromFile(InputStream fileStream) throws IOException;
 }

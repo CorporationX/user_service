@@ -1,0 +1,19 @@
+package school.faang.user_service.entity.student;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.json.student.Address;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ContactInfo {
+    private String email;
+    private String phone;
+    @JsonUnwrapped
+    private Address address;
+}

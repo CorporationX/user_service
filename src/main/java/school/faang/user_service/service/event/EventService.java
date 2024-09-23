@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class EventService {
 
     private Event getEventOrThrow(long eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataValidationException("Event not found with id: " + eventId));
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
     }
 
     public EventDto create(EventDto eventDto) {
@@ -49,32 +50,21 @@ public class EventService {
             throw new DataValidationException("filters is null");
         }
 
-        Stream<Event> events = eventRepository.findAll().stream();
         return eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .flatMap(filter -> filter.apply(events, filters))
+                .flatMap(filter -> filter.apply(eventRepository.findAll().stream(), filters))
                 .map(eventMapper::toDto)
                 .toList();
-
-//        а такой метод не сработает?
-//        return eventRepository.findAll().stream()
-//                .map(eventMapper::eventToEventFilterDto)
-//                .filter(event -> event.equals(filter))
-//                .map(eventMapper::eventFilterDtoToEvent)
-//                .map(eventMapper::eventToDto)
-//                .toList();
     }
 
     public void deleteEvent(long eventId) {
-        getEventOrThrow(eventId);
         eventRepository.deleteById(eventId);
     }
 
     public EventDto updateEvent(EventDto eventDto) {
         Event eventFromDB = getEventOrThrow(eventDto.getId());
-        boolean equalityId = Objects.equals(eventFromDB.getOwner().getId(), eventDto.getOwnerId());
 
-        if (!equalityId) {
+        if (!Objects.equals(eventFromDB.getOwner().getId(), eventDto.getOwnerId())) {
             throw new DataValidationException("the user is not the creator of the event with id: " + eventDto.getId());
         }
 
@@ -88,15 +78,17 @@ public class EventService {
     public List<EventDto> getOwnedEvents(long userId) {
         List<Event> eventsOwned = eventRepository.findAllByUserId(userId);
 
-        return eventsOwned.stream()
-                .map(eventMapper::toDto)
-                .toList();
+        return mapping(eventsOwned);
     }
 
     public List<EventDto> getParticipatedEvents(long userId) {
         List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(userId);
 
-        return participatedEvents.stream()
+        return mapping(participatedEvents);
+    }
+
+    private List<EventDto> mapping(List<Event> events) {
+        return events.stream()
                 .map(eventMapper::toDto)
                 .toList();
     }

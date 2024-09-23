@@ -13,6 +13,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ class EventMapperTest {
     void testToEvent() {
 
         SkillRepository skillRepository = mock(SkillRepository.class);
+        UserRepository userRepository = mock(UserRepository.class);
 
         EventDto eventDto = EventDto.builder()
                 .id(1L)
@@ -56,15 +58,23 @@ class EventMapperTest {
                 .id(2L)
                 .build();
 
+        User user = User.builder()
+                .id(1L)
+                .username("Oleg")
+                .build();
+
         List<Skill> mockSkills = List.of(skill1, skill2);
 
         when(skillRepository.findAllByUserId(1L)).thenReturn(mockSkills);
+        when(userRepository.getById(eventDto.getOwnerId())).thenReturn(user);
 
         Event event = eventMapper.toEvent(eventDto);
 
         eventMapper.mapRelatedSkillsTargetEvent(eventDto, event, skillRepository);
+        eventMapper.mapOwnerIdInOwner(eventDto, event, userRepository);
 
         assertNotNull(event.getRelatedSkills());
+        assertNotNull(event.getOwner());
 
         List<Long> eventIds = event.getRelatedSkills().stream()
                 .map(Skill::getId)
@@ -132,35 +142,6 @@ class EventMapperTest {
         assertEquals(eventIds, eventDto.getRelatedSkills());
         assertEquals(event.getLocation(), eventDto.getLocation());
         assertEquals(event.getMaxAttendees(), eventDto.getMaxAttendees());
-    }
-
-    @Test
-    @DisplayName("success mapping Event to EventFilterDto")
-    void testToEventFilterDto() {
-
-        Event event = Event.builder()
-                .id(1L)
-                .title("Новое событие")
-                .description("какое-то описание")
-                .startDate(LocalDateTime.of(2023, 10, 1, 12, 0))
-                .endDate(LocalDateTime.of(2024, 10, 1, 12, 0))
-                .location("location")
-                .maxAttendees(5)
-                .type(EventType.GIVEAWAY)
-                .status(EventStatus.IN_PROGRESS)
-                .createdAt(LocalDateTime.of(2022, 10, 1, 12, 0))
-                .build();
-
-        EventFilterDto filterDto = eventMapper.toEventFilterDto(event);
-
-        assertEquals(event.getTitle(), filterDto.getTitle());
-        assertEquals(event.getStartDate().toLocalDate(), filterDto.getStartDate());
-        assertEquals(event.getEndDate().toLocalDate(), filterDto.getEndDate());
-        assertEquals(event.getLocation(), filterDto.getLocation());
-        assertEquals(event.getMaxAttendees(), filterDto.getMaxAttendees());
-        assertEquals(event.getCreatedAt().toLocalDate(), filterDto.getCreatedAt());
-        assertEquals(event.getType(), filterDto.getType());
-        assertEquals(event.getStatus(), filterDto.getStatus());
     }
 
     @Test

@@ -15,10 +15,6 @@ public class EventController {
 
     private final EventService eventService;
 
-    //??? добавил базовый URL-шаблон для всех обработчиков запросов @RequestMapping("/v1/events"), чтоб сократить код,
-    //но теперь это не сосем сематически правильно, например мы создаем событие (одно, т.е event) по "/v1/events",
-    //нужно это исправить и явно везде прописать? или я сейчас сделал правильно?
-
     @PostMapping
     public EventDto create(@RequestBody EventDto event) {
         return eventService.create(event);

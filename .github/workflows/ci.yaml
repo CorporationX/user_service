@@ -46,11 +46,11 @@ jobs:
           ./gradlew build --no-daemon
 
       - name: Run Tests
-        run: |
-          sudo update-locale LANG=ru_RU.UTF-8
-          export LANG=ru_RU.UTF-8
-          locale
-          ./gradlew test --no-daemon
+        run: ./gradlew test --no-daemon
+#          sudo update-locale LANG=ru_RU.UTF-8
+#          export LANG=ru_RU.UTF-8
+#          locale
+
 
       - name: Tests logs
         if: failure() || success()

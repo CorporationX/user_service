@@ -54,6 +54,7 @@ class GoalInvitationControllerTest {
     void testCreateInvitation_inviterIdIsNull() {
         goalInvitationDto.setInviterId(null);
 
+
         Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
         goalInvitationController.createInvitation(goalInvitationDto);
 

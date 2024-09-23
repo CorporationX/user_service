@@ -42,7 +42,7 @@ jobs:
           ./gradlew build --no-daemon
 
       - name: Run Tests
-        if: failure()
+        if: always()
         run: ./gradlew test --no-daemon --info
 
       - name: Save logs

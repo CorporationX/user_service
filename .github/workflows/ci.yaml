@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  job_unit_tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,12 +24,6 @@ jobs:
           sudo locale-gen ru_RU.UTF-8
           sudo locale-gen en_US.UTF-8
           sudo update-locale
-
-      #      - name: Set locale to Russian (ru_RU.UTF-8)
-      #        run: |
-      #          sudo update-locale LANG=ru_RU.UTF-8
-      #          export LANG=ru_RU.UTF-8
-      #          locale
 
       - name: Cache Gradle packages
         uses: actions/cache@v4

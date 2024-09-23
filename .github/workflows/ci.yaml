@@ -31,18 +31,21 @@ jobs:
           export LANG=ru_RU.UTF-8
           locale
 
-#      - name: Cache Gradle packages
-#        uses: actions/cache@v2
-#        with:
-#          path: ~/.gradle/caches
-#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#          restore-keys: |
-#            ${{ runner.os }}-gradle-
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-#      - name: Build with Gradle
-#        run: ./gradlew build --no-daemon
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
 
       - name: Run Tests
+          sudo update-locale LANG=ru_RU.UTF-8
+          export LANG=ru_RU.UTF-8
+          locale
         run: ./gradlew test --no-daemon
 
       - name: Tests logs

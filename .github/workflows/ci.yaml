@@ -1,4 +1,4 @@
-name: Unit tests
+name: Check unit tests
 
 on:
   pull_request:
@@ -25,11 +25,11 @@ jobs:
           sudo locale-gen en_US.UTF-8
           sudo update-locale
 
-      - name: Set locale to Russian (ru_RU.UTF-8)
-        run: |
-          sudo update-locale LANG=ru_RU.UTF-8
-          export LANG=ru_RU.UTF-8
-          locale
+      #      - name: Set locale to Russian (ru_RU.UTF-8)
+      #        run: |
+      #          sudo update-locale LANG=ru_RU.UTF-8
+      #          export LANG=ru_RU.UTF-8
+      #          locale
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -41,18 +41,14 @@ jobs:
 
       - name: Build with Gradle
         run: |
+          sudo update-locale LANG=ru_RU.UTF-8
           export LANG=ru_RU.UTF-8
-          locale
           ./gradlew build --no-daemon
 
       - name: Run Tests
         run: ./gradlew test --no-daemon
-#          sudo update-locale LANG=ru_RU.UTF-8
-#          export LANG=ru_RU.UTF-8
-#          locale
 
-
-      - name: Tests logs
+      - name: Save logs
         if: failure() || success()
         uses: actions/upload-artifact@v4
         with:

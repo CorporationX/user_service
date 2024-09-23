@@ -3,7 +3,7 @@ package school.faang.user_service.controller.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
@@ -15,14 +15,14 @@ public class EventParticipationController {
 
     private final EventParticipationService eventParticipationService;
 
-    @PostMapping("/register/{eventId}/{userId}")
+    @PostMapping("/{eventId}/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerParticipant(@PathVariable long eventId,
                                     @PathVariable long userId) {
          eventParticipationService.registerParticipant(eventId, userId);
     }
 
-    @DeleteMapping("/unregister/{eventId}/{userId}")
+    @DeleteMapping("/{eventId}/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void unregisterParticipant(@PathVariable long eventId,
                                       @PathVariable long userId) {

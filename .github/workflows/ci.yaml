@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check code
+      - name: Clone repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -42,7 +42,8 @@ jobs:
           ./gradlew build --no-daemon
 
       - name: Run Tests
-        run: ./gradlew test --no-daemon
+        if: always()
+        run: ./gradlew test --no-daemon --info
 
       - name: Save logs
         if: failure() || success()

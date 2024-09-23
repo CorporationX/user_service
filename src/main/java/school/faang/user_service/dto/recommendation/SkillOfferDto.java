@@ -1,5 +1,4 @@
-package school.faang.user_service.dto.user;
-
+package school.faang.user_service.dto.recommendation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class SkillOfferDto {
     private Long id;
-    private String username;
-    private String email;
+    private Long skillId;
+    private Long recommendationId;
 }

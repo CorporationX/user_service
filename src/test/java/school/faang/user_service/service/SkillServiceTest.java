@@ -12,6 +12,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.validation.SkillOfferValidator;
 import school.faang.user_service.validation.SkillValidator;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -32,8 +35,6 @@ class SkillServiceTest {
     private SkillService skillService;
     @Mock
     private SkillRepository skillRepository;
-    private static final long ANY_ID = 123L;
-    private final String SKILL_TITLE = "squating";
     @Mock
     private SkillOfferService skillOfferService;
     @Mock
@@ -48,6 +49,12 @@ class SkillServiceTest {
     private SkillValidator skillValidator;
     @Mock
     private SkillOfferValidator skillOfferValidator;
+
+    private static final long ANY_ID = 123L;
+    private static final String SKILL_TITLE = "squating";
+    private static final List<Long> IDS = List.of(1L);
+    private static final List<Skill> SKILLS = List.of(new Skill());
+
     private SkillDto skillDto;
     private List<SkillOffer> skillOfferList;
     private SkillOffer skillOffer;
@@ -69,6 +76,7 @@ class SkillServiceTest {
 
     @Nested
     class NegativeTests {
+
         @Test
         @DisplayName("Exception when skill with such id doesn't exist")
         void whenSkillNotExistThenThrowException() {
@@ -78,11 +86,22 @@ class SkillServiceTest {
                     () -> skillService.getSkill(ANY_ID), "Skill with id " + ANY_ID + " doesn't exist");
         }
 
+        @Test
+        @DisplayName("Ошибка если List равен null")
+        public void whenGetSkillByIdsWithNullThenException() {
+            assertThrows(DataValidationException.class, () -> skillService.getSkillByIds(null));
+        }
 
+        @Test
+        @DisplayName("Ошибка если Skill равен null")
+        public void whenSaveSkillWithNullThenException() {
+            assertThrows(DataValidationException.class, () -> skillService.saveSkill(null));
+        }
     }
 
     @Nested
     class PositiveTests {
+
         @Test
         @DisplayName("Verify saving skills")
         void whenCreatedThenSuccess() {
@@ -120,7 +139,26 @@ class SkillServiceTest {
             verify(skillCandidateMapper).toSkillCandidateDtoList(anyList());
         }
 
+        @Test
+        @DisplayName("Успех при получении List<Skill>")
+        public void whenGetSkillByIdsThenSuccess() {
+            when(skillRepository.findByIdIn(IDS)).thenReturn(SKILLS);
+
+            List<Skill> resultSkills = skillService.getSkillByIds(IDS);
+
+            assertNotNull(resultSkills);
+            assertEquals(SKILLS, resultSkills);
+            verify(skillRepository).findByIdIn(IDS);
+        }
+
+        @Test
+        @DisplayName("Успех при сохранении skill")
+        public void whenSaveSkillThenSuccess() {
+            Skill skill = new Skill();
+
+            skillService.saveSkill(skill);
+
+            verify(skillRepository).save(skill);
+        }
     }
-
-
 }

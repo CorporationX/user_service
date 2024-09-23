@@ -48,12 +48,12 @@ jobs:
           export LANG=ru_RU.UTF-8
           ./gradlew test --no-daemon
 
-      - name: Run failure tests with --stacktrace option
-        if: failure()
-        run: |
-          sudo update-locale LANG=ru_RU.UTF-8
-          export LANG=ru_RU.UTF-8
-          ./gradlew test --no-daemon --stacktrace
+#      - name: Run failure tests with --stacktrace option
+#        if: failure()
+#        run: |
+#          sudo update-locale LANG=ru_RU.UTF-8
+#          export LANG=ru_RU.UTF-8
+#          ./gradlew test --no-daemon --stacktrace
 
       - name: Save logs
         if: failure() || success()

@@ -40,7 +40,9 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: export LANG=ru_RU.UTF-8
+          locale
+          ./gradlew build --no-daemon
 
       - name: Run Tests
         run: sudo update-locale LANG=ru_RU.UTF-8

@@ -28,6 +28,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
+      - name: Set locale to Russian (ru_RU.UTF-8)
+        run: |
+            sudo update-locale LANG=ru_RU.UTF-8
+            export LANG=ru_RU.UTF-8
+            locale
+
       - name: Run Tests
         run: ./gradlew test --no-daemon
 

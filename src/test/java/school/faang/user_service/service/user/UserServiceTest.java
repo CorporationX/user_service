@@ -151,6 +151,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         verify(userRepository, times(1)).save(user);
         verify(avatarService, times(1)).generateAndSaveAvatar(AvatarStyle.BOTTTTS);
+    }
 
     @Test
     void testGetPremiumUsers() {

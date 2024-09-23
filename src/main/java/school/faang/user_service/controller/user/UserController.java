@@ -26,6 +26,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+
     private final UserMapper userMapper;
 
     @Operation(summary = "Register a new user", description = "Registers a new user and returns the created user data.")
@@ -33,7 +34,7 @@ public class UserController {
     public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         User registeredUser = userService.registerUser(user);
-        UserDto responseDto = userMapper.toDto(registeredUser);
+        UserDto responseDto = userMapper.toUserDto(registeredUser);
         return ResponseEntity.ok(responseDto);
     }
 

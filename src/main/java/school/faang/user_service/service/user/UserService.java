@@ -107,9 +107,10 @@ public class UserService {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExistsException("User with this username already exists");
         }
+    }
 
     @Transactional(readOnly = true)
-    public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
+    public List<User> getPremiumUsers (UserFilterDto userFilterDto) {
         log.info("Find premium users by filter: {}", userFilterDto.toString());
         List<Premium> premiums = premiumRepository.findAll();
         Stream<User> users = premiums.stream().map(Premium::getUser);

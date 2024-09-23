@@ -14,10 +14,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
+    private final GoalInvitationMapper goalInvitationMapper;
 
     public  GoalInvitationDto createInvitation(GoalInvitationDto invitationDTO) {
         createInvitationValidation(invitationDTO);
-        GoalInvitation invitation = GoalInvitationMapper.INSTANCE.toEntity(invitationDTO);
+        GoalInvitation invitation = goalInvitationMapper.toEntity(invitationDTO);
         goalInvitationRepository.save(invitation);
         return invitationDTO;
     }

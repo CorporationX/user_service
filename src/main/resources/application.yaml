@@ -52,3 +52,9 @@ springdoc:
 app:
   goal:
     max-active-per-user: 3
+
+minio:
+  endpoint: http://localhost:9000
+  accessKey: user
+  secretKey: password
+  bucketName: corpbucket

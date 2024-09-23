@@ -24,7 +24,7 @@ public class GoalInvitationControllerTest {
     }
 
     @Test
-    void testCreateInvitation() {
+    public void testCreateInvitation() {
         GoalInvitationDto invitation = new GoalInvitationDto(1L, 2L, 3L, 4L, ACCEPTED);
         ResponseEntity<GoalInvitationDto> response = controller.createInvitation(invitation);
         verify(service).createInvitation(invitation);

@@ -56,7 +56,7 @@ public class GoalInvitationService {
                 .collect(Collectors.toList());
     }
 
-    public void createInvitationValidation(GoalInvitationDto invitationDTO){
+    public void createInvitationValidation(GoalInvitationDto invitationDTO) {
         if (invitationDTO.getInviterId().equals(invitationDTO.getInvitedUserId())) {
             throw new IllegalArgumentException("Приглашающий и приглашенный - один и тот же человек");
         }

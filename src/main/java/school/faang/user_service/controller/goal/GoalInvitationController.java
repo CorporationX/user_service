@@ -33,6 +33,7 @@ public class GoalInvitationController {
         return ResponseEntity.ok("Приглашение отклонено.");
     }
 
+    @PostMapping("/getInvitations")
     public List<GoalInvitation> getInvitations(@RequestBody InvitationFilterDto filter){
        return goalInvitationService.getInvitations(filter);
     }

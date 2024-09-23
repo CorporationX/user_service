@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.goal;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,17 +28,16 @@ public class GoalController {
     private GoalService goalService;
 
     @PostMapping
-    public ResponseEntity<String> createGoal(@RequestParam Long userId, @RequestBody GoalDto goalDto) {
+    public ResponseEntity<String> createGoal(@RequestParam Long userId, @Valid @RequestBody GoalDto goalDto) {
         goalService.createGoal(userId, goalDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Цель успешно создана");
     }
 
     @PutMapping("/{goalId}")
-    public ResponseEntity<String> updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goalDto) {
+    public ResponseEntity<String> updateGoal(@PathVariable Long goalId, @Valid @RequestBody GoalDto goalDto) {
         goalService.updateGoal(goalId, goalDto);
         return ResponseEntity.ok("Цель успешно обновлена");
     }
-
     @DeleteMapping("/{goalId}")
     public ResponseEntity<String> deleteGoal(@PathVariable long goalId) {
         goalService.deleteGoal(goalId);
@@ -52,7 +52,7 @@ public class GoalController {
         return ResponseEntity.ok(subtasks);
     }
 
-    @GetMapping("/{userId}/goals")
+    @GetMapping("/{userId}")
     public ResponseEntity<List<GoalDto>> getGoalsByUser(
             @PathVariable Long userId,
             @ModelAttribute GoalFilterDto filter) {

@@ -19,7 +19,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     JOIN user_goal ug ON g.id = ug.goal_id
     WHERE ug.user_id = :userId
     """, nativeQuery = true)
-    List<Goal> findGoalsByUserId(@Param("userId") Long userId);
+    List<Goal> findGoalsByUserId(Long userId);
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
@@ -35,16 +35,15 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     int countActiveGoalsPerUser(long userId);
 
     @Query(nativeQuery = true, value = """
-            WITH RECURSIVE subtasks AS (
-            SELECT * FROM goal WHERE id = :goalId
-            UNION
-            SELECT g.* FROM goal g
-            JOIN subtasks st ON st.id = g.parent_goal_id
-            )
-            SELECT * FROM subtasks WHERE id != :goalId
-            """)
-    Stream<Goal> findByParent(long goalId);
-
+        WITH RECURSIVE subtasks AS (
+        SELECT * FROM goal WHERE id = :goalId
+        UNION
+        SELECT g.* FROM goal g
+        JOIN subtasks st ON st.id = g.parent_goal_id
+        )
+        SELECT * FROM subtasks WHERE id != :goalId AND title LIKE %:titleFilter%
+        """)
+    List<Goal> findByParent(@Param("goalId") long goalId, @Param("titleFilter") String titleFilter);
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM users u
             JOIN user_goal ug ON u.id = ug.user_id

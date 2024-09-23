@@ -60,28 +60,28 @@ class GoalInvitationControllerTest {
         assertEquals(1, violations.size());
         assertEquals("не должно равняться null", violations.iterator().next().getMessage());
     }
-//
-//    @Test
-//    void testCreateInvitation_invitedUserIdIsNull() {
-//        goalInvitationDto.setInvitedUserId(null);
-//
-//        Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
-//        goalInvitationController.createInvitation(goalInvitationDto);
-//
-//        assertEquals(1, violations.size());
-//        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
-//    }
-//
-//    @Test
-//    void testCreateInvitation_goalIdIsNull() {
-//        goalInvitationDto.setGoalId(null);
-//
-//        Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
-//        goalInvitationController.createInvitation(goalInvitationDto);
-//
-//        assertEquals(1, violations.size());
-//        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
-//    }
+
+    @Test
+    void testCreateInvitation_invitedUserIdIsNull() {
+        goalInvitationDto.setInvitedUserId(null);
+
+        Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
+        goalInvitationController.createInvitation(goalInvitationDto);
+
+        assertEquals(1, violations.size());
+        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    void testCreateInvitation_goalIdIsNull() {
+        goalInvitationDto.setGoalId(null);
+
+        Set<ConstraintViolation<GoalInvitationDto>> violations = validator.validate(goalInvitationDto, GoalInvitationDto.BeforeCreate.class);
+        goalInvitationController.createInvitation(goalInvitationDto);
+
+        assertEquals(1, violations.size());
+        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
+    }
 
     @Test
     void testGetInvitations_positive() {

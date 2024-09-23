@@ -9,6 +9,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -18,9 +19,10 @@ import school.faang.user_service.validation.SkillValidator;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SkillService {
+
     private final SkillRepository skillRepository;
     private final SkillOfferService skillOfferService;
     private final UserSkillGuaranteeService userSkillGuaranteeService;
@@ -29,7 +31,6 @@ public class SkillService {
     private final SkillCandidateMapper skillCandidateMapper;
     private final SkillValidator skillValidator;
     private final SkillOfferValidator skillOfferValidator;
-
 
     public SkillDto create(SkillDto skill) {
         skillValidator.validateSkill(skill);
@@ -72,5 +73,21 @@ public class SkillService {
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
         List<SkillDto> skillsDto = skillMapper.toSkillDtoList(skills);
         return skillCandidateMapper.toSkillCandidateDtoList(skillsDto);
+    }
+
+    public List<Skill> getSkillByIds(List<Long> ids) {
+        if (ids == null) {
+            throw new DataValidationException("List ids cannot be null");
+        }
+
+        return skillRepository.findByIdIn(ids);
+    }
+
+    public void saveSkill(Skill skill) {
+        if (skill == null) {
+            throw new DataValidationException("Skill cannot be null");
+        }
+
+        skillRepository.save(skill);
     }
 }

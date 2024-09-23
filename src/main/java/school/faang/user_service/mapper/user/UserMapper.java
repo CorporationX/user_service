@@ -18,6 +18,6 @@ public interface UserMapper {
     @Mapping(source = "country.id", target = "countryId")
     @Mapping(source = "userProfilePic.fileId", target = "userProfilePicId")
     UserDto toDto(User user);
-
+  
     List<UserDto> toDtos(List<User> users);
 }

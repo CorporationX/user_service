@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        List<User> list = userRepository.findAllById(ids);
-        return userMapper.toDto(list);
+        List<User> users = userRepository.findAllById(ids);
+        return userMapper.toDto(users);
     }
 }

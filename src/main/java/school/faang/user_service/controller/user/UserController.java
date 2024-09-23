@@ -29,12 +29,12 @@ public class UserController {
         return mapper.toDto(premiumUsers);
     }
 
-    @GetMapping("/{userId}/get-user")
-    public UserDto getUser(@PathVariable long userId) {
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable @Valid long userId) {
         return userService.getUser(userId);
     }
 
-    @PostMapping("/users-by-ids")
+    @PostMapping()
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
         return userService.getUsersByIds(ids);
     }

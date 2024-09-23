@@ -10,7 +10,8 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestController("/api/v1/users")
+@RestController
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -20,12 +21,12 @@ public class UserController {
         userService.deactivateUser(id);
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }

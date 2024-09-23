@@ -11,7 +11,6 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.mapper.GoalMapper;
 
 import java.util.List;
 

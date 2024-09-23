@@ -17,11 +17,11 @@ public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createInvitation (@RequestBody GoalInvitationDto invitation){
-        goalInvitationService.createInvitation(invitation);
-        return ResponseEntity.ok("Приглашение создано.");
+    public ResponseEntity<GoalInvitationDto> createInvitation (@RequestBody GoalInvitationDto invitation){
+        GoalInvitationDto invitationDto = goalInvitationService.createInvitation(invitation);
+        return ResponseEntity.ok(invitationDto);
     }
-    @PostMapping("/accept/id")
+    @PutMapping("/accept/id")
     public ResponseEntity<String> acceptGoalInvitation(@PathVariable long id){
         goalInvitationService.acceptGoalInvitation(id);
         return ResponseEntity.ok("Приглашение принято.");

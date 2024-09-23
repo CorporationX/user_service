@@ -15,15 +15,11 @@ import java.util.stream.Collectors;
 public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
 
-    public void createInvitation(GoalInvitationDto invitationDTO) {
-        if (invitationDTO.getInviterId().equals(invitationDTO.getInvitedUserId())) {
-            throw new IllegalArgumentException("Приглашающий и приглашенный - один и тот же человек");
-        }
-        if (invitationDTO.getInviterId() == null || invitationDTO.getInvitedUserId() == null) {
-            throw new IllegalArgumentException("Пользователь не существует");
-        }
+    public  GoalInvitationDto createInvitation(GoalInvitationDto invitationDTO) {
+        createInvitationValidation(invitationDTO);
         GoalInvitation invitation = GoalInvitationMapper.INSTANCE.toEntity(invitationDTO);
         goalInvitationRepository.save(invitation);
+        return invitationDTO;
     }
 
     public void acceptGoalInvitation(long id){
@@ -58,6 +54,15 @@ public class GoalInvitationService {
                 .filter(invitation -> filter.getStatus() == null ||
                         invitation.getStatus().equals(filter.getStatus()))
                 .collect(Collectors.toList());
+    }
+
+    public void createInvitationValidation(GoalInvitationDto invitationDTO){
+        if (invitationDTO.getInviterId().equals(invitationDTO.getInvitedUserId())) {
+            throw new IllegalArgumentException("Приглашающий и приглашенный - один и тот же человек");
+        }
+        if (invitationDTO.getInviterId() == null || invitationDTO.getInvitedUserId() == null) {
+            throw new IllegalArgumentException("Пользователь не существует");
+        }
     }
 }
 

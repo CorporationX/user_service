@@ -12,6 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.student.Address;
 import school.faang.user_service.entity.student.ContactInfo;
@@ -125,6 +126,25 @@ class UserServiceTest {
         assertThat(capturedUsers.get(1).getUsername()).startsWith(persons.get(1).getFirstName());
     }
 
+
+    @Test
+    @DisplayName("test that when country is not in database it is created and saved")
+    void testThatCountryIsSaved() throws IOException {
+        ByteArrayInputStream inputStream = getTestStream();
+        List<Person> persons = getTestPersonList();
+        when(countryRepository.findByTitle(any())).thenReturn(Optional.empty());
+
+        ArgumentCaptor<Country> counryCaptor = ArgumentCaptor.forClass(Country.class);
+
+        userService.addUsersFromFile(inputStream);
+
+
+        verify(countryRepository,times(2)).save(counryCaptor.capture());
+        List<Country> capturedCountries = counryCaptor.getAllValues();
+
+        assertThat(capturedCountries.get(0).getTitle()).isEqualTo(persons.get(0).getContactInfo().getAddress().getCountry());
+        assertThat(capturedCountries.get(1).getTitle()).isEqualTo(persons.get(1).getContactInfo().getAddress().getCountry());
+    }
 
     @Test
     void shouldReturnPremiumUsersByFilters() {

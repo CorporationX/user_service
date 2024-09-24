@@ -1,7 +1,6 @@
 package school.faang.user_service.entity.student;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.json.student.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

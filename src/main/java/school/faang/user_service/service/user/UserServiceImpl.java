@@ -3,6 +3,7 @@ package school.faang.user_service.service.user;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
@@ -26,12 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -67,17 +67,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void addUsersFromFile(InputStream fileStream) throws IOException {
-        var students = getPersonsFromFile(fileStream);
-        students.stream().map(student -> {
+        List<Person> persons = getPersonsFromFile(fileStream);
+        persons.stream().map(student -> {
             var user = userMapper.personToUser(student);
             user.setPassword(generatePassword());
-            ifUserCountryExistsInDB(user, user::setCountry, () -> {
-                countryRepository.save(Country.builder().title(user.getCountry().getTitle()).build());
-            });
+            countryRepository.findByTitle(student.getContactInfo().getAddress().getCountry())
+                    .ifPresentOrElse(user::setCountry,
+                            () -> {
+                               var country = countryRepository.save(
+                                        Country.builder()
+                                                .title(student.getContactInfo().getAddress().getCountry())
+                                                .build()
+                                );
+                               user.setCountry(country);
+                            }
+                    );
             userRepository.save(user);
             return user;
-        });
+        }).toList();
     }
 
     @Override
@@ -108,13 +117,6 @@ public class UserServiceImpl implements UserService {
                 .toList();
 
         goalService.removeGoals(goalsToRemove);
-    }
-
-    private void ifUserCountryExistsInDB(User user, Consumer<Country> action, Runnable orElse) {
-        StreamSupport.stream(countryRepository.findAll().spliterator(), false)
-                .filter(country -> country.getTitle().equals(user.getCountry().getTitle()))
-                .findFirst()
-                .ifPresentOrElse(action, orElse);
     }
 
     private String generatePassword() {

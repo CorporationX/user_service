@@ -7,9 +7,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.AvatarStyle;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
@@ -17,6 +19,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
@@ -30,7 +33,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +52,8 @@ class UserServiceTest extends AbstractUserServiceTest {
     @Mock
     private MentorshipService mentorshipService;
     @Mock
+    private AvatarService avatarService;
+    @Mock  
     private PremiumRepository premiumRepository;
     @InjectMocks
     private UserService userService;
@@ -119,6 +128,29 @@ class UserServiceTest extends AbstractUserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         assertThrows(UserDeactivatedException.class, () -> userService.deactivateUser(userId));
+    }
+  
+    @Test
+    public void testRegisterUser() {
+        User user = new User();
+        user.setUsername("testuser");
+
+        UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId("avatar.png");
+        userProfilePic.setSmallFileId("avatar_small.png");
+
+        when(avatarService.generateAndSaveAvatar(AvatarStyle.BOTTTTS)).thenReturn(userProfilePic);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        User result = userService.registerUser(user);
+
+        assertNotNull(result);
+        assertEquals("testuser", result.getUsername());
+        assertNotNull(result.getUserProfilePic());
+        assertEquals("avatar.png", result.getUserProfilePic().getFileId());
+
+        verify(userRepository, times(1)).save(user);
+        verify(avatarService, times(1)).generateAndSaveAvatar(AvatarStyle.BOTTTTS);
     }
 
     @Test

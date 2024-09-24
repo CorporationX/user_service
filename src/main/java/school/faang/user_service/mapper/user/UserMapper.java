@@ -1,12 +1,12 @@
 package school.faang.user_service.mapper.user;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.student.Person;
+import school.faang.user_service.service.user.SafeExtractor;
 
 import java.util.List;
 
@@ -32,25 +32,27 @@ public interface UserMapper {
         }
         StringBuilder aboutMe = new StringBuilder();
 
-        var state = ObjectUtils.defaultIfNull(person.getContactInfo().getAddress().getState(), null);
+
+        var state = SafeExtractor.extract(person, (p) -> p.getContactInfo().getAddress().getState());
         if (state != null) {
             aboutMe.append(state).append(", ");
         }
-        var faculty = ObjectUtils.defaultIfNull(person.getEducation().getFaculty(), null);
+
+        var faculty = SafeExtractor.extract(person, (p) -> p.getEducation().getFaculty());
         if (faculty != null) {
             aboutMe.append(faculty).append(", ");
         }
 
-        var yearOfStudy = ObjectUtils.defaultIfNull(person.getEducation().getYearOfStudy(), null);
+        var yearOfStudy = SafeExtractor.extract(person, (p) -> p.getEducation().getYearOfStudy());
         if (yearOfStudy != null) {
             aboutMe.append(yearOfStudy).append(", ");
         }
-        var major = ObjectUtils.defaultIfNull(person.getEducation().getMajor(), null);
+        var major = SafeExtractor.extract(person, (p) ->p.getEducation().getMajor());
         if (major != null) {
             aboutMe.append(major).append(", ");
         }
 
-        var employer = ObjectUtils.defaultIfNull(person.getEmployer(), null);
+        var employer = SafeExtractor.extract(person, Person::getEmployer);
         if (employer != null) {
             aboutMe.append(employer);
         }

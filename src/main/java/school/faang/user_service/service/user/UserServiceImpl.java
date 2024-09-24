@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -130,11 +131,17 @@ public class UserServiceImpl implements UserService {
         return password.toString();
     }
 
-    private List<Person> getPersonsFromFile(InputStream fileStream) throws IOException {
-        return new CsvMapper()
-                .readerFor(Person.class)
-                .with(CsvSchema.emptySchema().withHeader())
-                .<Person>readValues(fileStream)
-                .readAll();
+    private List<Person> getPersonsFromFile(InputStream fileStream) {
+        try {
+            return new CsvMapper()
+                    .readerFor(Person.class)
+                    .with(CsvSchema.emptySchema().withHeader())
+                    .<Person>readValues(fileStream)
+                    .readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    Function<InputStream,List<Person>> parseFileToPersons = (this::getPersonsFromFile);
 }

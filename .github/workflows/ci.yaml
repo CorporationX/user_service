@@ -3,7 +3,7 @@ name: Check unit tests
 on:
   pull_request:
     branches:
-      - werewolf-master-stream6
+      - feature-pipeline-BJS2-27218
 
 jobs:
   job_unit_tests:
@@ -39,7 +39,7 @@ jobs:
         run: |
           sudo update-locale LANG=ru_RU.UTF-8
           export LANG=ru_RU.UTF-8
-          ./gradlew build --no-daemon
+          ./gradlew build --no-daemon -x test
 
       - name: Run Tests
         if: always()

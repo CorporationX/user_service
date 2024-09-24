@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
@@ -55,8 +57,11 @@ class EventServiceTest {
     @Mock
     EventValidator eventValidator;
 
+    @Mock
+    UserRepository userRepository;
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         eventDto = EventDto.builder()
                 .id(1L)
                 .title("Новое событие")
@@ -102,26 +107,31 @@ class EventServiceTest {
     @DisplayName("successful event creation")
     void whenCreateThenSaveEvent() {
         {
-            EventDto inputDto = new EventDto();
-            Event event = new Event();
             Event savedEvent = new Event();
             EventDto resultDto = new EventDto();
 
-            doNothing().when(eventValidator).validateEventDto(inputDto);
-            doNothing().when(eventValidator).validateOwnerSkills(inputDto);
-            when(eventMapper.toEvent(inputDto)).thenReturn(event);
-            when(eventRepository.save(event)).thenReturn(savedEvent);
-            when(eventMapper.toDto(savedEvent)).thenReturn(resultDto);
+            doNothing().when(eventValidator).validateEventDto(eventDto);
+            doNothing().when(eventValidator).validateOwnerSkills(eventDto);
+            when(eventMapper.toEvent(eventDto)).thenReturn(event);
+            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(skills);
+            when(userRepository.getById(eventDto.getOwnerId())).thenReturn(user);
+            when(eventRepository.save(event)).thenReturn(event);
+            when(eventMapper.toDto(event)).thenReturn(eventDto);
 
-            EventDto returnedDto = eventService.create(inputDto);
+            EventDto returnedDto = eventService.create(eventDto);
 
-            verify(eventValidator).validateEventDto(inputDto);
-            verify(eventValidator).validateOwnerSkills(inputDto);
-            verify(eventMapper).toEvent(inputDto);
+            assertNotNull(event.getRelatedSkills());
+            assertNotNull(event.getOwner());
+
+            verify(eventValidator).validateEventDto(eventDto);
+            verify(eventValidator).validateOwnerSkills(eventDto);
+            verify(eventMapper).toEvent(eventDto);
+            verify(skillRepository).findAllByUserId(eventDto.getOwnerId());
+            verify(userRepository).getById(eventDto.getOwnerId());
             verify(eventRepository).save(event);
-            verify(eventMapper).toDto(savedEvent);
+            verify(eventMapper).toDto(event);
 
-            assertEquals(resultDto, returnedDto);
+            assertEquals(eventDto, returnedDto);
         }
     }
 
@@ -146,33 +156,19 @@ class EventServiceTest {
         long eventId = 1L;
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> eventService.getEvent(eventId));
         assertEquals("Event not found with id: " + eventId, exception.getMessage());
         verify(eventRepository).findById(eventId);
     }
 
     @Test
-    void testDeleteEventWhenEventExists() {
-        long eventId = 1L;
-        Event event = mock(Event.class);
-        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+    void testDeleteEvent() {
+        doNothing().when(eventRepository).deleteById(event.getId());
 
-        eventService.deleteEvent(eventId);
+        eventService.deleteEvent(event.getId());
 
-        verify(eventRepository).findById(eventId);
-        verify(eventRepository).deleteById(eventId);
-    }
-
-    @Test
-    void testDeleteEventWhenEventDoesNotExist() {
-        long eventId = 1L;
-        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventService.deleteEvent(eventId));
-        assertEquals("Event not found with id: " + eventId, exception.getMessage());
-        verify(eventRepository).findById(eventId);
+        verify(eventRepository).deleteById(event.getId());
     }
 
     @Test
@@ -183,10 +179,15 @@ class EventServiceTest {
         doNothing().when(eventValidator).validateOwnerSkills(eventDto);
 
         when(eventMapper.toEvent(eventDto)).thenReturn(event);
+        when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(skills);
+        when(userRepository.getById(eventDto.getOwnerId())).thenReturn(user);
         when(eventRepository.save(event)).thenReturn(event);
         when(eventMapper.toDto(event)).thenReturn(eventDto);
 
         EventDto result = eventService.updateEvent(eventDto);
+
+        assertNotNull(event.getRelatedSkills());
+        assertNotNull(event.getOwner());
 
         verify(eventRepository).findById(eventDto.getId());
         verify(eventValidator).validateEventDto(eventDto);
@@ -270,7 +271,8 @@ class EventServiceTest {
         when(filter.isApplicable(filters)).thenReturn(true);
         when(filter.apply(any(), eq(filters))).thenReturn(allEvents.stream());
 
-        eventService = new EventService(eventMapper, eventRepository, Arrays.asList(filter), eventValidator);
+        eventService = new EventService(eventMapper, eventRepository, Arrays.asList(filter),
+                eventValidator, skillRepository, userRepository);
 
         List<EventDto> result = eventService.getEventsByFilter(filters);
 

@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.mapper.EventMapper;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
@@ -26,6 +30,8 @@ public class EventService {
     private final EventRepository eventRepository;
     private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
+    private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
 
     private Event getEventOrThrow(long eventId) {
         return eventRepository.findById(eventId)
@@ -36,6 +42,13 @@ public class EventService {
         eventValidator.validateEventDto(eventDto);
         eventValidator.validateOwnerSkills(eventDto);
         Event event = eventMapper.toEvent(eventDto);
+
+        List<Skill> skills = skillRepository.findAllByUserId(eventDto.getOwnerId());
+        event.setRelatedSkills(skills);
+
+        User user = userRepository.getById(eventDto.getOwnerId());
+        event.setOwner(user);
+
         event = eventRepository.save(event);
         return eventMapper.toDto(event);
     }
@@ -71,6 +84,13 @@ public class EventService {
         eventValidator.validateEventDto(eventDto);
         eventValidator.validateOwnerSkills(eventDto);
         Event event = eventMapper.toEvent(eventDto);
+
+        List<Skill> skills = skillRepository.findAllByUserId(eventDto.getOwnerId());
+        event.setRelatedSkills(skills);
+
+        User user = userRepository.getById(eventDto.getOwnerId());
+        event.setOwner(user);
+
         event = eventRepository.save(event);
         return eventMapper.toDto(event);
     }

@@ -35,15 +35,6 @@ public class EventValidator {
         if (skills.size() != setIdSkillsEvent.size()) {
             throw new DataValidationException("User can't send such event with such skills");
         }
-        // 2 решение
-//        Set<Long> setIdSkillsOwner = skillsOwner.stream()
-//                .map(Skill::getId)
-//                .collect(Collectors.toSet());
-//
-//        for (Long skillId : eventDto.getRelatedSkills()) {
-//            if (!setIdSkillsOwner.contains(skillId)) {
-//                throw new DataValidationException("User can't send such event with such skills");
-//            }
     }
 
     public void validateEventDto(EventDto eventDto) {

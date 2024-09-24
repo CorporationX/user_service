@@ -14,7 +14,6 @@ import school.faang.user_service.repository.SkillRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,8 +54,9 @@ class EventValidatorTest {
                     .id(2L)
                     .build();
 
-            when(skillRepository.findUserSkill(1L, eventDto.getOwnerId())).thenReturn(Optional.of(skill1));
-            when(skillRepository.findUserSkill(2L, eventDto.getOwnerId())).thenReturn(Optional.of(skill2));
+            List<Skill> skillsOwner = List.of(skill1, skill2);
+
+            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(skillsOwner);
             assertDoesNotThrow(() -> eventValidator.validateOwnerSkills(eventDto));
         }
 
@@ -100,8 +100,13 @@ class EventValidatorTest {
                     .id(1L)
                     .build();
 
-            when(skillRepository.findUserSkill(1L, eventDto.getOwnerId())).thenReturn(Optional.of(skill1));
-            when(skillRepository.findUserSkill(2L, eventDto.getOwnerId())).thenReturn(Optional.empty());
+            Skill skill2 = Skill.builder()
+                    .id(3L)
+                    .build();
+
+            List<Skill> skillsOwner = List.of(skill1, skill2);
+
+            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(skillsOwner);
 
             assertThrows(DataValidationException.class, () -> eventValidator.validateOwnerSkills(eventDto));
 

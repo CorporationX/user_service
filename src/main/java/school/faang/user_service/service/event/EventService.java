@@ -9,6 +9,7 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.mapper.EventMapper;
@@ -17,9 +18,9 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Data
 @Service
@@ -28,6 +29,7 @@ public class EventService {
 
     private final EventMapper eventMapper;
     private final EventRepository eventRepository;
+    private final EventParticipationService eventParticipationService;
     private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
     private final SkillRepository skillRepository;
@@ -56,6 +58,23 @@ public class EventService {
     public EventDto getEvent(long eventId) {
         Event event = getEventOrThrow(eventId);
         return eventMapper.toDto(event);
+    }
+
+    public void deactivatePlanningUserEventsAndDeleteEvent(User user) {
+        List<Event> removedEvents = new ArrayList<>();
+
+        user.getOwnedEvents().stream()
+                .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
+                .forEach(event -> {
+                    event.setStatus(EventStatus.CANCELED);
+                    eventParticipationService.deleteParticipantsFromEvent(event);
+                    if (event.getAttendees() != null) {
+                        event.getAttendees().clear();
+                    }
+                    eventRepository.deleteById(event.getId());
+                    removedEvents.add(event);
+                });
+        user.getOwnedEvents().removeAll(removedEvents);
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {

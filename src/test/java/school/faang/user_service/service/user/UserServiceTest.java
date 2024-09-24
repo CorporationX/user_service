@@ -147,6 +147,19 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("test that when country is in database it is not saved")
+    void testThatCountryIsNotSaved() throws IOException {
+        ByteArrayInputStream inputStream = getTestStream();
+        when(countryRepository.findByTitle(any())).thenReturn(Optional.of(Country.builder().title("US").build()));
+
+        ArgumentCaptor<Country> counryCaptor = ArgumentCaptor.forClass(Country.class);
+
+        userService.addUsersFromFile(inputStream);
+
+        verify(countryRepository,never()).save(counryCaptor.capture());
+    }
+
+    @Test
     void shouldReturnPremiumUsersByFilters() {
         when(userRepository.findPremiumUsers()).thenReturn(Stream.of(user));
         when(filters.get(0).isApplicable(any())).thenReturn(true);

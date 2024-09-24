@@ -15,7 +15,6 @@ import school.faang.user_service.service.user.CountryService;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -63,7 +62,7 @@ public class ConvertToUserServiceTest {
                 .build();
         when(personMapperMock.toUser(testPerson)).thenReturn(savedUser);
         when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(userFromDB));
+                .thenReturn(List.of(userFromDB));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
@@ -79,7 +78,7 @@ public class ConvertToUserServiceTest {
                 .build();
         when(personMapperMock.toUser(testPerson)).thenReturn(savedUser);
         when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(userFromDB));
+                .thenReturn(List.of(userFromDB));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
@@ -95,7 +94,7 @@ public class ConvertToUserServiceTest {
                 .build();
         when(personMapperMock.toUser(testPerson)).thenReturn(savedUser);
         when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
-                .thenReturn(Optional.of(userFromDB));
+                .thenReturn(List.of(userFromDB));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 
@@ -108,8 +107,10 @@ public class ConvertToUserServiceTest {
         User user = prepareTestingUser();
         Country country = prepareTestingCountry();
         when(personMapperMock.toUser(any())).thenReturn(user);
-        when(countryService.existsCountryByTitle(any())).thenReturn(true);
-        when(countryService.findAllCountries()).thenReturn(List.of(country));
+//        when(userRepository.findByUsernameOrEmailOrPhone(anyString(), anyString(), anyString()))
+//                .thenReturn(Collections.emptyList());
+//        when(countryService.existsCountryByTitle(any())).thenReturn(true);
+//        when(countryService.findAllCountries()).thenReturn(List.of(country));
 
         convertToUserService.prepareAndSaveUsers(List.of(testPerson));
 

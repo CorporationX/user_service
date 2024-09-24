@@ -13,7 +13,6 @@ import school.faang.user_service.repository.UserRepository;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +56,7 @@ public class ConvertToUserService {
                                 }
                             }
                     );
-            if(!countriesForSave.isEmpty()) {
+            if (!countriesForSave.isEmpty()) {
                 countryService.createCountries(countriesForSave);
             }
             List<Country> allCountry = countryService.findAllCountries();
@@ -66,10 +65,9 @@ public class ConvertToUserService {
                 String userCountryTitle = user.getCountry().getTitle();
                 Country userCountry = allCountry.stream().
                         filter(country -> country
-                                        .getTitle()
-                                        .equals(userCountryTitle))
-                        .findFirst()
-                        .orElseThrow();
+                                .getTitle()
+                                .equals(userCountryTitle))
+                        .findFirst().get();
                 user.setCountry(userCountry);
             });
         }
@@ -84,24 +82,25 @@ public class ConvertToUserService {
         //ToDo которые содержатся в базе данных, то новый юзер не будет сохранен, а в лог выйдет сообщение.
         //ToDo Но ошибку я не бросаю, так как операция прервется и следующие юзеры не сохранятся
 
-        Optional<User> resultUser = userRepository.findByUsernameOrEmailOrPhone(
+        List<User> resultUsers = userRepository.findByUsernameOrEmailOrPhone(
                 studentToUser.getUsername(),
                 studentToUser.getEmail(),
                 studentToUser.getPhone());
 
-        boolean resultValidate = resultUser.isPresent();
+        boolean usersIsExists = resultUsers.isEmpty();
 
-        if(resultValidate) {
-
-            if (studentToUser.getUsername().equals(resultUser.get().getUsername())) {
-                log.warn("User with username {} already exists", studentToUser.getUsername());
-            } else if (studentToUser.getEmail().equals(resultUser.get().getEmail())) {
-                log.warn("User with email {} already exists", studentToUser.getEmail());
-            } else if (studentToUser.getPhone().equals(resultUser.get().getPhone())) {
-                log.warn("User with phone number {} already exists", studentToUser.getPhone());
+        if (!usersIsExists) {
+            for (User resultUser : resultUsers) {
+                if (studentToUser.getUsername().equals(resultUser.getUsername())) {
+                    log.warn("User with username {} already exists", studentToUser.getUsername());
+                } else if (studentToUser.getEmail().equals(resultUser.getEmail())) {
+                    log.warn("User with email {} already exists", studentToUser.getEmail());
+                } else if (studentToUser.getPhone().equals(resultUser.getPhone())) {
+                    log.warn("User with phone number {} already exists", studentToUser.getPhone());
+                }
             }
         }
-        return resultValidate;
+        return usersIsExists;
     }
 
     private String generatePassword() {

@@ -51,16 +51,18 @@ class EventServiceTest {
 
     @Mock
     private EventRepository eventRepository;
-    EventRepository eventRepository;
 
     @Mock
-    EventMapper eventMapper;
+    private EventMapper eventMapper;
 
     @Mock
-    SkillRepository skillRepository;
+    private SkillRepository skillRepository;
 
     @Mock
-    EventValidator eventValidator;
+    private EventValidator eventValidator;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private EventParticipationService eventParticipationService;
@@ -71,10 +73,28 @@ class EventServiceTest {
         private User user;
         private Event plannedEvent;
         private Event canceledEvent;
-        UserRepository userRepository;
 
         @BeforeEach
         void init() {
+            plannedEvent = Event.builder()
+                    .id(EVENT_ID_ONE)
+                    .status(EventStatus.PLANNED)
+                    .build();
+
+            canceledEvent = Event.builder()
+                    .id(EVENT_ID_TWO)
+                    .status(EventStatus.CANCELED)
+                    .build();
+
+            List<Event> events = new ArrayList<>();
+            events.add(plannedEvent);
+            events.add(canceledEvent);
+
+            user = User.builder()
+                    .id(USER_ID_IS_ONE)
+                    .ownedEvents(events)
+                    .build();
+
             eventDto = EventDto.builder()
                     .id(1L)
                     .title("Новое событие")
@@ -109,25 +129,6 @@ class EventServiceTest {
                     .relatedSkills(skills)
                     .type(EventType.GIVEAWAY)
                     .status(EventStatus.IN_PROGRESS)
-                    .build();
-
-            plannedEvent = Event.builder()
-                    .id(EVENT_ID_ONE)
-                    .status(EventStatus.PLANNED)
-                    .build();
-
-            canceledEvent = Event.builder()
-                    .id(EVENT_ID_TWO)
-                    .status(EventStatus.CANCELED)
-                    .build();
-
-            List<Event> events = new ArrayList<>();
-            events.add(plannedEvent);
-            events.add(canceledEvent);
-
-            user = User.builder()
-                    .id(USER_ID_IS_ONE)
-                    .ownedEvents(events)
                     .build();
         }
 
@@ -315,8 +316,8 @@ class EventServiceTest {
             when(filter.isApplicable(filters)).thenReturn(true);
             when(filter.apply(any(), eq(filters))).thenReturn(allEvents.stream());
 
-            eventService = new EventService(eventMapper, eventRepository, Arrays.asList(filter),
-                    eventValidator, skillRepository, userRepository);
+            eventService = new EventService(eventMapper, eventRepository, eventParticipationService,
+                    Arrays.asList(filter), eventValidator, skillRepository, userRepository);
 
             List<EventDto> result = eventService.getEventsByFilter(filters);
 

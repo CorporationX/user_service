@@ -112,13 +112,8 @@ class UserServiceTest {
     @Test
     @DisplayName("test that both users are saved to db")
     void testAddUsersFromFile() throws IOException {
-        // Prepare mock CSV data
-        String csvData = "firstName,lastName,email,addressCountry\n" +
-                "John,Doe,john.doe@example.com,USA\n" +
-                "Jane,Smith,jane.smith@example.com,Canada";
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(csvData.getBytes());
-
+        ByteArrayInputStream inputStream = getTestStream();
+        List<Person> persons = getTestPersonList();;
 
         userService.addUsersFromFile(inputStream);
 
@@ -126,8 +121,8 @@ class UserServiceTest {
         verify(userRepository,times(2)).save(userCaptor.capture());
         List<User> capturedUsers = userCaptor.getAllValues();
 
-        assertThat(capturedUsers.get(0).getUsername()).startsWith("John");
-        assertThat(capturedUsers.get(1).getUsername()).startsWith("Jane");
+        assertThat(capturedUsers.get(0).getUsername()).startsWith(persons.get(0).getFirstName());
+        assertThat(capturedUsers.get(1).getUsername()).startsWith(persons.get(1).getFirstName());
     }
 
 

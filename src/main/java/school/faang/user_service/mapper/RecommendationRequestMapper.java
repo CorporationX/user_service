@@ -3,9 +3,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.recomendation.CreateRecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recomendation.RejectRecommendationRequestDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 
@@ -42,5 +44,11 @@ public interface RecommendationRequestMapper {
         return skills.stream()
                 .map(s -> s.getSkill().getId())
                 .toList();
+    }
+
+    @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    interface UserMapper {
+        UserDto toDto(User entity);
+        List<UserDto> toDto(List<User> entities);
     }
 }

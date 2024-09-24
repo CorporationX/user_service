@@ -11,6 +11,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.userClient.UserClientService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class ClientControllerTest {
     @Mock
-    private UserRepository userRepository;
-
-    @Spy
-    private UserMapper userMapper;
+    private UserClientService userClientService;
 
     @InjectMocks
     private ClientController clientController;
@@ -54,33 +52,16 @@ class ClientControllerTest {
     }
 
     @Test
-    void testGetNonExistUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> clientController.getUser(1L));
-    }
-
-    @Test
     void testGetUser() {
+        clientController.getUser(user.getId());
 
-        UserDto userDto = new UserDto(1L, "username", "email@");
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userDto);
-
-        clientController.getUser(1L);
-
-        verify(userRepository, times(1)).findById(1L);
+        verify(userClientService, times(1)).getUser(user.getId());
     }
 
     @Test
-    void testGetUsersById() {
-        List<Long> ids = new ArrayList<>();
+    void testGetUsersByIds() {
+        clientController.getUsersByIds(List.of(1L, 2L));
 
-        when(userRepository.findAllById(ids)).thenReturn(users);
-
-        clientController.getUsersByIds(ids);
-
-        verify(userMapper, times(2)).toDto(any());
+        verify(userClientService, times(1)).getUsersByIds(any());
     }
 }

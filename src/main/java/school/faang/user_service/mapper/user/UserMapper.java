@@ -1,10 +1,11 @@
-package school.faang.user_service.mapping;
+package school.faang.user_service.mapper.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserResponseDto;
+import school.faang.user_service.dto.user.UserResponseShortDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public interface UserMapper {
     UserResponseDto toDto(User entity);
 
     List<UserResponseDto> toDtos(List<User> entities);
+
+    UserResponseShortDto toUserResponseShortDto(User user);
+    List<UserResponseShortDto> toUserResponseShortDtos(List<User> users);
 
     @Mapping(source = "countryId", target = "country.id")
     User toEntity(UserDto userDto);

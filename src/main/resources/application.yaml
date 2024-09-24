@@ -41,6 +41,20 @@ payment-service:
   host: localhost
   port: 9080
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger
+    tagsSorter: alpha
+    operationsSorter: alpha
+
 app:
   goal:
     max-active-per-user: 3
+
+minio:
+  endpoint: http://localhost:9000
+  accessKey: user
+  secretKey: password
+  bucketName: corpbucket

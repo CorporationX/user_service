@@ -100,10 +100,12 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<User> getUsers(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
 
+    @Transactional(readOnly = true)
     public User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }

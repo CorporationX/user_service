@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserResponseShortDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class UserMapperTest {
 
     @Test
     void testToUserDto() {
-        UserDto userDto = userMapper.toUserDto(user1);
+        UserResponseShortDto userDto = userMapper.toUserResponseShortDto(user1);
 
         assertEquals(user1.getId(), userDto.getId());
         assertEquals(user1.getUsername(), userDto.getUsername());
@@ -42,7 +43,7 @@ public class UserMapperTest {
     void testToListUserDtos() {
         List<User> users = List.of(user1, user2);
 
-        List<UserDto> userDtos = userMapper.toListUserDtos(users);
+        List<UserResponseShortDto> userDtos = userMapper.toUserResponseShortDtos(users);
 
         assertEquals(users.size(), userDtos.size());
         assertEquals(user1.getUsername(), userDtos.get(0).getUsername());

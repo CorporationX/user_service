@@ -14,6 +14,7 @@ import school.faang.user_service.annotation.AppExceptionHandler;
 import school.faang.user_service.dto.user.UserAmountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserExtendedFilterDto;
+import school.faang.user_service.dto.user.UserResponseShortDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.service.subscription.SubscriptionService;
@@ -41,9 +42,9 @@ public class SubscriptionController {
     }
 
     @PostMapping("/{followeeId}/followers")
-    public List<UserDto> getFollowers(@PathVariable long followeeId, @RequestBody UserExtendedFilterDto filter) {
+    public List<UserResponseShortDto> getFollowers(@PathVariable long followeeId, @RequestBody UserExtendedFilterDto filter) {
         List<User> followers = subscriptionService.getFollowers(followeeId, filter);
-        return userMapper.toListUserDtos(followers);
+        return userMapper.toUserResponseShortDtos(followers);
     }
 
     @GetMapping("/{followeeId}/followers/count")
@@ -54,9 +55,9 @@ public class SubscriptionController {
     }
 
     @PostMapping("/{followerId}/following")
-    public List<UserDto> getFollowing(@PathVariable long followerId, @RequestBody UserExtendedFilterDto filter) {
+    public List<UserResponseShortDto> getFollowing(@PathVariable long followerId, @RequestBody UserExtendedFilterDto filter) {
         List<User> following = subscriptionService.getFollowing(followerId, filter);
-        return userMapper.toListUserDtos(following);
+        return userMapper.toUserResponseShortDtos(following);
     }
 
     @GetMapping("/{followerId}/following/count")

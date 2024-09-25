@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -28,5 +29,9 @@ public class UserController {
     @PostMapping("/users")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto filter) {
+        return userService.getPremiumUsers(filter);
     }
 }

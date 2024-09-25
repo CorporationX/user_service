@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,8 +9,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -88,8 +88,8 @@ class UserServiceImplTest {
 
         UserDto result = userService.getUser(id);
 
-        assertEquals(userEntity.getUsername(), result.username());
-        assertEquals(userEntity.getEmail(), result.email());
+        Assertions.assertEquals(userEntity.getUsername(), result.username());
+        Assertions.assertEquals(userEntity.getEmail(), result.email());
 
         verify(userRepository).findById(id);
         verify(userMapper).toDto(userEntity);

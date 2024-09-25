@@ -14,18 +14,15 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.handler.EntityHandler;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.UserValidator;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -192,11 +189,11 @@ class UserServiceTest {
 
     @Test
     @DisplayName("test that getUsersByIds calls all methods correctly + return test")
-    public void testGetUsersByIds() {
+    public void testGetUserTransportDtosByIds() {
         when(userRepository.findAllById(userIds)).thenReturn(List.of(user));
         when(userMapper.toTransportDto(user)).thenReturn(userTransportDto);
 
-        List<UserTransportDto> result = userService.getUsersByIds(userIds);
+        List<UserTransportDto> result = userService.getUserTransportDtosByIds(userIds);
 
         verify(userRepository).findAllById(userIds);
         verify(userMapper).toTransportDto(user);

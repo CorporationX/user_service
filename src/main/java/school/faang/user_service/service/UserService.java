@@ -99,9 +99,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserTransportDto> getUsersByIds(List<Long> ids) {
+    public List<UserTransportDto> getUserTransportDtosByIds(List<Long> ids) {
         Stream<User> userStream = userRepository.findAllById(ids).stream();
         return userStream.map(userMapper::toTransportDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getUserByIds(List<Long> ids) {
+        return userMapper.toDtoList(userRepository.findAllById(ids));
     }
 
     @Transactional

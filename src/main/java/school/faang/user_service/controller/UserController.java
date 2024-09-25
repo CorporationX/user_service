@@ -22,7 +22,6 @@ import school.faang.user_service.dto.user.UserTransportDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,8 +71,8 @@ public class UserController {
 
     @GetMapping("/byList")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserTransportDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersByIds(ids);
+    public List<UserTransportDto> getUserTransportDtosByIds(@RequestBody List<Long> ids) {
+        return userService.getUserTransportDtosByIds(ids);
     }
 
     @PutMapping("/avatar/put")
@@ -102,5 +101,11 @@ public class UserController {
     @GetMapping("/all")
     public List<UserDto> getAllUsers() {
         return  userService.getAllUsers();
+    }
+
+    @PostMapping("/byIds")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getUserByIds(@RequestBody List<Long> ids) {
+        return userService.getUserByIds(ids);
     }
 }

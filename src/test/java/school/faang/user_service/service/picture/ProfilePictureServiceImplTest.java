@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 class ProfilePictureServiceImplTest {
 
-
     @Mock
     private AmazonS3Service s3Service;
 

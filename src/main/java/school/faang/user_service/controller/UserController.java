@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.service.UserLifeCycleService;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -48,5 +49,9 @@ public class UserController {
     @PostMapping("/users")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto filter) {
+        return userService.getPremiumUsers(filter);
     }
 }

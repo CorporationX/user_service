@@ -12,16 +12,22 @@ import school.faang.user_service.service.event.EventParticipationServiceImpl;
 
 @ExtendWith(SpringExtension.class)
 class EventParticipationControllerTest {
+
     @Mock
     EventParticipationServiceImpl service;
+
     @InjectMocks
     EventParticipationController controller;
 
-    UserDto userDto;
+    private UserDto userDto;
 
     @BeforeEach
     void init() {
-        userDto = new UserDto(1L, "1", "1", "1");
+        userDto = UserDto.builder()
+                .id(1L)
+                .username("1")
+                .email("1")
+                .build();
     }
 
     @Test

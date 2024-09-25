@@ -12,7 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.validator.EventParticipationServiceValidator;
 
@@ -49,7 +49,11 @@ class EventParticipationServiceImplTest {
         Mockito.when(repository.findAllParticipantsByEventId(1))
                 .thenReturn(List.of(user));
 
-        Assertions.assertEquals(List.of(new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getPhone())),
+        Assertions.assertEquals(List.of(UserDto.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .build()),
                 service.getParticipant(1L));
 
         Mockito.verify(repository, Mockito.times(1))

@@ -8,14 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationControllerTest {
@@ -39,39 +37,6 @@ public class RecommendationControllerTest {
                 .build();
 
         id = 1L;
-    }
-
-    @Test
-    void testGiveRecommendationThrowsExceptionWithNullContent() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.giveRecommendation(RecommendationDto.builder().id(1L).build()));
-    }
-
-    @Test
-    void testGiveRecommendationThrowsExceptionWithEmptyContent() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.giveRecommendation(RecommendationDto.builder()
-                        .id(id)
-                        .content("")
-                        .build()));
-    }
-
-    @Test
-    void testGiveRecommendationThrowsExceptionWithNullAuthor() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.giveRecommendation(RecommendationDto.builder()
-                        .id(id)
-                        .content("asd")
-                        .build()));
-    }
-
-    @Test
-    void testGiveRecommendationThrowsExceptionWithNullReceiver() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.giveRecommendation(RecommendationDto.builder()
-                        .id(id)
-                        .content("asd")
-                        .authorId(4L).build()));
     }
 
     @Test

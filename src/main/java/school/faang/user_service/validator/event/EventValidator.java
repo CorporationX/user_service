@@ -8,7 +8,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,10 +17,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EventValidator {
     private final UserRepository userRepository;
-    private final EventRepository eventRepository;
 
     public void validateEvent(EventDto eventDto) {
-        //validateTitlePresent(eventDto);
         validateStartDate(eventDto);
         validateOwnerPresent(eventDto);
     }

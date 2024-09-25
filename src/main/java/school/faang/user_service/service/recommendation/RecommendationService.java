@@ -25,6 +25,7 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public RecommendationDto create(RecommendationDto recommendation) {
+        validator.validateRecommendation(recommendation);
         validator.validateDaysBetweenRecommendations(recommendation);
         validator.validateSkillOffers(recommendation);
 
@@ -39,6 +40,7 @@ public class RecommendationService {
     }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
+        validator.validateRecommendation(recommendationDto);
         validator.validateDaysBetweenRecommendations(recommendationDto);
         validator.validateSkillOffers(recommendationDto);
 

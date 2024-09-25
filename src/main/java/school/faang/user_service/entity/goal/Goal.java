@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -67,6 +69,7 @@ public class Goal {
             joinColumns = @JoinColumn(name = "goal_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<User> users;
 
     @ManyToMany
@@ -75,5 +78,6 @@ public class Goal {
             joinColumns = @JoinColumn(name = "goal_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Skill> skillsToAchieve;
 }

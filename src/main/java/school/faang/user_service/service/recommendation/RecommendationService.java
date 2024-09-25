@@ -1,7 +1,6 @@
 package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationServiceHandler recommendationServiceHandler;
-
 
     @Transactional
     public RecommendationDto createRecommendation(RecommendationDto recommendationDto) {
@@ -65,19 +63,23 @@ public class RecommendationService {
 
     @Transactional
     public void deleteRecommendation(long recommendationId) {
-        recommendationRepository.deleteById(recommendationId);
+        if (recommendationRepository.existsById(recommendationId)) {
+            recommendationRepository.deleteById(recommendationId);
+        } else {
+            throw new DataValidationException("Recommendation with ID: " + recommendationId + " not found");
+        }
     }
 
     @Transactional(readOnly = true)
-    public Page<Recommendation> getAllUserRecommendations(Long receiverId, int offset, int limit) {
+    public List<Recommendation> getAllUserRecommendations(Long receiverId, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset, limit);
-        return recommendationRepository.findAllByReceiverId(receiverId, pageable);
+        return recommendationRepository.findAllByReceiverId(receiverId, pageable).getContent();
     }
 
     @Transactional(readOnly = true)
-    public Page<Recommendation> getAllGivenRecommendations(long authorId, int offset, int limit) {
+    public List<Recommendation> getAllGivenRecommendations(long authorId, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset, limit);
-        return recommendationRepository.findAllByAuthorId(authorId, pageable);
+        return recommendationRepository.findAllByAuthorId(authorId, pageable).getContent();
     }
 
 
@@ -93,10 +95,12 @@ public class RecommendationService {
             if (userSkillGuaranteeRepository.findFirstByGuarantorIdAndUserIdAndSkillIdOrderById(authorId, receiverId, skillId).isEmpty()) {
                 userSkillGuaranteeRepository.create(authorId, receiverId, skillId);
             } else {
-                throw new DataValidationException("Guarantee for SkillOffer with ID: " + skillId +
-                        " for User with ID: " + receiverId +
-                        " from Guarantor with ID: " + authorId +
-                        " already exist");
+                throw new DataValidationException(
+                        "Guarantee for SkillOffer with ID: " + skillId +
+                                " for User with ID: " + receiverId +
+                                " from Guarantor with ID: " + authorId +
+                                " already exist"
+                );
             }
         }
     }
@@ -113,10 +117,12 @@ public class RecommendationService {
             if (userSkillGuaranteeRepository.findFirstByGuarantorIdAndUserIdAndSkillIdOrderById(authorId, receiverId, skillId).isEmpty()) {
                 userSkillGuaranteeRepository.create(authorId, receiverId, skillId);
             } else {
-                throw new DataValidationException("Guarantee for SkillOffer with ID: " + skillId +
-                        " for User with ID: " + receiverId +
-                        " from Guarantor with ID: " + authorId +
-                        " already exist");
+                throw new DataValidationException(
+                        "Guarantee for SkillOffer with ID: " + skillId +
+                                " for User with ID: " + receiverId +
+                                " from Guarantor with ID: " + authorId +
+                                " already exist"
+                );
             }
         }
     }

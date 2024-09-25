@@ -2,7 +2,6 @@ package school.faang.user_service.controller.recommendation;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +17,8 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.service.recommendation.RecommendationService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/recommendations")
@@ -43,18 +44,24 @@ public class RecommendationController {
     }
 
     @GetMapping("/receiver/{receiverId}")
-    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable("receiverId") long receiverId,
+    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId,
                                                              @RequestParam int offset,
                                                              @RequestParam int limit) {
-        Page<Recommendation> allUserRecommendations = recommendationService.getAllUserRecommendations(receiverId, offset, limit);
-        return allUserRecommendations.map(recommendationMapper::toDto);
+        List<Recommendation> allUserRecommendations = recommendationService.getAllUserRecommendations(receiverId, offset, limit);
+
+        return allUserRecommendations.stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/author/{authorId}")
-    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable("authorId") long authorId,
+    public List<RecommendationDto> getAllGivenRecommendations(@PathVariable long authorId,
                                                               @RequestParam int offset,
                                                               @RequestParam int limit) {
-        Page<Recommendation> allGivenRecommendations = recommendationService.getAllGivenRecommendations(authorId, offset, limit);
-        return allGivenRecommendations.map(recommendationMapper::toDto);
+        List<Recommendation> allGivenRecommendations = recommendationService.getAllGivenRecommendations(authorId, offset, limit);
+
+        return allGivenRecommendations.stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 }

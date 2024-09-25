@@ -18,7 +18,7 @@ public class RecommendationServiceHandler {
 
     public void selfRecommendationValidation(User author, User receiver) {
         if (author.getId().equals(receiver.getId())) {
-            throw new DataValidationException("Cannot recommend yourself ");
+            throw new DataValidationException("Cannot recommend yourself");
         }
     }
 
@@ -31,20 +31,20 @@ public class RecommendationServiceHandler {
                 .ifPresent(this::intervalCheck);
     }
 
+    public void skillOffersValidation(List<Long> skillOfferDtoIds, List<Long> allSkillsIds) {
+        Set<Long> skillOfferDtoIdsSet = new HashSet<>(skillOfferDtoIds);
+        Set<Long> allSkillsIdsSet = new HashSet<>(allSkillsIds);
+        if (!allSkillsIdsSet.containsAll(skillOfferDtoIdsSet)) {
+            throw new DataValidationException("SkillOffer of this recommendation not valid.");
+        }
+    }
+
     private void intervalCheck(LocalDateTime localDateTime) {
         LocalDateTime seekInterval = LocalDateTime.now().minusMonths(INTERVAL_IN_MONTHS);
         if (localDateTime.isAfter(seekInterval)) {
             throw new DataValidationException("This receiver has already gave a recommendation less than " +
                     INTERVAL_IN_MONTHS + " months to that author."
             );
-        }
-    }
-
-    public void skillOffersValidation(List<Long> skillOfferDtoIds, List<Long> allSkillsIds) {
-        Set<Long> skillOfferDtoIdsSet = new HashSet<>(skillOfferDtoIds);
-        Set<Long> allSkillsIdsSet = new HashSet<>(allSkillsIds);
-        if (!allSkillsIdsSet.containsAll(skillOfferDtoIdsSet)) {
-            throw new DataValidationException("SkillOffer of this recommendation not valid.");
         }
     }
 }

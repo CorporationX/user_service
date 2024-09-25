@@ -5,13 +5,17 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
+@EqualsAndHashCode(of = "skillOffers")
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendationDto {
@@ -23,7 +27,7 @@ public class RecommendationDto {
     private Long authorId;
 
     @Positive(message = "ReceiverID must be positive")
-    @NotNull(message = "ReceiverID cannot be empty")
+    @NotNull(message = "ReceiverID cannot be null")
     private Long receiverId;
 
     @NotBlank(message = "Content cannot be blank")

@@ -1,12 +1,12 @@
-package school.faang.user_service.helper.validator;
+package school.faang.user_service.helper.validator.mentorshiprequst;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.services.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;

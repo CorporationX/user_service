@@ -1,4 +1,4 @@
-package school.faang.user_service.services;
+package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package school.faang.user_service.services;
+package school.faang.user_service.service.mentorshiprequest;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,15 +9,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
+import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.helper.filters.RequestFilter;
-import school.faang.user_service.helper.mapper.MentorshipRequestMapper;
-import school.faang.user_service.helper.validator.MentorshipRequestValidator;
+import school.faang.user_service.helper.filters.mentorshiprequest.RequestFilter;
+import school.faang.user_service.helper.mapper.mentorshiprequest.MentorshipRequestMapper;
+import school.faang.user_service.helper.validator.mentorshiprequst.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.ArrayList;

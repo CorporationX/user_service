@@ -1,10 +1,10 @@
-package school.faang.user_service.helper.mapper;
+package school.faang.user_service.helper.mapper.mentorshiprequest;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
 import java.time.LocalDate;

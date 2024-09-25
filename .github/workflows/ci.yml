@@ -2,7 +2,7 @@ name: CI Pipeline
 
 on:
   pull_request:
-    branches: [ "phoenix-master-stream6-CI-test" ]
+    branches: [ "phoenix-master-stream6" ]
 
 jobs:
   build:

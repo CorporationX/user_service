@@ -33,7 +33,7 @@ public class UserController {
         userLifeCycleService.deactivateUser(id);
     }
 
-    @PostMapping
+    @PostMapping("/registration")
     public void registrationUser(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         log.info("Register user: {}", userRegistrationDto);
         userLifeCycleService.registrationUser(userRegistrationDto);

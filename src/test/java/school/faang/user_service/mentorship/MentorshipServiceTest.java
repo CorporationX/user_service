@@ -16,11 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)

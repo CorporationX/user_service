@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.controller.mentorship.MentorshipController;
+import school.faang.user_service.dto.mentee.MenteeDTO;
+
 import java.util.Collections;
 import java.util.List;
 import static org.mockito.Mockito.when;

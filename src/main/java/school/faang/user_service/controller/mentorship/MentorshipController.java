@@ -5,8 +5,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.service.MenteeDTO;
+import school.faang.user_service.dto.mentee.MenteeDTO;
 import java.util.List;
 
 @RestController
@@ -18,6 +19,11 @@ public class MentorshipController {
     @GetMapping("/mentees/{userId}")
     public List<MenteeDTO> getMentees(@PathVariable long userId) {
         return mentorshipService.getMentees(userId);
+    }
+
+    @GetMapping("/mentors/{userId}")
+    public List<UserDto> getMentors(@PathVariable long userId) {
+        return mentorshipService.getMentors(userId);
     }
 
     @DeleteMapping("/mentees/{mentorId}/{menteeId}")

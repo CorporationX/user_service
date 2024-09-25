@@ -45,9 +45,11 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         Stream<User> followersStream = subscriptionRepository.findByFolloweeId(followeeId);
-        List<User> filteredFollowers = filterUsers(followersStream, filter).toList();
+        if (filter != null) {
+            followersStream = filterUsers(followersStream, filter);
+        }
 
-        return userMapper.toDtoList(filteredFollowers);
+        return userMapper.toDtoList(followersStream.toList());
     }
 
     private Stream<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
@@ -57,7 +59,7 @@ public class SubscriptionService {
                 .reduce(userStream,
                         (userStream1, userFilter) -> userFilter.apply(userStream1, filter),
                         ((userStream1, userStream2) -> userStream2))
-                // полагаю что номер страницы приходит в пользовательком формате (начиная с 1)
+                // полагаю что номер страницы приходит в пользовательском формате (начиная с 1)
                 // default - 1 (валидация на уровне контроллера)
                 .skip((long) (filter.getPage() - 1) * filter.getPageSize())
                 // default - 10

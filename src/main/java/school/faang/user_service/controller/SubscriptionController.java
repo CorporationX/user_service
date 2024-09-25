@@ -59,7 +59,7 @@ public class SubscriptionController {
                     "согласно переданному обязательному фильтру"
     )
     @GetMapping
-    public List<UserDto> getFollowers(@PathVariable("userId") @Positive long followeeId, @RequestBody UserFilterDto filter) {
+    public List<UserDto> getFollowers(@PathVariable("userId") @Positive long followeeId, @RequestBody(required = false) UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 

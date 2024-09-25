@@ -1,13 +1,15 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
-import java.util.Optional;
 
+@Validated
 @RestController
 @RequestMapping("/mentorship")
 @RequiredArgsConstructor
@@ -26,12 +28,12 @@ public class MentorshipController {
   }
 
   @DeleteMapping("/mentee/{mentorId}/{menteeId}")
-  public Optional<UserDto> deleteMentee(@PathVariable long mentorId, @PathVariable long menteeId) {
-    return mentorshipService.deleteMentee(mentorId, menteeId);
+  public void deleteMentee(@PathVariable long mentorId, @PathVariable long menteeId) {
+    mentorshipService.deleteMentee(mentorId, menteeId);
   }
 
   @DeleteMapping("/mentor/{menteeId}/{mentorId}")
-  public Optional<UserDto> deleteMentor(@PathVariable long menteeId, @PathVariable long mentorId) {
-    return mentorshipService.deleteMentor(menteeId, mentorId);
+  public void deleteMentor(@PathVariable long menteeId, @PathVariable long mentorId) {
+    mentorshipService.deleteMentor(menteeId, mentorId);
   }
 }

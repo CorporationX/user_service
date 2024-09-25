@@ -2,17 +2,17 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import jakarta.persistence.EntityNotFoundException;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,46 +22,41 @@ public class MentorshipService {
   private final UserMapper userMapper;
 
   public List<UserDto> getMentees(long mentorId) {
-    return getUsers(mentorId, User::getMentees);
+    return mentorshipRepository.findById(mentorId)
+        .map(mentor -> getUsers(mentor, User::getMentees))
+        .orElseThrow(() -> new EntityNotFoundException("Ментор с ID " + mentorId + " не найден"));
   }
 
   public List<UserDto> getMentors(long menteeId) {
-    return getUsers(menteeId, User::getMentors);
+    return mentorshipRepository.findById(menteeId)
+        .map((User mentee) -> getUsers(mentee, User::getMentors))
+        .orElseThrow(() -> new EntityNotFoundException("Менти с ID " + menteeId + " не найден"));
   }
 
-  public Optional<UserDto> deleteMentee(long mentorId, long menteeId) {
-    return processRelationship(mentorId, menteeId,
-        (mentor, mentee) -> userMapper.toDto(mentee),
+  public void deleteMentee(long mentorId, long menteeId) {
+    breakRelationship(mentorId, menteeId,
         (mentor, mentee) -> mentor.getMentees().remove(mentee));
   }
 
-  public Optional<UserDto> deleteMentor(long menteeId, long mentorId) {
-    return processRelationship(menteeId, mentorId,
-        (mentee, mentor) -> userMapper.toDto(mentor),
+  public void deleteMentor(long menteeId, long mentorId) {
+    breakRelationship(menteeId, mentorId,
         (mentee, mentor) -> mentee.getMentors().remove(mentor));
   }
 
-  private List<UserDto> getUsers(long userId, Function<User, List<User>> getUsersFunction) {
-    return mentorshipRepository.findById(userId)
-        .map(getUsersFunction)
-        .orElseGet(Collections::emptyList)
-        .stream()
+  private List<UserDto> getUsers(User user, Function<User, List<User>> relationExtractor) {
+    return relationExtractor.apply(user).stream()
         .map(userMapper::toDto)
-        .toList();
+        .collect(Collectors.toList());
   }
 
-  private <T> Optional<T> processRelationship(long userId1, long userId2, BiFunction<User, User, T> action,
-      BiConsumer<User, User> modifyRelationship) {
-    Optional<User> user1 = mentorshipRepository.findById(userId1);
-    Optional<User> user2 = mentorshipRepository.findById(userId2);
+  private void breakRelationship(long userId1, long userId2, BiConsumer<User, User> modifyRelationship) {
+    User user1 = mentorshipRepository.findById(userId1)
+        .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId1 + " не найден"));
+    User user2 = mentorshipRepository.findById(userId2)
+        .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId2 + " не найден"));
 
-    if (user1.isPresent() && user2.isPresent()) {
-      modifyRelationship.accept(user1.get(), user2.get());
-      mentorshipRepository.save(user1.get());
-      return Optional.of(action.apply(user1.get(), user2.get()));
-    }
-
-    return Optional.empty();
+    modifyRelationship.accept(user1, user2);
+    mentorshipRepository.save(user1);
   }
 
 }

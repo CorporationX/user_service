@@ -38,5 +38,6 @@ project-service:
   port: 8082
 
 payment-service:
+  url: http://localhost:9080/api/payment;
   host: localhost
   port: 9080

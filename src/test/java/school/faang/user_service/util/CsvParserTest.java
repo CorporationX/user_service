@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.student.Address;
 import school.faang.user_service.entity.student.ContactInfo;
 import school.faang.user_service.entity.student.Education;
-import school.faang.user_service.entity.student.Person;
+import school.faang.user_service.dto.student.Person;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;

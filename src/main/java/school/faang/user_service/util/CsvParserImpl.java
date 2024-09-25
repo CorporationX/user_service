@@ -2,13 +2,15 @@ package school.faang.user_service.util;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.student.Person;
+import school.faang.user_service.dto.student.Person;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 @Component
+@Slf4j
 public class CsvParserImpl implements CsvParser {
     @Override
     public List<Person> getPersonsFromFile(InputStream fileStream) {
@@ -19,6 +21,7 @@ public class CsvParserImpl implements CsvParser {
                     .<Person>readValues(fileStream)
                     .readAll();
         } catch (IOException e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

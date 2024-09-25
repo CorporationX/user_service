@@ -50,7 +50,7 @@ public class UserController {
         userService.deactivateUserProfile(id);
     }
 
-    @PostMapping("upload")
+    @PostMapping("/csvfile")
     public ResponseEntity<String> addUsersFromFile(@RequestParam("file") MultipartFile file) throws IOException {
       userService.addUsersFromFile(file.getInputStream());
       return ResponseEntity.ok("sucessfuly uploaded");

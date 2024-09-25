@@ -11,7 +11,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.student.Person;
+import school.faang.user_service.dto.student.Person;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
@@ -25,6 +25,8 @@ import school.faang.user_service.util.CsvParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -70,23 +72,30 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void addUsersFromFile(InputStream fileStream) throws IOException {
         List<Person> persons = csvParser.getPersonsFromFile(fileStream);
+        List<Country> countryList = countryRepository.findAll();
         persons.stream().map(student -> {
             var user = userMapper.personToUser(student);
             user.setPassword(generatePassword());
-            countryRepository.findByTitle(student.getContactInfo().getAddress().getCountry())
-                    .ifPresentOrElse(user::setCountry,
-                            () -> {
-                               var country = countryRepository.save(
-                                        Country.builder()
-                                                .title(student.getContactInfo().getAddress().getCountry())
-                                                .build()
-                                );
-                               user.setCountry(country);
-                            }
-                    );
+            setStudentsCountry(student, user, countryList);
             userRepository.save(user);
             return user;
-        }).toList();
+        }).forEach(v -> {});
+    }
+
+    private void setStudentsCountry(Person person, User user,List<Country> countryList) {
+        Optional<Country> country =  gerPersonsCountryFromDB(person, countryList);
+        country.ifPresentOrElse(user::setCountry,() -> {
+            var saved = countryRepository.save(
+                    Country.builder()
+                            .title(person.getContactInfo().getAddress().getCountry())
+                            .build()
+            );
+            user.setCountry(saved);
+        });
+    }
+
+    private Optional<Country> gerPersonsCountryFromDB(Person person, List<Country> countryList) {
+       return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
     }
 
     @Override

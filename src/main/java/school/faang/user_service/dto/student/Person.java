@@ -1,10 +1,13 @@
-package school.faang.user_service.entity.student;
+package school.faang.user_service.dto.student;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.student.ContactInfo;
+import school.faang.user_service.entity.student.Education;
+import school.faang.user_service.entity.student.PreviousEducation;
 
 import java.util.ArrayList;
 import java.util.List;

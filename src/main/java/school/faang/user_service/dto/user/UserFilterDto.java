@@ -12,4 +12,5 @@ public class UserFilterDto {
     private String phone;
     private LocalDateTime createdAfter;
     private LocalDateTime createdBefore;
+    private Integer experience;
 }

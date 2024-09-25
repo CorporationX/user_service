@@ -13,27 +13,30 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.RemoteImageService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.user.UserValidator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     private static final long USER_ID = 1L;
+
+    private static final int TWO_TIMES_USES_REPOSITORY = 2;
+
     private static final List<Long> USER_IDS = List.of(USER_ID);
+
     private static final String USER_NAME = "name";
 
     @InjectMocks
@@ -152,7 +155,7 @@ class UserServiceTest {
 
             @Test
             @DisplayName("Success when user registration and got remote profile picture correct")
-            void whenUserRegistrationDtoIsValidAndRemoteServiceSendPicFoundThenSuccess() throws IOException {
+            void whenUserRegistrationDtoIsValidAndRemoteServiceSendPicFoundThenSuccess() {
                 userRegistrationDto = new UserRegistrationDto();
                 user = new User();
 
@@ -165,7 +168,7 @@ class UserServiceTest {
                         .toEntity(userRegistrationDto);
                 verify(userValidator)
                         .validateUserConstrains(user);
-                verify(userRepository)
+                verify(userRepository, times(TWO_TIMES_USES_REPOSITORY))
                         .save(user);
                 verify(userMapper)
                         .toDto(user);
@@ -178,14 +181,14 @@ class UserServiceTest {
 
             @Test
             @DisplayName("Success when user registration and don't get remote profile picture then get local pic")
-            void whenUserRegistrationDtoIsValidAndRemoteServiceNotSendPicFoundThenSuccess() throws IOException {
+            void whenUserRegistrationDtoIsValidAndRemoteServiceNotSendPicFoundThenSuccess() {
                 userRegistrationDto = new UserRegistrationDto();
                 user = new User();
 
                 when(userMapper.toEntity(userRegistrationDto))
                         .thenReturn(user);
                 when(remoteImageService.getUserProfileImageFromRemoteService())
-                        .thenThrow(new IOException());
+                        .thenThrow(new ImageGeneratorException(null));
                 when(s3Service.isDefaultPictureExistsOnCloud())
                         .thenReturn(Boolean.TRUE);
 
@@ -195,7 +198,7 @@ class UserServiceTest {
                         .toEntity(userRegistrationDto);
                 verify(userValidator)
                         .validateUserConstrains(user);
-                verify(userRepository)
+                verify(userRepository, times(TWO_TIMES_USES_REPOSITORY))
                         .save(user);
                 verify(userMapper)
                         .toDto(user);
@@ -205,14 +208,14 @@ class UserServiceTest {
 
             @Test
             @DisplayName("Success when user registration and don't get remote profile picture and don't get local pic")
-            void whenUserRegistrationDtoIsValidAndNoLocalOrRemotePictureThenSuccess() throws IOException {
+            void whenUserRegistrationDtoIsValidAndNoLocalOrRemotePictureThenSuccess() {
                 userRegistrationDto = new UserRegistrationDto();
                 user = new User();
 
                 when(userMapper.toEntity(userRegistrationDto))
                         .thenReturn(user);
                 when(remoteImageService.getUserProfileImageFromRemoteService())
-                        .thenThrow(new IOException());
+                        .thenThrow(new ImageGeneratorException(null));
                 when(s3Service.isDefaultPictureExistsOnCloud())
                         .thenReturn(Boolean.FALSE);
 
@@ -222,7 +225,7 @@ class UserServiceTest {
                         .toEntity(userRegistrationDto);
                 verify(userValidator)
                         .validateUserConstrains(user);
-                verify(userRepository)
+                verify(userRepository, times(TWO_TIMES_USES_REPOSITORY))
                         .save(user);
                 verify(userMapper)
                         .toDto(user);

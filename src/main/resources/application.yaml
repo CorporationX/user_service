@@ -46,13 +46,15 @@ services:
     endpoint: http://localhost:9000
     accessKey: user
     secretKey: password
-    bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
+    connectionTimeout: 10_000
+    socketTimeout: 10_000
+    bucketDefaultAvatarsName: usersdefau_ltavatars #should be lowerCase
     defaultProfilePicture: defaultAvatar.png
-
-external:
-  apis:
-    urls:
-      remoteAvatars: https://api.dicebear.com/9.x
-      externalUrl: https://external.api #example how to add external url
+    remoteFilename: pic.png
+  imagegenerator:
+    endpoint: https://api.dicebear.com/9.x
     paths:
-      getRemoteAvatars: adventurer-neutral/png
+      get: adventurer-neutral/png
+    #servicename:
+    #endpoint: example.com
+    #other keys

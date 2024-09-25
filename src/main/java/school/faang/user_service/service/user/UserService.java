@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
@@ -11,13 +12,14 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.remote.AmazonS3CustomException;
+import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.RemoteImageService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.user.UserValidator;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -52,14 +54,18 @@ public class UserService {
 
     @Transactional
     public UserDto registerUser(UserRegistrationDto userRegistrationDto) {
+        log.debug("registerUser() - start : userRegistrationDto = {}", userRegistrationDto);
+
         User user = userMapper.toEntity(userRegistrationDto);
         userValidator.validateUserConstrains(user);
 
         log.info("Trying save new user {}", user);
         userRepository.save(user);
-        log.info("User {} saved", user);
 
         setUserDefaultAvatar(user);
+        userRepository.save(user);
+
+        log.debug("registerUser() - end : user = {}", user);
         return userMapper.toDto(user);
     }
 
@@ -91,18 +97,14 @@ public class UserService {
     private String assignUserRemoteRandomPicture(User user) {
         log.info("Trying to assign random picture for user {}", user);
 
-        String pictureKey;
-
         try {
             ResponseEntity<byte[]> pictureContent = remoteImageService.getUserProfileImageFromRemoteService();
 
             String s3Folder = user.getUsername() + user.getId() + "profilePic";
-            pictureKey = s3Service.uploadHttpData(pictureContent, s3Folder);
-        } catch (IOException e) {
+            return s3Service.uploadHttpData(pictureContent, s3Folder);
+        } catch (FeignException | AmazonS3CustomException e) {
             log.error(e.getMessage());
-            throw new RuntimeException(e);
+            throw new ImageGeneratorException(e.getMessage());
         }
-
-        return pictureKey;
     }
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
@@ -38,10 +39,10 @@ public class UserController {
     }
 
     @PutMapping("/registration")
-    public UserDto createUserAccount(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
-        log.info("Registration user {} started", userRegistrationDto);
+    public ResponseEntity<UserDto> createUserAccount(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
+        log.debug("createUserAccount() - start, suerRegistrationDto: {}", userRegistrationDto);
         UserDto userDto = userService.registerUser(userRegistrationDto);
-        log.info("Registration user {} completed", userDto);
-        return userDto;
+        log.debug("Registration user {} completed", userDto);
+        return ResponseEntity.ok(userDto);
     }
 }

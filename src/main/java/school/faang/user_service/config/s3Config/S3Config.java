@@ -23,13 +23,19 @@ public class S3Config {
     @Value("${services.s3.secretKey}")
     private String secretKey;
 
+    @Value("${services.s3.connectionTimeout}")
+    private int connectionTimeout;
+
+    @Value("${services.s3.socketTimeout}")
+    private int socketTimeout;
+
     @Bean
     public AmazonS3 s3Client() {
         var credentialsProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey));
         var endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(endpoint, "");
         var clientConfig = new ClientConfiguration()
-                .withConnectionTimeout(10_000)
-                .withSocketTimeout(10_000)
+                .withConnectionTimeout(connectionTimeout)
+                .withSocketTimeout(socketTimeout)
                 .withProtocol(Protocol.HTTPS);
 
         return AmazonS3Client.builder()

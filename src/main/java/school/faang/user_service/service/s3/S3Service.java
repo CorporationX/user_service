@@ -1,7 +1,7 @@
 package school.faang.user_service.service.s3;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.exception.remote.AmazonS3CustomException;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,13 +29,19 @@ public class S3Service {
 
     private final AmazonS3 s3Client;
 
+    private final String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
+    private final String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
+
     @Value("${services.s3.bucketDefaultAvatarsName}")
     private String bucketDefaultAvatarsName;
 
     @Value("${services.s3.defaultProfilePicture}")
     private String defaultPictureName;
 
-    public String uploadHttpData(ResponseEntity<byte[]> data, String folder) throws RuntimeException {
+    @Value("${services.s3.remoteFilename}")
+    private String remoteFileName;
+
+    public String uploadHttpData(ResponseEntity<byte[]> data, String folder) {
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(data.getHeaders().getContentLength());
@@ -45,16 +53,12 @@ public class S3Service {
                 createBucket(bucketDefaultAvatarsName);
             }
 
-            log.info("Trying to save data in s3 {}", bucketDefaultAvatarsName);
-
-            PutObjectRequest putObjectRequest = new PutObjectRequest(
-                    bucketDefaultAvatarsName, key, new ByteArrayInputStream(data.getBody()), objectMetadata);
-            s3Client.putObject(putObjectRequest);
+            putObjectInS3(bucketDefaultAvatarsName, key, new ByteArrayInputStream(data.getBody()), objectMetadata);
 
             return key;
         } catch (Exception e) {
-            log.error("Error while trying to save file in cloud: {}", e.getMessage());
-            throw new RuntimeException("Failed to upload image");
+            log.error("Error while saving file in cloud: {}", e.getMessage());
+            throw new AmazonS3CustomException("Failed to upload image");
         }
     }
 
@@ -62,13 +66,21 @@ public class S3Service {
         return s3Client.doesObjectExist(bucketDefaultAvatarsName.toLowerCase(), defaultPictureName);
     }
 
-    private String getFileName(Map<String, List<String>> headers) {
-        String filename = "pic.png";
+    private void putObjectInS3(String bucketName, String key, InputStream inputStream, ObjectMetadata objectMetadata) {
+        log.info("Trying to save data in s3. BucketName = {}, key = {}", bucketName, key);
 
-        if (headers.containsKey("Content-Disposition")) {
-            if (headers.get("Content-Disposition").get(0) != null) {
-                Pattern pattern = Pattern.compile("filename=\"?([^\"]+)\"?");
-                Matcher matcher = pattern.matcher(headers.get("Content-Disposition").get(0));
+        PutObjectRequest putObjectRequest = new PutObjectRequest(
+                bucketName, key, inputStream, objectMetadata);
+        s3Client.putObject(putObjectRequest);
+    }
+
+    private String getFileName(Map<String, List<String>> headers) {
+        String filename = remoteFileName;
+
+        if (headers.containsKey(CONTENT_DISPOSITION)) {
+            if (headers.get(CONTENT_DISPOSITION).get(0) != null) {
+                Pattern pattern = Pattern.compile(FILE_NAME_PATTERN);
+                Matcher matcher = pattern.matcher(headers.get(CONTENT_DISPOSITION).get(0));
                 if (matcher.find()) {
                     filename = matcher.group(1);
                 }
@@ -78,26 +90,20 @@ public class S3Service {
         return filename;
     }
 
-    public boolean isBucketExists(String bucketName) {
+    private boolean isBucketExists(String bucketName) {
+        log.info("Check does bucket with name {} exists", bucketName);
+
         try {
-            log.info("Check does bucket with name {} exists", bucketName);
-
-            s3Client.doesBucketExistV2(bucketName);
-            log.info("Bucket with name {} exists", bucketName);
-
-            return true;
+            return s3Client.doesBucketExistV2(bucketName);
         } catch (AmazonS3Exception e) {
-            log.info("Bucket with name {} doesn't exists", bucketName);
+            log.error("Error while checking bucket existence");
             return false;
         }
     }
 
-    public void createBucket(String bucketName) {
-        try {
-            log.info("Creating bucket with name {}", bucketName);
-            s3Client.createBucket(new CreateBucketRequest(bucketName.toLowerCase()));
-        } catch (AmazonServiceException a) {
-            log.error("Error while creating new bucket");
-        }
+    private void createBucket(String bucketName) {
+        log.info("Trying to create bucket with name {}", bucketName);
+
+        s3Client.createBucket(new CreateBucketRequest(bucketName.toLowerCase()));
     }
 }

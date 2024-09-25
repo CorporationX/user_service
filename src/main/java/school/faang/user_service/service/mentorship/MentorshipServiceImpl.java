@@ -3,10 +3,11 @@ package school.faang.user_service.service.mentorship;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
 
 import java.util.Collections;
 import java.util.List;

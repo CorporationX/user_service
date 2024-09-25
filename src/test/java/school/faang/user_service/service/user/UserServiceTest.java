@@ -26,6 +26,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.util.CsvParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,6 +54,9 @@ class UserServiceTest {
 
     @Mock
     private UserFilter userFilter;
+
+    @Mock
+    private CsvParser csvParser;
 
     @Mock
     private GoalService goalService;
@@ -96,25 +100,16 @@ class UserServiceTest {
         userStream = Stream.of(user);
         filters = List.of(userFilter);
         userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService,
-                eventService, mentorshipService);
+                eventService, mentorshipService,csvParser);
     }
 
-    @Test
-    @DisplayName("test CSV parsing logic")
-    void testCsvParsing() {
-        ByteArrayInputStream inputStream = getTestStream();
-        List<Person> persons = getTestPersonList();
-
-        List<Person> userList = userService.parseFileToPersons.apply(inputStream);
-
-        assertThat(userList).isEqualTo(persons);
-    }
 
     @Test
     @DisplayName("test that both users are saved to db")
     void testAddUsersFromFile() throws IOException {
         ByteArrayInputStream inputStream = getTestStream();
         List<Person> persons = getTestPersonList();;
+        when(csvParser.getPersonsFromFile(any())).thenReturn(persons);
 
         userService.addUsersFromFile(inputStream);
 
@@ -132,6 +127,7 @@ class UserServiceTest {
     void testThatCountryIsSaved() throws IOException {
         ByteArrayInputStream inputStream = getTestStream();
         List<Person> persons = getTestPersonList();
+        when(csvParser.getPersonsFromFile(any())).thenReturn(persons);
         when(countryRepository.findByTitle(any())).thenReturn(Optional.empty());
 
         ArgumentCaptor<Country> counryCaptor = ArgumentCaptor.forClass(Country.class);
@@ -150,6 +146,7 @@ class UserServiceTest {
     @DisplayName("test that when country is in database it is not saved")
     void testThatCountryIsNotSaved() throws IOException {
         ByteArrayInputStream inputStream = getTestStream();
+        when(csvParser.getPersonsFromFile(any())).thenReturn(getTestPersonList());
         when(countryRepository.findByTitle(any())).thenReturn(Optional.of(Country.builder().title("US").build()));
 
         ArgumentCaptor<Country> counryCaptor = ArgumentCaptor.forClass(Country.class);

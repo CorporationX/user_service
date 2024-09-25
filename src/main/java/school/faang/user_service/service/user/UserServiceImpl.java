@@ -1,7 +1,5 @@
 package school.faang.user_service.service.user;
 
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,12 +20,12 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.util.CsvParser;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
+    private final CsvParser csvParser;
 
     @Override
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
@@ -70,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void addUsersFromFile(InputStream fileStream) throws IOException {
-        List<Person> persons = getPersonsFromFile(fileStream);
+        List<Person> persons = csvParser.getPersonsFromFile(fileStream);
         persons.stream().map(student -> {
             var user = userMapper.personToUser(student);
             user.setPassword(generatePassword());
@@ -130,18 +129,4 @@ public class UserServiceImpl implements UserService {
         }
         return password.toString();
     }
-
-    private List<Person> getPersonsFromFile(InputStream fileStream) {
-        try {
-            return new CsvMapper()
-                    .readerFor(Person.class)
-                    .with(CsvSchema.emptySchema().withHeader())
-                    .<Person>readValues(fileStream)
-                    .readAll();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    Function<InputStream,List<Person>> parseFileToPersons = (this::getPersonsFromFile);
 }

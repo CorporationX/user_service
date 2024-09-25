@@ -1,4 +1,4 @@
-package school.faang.user_service.requestformentoring.services;
+package school.faang.user_service.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +15,10 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.helper.filters.RequestFilter;
 import school.faang.user_service.helper.mapper.MentorshipRequestMapper;
 import school.faang.user_service.helper.validator.MentorshipRequestValidator;
-import school.faang.user_service.services.MentorshipRequestService;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,52 +32,62 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
+
+    @InjectMocks
+    private MentorshipRequestService menReqService;
+    @Mock
+    private MentorshipRequestMapper menReqMapper;
+    @Mock
+    private MentorshipRequestValidator menReqValidator;
     @Mock
     private MentorshipRequestRepository menReqRepository;
+
+    private MentorshipRequestDto menReqDto = new MentorshipRequestDto();
+    private MentorshipRequest menReqEntity = new MentorshipRequest();
+    private RejectionDto rejectionDto = new RejectionDto();
+    private User requester = new User();
+    private User receiver = new User();
+    private List<RequestFilter> filterRequests;
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
     private static final long MENTORSHIP_REQUEST_ID = 1L;
     private static final String DESCRIPTION_TEXT = "Test";
     private static final int MEN_REQS_SIZE = 2;
-    private final MentorshipRequestDto menReqDto = new MentorshipRequestDto();
-    private final MentorshipRequest menReqEntity = new MentorshipRequest();
-    private final RejectionDto rejectionDto = new RejectionDto();
-    private final User requester = new User();
-    private final User receiver = new User();
-    @Mock
-    private MentorshipRequestMapper menReqMapper;
-    @Mock
-    private MentorshipRequestValidator menReqValidator;
-    @InjectMocks
-    private MentorshipRequestService menReqService;
-    private List<RequestFilter> filterRequests;
 
     @Nested
     class PositiveTest {
-
         @BeforeEach
         public void init() {
+            List<User> mentors = new ArrayList<>();
+
             RequestFilter requestFilter = mock(RequestFilter.class);
             filterRequests = List.of(requestFilter);
 
             menReqService = new MentorshipRequestService(
                     menReqRepository, menReqMapper, menReqValidator, filterRequests);
 
-            menReqDto.setId(MENTORSHIP_REQUEST_ID);
-            menReqDto.setRequesterId(REQUESTER_ID);
-            menReqDto.setReceiverId(RECEIVER_ID);
-            menReqDto.setDescription(DESCRIPTION_TEXT);
+            menReqDto = MentorshipRequestDto.builder()
+                    .id(MENTORSHIP_REQUEST_ID)
+                    .requesterId(REQUESTER_ID)
+                    .receiverId(RECEIVER_ID)
+                    .description(DESCRIPTION_TEXT)
+                    .build();
 
-            requester.setId(REQUESTER_ID);
-            receiver.setId(RECEIVER_ID);
-            List<User> mentors = new ArrayList<>();
-            receiver.setMentors(mentors);
+            requester = User.builder()
+                    .id(REQUESTER_ID)
+                    .build();
 
-            menReqEntity.setRequester(requester);
-            menReqEntity.setReceiver(receiver);
-            menReqEntity.setId(MENTORSHIP_REQUEST_ID);
-            menReqEntity.setDescription(DESCRIPTION_TEXT);
+            receiver = User.builder()
+                    .id(RECEIVER_ID)
+                    .mentors(mentors)
+                    .build();
 
+            menReqEntity = MentorshipRequest.builder()
+                    .requester(requester)
+                    .receiver(receiver)
+                    .id(MENTORSHIP_REQUEST_ID)
+                    .description(DESCRIPTION_TEXT)
+                    .build();
         }
 
         @Test
@@ -165,8 +174,8 @@ class MentorshipRequestServiceTest {
             assertEquals(menReqEntity.getRequester(), requester);
             assertEquals(menReqEntity.getReceiver(), receiver);
             assertEquals(mentorshipRequestDtoNew.getStatus(), menReqEntity.getStatus());
-            assertEquals(mentorshipRequestDtoNew.getReceiverId(), menReqEntity.getRequester().getId());
-            assertEquals(mentorshipRequestDtoNew.getRequesterId(), menReqEntity.getReceiver().getId());
+            assertEquals(mentorshipRequestDtoNew.getReceiverId(), menReqEntity.getReceiver().getId());
+            assertEquals(mentorshipRequestDtoNew.getRequesterId(), menReqEntity.getRequester().getId());
 
             verify(menReqValidator).validateMentorsContainsReceiver(menReqEntity);
             verify(menReqRepository).findById(MENTORSHIP_REQUEST_ID);
@@ -203,7 +212,6 @@ class MentorshipRequestServiceTest {
 
     @Nested
     class NegativeTest {
-
         @Test
         @DisplayName("Бросить исключение если пользователь отсутствует в БД")
         void whenValidateAcceptThenException() {

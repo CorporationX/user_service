@@ -1,4 +1,4 @@
-package school.faang.user_service.requestformentoring.helper.filters;
+package school.faang.user_service.helper.filters;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,16 +17,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthorRequestFilterTest {
-    private static final User receiver = new User();
-    private static final RequestFilterDto requestFilterDto = new RequestFilterDto();
-    private static final long RECEIVER_ID = 1L;
-    private static final long STREAM_COUNT = 1L;
+
     @InjectMocks
     private AuthorRequestFilter filterByAuthorRequest;
 
+    private User receiver = new User();
+    private RequestFilterDto requestFilterDto = new RequestFilterDto();
+    private static final long RECEIVER_ID = 1L;
+    private static final long STREAM_COUNT = 1L;
+
     @Nested
     class PositiveTest {
-
         @Test
         @DisplayName("Возвращаем положительный результат")
         void whenValidateIsApplicableThenReturnNotNull() {
@@ -58,6 +59,8 @@ class AuthorRequestFilterTest {
             @Test
             @DisplayName("Ничего не возвращаем ")
             void whenValidateIsApplicableThenBrake() {
+                requestFilterDto.setReceiverId(null);
+
                 assertFalse(filterByAuthorRequest.isApplicable(requestFilterDto));
             }
         }

@@ -1,4 +1,4 @@
-package school.faang.user_service.requestformentoring.helper.filters;
+package school.faang.user_service.helper.filters;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class DescriptionFilterTest {
+
     @InjectMocks
     private DescriptionFilter filterByDescription;
 
@@ -53,6 +54,8 @@ class DescriptionFilterTest {
         @Test
         @DisplayName("Ничего не возвращаем ")
         void whenValidateIsApplicableThenBrake() {
+            requestFilterDto.setDescription(null);
+
             assertFalse(filterByDescription.isApplicable(requestFilterDto));
         }
     }

@@ -1,4 +1,4 @@
-package school.faang.user_service.requestformentoring.helper.validator;
+package school.faang.user_service.helper.validator;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.helper.validator.MentorshipRequestValidator;
 import school.faang.user_service.services.UserService;
 
 import java.time.LocalDateTime;
@@ -26,37 +25,46 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestValidatorTest {
+
+    @InjectMocks
+    private MentorshipRequestValidator menReqValidator;
+    @Mock
+    private UserService userService;
+
+    private MentorshipRequestDto menReqDto = new MentorshipRequestDto();
+    private MentorshipRequest menReqEntity = new MentorshipRequest();
+    private User receiver = new User();
+    private User requester = new User();
+    private List<User> users = new ArrayList<>();
     private static final long MONTHS_REQUEST = 3;
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(2024, 5, 22, 20, 20, 20);
-    private final MentorshipRequestDto menReqDto = new MentorshipRequestDto();
-    private final MentorshipRequest menReqEntity = new MentorshipRequest();
-    private final User receiver = new User();
-    private final User requester = new User();
-    @Mock
-    private UserService userService;
-    @InjectMocks
-    private MentorshipRequestValidator menReqValidator;
-    private List<User> users = new ArrayList<>();
 
     @BeforeEach
     void init() {
-        receiver.setId(RECEIVER_ID);
+        receiver = User.builder()
+                .id(RECEIVER_ID)
+                .build();
 
-        requester.setId(REQUESTER_ID);
+        requester = User.builder()
+                .id(REQUESTER_ID)
+                .build();
 
-        menReqDto.setRequesterId(REQUESTER_ID);
-        menReqDto.setReceiverId(RECEIVER_ID);
+        menReqDto = MentorshipRequestDto.builder()
+                .requesterId(REQUESTER_ID)
+                .receiverId(RECEIVER_ID)
+                .build();
 
-        menReqEntity.setCreatedAt(LOCAL_DATE_TIME);
-        menReqEntity.setRequester(requester);
-        menReqEntity.setReceiver(receiver);
+        menReqEntity = MentorshipRequest.builder()
+                .createdAt(LOCAL_DATE_TIME)
+                .requester(requester)
+                .receiver(receiver)
+                .build();
     }
 
     @Nested
     class PositiveTest {
-
         @Test
         @DisplayName("Выбрасываем исключение если ID пользователей равны")
         void whenRequesterIdEqualsReceiverIdThenException() {

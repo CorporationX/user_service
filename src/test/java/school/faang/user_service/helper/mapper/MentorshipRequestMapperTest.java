@@ -1,4 +1,4 @@
-package school.faang.user_service.requestformentoring.helper.mapper;
+package school.faang.user_service.helper.mapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,6 @@ import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.helper.mapper.MentorshipRequestMapper;
 
 import java.time.LocalDateTime;
 
@@ -15,12 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MentorshipRequestMapperTest {
 
+    private final MentorshipRequestMapper menReqMapper = Mappers.getMapper(MentorshipRequestMapper.class);
+
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
     private static final long MENTORSHIP_REQUEST_ID = 1L;
     private static final String DESCRIPTION = "Test";
     private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(2024, 8, 22, 22, 20, 20);
-    private final MentorshipRequestMapper menReqMapper = Mappers.getMapper(MentorshipRequestMapper.class);
 
     @Test
     @DisplayName("Успех маппинга MentorshipRequest в MentorshipRequestDto")

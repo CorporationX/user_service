@@ -1,5 +1,6 @@
 package school.faang.user_service.exception.handler;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.dto.ErrorResponse;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileUploadException;
+import school.faang.user_service.exception.NonUniqueFieldsException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,19 +36,6 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(DataValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDataValidationException(DataValidationException exception) {
-        String message = exception.getMessage();
-        log.error("Data error: {}", message);
-
-        return ErrorResponse.builder()
-                .serviceName(serviceName)
-                .globalMessage(message)
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
@@ -62,6 +51,18 @@ public class GlobalExceptionHandler {
         return ErrorResponse.builder()
                 .serviceName(serviceName)
                 .fieldErrors(errors)
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+    }
+
+    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataExceptions(RuntimeException exception) {
+        String message = exception.getMessage();
+        log.error("Error: {}", message);
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage(message)
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
     }

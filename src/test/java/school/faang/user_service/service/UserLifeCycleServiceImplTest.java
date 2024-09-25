@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NonUniqueFieldsException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -136,7 +138,7 @@ class UserLifeCycleServiceImplTest {
 
         when(countryRepository.findById(countryId)).thenReturn(Optional.empty());
 
-        Throwable exception = assertThrows(DataValidationException.class,
+        Throwable exception = assertThrows(EntityNotFoundException.class,
                 () -> userService.registrationUser(registrationDto));
 
         assertEquals(correctMessage, exception.getMessage());
@@ -151,7 +153,7 @@ class UserLifeCycleServiceImplTest {
         String invalidDataMessage = "Username/email/phone already in use";
         when(userRepository.existsByUsernameAndEmailAndPhone(username, email, phone)).thenReturn(true);
 
-        Throwable exception = assertThrows(DataValidationException.class,
+        Throwable exception = assertThrows(NonUniqueFieldsException.class,
                 () -> userService.registrationUser(registrationDto));
 
         assertEquals(invalidDataMessage, exception.getMessage());

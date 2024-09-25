@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.dice.bear.DiceBearClient;
+import school.faang.user_service.config.ProfilePictureProperties;
 import school.faang.user_service.service.GeneratorPictureService;
 import school.faang.user_service.util.BinaryFileReader;
 
@@ -27,21 +27,18 @@ public class AsyncRandomGeneratorProfilePictureService implements GeneratorPictu
 
     private final DiceBearClient diceBearClient;
     private final BinaryFileReader profilePictureReader;
+    private final ProfilePictureProperties profilePictureProperties;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(12);
     private List<byte[]> defaultProfilePictures;
 
-    @Value("${profile-picture.normal.size}")
-    private int size;
-
-    @Value("${profile-picture.small.small-size}")
-    private int smallSize;
-
-    @Value("${profile-picture.normal.path}")
-    private String path;
-
-    @Value("${profile-picture.small.path}")
-    private String smallPath;
+    @PostConstruct
+    public void initializeDefaultPictures() {
+        defaultProfilePictures = List.of(
+                profilePictureReader.readFile(profilePictureProperties.getNormal().getPath()),
+                profilePictureReader.readFile(profilePictureProperties.getSmall().getPath())
+        );
+    }
 
     @Override
     public List<byte[]> getProfilePictures(String seed) {
@@ -49,9 +46,9 @@ public class AsyncRandomGeneratorProfilePictureService implements GeneratorPictu
             log.info("Get avatars by seed {}.", seed);
 
             var picFuture = CompletableFuture.supplyAsync(
-                    () -> diceBearClient.getSvgAvatar(seed, size), executor);
+                    () -> diceBearClient.getSvgAvatar(seed, profilePictureProperties.getNormal().getSize()), executor);
             var smallPicFuture = CompletableFuture.supplyAsync(
-                    () -> diceBearClient.getSvgAvatar(seed, smallSize), executor);
+                    () -> diceBearClient.getSvgAvatar(seed, profilePictureProperties.getSmall().getSize()), executor);
 
             return List.of(picFuture.join(), smallPicFuture.join());
 
@@ -59,14 +56,6 @@ public class AsyncRandomGeneratorProfilePictureService implements GeneratorPictu
             log.error("Failed to get avatar for seed {}.", seed, exception);
             return defaultProfilePictures;
         }
-    }
-
-    @PostConstruct
-    public void initializeDefaultPictures() {
-        defaultProfilePictures = List.of(
-                profilePictureReader.readFile(path),
-                profilePictureReader.readFile(smallPath)
-        );
     }
 
     @PreDestroy

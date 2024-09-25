@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,7 @@ import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NonUniqueFieldsException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -27,12 +28,10 @@ public class UserLifeCycleServiceImpl implements UserLifeCycleService {
 
     private final MentorshipService mentorshipService;
     private final ProfilePictureService profilePictureService;
-
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final GoalRepository goalRepository;
     private final CountryRepository countryRepository;
-
     private final UserMapper userMapper;
 
     @Override
@@ -47,20 +46,19 @@ public class UserLifeCycleServiceImpl implements UserLifeCycleService {
     }
 
     @Override
-    @Transactional
     public UserDto registrationUser(UserRegistrationDto userRegistrationDto) {
-        validateUserRegistrationDto(userRegistrationDto);
+        existsByUsernameEmailAndPhone(userRegistrationDto);
         Country country = countryRepository.findById(userRegistrationDto.countryId())
-                .orElseThrow(() -> new DataValidationException("Country not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Country not found"));
 
         UserProfilePic userProfilePic = profilePictureService.saveProfilePictures(userRegistrationDto);
         User user = configureUser(userRegistrationDto, userProfilePic, country);
         return userMapper.toDto(userRepository.save(user));
     }
 
-    private void validateUserRegistrationDto(UserRegistrationDto dto) {
+    private void existsByUsernameEmailAndPhone(UserRegistrationDto dto) {
         if (userRepository.existsByUsernameAndEmailAndPhone(dto.username(), dto.email(), dto.phone())) {
-            throw new DataValidationException("Username/email/phone already in use");
+            throw new NonUniqueFieldsException("Username/email/phone already in use");
         }
     }
 

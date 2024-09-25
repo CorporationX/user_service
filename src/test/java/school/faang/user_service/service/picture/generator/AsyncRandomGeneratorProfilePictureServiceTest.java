@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.client.dice.bear.DiceBearClient;
+import school.faang.user_service.config.ProfilePictureProperties;
 import school.faang.user_service.util.BinaryFileReader;
 
 import java.util.List;
@@ -24,6 +26,9 @@ class AsyncRandomGeneratorProfilePictureServiceTest {
 
     @Mock
     private BinaryFileReader profilePictureReader;
+
+    @Spy
+    private ProfilePictureProperties properties;
 
     @InjectMocks
     private AsyncRandomGeneratorProfilePictureService service;
@@ -44,10 +49,8 @@ class AsyncRandomGeneratorProfilePictureServiceTest {
         when(profilePictureReader.readFile(path)).thenReturn(defaultProfilePicture);
         when(profilePictureReader.readFile(smallPath)).thenReturn(defaultSmallProfilePicture);
 
-        service.setSize(size);
-        service.setSmallSize(smallSize);
-        service.setPath(path);
-        service.setSmallPath(smallPath);
+        properties.setNormal(new ProfilePictureProperties.Picture(path, size));
+        properties.setSmall(new ProfilePictureProperties.Picture(smallPath, smallSize));
 
         service.initializeDefaultPictures();
     }
@@ -86,7 +89,7 @@ class AsyncRandomGeneratorProfilePictureServiceTest {
 
     @Test
     void shutdown() {
-        var service = new AsyncRandomGeneratorProfilePictureService(diceBearClient, profilePictureReader);
+        var service = new AsyncRandomGeneratorProfilePictureService(diceBearClient, profilePictureReader, properties);
 
         service.shutdown();
         boolean isShutdown = service.getExecutor().isShutdown();

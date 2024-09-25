@@ -64,4 +64,4 @@ profile-picture:
     size: 320
   small:
     path: image/default-small-profile-picture.svg
-    small-size: 110
+    size: 110

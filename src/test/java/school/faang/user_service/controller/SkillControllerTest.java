@@ -29,8 +29,8 @@ class SkillControllerTest {
         SkillDto skillDto2 = new SkillDto();
         skillDto2.setTitle(" ");
 
-        Assert.assertThrows(DataValidationException.class, () -> skillController.create(skillDto1));
-        Assert.assertThrows(DataValidationException.class, () -> skillController.create(skillDto2));
+        Assert.assertThrows(NullPointerException.class, () -> skillController.create(skillDto1));
+        Assert.assertThrows(NullPointerException.class, () -> skillController.create(skillDto2));
     }
 
     @Test

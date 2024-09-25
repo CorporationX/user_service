@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidationException(DataValidationException e) {
-        log.info("DataValidationException occurred: {}", e.getMessage());
+        log.info("DataValidationException found and occurred: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 

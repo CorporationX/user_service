@@ -34,11 +34,12 @@ class UserServiceTest {
     private UserService userService;
     @Mock
     private UserRepository userRepository;
+    private static final long REQUESTER_ID = 1L;
+    private static final long RECEIVER_ID = 2L;
+
     private static final List<Long> USER_IDS = List.of(REQUESTER_ID);
     private static final String USER_NAME = "name";
 
-    private static final long REQUESTER_ID = 1L;
-    private static final long RECEIVER_ID = 2L;
     @Mock
     private UserMapper userMapper;
     @Mock

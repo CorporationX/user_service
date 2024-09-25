@@ -29,6 +29,14 @@ spring:
         follower-event-channel:
           name: follower_event
 
+services:
+  s3:
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    region: us-east-1
+    bucketName: corpbucket
+
 server:
   port: 8080
 

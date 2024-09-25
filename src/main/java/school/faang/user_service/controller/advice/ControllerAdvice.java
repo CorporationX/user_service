@@ -7,12 +7,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.controller.goal.GoalInvitationController;
+import school.faang.user_service.controller.user.UserController;
+
 import java.util.stream.Collectors;
 
 @RestControllerAdvice(assignableTypes = {
-        GoalInvitationController.class
+        GoalInvitationController.class,
+        UserController.class
 })
-public class ApiControllerAdvice {
+public class ControllerAdvice {
 
     // Validator exceptions, based on convention chosen by the team
     @ExceptionHandler({
@@ -46,7 +49,6 @@ public class ApiControllerAdvice {
         return new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
-//                "Something wrong on our end, contact IT support immediately."
         );
     }
 }

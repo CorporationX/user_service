@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,5 +52,8 @@ public class MentorshipService {
         User mentee = userRepository.findById(menteeId).orElseThrow(() -> new NoSuchElementException("Mentee not found"));
         mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
         userRepository.save(mentee);
+    }
+
+    public void stopMentorship(User user) {
     }
 }

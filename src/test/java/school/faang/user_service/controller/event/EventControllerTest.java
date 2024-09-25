@@ -14,12 +14,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,7 +33,7 @@ public class EventControllerTest {
     private EventFilterDto eventFilterDto;
 
     @Mock
-    private EventService userService;
+    private EventService eventService;
 
     @Mock
     private UserContext userContext;
@@ -50,19 +51,22 @@ public class EventControllerTest {
         eventFilterDto = new EventFilterDto();
 
         objectMapper = new ObjectMapper();
-        mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
+
+        mockMvc = MockMvcBuilders.standaloneSetup(eventController)
+                .setControllerAdvice(new GlobalRestExceptionHandler())
+                .build();
     }
 
     @Test
     @DisplayName("Should return filtered events successfully with correct user ID and filters")
-    public void testGetFilteredUsers_Success() throws Exception {
+    public void testGetFilteredEvents_Success() throws Exception {
         Long userId = 1L;
         String requestBody = objectMapper.writeValueAsString(eventFilterDto);
 
         when(userContext.getUserId()).thenReturn(userId);
-        when(userService.getFilteredEvents(eventFilterDto, userId)).thenReturn(List.of(eventDto, anotherEventDto));
+        when(eventService.getFilteredEvents(eventFilterDto, userId)).thenReturn(List.of(eventDto, anotherEventDto));
 
-        mockMvc.perform(get("/events/filtered")
+        mockMvc.perform(post("/events/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -73,12 +77,15 @@ public class EventControllerTest {
 
     @Test
     @DisplayName("Should return 400 Bad Request when invalid json is provided")
-    public void testGetFilteredUsers_InvalidRequest() throws Exception {
+    public void testGetFilteredEvents_InvalidRequest() throws Exception {
         String invalidJson = "{invalid json}";
 
-        mockMvc.perform(get("/events/filtered")
+        mockMvc.perform(post("/events/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Invalid Input Format"))
+                .andExpect(jsonPath("$.message")
+                        .value(org.hamcrest.Matchers.containsString("JSON parse error")));
     }
 }

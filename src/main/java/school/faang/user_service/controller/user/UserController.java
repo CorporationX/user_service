@@ -30,7 +30,7 @@ public class UserController {
         return userService.deactivateUser(userDto);
     }
 
-    @GetMapping(value = "/filtered")
+    @PostMapping(value = "/filtered")
     public List<UserDto> getFilteredUsers(@RequestBody UserFilterDto filter) {
         long userId = userContext.getUserId();
         return userService.getFilteredUsers(filter, userId);

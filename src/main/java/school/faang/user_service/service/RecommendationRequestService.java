@@ -1,14 +1,13 @@
-package school.faang.user_service.Service;
+package school.faang.user_service.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.exception.*;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -20,29 +19,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserRepository userRepository;
 
-    @Autowired
-    public RecommendationRequestService(RecommendationRequestRepository recommendationRequestRepository,
-                                        SkillRepository skillRepository,
-                                        SkillRequestRepository skillRequestRepository,
-                                        RecommendationRequestMapper recommendationRequestMapper, UserRepository userRepository) {
-        this.recommendationRequestRepository = recommendationRequestRepository;
-        this.skillRequestRepository = skillRequestRepository;
-        this.recommendationRequestMapper = recommendationRequestMapper;
-        this.userRepository = userRepository;
-    }
-
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recommendation request not found for id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation request not found for id: " + id));
 
         if (recommendationRequest.getStatus() != RequestStatus.PENDING) {
-            throw new RuntimeException("Recommendation request has already been processed (accepted or rejected).");
+            throw new RecommendationRequestAlreadyProcessedException("Recommendation request has already been processed (accepted or rejected).");
         }
 
         recommendationRequest.setStatus(RequestStatus.REJECTED);
@@ -55,7 +44,7 @@ public class RecommendationRequestService {
 
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recommendation Request not found for id: " + id));
+                .orElseThrow(() -> new RecommendationRequestNotFoundException("Recommendation Request not found for id: " + id));
 
         return recommendationRequestMapper.toDto(recommendationRequest);
     }
@@ -82,35 +71,15 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-
-        if (!userRepository.existsById(recommendationRequestDto.getRequesterId())) {
-            throw new IllegalArgumentException("Requester not found");
-        }
-
-        // Проверяем наличие Receiver
-        if (!userRepository.existsById(recommendationRequestDto.getReceiverId())) {
-            throw new IllegalArgumentException("Receiver not found");
-        }
-
         recommendationRequestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
                         recommendationRequestDto.getReceiverId())
                 .ifPresent(request -> {
                     if (ChronoUnit.MONTHS.between(request.getCreatedAt(), LocalDateTime.now()) < 6) {
-                        throw new IllegalArgumentException("Recommendation request can be sent only once in 6 months");
+                        throw new RecommendationRequestTooFrequentException("Recommendation request can be sent only once in 6 months");
                     }
                 });
 
-        // Проверяем, владеет ли пользователь всеми указанными навыками
-        if (recommendationRequestDto.getSkillId() != null && !recommendationRequestDto.getSkillId().isEmpty()) {
-            int ownedSkillsCount = userRepository.countOwnedSkills(
-                    recommendationRequestDto.getRequesterId(),
-                    recommendationRequestDto.getSkillId()
-            );
-
-            if (ownedSkillsCount != recommendationRequestDto.getSkillId().size()) {
-                throw new IllegalArgumentException("One or more skills do not exist for the requester");
-            }
-        }
+        checkRequesterSkills(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getSkillId());
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
         recommendationRequest.setCreatedAt(LocalDateTime.now());
@@ -118,13 +87,27 @@ public class RecommendationRequestService {
 
         RecommendationRequest savedRequest = recommendationRequestRepository.save(recommendationRequest);
 
-        if (recommendationRequestDto.getSkillId() != null) {
-            recommendationRequestDto.getSkillId().forEach(skillId ->
-                    skillRequestRepository.create(savedRequest.getId(), skillId)
-            );
-        }
+        saveSkills(recommendationRequestDto, savedRequest.getId());
 
         return recommendationRequestMapper.toDto(savedRequest);
     }
 
+    private void checkRequesterSkills(Long requesterId, List<Long> skillIds) {
+        if (skillIds != null && !skillIds.isEmpty()) {
+            int ownedSkillsCount = userRepository.countOwnedSkills(requesterId, skillIds);
+            if (ownedSkillsCount != skillIds.size()) {
+                throw new SkillOwnershipException("One or more skills do not exist for the requester");
+            }
+        }
+    }
+
+    private void saveSkills(RecommendationRequestDto recommendationRequestDto, Long requestId) {
+        recommendationRequestDto.getSkillId().forEach(skillId ->
+                skillRequestRepository.create(requestId, skillId)
+        );
+    }
+
+    private boolean hasSkills(RecommendationRequestDto recommendationRequestDto) {
+        return recommendationRequestDto.getSkillId() != null;
+    }
 }

@@ -1,13 +1,9 @@
 package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.Service.RecommendationRequestService;
+import school.faang.user_service.service.RecommendationRequestService;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -16,14 +12,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/recommendations")
+@RequiredArgsConstructor
 public class RecommendationRequestController {
 
     private final RecommendationRequestService recommendationRequestService;
-
-    @Autowired
-    public RecommendationRequestController(RecommendationRequestService recommendationRequestService) {
-        this.recommendationRequestService = recommendationRequestService;
-    }
 
     @PostMapping("/{id}/reject")
     public RecommendationRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {

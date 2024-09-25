@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.service.UserLifeCycleService;
-import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserContext userContext;
@@ -41,17 +40,13 @@ public class UserController {
         log.info("User registration successful");
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
-    }
-
-    public List<UserDto> getPremiumUsers(UserFilterDto filter) {
-        return userService.getPremiumUsers(filter);
     }
 }

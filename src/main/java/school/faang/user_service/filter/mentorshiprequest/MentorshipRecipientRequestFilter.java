@@ -7,15 +7,15 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.stream.Stream;
 
 @Component
-public class DescriptionFilter implements RequestFilter {
+public class MentorshipRecipientRequestFilter implements MentorshipRequestFilter {
 
     @Override
     public boolean isApplicable(RequestFilterDto filterDto) {
-        return filterDto.getDescription() != null && !filterDto.getDescription().isBlank();
+        return filterDto.getRequesterId() != null;
     }
 
     @Override
     public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> menReqs, RequestFilterDto filterDto) {
-        return menReqs.filter(menReq -> menReq.getDescription().contains(filterDto.getDescription()));
+        return menReqs.filter(menReq -> menReq.getRequester().getId().equals(filterDto.getRequesterId()));
     }
 }

@@ -8,17 +8,17 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.filter.mentorshiprequest.DescriptionFilter;
+import school.faang.user_service.filter.mentorshiprequest.MentorshipDescriptionFilter;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class DescriptionFilterTest {
+class MentorshipDescriptionFilterTest {
 
     @InjectMocks
-    private DescriptionFilter filterByDescription;
+    private MentorshipDescriptionFilter filterByDescription;
 
     private static final RequestFilterDto requestFilterDto = new RequestFilterDto();
     private static final String DESCRIPTION = "Test";

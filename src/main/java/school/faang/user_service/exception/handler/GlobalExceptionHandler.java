@@ -13,6 +13,7 @@ import school.faang.user_service.exceptions.DataValidationException;
 
 import javax.naming.AuthenticationException;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,20 @@ public class GlobalExceptionHandler {
                 error -> ((FieldError) error).getField(),
                 error -> Objects.requireNonNullElse(error.getDefaultMessage(), "")
         ));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
+        log.info("IllegalArgumentException found and occurred: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleNoSuchElementException(NoSuchElementException e) {
+        log.info("NoSuchElementException found and occurred: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

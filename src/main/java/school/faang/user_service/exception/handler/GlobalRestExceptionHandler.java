@@ -21,9 +21,6 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalRestExceptionHandler {
-    private static final String ARGUMENT_TYPE_MISMATCH_MESSAGE = "Sorry, you've provided an invalid request." +
-            " Please check the request format and ensure all required parameters are correct.";
-    private static final String METHOD_NOT_ALLOWED_MESSAGE = "The method you chose is not supported!";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -47,7 +44,7 @@ public class GlobalRestExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         log.error("Argument Type Mismatch", ex);
-        return new ErrorResponse("Argument Type Mismatch", ARGUMENT_TYPE_MISMATCH_MESSAGE);
+        return new ErrorResponse("Argument Type Mismatch", ex.getMessage());
     }
 
     @ExceptionHandler(SkillAssignmentException.class)
@@ -83,7 +80,7 @@ public class GlobalRestExceptionHandler {
     public ErrorResponse handleHttpRequestMethodNotSupported(
             HttpRequestMethodNotSupportedException ex) {
         log.error("Method Not Allowed", ex);
-        return new ErrorResponse("Method Not Allowed", METHOD_NOT_ALLOWED_MESSAGE);
+        return new ErrorResponse("Method Not Allowed", ex.getMessage());
     }
 
     @ExceptionHandler(FeignException.class)

@@ -1,8 +1,8 @@
 package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ValidationException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
@@ -24,10 +24,10 @@ public class UserService {
     @Transactional
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with this id does not exist in the database"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + "does not exist"));
     }
 
-    public UserDto getUser(long userId) {
+    public UserDto getUserDto(long userId) {
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
 
@@ -39,4 +39,9 @@ public class UserService {
 
         return userMapper.toDtos(userRepository.findAllById(ids));
     }
+
+//    public User getUser(long userId) {
+//        return userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " doesn't exist"));
+//    }
 }

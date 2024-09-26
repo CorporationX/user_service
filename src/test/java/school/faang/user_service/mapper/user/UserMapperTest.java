@@ -9,11 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.pojo.student.Address;
+import school.faang.user_service.pojo.student.ContactInfo;
+import school.faang.user_service.pojo.student.Person;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,11 +25,12 @@ class UserMapperTest {
 
     private final static long USER_ID_ONE = 1L;
     private final static long USER_ID_TWO = 2L;
-    private static final String USER_NAME_ONE = "name";
-    private static final String USER_NAME_TWO = "Name";
-    private static final int USER_DTOS_SIZE = 2;
 
     private final static int SIZE_USER_DTO_LIST = 2;
+    private static final int USER_DTOS_SIZE = 2;
+
+    private static final String USER_NAME_ONE = "name";
+    private static final String USER_NAME_TWO = "Name";
 
     private User userOne;
     private User userTwo;
@@ -99,6 +101,46 @@ class UserMapperTest {
             assertEquals(userOne.getUsername(), userDtos.get(0).getUsername());
             assertEquals(userTwo.getId(), userDtos.get(1).getId());
             assertEquals(userTwo.getUsername(), userDtos.get(1).getUsername());
+        }
+    }
+
+    @Nested
+    class PojoToEntity {
+
+        private final static String FIRST_NAME = "John";
+        private final static String LAST_NAME = "Doe";
+        private final static String EMAIL = "johndoe@example.com";
+        private final static String PHONE = "+1-123-456-7890";
+        private final static String COUNTRY = "USA";
+
+        private static Person person;
+
+        @BeforeEach
+        void init() {
+            person = Person.builder()
+                    .firstName(FIRST_NAME)
+                    .lastName(LAST_NAME)
+                    .contactInfo(ContactInfo.builder()
+                            .phone(PHONE)
+                            .email(EMAIL)
+                            .address(Address.builder()
+                                    .country(COUNTRY)
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Test
+        @DisplayName("Assert that fields from Person pojo are equals to User fields")
+        void whenPersonPojoMappedToUserThenFieldsShouldBeEquals() {
+            User user = userMapper.toEntity(person);
+
+            String expectedUsername = FIRST_NAME + " " + LAST_NAME;
+
+            assertEquals(expectedUsername, user.getUsername());
+            assertEquals(EMAIL, user.getEmail());
+            assertEquals(PHONE, user.getPhone());
+            assertEquals(COUNTRY, user.getCountry().getTitle());
         }
     }
 }

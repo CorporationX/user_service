@@ -54,27 +54,6 @@ class GoalValidatorTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class GoalIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
-
-            @Test
-            @DisplayName("Throws ValidationException when goalId is null")
-            void whenIdIsNullValueThenThrowValidationException() {
-                assertThrows(ValidationException.class,
-                        () -> goalValidator.validateGoalIdIsPositiveAndNotNull(null),
-                        "Goal id can't be null");
-            }
-
-            @Test
-            @DisplayName("Throws ValidationException when goalId is negative")
-            void whenIdIsNegativeValueThenThrowValidationException() {
-                assertThrows(ValidationException.class,
-                        () -> goalValidator.validateGoalIdIsPositiveAndNotNull(
-                                GOAL_ID_NEGATIVE_ONE),
-                        "Goal id can't be less than 0");
-            }
-        }
-
         @Test
         @DisplayName("Throws ValidationException when goal with goalId not exists")
         void whenGoalNotExistsThenThrowValidationException() {
@@ -130,6 +109,27 @@ class GoalValidatorTest {
             goal.setStatus(ACTIVE_STATUS);
 
             goalValidator.validateGoalStatusNotCompleted(goal);
+        }
+
+        @Nested
+        class GoalIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Throws ValidationException when goalId is null")
+            void whenIdIsNullValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.validateGoalIdIsPositiveAndNotNull(null),
+                        "Goal id can't be null");
+            }
+
+            @Test
+            @DisplayName("Throws ValidationException when goalId is negative")
+            void whenIdIsNegativeValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> goalValidator.validateGoalIdIsPositiveAndNotNull(
+                                GOAL_ID_NEGATIVE_ONE),
+                        "Goal id can't be less than 0");
+            }
         }
     }
 

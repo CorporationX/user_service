@@ -22,7 +22,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
-        return userService.getUserDto(userId);
+        return userService.getUser(userId);
     }
 
     @PostMapping

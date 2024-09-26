@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestMapperTest {
 
-    private final RecommendationRequestMapperImpl mapper = new RecommendationRequestMapperImpl();
-
     private static final long RECOMMENDATION_REQUEST_ID = 1L;
     private static final String MESSAGE = "Test message";
     private static final RequestStatus REQUEST_STATUS = RequestStatus.ACCEPTED;
@@ -37,6 +35,7 @@ public class RecommendationRequestMapperTest {
     private static final long SKILL_REQUEST_ID_TWO = 2L;
     private static final long SKILL_ID_ONE = 1L;
     private static final long SKILL_ID_TWO = 2L;
+    private final RecommendationRequestMapperImpl mapper = new RecommendationRequestMapperImpl();
     private RecommendationRequest rq;
     private RecommendationRequestDto rqd;
 

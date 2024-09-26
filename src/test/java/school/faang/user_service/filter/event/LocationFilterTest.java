@@ -16,11 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class LocationFilterTest {
 
+    private final String location = "title";
     @InjectMocks
     private LocationFilter locationFilter;
-
-    private final String location = "title";
-
     private EventFilterDto eventFilterDto;
 
     @Nested
@@ -64,25 +62,25 @@ class LocationFilterTest {
     @Nested
     class NegativeTests {
 
-            @Test
-            @DisplayName("Если у EventFilterDto поле location null тогда возвращаем false")
-            void whenFieldNullThenReturnFalse() {
+        @Test
+        @DisplayName("Если у EventFilterDto поле location null тогда возвращаем false")
+        void whenFieldNullThenReturnFalse() {
 
-                eventFilterDto = EventFilterDto.builder()
-                        .location(null)
-                        .build();
+            eventFilterDto = EventFilterDto.builder()
+                    .location(null)
+                    .build();
 
-                assertFalse(locationFilter.isApplicable(eventFilterDto));
-            }
+            assertFalse(locationFilter.isApplicable(eventFilterDto));
+        }
 
-            @Test
-            @DisplayName("Если у EventFilterDto поле location пустое, тогда возвращаем false")
-            void whenFielIsEmptyThenReturnFalse() {
-                eventFilterDto = EventFilterDto.builder()
-                        .location("   ")
-                        .build();
+        @Test
+        @DisplayName("Если у EventFilterDto поле location пустое, тогда возвращаем false")
+        void whenFielIsEmptyThenReturnFalse() {
+            eventFilterDto = EventFilterDto.builder()
+                    .location("   ")
+                    .build();
 
-                assertFalse(locationFilter.isApplicable(eventFilterDto));
-            }
+            assertFalse(locationFilter.isApplicable(eventFilterDto));
+        }
     }
 }

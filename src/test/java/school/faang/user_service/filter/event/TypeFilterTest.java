@@ -17,11 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class TypeFilterTest {
 
+    private final EventType type = EventType.GIVEAWAY;
     @InjectMocks
     private TypeFilter typeFilter;
-
-    private final EventType type = EventType.GIVEAWAY;
-
     private EventFilterDto eventFilterDto;
 
     @Nested

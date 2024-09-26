@@ -36,6 +36,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class RecommendationServiceTest {
 
+    private static final long ID = 1L;
+    private static final String CONTENT = "content";
+    private static final String UPDATED_CONTENT = "update";
     @InjectMocks
     private RecommendationService recommendationService;
     @Mock
@@ -48,11 +51,6 @@ public class RecommendationServiceTest {
     private SkillOfferService skillOfferService;
     @Mock
     private RecommendationMapper recommendationMapper;
-
-    private static final long ID = 1L;
-    private static final String CONTENT = "content";
-    private static final String UPDATED_CONTENT = "update";
-
     private RecommendationDto recommendationDto;
     private RecommendationDto updatedRecommendationDto;
     private Recommendation recommendation;

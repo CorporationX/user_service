@@ -17,11 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class EndDateFilterTest {
 
+    private final LocalDateTime endDate = LocalDateTime.of(2024, 9, 1, 12, 5);
     @InjectMocks
     private EndDateFilter endDateFilter;
-
-    private final LocalDateTime endDate = LocalDateTime.of(2024, 9, 1, 12, 5);
-
     private EventFilterDto eventFilterDto;
 
     @Nested

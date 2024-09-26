@@ -31,10 +31,10 @@ public class UserService {
     @Transactional
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + "does not exist"));
+                .orElseThrow(() -> new EntityNotFoundException("User with this id does not exist in the database"));
     }
 
-    public UserDto getUserDto(long userId) {
+    public UserDto getUser(long userId) {
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
 
@@ -72,5 +72,8 @@ public class UserService {
 
     private void setDefaultPassword(List<User> users) {
         users.forEach(u -> u.setPassword(u.getUsername()));
+    }
+    public List<User> getUsersById(List<Long> usersId) {
+        return userRepository.findAllById(usersId);
     }
 }

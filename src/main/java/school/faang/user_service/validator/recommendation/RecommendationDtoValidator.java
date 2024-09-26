@@ -13,8 +13,8 @@ import java.time.temporal.ChronoUnit;
 @RequiredArgsConstructor
 public class RecommendationDtoValidator {
 
-    private final RecommendationRepository recommendationRepository;
     private static final int MIN_MONTH_COUNT = 6;
+    private final RecommendationRepository recommendationRepository;
 
     public void validateRecommendation(RecommendationDto recommendation) {
         validateDateOfLastRecommendation(recommendation);

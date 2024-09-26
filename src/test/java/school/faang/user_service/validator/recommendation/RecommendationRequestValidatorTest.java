@@ -20,11 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestValidatorTest {
 
-    @InjectMocks
-    private RecommendationRequestValidator recommendationRequestValidator;
-    private RecommendationRequestDto rqd;
-    private RecommendationRequestDto rqd2;
-    private RecommendationRequest rq;
     private static final String VALID_MESSAGE = "Hi ho!";
     private static final RequestStatus REQUEST_STATUS_PENDING = RequestStatus.PENDING;
     private static final LocalDateTime VALID_TIME =
@@ -34,6 +29,11 @@ public class RecommendationRequestValidatorTest {
     private static final LocalDateTime NOT_VALID_TIME =
             LocalDateTime.of(2024, Month.JULY, 2, 15, 50);
     private static final RequestStatus REQUEST_STATUS_REJECTED = RequestStatus.REJECTED;
+    @InjectMocks
+    private RecommendationRequestValidator recommendationRequestValidator;
+    private RecommendationRequestDto rqd;
+    private RecommendationRequestDto rqd2;
+    private RecommendationRequest rq;
 
     @Nested
     class PositiveTests {

@@ -15,15 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SkillCandidateMapperTest {
 
-    SkillCandidateMapper skillCandidateMapper = Mappers.getMapper(SkillCandidateMapper.class);
-
     private static final long FIRST_ID = 1L;
     private static final long SECOND_ID = 2L;
     private static final long THIRD_ID = 3L;
     private static final String FIRST_TITLE = "squating";
     private static final String SECOND_TITLE = "lifting";
     private static final String THIRD_TITLE = "spotting";
-
+    SkillCandidateMapper skillCandidateMapper = Mappers.getMapper(SkillCandidateMapper.class);
     private List<SkillDto> skillDtos;
 
     @BeforeEach

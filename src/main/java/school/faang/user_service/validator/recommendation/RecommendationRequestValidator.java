@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.recomendation.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

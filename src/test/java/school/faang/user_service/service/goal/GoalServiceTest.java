@@ -79,6 +79,18 @@ public class GoalServiceTest {
         goalDto.setDescription(GOAL_DESCRIPTION);
     }
 
+    @Test
+    @DisplayName("Throws exception when goal is not found")
+    void whenGoalNotFoundThenThrowEntityNotFoundException() {
+        when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () ->
+                goalService.updateGoal(GOAL_ID, goalDto)
+        );
+
+        verify(goalRepository).findById(GOAL_ID);
+    }
+
     @Nested
     @DisplayName("User Goal Limit Validation Tests")
     class UserGoalLimitTests {
@@ -143,18 +155,6 @@ public class GoalServiceTest {
             verify(goalValidator).validateGoalStatusNotCompleted(goal);
             verify(goalMapper).toGoalDto(goal);
         }
-    }
-
-    @Test
-    @DisplayName("Throws exception when goal is not found")
-    void whenGoalNotFoundThenThrowEntityNotFoundException() {
-        when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () ->
-                goalService.updateGoal(GOAL_ID, goalDto)
-        );
-
-        verify(goalRepository).findById(GOAL_ID);
     }
 
     @Nested

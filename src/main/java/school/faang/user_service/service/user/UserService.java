@@ -52,6 +52,10 @@ public class UserService {
         return userMapper.toDtos(userRepository.findAllById(ids));
     }
 
+    public List<User> getUsersById(List<Long> usersId) {
+        return userRepository.findAllById(usersId);
+    }
+
     @Transactional
     public UserDto registerUser(UserRegistrationDto userRegistrationDto) {
         log.debug("registerUser() - start : userRegistrationDto = {}", userRegistrationDto);

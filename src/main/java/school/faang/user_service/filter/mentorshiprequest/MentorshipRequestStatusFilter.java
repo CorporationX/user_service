@@ -7,7 +7,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.stream.Stream;
 
 @Component
-public class RequestStatusFilter implements RequestFilter {
+public class MentorshipRequestStatusFilter implements MentorshipRequestFilter {
 
     @Override
     public boolean isApplicable(RequestFilterDto filterDto) {

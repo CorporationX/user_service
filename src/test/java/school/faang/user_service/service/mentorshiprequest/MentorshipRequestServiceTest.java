@@ -15,10 +15,10 @@ import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorshiprequest.RequestFilter;
+import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
-import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ class MentorshipRequestServiceTest {
     private RejectionDto rejectionDto = new RejectionDto();
     private User requester = new User();
     private User receiver = new User();
-    private List<RequestFilter> filterRequests;
+    private List<MentorshipRequestFilter> filterRequests;
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
     private static final long MENTORSHIP_REQUEST_ID = 1L;
@@ -60,7 +60,7 @@ class MentorshipRequestServiceTest {
         public void init() {
             List<User> mentors = new ArrayList<>();
 
-            RequestFilter requestFilter = mock(RequestFilter.class);
+            MentorshipRequestFilter requestFilter = mock(MentorshipRequestFilter.class);
             filterRequests = List.of(requestFilter);
 
             menReqService = new MentorshipRequestService(

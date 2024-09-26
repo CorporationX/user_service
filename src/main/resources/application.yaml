@@ -25,6 +25,31 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+  cloud:
+    openfeign:
+      client:
+        config:
+          DiceBear:
+            connectTimeout: 5000
+            readTimeout: 10000
+services:
+  user-service:
+    name: User service
+
+  payment-service:
+    host: localhost
+    port: 9080
+
+  project-service:
+    host: localhost
+    port: 8082
+
+  s3:
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    region: us-east-1
+    bucketName: userbucket
 
 server:
   port: 8080
@@ -33,10 +58,10 @@ logging:
   level:
     root: info
 
-project-service:
-  host: localhost
-  port: 8082
-
-payment-service:
-  host: localhost
-  port: 9080
+profile-picture:
+  normal:
+    path: image/default-profile-picture.svg
+    size: 320
+  small:
+    path: image/default-small-profile-picture.svg
+    size: 110

@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -27,7 +26,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public void followUser(long followerId, long followeeId) throws DataValidationException {
+    public void followUser(long followerId, long followeeId) {
         validator.validateUserIds(followerId, followeeId);
         boolean exists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
         validator.validateFollowSubscription(exists, followerId, followeeId);
@@ -36,7 +35,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
+    public void unfollowUser(long followerId, long followeeId) {
         validator.validateUserIds(followerId, followeeId);
         boolean exists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
         validator.validateUnfollowSubscription(exists, followerId, followeeId);

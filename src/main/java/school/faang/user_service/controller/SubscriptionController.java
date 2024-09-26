@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "404", description = "Невалидные данные")
     })
     @PostMapping("/follow")
-    public void followUser(@RequestParam Long followerId, @RequestParam Long followeeId) throws DataValidationException {
+    public void followUser(@RequestParam Long followerId, @RequestParam Long followeeId) {
             subscriptionService.followUser(followerId, followeeId);
             log.info("Follower {} followed user with id {}.", followerId, followeeId);
     }
@@ -49,7 +48,7 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "404", description = "Невалидные данные")
     })
     @DeleteMapping("/unfollow")
-    public void unfollowUser(@RequestParam Long followerId, @RequestParam Long followeeId) throws DataValidationException {
+    public void unfollowUser(@RequestParam Long followerId, @RequestParam Long followeeId) {
             subscriptionService.unfollowUser(followerId, followeeId);
             log.info("Follower {} unfollowed user with id {}.", followerId, followeeId);
     }

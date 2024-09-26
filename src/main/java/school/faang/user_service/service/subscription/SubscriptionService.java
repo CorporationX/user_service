@@ -6,13 +6,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.FollowerEvent;
-import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.publisher.FollowerEventPublisher;
-import school.faang.user_service.service.user.filters.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.publisher.FollowerEventPublisher;
+import school.faang.user_service.service.user.filters.UserFilter;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public class SubscriptionService {
         validator.validateExistingSubscription(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
         FollowerEvent followerEvent = FollowerEvent.builder().followerId(followerId).followeeId(followeeId).
-        subscriptionTime(LocalDateTime.now()).build();
+                subscriptionTime(LocalDateTime.now()).build();
         followerEventPublisher.publish(followerEvent);
     }
 
@@ -68,5 +68,9 @@ public class SubscriptionService {
         return new PageImpl<>(filteredUsers,
                 PageRequest.of(filters.getPage() - 1, filters.getPageSize()),
                 filteredUsers.size()).stream().toList();
+    }
+
+    public List<Long> getFollowerIdsByFolloweeId(long followerId) {
+        return subscriptionRepository.findFollowerIdsByFolloweeId(followerId);
     }
 }

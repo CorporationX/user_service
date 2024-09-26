@@ -1,14 +1,10 @@
 package school.faang.user_service.controller.subscription;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.user.UserFilterDto;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
@@ -48,5 +44,10 @@ public class SubscriptionController {
     public int getFollowingCount(long followerId) {
         return subscriptionService.getFollowingCount(followerId);
 
+    }
+
+    @GetMapping("/followee/{followeeId}/followerids")
+    public List<Long> getFollowerIdsByFolloweeId(@PathVariable @Min(value = 1L, message = "Followee id cannot be less than 1") long followeeId) {
+        return subscriptionService.getFollowerIdsByFolloweeId(followeeId);
     }
 }

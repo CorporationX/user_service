@@ -15,6 +15,7 @@ import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.service.util.AvatarApiService;
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -44,9 +45,12 @@ public class UserService {
         validateCountry(newUser.getCountry().getId());
 
         User withId = userRepository.save(newUser);
-        byte[] avatarData = avatarApiService.getDefaultAvatar(newUser.getUsername());
-        ObjectMetadata metadata = prepareFileMetadata("image/svg+xml", avatarData.length);
-        uploadDefaultAvatar(withId, avatarData, metadata);
+        Optional<byte[]> optionalAvatarData = avatarApiService.getDefaultAvatar(newUser.getUsername());
+        if (optionalAvatarData.isEmpty()) {
+            throw new RuntimeException("Can't get response from the avatar API.");
+        }
+        ObjectMetadata metadata = prepareFileMetadata("image/svg+xml", optionalAvatarData.get().length);
+        uploadDefaultAvatar(withId, optionalAvatarData.get(), metadata);
 
         return userRepository.save(newUser);
     }

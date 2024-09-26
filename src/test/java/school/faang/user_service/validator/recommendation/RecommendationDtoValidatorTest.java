@@ -24,13 +24,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RecommendationDtoValidatorTest {
 
+    private static final long USER_ID = 1L;
+    private static final String CONTENT = "content";
     @InjectMocks
     private RecommendationDtoValidator recommendationDtoValidator;
     @Mock
     private RecommendationRepository recommendationRepository;
-
-    private static final long USER_ID = 1L;
-    private static final String CONTENT = "content";
     private RecommendationDto recommendationDto;
     private Recommendation recommendation;
 

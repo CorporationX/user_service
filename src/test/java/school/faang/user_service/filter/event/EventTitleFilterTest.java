@@ -16,11 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class EventTitleFilterTest {
 
+    private final String title = "title";
     @InjectMocks
     private EventTitleFilter eventTitleFilter;
-
-    private final String title = "title";
-
     private EventFilterDto eventFilterDto;
 
     @Nested

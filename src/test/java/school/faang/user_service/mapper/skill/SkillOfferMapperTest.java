@@ -17,11 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SkillOfferMapperTest {
 
-    private final SkillOfferMapper skillOfferMapper = Mappers.getMapper(SkillOfferMapper.class);
-
     private static final long ID = 1L;
     private static final int DTOS_SIZE = 1;
-
+    private final SkillOfferMapper skillOfferMapper = Mappers.getMapper(SkillOfferMapper.class);
     private Skill skill;
     private Recommendation recommendation;
     private SkillOffer skillOffer;

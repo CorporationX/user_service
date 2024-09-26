@@ -41,6 +41,19 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
 
+    private static final long RECOMMENDATION_REQUEST_DTO_ID_ONE = 1L;
+    private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
+    private static final long SKILL_REQUEST_ID_ONE = 1L;
+    private static final long SKILL_REQUEST_ID_TWO = 2L;
+    private static final long SKILL_REQUEST_ID_THREE = 3L;
+    private static final long SKILL_REQUEST_ID_FOUR = 4L;
+    private static final long SKILL_ID_ONE = 1L;
+    private static final long SKILL_ID_TWO = 2L;
+    private static final long REQUESTER_ID_ONE = 1L;
+    private static final long RECEIVER_ID_TWO = 2L;
+    private static final String TOO_SERIOUS = "Too serious!";
+    private static final RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
+    private static final RequestStatus REQUEST_STATUS_REJECTED = RequestStatus.REJECTED;
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
     @Mock
@@ -59,20 +72,6 @@ public class RecommendationRequestServiceTest {
     private RequestFilter requestFilter;
     @Mock
     private List<RequestFilter> requestFilters;
-    private static final long RECOMMENDATION_REQUEST_DTO_ID_ONE = 1L;
-    private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
-    private static final long SKILL_REQUEST_ID_ONE = 1L;
-    private static final long SKILL_REQUEST_ID_TWO = 2L;
-    private static final long SKILL_REQUEST_ID_THREE = 3L;
-    private static final long SKILL_REQUEST_ID_FOUR = 4L;
-    private static final long SKILL_ID_ONE = 1L;
-    private static final long SKILL_ID_TWO = 2L;
-    private static final long REQUESTER_ID_ONE = 1L;
-    private static final long RECEIVER_ID_TWO = 2L;
-    private static final String TOO_SERIOUS = "Too serious!";
-    private static final RequestStatus REQUEST_STATUS_ACCEPTED = RequestStatus.ACCEPTED;
-    private static final RequestStatus REQUEST_STATUS_REJECTED = RequestStatus.REJECTED;
-
     private RecommendationRequestDto rqd;
     private RecommendationRequest rq;
     private RecommendationRejectionDto rejection;
@@ -127,6 +126,14 @@ public class RecommendationRequestServiceTest {
                         .build());
 
         skills = List.of(Skill.builder().build(), Skill.builder().build());
+    }
+
+    private void customRecommendationRequestService() {
+        requestFilters = List.of(requestFilter);
+        recommendationRequestMapper = Mappers.getMapper(RecommendationRequestMapper.class);
+        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository,
+                recommendationRequestMapper, userService, skillService, recommendationRequestValidator,
+                skillValidator, requestFilters);
     }
 
     @Nested
@@ -209,13 +216,5 @@ public class RecommendationRequestServiceTest {
             assertThrows(DataValidationException.class, () ->
                     recommendationRequestService.getRequests(filters));
         }
-    }
-
-    private void customRecommendationRequestService() {
-        requestFilters = List.of(requestFilter);
-        recommendationRequestMapper = Mappers.getMapper(RecommendationRequestMapper.class);
-        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository,
-                recommendationRequestMapper, userService, skillService, recommendationRequestValidator,
-                skillValidator, requestFilters);
     }
 }

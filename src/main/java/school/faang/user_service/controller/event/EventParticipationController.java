@@ -19,7 +19,7 @@ public class EventParticipationController {
     @ResponseStatus(HttpStatus.CREATED)
     public void registerParticipant(@PathVariable long eventId,
                                     @PathVariable long userId) {
-         eventParticipationService.registerParticipant(eventId, userId);
+        eventParticipationService.registerParticipant(eventId, userId);
     }
 
     @DeleteMapping("/{eventId}/{userId}")

@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Slf4j
 public class RecommendationRequestService {
+    private static final String RECOMMENDATION_REQUEST_NOT_FOUND_MESSAGE = "No recommendation request exist with id ";
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserService userService;
@@ -36,7 +37,6 @@ public class RecommendationRequestService {
     private final RecommendationRequestValidator recommendationRequestValidator;
     private final SkillValidator skillValidator;
     private final List<RequestFilter> requestFilters;
-    private static final String RECOMMENDATION_REQUEST_NOT_FOUND_MESSAGE = "No recommendation request exist with id ";
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         recommendationRequestValidator.validateRecommendationRequestMessageNotNull(recommendationRequestDto);

@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class SkillOfferValidatorTest {
+    private static final int MINIMUM_OFFERS = 3;
     private final long ANY_ID = 123L;
     private final String ANY_TITLE = "squat";
     private final String ANY_USERNAME = "username";
-    private static final int MINIMUM_OFFERS = 3;
     @Mock
     private SkillOfferRepository skillOfferRepository;
     private Skill skill;

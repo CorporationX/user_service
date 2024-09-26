@@ -34,27 +34,6 @@ class UserValidatorTest {
     @Nested
     class NegativeTests {
 
-        @Nested
-        class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
-
-            @Test
-            @DisplayName("Throws ValidationException when userId is null")
-            void whenNullValueThenThrowValidationException() {
-                assertThrows(ValidationException.class,
-                        () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
-                        "User id can't be null");
-            }
-
-            @Test
-            @DisplayName("Throws ValidationException when userId is negative")
-            void whenNegativeValueThenThrowValidationException() {
-                assertThrows(ValidationException.class,
-                        () -> userValidator
-                                .validateUserIdIsPositiveAndNotNull(USER_ID_IS_NEGATIVE_ONE),
-                        "User id can't be less than 0");
-            }
-        }
-
         @Test
         @DisplayName("Throws ValidationException when user not exists in DB")
         void whenUserNotExistsThenThrowValidationException() {
@@ -76,6 +55,27 @@ class UserValidatorTest {
                             USER_ID_IS_ONE,
                             exceptionMessage),
                     exceptionMessage);
+        }
+
+        @Nested
+        class UserIdIsPositiveAndNotNullOrElseThrowValidationExceptionMethod {
+
+            @Test
+            @DisplayName("Throws ValidationException when userId is null")
+            void whenNullValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> userValidator.validateUserIdIsPositiveAndNotNull(null),
+                        "User id can't be null");
+            }
+
+            @Test
+            @DisplayName("Throws ValidationException when userId is negative")
+            void whenNegativeValueThenThrowValidationException() {
+                assertThrows(ValidationException.class,
+                        () -> userValidator
+                                .validateUserIdIsPositiveAndNotNull(USER_ID_IS_NEGATIVE_ONE),
+                        "User id can't be less than 0");
+            }
         }
     }
 

@@ -16,11 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class MaxAttendeesFilterTest {
 
+    private final int maxAttendees = 5;
     @InjectMocks
     private MaxAttendeesFilter maxAttendeesFilter;
-
-    private final int maxAttendees = 5;
-
     private EventFilterDto eventFilterDto;
 
     @Nested
@@ -64,14 +62,14 @@ class MaxAttendeesFilterTest {
     @Nested
     class NegativeTests {
 
-            @Test
-            @DisplayName("Если у EventFilterDto поле maxAttendees равно 0 или меньше 0, тогда возвращаем false")
-            void whenFielIsEmptyThenReturnFalse() {
-                eventFilterDto = EventFilterDto.builder()
-                        .maxAttendees(0)
-                        .build();
+        @Test
+        @DisplayName("Если у EventFilterDto поле maxAttendees равно 0 или меньше 0, тогда возвращаем false")
+        void whenFielIsEmptyThenReturnFalse() {
+            eventFilterDto = EventFilterDto.builder()
+                    .maxAttendees(0)
+                    .build();
 
-                assertFalse(maxAttendeesFilter.isApplicable(eventFilterDto));
-            }
+            assertFalse(maxAttendeesFilter.isApplicable(eventFilterDto));
+        }
     }
 }

@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
 
+    private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
+    private static final String NOT_VALID_STRING = "Not valid";
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
     @Mock
     private RecommendationRequestService recommendationRequestService;
-    private static final long RECOMMENDATION_REQUEST_ID_ONE = 1L;
-    private static final String NOT_VALID_STRING = "Not valid";
 
     @Nested
     class ControllerCallsTests {

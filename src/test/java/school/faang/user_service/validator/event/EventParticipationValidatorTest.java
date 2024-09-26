@@ -15,13 +15,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class EventParticipationValidatorTest {
 
+    private static final long ID = 1L;
     @InjectMocks
     private EventParticipationValidator eventParticipationValidator;
-
     @Mock
     private EventParticipationRepository eventParticipationRepository;
-
-    private static final long ID = 1L;
 
     @Test
     @DisplayName("Ошибка валидации если id пользователя уже существует")

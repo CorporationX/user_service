@@ -17,11 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class StatusFilterTest {
 
+    private final EventStatus status = EventStatus.IN_PROGRESS;
     @InjectMocks
     private StatusFilter statusFilter;
-
-    private final EventStatus status = EventStatus.IN_PROGRESS;
-
     private EventFilterDto eventFilterDto;
 
     @Nested

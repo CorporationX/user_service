@@ -25,13 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class RecommendationMapperTest {
 
+    private static final long ID = 1L;
+    private static final String CONTENT = "content";
     @InjectMocks
     private RecommendationMapperImpl recommendationMapper = new RecommendationMapperImpl(
             Mappers.getMapper(SkillOfferMapper.class));
-
-    private static final long ID = 1L;
-    private static final String CONTENT = "content";
-
     private Recommendation recommendation;
     private List<Recommendation> recommendations;
 

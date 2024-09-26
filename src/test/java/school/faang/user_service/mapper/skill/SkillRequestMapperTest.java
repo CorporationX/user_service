@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MockitoExtension.class)
 public class SkillRequestMapperTest {
 
-    private final SkillRequestMapperImpl mapper = new SkillRequestMapperImpl(new SkillMapperImpl());
     private static final long RECOMMENDATION_REQUEST_ID = 1L;
     private static final long SKILL_REQUEST_ID_ONE = 1L;
     private static final long SKILL_ID_ONE = 1L;
+    private final SkillRequestMapperImpl mapper = new SkillRequestMapperImpl(new SkillMapperImpl());
     private SkillRequest skillRequest;
     private SkillRequestDto skillRequestDto;
 

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SkillOfferServiceTest {
 
+    private static final long ID = 1L;
     @InjectMocks
     private SkillOfferService skillOfferService;
     @Mock
@@ -35,8 +36,6 @@ class SkillOfferServiceTest {
     private UserSkillGuaranteeService userSkillGuaranteeService;
     @Mock
     private SkillService skillService;
-
-    private static final long ID = 1L;
     private User author;
     private User receiver;
     private Skill skill;

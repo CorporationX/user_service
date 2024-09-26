@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SkillCandidateMapperTest {
 
@@ -42,6 +42,7 @@ class SkillCandidateMapperTest {
                 .build();
         skillDtos = List.of(firstDto, firstDto, secondDto, thirdDto);
     }
+
     @Test
     @DisplayName("Testing mapping")
     void whenSkillDtoListMappedToSkillCandidateDtoListThenSuccess() {

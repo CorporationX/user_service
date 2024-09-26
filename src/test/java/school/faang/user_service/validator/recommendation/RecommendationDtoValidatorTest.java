@@ -12,7 +12,6 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.validator.recommendation.RecommendationDtoValidator;
 
 import java.time.LocalDateTime;
 import java.time.Month;

@@ -11,8 +11,6 @@ import school.faang.user_service.dto.skill.SkillRequestDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.skill.SkillMapperImpl;
-import school.faang.user_service.mapper.skill.SkillRequestMapperImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

@@ -10,7 +10,6 @@ import school.faang.user_service.repository.SkillRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

@@ -12,7 +12,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;

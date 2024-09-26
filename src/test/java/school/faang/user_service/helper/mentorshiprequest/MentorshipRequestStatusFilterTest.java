@@ -9,17 +9,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.filter.mentorshiprequest.RequestStatusFilter;
+import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestStatusFilter;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class RequestStatusFilterTest {
+class MentorshipRequestStatusFilterTest {
 
     @InjectMocks
-    private RequestStatusFilter filterByRequestStatus;
+    private MentorshipRequestStatusFilter filterByRequestStatus;
 
     private static final RequestFilterDto requestFilterDto = new RequestFilterDto();
     private static final RequestStatus STATUS = RequestStatus.ACCEPTED;

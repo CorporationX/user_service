@@ -8,10 +8,10 @@ import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.filter.mentorshiprequest.RequestFilter;
-import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository menReqRepository;
     private final MentorshipRequestMapper menReqMapper;
     private final MentorshipRequestValidator menReqValidator;
-    private final List<RequestFilter> filtersRequests;
+    private final List<MentorshipRequestFilter> filtersRequests;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto menReqDto) {
         menReqValidator.validateReceiverNoEqualsRequester(menReqDto);

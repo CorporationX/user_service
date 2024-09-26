@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 import java.util.List;
@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 public class RequestRejectionReasonFilterTest {
 
+    @InjectMocks
+    private RequestRejectionReasonFilter requestRejectionReasonFilter;
+    private RecommendationRequestFilterDto filterDto;
     private static final String REJECTION_REASON = "good";
     private static final String TOO_GOOD = "Too good is true";
     private static final String TOO_BAD = "Too bad is false";
-    @InjectMocks
-    private RequestRejectionReasonFilter requestRejectionReasonFilter;
-    private RequestFilterDto filterDto;
 
     @Nested
     class PositiveTests {
@@ -32,7 +32,7 @@ public class RequestRejectionReasonFilterTest {
         @Test
         @DisplayName("If RequestFilterDto has rejectionReason field then true")
         public void whenRequestRejectionReasonFilterParameterNotNullThenReturnTrue() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .rejectionReason(REJECTION_REASON)
                     .build();
 
@@ -50,7 +50,7 @@ public class RequestRejectionReasonFilterTest {
                             .rejectionReason(TOO_BAD)
                             .build());
 
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .rejectionReason(REJECTION_REASON)
                     .build();
 
@@ -70,7 +70,7 @@ public class RequestRejectionReasonFilterTest {
         @Test
         @DisplayName("If rejectionReason is null then return false")
         public void whenRequestRejectionReasonFilterParameterIsNullThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .rejectionReason(null)
                     .build();
 
@@ -80,7 +80,7 @@ public class RequestRejectionReasonFilterTest {
         @Test
         @DisplayName("If rejectionReason is blank then return false")
         public void whenRequestRejectionReasonFilterParameterIsBlankThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .rejectionReason(" ")
                     .build();
 

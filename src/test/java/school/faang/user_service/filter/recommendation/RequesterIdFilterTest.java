@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
@@ -20,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 public class RequesterIdFilterTest {
 
+    @InjectMocks
+    private RequesterIdFilter requesterIdFilter;
+    private RecommendationRequestFilterDto filterDto;
     private static final long REQUESTER_ID_ONE = 1L;
     private static final long REQUESTER_ID_TWO = 2L;
     private static final long REQUESTER_ID_NEGATIVE_ONE = -1L;
-    @InjectMocks
-    private RequesterIdFilter requesterIdFilter;
-    private RequestFilterDto filterDto;
 
     @Nested
     class PositiveTests {
@@ -33,7 +33,7 @@ public class RequesterIdFilterTest {
         @Test
         @DisplayName("If requesterId not null then true")
         public void whenRequesterIdFilterParameterNotNullThenReturnTrue() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .requesterId(REQUESTER_ID_ONE)
                     .build();
 
@@ -58,7 +58,7 @@ public class RequesterIdFilterTest {
                             .requester(requesterTwo)
                             .build());
 
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .requesterId(REQUESTER_ID_TWO)
                     .build();
 
@@ -78,7 +78,7 @@ public class RequesterIdFilterTest {
         @Test
         @DisplayName("If requesterId is null return false")
         public void whenRequesterIdFilterParameterIsNullThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .requesterId(null)
                     .build();
 
@@ -88,7 +88,7 @@ public class RequesterIdFilterTest {
         @Test
         @DisplayName("If requesterId is negative return false")
         public void whenRequesterIdFilterParameterIsNegativeThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .requesterId(REQUESTER_ID_NEGATIVE_ONE)
                     .build();
 

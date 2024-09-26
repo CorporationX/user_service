@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 import java.time.LocalDate;
@@ -21,13 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 public class RequestUpdatedDateFilterTest {
 
+    @InjectMocks
+    private RequestUpdatedDateFilter requestUpdatedDateFilter;
+    private RecommendationRequestFilterDto filterDto;
+
     private static final LocalDateTime FIRST_DATE = LocalDateTime
             .of(2024, 5, 15, 12, 30);
     private static final LocalDateTime SECOND_DATE = LocalDateTime
             .of(2024, 6, 30, 8, 45);
-    @InjectMocks
-    private RequestUpdatedDateFilter requestUpdatedDateFilter;
-    private RequestFilterDto filterDto;
 
     @Nested
     class PositiveTests {
@@ -35,7 +36,7 @@ public class RequestUpdatedDateFilterTest {
         @Test
         @DisplayName("If updatedAt not null then return true")
         public void whenRequestUpdatedDateFilterParameterNotNullThenReturnTrue() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .updatedAt(LocalDate.from(FIRST_DATE))
                     .build();
 
@@ -53,7 +54,7 @@ public class RequestUpdatedDateFilterTest {
                             .updatedAt(SECOND_DATE)
                             .build());
 
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .updatedAt(LocalDate.from(SECOND_DATE))
                     .build();
 
@@ -73,7 +74,7 @@ public class RequestUpdatedDateFilterTest {
         @Test
         @DisplayName("If updatedAt is null then return false")
         public void whenRequestUpdatedDateFilterParameterIsNullThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .updatedAt(null)
                     .build();
 

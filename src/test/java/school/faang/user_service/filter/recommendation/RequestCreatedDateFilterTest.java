@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 import java.time.LocalDate;
@@ -21,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 public class RequestCreatedDateFilterTest {
 
+    @InjectMocks
+    private RequestCreatedDateFilter requestCreatedDateFilter;
+    private RecommendationRequestFilterDto filterDto;
     private static final LocalDateTime FIRST_DATE = LocalDateTime
             .of(2024, 5, 15, 12, 30);
     private static final LocalDateTime SECOND_DATE = LocalDateTime
             .of(2024, 6, 30, 8, 45);
-    @InjectMocks
-    private RequestCreatedDateFilter requestCreatedDateFilter;
-    private RequestFilterDto filterDto;
 
     @Nested
     class PositiveTests {
@@ -35,7 +35,7 @@ public class RequestCreatedDateFilterTest {
         @Test
         @DisplayName("If createdAt not null then return true")
         public void whenRequestCreatedDateFilterParameterNotNullThenReturnTrue() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .createdDate(LocalDate.from(FIRST_DATE))
                     .build();
 
@@ -53,7 +53,7 @@ public class RequestCreatedDateFilterTest {
                             .createdAt(SECOND_DATE)
                             .build());
 
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .createdDate(LocalDate.from(SECOND_DATE))
                     .build();
 
@@ -73,7 +73,7 @@ public class RequestCreatedDateFilterTest {
         @Test
         @DisplayName("If createdAt is null then return false")
         public void whenRequestCreatedDateFilterParameterIsNullThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .createdDate(null)
                     .build();
 

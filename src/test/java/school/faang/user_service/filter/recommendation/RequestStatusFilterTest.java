@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 public class RequestStatusFilterTest {
 
-    private static final RequestStatus REQUEST_STATUS_IS_ACCEPTED = RequestStatus.ACCEPTED;
     @InjectMocks
     private RequestStatusFilter requestStatusFilter;
-    private RequestFilterDto filterDto;
+    private RecommendationRequestFilterDto filterDto;
+    private static final RequestStatus REQUEST_STATUS_IS_ACCEPTED = RequestStatus.ACCEPTED;
 
     @Nested
     class PositiveTests {
@@ -31,7 +31,7 @@ public class RequestStatusFilterTest {
         @Test
         @DisplayName("If filterDto status not null then true")
         public void whenRequestStatusFilterParameterNotNullThenReturnTrue() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .status(REQUEST_STATUS_IS_ACCEPTED)
                     .build();
 
@@ -49,7 +49,7 @@ public class RequestStatusFilterTest {
                             .status(RequestStatus.REJECTED)
                             .build());
 
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .status(REQUEST_STATUS_IS_ACCEPTED)
                     .build();
 
@@ -69,7 +69,7 @@ public class RequestStatusFilterTest {
         @Test
         @DisplayName("If status null return false")
         public void whenRequestStatusFilterParameterIsNullThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .status(null)
                     .build();
 

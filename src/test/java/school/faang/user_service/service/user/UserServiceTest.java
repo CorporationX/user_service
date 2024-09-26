@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.user;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +11,6 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.filters.UserCityPattern;
 import school.faang.user_service.service.filters.UserFilter;
 import school.faang.user_service.service.filters.UserSkillPattern;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
@@ -22,7 +22,7 @@ public class ReceiverIdFilterTest {
 
     @InjectMocks
     private ReceiverIdFilter receiverIdFilter;
-    private RequestFilterDto filterDto;
+    private RecommendationRequestFilterDto filterDto;
     private static final long RECEIVER_ID_ONE = 1L;
     private static final long RECEIVER_ID_TWO = 2L;
     private static final long RECEIVER_ID_NEGATIVE_ONE = -1L;
@@ -33,7 +33,7 @@ public class ReceiverIdFilterTest {
         @Test
         @DisplayName("If receiverId not null then true")
         public void whenReceiverIdFilterParameterNotNullThenReturnTrue() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .receiverId(RECEIVER_ID_ONE)
                     .build();
 
@@ -58,7 +58,7 @@ public class ReceiverIdFilterTest {
                             .receiver(receiverTwo)
                             .build());
 
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .receiverId(RECEIVER_ID_TWO)
                     .build();
 
@@ -78,7 +78,7 @@ public class ReceiverIdFilterTest {
         @Test
         @DisplayName("If receiverId is null return false")
         public void whenReceiverIdFilterParameterIsNullThenReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .requesterId(null)
                     .build();
 
@@ -88,7 +88,7 @@ public class ReceiverIdFilterTest {
         @Test
         @DisplayName("If receiverId is negative return false")
         public void whenReceiverIdFilterParameterIsNegativeReturnFalse() {
-            filterDto = RequestFilterDto.builder()
+            filterDto = RecommendationRequestFilterDto.builder()
                     .receiverId(RECEIVER_ID_NEGATIVE_ONE)
                     .build();
 

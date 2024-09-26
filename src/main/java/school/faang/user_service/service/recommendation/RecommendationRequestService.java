@@ -4,21 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.exception.recomendation.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.recommendation.RequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
-import school.faang.user_service.validator.recommendation.SkillValidator;
+import school.faang.user_service.validator.skill.SkillValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +58,7 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(requestSavedResult);
     }
 
-    public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
+    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filters) {
         if (filters == null) {
             log.error("Filters cannot be null or empty!");
             throw new DataValidationException("RequestFilterDto can't be null!");
@@ -76,7 +76,7 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(rqToFind);
     }
 
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+    public RecommendationRequestDto rejectRequest(long id, RecommendationRejectionDto rejection) {
         RecommendationRequest rq = findExistingRecommendationRequest(id);
         recommendationRequestValidator.validateRequestStatus(rq);
         rq.setRejectionReason(rejection.getReason());

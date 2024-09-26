@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -82,7 +82,7 @@ class UserServiceTest {
         public void whenUserIsNotExistThenThrowException() {
             when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
 
-            assertThrows(ValidationException.class, () -> userService.getUser(USER_ID));
+            assertThrows(ValidationException.class, () -> userService.getUserDto(USER_ID));
         }
 
         @Test
@@ -118,7 +118,7 @@ class UserServiceTest {
             when(userRepository.findById(USER_ID)).thenReturn(Optional.ofNullable(secondUser));
             when(userMapper.toDto(secondUser)).thenReturn(userDto);
 
-            UserDto resultUserDto = userService.getUser(USER_ID);
+            UserDto resultUserDto = userService.getUserDto(USER_ID);
 
             assertNotNull(resultUserDto);
             verify(userRepository).findById(USER_ID);

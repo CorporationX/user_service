@@ -18,11 +18,11 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
-import school.faang.user_service.mapper.event.mapper.EventMapper;
+import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.validator.EventValidator;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

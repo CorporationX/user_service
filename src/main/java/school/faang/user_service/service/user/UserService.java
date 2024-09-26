@@ -19,6 +19,7 @@ import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.cache.UserCacheRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
@@ -53,6 +54,7 @@ public class UserService {
     private final CountryService countryService;
     private final S3Service s3Service;
     private final PasswordService passwordService;
+    private final UserCacheRepository userCacheRepository;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
 
@@ -146,6 +148,12 @@ public class UserService {
 
     public List<Long> getFollowerIds(Long userId) {
         return userRepository.findFollowerIdsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public void cacheUser(long userId) {
+        User user = findUserById(userId);
+        userCacheRepository.save(userId, userMapper.toDto(user));
     }
 
     private List<Person> readPersonsFromCSV(InputStream file) throws IOException {

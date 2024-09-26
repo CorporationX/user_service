@@ -84,3 +84,13 @@ scheduler:
   clear-events:
     cron: "0 0 0 * * SUN"
     chunk-size: 10
+
+kafka:
+  host-port: localhost:9092
+  topic:
+    user-cache-topic:
+      name: user-cache
+      group-id: user-cache-group
+
+cache:
+  post-ttl-seconds: 86400

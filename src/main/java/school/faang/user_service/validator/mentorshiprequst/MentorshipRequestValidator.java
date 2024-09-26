@@ -1,4 +1,4 @@
-package school.faang.user_service.helper.validator.mentorshiprequst;
+package school.faang.user_service.validator.mentorshiprequst;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

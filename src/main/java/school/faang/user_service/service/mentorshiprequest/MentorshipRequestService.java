@@ -8,10 +8,10 @@ import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.helper.filters.mentorshiprequest.RequestFilter;
-import school.faang.user_service.helper.validator.mentorshiprequst.MentorshipRequestValidator;
+import school.faang.user_service.filter.mentorshiprequest.RequestFilter;
+import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.helper.mapper.mentorshiprequest.MentorshipRequestMapper;
+import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package school.faang.user_service.helper.filters.mentorshiprequest;
+package school.faang.user_service.helper.mentorshiprequest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.filter.mentorshiprequest.AuthorRequestFilter;
 
 import java.util.stream.Stream;
 

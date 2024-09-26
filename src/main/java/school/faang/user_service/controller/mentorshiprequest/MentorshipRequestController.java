@@ -1,4 +1,4 @@
-package school.faang.user_service.controllers;
+package school.faang.user_service.controller.mentorshiprequest;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.services.MentorshipRequestService;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
+import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
+import school.faang.user_service.service.mentorshiprequest.MentorshipRequestService;
 
 import java.util.List;
 

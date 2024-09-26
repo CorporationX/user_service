@@ -1,4 +1,4 @@
-package school.faang.user_service.helper.mapper.mentorshiprequest;
+package school.faang.user_service.helper.mentorshiprequest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,7 @@ import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
 
 import java.time.LocalDateTime;
 

@@ -5,23 +5,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.service.util.AvatarApiService;
-
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -29,6 +22,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
     private final AvatarApiService avatarApiService;
     private final S3Service s3Service;
@@ -43,35 +37,28 @@ public class UserService {
     }
 
     @Transactional
-    public User setAvatar(Long userId, MultipartFile file) {
-        User user = userRepository.findById(userId).orElseThrow();
-        ObjectMetadata metadata = null;
-        byte[] fileBytes = null;
-        String fileName = null;
+    public User registerNewUser(User newUser) {
+        validateUsername(newUser.getUsername());
+        validateEmail(newUser.getEmail());
+        validatePhone(newUser.getPhone());
+        validateCountry(newUser.getCountry().getId());
 
-        if (Objects.isNull(file) || file.isEmpty()) {
-            fileBytes = avatarApiService.getDefaultAvatar(user.getUsername());
-            fileName = "profile_default.svg";
-            metadata = prepareFileMetadata("image/svg+xml", fileBytes.length);
-        } else {
-            try {
-                fileBytes = file.getBytes();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-            fileName = file.getOriginalFilename();
-            metadata = prepareFileMetadata(file.getContentType(), fileBytes.length);
-        }
+        User withId = userRepository.save(newUser);
+        byte[] avatarData = avatarApiService.getDefaultAvatar(newUser.getUsername());
+        ObjectMetadata metadata = prepareFileMetadata("image/svg+xml", avatarData.length);
+        uploadDefaultAvatar(withId, avatarData, metadata);
 
-        return userPictureUpdate(user, fileName, fileBytes, metadata);
+        return userRepository.save(newUser);
     }
 
-    private User userPictureUpdate(User toUpdate, String fileName, byte[] fileBytes, ObjectMetadata metadata) {
-        String fileId = s3Service.uploadFile(fileName, new ByteArrayInputStream(fileBytes), metadata, toUpdate.getId());
+    private void uploadDefaultAvatar(User toUpdate, byte[] fileBytes, ObjectMetadata metadata) {
+        String folder = String.format("user_%d/profile", toUpdate.getId());
+        String fileKey = s3Service.uploadFile(new ByteArrayInputStream(fileBytes), metadata, folder, toUpdate.getId());
         UserProfilePic profilePic = new UserProfilePic();
-        profilePic.setFileId(fileId);
+        profilePic.setFileId(fileKey);
+        profilePic.setSmallFileId(fileKey);
         toUpdate.setUserProfilePic(profilePic);
-        return userRepository.save(toUpdate);
+        log.info("Registered user(userId={}), with default avatar(fileKey={})", toUpdate.getId(), fileKey);
     }
 
     private ObjectMetadata prepareFileMetadata(String contentType, long sizeInBytes) {
@@ -79,5 +66,29 @@ public class UserService {
         metadata.setContentType(contentType);
         metadata.setContentLength(sizeInBytes);
         return metadata;
+    }
+
+    private void validateUsername(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalStateException(String.format("Username %s is already in use", username));
+        }
+    }
+
+    private void validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalStateException(String.format("Email %s is already in use", email));
+        }
+    }
+
+    private void validatePhone(String phone) {
+        if (userRepository.existsByPhone(phone)) {
+            throw new IllegalStateException(String.format("Phone %s is already in use", phone));
+        }
+    }
+
+    private void validateCountry(Long countryId) {
+        if (!countryRepository.existsById(countryId)) {
+            throw new IllegalStateException(String.format("Country with ID %d does not exist", countryId));
+        }
     }
 }

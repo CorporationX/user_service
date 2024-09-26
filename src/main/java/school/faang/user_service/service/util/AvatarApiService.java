@@ -6,22 +6,22 @@ import org.apache.http.impl.execchain.RequestAbortedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AvatarApiService {
-    private final String BASE_URL = "https://api.dicebear.com/9.x";
-    private final String AVATAR_TYPE = "initials";
-    private final String FILE_TYPE = "svg";
-    private final String BASE_PARAMS = "scale=50&backgroundType=gradientLinear&radius=50";
     private final RestTemplate restTemplate;
 
     public Optional<byte[]> getDefaultAvatar(String username) {
-        String url = String.format("%s/%s/%s?%s&seed=%s", BASE_URL, AVATAR_TYPE, FILE_TYPE, BASE_PARAMS, username);
+        String url = "https://api.dicebear.com/9.x/initials/svg" +
+                "scale=50&backgroundType=gradientLinear&radius=50&seed=" + username;
+
         try {
-            return Optional.ofNullable(restTemplate.getForObject(url, byte[].class));
+            byte[] data = restTemplate.getForObject(url, byte[].class);
+            return Optional.ofNullable(data);
         } catch(RestClientException e) {
             return Optional.empty();
         }

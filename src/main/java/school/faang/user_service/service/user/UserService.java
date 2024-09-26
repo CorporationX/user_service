@@ -45,12 +45,10 @@ public class UserService {
         validateCountry(newUser.getCountry().getId());
 
         User withId = userRepository.save(newUser);
-        Optional<byte[]> optionalAvatarData = avatarApiService.getDefaultAvatar(newUser.getUsername());
-        if (optionalAvatarData.isEmpty()) {
-            throw new RuntimeException("Can't get response from the avatar API.");
-        }
-        ObjectMetadata metadata = prepareFileMetadata("image/svg+xml", optionalAvatarData.get().length);
-        uploadDefaultAvatar(withId, optionalAvatarData.get(), metadata);
+        byte[] avatarData = avatarApiService.getDefaultAvatar(newUser.getUsername())
+                .orElseThrow(() -> new RuntimeException("Avatar not found"));
+        ObjectMetadata metadata = prepareFileMetadata("image/svg+xml", avatarData.length);
+        uploadDefaultAvatar(withId, avatarData, metadata);
 
         return userRepository.save(newUser);
     }

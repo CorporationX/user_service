@@ -36,10 +36,4 @@ public class UserServiceImpl implements UserService {
                         .allMatch(filter -> filter.apply(userDto, userFilterDto)))
                 .toList();
     }
-
-    private Stream<User> findPremiumUsers(List<UserDto> users, UserFilterDto filter) {
-        return users.stream()
-                .filter(user -> filters.stream().allMatch(f -> f.apply(user, filter)))
-                .map(userMapper::toEntity);
-    }
 }

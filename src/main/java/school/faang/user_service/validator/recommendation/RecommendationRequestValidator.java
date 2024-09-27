@@ -2,6 +2,7 @@ package school.faang.user_service.validator.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 
@@ -12,19 +13,19 @@ public class RecommendationRequestValidator {
 
     public void validateUserExistence(boolean exists, long userId) {
         if (!exists) {
-            throw new IllegalArgumentException("User with ID " + userId + " does not exist.");
+            throw new DataValidationException("User with ID " + userId + " does not exist.");
         }
     }
 
     public void validateRequesterAndReceiver(Long requesterId, Long receiverId) {
         if (requesterId.equals(receiverId)) {
-            throw new IllegalArgumentException("Requester and receiver cannot be the same person.");
+            throw new DataValidationException("Requester and receiver cannot be the same person.");
         }
     }
 
     public void validateRequestAndCheckTimeLimit(LocalDateTime lastRequestTime) {
         if (lastRequestTime != null && lastRequestTime.plusMonths(MONTH_FOR_SEARCH_REQUEST).isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Not enough time has passed since the last request.");
+            throw new DataValidationException("Not enough time has passed since the last request.");
         }
     }
 }

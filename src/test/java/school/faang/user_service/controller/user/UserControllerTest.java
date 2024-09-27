@@ -148,7 +148,7 @@ public class UserControllerTest {
         when(userContext.getUserId()).thenReturn(userId);
         when(userService.getFilteredUsers(userFilterDto, userId)).thenReturn(List.of(userDto, anotherUserDto));
 
-        mockMvc.perform(get("/users/filtered")
+        mockMvc.perform(post("/users/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -162,9 +162,12 @@ public class UserControllerTest {
     public void testGetFilteredUsers_InvalidRequest() throws Exception {
         String invalidJson = "{invalid json}";
 
-        mockMvc.perform(get("/users/filtered")
+        mockMvc.perform(post("/users/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Invalid Input Format"))
+                .andExpect(jsonPath("$.message")
+                        .value(org.hamcrest.Matchers.containsString("JSON parse error")));
     }
 }

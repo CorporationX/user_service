@@ -193,10 +193,11 @@ public class SkillControllerTest {
         when(skillService.acquireSkillFromOffers(anyLong(), anyLong()))
                 .thenThrow(new SkillAssignmentException("Skill already acquired by the user."));
 
-        mockMvc.perform(post("/skills/{skillId}/beneficiary/{skillId}", skillDto.getId(), validId)
+        mockMvc.perform(post("/skills/{skillId}/beneficiary/{userId}", skillDto.getId(), validId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("Skill already acquired by the user."));
+                .andExpect(jsonPath("$.error").value("Skill Assignment Conflict"))
+                .andExpect(jsonPath("$.message").value("Skill already acquired by the user."));
 
         verify(skillService, times(1)).acquireSkillFromOffers(anyLong(), anyLong());
     }

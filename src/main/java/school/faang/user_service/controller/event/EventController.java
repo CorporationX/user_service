@@ -1,7 +1,7 @@
 package school.faang.user_service.controller.event;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +20,7 @@ public class EventController {
     private final EventService eventService;
     private final UserContext userContext;
 
-    @GetMapping(value = "/filtered")
+    @PostMapping(value = "/filtered")
     public List<EventDto> getFilteredUsers(@RequestBody EventFilterDto filter) {
         long userId = userContext.getUserId();
         return eventService.getFilteredEvents(filter, userId);

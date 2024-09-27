@@ -22,6 +22,7 @@ import school.faang.user_service.validator.recommendation.RecommendationValidato
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,6 +118,10 @@ public class RecommendationServiceImpl implements RecommendationService{
         List<Skill> existingReceiverSkills = skillRepository.findAllByUserId(receiver.getId());
         List<SkillOfferDto> skillOffersDto = recommendationDto.getSkillOffers();
 
+        if (skillOffersDto == null) {
+            skillOffersDto = new ArrayList<>();
+        }
+
         updateSkillsGuarantees(
                 skillOffersDto,
                 existingReceiverSkills,
@@ -143,8 +148,9 @@ public class RecommendationServiceImpl implements RecommendationService{
             User author,
             User receiver) {
 
-        List<Long> skillOfferIds = skillOffersDto.stream()
-                .map(SkillOfferDto::getSkillId).toList();
+        Set<Long> skillOfferIds = skillOffersDto.stream()
+                .map(SkillOfferDto::getSkillId)
+                .collect(Collectors.toSet());
 
         receiverSkills.stream()
                 .filter(skill -> skillOfferIds.contains(skill.getId()))

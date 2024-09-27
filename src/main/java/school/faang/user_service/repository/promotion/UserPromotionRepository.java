@@ -14,24 +14,4 @@ import java.util.Optional;
 
 @Repository
 public interface UserPromotionRepository extends CrudRepository<UserPromotion, Long> {
-
-//    @Modifying
-//    @Query(nativeQuery = true, value = """
-//            UPDATE user_promotion
-//            SET number_of_views = number_of_views - 1
-//            WHERE id = :id
-//            AND number_of_views > 0
-//            """)
-//    void decrementPromotionViews(@Param("id") long id);
-//
-//    @Query(nativeQuery = true, value = """
-//        UPDATE user_promotion
-//        SET number_of_views = GREATEST(number_of_views - :decrement, 0)
-//        WHERE user_id = :userId
-//    """)
-//    void decrementPromotionViewsByValue(@Param("userId") long userId, @Param("decrement") int decrement);
-//
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    @Query("SELECT up FROM UserPromotion up WHERE up.id = :id")
-//    Optional<UserPromotion> findByIdWithLock(@Param("id") long id);
 }

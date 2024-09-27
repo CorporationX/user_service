@@ -48,3 +48,9 @@ app:
     user_views_decrement_schedule_time: 10000
     event_views_decrement_schedule_time: 10000
     scheduled_decrement_pool_size: 2
+  payment_service:
+    retryable:
+      send_payment:
+        max_attempts: 3
+        delay: 100
+        multiplier: 2

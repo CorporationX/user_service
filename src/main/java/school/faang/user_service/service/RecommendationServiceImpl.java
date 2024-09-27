@@ -117,10 +117,6 @@ public class RecommendationServiceImpl implements RecommendationService{
         List<Skill> existingReceiverSkills = skillRepository.findAllByUserId(receiver.getId());
         List<SkillOfferDto> skillOffersDto = recommendationDto.getSkillOffers();
 
-        if (skillOffersDto == null) {
-            skillOffersDto = new ArrayList<>();
-        }
-
         updateSkillsGuarantees(
                 skillOffersDto,
                 existingReceiverSkills,

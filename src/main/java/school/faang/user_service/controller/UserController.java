@@ -8,6 +8,7 @@ import school.faang.user_service.service.UserService;
 
 import java.util.List;
 
+@RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -18,7 +19,7 @@ public class UserController {
         return userService.getPremiumUsers(userFilterDto);
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("userId")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }

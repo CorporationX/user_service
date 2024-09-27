@@ -1,23 +1,20 @@
 package school.faang.user_service.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.UserFilter;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +22,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
+
+    private UserFilterDto filterDto;
+    private User user;
+    private Premium premium;
+    private List<Long> userIds;
+
+    @Mock
+    private UserFilter filterMock;
 
     @Mock
     private PremiumRepository premiumRepository;
@@ -44,14 +53,14 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        filterDto = new UserFilterDto();
+        user = new User();
+        premium = new Premium();
+        userIds = Arrays.asList(1L, 2L);
     }
 
     @Test
     void shouldReturnFilteredPremiumUsers_WhenFilterIsApplied() {
-        UserFilterDto filterDto = new UserFilterDto();
-        User user = new User();
-        Premium premium = new Premium();
         premium.setUser(user);
         List<Premium> premiumList = List.of(premium);
 
@@ -59,7 +68,6 @@ public class UserServiceTest {
         when(premiumRepository.findAll()).thenReturn(premiumList);
         when(userMapper.toDto(user)).thenReturn(userDto);
 
-        UserFilter filterMock = mock(UserFilter.class);
         when(filterMock.apply(any(UserDto.class), any(UserFilterDto.class))).thenReturn(true);
         when(filters.stream()).thenReturn(Stream.of(filterMock));
 
@@ -137,7 +145,6 @@ public class UserServiceTest {
 
     @Test
     void shouldReturnListOfUserDtos_WhenUsersFound() {
-
         List<Long> userIds = Arrays.asList(1L, 2L, 3L);
 
         User user1 = new User();
@@ -179,9 +186,6 @@ public class UserServiceTest {
 
     @Test
     void shouldReturnEmptyList_WhenNoUsersFound() {
-
-        List<Long> userIds = Arrays.asList(1L, 2L);
-
         when(userRepository.findAllById(userIds)).thenReturn(List.of());
 
         List<UserDto> result = userService.getUsersByIds(userIds);

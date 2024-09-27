@@ -16,7 +16,9 @@ import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.util.file.CsvUtil;
 import school.faang.user_service.validator.user.UserValidator;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -47,32 +49,37 @@ public class UserService {
         return userMapper.toDtos(userRepository.findAllById(ids));
     }
 
+    @Transactional
     public List<UserDto> saveUsersFromCsvFile(MultipartFile multipartFile) {
+        List<UserDto> response = new ArrayList<>();
 
-        List<Person> persons = csvUtil.parseCsvToPojo(multipartFile, Person.class);
+        CompletableFuture.supplyAsync(() -> csvUtil.parseCsvMultipartFile(multipartFile, Person.class))
+                .thenAccept(result -> {
+                    List<User> users = userMapper.toEntities(result);
+                    users.parallelStream()
+                            .forEach(user -> {
+                                setDefaultPassword(users);
 
-        List<User> users = userMapper.toEntities(persons);
+                                try {
+                                    Country country = countryService.findCountryByTitle(user.getCountry().getTitle());
+                                    user.setCountry(country);
+                                } catch (EntityNotFoundException e) {
+                                    Country country = countryService.saveCountry(user.getCountry());
+                                    user.setCountry(country);
+                                }
+                            });
+                    userRepository.saveAll(users);
+                    users.forEach(u -> response.add(userMapper.toDto(u)));
+                })
+                .join();
 
-        users.forEach(user -> {
-            setDefaultPassword(users);
-
-            try {
-                Country country = countryService.findCountryByTitle(user.getCountry().getTitle());
-                user.setCountry(country);
-            } catch (EntityNotFoundException e) {
-                Country country = countryService.saveCountry(user.getCountry());
-                user.setCountry(country);
-            }
-        });
-
-        userRepository.saveAll(users);
-
-        return userMapper.toDtos(users);
+        return response;
     }
 
     private void setDefaultPassword(List<User> users) {
         users.forEach(u -> u.setPassword(u.getUsername()));
     }
+
     public List<User> getUsersById(List<Long> usersId) {
         return userRepository.findAllById(usersId);
     }

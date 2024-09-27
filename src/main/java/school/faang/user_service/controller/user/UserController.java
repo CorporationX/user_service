@@ -3,7 +3,6 @@ package school.faang.user_service.controller.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
@@ -37,8 +36,7 @@ public class UserController {
     }
 
     @PostMapping("/parsing")
-    public ResponseEntity<List<UserDto>> parseUserCsvFile(@RequestBody MultipartFile multipartFile) {
-        List<UserDto> response = userService.saveUsersFromCsvFile(multipartFile);
-        return ResponseEntity.ok(response);
+    public List<UserDto> parseUserCsvFile(@RequestBody MultipartFile multipartFile) {
+        return userService.saveUsersFromCsvFile(multipartFile);
     }
 }

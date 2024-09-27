@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +18,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.Recommendation.RecommendationValidator;
+import school.faang.user_service.validator.recommendation.RecommendationValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +50,6 @@ class RecommendationServiceImplTest {
 
     @InjectMocks
     private RecommendationServiceImpl recommendationServiceImpl;
-
-    @BeforeEach
-    void setUp() {
-    }
 
 
     @Test

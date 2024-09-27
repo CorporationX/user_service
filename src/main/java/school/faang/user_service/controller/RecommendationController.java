@@ -22,16 +22,16 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PostMapping
-    public RecommendationDto giveRecommendation(@RequestBody @Validated RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
 
     @PutMapping
-    public RecommendationDto updateRecommendation(@RequestBody @Validated RecommendationDto updated) {
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
         return recommendationService.updateRecommendation(updated);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public RecommendationDto deleteRecommendation(@Positive @PathVariable long id) {
         return recommendationService.delete(id);
     }

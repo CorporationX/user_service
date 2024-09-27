@@ -17,7 +17,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.Recommendation.RecommendationValidator;
+import school.faang.user_service.validator.recommendation.RecommendationValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,7 @@ public class RecommendationServiceImpl implements RecommendationService{
     private final SkillRepository skillRepository;
     private final RecommendationValidator validator;
     private final UserRepository userRepository;
+
 
     @Override
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -75,10 +76,6 @@ public class RecommendationServiceImpl implements RecommendationService{
         validator.checkIfRecommendationNotExist(id);
 
         Optional<Recommendation> recommendationToDelete = recommendationRepository.findById(id);
-
-        if (recommendationToDelete.isEmpty()) {
-            throw new EntityNotFoundException("Recommendation with id: " + id + " not found");
-        }
 
         RecommendationDto recommendationDto = recommendationMapper.toDto(recommendationToDelete.get());
         recommendationRepository.deleteById(id);

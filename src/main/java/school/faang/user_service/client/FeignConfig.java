@@ -3,15 +3,17 @@ package school.faang.user_service.client;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import school.faang.user_service.config.api.ApiProperties;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.config.externalApis.ExternalApisProperties;
+
+import java.util.List;
 
 @Configuration
 public class FeignConfig {
 
     @Bean
     public FeignUserInterceptor feignUserInterceptor(UserContext userContext,
-                                                     ExternalApisProperties externalApisProperties) {
-        return new FeignUserInterceptor(userContext, externalApisProperties);
+                                                     List<ApiProperties> apiProperties) {
+        return new FeignUserInterceptor(userContext, apiProperties);
     }
 }

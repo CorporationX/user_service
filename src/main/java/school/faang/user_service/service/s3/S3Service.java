@@ -32,13 +32,13 @@ public class S3Service {
     private final String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
     private final String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
 
-    @Value("${services.external.s3.bucketDefaultAvatarsName}")
+    @Value("${services.s3.bucketDefaultAvatarsName}")
     private String bucketDefaultAvatarsName;
 
-    @Value("${services.external.s3.defaultProfilePicture}")
+    @Value("${services.s3.defaultProfilePicture}")
     private String defaultPictureName;
 
-    @Value("${services.external.s3.remoteFilename}")
+    @Value("${services.s3.remoteFilename}")
     private String remoteFileName;
 
     private final Pattern PATTERN_GET_IMAGE_NAME_FROM_HEADER = Pattern.compile(FILE_NAME_PATTERN);

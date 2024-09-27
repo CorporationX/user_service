@@ -42,22 +42,19 @@ payment-service:
   port: 9080
 
 services:
-  external:
-    s3:
-      endpoint: http://localhost:9000
-      accessKey: user
-      secretKey: password
-      connectionTimeout: 10_000
-      socketTimeout: 10_000
-      bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
-      defaultProfilePicture: defaultAvatar.png
-      remoteFilename: pic.png
-      headers: false
-    imagegenerator:
-      endpoint: https://api.dicebear.com/9.x
-      paths:
-        get: adventurer-neutral/png
-      headers: false
-    #servicename:
-      #endpoint: example.com
-      #other keys
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    connectionTimeout: 10_000
+    socketTimeout: 10_000
+    bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
+    defaultProfilePicture: defaultAvatar.png
+    remoteFilename: pic.png
+  imagegenerator:
+    endpoint: https://api.dicebear.com/9.x
+    paths:
+      get: adventurer-neutral/png
+  postService:
+    endpoint: http://localhost:8081
+    headers: x-user-id

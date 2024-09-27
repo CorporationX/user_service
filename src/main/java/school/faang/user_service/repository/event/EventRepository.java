@@ -27,13 +27,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(nativeQuery = true, value = """
             SELECT e.*
             FROM event e
-            LEFT JOIN event_promotion ep ON e.id = ep.event_id
+            LEFT JOIN event_promotion ep ON e.id = ep.event_id AND ep.number_of_views > 0
             ORDER BY
                 CASE WHEN ep.coefficient IS NULL THEN 1 ELSE 0 END,
                 ep.coefficient DESC,
                 ep.creation_date ASC
-            LIMIT :limit
             OFFSET :offset
+            LIMIT :limit
             """)
-    List<Event> findAllSortedByPromotedEventsPerPage(@Param("limit") int limit, @Param("offset") int offset);
+    List<Event> findAllSortedByPromotedEventsPerPage(@Param("offset") int offset, @Param("limit") int limit);
 }

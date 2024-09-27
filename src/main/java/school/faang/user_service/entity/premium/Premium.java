@@ -40,19 +40,4 @@ public class Premium {
 
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Premium premium = (Premium) o;
-        return Objects.equals(user, premium.user) &&
-                Objects.equals(startDate, premium.startDate) &&
-                Objects.equals(endDate, premium.endDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, startDate, endDate);
-    }
 }

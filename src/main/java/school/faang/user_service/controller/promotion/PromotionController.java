@@ -54,18 +54,18 @@ public class PromotionController {
     }
 
     @GetMapping("/per-page")
-    public List<UserResponseDto> getPromotedUsersBeforeAllPerPage(@RequestParam(name = "limit") int limit,
-                                                                  @RequestParam(name = "offset") int offset) {
-        return promotionService.getPromotedUsersBeforeAllPerPage(limit, offset)
+    public List<UserResponseDto> getPromotedUsersBeforeAllPerPage(@RequestParam(name = "offset") int offset,
+                                                                  @RequestParam(name = "limit") int limit) {
+        return promotionService.getPromotedUsersBeforeAllPerPage(offset, limit)
                 .stream()
                 .map(userMapper::toUserResponseDto)
                 .toList();
     }
 
     @GetMapping("/events/per-page")
-    public List<PromotedEventResponseDto> getPromotedEventsBeforeAllPerPage(@RequestParam(name = "limit") int limit,
-                                                                            @RequestParam(name = "offset") int offset) {
-        return promotionService.getPromotedEventsBeforeAllPerPage(limit, offset)
+    public List<PromotedEventResponseDto> getPromotedEventsBeforeAllPerPage(@RequestParam(name = "offset") int offset,
+                                                                            @RequestParam(name = "limit") int limit) {
+        return promotionService.getPromotedEventsBeforeAllPerPage(offset, limit)
                 .stream()
                 .map(eventMapper::toPromotedEventResponseDto)
                 .toList();

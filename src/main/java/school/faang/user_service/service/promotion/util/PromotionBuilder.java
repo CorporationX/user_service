@@ -1,6 +1,5 @@
 package school.faang.user_service.service.promotion.util;
 
-import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @Component
 public class PromotionBuilder {
 
-    public UserPromotion getUserPromotion(User user, PromotionTariff tariff) {
+    public UserPromotion buildUserPromotion(User user, PromotionTariff tariff) {
         return UserPromotion
                 .builder()
                 .promotionTariff(tariff)
@@ -27,7 +26,7 @@ public class PromotionBuilder {
                 .build();
     }
 
-    public EventPromotion getEventPromotion(Event event, PromotionTariff tariff) {
+    public EventPromotion buildEventPromotion(Event event, PromotionTariff tariff) {
         return EventPromotion
                 .builder()
                 .promotionTariff(tariff)

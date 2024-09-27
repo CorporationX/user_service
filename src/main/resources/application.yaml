@@ -42,3 +42,9 @@ payment-service:
   port: 9080
   base-path: /api
   url: http://${payment-service.host}:${payment-service.port}${payment-service.base-path}
+
+app:
+  promotion:
+    user_views_decrement_schedule_time: 10000
+    event_views_decrement_schedule_time: 10000
+    scheduled_decrement_pool_size: 2

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.stream.LongStream;
 
 public class PromotionFabric {
+    public static final int ACTIVE_NUMBER_OF_VIEWS = 1;
+    public static final int NON_ACTIVE_NUMBER_OF_VIEWS = 0;
 
     public static EventPromotion getEventPromotion(long id, Event event, int numberOfViews, int audienceReach,
                                                    LocalDateTime creationDate) {
@@ -40,13 +42,13 @@ public class PromotionFabric {
                 .build();
     }
 
-    public static Event getEvent(long id, String title, User owner, EventPromotion promotion) {
+    public static Event getEvent(long id, String title, User owner, List<EventPromotion> promotions) {
         return Event
                 .builder()
                 .id(id)
                 .title(title)
                 .owner(owner)
-                .promotion(promotion)
+                .promotions(promotions)
                 .build();
     }
 
@@ -64,26 +66,26 @@ public class PromotionFabric {
                 .build();
     }
 
-    public static Event getEvent(long id, EventPromotion eventPromotion) {
+    public static Event getEvent(long id, List<EventPromotion> eventPromotions) {
         return Event
                 .builder()
                 .id(id)
-                .promotion(eventPromotion)
+                .promotions(eventPromotions)
                 .build();
     }
 
-    public static Event getEvent(User owner, EventPromotion eventPromotion) {
+    public static Event getEvent(User owner, List<EventPromotion> eventPromotions) {
         return Event
                 .builder()
                 .owner(owner)
-                .promotion(eventPromotion)
+                .promotions(eventPromotions)
                 .build();
     }
 
-    public static List<Event> getEvents(int number, EventPromotion eventPromotion) {
+    public static List<Event> getEvents(int number, List<EventPromotion> eventPromotions) {
         return LongStream
                 .rangeClosed(1, number)
-                .mapToObj(i -> getEvent(i, eventPromotion))
+                .mapToObj(i -> getEvent(i, eventPromotions))
                 .toList();
     }
 
@@ -129,20 +131,20 @@ public class PromotionFabric {
                 .build();
     }
 
-    public static User getUser(long id, String username, UserPromotion promotion) {
+    public static User getUser(long id, String username, List<UserPromotion> promotions) {
         return User
                 .builder()
                 .id(id)
                 .username(username)
-                .promotion(promotion)
+                .promotions(promotions)
                 .build();
     }
 
-    public static User getUser(long id, UserPromotion promotion) {
+    public static User getUser(long id, List<UserPromotion> promotions) {
         return User
                 .builder()
                 .id(id)
-                .promotion(promotion)
+                .promotions(promotions)
                 .build();
     }
 
@@ -153,10 +155,10 @@ public class PromotionFabric {
                 .build();
     }
 
-    public static List<User> getUsers(int number, UserPromotion userPromotion) {
+    public static List<User> getUsers(int number, List<UserPromotion> userPromotions) {
         return LongStream
                 .rangeClosed(1, number)
-                .mapToObj(i -> getUser(i, userPromotion))
+                .mapToObj(i -> getUser(i, userPromotions))
                 .toList();
     }
 
@@ -165,5 +167,73 @@ public class PromotionFabric {
                 .rangeClosed(1, number)
                 .mapToObj(PromotionFabric::getUser)
                 .toList();
+    }
+
+    public static List<User> buildUsersWithActivePromotion(int number) {
+        return LongStream
+                .rangeClosed(1, number)
+                .mapToObj(PromotionFabric::buildUserWithActivePromotion)
+                .toList();
+    }
+
+    public static User buildUserWithActivePromotion(Long id) {
+        return User
+                .builder()
+                .id(id)
+                .promotions(List.of(buildActiveUserPromotion(id)))
+                .build();
+    }
+
+    public static List<UserPromotion> buildActiveUserPromotions(int number) {
+        return LongStream
+                .rangeClosed(1, number)
+                .mapToObj(PromotionFabric::buildActiveUserPromotion)
+                .toList();
+    }
+
+    public static UserPromotion buildActiveUserPromotion(Long id) {
+        return UserPromotion
+                .builder()
+                .id(id)
+                .numberOfViews(ACTIVE_NUMBER_OF_VIEWS)
+                .build();
+    }
+
+    public static UserPromotion buildNonActiveUserPromotion(Long id) {
+        return UserPromotion
+                .builder()
+                .id(id)
+                .numberOfViews(NON_ACTIVE_NUMBER_OF_VIEWS)
+                .build();
+    }
+
+    public static List<Event> buildEventsWithActivePromotion(int number) {
+        return LongStream
+                .rangeClosed(1, number)
+                .mapToObj(PromotionFabric::buildEventWithActivePromotion)
+                .toList();
+    }
+
+    public static Event buildEventWithActivePromotion(Long id) {
+        return Event
+                .builder()
+                .id(id)
+                .promotions(List.of(buildActiveEventPromotion(id)))
+                .build();
+    }
+
+    public static List<EventPromotion> buildActiveEventPromotions(int number) {
+        return LongStream
+                .rangeClosed(1, number)
+                .mapToObj(PromotionFabric::buildActiveEventPromotion)
+                .toList();
+    }
+
+    public static EventPromotion buildActiveEventPromotion(Long id) {
+        return EventPromotion
+                .builder()
+                .id(id)
+                .numberOfViews(ACTIVE_NUMBER_OF_VIEWS)
+                .build();
     }
 }

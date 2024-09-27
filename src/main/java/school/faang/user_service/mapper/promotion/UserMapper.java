@@ -8,26 +8,36 @@ import school.faang.user_service.dto.promotion.UserResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.UserPromotion;
 
+import java.util.List;
+import java.util.Optional;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
-    @Mapping(source = "promotion", target = "promotionTariff", qualifiedByName = "mapTariff")
-    @Mapping(source = "promotion", target = "numberOfViews", qualifiedByName = "mapNumberOfViews")
+    @Mapping(source = "promotions", target = "promotionTariff", qualifiedByName = "mapTariff")
+    @Mapping(source = "promotions", target = "numberOfViews", qualifiedByName = "mapNumberOfViews")
     UserResponseDto toUserResponseDto(User user);
 
     @Named("mapTariff")
-    default String mapTariff(UserPromotion userPromotion) {
-        if (userPromotion == null) {
-            return null;
-        }
-        return userPromotion.getPromotionTariff().toString();
+    default String mapTariff(List<UserPromotion> userPromotions) {
+        Optional<UserPromotion> promotionOpt = getActivePromotion(userPromotions);
+        return promotionOpt
+                .map(userPromotion -> userPromotion.getPromotionTariff().toString())
+                .orElse(null);
     }
 
     @Named("mapNumberOfViews")
-    default Integer mapNumberOfViews(UserPromotion userPromotion) {
-        if (userPromotion == null) {
-            return null;
-        }
-        return userPromotion.getNumberOfViews();
+    default Integer mapNumberOfViews(List<UserPromotion> userPromotions) {
+        Optional<UserPromotion> promotionOpt = getActivePromotion(userPromotions);
+        return promotionOpt
+                .map(UserPromotion::getNumberOfViews)
+                .orElse(null);
+    }
+
+    default Optional<UserPromotion> getActivePromotion(List<UserPromotion> userPromotions) {
+        return userPromotions
+                .stream()
+                .filter(promotion -> promotion.getNumberOfViews() > 0)
+                .findFirst();
     }
 }

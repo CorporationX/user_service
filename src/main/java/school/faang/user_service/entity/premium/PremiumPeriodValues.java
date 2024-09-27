@@ -14,5 +14,4 @@ public class PremiumPeriodValues {
     public static final int DAYS_YEAR = 365;
 
     public static final Currency PREMIUM_CURRENCY = Currency.USD;
-
 }

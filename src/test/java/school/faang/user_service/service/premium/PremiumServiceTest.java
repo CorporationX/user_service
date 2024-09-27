@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_NOT_FOUND_PREMIUM;
+import static school.faang.user_service.service.premium.util.PremiumErrorMessages.USER_NOT_FOUND_WHEN_BUYING_PREMIUM;
 import static school.faang.user_service.util.premium.PremiumFabric.getPaymentResponse;
 import static school.faang.user_service.util.premium.PremiumFabric.getUser;
 
@@ -53,7 +53,7 @@ class PremiumServiceTest {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> premiumService.buyPremium(USER_ID, PERIOD))
                 .isInstanceOf(PremiumNotFoundException.class)
-                .hasMessageContaining(USER_NOT_FOUND_PREMIUM, USER_ID);
+                .hasMessageContaining(USER_NOT_FOUND_WHEN_BUYING_PREMIUM, USER_ID);
     }
 
     @Test

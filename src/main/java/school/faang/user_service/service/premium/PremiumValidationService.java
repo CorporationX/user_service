@@ -23,9 +23,7 @@ public class PremiumValidationService {
     public void validateUserForSubPeriod(long userId, User user) {
         log.error("Verification of User with id: {} for buying premium subscription", userId);
         getActivePremium(user).ifPresent(premium -> {
-            if (premium.getEndDate().isAfter(LocalDateTime.now())) {
-                throw new PremiumValidationFailureException(USER_ALREADY_HAS_PREMIUM, userId, premium.getEndDate());
-            }
+            throw new PremiumValidationFailureException(USER_ALREADY_HAS_PREMIUM, userId, premium.getEndDate());
         });
     }
 
@@ -37,8 +35,7 @@ public class PremiumValidationService {
     }
 
     private Optional<Premium> getActivePremium(User user) {
-        return user
-                .getPremiums()
+        return user.getPremiums()
                 .stream()
                 .filter(premium -> premium.getEndDate().isAfter(LocalDateTime.now()))
                 .findFirst();

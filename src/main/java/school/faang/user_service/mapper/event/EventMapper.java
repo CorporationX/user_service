@@ -17,6 +17,7 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -50,8 +51,8 @@ public abstract class EventMapper {
     public abstract EventWithSubscribersDto toEventWithSubscribersDto(Event event, Integer subscribersCount);
 
     @Mapping(source = "owner.id", target = "ownerId")
-    @Mapping(source = "promotion", target = "promotionTariff", qualifiedByName = "mapTariff")
-    @Mapping(source = "promotion", target = "numberOfViews", qualifiedByName = "mapNumberOfViews")
+    @Mapping(source = "promotions", target = "promotionTariff", qualifiedByName = "mapTariff")
+    @Mapping(source = "promotions", target = "numberOfViews", qualifiedByName = "mapNumberOfViews")
     public abstract PromotedEventResponseDto toPromotedEventResponseDto(Event event);
 
     @Named("mapIdsSkills")
@@ -78,18 +79,25 @@ public abstract class EventMapper {
     }
 
     @Named("mapTariff")
-    protected String mapTariff(EventPromotion eventPromotion) {
-        if (eventPromotion == null) {
-            return "Don't have promotion";
-        }
-        return eventPromotion.getPromotionTariff().toString();
+    protected String mapTariff(List<EventPromotion> eventPromotions) {
+        Optional<EventPromotion> promotionOpt = getActivePromotion(eventPromotions);
+        return promotionOpt
+                .map(eventPromotion -> eventPromotion.getPromotionTariff().toString())
+                .orElse(null);
     }
 
     @Named("mapNumberOfViews")
-    protected Integer mapNumberOfViews(EventPromotion eventPromotion) {
-        if (eventPromotion == null) {
-            return null;
-        }
-        return eventPromotion.getNumberOfViews();
+    protected Integer mapNumberOfViews(List<EventPromotion> eventPromotions) {
+        Optional<EventPromotion> promotionOpt = getActivePromotion(eventPromotions);
+        return promotionOpt
+                .map(EventPromotion::getNumberOfViews)
+                .orElse(null);
+    }
+
+    protected Optional<EventPromotion> getActivePromotion(List<EventPromotion> eventPromotions) {
+        return eventPromotions
+                .stream()
+                .filter(promotion -> promotion.getNumberOfViews() > 0)
+                .findFirst();
     }
 }

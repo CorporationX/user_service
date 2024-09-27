@@ -27,18 +27,43 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
+    //    @Query(nativeQuery = true, value = """
+//            SELECT u.*
+//            FROM users u
+//            LEFT JOIN user_promotion up ON u.id = up.user_id
+//            ORDER BY
+//                CASE WHEN up.active IS NULL THEN 1 ELSE 0 END,
+//                up.coefficient DESC,
+//                up.creation_date ASC
+//            OFFSET :offset
+//            LIMIT :limit
+//            """)
     @Query(nativeQuery = true, value = """
             SELECT u.*
             FROM users u
-            LEFT JOIN user_promotion up ON u.id = up.user_id
+            LEFT JOIN user_promotion up ON u.id = up.user_id AND up.number_of_views > 0
             ORDER BY
                 CASE WHEN up.coefficient IS NULL THEN 1 ELSE 0 END,
                 up.coefficient DESC,
                 up.creation_date ASC
-            LIMIT :limit 
             OFFSET :offset
+            LIMIT :limit
             """)
-    List<User> findAllSortedByPromotedUsersPerPage(@Param("limit") int limit, @Param("offset") int offset);
+    List<User> findAllSortedByPromotedUsersPerPage(@Param("offset") int offset, @Param("limit") int limit);
+
+//    @Query(nativeQuery = true, value = """
+//    SELECT u.*
+//    FROM users u
+//    LEFT JOIN user_promotion up ON u.id = up.user_id
+//    ORDER BY
+//        CASE WHEN up.coefficient IS NULL OR up.coefficient = 0 THEN 1 ELSE 0 END ASC,
+//        up.coefficient DESC,
+//        CASE WHEN up.coefficient IS NULL OR up.coefficient = 0 THEN up.creation_date END DESC,
+//        up.creation_date ASC
+//    OFFSET :offset
+//    LIMIT :limit
+//    """)
+//    List<User> findAllSortedByPromotedUsersPerPage(@Param("limit") int limit, @Param("offset") int offset);
 
     @Query("""
             SELECT COUNT(f) FROM User u 

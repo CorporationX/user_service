@@ -2,75 +2,93 @@ package school.faang.user_service.service.promotion;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.EventPromotion;
 import school.faang.user_service.entity.promotion.UserPromotion;
-import school.faang.user_service.repository.promotion.EventPromotionRepository;
-import school.faang.user_service.repository.promotion.UserPromotionRepository;
+import school.faang.user_service.repository.promotion.EventPromotionRepositoryBatch;
+import school.faang.user_service.repository.promotion.UserPromotionRepositoryBatch;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PromotionTaskService {
-    private final UserPromotionRepository userPromotionRepository;
-    private final EventPromotionRepository eventPromotionRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void decrementUserPromotionViews(List<User> users) {
-        users.stream()
-                .filter(user -> user.getPromotion() != null)
-                .forEach(user -> {
-                    try {
-                        decrementUserPromotionView(user.getPromotion().getId());
-                    } catch (Exception exc) {
-                        log.info("Failed to decrement user promotion views for user id: {}, message: {}", user.getId(),
-                                exc.getMessage());
-                    }
-                });
+    @Value("${app.promotion.scheduled_decrement_pool_size}")
+    private int threadPoolSize;
+
+    @Value("${app.promotion.user_views_decrement_schedule_time}")
+    private int userViewsDecrementScheduleTime;
+
+    @Value("${app.promotion.event_views_decrement_schedule_time}")
+    private int eventViewsDecrementScheduleTime;
+
+    private final UserPromotionRepositoryBatch userPromotionRepositoryBatch;
+    private final EventPromotionRepositoryBatch eventPromotionRepositoryBatch;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(threadPoolSize);
+    private final Map<Long, Integer> userPromotionViews = new ConcurrentHashMap<>();
+    private final Map<Long, Integer> eventPromotionViews = new ConcurrentHashMap<>();
+    private final AtomicBoolean isUserViewsDecrementRunning = new AtomicBoolean(false);
+    private final AtomicBoolean isEventViewsDecrementRunning = new AtomicBoolean(false);
+
+    @Async
+    public void decrementUserPromotionViews(List<UserPromotion> userPromotions) {
+        log.info("Decrement user promotion views");
+        userPromotions.forEach(userPromotion -> {
+            long promotionId = userPromotion.getId();
+            int views = userPromotionViews.computeIfAbsent(promotionId, k -> 0);
+            userPromotionViews.put(promotionId, ++views);
+        });
+        System.out.println(userPromotionViews);
+        if (isUserViewsDecrementRunning.compareAndSet(false, true)) {
+            scheduler.schedule(this::executeUserPromotionViewsDecrement, userViewsDecrementScheduleTime,
+                    TimeUnit.MILLISECONDS);
+        }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void decrementUserPromotionView(long id) {
-        Optional<UserPromotion> userPromotionOpt = userPromotionRepository.findByIdWithLock(id);
-        userPromotionOpt.ifPresentOrElse(userPromotion -> {
-            if (userPromotion.getNumberOfViews() <= 1) {
-                userPromotionRepository.delete(userPromotion);
-            } else {
-                userPromotionRepository.decrementPromotionViews(userPromotion.getId());
-            }
-        }, () -> log.info("User promotion with id: {} not found", id));
+    private void executeUserPromotionViewsDecrement() {
+        try {
+            log.info("User promotion views batch decrement: {}", userPromotionViews);
+            Map<Long, Integer> userPromotionViewsCopy = new HashMap<>(userPromotionViews);
+            userPromotionViews.clear();
+            userPromotionRepositoryBatch.updateUserPromotions(userPromotionViewsCopy);
+        } finally {
+            isUserViewsDecrementRunning.set(false);
+        }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void decrementEventPromotionViews(List<Event> events) {
-        events.stream()
-                .filter(event -> event.getPromotion() != null)
-                .forEach(event -> {
-                    try {
-                        decrementEventPromotionView(event.getPromotion().getId());
-                    } catch (Exception exc) {
-                        log.info("Failed to decrement event promotion views for user id: {}, message: {}", event.getId(),
-                                exc.getMessage());
-                    }
-                });
+    @Async
+    public void decrementEventPromotionViews(List<EventPromotion> eventPromotions) {
+        log.info("Decrement event promotion");
+        eventPromotions.forEach(eventPromotion -> {
+            long promotionId = eventPromotion.getId();
+            int views = eventPromotionViews.computeIfAbsent(promotionId, k -> 0);
+            eventPromotionViews.put(promotionId, ++views);
+        });
+        if (isEventViewsDecrementRunning.compareAndSet(false, true)) {
+            scheduler.schedule(this::executeEventPromotionViewsDecrement, eventViewsDecrementScheduleTime,
+                    TimeUnit.MILLISECONDS);
+        }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void decrementEventPromotionView(long id) {
-        Optional<EventPromotion> eventPromotionOpt = eventPromotionRepository.findByIdWithLock(id);
-        eventPromotionOpt.ifPresentOrElse(eventPromotion -> {
-            if (eventPromotion.getNumberOfViews() <= 1) {
-                eventPromotionRepository.delete(eventPromotion);
-            } else {
-                eventPromotionRepository.decrementPromotionViews(eventPromotion.getId());
-            }
-        }, () -> log.info("Event promotion with id: {} not found", id));
+    private void executeEventPromotionViewsDecrement() {
+        try {
+            log.info("Event promotion views batch decrement: {}", eventPromotionViews);
+            Map<Long, Integer> eventPromotionViewsCopy = new HashMap<>(eventPromotionViews);
+            eventPromotionViews.clear();
+            eventPromotionRepositoryBatch.updateEventPromotions(eventPromotionViewsCopy);
+        } finally {
+            isEventViewsDecrementRunning.set(false);
+        }
     }
 }

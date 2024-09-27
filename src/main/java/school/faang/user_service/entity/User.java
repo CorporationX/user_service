@@ -144,6 +144,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Premium> premiums;
 
-    @OneToOne(mappedBy = "user")
-    private UserPromotion promotion;
+    @OneToMany(mappedBy = "user")
+    private List<UserPromotion> promotions;
 }

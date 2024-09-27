@@ -78,6 +78,6 @@ public class Event {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "event")
-    private EventPromotion promotion;
+    @OneToMany(mappedBy = "event")
+    private List<EventPromotion> promotions;
 }

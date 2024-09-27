@@ -159,7 +159,7 @@ public class EventMapperTest {
     void testToDto() {
         User user = getUser(USER_ID);
         EventPromotion eventPromotion = getEventPromotion(TARIFF, TARIFF.getNumberOfViews());
-        Event event = getEvent(EVENT_ID, TITLE, user, eventPromotion);
+        Event event = getEvent(EVENT_ID, TITLE, user, List.of(eventPromotion));
         var responseDto = new PromotedEventResponseDto(EVENT_ID, TITLE, USER_ID, TARIFF.toString(), TARIFF.getNumberOfViews());
 
         assertThat(eventMapper.toPromotedEventResponseDto(event)).isEqualTo(responseDto);

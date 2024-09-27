@@ -30,7 +30,6 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
 public class UserServiceImpl implements UserService {
 

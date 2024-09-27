@@ -49,7 +49,6 @@ public class PromotionTaskService {
             int views = userPromotionViews.computeIfAbsent(promotionId, k -> 0);
             userPromotionViews.put(promotionId, ++views);
         });
-        System.out.println(userPromotionViews);
         if (isUserViewsDecrementRunning.compareAndSet(false, true)) {
             scheduler.schedule(this::executeUserPromotionViewsDecrement, userViewsDecrementScheduleTime,
                     TimeUnit.MILLISECONDS);

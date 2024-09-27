@@ -1,7 +1,7 @@
 package school.faang.user_service.validator.recommendation;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.Skill;
@@ -14,8 +14,8 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Component
-@RequiredArgsConstructor
 public class RecommendationValidator {
     private final SkillRepository skillRepository;
     private final RecommendationRepository recommendationRepository;

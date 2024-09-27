@@ -22,7 +22,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class RecommendationValidatorTest {
+public class RecommendationValidatorImplTest {
+
     @Mock
     private SkillRepository skillRepository;
 

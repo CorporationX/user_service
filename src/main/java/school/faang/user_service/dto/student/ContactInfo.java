@@ -1,4 +1,4 @@
-package school.faang.user_service.entity.student;
+package school.faang.user_service.dto.student;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;

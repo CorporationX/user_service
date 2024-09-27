@@ -24,10 +24,10 @@ public class PaymentService {
 
     @Retryable(
             retryFor = FeignException.class,
-            maxAttemptsExpression = "${app.payment_service.retryable.send_payment.max_attempts}",
+            maxAttemptsExpression = "${app.retryable.payment_service.send_payment.max_attempts}",
             backoff = @Backoff(
-                    delayExpression = "${app.payment_service.retryable.send_payment.delay}",
-                    multiplierExpression = "${app.payment_service.retryable.send_payment.multiplier}"
+                    delayExpression = "${app.retryable.payment_service.send_payment.delay}",
+                    multiplierExpression = "${app.retryable.payment_service.send_payment.multiplier}"
             )
     )
     public PaymentResponseDto sendPayment(PremiumPeriod period) {
@@ -43,10 +43,10 @@ public class PaymentService {
 
     @Retryable(
             retryFor = FeignException.class,
-            maxAttemptsExpression = "${app.payment_service.retryable.send_payment.max_attempts}",
+            maxAttemptsExpression = "${app.retryable.payment_service.send_payment.max_attempts}",
             backoff = @Backoff(
-                    delayExpression = "${app.payment_service.retryable.send_payment.delay}",
-                    multiplierExpression = "${app.payment_service.retryable.send_payment.multiplier}"
+                    delayExpression = "${app.retryable.payment_service.send_payment.delay}",
+                    multiplierExpression = "${app.retryable.payment_service.send_payment.multiplier}"
             )
     )
     public PaymentResponseDto sendPayment(PromotionTariff tariff) {

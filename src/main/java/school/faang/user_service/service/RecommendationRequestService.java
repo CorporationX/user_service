@@ -8,6 +8,8 @@ import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.*;
+import school.faang.user_service.filter.*;
+import school.faang.user_service.repository.RequestFilter;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -15,6 +17,7 @@ import school.faang.user_service.repository.recommendation.SkillRequestRepositor
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,21 +53,12 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
+        List<RequestFilter> filters = createFilters(filter);
+
         List<RecommendationRequest> allRequests = recommendationRequestRepository.findAll();
 
         List<RecommendationRequest> filteredRequests = allRequests.stream()
-                .filter(request -> {
-                    if (filter.getRequesterId() != null && !request.getRequester().getId().equals(filter.getRequesterId())) {
-                        return false;
-                    }
-                    if (filter.getReceiverId() != null && !request.getReceiver().getId().equals(filter.getReceiverId())) {
-                        return false;
-                    }
-                    if (filter.getStatus() != null && !request.getStatus().equals(filter.getStatus())) {
-                        return false;
-                    }
-                    return true;
-                })
+                .filter(request -> filters.stream().allMatch(f -> f.apply(request)))
                 .collect(Collectors.toList());
 
         return recommendationRequestMapper.toDtoList(filteredRequests);
@@ -107,7 +101,17 @@ public class RecommendationRequestService {
         );
     }
 
-    private boolean hasSkills(RecommendationRequestDto recommendationRequestDto) {
-        return recommendationRequestDto.getSkillId() != null;
+    private List<RequestFilter> createFilters(RequestFilterDto filter) {
+        List<RequestFilter> filters = new ArrayList<>();
+        if (filter.getRequesterId() != null) {
+            filters.add(new RequesterIdFilter(filter.getRequesterId()));
+        }
+        if (filter.getReceiverId() != null) {
+            filters.add(new ReceiverIdFilter(filter.getReceiverId()));
+        }
+        if (filter.getStatus() != null) {
+            filters.add(new StatusFilter(filter.getStatus()));
+        }
+        return filters;
     }
 }

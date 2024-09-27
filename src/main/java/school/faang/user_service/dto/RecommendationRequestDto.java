@@ -13,8 +13,8 @@ import java.util.List;
 @Data
 public class RecommendationRequestDto {
     private long id;
-    @NotBlank(message = "Message cannot be blank")
     @Size(max = 500, message = "Message cannot exceed 500 characters")
+    @NotBlank(message = "Message cannot be empty")
     private String message;
     private RequestStatus status;
     @NotEmpty(message = "Skill list cannot be empty")

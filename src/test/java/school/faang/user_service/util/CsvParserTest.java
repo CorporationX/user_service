@@ -9,6 +9,7 @@ import school.faang.user_service.entity.student.Address;
 import school.faang.user_service.entity.student.ContactInfo;
 import school.faang.user_service.entity.student.Education;
 import school.faang.user_service.dto.student.Person;
+import school.faang.user_service.util.impl.CsvParserImpl;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class CsvParserTest {
         assertThat(userList).isEqualTo(persons);
     }
 
-    private static @NotNull List<Person> getTestPersonList() {
+    public static @NotNull List<Person> getTestPersonList() {
         List<Person> persons = new ArrayList<>();
 
         Person johnDoe = Person.builder()
@@ -97,7 +98,7 @@ public class CsvParserTest {
         return persons;
     }
 
-    private static @NotNull ByteArrayInputStream getTestStream() {
+    public static @NotNull ByteArrayInputStream getTestStream() {
         String csvData = "firstName,lastName,yearOfBirth,group,studentID,email,phone,street,city,state,country,postalCode,faculty,yearOfStudy,major,GPA,status,admissionDate,graduationDate,degree,institution,completionYear,scholarship,employer\n" +
                 "John,Doe,1998,A,123456,johndoe@example.com,+1-123-456-7890,123 Main Street,New York,NY,USA,10001,Computer Science,3,Software Engineering,3.8,Active,2016-09-01,2020-05-30,High School Diploma,XYZ High School,2016,true,XYZ Technologies\n" +
                 "Michael,Johnson,1988,Group A,246813,michaeljohnson@example.com,1112223333,Second Street,Miami,FL,USA,67890,Law,2021,Corporate Law,3.7,Graduated,2019-01-01,2021-12-31,Bachelor,DEF University,2019,true,ABC Law Firm\n" ;

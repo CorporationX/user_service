@@ -49,9 +49,7 @@ public class RecommendationController {
                                                              @RequestParam int limit) {
         List<Recommendation> allUserRecommendations = recommendationService.getAllUserRecommendations(receiverId, offset, limit);
 
-        return allUserRecommendations.stream()
-                .map(recommendationMapper::toDto)
-                .toList();
+        return recommendationMapper.toDtoList(allUserRecommendations);
     }
 
     @GetMapping("/author/{authorId}")
@@ -60,8 +58,6 @@ public class RecommendationController {
                                                               @RequestParam int limit) {
         List<Recommendation> allGivenRecommendations = recommendationService.getAllGivenRecommendations(authorId, offset, limit);
 
-        return allGivenRecommendations.stream()
-                .map(recommendationMapper::toDto)
-                .toList();
+        return recommendationMapper.toDtoList(allGivenRecommendations);
     }
 }

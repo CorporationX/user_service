@@ -87,7 +87,7 @@ class RecommendationControllerTest {
         when(recommendationService.getAllUserRecommendations(receiver.getId(), offset, limit))
                 .thenReturn(recommendationList);
 
-        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+        when(recommendationMapper.toDtoList(recommendationList)).thenReturn(recommendationDtoList);
 
         List<RecommendationDto> result = recommendationController.getAllUserRecommendations(receiver.getId(), offset, limit);
         assertNotNull(result);
@@ -106,7 +106,7 @@ class RecommendationControllerTest {
         when(recommendationService.getAllGivenRecommendations(author.getId(), offset, limit))
                 .thenReturn(recommendationList);
 
-        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+        when(recommendationMapper.toDtoList(recommendationList)).thenReturn(recommendationDtoList);
 
         List<RecommendationDto> result = recommendationController.getAllGivenRecommendations(author.getId(), offset, limit);
         assertNotNull(result);

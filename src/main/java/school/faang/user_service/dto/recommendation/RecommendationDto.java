@@ -31,6 +31,7 @@ public class RecommendationDto {
     private Long receiverId;
 
     @NotBlank(message = "Content cannot be blank")
+    @NotNull(message = "Content cannot be null")
     private String content;
 
     private List<SkillOfferDto> skillOffers;

@@ -44,9 +44,11 @@ public class PromotionService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new PromotionNotFoundException(USER_NOT_FOUND_WHEN_BUYING_PROMOTION, userId));
         promotionValidationService.checkUserForPromotion(user);
+
         PaymentResponseDto paymentResponse = paymentService.sendPayment(tariff);
         promotionValidationService
                 .checkPromotionPaymentResponse(paymentResponse, userId, tariff, UNSUCCESSFUL_USER_PROMOTION_PAYMENT);
+
         UserPromotion promotion = promotionBuilder.buildUserPromotion(user, tariff);
         return userPromotionRepository.save(promotion);
     }
@@ -57,9 +59,11 @@ public class PromotionService {
         Event event = eventRepository.findById(eventId).orElseThrow(() ->
                 new PromotionNotFoundException(EVENT_NOT_FOUND_PROMOTION, eventId));
         promotionValidationService.checkEventForUserAndPromotion(userId, eventId, event);
+
         PaymentResponseDto paymentResponse = paymentService.sendPayment(tariff);
         promotionValidationService
                 .checkPromotionPaymentResponse(paymentResponse, eventId, tariff, UNSUCCESSFUL_EVENT_PROMOTION_PAYMENT);
+
         EventPromotion eventPromotion = promotionBuilder.buildEventPromotion(event, tariff);
         return eventPromotionRepository.save(eventPromotion);
     }
@@ -69,6 +73,7 @@ public class PromotionService {
         log.info("Get promoted users before all per page: {} - {}", offset, limit);
         List<User> users = userRepository.findAllSortedByPromotedUsersPerPage(offset, limit);
         List<UserPromotion> activeUserPromotions = promotionValidationService.getActiveUserPromotions(users);
+
         if (!activeUserPromotions.isEmpty()) {
             promotionTaskService.decrementUserPromotionViews(activeUserPromotions);
         }
@@ -80,6 +85,7 @@ public class PromotionService {
         log.info("Get promoted events before all per page: {} - {}", offset, limit);
         List<Event> events = eventRepository.findAllSortedByPromotedEventsPerPage(offset, limit);
         List<EventPromotion> activeEventPromotions = promotionValidationService.getActiveEventPromotions(events);
+
         if (!activeEventPromotions.isEmpty()) {
             promotionTaskService.decrementEventPromotionViews(activeEventPromotions);
         }

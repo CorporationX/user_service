@@ -10,7 +10,7 @@ import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -88,7 +88,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     @Override
     @Transactional
-    public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejectionDto) throws DataValidationException {
+    public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejectionDto){
         RecommendationRequestDto recommendationRequestDto = getRequest(id);
         if (recommendationRequestDto.getStatus() == RequestStatus.PENDING) {
             RecommendationRequest recommendationRequestEntity = recommendationRequestMapper

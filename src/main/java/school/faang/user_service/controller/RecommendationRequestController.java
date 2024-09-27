@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class RecommendationRequestController {
 
     @PostMapping("/reject/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable("id") @Positive Long recommendationRequestId,
-                                                  @RequestBody @NotNull RejectionDto rejectionDto) throws DataValidationException {
+                                                  @RequestBody @NotNull RejectionDto rejectionDto) {
         return recommendationRequestService.rejectRequest(recommendationRequestId, rejectionDto);
     }
 }

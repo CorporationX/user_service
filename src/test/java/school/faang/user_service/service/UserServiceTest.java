@@ -145,8 +145,6 @@ public class UserServiceTest {
 
     @Test
     void shouldReturnListOfUserDtos_WhenUsersFound() {
-        List<Long> userIds = Arrays.asList(1L, 2L, 3L);
-
         User user1 = new User();
         user1.setId(1L);
         user1.setUsername("user1");

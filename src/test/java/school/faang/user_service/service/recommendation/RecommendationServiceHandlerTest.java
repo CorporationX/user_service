@@ -4,10 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.test_data.recommendation.TestDataRecommendation;
 
 import java.time.LocalDateTime;
@@ -15,9 +17,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceHandlerTest {
+    @Mock
+    private RecommendationRepository recommendationRepository;
     @InjectMocks
     private RecommendationServiceHandler recommendationServiceHandler;
     private User author;
@@ -66,5 +71,15 @@ class RecommendationServiceHandlerTest {
                 () -> recommendationServiceHandler.skillOffersValidation(skillOfferDtoIds, allSkillsIds));
 
         assertEquals("SkillOffer of this recommendation not valid.", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteRecommendation_recommendationNotFound_throwDataValidationException() {
+        when(recommendationRepository.existsById(recommendation.getId())).thenReturn(false);
+
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> recommendationServiceHandler.recommendationExistsByIdValidation(recommendation.getId()));
+
+        assertEquals("Recommendation with ID: " + recommendation.getId() + " not found.", exception.getMessage());
     }
 }

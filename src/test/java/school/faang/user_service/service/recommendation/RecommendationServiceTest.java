@@ -124,11 +124,10 @@ class RecommendationServiceTest {
 
         @Test
         void testDeleteRecommendationSuccess() {
-            when(recommendationRepository.existsById(recommendation.getId())).thenReturn(true);
-
             recommendationService.deleteRecommendation(recommendation.getId());
 
             verify(recommendationRepository, atLeastOnce()).deleteById(recommendation.getId());
+            verify(recommendationServiceHandler,atLeastOnce()).recommendationExistsByIdValidation(recommendation.getId());
         }
 
         @Test
@@ -188,7 +187,7 @@ class RecommendationServiceTest {
                     "Guarantee for SkillOffer with ID: " + skill1.getId() +
                             " for User with ID: " + receiver.getId() +
                             " from Guarantor with ID: " + author.getId() +
-                            " already exist",
+                            " already exist.",
                     exception.getMessage()
             );
         }
@@ -201,7 +200,7 @@ class RecommendationServiceTest {
                     () -> recommendationService.createRecommendation(recommendationDto)
             );
 
-            assertEquals("User with ID: " + author.getId() + " not found", exception.getMessage());
+            assertEquals("User with ID: " + author.getId() + " not found.", exception.getMessage());
         }
 
         @Test
@@ -224,7 +223,7 @@ class RecommendationServiceTest {
                     "Guarantee for SkillOffer with ID: " + skill2.getId() +
                             " for User with ID: " + receiver.getId() +
                             " from Guarantor with ID: " + author.getId() +
-                            " already exist",
+                            " already exist.",
                     exception.getMessage()
             );
         }
@@ -237,20 +236,7 @@ class RecommendationServiceTest {
                     () -> recommendationService.createRecommendation(recommendationDto)
             );
 
-            assertEquals("User with ID: " + author.getId() + " not found", exception.getMessage());
+            assertEquals("User with ID: " + author.getId() + " not found.", exception.getMessage());
         }
-
-        @Test
-        void testDeleteRecommendation_recommendationNotFound_throwDataValidationException() {
-            when(recommendationRepository.existsById(recommendation.getId())).thenReturn(false);
-
-            DataValidationException exception = assertThrows(DataValidationException.class,
-                    () -> recommendationService.deleteRecommendation(recommendation.getId())
-            );
-
-            assertEquals("Recommendation with ID: " + recommendation.getId() + " not found", exception.getMessage());
-        }
-
-
     }
 }

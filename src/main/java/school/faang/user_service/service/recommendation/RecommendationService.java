@@ -63,11 +63,8 @@ public class RecommendationService {
 
     @Transactional
     public void deleteRecommendation(long recommendationId) {
-        if (recommendationRepository.existsById(recommendationId)) {
-            recommendationRepository.deleteById(recommendationId);
-        } else {
-            throw new DataValidationException("Recommendation with ID: " + recommendationId + " not found");
-        }
+        recommendationServiceHandler.recommendationExistsByIdValidation(recommendationId);
+        recommendationRepository.deleteById(recommendationId);
     }
 
     @Transactional(readOnly = true)
@@ -97,9 +94,9 @@ public class RecommendationService {
             } else {
                 throw new DataValidationException(
                         "Guarantee for SkillOffer with ID: " + skillId +
-                                " for User with ID: " + receiverId +
-                                " from Guarantor with ID: " + authorId +
-                                " already exist"
+                        " for User with ID: " + receiverId +
+                        " from Guarantor with ID: " + authorId +
+                        " already exist."
                 );
             }
         }
@@ -119,9 +116,9 @@ public class RecommendationService {
             } else {
                 throw new DataValidationException(
                         "Guarantee for SkillOffer with ID: " + skillId +
-                                " for User with ID: " + receiverId +
-                                " from Guarantor with ID: " + authorId +
-                                " already exist"
+                        " for User with ID: " + receiverId +
+                        " from Guarantor with ID: " + authorId +
+                        " already exist."
                 );
             }
         }
@@ -137,7 +134,7 @@ public class RecommendationService {
 
     private User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
-                new DataValidationException("User with ID: " + userId + " not found")
+                new DataValidationException("User with ID: " + userId + " not found.")
         );
     }
 

@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -13,5 +12,5 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(value = "services")
 public class ExternalApisProperties {
-    private Map<String, List<String>> imagegenerator;
+    private Map<String, Map<String, String>> external;
 }

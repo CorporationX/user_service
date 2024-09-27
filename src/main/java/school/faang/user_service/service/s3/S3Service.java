@@ -32,14 +32,16 @@ public class S3Service {
     private final String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
     private final String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
 
-    @Value("${services.s3.bucketDefaultAvatarsName}")
+    @Value("${services.external.s3.bucketDefaultAvatarsName}")
     private String bucketDefaultAvatarsName;
 
-    @Value("${services.s3.defaultProfilePicture}")
+    @Value("${services.external.s3.defaultProfilePicture}")
     private String defaultPictureName;
 
-    @Value("${services.s3.remoteFilename}")
+    @Value("${services.external.s3.remoteFilename}")
     private String remoteFileName;
+
+    private final Pattern PATTERN_GET_IMAGE_NAME_FROM_HEADER = Pattern.compile(FILE_NAME_PATTERN);
 
     public String uploadHttpData(ResponseEntity<byte[]> data, String folder) {
         try {
@@ -79,8 +81,7 @@ public class S3Service {
 
         if (headers.containsKey(CONTENT_DISPOSITION)) {
             if (headers.get(CONTENT_DISPOSITION).get(0) != null) {
-                Pattern pattern = Pattern.compile(FILE_NAME_PATTERN);
-                Matcher matcher = pattern.matcher(headers.get(CONTENT_DISPOSITION).get(0));
+                Matcher matcher = PATTERN_GET_IMAGE_NAME_FROM_HEADER.matcher(headers.get(CONTENT_DISPOSITION).get(0));
                 if (matcher.find()) {
                     filename = matcher.group(1);
                 }

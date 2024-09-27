@@ -15,7 +15,7 @@ public class RemoteImageService {
 
     private final ImageGeneratorClient imageGeneratorClient;
 
-    public ResponseEntity<byte[]> getUserProfileImageFromRemoteService() throws ImageGeneratorException {
+    public ResponseEntity<byte[]> getUserProfileImageFromRemoteService() {
         log.info("Trying to get random picture");
 
         try {

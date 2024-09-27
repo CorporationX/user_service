@@ -58,7 +58,7 @@ public class UserService {
 
     @Transactional
     public UserDto registerUser(UserRegistrationDto userRegistrationDto) {
-        log.debug("registerUser() - start : userRegistrationDto = {}", userRegistrationDto);
+        log.info("registerUser() - start : userRegistrationDto = {}", userRegistrationDto);
 
         User user = userMapper.toEntity(userRegistrationDto);
         userValidator.validateUserConstrains(user);
@@ -69,7 +69,7 @@ public class UserService {
         setUserDefaultAvatar(user);
         userRepository.save(user);
 
-        log.debug("registerUser() - end : user = {}", user);
+        log.info("registerUser() - end : user = {}", user);
         return userMapper.toDto(user);
     }
 

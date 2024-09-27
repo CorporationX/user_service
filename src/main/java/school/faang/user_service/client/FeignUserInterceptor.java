@@ -20,6 +20,9 @@ public class FeignUserInterceptor implements RequestInterceptor {
     }
 
     private boolean shouldSkipInterceptor(String url) {
-        return externalApisProperties.getImagegenerator().get("endpoint").contains(url);
+        return externalApisProperties.getExternal().values().stream()
+                .filter(stringStringMap -> stringStringMap.containsKey("endpoint"))
+                .map(stringStringMap -> stringStringMap.get("endpoint"))
+                .anyMatch(e -> e.contains(url));
     }
 }

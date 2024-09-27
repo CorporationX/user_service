@@ -14,19 +14,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class S3Config {
 
-    @Value("${services.s3.endpoint}")
+    @Value("${services.external.s3.endpoint}")
     private String endpoint;
 
-    @Value("${services.s3.accessKey}")
+    @Value("${services.external.s3.accessKey}")
     private String accessKey;
 
-    @Value("${services.s3.secretKey}")
+    @Value("${services.external.s3.secretKey}")
     private String secretKey;
 
-    @Value("${services.s3.connectionTimeout}")
+    @Value("${services.external.s3.connectionTimeout}")
     private int connectionTimeout;
 
-    @Value("${services.s3.socketTimeout}")
+    @Value("${services.external.s3.socketTimeout}")
     private int socketTimeout;
 
     @Bean

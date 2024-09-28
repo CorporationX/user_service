@@ -63,10 +63,8 @@ public class UserService {
         User user = userMapper.toEntity(userRegistrationDto);
         userValidator.validateUserConstrains(user);
 
-        log.info("Trying save new user {}", user);
-        userRepository.save(user);
-
         setUserDefaultAvatar(user);
+        log.info("Trying save new user {}", user);
         userRepository.save(user);
 
         log.info("registerUser() - end : user = {}", user);

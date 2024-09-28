@@ -11,5 +11,5 @@ import java.util.List;
 @Configuration
 public abstract class ApiProperties {
     private String endpoint;
-    private List<String> headers;
+    private List<String> requiredHeaders;
 }

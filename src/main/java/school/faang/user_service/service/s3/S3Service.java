@@ -27,10 +27,10 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class S3Service {
 
-    private final AmazonS3 s3Client;
+    private final static String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
+    private final static String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
 
-    private final String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
-    private final String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
+    private final AmazonS3 s3Client;
 
     @Value("${services.s3.bucketDefaultAvatarsName}")
     private String bucketDefaultAvatarsName;

@@ -15,7 +15,9 @@ import school.faang.user_service.entity.UserProfilePic;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
@@ -146,7 +148,7 @@ class UserMapperTest {
     }
 
     @Nested
-    class toEntity {
+    class ToEntity {
 
         @Test
         @DisplayName("Convert userRegistration dto should be correctly converted to User entity")

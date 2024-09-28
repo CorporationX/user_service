@@ -24,34 +24,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     private static final long USER_ID = 1L;
-
-    private static final int TWO_TIMES_USES_REPOSITORY = 2;
-
-    private static final List<Long> USER_IDS = List.of(USER_ID);
-
-    private static final String USER_NAME = "name";
-
-    @InjectMocks
-    private UserService userService;
-    @Mock
-    private UserRepository userRepository;
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
 
+    private static final String USER_NAME = "name";
+
+    private static final List<Long> USER_IDS = List.of(USER_ID);
+
+    @InjectMocks
+    private UserService userService;
+
+    @Mock
+    private UserRepository userRepository;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private UserValidator userValidator;
+
     @Mock
     private RemoteImageService remoteImageService;
+
     @Mock
     private S3Service s3Service;
 
@@ -199,7 +206,7 @@ class UserServiceTest {
                         .toEntity(userRegistrationDto);
                 verify(userValidator)
                         .validateUserConstrains(user);
-                verify(userRepository, times(TWO_TIMES_USES_REPOSITORY))
+                verify(userRepository)
                         .save(user);
                 verify(userMapper)
                         .toDto(user);
@@ -229,7 +236,7 @@ class UserServiceTest {
                         .toEntity(userRegistrationDto);
                 verify(userValidator)
                         .validateUserConstrains(user);
-                verify(userRepository, times(TWO_TIMES_USES_REPOSITORY))
+                verify(userRepository)
                         .save(user);
                 verify(userMapper)
                         .toDto(user);
@@ -256,7 +263,7 @@ class UserServiceTest {
                         .toEntity(userRegistrationDto);
                 verify(userValidator)
                         .validateUserConstrains(user);
-                verify(userRepository, times(TWO_TIMES_USES_REPOSITORY))
+                verify(userRepository)
                         .save(user);
                 verify(userMapper)
                         .toDto(user);

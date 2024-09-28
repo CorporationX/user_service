@@ -57,4 +57,4 @@ services:
       get: adventurer-neutral/png
   postService:
     endpoint: http://localhost:8081
-    headers: x-user-id
+    requiredHeaders: x-user-id

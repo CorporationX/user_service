@@ -13,3 +13,34 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - changeSet:
+      id: addCalendarEventId
+      author: Vanchous
+      changes:
+        - addColumn:
+            tableName: event
+            columns:
+              - column:
+                  name: calendar_event_id
+                  type: varchar(64)
+
+  - changeSet:
+      id: 3
+      author: Vanchous
+      changes:
+        - createTable:
+            tableName: authorization_tokens
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: json
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+

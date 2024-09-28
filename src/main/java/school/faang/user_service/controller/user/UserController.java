@@ -2,13 +2,20 @@ package school.faang.user_service.controller.user;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -21,6 +28,8 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 public class UserController {
+
+    public static final int MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
     private final UserService userService;
     private final UserContext userContext;
@@ -53,4 +62,39 @@ public class UserController {
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
+
+    // TODO: тесты
+
+    @PostMapping("/avatar")
+    public void saveAvatar(@RequestParam MultipartFile file) {
+        long fileSize = file.getSize();
+        if (fileSize > MAX_IMAGE_SIZE_BYTES) {
+            throw new IllegalArgumentException("File size is too large! Current size is " + fileSize
+                    + " bytes, but allowed max is " + MAX_IMAGE_SIZE_BYTES + " bytes");
+        }
+
+        String contentType = file.getContentType();
+        if (!MediaType.IMAGE_JPEG_VALUE.equals(contentType)) {
+            throw new IllegalArgumentException("Invalid file type. Only images jpg are allowed!");
+        }
+
+        long userId = userContext.getUserId();
+        userService.saveAvatar(userId, file);
+    }
+
+    @GetMapping(value = "/avatar", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getAvatar() {
+        long userId = userContext.getUserId();
+        byte[] imageBytes = userService.getAvatar(userId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
+                .body(imageBytes);
+    }
+
+    @DeleteMapping("/avatar")
+    public void deleteAvatar() {
+        long userId = userContext.getUserId();
+        userService.deleteAvatar(userId);
+    }
+
 }

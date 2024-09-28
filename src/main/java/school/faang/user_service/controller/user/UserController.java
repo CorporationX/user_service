@@ -3,9 +3,11 @@ package school.faang.user_service.controller.user;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Tag(name = "User")
 public class UserController {
     private final UserService userService;
 
@@ -43,8 +46,9 @@ public class UserController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Некорректный запрос",
-                    content = @Content),
+                    description = "Ошибки валидации",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = @ExampleObject(value = "{\"field\": \"message\"}"))),
             @ApiResponse(
                     responseCode = "500",
                     description = "Внутренняя ошибка сервера",
@@ -77,10 +81,8 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @Operation(summary = "Получение пользователей", description = "Получение пользователей по списку ID",
-            parameters = @Parameter (name = "user_id", description = "Список идентификаторов пользователей"))
     @GetMapping
-    public List<UserDto> getUserByIds(@RequestParam("user_id") List<Long> userIds) {
+    public List<UserDto> getUsersByIds(@RequestParam("user_id") List<Long> userIds) {
         return userService.getUsersByIds(userIds);
     }
 }

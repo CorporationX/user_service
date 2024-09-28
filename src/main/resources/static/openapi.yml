@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: User Service Rest API
+  description: User Service REST API Docs
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер разработки
+paths:
+  /api/v1/users//premium:
+    get:
+      responses:
+        200:
+          description: Успешное получение премиум пользователей
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+components:
+  schemas:
+    UserDto:
+      type: object
+      title: userDto
+      properties:
+        id:
+          type: integer
+          example: 1
+          description: ID пользователя
+        username:
+          type: string
+          example: "Somebody"
+          description: Имя пользователя
+          nullable: false
+        email:
+          type: string
+          example: "someone@mail.ru"
+          description: Email пользователя
+          nullable: false

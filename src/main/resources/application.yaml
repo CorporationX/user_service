@@ -40,3 +40,6 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+springdoc:
+  swagger-ui:

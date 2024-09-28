@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.entity.ErrorResponse;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 
 import javax.naming.AuthenticationException;
 import java.util.Map;

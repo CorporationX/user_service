@@ -1,33 +1,150 @@
 package school.faang.user_service.service.mentorship;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
 
-    private static final int SIZE_OF_MENTORS_IS_ONE = 1;
-    private static final int SIZE_OF_MENTORS_IS_EMPTY = 0;
+    @Nested
+    @DisplayName("Тесты для получения списка менти")
+    class MenteesServiceTests {
+        @Mock
+        private MentorshipRepository mentorshipRepository;
 
-    private static final long USER_ID_IS_ONE = 1L;
-    private static final long USER_ID_IS_TWO = 2L;
-    private static final long USER_ID_IS_THREE = 3L;
+        @Mock
+        private UserMapper userMapper;
 
-    @InjectMocks
-    private MentorshipService mentorshipService;
+        @InjectMocks
+        private MentorshipService mentorshipService;
+
+        private User mentor;
+        private User mentee;
+
+        @BeforeEach
+        public void setup() {
+            mentor = new User();
+            mentor.setId(1L);
+            mentee = new User();
+            mentee.setId(2L);
+
+            mentor.setMentees(new ArrayList<>(List.of(mentee)));
+            mentee.setMentors(new ArrayList<>(List.of(mentor)));
+        }
+
+        @Test
+        @DisplayName("Должен вернуть список менти для ментора")
+        void shouldReturnListOfMenteesForMentor() {
+            when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
+            when(userMapper.toDto(mentee))
+                    .thenReturn(new UserDto(mentee.getId(), "Mentee Name", "mentee@example.com"));
+
+            List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
+
+            assertEquals(1, mentees.size());
+            assertEquals(mentee.getId(), mentees.get(0).getId());
+            verify(mentorshipRepository).findById(mentor.getId());
+            verify(userMapper).toDto(mentee);
+        }
+
+
+        @Test
+        @DisplayName("Должен удалить менти для ментора")
+        void shouldDeleteMenteeForMentor() {
+            when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
+            when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
+
+            assertTrue(mentor.getMentees().contains(mentee));
+
+            mentorshipService.deleteMentee(mentor.getId(), mentee.getId());
+
+            verify(mentorshipRepository).save(mentor);
+            assertFalse(mentor.getMentees().contains(mentee));
+        }
+
+        @Test
+        @DisplayName("Должен вернуть список менторов для менти")
+        void shouldReturnListOfMentorsForMentee() {
+            when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
+            mentee.setMentors(new ArrayList<>(List.of(mentor)));
+            when(userMapper.toDto(mentor))
+                    .thenReturn(new UserDto(mentor.getId(), "Mentor Name", "mentor@example.com"));
+
+            List<UserDto> mentors = mentorshipService.getMentors(mentee.getId());
+
+            assertEquals(1, mentors.size());
+            assertEquals(mentor.getId(), mentors.get(0).getId());
+            verify(mentorshipRepository).findById(mentee.getId());
+            verify(userMapper).toDto(mentor);
+        }
+
+
+        @Test
+        @DisplayName("Должен удалить ментора для менти")
+        void shouldDeleteMentorForMentee() {
+            when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
+            when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
+
+            assertTrue(mentee.getMentors().contains(mentor));
+
+            mentorshipService.deleteMentor(mentee.getId(), mentor.getId());
+
+            verify(mentorshipRepository).save(mentee);
+            assertFalse(mentee.getMentors().contains(mentor));
+        }
+
+        @Test
+        @DisplayName("Должен выбросить исключение, если ментор не найден")
+        void shouldThrowExceptionWhenMentorNotFound() {
+            when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
+            when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.empty());
+
+            EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+                mentorshipService.deleteMentor(mentee.getId(), mentor.getId());
+            });
+
+            assertEquals("Пользователь с ID 1 не найден", exception.getMessage());
+            verify(mentorshipRepository).findById(mentee.getId());
+            verify(mentorshipRepository).findById(mentor.getId());
+            verify(mentorshipRepository, never()).save(mentee);
+        }
+    }
 
     @Nested
-    class PositiveTests {
+    @ExtendWith(MockitoExtension.class)
+    class RemoveUserMenteesTest {
+        private static final int SIZE_OF_MENTORS_IS_ONE = 1;
+        private static final int SIZE_OF_MENTORS_IS_EMPTY = 0;
+
+        private static final long USER_ID_IS_ONE = 1L;
+        private static final long USER_ID_IS_TWO = 2L;
+        private static final long USER_ID_IS_THREE = 3L;
+
+        @InjectMocks
+        private MentorshipService mentorshipService;
 
         @Test
         @DisplayName("Mentors size decrease from 1 to 0")

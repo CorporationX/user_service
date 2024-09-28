@@ -51,6 +51,63 @@ class SubscriptionServiceTest {
     private UserFilterDto userFilterNameDto;
     private List<UserFilter> userFilters;
 
+    private void verifyUser(long userId) {
+        verify(userValidator)
+                .validateUserIdIsPositiveAndNotNull(userId);
+        verify(userValidator)
+                .validateUserIsExisted(userId);
+    }
+
+    private void verifyUsers(long userId1, long userId2) {
+        verifyUser(userId1);
+        verifyUser(userId2);
+    }
+
+    private void verifyIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(long userId1,
+                                                                                 long userId2,
+                                                                                 String messageError) {
+        verify(userValidator)
+                .validateFirstUserIdAndSecondUserIdNotEquals(userId1,
+                        userId2,
+                        messageError);
+    }
+
+    private void verifyIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(long userId1,
+                                                                                    long userId2,
+                                                                                    boolean shouldExist,
+                                                                                    String messageError) {
+        verify(subscriptionValidator)
+                .validateSubscriptionExistsAndEqualsShouldExistVariable(userId1,
+                        userId2,
+                        shouldExist,
+                        messageError);
+    }
+
+    private void customInitSubscriptionService() {
+        user = User.builder()
+                .id(USER_ID_IS_ONE)
+                .username("User1")
+                .build();
+
+        users = List.of(
+                user,
+                User.builder()
+                        .id(USER_ID_IS_TWO)
+                        .username("User2")
+                        .build());
+
+        userFilterNameDto = UserFilterDto.builder()
+                .namePattern("User1")
+                .build();
+
+        userFilters = List.of(userFilter);
+        subscriptionService = new SubscriptionService(subscriptionRepository,
+                userMapper,
+                userFilters,
+                userValidator,
+                subscriptionValidator);
+    }
+
     @Nested
     class NegativeTests {
 
@@ -277,62 +334,5 @@ class SubscriptionServiceTest {
                         .toDtos(List.of(user));
             }
         }
-    }
-
-    private void verifyUser(long userId) {
-        verify(userValidator)
-                .validateUserIdIsPositiveAndNotNull(userId);
-        verify(userValidator)
-                .validateUserIsExisted(userId);
-    }
-
-    private void verifyUsers(long userId1, long userId2) {
-        verifyUser(userId1);
-        verifyUser(userId2);
-    }
-
-    private void verifyIfFirstUserIdAndSecondUserIdNotEqualsOrElseThrowException(long userId1,
-                                                                                 long userId2,
-                                                                                 String messageError) {
-        verify(userValidator)
-                .validateFirstUserIdAndSecondUserIdNotEquals(userId1,
-                        userId2,
-                        messageError);
-    }
-
-    private void verifyIfSubscriptionExistsAndIfEqualsShouldExistThenThrowException(long userId1,
-                                                                                    long userId2,
-                                                                                    boolean shouldExist,
-                                                                                    String messageError) {
-        verify(subscriptionValidator)
-                .validateSubscriptionExistsAndEqualsShouldExistVariable(userId1,
-                        userId2,
-                        shouldExist,
-                        messageError);
-    }
-
-    private void customInitSubscriptionService() {
-        user = User.builder()
-                .id(USER_ID_IS_ONE)
-                .username("User1")
-                .build();
-
-        users = List.of(
-                user,
-                User.builder()
-                        .id(USER_ID_IS_TWO)
-                        .username("User2")
-                        .build());
-
-        userFilterNameDto = UserFilterDto.builder()
-                .namePattern("User1")
-                .build();
-
-        userFilters = List.of(userFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository,
-                userMapper,
-                userFilters,
-                userValidator,
-                subscriptionValidator);
     }
 }

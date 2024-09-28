@@ -11,6 +11,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.validator.event.EventParticipationValidator;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EventParticipationService {
@@ -22,7 +23,7 @@ public class EventParticipationService {
     public void deleteParticipantsFromEvent(Event event) {
         List<User> attenders = event.getAttendees();
         attenders.forEach(user -> user.getParticipatedEvents().remove(event));
-        }
+    }
 
     @Transactional
     public void registerParticipant(long eventId, long userId) {

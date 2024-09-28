@@ -34,32 +34,40 @@ class UserServiceTest {
     private UserService userService;
     @Mock
     private UserRepository userRepository;
+    private static final long REQUESTER_ID = 1L;
+    private static final long RECEIVER_ID = 2L;
+
+    private static final List<Long> USER_IDS = List.of(REQUESTER_ID);
+    private static final String USER_NAME = "name";
+
     @Mock
     private UserMapper userMapper;
     @Mock
     private UserValidator userValidator;
-
-    private static final long USER_ID = 1L;
-    private static final List<Long> USER_IDS = List.of(USER_ID);
-    private static final String USER_NAME = "name";
-
-    private User secondUser;
+    private User receiver;
+    private User requester;
     private UserDto userDto;
     private List<User> users;
     private List<UserDto> userDtos;
 
     @BeforeEach
     public void init() {
-        secondUser = User.builder()
-                .id(USER_ID)
-                .username(USER_NAME)
-                .build();
-        userDto = UserDto.builder()
-                .id(USER_ID)
+        requester = User.builder()
+                .id(REQUESTER_ID)
                 .username(USER_NAME)
                 .build();
 
-        users = List.of(secondUser);
+        receiver = User.builder()
+                .id(REQUESTER_ID)
+                .id(RECEIVER_ID)
+                .build();
+
+        userDto = UserDto.builder()
+                .id(REQUESTER_ID)
+                .username(USER_NAME)
+                .build();
+
+        users = List.of(requester);
         userDtos = List.of(userDto);
     }
 
@@ -80,9 +88,9 @@ class UserServiceTest {
         @Test
         @DisplayName("Ошибка если user не существует")
         public void whenUserIsNotExistThenThrowException() {
-            when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+            when(userRepository.findById(REQUESTER_ID)).thenReturn(Optional.empty());
 
-            assertThrows(ValidationException.class, () -> userService.getUser(USER_ID));
+            assertThrows(ValidationException.class, () -> userService.getUser(REQUESTER_ID));
         }
 
         @Test
@@ -94,7 +102,7 @@ class UserServiceTest {
             List<UserDto> resultUserDros = userService.getUsersByIds(USER_IDS);
 
             assertEquals(0, resultUserDros.size());
-            verify(userValidator).validateUserIdIsPositiveAndNotNull(USER_ID);
+            verify(userValidator).validateUserIdIsPositiveAndNotNull(REQUESTER_ID);
             verify(userRepository).findAllById(USER_IDS);
             verify(userMapper).toDtos(List.of());
         }
@@ -115,14 +123,14 @@ class UserServiceTest {
         @Test
         @DisplayName("Успех если user существует")
         public void whenUserIsExistThenSuccess() {
-            when(userRepository.findById(USER_ID)).thenReturn(Optional.ofNullable(secondUser));
-            when(userMapper.toDto(secondUser)).thenReturn(userDto);
+            when(userRepository.findById(REQUESTER_ID)).thenReturn(Optional.ofNullable(requester));
+            when(userMapper.toDto(requester)).thenReturn(userDto);
 
-            UserDto resultUserDto = userService.getUser(USER_ID);
+            UserDto resultUserDto = userService.getUser(REQUESTER_ID);
 
             assertNotNull(resultUserDto);
-            verify(userRepository).findById(USER_ID);
-            verify(userMapper).toDto(secondUser);
+            verify(userRepository).findById(REQUESTER_ID);
+            verify(userMapper).toDto(requester);
         }
 
         @Test
@@ -134,9 +142,29 @@ class UserServiceTest {
             List<UserDto> resultUserDros = userService.getUsersByIds(USER_IDS);
 
             assertNotNull(resultUserDros);
-            verify(userValidator).validateUserIdIsPositiveAndNotNull(USER_ID);
+            verify(userValidator).validateUserIdIsPositiveAndNotNull(REQUESTER_ID);
             verify(userRepository).findAllById(USER_IDS);
             verify(userMapper).toDtos(users);
+        }
+
+        @Test
+        @DisplayName("Успешное получение пользователей")
+        void whenGetThenReturn() {
+            users = List.of(receiver, requester);
+
+            List<Long> usersId = new ArrayList<>();
+            usersId.add(REQUESTER_ID);
+            usersId.add(RECEIVER_ID);
+
+            when(userRepository.findAllById(usersId)).thenReturn(users);
+
+            List<User> result = userService.getUsersById(usersId);
+
+            assertNotNull(result);
+            assertEquals(result.size(), users.size());
+            assertEquals(result, users);
+
+            verify(userRepository).findAllById(usersId);
         }
     }
 }

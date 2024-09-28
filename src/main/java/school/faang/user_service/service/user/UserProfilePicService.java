@@ -20,7 +20,7 @@ public class UserProfilePicService {
     private final S3Service s3Service;
 
     public void uploadUserAvatar(Long userId, MultipartFile file) {
-        User user = userService.findById(userId);
+        User user = userService.getUserById(userId);
         pictureValidator.checkPictureSizeExceeded(file);
 
         String folder = user.getId() + user.getUsername();
@@ -39,13 +39,13 @@ public class UserProfilePicService {
     }
 
     public InputStream downloadUserAvatar(Long userId) {
-        User user = userService.findById(userId);
+        User user = userService.getUserById(userId);
 
         return s3Service.downloadAvatar(user.getUserProfilePic().getFileId());
     }
 
     public void deleteUserAvatar(Long userId) {
-        User user = userService.findById(userId);
+        User user = userService.getUserById(userId);
 
         s3Service.deleteAvatar(user.getUserProfilePic().getFileId());
         s3Service.deleteAvatar(user.getUserProfilePic().getSmallFileId());

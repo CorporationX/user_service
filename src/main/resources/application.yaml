@@ -48,7 +48,6 @@ default-avatar_client:
 services:
   s3:
     endpoint: http://192.168.1.100:9000
-    endpoint1: http://localhost:9000
     accessKey: user
     secretKey: password
     bucketName: user-avatar

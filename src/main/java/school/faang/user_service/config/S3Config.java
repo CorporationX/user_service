@@ -32,12 +32,10 @@ public class S3Config {
                 secretKey
         );
 
-        AmazonS3 s3Client = AmazonS3ClientBuilder
+        return AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                //.withRegion(Regions.US_EAST_1)
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, "us_east_1"))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, null))
                 .build();
-        return s3Client;
     }
 }

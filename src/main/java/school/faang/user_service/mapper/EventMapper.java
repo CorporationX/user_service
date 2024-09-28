@@ -7,6 +7,7 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.user.UserMapper;
 
 import java.util.List;
 

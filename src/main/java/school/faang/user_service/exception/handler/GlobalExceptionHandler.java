@@ -18,7 +18,6 @@ import javax.naming.AuthenticationException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,11 +27,16 @@ public class GlobalExceptionHandler {
     @Value("${services.user-service.name}")
     private String serviceName;
 
+
     @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidationException(DataValidationException e) {
         log.info("DataValidationException found and occurred: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return  ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .build();
     }
 
 
@@ -50,7 +54,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNoSuchElementException(NoSuchElementException e) {
         log.info("NoSuchElementException found and occurred: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -75,7 +83,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
         log.info("IllegalArgumentException found and occurred: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
     }
 
     @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class})
@@ -93,13 +105,21 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(EntityNotFoundException e) {
         log.info("EntityNotFoundException occurred: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.NOT_FOUND.value())
+                .build();
     }
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleAuthenticationException(AuthenticationException e) {
         log.info("AuthenticationException occurred: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .build();
     }
 
 
@@ -107,6 +127,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
     public ErrorResponse handleRuntimeException(RuntimeException e) {
         log.info("RuntimeException occurred: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.REQUEST_TIMEOUT.value())
+                .build();
     }
 }

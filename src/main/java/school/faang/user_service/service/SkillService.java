@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public interface SkillService {
 
     List<SkillCandidateDto> getOfferedSkills(long userId);
 
-    SkillDto acquireSkillFromOffers(long skillId, long userId) throws DataValidationException;
+    SkillDto acquireSkillFromOffers(long skillId, long userId);
 }

@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    public static final int MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+    public static final int MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5 Mb
 
     private final UserService userService;
     private final UserContext userContext;
@@ -62,8 +62,6 @@ public class UserController {
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
-
-    // TODO: тесты
 
     @PostMapping("/avatar")
     public void saveAvatar(@RequestParam MultipartFile file) {

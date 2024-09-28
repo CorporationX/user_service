@@ -152,8 +152,6 @@ public class UserService {
                 .toList();
     }
 
-    // TODO: тесты
-
     @Transactional
     public void saveAvatar(long userId, MultipartFile file) {
         UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);

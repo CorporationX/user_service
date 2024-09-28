@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
@@ -107,7 +106,6 @@ class UserServiceImplTest {
                 .email("someone@mail.com")
                 .build();
 
-        Stream<User> userStream = Stream.of(user);
         filters = List.of(userFilter);
         userService = new UserServiceImpl(userRepository, filters, userMapper, goalService,
                 eventService, mentorshipService);
@@ -131,7 +129,7 @@ class UserServiceImplTest {
         // given
         when(userRepository.findById(id)).thenReturn(Optional.empty());
         // when/then
-        assertThrows(IllegalStateException.class, () -> userService.findUserById(id),
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(id),
                 "User with ID: %d does not exist.".formatted(id));
         verify(userRepository, times(1)).findById(id);
     }
@@ -156,7 +154,7 @@ class UserServiceImplTest {
     void testDeactivateUserProfileWrongIdThrow() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> userService.deactivateUserProfile(id));
+        assertThrows(EntityNotFoundException.class, () -> userService.deactivateUserProfile(id));
     }
 
 

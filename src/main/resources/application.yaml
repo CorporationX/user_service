@@ -43,3 +43,5 @@ payment-service:
 
 springdoc:
   swagger-ui:
+    enabled: true
+    url: openapi.yml

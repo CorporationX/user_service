@@ -3,14 +3,12 @@ package school.faang.user_service.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -22,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -46,7 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deactivateUserProfile(long id) {
         User userToDeactivate = userRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Incorrect user id"));
+                .orElseThrow(() -> new EntityNotFoundException("User with ID: %d does not exist"));
 
         removeGoals(userToDeactivate);
         removeEvents(userToDeactivate);
@@ -58,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalStateException(
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(
                 "User with ID: %d does not exist.".formatted(userId)));
     }
 
@@ -88,9 +85,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(long userId) {
-        var foundUser = userRepository.findById(userId).orElseThrow(() ->
-                        new EntityNotFoundException("User with ID: %d does not exist.".formatted(userId)));
-        return userMapper.toDto(foundUser);
+        return userMapper.toDto(findUserById(userId));
     }
 
     @Override

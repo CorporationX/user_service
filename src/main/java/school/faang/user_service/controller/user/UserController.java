@@ -2,6 +2,7 @@ package school.faang.user_service.controller.user;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,10 +30,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    public static final int MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5 Mb
-
     private final UserService userService;
     private final UserContext userContext;
+
+    @Value("${services.s3.max-image-size-mb}")
+    private long maxImageSizeMb;
 
     @PutMapping("/deactivate")
     public UserDto deactivateUser(@RequestBody UserDto userDto) {
@@ -66,9 +68,10 @@ public class UserController {
     @PostMapping("/avatar")
     public void saveAvatar(@RequestParam MultipartFile file) {
         long fileSize = file.getSize();
-        if (fileSize > MAX_IMAGE_SIZE_BYTES) {
+        long maxSizeBytes = maxImageSizeMb * 1024 * 1024;
+        if (fileSize > maxSizeBytes) {
             throw new IllegalArgumentException("File size is too large! Current size is " + fileSize
-                    + " bytes, but allowed max is " + MAX_IMAGE_SIZE_BYTES + " bytes");
+                    + " bytes, but allowed max is " + maxSizeBytes + " bytes");
         }
 
         String contentType = file.getContentType();

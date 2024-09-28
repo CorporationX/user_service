@@ -38,6 +38,7 @@ services:
     accessKey: user
     secretKey: password
     bucketName: corpbucket
+    max-image-size-mb: 5
 
 server:
   port: 8080

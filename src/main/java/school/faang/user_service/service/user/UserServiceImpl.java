@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,5 +84,19 @@ public class UserServiceImpl implements UserService {
                 .toList();
 
         goalService.removeGoals(goalsToRemove);
+    }
+
+    @Override
+    public UserDto getUser(long userId) {
+        var foundUser = userRepository.findById(userId).orElseThrow(() ->
+                        new EntityNotFoundException("User with ID: %d does not exist.".formatted(userId)));
+        return userMapper.toDto(foundUser);
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds).stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 }

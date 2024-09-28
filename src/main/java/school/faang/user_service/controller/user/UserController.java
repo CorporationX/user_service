@@ -8,13 +8,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.exception.ErrorResponse;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
@@ -31,23 +34,53 @@ public class UserController {
             parameters = {
                     @Parameter(
                             name = "filter",
-                            description = "Фильтры для поиска пользователей"
-                    )
+                            description = "Фильтры для поиска пользователей")
             }
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Список премиум-пользователей",
+            @ApiResponse(
+                    responseCode = "200", description = "Список премиум-пользователей",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
-            @ApiResponse(responseCode = "400", description = "Некорректный запрос", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Некорректный запрос",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Внутренняя ошибка сервера",
+                    content = @Content)
     })
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(@ParameterObject UserFilterDto filter) {
         return userService.getPremiumUsers(filter);
     }
 
+    @Operation(summary = "Деактивация пользователя", description = "Деактивация пользователя по его ID")
     @PutMapping("/{id}")
     public void deactivateUserProfile(@PathVariable long id) {
         userService.deactivateUserProfile(id);
+    }
+
+    @Operation(summary = "Получение пользователя", description = "Возвращает пользователя по его ID")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "Получен пользователь",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(
+                    responseCode = "404", description = "Пользователь не найден",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable long userId) {
+        return userService.getUser(userId);
+    }
+
+    @Operation(summary = "Получение пользователей", description = "Получение пользователей по списку ID",
+            parameters = @Parameter (name = "user_id", description = "Список идентификаторов пользователей"))
+    @GetMapping
+    public List<UserDto> getUserByIds(@RequestParam("user_id") List<Long> userIds) {
+        return userService.getUsersByIds(userIds);
     }
 }

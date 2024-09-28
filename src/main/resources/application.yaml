@@ -40,3 +40,15 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+default-avatar_client:
+  url: https://api.dicebear.com
+  ver: 9.x
+
+services:
+  s3:
+    endpoint: http://192.168.1.100:9000
+    endpoint1: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: user-avatar

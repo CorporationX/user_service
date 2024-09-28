@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -14,6 +15,6 @@ import java.util.Map;
 public class ErrorResponse {
     private String serviceName;
     private String globalMessage;
-    private Map<String, String> fieldErrors;
+    private List<ValidationErrorDTO> fieldErrors;
     private int status;
 }

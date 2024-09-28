@@ -4,18 +4,18 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.dto.ErrorResponse;
+import school.faang.user_service.dto.ValidationErrorDTO;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileUploadException;
 import school.faang.user_service.exception.NonUniqueFieldsException;
 
 import javax.naming.AuthenticationException;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -64,13 +64,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        Map<String, String> errors = exception.getBindingResult()
+        List<ValidationErrorDTO> errors = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        error -> Optional.ofNullable(error.getDefaultMessage()).orElse("Unknown error")
-                ));
+                .map(error -> new ValidationErrorDTO(error.getField(), Optional.ofNullable(error.getDefaultMessage()).orElse("Unknown error")))
+                .collect(Collectors.toList());
         log.error("Constraint violation error: {}", errors);
 
         return ErrorResponse.builder()

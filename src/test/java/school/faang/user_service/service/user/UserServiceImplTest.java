@@ -63,10 +63,8 @@ class UserServiceImplTest {
 
     private long id;
     private UserDto userDto;
-    private UserDto userDto2;
     private UserFilterDto userFilterDto;
     private User user;
-    private User user2;
     private List<UserFilter> filters;
 
     @BeforeEach
@@ -76,7 +74,8 @@ class UserServiceImplTest {
         userDto = new UserDto(
                 1L,
                 "JaneSmith",
-                "janesmith@example.com");
+                "janesmith@example.com",
+                "0987654321");
 
         user = User.builder()
                 .id(1L)
@@ -87,23 +86,6 @@ class UserServiceImplTest {
                 .phone("0987654321")
                 .aboutMe("About Jane Smith")
                 .experience(5)
-                .build();
-
-        user2 = User.builder()
-                .id(2L)
-                .goals(List.of())
-                .ownedEvents(List.of())
-                .username("Someone")
-                .email("someone@mail.com")
-                .phone("1234567890")
-                .aboutMe("About Someone")
-                .experience(10)
-                .build();
-
-        userDto2 = UserDto.builder()
-                .id(2L)
-                .username("Someone")
-                .email("someone@mail.com")
                 .build();
 
         filters = List.of(userFilter);
@@ -199,6 +181,24 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Get Users - Success")
     void testGetUsersShouldReturnUsers() {
+        var user2 = User.builder()
+                .id(2L)
+                .goals(List.of())
+                .ownedEvents(List.of())
+                .username("Someone")
+                .email("someone@mail.com")
+                .phone("1234567890")
+                .aboutMe("About Someone")
+                .experience(10)
+                .build();
+
+        var userDto2 = UserDto.builder()
+                .id(2L)
+                .username("Someone")
+                .email("someone@mail.com")
+                .phone("1234567890")
+                .build();
+
         doReturn(List.of(user, user2)).when(userRepository).findAllById(anyList());
 
         var result = userService.getUsersByIds(List.of(1L, 2L));
@@ -206,7 +206,6 @@ class UserServiceImplTest {
         verify(userRepository).findAllById(List.of(1L, 2L));
         verify(userMapper).toDto(user);
         assertThat(result).isNotNull().hasSize(2).isEqualTo(List.of(userDto, userDto2));
-
     }
 
     private User buildUser() {

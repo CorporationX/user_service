@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -77,6 +78,33 @@ class UserValidatorTest {
                         "User id can't be less than 0");
             }
         }
+
+        @Test
+        @DisplayName("Throws ValidationException when user with email already exists")
+        void whenUserEmailAlreadyExistsThenThrowValidationException() {
+            when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(new User()));
+
+            assertThrows(ValidationException.class,
+                    () -> userValidator.validateEmailNotExists(anyString()));
+        }
+
+        @Test
+        @DisplayName("Throws ValidationException when user with phone already exists")
+        void whenUserPhoneAlreadyExistsThenThrowValidationException() {
+            when(userRepository.findByPhone(anyString())).thenReturn(Optional.of(new User()));
+
+            assertThrows(ValidationException.class,
+                    () -> userValidator.validatePhoneNotExists(anyString()));
+        }
+
+        @Test
+        @DisplayName("Throws ValidationException when user with username already exists")
+        void whenUserUsernameAlreadyExistsThenThrowValidationException() {
+            when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(new User()));
+
+            assertThrows(ValidationException.class,
+                    () -> userValidator.validateNameNotExists(anyString()));
+        }
     }
 
     @Nested
@@ -107,6 +135,40 @@ class UserValidatorTest {
                     USER_ID_IS_ONE,
                     USER_ID_IS_TWO,
                     exceptionMessage);
+        }
+
+
+        @Test
+        @DisplayName("Success if user with email not exists")
+        void whenUserEmailNotExistsThenNotThrownValidationException() {
+            when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+            userValidator.validateEmailNotExists(anyString());
+
+            verify(userRepository)
+                    .findByEmail(anyString());
+        }
+
+        @Test
+        @DisplayName("Success if user with phone not exists")
+        void whenUserPhoneAlreadyExistsThenNotThrownValidationException() {
+            when(userRepository.findByPhone(anyString())).thenReturn(Optional.empty());
+
+            userValidator.validatePhoneNotExists(anyString());
+
+            verify(userRepository)
+                    .findByPhone(anyString());
+        }
+
+        @Test
+        @DisplayName("Success if user with username not exists")
+        void whenUserUsernameAlreadyExistsThenNotThrownValidationException() {
+            when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+
+            userValidator.validateNameNotExists(anyString());
+
+            verify(userRepository)
+                    .findByUsername(anyString());
         }
     }
 }

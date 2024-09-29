@@ -18,13 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -60,7 +55,11 @@ class MentorshipServiceTest {
         void shouldReturnListOfMenteesForMentor() {
             when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
             when(userMapper.toDto(mentee))
-                    .thenReturn(new UserDto(mentee.getId(), "Mentee Name", "mentee@example.com"));
+                    .thenReturn(UserDto.builder()
+                            .id(mentee.getId())
+                            .username("Mentee Name")
+                            .email("mentee@example.com")
+                            .build());
 
             List<UserDto> mentees = mentorshipService.getMentees(mentor.getId());
 
@@ -91,7 +90,11 @@ class MentorshipServiceTest {
             when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
             mentee.setMentors(new ArrayList<>(List.of(mentor)));
             when(userMapper.toDto(mentor))
-                    .thenReturn(new UserDto(mentor.getId(), "Mentor Name", "mentor@example.com"));
+                    .thenReturn(UserDto.builder()
+                            .id(mentor.getId())
+                            .username("Mentee Name")
+                            .email("mentee@example.com")
+                            .build());
 
             List<UserDto> mentors = mentorshipService.getMentors(mentee.getId());
 

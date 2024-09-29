@@ -49,6 +49,7 @@ public class UserProfilePicService {
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
+
         UserProfilePic userProfilePic = new UserProfilePic();
 
         if (width > largeImage || height > largeImage) {
@@ -63,6 +64,7 @@ public class UserProfilePicService {
             BufferedImage maxLargeImage = resizeImage(originalImage, targetWidth, targetHeight);
             InputStream largeImageStream = bufferedImageToInputStream(maxLargeImage, "jpg");
             s3Service.uploadFile(largeImageStream, metadata, filePath, userId);
+
             userProfilePic.setFileId(filePath);
         }
 
@@ -78,15 +80,27 @@ public class UserProfilePicService {
             BufferedImage maxSmallImage = resizeImage(originalImage, targetWidth, targetHeight);
             InputStream smallImageStream = bufferedImageToInputStream(maxSmallImage, "jpg");
             String filePathSmallImage = filePath + "_small";
-            s3Service.uploadFile(smallImageStream,  metadata, filePathSmallImage, userId);
+            s3Service.uploadFile(smallImageStream, metadata, filePathSmallImage, userId);
+
             userProfilePic.setSmallFileId(filePathSmallImage);
+
         }
+        user.setUserProfilePic(userProfilePic);
+        userRepository.save(user);
+
     }
 
-    public InputStream downloadFile(String fileName) {
-        return null;
+    public InputStream getBigImageFromProfile(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        return s3Service.downloadFile(user.getUserProfilePic().getFileId());
     }
 
+    public InputStream getSmallImageFromProfile(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        return s3Service.downloadFile(user.getUserProfilePic().getSmallFileId());
+    }
+
+    @Transactional
     public void deleteProfileImage(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
         String large = user.getUserProfilePic().getFileId();

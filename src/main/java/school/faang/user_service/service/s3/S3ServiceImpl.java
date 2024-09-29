@@ -24,12 +24,11 @@ public class S3ServiceImpl implements S3Service {
     @Override
     public void uploadFile(InputStream data, ObjectMetadata metadata, String filePath, Long userId) {
         s3Client.putObject(bucketName, filePath, data, metadata);
-
     }
 
     @Override
-    public InputStream downloadFile(String fileName) {
-        return null;
+    public InputStream downloadFile(String filePath) {
+        return s3Client.getObject(bucketName, filePath).getObjectContent();
     }
 
     @Override

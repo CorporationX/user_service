@@ -14,7 +14,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.BufferedImagesHolder;
 import school.faang.user_service.service.image.ImageProcessor;
-import school.faang.user_service.service.s3.S3ServiceImpl;
+import school.faang.user_service.service.s3.S3Service;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final ImageProcessor imageProcessor;
-    private final S3ServiceImpl s3ServiceImpl;
+    private final S3Service s3Service;
 
     @Override
     public UserDto getUser(long userId) {
@@ -59,19 +59,20 @@ public class UserServiceImpl implements UserService {
 
     public UserDto uploadUserAvatar(Long userId, BufferedImage uploadedImage) {
         log.debug("Starting upload user avatar for user ID: {}", userId);
-        Optional<User> user = userRepository.findById(userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
         BufferedImagesHolder scaledImage = imageProcessor.scaleImage(uploadedImage);
         String fileId = uploadFile(userId, imageProcessor.getImageOS(scaledImage.getBigPic()), BIG_AVATAR_PICTURE_NAME);
         String smallFieldId = uploadFile(userId, imageProcessor.getImageOS(scaledImage.getSmallPic()), SMALL_AVATAR_PICTURE_NAME);
-        if (user.get().getUserProfilePic() != null) {
+        if (user.getUserProfilePic() != null) {
             log.info("Deleting old user avatar for user ID: {}", userId);
             deleteUserAvatar(userId);
         }
-        user.get().setUserProfilePic(UserProfilePic.builder()
+        user.setUserProfilePic(UserProfilePic.builder()
                 .fileId(fileId)
                 .smallFileId(smallFieldId)
                 .build());
-        User updateUser = userRepository.save(user.get());
+        User updateUser = userRepository.save(user);
         log.info("User avatar uploaded successfully for user ID: {}", userId);
         return userMapper.userToUserDto(updateUser);
     }
@@ -89,7 +90,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("User with id %s does not have an avatar".formatted(userId));
         }
         String fileId = size.equals("small") ? userProfilePic.getSmallFileId() : userProfilePic.getFileId();
-        try (InputStream userAvatarIS = s3ServiceImpl.downloadFile(fileId)) {
+        try (InputStream userAvatarIS = s3Service.downloadFile(fileId)) {
             byte[] avatarBytes = userAvatarIS.readAllBytes();
             log.info("User avatar downloaded successfully for user ID: {}, size: {}", userId, size);
             return avatarBytes;
@@ -113,8 +114,8 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("User with id %s does not have an avatar".formatted(userId));
         }
         try {
-            s3ServiceImpl.deleteFile(userProfilePic.getFileId());
-            s3ServiceImpl.deleteFile(userProfilePic.getSmallFileId());
+            s3Service.deleteFile(userProfilePic.getFileId());
+            s3Service.deleteFile(userProfilePic.getSmallFileId());
             log.info("User avatar deleted successfully for user ID: {}", userId);
         } catch (Exception e) {
             log.error("Failed to delete user avatar for user ID: {}", userId, e);
@@ -129,7 +130,7 @@ public class UserServiceImpl implements UserService {
         String key = String.format("%s/%d%s", FOLDER_PREFIX + userId, System.currentTimeMillis(), fileName);
         log.debug("Starting file upload for user ID: {}, key: {}", userId, key);
         try {
-            s3ServiceImpl.uploadFile(outputStream, key);
+            s3Service.uploadFile(outputStream, key);
             log.info("File uploaded successfully for user ID: {}, key: {}", userId, key);
         } catch (Exception e) {
             log.error("Failed to upload file for user ID: {}, key: {}", userId, key, e);

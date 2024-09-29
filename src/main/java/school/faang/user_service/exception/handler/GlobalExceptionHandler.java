@@ -73,6 +73,7 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
@@ -97,18 +98,6 @@ public class GlobalExceptionHandler {
         return ErrorResponse.builder()
                 .serviceName(serviceName)
                 .globalMessage("Something went wrong...")
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-    }
-
-    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDataExceptions(RuntimeException exception) {
-        String message = exception.getMessage();
-        log.error("Error: {}", message);
-        return ErrorResponse.builder()
-                .serviceName(serviceName)
-                .globalMessage(message)
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
     }

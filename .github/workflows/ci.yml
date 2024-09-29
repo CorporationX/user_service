@@ -47,19 +47,19 @@ jobs:
         if: always()
         uses: pavi2410/html-preview-action@v4
         with:
-          html-file: "build/reports/tests/test/index.html"
+          html-file: build/reports/tests/test/index.html
 
       - name: Preview checkstyle main classes report
         if: always()
         uses: pavi2410/html-preview-action@v4
         with:
-          html-file: "build/reports/checkstyle/main.html"
+          html-file: build/reports/checkstyle/main.html
 
       - name: Preview checkstyle test classes report
         if: always()
         uses: pavi2410/html-preview-action@v4
         with:
-          html-file: "build/reports/checkstyle/test.html"
+          html-file: build/reports/checkstyle/test.html
 
 #      - name: Archive test report
 #        if: always()

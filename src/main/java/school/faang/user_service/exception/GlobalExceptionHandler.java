@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(BAD_REQUEST)
     public ErrorResponse handleBadRequestException(BadRequestException ex) {
+        log.error("BadRequestException occurred: {}", ex.getMessage());
         return new ErrorResponse(ex.getMessage());
     }
 

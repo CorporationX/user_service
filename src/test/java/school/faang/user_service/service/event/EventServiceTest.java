@@ -17,6 +17,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
@@ -102,9 +103,12 @@ class EventServiceTest {
             events.add(plannedEvent);
             events.add(canceledEvent);
 
+            Promotion promotion = mock(Promotion.class);
+
             user = User.builder()
                     .id(USER_ID_IS_ONE)
                     .ownedEvents(events)
+                    .promotions(List.of(promotion))
                     .build();
 
             eventDto = EventDto.builder()
@@ -313,31 +317,23 @@ class EventServiceTest {
         }
 
         @Test
-        void testGetEventsByFilter() {
-//            EventFilterDto filterDto = mock(EventFilterDto.class);
-//            List<Event> allEvents = Arrays.asList(mock(Event.class), mock(Event.class));
-//            EventDto eventDto1 = mock(EventDto.class);
-//            EventDto eventDto2 = mock(EventDto.class);
-//            Specification<Event> specification = mock(Specification.class);
-//
-//            when(eventFilter.isApplicable(filterDto)).thenReturn(true);
-//            when(eventFilter.apply(any(Stream.class), eq(filterDto))).thenReturn(allEvents.stream());
-//            when(eventFilter.toSpecification(filterDto)).thenReturn(specification);
-//            when(eventFilters.stream()).thenReturn(Stream.of(eventFilter));
-//
-//            doReturn(allEvents).when(eventRepository).findAll(any(Specification.class));
-//
-//            when(eventMapper.toDto(allEvents.get(0))).thenReturn(eventDto1);
-//            when(eventMapper.toDto(allEvents.get(1))).thenReturn(eventDto2);
-//
-//            List<EventDto> result = eventService.getEventsByFilter(filterDto);
-//
-//            verify(eventRepository).findAll(any(Specification.class)); // Проверяем вызов findAll со Specification
-//            verify(eventFilter).isApplicable(filterDto);
-//            verify(eventFilter).apply(any(), eq(filterDto));
-//            verify(eventMapper).toDto(allEvents.get(0));
-//            verify(eventMapper).toDto(allEvents.get(1));
-//            assertEquals(Arrays.asList(eventDto1, eventDto2), result);
+        @DisplayName("Successfully get filtered and prioritized events")
+        void whenGetEventsByFilterThenSuccess() {
+            EventFilterDto filterDto = new EventFilterDto();
+            List<Event> filteredEvents = List.of(event);
+
+            doNothing().when(promotionService).removeExpiredPromotions();
+            when(eventFilters.stream()).thenReturn(Stream.of(eventFilter));
+            when(eventFilter.isApplicable(filterDto)).thenReturn(true);
+            when(eventFilter.toSpecification(filterDto)).thenReturn(mock(Specification.class));
+            when(eventRepository.findAll(any(Specification.class))).thenReturn(filteredEvents);
+            when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
+
+            List<EventDto> result = eventService.getEventsByFilter(filterDto);
+
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            verify(eventMapper, times(1)).toDto(any(Event.class));
         }
     }
 }

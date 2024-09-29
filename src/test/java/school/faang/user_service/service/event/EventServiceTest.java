@@ -22,6 +22,7 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.promotion.PromotionService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -66,6 +67,9 @@ class EventServiceTest {
 
     @Mock
     private EventParticipationService eventParticipationService;
+
+    @Mock
+    private PromotionService promotionService;
 
     @Nested
     class PositiveTests {
@@ -317,7 +321,7 @@ class EventServiceTest {
             when(filter.apply(any(), eq(filters))).thenReturn(allEvents.stream());
 
             eventService = new EventService(eventMapper, eventRepository, eventParticipationService,
-                    Arrays.asList(filter), eventValidator, skillRepository, userRepository);
+                    Arrays.asList(filter), eventValidator, skillRepository, userRepository, promotionService);
 
             List<EventDto> result = eventService.getEventsByFilter(filters);
 

@@ -4,14 +4,23 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.promotion.Promotion;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.promotion.PromotionService;
 import school.faang.user_service.validator.user.UserValidator;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

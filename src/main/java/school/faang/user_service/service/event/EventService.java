@@ -3,24 +3,27 @@ package school.faang.user_service.service.event;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.promotion.PromotionService;
 import school.faang.user_service.validator.event.EventValidator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Service
@@ -78,14 +81,14 @@ public class EventService {
         user.getOwnedEvents().removeAll(removedEvents);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
-        if (filters == null) {
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+        if (filter == null) {
             throw new DataValidationException("filters is null");
         }
 
         promotionService.removeExpiredPromotions();
 
-        List<Event> filteredEvents = filteredEvents(filterDto);
+        List<Event> filteredEvents = filteredEvents(filter);
         List<Event> prioritizedEvents = prioritizedEvents(filteredEvents);
 
         markAsShownEvents(prioritizedEvents);

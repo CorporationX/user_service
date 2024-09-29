@@ -12,6 +12,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.upload.CsvLoader;
+import school.faang.user_service.service.user.upload.UserUploadService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,7 @@ public class UserServiceImplTest {
 
     @Mock
     private UserRepository repository;
-
+    
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
 

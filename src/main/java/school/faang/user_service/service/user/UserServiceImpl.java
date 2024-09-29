@@ -3,21 +3,33 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.upload.CsvLoader;
+import school.faang.user_service.service.user.upload.UserUploadService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserUploadService userUploadService;
+    private final CsvLoader csvLoader;
 
     @Override
     public UserDto getUser(long userId) {
@@ -39,5 +51,21 @@ public class UserServiceImpl implements UserService {
         log.debug("Users with ids %s not found"
                 .formatted(String.join(", ", notFoundUserIds.stream().map(Object::toString).toList())));
         return userMapper.usersToUserDtos(users);
+    }
+
+    @Override
+    @Transactional
+    public void uploadUsers(MultipartFile file) {
+        CompletableFuture<List<User>> futureUploadedUsers = csvLoader.parseCsvToUsers(file);
+        CompletableFuture<Map<String, Country>> futureCountries = userUploadService.getAllCountries();
+
+        CompletableFuture<List<User>> futureUsers = futureUploadedUsers.thenCombine(futureCountries,
+                        userUploadService::setCountriesToUsers)
+                .thenCompose(Function.identity());
+
+        futureUsers.thenAccept(userUploadService::saveUsers)
+                .exceptionally(e -> {
+                    throw new EntitySaveException("Users were not saved");
+                });
     }
 }

@@ -40,3 +40,14 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+user:
+  password:
+    length: 16
+  constants:
+    upload:
+      task-executor:
+        core-pool-size: 10
+        max-pool-size: 20
+        queue-capacity: 1000
+        thread-name-prefix: "UserUpload-"

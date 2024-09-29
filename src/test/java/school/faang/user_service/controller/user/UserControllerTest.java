@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -47,6 +48,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
+
+    private static final long MAX_IMAGE_SIZE_MB = 5;
+
     private ObjectMapper objectMapper;
     private MockMvc mockMvc;
     private UserDto userDto;
@@ -63,6 +67,7 @@ public class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+
     @BeforeEach
     public void setUp() {
         userDto = new UserDto();
@@ -73,6 +78,8 @@ public class UserControllerTest {
         userFilterDto = new UserFilterDto();
 
         objectMapper = new ObjectMapper();
+
+        userController.setMaxImageSizeMb(5);
 
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalRestExceptionHandler())
@@ -177,5 +184,55 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value("Invalid Input Format"))
                 .andExpect(jsonPath("$.message")
                         .value(containsString("JSON parse error")));
+    }
+
+    @Test
+    void testSaveAvatar_FileTooLarge() throws Exception {
+        long maxSizeBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "avatar.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[(int) (maxSizeBytes + 1)]);
+
+        mockMvc.perform(multipart("/users/avatar")
+                        .file(file))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("File size is too large!")));
+
+        verify(userService, never()).saveAvatar(anyLong(), any(MultipartFile.class));
+    }
+
+    @Test
+    void testSaveAvatar_InvalidFileType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, new byte[1024]);
+
+        mockMvc.perform(multipart("/users/avatar")
+                        .file(file))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid file type. Only images jpg are allowed!")));
+
+        verify(userService, never()).saveAvatar(anyLong(), any(MultipartFile.class));
+    }
+
+    @Test
+    public void testGetAvatar_Success() throws Exception {
+        byte[] avatarBytes = new byte[1024];
+        when(userService.getAvatar(anyLong())).thenReturn(avatarBytes);
+
+        mockMvc.perform(get("/users/avatar")
+                        .header("x-user-id", 1L))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE))
+                .andExpect(content().bytes(avatarBytes));
+
+        verify(userService, times(1)).getAvatar(anyLong());
+    }
+
+
+    @Test
+    void testDeleteAvatar_Success() throws Exception {
+        mockMvc.perform(delete("/users/avatar")
+                        .header("x-user-id", 1L))
+                .andExpect(status().isOk());
+
+        verify(userService, times(1)).deleteAvatar(anyLong());
     }
 }

@@ -44,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static school.faang.user_service.controller.user.UserController.MAX_IMAGE_SIZE_BYTES;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
@@ -193,8 +192,9 @@ public class UserControllerTest {
 
     @Test
     void testSaveAvatar_FileTooLarge() throws Exception {
+        long maxSizeBytes = 5 * 1024 * 1024;
         MockMultipartFile file = new MockMultipartFile(
-                "file", "avatar.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[(int) (MAX_IMAGE_SIZE_BYTES + 1)]);
+                "file", "avatar.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[(int) (maxSizeBytes + 1)]);
 
         mockMvc.perform(multipart("/users/avatar")
                         .file(file))

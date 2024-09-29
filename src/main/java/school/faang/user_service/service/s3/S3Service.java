@@ -27,8 +27,9 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class S3Service {
 
-    private final static String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
-    private final static String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
+    private static final String FILE_NAME_PATTERN = "filename=\"?([^\"]+)\"?";
+    private static final String CONTENT_DISPOSITION = Headers.CONTENT_DISPOSITION;
+    private static final Pattern PATTERN_GET_IMAGE_NAME_FROM_HEADER = Pattern.compile(FILE_NAME_PATTERN);
 
     private final AmazonS3 s3Client;
 
@@ -40,8 +41,6 @@ public class S3Service {
 
     @Value("${services.s3.remoteFilename}")
     private String remoteFileName;
-
-    private final Pattern PATTERN_GET_IMAGE_NAME_FROM_HEADER = Pattern.compile(FILE_NAME_PATTERN);
 
     public String uploadHttpData(ResponseEntity<byte[]> data, String folder) {
         try {

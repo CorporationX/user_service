@@ -23,10 +23,9 @@ public class FeignUserInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        if (endpointRequiredHeaders.containsKey(template.feignTarget().url()) &&
-                endpointRequiredHeaders.get(template.feignTarget().url()) != null &&
-                !endpointRequiredHeaders.get(template.feignTarget().url()).isEmpty()) {
-            addHeaderToTemplate(template, endpointRequiredHeaders.get(template.feignTarget().url()));
+        List<String> headers = endpointRequiredHeaders.get(template.feignTarget().url());
+        if (headers != null && !headers.isEmpty()) {
+            addHeaderToTemplate(template, headers);
         }
     }
 

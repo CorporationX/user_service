@@ -48,21 +48,18 @@ jobs:
         uses: pavi2410/html-preview-action@v4
         with:
           html-file: "build/reports/tests/test/index.html"
-          job_summary: true
 
       - name: Preview checkstyle main classes report
         if: always()
         uses: pavi2410/html-preview-action@v4
         with:
           html-file: "build/reports/checkstyle/main.html"
-          job_summary: true
 
       - name: Preview checkstyle test classes report
         if: always()
         uses: pavi2410/html-preview-action@v4
         with:
           html-file: "build/reports/checkstyle/test.html"
-          job_summary: true
 
 #      - name: Archive test report
 #        if: always()

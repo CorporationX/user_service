@@ -126,10 +126,10 @@ class SubscriptionServiceImplTest {
                 .map(SubscriptionUserDto::id)
                 .toList();
 
+        assertEquals(followersIds, resultIds);
         verify(subscriptionRepository).findByFolloweeId(followeeId);
         verify(userFilter).applyFilters(followersStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followers);
-        assertEquals(followersIds, resultIds);
     }
 
     @Test
@@ -143,11 +143,10 @@ class SubscriptionServiceImplTest {
 
         var result = subscriptionService.getFollowers(followeeId, userFilterDto);
 
+        assertTrue(result.isEmpty());
         verify(subscriptionRepository).findByFolloweeId(followeeId);
         verify(userFilter).applyFilters(followersStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followers);
-
-        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -198,11 +197,10 @@ class SubscriptionServiceImplTest {
                 .map(SubscriptionUserDto::id)
                 .toList();
 
+        assertEquals(followingIds, resultIds);
         verify(subscriptionRepository).findByFollowerId(followerId);
         verify(userFilter).applyFilters(followingsStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followings);
-
-        assertEquals(followingIds, resultIds);
     }
 
     @Test
@@ -216,11 +214,10 @@ class SubscriptionServiceImplTest {
 
         var result = subscriptionService.getFollowings(followerId, userFilterDto);
 
+        assertTrue(result.isEmpty());
         verify(subscriptionRepository).findByFollowerId(followerId);
         verify(userFilter).applyFilters(followingsStream, userFilterDto);
         verify(userMapper).toSubscriptionUserDtos(followings);
-
-        assertTrue(result.isEmpty());
     }
 
     @Test

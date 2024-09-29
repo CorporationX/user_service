@@ -28,12 +28,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipServiceTest {
+class MentorshipServiceTest {
 
-    private final static long USER_ID = 1;
-    private final static long MENTOR_ID = 2;
-    private final static long MENTEE_ID = 3;
-    private final static long NON_EXIST_ID = 7;
+    private static final long USER_ID = 1;
+    private static final long MENTOR_ID = 2;
+    private static final long MENTEE_ID = 3;
+    private static final long NON_EXIST_ID = 7;
 
     @Mock
     private MentorshipRepository mentorshipRepository;

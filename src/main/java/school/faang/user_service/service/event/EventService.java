@@ -157,11 +157,15 @@ public class EventService {
     }
 
     private Integer eventPriority(Event event) {
-        return event.getOwner().getPromotions().stream()
-                .filter(promotion -> PromotionTarget.EVENTS.name().equals(promotion.getTarget()))
-                .findFirst()
-                .map(Promotion::getPriority)
-                .orElse(0);
+        if (event.getOwner() != null && event.getOwner().getPromotions() != null) {
+            return event.getOwner().getPromotions().stream()
+                    .filter(promotion -> PromotionTarget.EVENTS.name().equals(promotion.getTarget()))
+                    .findFirst()
+                    .map(Promotion::getPriority)
+                    .orElse(0);
+        } else {
+            return 0;
+        }
     }
 
     private void markAsShownEvents(List<Event> events) {

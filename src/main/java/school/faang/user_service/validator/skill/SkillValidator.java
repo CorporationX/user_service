@@ -42,6 +42,7 @@ public class SkillValidator {
             throw new DataValidationException("User with id:" + userId + " already have skill with id" + skillId);
         }
     }
+
     public void validateSkillsExist(List<Long> skillIds, List<Skill> skills) {
         if (skills.isEmpty() || skillIds.isEmpty()) {
             log.error("Skills or skill ids is empty!");

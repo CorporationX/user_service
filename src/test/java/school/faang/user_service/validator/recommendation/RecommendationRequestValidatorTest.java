@@ -2,10 +2,13 @@ package school.faang.user_service.validator.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RecommendationRequestValidatorTest {
 
@@ -22,7 +25,7 @@ public class RecommendationRequestValidatorTest {
         Long requesterId = 1L;
         Long receiverId = 1L;
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        DataValidationException exception = assertThrows(DataValidationException.class, () ->
                 recommendationRequestValidator.validateRequesterAndReceiver(requesterId, receiverId)
         );
 
@@ -42,7 +45,7 @@ public class RecommendationRequestValidatorTest {
     void validateRequestAndCheckTimeLimit_ShouldThrowException_WhenTimeLimitHasNotPassed() {
         LocalDateTime lastRequestTime = LocalDateTime.now().minusMonths(3);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        DataValidationException exception = assertThrows(DataValidationException.class, () ->
                 recommendationRequestValidator.validateRequestAndCheckTimeLimit(lastRequestTime)
         );
 

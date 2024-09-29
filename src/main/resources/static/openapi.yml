@@ -48,13 +48,17 @@ paths:
           description: ID пользователя
           schema:
             type: integer
+            format: int64
       responses:
         200:
           description: Пользователь деактивирован успешно
           content:
-            text/plain:
+            application/json:
               schema:
-                example: User deactivated successfully
+                type: string
+                example: {
+                           "message": "User deactivated successfully"
+                }
         404:
           description: Пользователь не найден
           content:
@@ -72,6 +76,7 @@ paths:
           description: ID пользователя
           schema:
             type: integer
+            format: int64
       responses:
         200:
           description: Успешное получение пользователя
@@ -95,12 +100,12 @@ paths:
         - name: user_id
           in: query
           description: ID Пользователя(-ей)
+          required: true
           schema:
             type: array
-            properties:
-              user_id:
+            items:
                 type: integer
-                title: user_id
+                format: int64
       responses:
         200:
           description: Успешное получение списка пользователей
@@ -146,10 +151,12 @@ components:
           example: Java
         experienceMin:
           type: integer
+          format: int32
           description: Фильтр по минимальному опыту
           example: 1
         experienceMax:
           type: integer
+          format: int32
           description: Фильтр по максимальному опыту
           example: 5
 
@@ -187,6 +194,7 @@ components:
         code:
           type: integer
           title: code
+          format: int32
           description: Код ответа
           example: 400
         message:

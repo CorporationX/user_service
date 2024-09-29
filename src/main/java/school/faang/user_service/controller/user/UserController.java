@@ -3,6 +3,7 @@ package school.faang.user_service.controller.user;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +29,10 @@ public class UserController {
         return userService.getPremiumUsers(filter);
     }
 
-    @PutMapping("/{user_id}")
-    public String deactivateUserProfile(@PathVariable("user_id") long id) {
+    @PutMapping(value = "/{user_id}")
+    public ResponseEntity<String> deactivateUserProfile(@PathVariable("user_id") long id) {
         userService.deactivateUserProfile(id);
-        return "User deactivated successfully";
+        return ResponseEntity.ok("{\n\"message\": \"User deactivated successfully\"\n}");
     }
 
     @GetMapping("/{user_id}")

@@ -36,8 +36,8 @@ public class RecommendationServiceImpl implements RecommendationService{
     private final RecommendationValidator validator;
     private final UserRepository userRepository;
 
-
     @Override
+    @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
         User author = findUserByUserId(recommendationDto.getAuthorId());
         User receiver = findUserByUserId(recommendationDto.getReceiverId());
@@ -55,7 +55,9 @@ public class RecommendationServiceImpl implements RecommendationService{
     }
 
     @Override
+    @Transactional
     public RecommendationDto updateRecommendation(RecommendationDto updatedRecommendationDto) {
+
         User author = findUserByUserId(updatedRecommendationDto.getAuthorId());
         User receiver = findUserByUserId(updatedRecommendationDto.getReceiverId());
 
@@ -78,7 +80,12 @@ public class RecommendationServiceImpl implements RecommendationService{
 
         Optional<Recommendation> recommendationToDelete = recommendationRepository.findById(id);
 
+        if (recommendationToDelete.isEmpty()) {
+            throw new EntityNotFoundException("Recommendation with id: " + id + " not found");
+        }
+
         RecommendationDto recommendationDto = recommendationMapper.toDto(recommendationToDelete.get());
+
         recommendationRepository.deleteById(id);
 
         return recommendationDto;
@@ -111,6 +118,8 @@ public class RecommendationServiceImpl implements RecommendationService{
                 .toList();
     }
 
+
+    @Transactional
     public void processSkillsAndGuarantees(RecommendationDto recommendationDto) {
         User author = findUserByUserId(recommendationDto.getAuthorId());
         User receiver = findUserByUserId(recommendationDto.getReceiverId());
@@ -136,6 +145,8 @@ public class RecommendationServiceImpl implements RecommendationService{
         saveSkillOffers(skillOffersDto);
     }
 
+
+    @Transactional
     public User findUserByUserId(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -148,9 +159,8 @@ public class RecommendationServiceImpl implements RecommendationService{
             User author,
             User receiver) {
 
-        Set<Long> skillOfferIds = skillOffersDto.stream()
-                .map(SkillOfferDto::getSkillId)
-                .collect(Collectors.toSet());
+        List<Long> skillOfferIds = skillOffersDto.stream()
+                .map(SkillOfferDto::getSkillId).toList();
 
         receiverSkills.stream()
                 .filter(skill -> skillOfferIds.contains(skill.getId()))

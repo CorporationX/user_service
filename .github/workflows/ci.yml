@@ -49,3 +49,10 @@ jobs:
         with:
           name: test_report
           path: build/reports/tests/test
+
+      - name: Archive checkstyle report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle_report
+          path: build/reports/checkstyle

@@ -31,10 +31,9 @@ public class UserController {
         long id = userContext.getUserId();
         userLifeCycleService.deactivateUser(id);
     }
-
     @PutMapping("/deactivate/{id}")
     public void deactivateUser(@PathVariable Long id) {
-        userService.deactivateUser(id);
+        userLifeCycleService.deactivateUser(id);
     }
     @PostMapping("/registration")
     public void registrationUser(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
@@ -42,7 +41,6 @@ public class UserController {
         userLifeCycleService.registrationUser(userRegistrationDto);
         log.info("User registration successful");
     }
-
     @GetMapping("/users/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);

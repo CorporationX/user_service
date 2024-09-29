@@ -32,7 +32,7 @@
     </module>
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
-        <property name="max" value="100"/>
+        <property name="max" value="120"/>
         <property name="ignorePattern"
                   value="^package.*|^import.*|href\s*=\s*&quot;[^&quot;]*&quot;|http://|https://|ftp://"/>
     </module>
@@ -156,7 +156,7 @@
             <property name="option" value="nl"/>
         </module>
         <module name="PackageName">
-            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+            <property name="format" value="^[a-z]+(\.[a-z]+[_]*[a-z0-9]+)*$"/>
             <message key="name.invalidPattern"
                      value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>
@@ -234,11 +234,11 @@
         </module>
         <module name="Indentation">
             <property name="basicOffset" value="4"/>
-            <property name="braceAdjustment" value="2"/>
+            <property name="braceAdjustment" value="4"/>
             <property name="caseIndent" value="2"/>
             <property name="throwsIndent" value="4"/>
             <property name="lineWrappingIndentation" value="4"/>
-            <property name="arrayInitIndent" value="2"/>
+            <property name="arrayInitIndent" value="8"/>
         </module>
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
@@ -252,12 +252,12 @@
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="ConstructorsDeclarationGrouping"/>
         <module name="VariableDeclarationUsageDistance"/>
-        <module name="CustomImportOrder">
+        <!--<module name="CustomImportOrder">
             <property name="sortImportsInGroupAlphabetically" value="true"/>
             <property name="separateLineBetweenGroups" value="true"/>
             <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
             <property name="tokens" value="IMPORT, STATIC_IMPORT, PACKAGE_DEF"/>
-        </module>
+        </module>-->
         <module name="MethodParamPad"/>
         <module name="NoWhitespaceBefore">
             <property name="tokens"

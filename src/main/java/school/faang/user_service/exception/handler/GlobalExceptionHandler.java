@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidationException(DataValidationException e) {
         log.info("DataValidationException found and occurred: {}", e.getMessage());
-        return  ErrorResponse.builder()
+        return ErrorResponse.builder()
                 .serviceName(serviceName)
                 .globalMessage("Something went wrong...")
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -50,10 +50,22 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
     }
+
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNoSuchElementException(NoSuchElementException e) {
         log.info("NoSuchElementException found and occurred: {}", e.getMessage());
+        return ErrorResponse.builder()
+                .serviceName(serviceName)
+                .globalMessage("Something went wrong...")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+    }
+
+    @ExceptionHandler(NonUniqueFieldsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleNonUniqueFieldsException(NonUniqueFieldsException e) {
+        log.info("NonUniqueFieldsException found and occurred: {}", e.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
                 .globalMessage("Something went wrong...")
@@ -77,6 +89,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
@@ -99,6 +112,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(EntityNotFoundException e) {
@@ -109,6 +123,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND.value())
                 .build();
     }
+
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleAuthenticationException(AuthenticationException e) {

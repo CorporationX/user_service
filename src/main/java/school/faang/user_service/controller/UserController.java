@@ -48,7 +48,7 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @PostMapping("/users")
+    @GetMapping("/users")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }

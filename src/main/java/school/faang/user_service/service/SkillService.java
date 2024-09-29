@@ -13,6 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validation.SkillOfferValidator;
 import school.faang.user_service.validation.SkillValidator;
 
@@ -52,7 +53,7 @@ public class SkillService {
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = getSkill(skillId);
-        User user = userService.getUser(userId);
+        User user = userService.getUserById(userId);
         skillValidator.checkUserSkill(skillId, userId);
         List<SkillOffer> offers = skillOfferService.findAllOffersOfSkill(skill, user);
         skillOfferValidator.validateOffers(offers, skill, user);

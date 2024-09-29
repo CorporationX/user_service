@@ -1,8 +1,10 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserDeactivationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,5 +39,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void deactivateUserAccount(@PathVariable Long userId) {
         userDeactivationService.deactivateAccount(userId);
+    }
+
+    @GetMapping()
+    public List<UserDto> getFilteredUsers(@RequestBody @Valid UserFilterDto filter) {
+        return userService.users(filter);
     }
 }

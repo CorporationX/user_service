@@ -8,6 +8,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class SkillOfferService {
     }
 
     public void addSkillsWithGuarantees(List<Skill> skills, Long recommendationId, RecommendationDto recommendationDto) {
-        User receiver = userService.findById(recommendationDto.getReceiverId());
-        User author = userService.findById(recommendationDto.getAuthorId());
+        User receiver = userService.getUserById(recommendationDto.getReceiverId());
+        User author = userService.getUserById(recommendationDto.getAuthorId());
 
         for (Skill skill : skills) {
             skillOfferRepository.create(skill.getId(), recommendationId);

@@ -156,6 +156,27 @@ checkstyle {
     checkstyle.enableExternalDtdLoad.set(true)
 }
 
+tasks.withType<Checkstyle>().configureEach {
+    reports {
+        html.stylesheet = resources.text.fromFile("${project.rootDir}/config/checkstyle/checkstyle-simple.xsl")
+    }
+}
+
+tasks.checkstyleMain {
+    source = fileTree("${project.rootDir}/src/main/java")
+    include("**/*.java")
+    exclude("**/resources/**")
+
+    classpath = files()
+}
+
+tasks.checkstyleTest {
+    source = fileTree("${project.rootDir}/src/test")
+    include("**/*.java")
+
+    classpath = files()
+}
+
 kotlin {
     jvmToolchain(17)
 }

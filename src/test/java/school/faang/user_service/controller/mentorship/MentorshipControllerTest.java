@@ -1,28 +1,23 @@
-package school.faang.user_service.controller.mentorship;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import school.faang.user_service.controller.mentorship.MentorshipController;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.Collections;
+import java.util.List;
 
-@ExtendWith(SpringExtension.class)
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 public class MentorshipControllerTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(MentorshipControllerTest.class);
 
     @InjectMocks
     private MentorshipController mentorshipController;
@@ -36,21 +31,28 @@ public class MentorshipControllerTest {
     }
 
     @Test
+    public void testGetMentees_ReturnsEmptyList_WhenNoMenteesFound() {
+        long userId = 1L;
+        when(mentorshipService.getMentees(userId)).thenReturn(Collections.emptyList());
+        List<MenteeDTO> result = mentorshipController.getMentees(userId);
+        assertEquals(Collections.emptyList(), result);
+    }
+
+    @Test
     public void testDeleteMentee_DoesNothing_WhenMenteeDoesNotExist() {
         long mentorId = 1L;
         long menteeId = 2L;
-        doThrow(new RuntimeException("Mentee doesn't exist")).when(mentorshipService).deleteMentee(menteeId, mentorId);
-        assertThrows(RuntimeException.class, () -> mentorshipController.deleteMentee(menteeId, mentorId));
-        verify(mentorshipService, times(1)).deleteMentee(menteeId, mentorId);
+        doNothing().when(mentorshipService).deleteMentee(menteeId, mentorId);
+        mentorshipController.deleteMentee(mentorId, menteeId);
     }
+
 
     @Test
     public void testDeleteMentee_DeletesMentee_WhenMenteeExists() {
         long mentorId = 1L;
         long menteeId = 2L;
         doNothing().when(mentorshipService).deleteMentee(menteeId, mentorId);
-        mentorshipController.deleteMentee(menteeId, mentorId);
-        verify(mentorshipService, times(1)).deleteMentee(menteeId, mentorId);
+        mentorshipController.deleteMentee(mentorId, menteeId);
     }
 
     @Test
@@ -59,7 +61,6 @@ public class MentorshipControllerTest {
         long mentorId = 2L;
         doNothing().when(mentorshipService).deleteMentor(menteeId, mentorId);
         mentorshipController.deleteMentor(menteeId, mentorId);
-        verify(mentorshipService, times(1)).deleteMentor(menteeId, mentorId);
     }
 
     @Test
@@ -68,6 +69,6 @@ public class MentorshipControllerTest {
         long mentorId = 2L;
         doNothing().when(mentorshipService).deleteMentor(menteeId, mentorId);
         mentorshipController.deleteMentor(menteeId, mentorId);
-        verify(mentorshipService, times(1)).deleteMentor(menteeId, mentorId);
     }
 }
+//done

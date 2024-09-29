@@ -9,8 +9,9 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillMapper {
-    SkillDto toDto(Skill sKill);
+    SkillDto toDto(Skill skill);
 
     Skill toEntity(SkillDto skillDto);
+
     List<SkillDto> toSkillDtoList(List<Skill> skills);
 }

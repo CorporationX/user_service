@@ -19,17 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
-    @InjectMocks
-    private UserMapperImpl userMapper;
-
     private final static long USER_ID_ONE = 1L;
     private final static long USER_ID_TWO = 2L;
     private static final String USER_NAME_ONE = "name";
     private static final String USER_NAME_TWO = "Name";
     private static final int USER_DTOS_SIZE = 2;
-
     private final static int SIZE_USER_DTO_LIST = 2;
-
+    @InjectMocks
+    private UserMapperImpl userMapper;
     private User userOne;
     private User userTwo;
     private List<User> users;

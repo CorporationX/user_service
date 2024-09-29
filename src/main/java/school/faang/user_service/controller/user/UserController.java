@@ -1,10 +1,8 @@
 package school.faang.user_service.controller.user;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserDeactivationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

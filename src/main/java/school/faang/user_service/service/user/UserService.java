@@ -4,23 +4,14 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.promotion.Promotion;
-import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.promotion.PromotionService;
 import school.faang.user_service.validator.user.UserValidator;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,20 +30,6 @@ public class UserService {
     }
 
     @Transactional
-    public List<UserDto> users(UserFilterDto filterDto) {
-        promotionService.removeExpiredPromotions();
-
-        List<User> filteredUsers = filteredUsers(filterDto);
-        List<User> prioritizedUsers = prioritizedUsers(filteredUsers);
-
-        markAsShownUsers(prioritizedUsers);
-
-        return prioritizedUsers.stream()
-                .map(userMapper::toDto)
-                .toList();
-    }
-
-    @Transactional
     public UserDto getUser(long userId) {
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
@@ -65,6 +42,25 @@ public class UserService {
         ids.forEach(userValidator::validateUserIdIsPositiveAndNotNull);
 
         return userMapper.toDtos(userRepository.findAllById(ids));
+    }
+
+    @Transactional
+    public List<User> getUsersById(List<Long> usersId) {
+        return userRepository.findAllById(usersId);
+    }
+
+    @Transactional
+    public List<UserDto> users(UserFilterDto filterDto) {
+        promotionService.removeExpiredPromotions();
+
+        List<User> filteredUsers = filteredUsers(filterDto);
+        List<User> prioritizedUsers = prioritizedUsers(filteredUsers);
+
+        markAsShownUsers(prioritizedUsers);
+
+        return prioritizedUsers.stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     private List<User> filteredUsers(UserFilterDto filterDto) {

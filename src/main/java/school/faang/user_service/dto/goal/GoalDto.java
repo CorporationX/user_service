@@ -13,8 +13,10 @@ public class GoalDto {
 
     private Long id;
     private Long parentId;
-    @NonNull private String title;
-    @NonNull private String description;
+    @NonNull
+    private String title;
+    @NonNull
+    private String description;
     private GoalStatus status;
     private List<Long> skillIds;
 }

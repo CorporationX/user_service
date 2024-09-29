@@ -23,13 +23,12 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class GoalInvitationService {
 
+    private final static int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
     private final GoalValidator goalValidator;
     private final UserValidator userValidator;
     private final GoalInvitationMapper goalInvitationMapper;
     private final GoalInvitationRepository goalInvitationRepository;
     private final List<GoalInvitationFilter> goalInvitationFilters;
-
-    private final static int MAX_LIMIT_ACTIVE_GOALS_FOR_USER = 3;
 
     public void deleteGoalInvitations(List<GoalInvitation> goalInvitations) {
         goalInvitationRepository.deleteAll(goalInvitations);

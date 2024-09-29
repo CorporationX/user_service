@@ -67,6 +67,9 @@ public class Event {
     @Enumerated(EnumType.ORDINAL)
     private EventStatus status;
 
+    @Column(name = "google_calendar_event_id")
+    private String googleCalendarEventId;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")

@@ -5,11 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserProfilePicDto;
-import school.faang.user_service.service.UserProfilePicService;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.user.UserProfilePicServiceImpl;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -37,17 +36,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/avatar")
-    public void uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+    public void uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException {
         userProfilePicService.uploadAvatar(userId, file);
-    }
-
-    @GetMapping("/{userId}/avatar")
-    public UserProfilePicDto getAvatar(@PathVariable Long userId) {
-        return userProfilePicService.getAvatar(userId);
-    }
-
-    @DeleteMapping("/{userId}/avatar")
-    public void deleteAvatar(@PathVariable Long userId) {
-        userProfilePicService.deleteAvatar(userId);
     }
 }

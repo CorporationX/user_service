@@ -1,32 +1,30 @@
 package school.faang.user_service.service.user;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.UserProfilePicDto;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.UserProfilePicService;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 public class UserProfilePicServiceImpl implements UserProfilePicService {
 
-    private final UserRepository userRepository;
-    private final FileStorageService fileStorageService;
+    private final AmazonS3 amazonS3;
 
     @Override
-    public void uploadAvatar(Long userId, MultipartFile file) {
+    public void uploadAvatar(Long userId, MultipartFile file) throws IOException {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(file.getSize());
+        objectMetadata.setContentType(file.getContentType());
+        objectMetadata.setContentEncoding("utf-8");
+        String key = "Test Key";
+        PutObjectRequest request = new PutObjectRequest("corpbucket", key, file.getInputStream(), objectMetadata);
 
-    }
-
-    @Override
-    public UserProfilePicDto getAvatar(Long userId) {
-        return null;
-    }
-
-    @Override
-    public void deleteAvatar(Long userId) {
-
+        amazonS3.putObject(request);
     }
 }

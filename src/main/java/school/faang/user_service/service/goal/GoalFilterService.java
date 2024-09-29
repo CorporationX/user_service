@@ -16,6 +16,10 @@ public class GoalFilterService {
     private final List<GoalFilter> goalFilters;
 
     public Stream<Goal> applyFilters(Stream<Goal> goals, GoalFilterDto filter) {
+        if (filter == null) {
+            return goals;
+        }
+
         for (GoalFilter goalFilter : goalFilters) {
             if (goalFilter.isApplicable(filter)) {
                 goals = goalFilter.apply(goals, filter);

@@ -33,12 +33,13 @@ public class GoalService {
     @Transactional
     public void createGoal(Long userId, GoalDto goalDto) {
         Goal goal = goalMapper.goalDtoToGoal(goalDto);
+        setCreatorAsUser(userId, goal);
         checkMaxActiveGoals(userId);
         setSkillsToGoal(goalDto.skillIds(), goal);
-        setCreatorAsUser(userId, goal);
         goal.setStatus(GoalStatus.ACTIVE);
         goalRepository.save(goal);
     }
+
 
     private void checkMaxActiveGoals(Long userId) {
         int activeGoals = goalRepository.countActiveGoalsPerUser(userId);
@@ -134,7 +135,7 @@ public class GoalService {
         if (titleFilter != null && !titleFilter.isEmpty()) {
             subtasks = subtasks.stream()
                     .filter(goal -> goal.getTitle().contains(titleFilter))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return subtasks.stream()
@@ -145,10 +146,22 @@ public class GoalService {
     @Transactional(readOnly = true)
     public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter) {
         List<Goal> goals = goalRepository.findGoalsByUserId(userId);
+
+        if (goals.isEmpty()) {
+            System.out.println("Нет целей для пользователя: " + userId);
+            return Collections.emptyList();
+        }
+
         Stream<Goal> goalStream = goals.stream();
-        goalStream = goalFilterService.applyFilters(goalStream, filter);
-        return goalStream
+
+        if (filter != null) {
+            goalStream = goalFilterService.applyFilters(goalStream, filter);
+        }
+
+        List<GoalDto> result = goalStream
                 .map(goalMapper::goalToGoalDto)
                 .collect(Collectors.toList());
+
+        return result;
     }
 }

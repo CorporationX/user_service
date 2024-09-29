@@ -3,7 +3,6 @@ package school.faang.user_service.controller.goal;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.service.goal.GoalService;
 
 @RestController
@@ -28,9 +26,9 @@ public class GoalController {
     private GoalService goalService;
 
     @PostMapping
-    public ResponseEntity<String> createGoal(@RequestParam Long userId, @Valid @RequestBody GoalDto goalDto) {
+    public GoalDto createGoal(@RequestParam Long userId, @Valid @RequestBody GoalDto goalDto) {
         goalService.createGoal(userId, goalDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Цель успешно создана");
+        return goalDto;
     }
 
     @PutMapping("/{goalId}")
@@ -38,6 +36,7 @@ public class GoalController {
         goalService.updateGoal(goalId, goalDto);
         return ResponseEntity.ok("Цель успешно обновлена");
     }
+
     @DeleteMapping("/{goalId}")
     public ResponseEntity<String> deleteGoal(@PathVariable long goalId) {
         goalService.deleteGoal(goalId);

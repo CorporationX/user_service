@@ -69,7 +69,7 @@ public class UserService {
                                 }
                             });
                     userRepository.saveAll(users);
-                    users.forEach(u -> response.add(userMapper.toDto(u)));
+                    users.forEach(user -> response.add(userMapper.toDto(user)));
                 })
                 .join();
 
@@ -77,7 +77,7 @@ public class UserService {
     }
 
     private void setDefaultPassword(List<User> users) {
-        users.forEach(u -> u.setPassword(u.getUsername()));
+        users.forEach(user -> user.setPassword(user.getUsername()));
     }
 
     public List<User> getUsersById(List<Long> usersId) {

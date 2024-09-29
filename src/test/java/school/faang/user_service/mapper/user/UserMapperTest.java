@@ -23,10 +23,10 @@ class UserMapperTest {
     @InjectMocks
     private UserMapperImpl userMapper;
 
-    private final static long USER_ID_ONE = 1L;
-    private final static long USER_ID_TWO = 2L;
+    private static final long USER_ID_ONE = 1L;
+    private static final long USER_ID_TWO = 2L;
 
-    private final static int SIZE_USER_DTO_LIST = 2;
+    private static final int SIZE_USER_DTO_LIST = 2;
     private static final int USER_DTOS_SIZE = 2;
 
     private static final String USER_NAME_ONE = "name";
@@ -107,11 +107,11 @@ class UserMapperTest {
     @Nested
     class PojoToEntity {
 
-        private final static String FIRST_NAME = "John";
-        private final static String LAST_NAME = "Doe";
-        private final static String EMAIL = "johndoe@example.com";
-        private final static String PHONE = "+1-123-456-7890";
-        private final static String COUNTRY = "USA";
+        private static final String FIRST_NAME = "John";
+        private static final String LAST_NAME = "Doe";
+        private static final String EMAIL = "johndoe@example.com";
+        private static final String PHONE = "+1-123-456-7890";
+        private static final String COUNTRY = "USA";
 
         private static Person person;
 

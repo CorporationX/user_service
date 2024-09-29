@@ -11,6 +11,7 @@ import school.faang.user_service.exception.ParseException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,23 +20,18 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class CsvUtil {
 
+    private static final CsvMapper csvMapper = new CsvMapper();
+
     public <T> List<T> parseCsvMultipartFile(MultipartFile multipartFile, Class<T> clazz) {
         log.info("Start parseCsvMultipartFile() - {}", multipartFile.getOriginalFilename());
 
         List<CompletableFuture<T>> completableFuture = new ArrayList<>();
         int linesParsed = 0;
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(multipartFile.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(multipartFile.getInputStream(), StandardCharsets.UTF_8))) {
             String headerLine = reader.readLine();
+            CsvSchema csvSchema = generateCsvSchema(headerLine);
 
-            if (headerLine == null || headerLine.trim().isEmpty()) {
-                log.error("Exception while parsing - {}. Empty header line", multipartFile.getOriginalFilename());
-                throw new ParseException("Empty header line");
-            }
-            headerLine = headerLine.substring(3);
-            //Жесткий костыль, я не понимаю откуда в начале строки появились символы ï»¿
-
-            String finalHeaderLine = headerLine;
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) {
@@ -45,15 +41,16 @@ public class CsvUtil {
                 linesParsed++;
                 String finalLine = line;
                 completableFuture.add(CompletableFuture.supplyAsync(() ->
-                        parseCsvLineToPojo(finalHeaderLine.concat("\n" + finalLine), clazz)));
-                /*
-                finalHeaderLine.concat("\n" + finalLine) - еще костыль)
-                никак не получается решить проблему парсинга csv, если передаем просто данные то вываливается ошибка
-                много ошибок разных. Проблема в том что данные ожидаются вместе с хедером.
-                Я не нашел как отдельно сделать схему для хедера и просто уже ее передавать например.
-                 */
+                        parseCsvLineToPojo(headerLine.concat("\n" + finalLine), clazz, csvSchema)));
+/*
+finalHeaderLine.concat("\n" + finalLine) - костыль)
+никак не получается решить проблему парсинга csv, если передаем просто данные то вываливается ошибка
+Проблема в том что данные ожидаются вместе с хедером.
+Я не нашел как отдельно сделать схему для хедера и просто уже ее передавать например.
+(Вроде уже даже и схему передаю, все равно не хочет)
+com.fasterxml.jackson.databind.exc.MismatchedInputException: No content to map due to end-of-input
+ */
             }
-
         } catch (IOException e) {
             log.error("Exception while parsing - {}. {}", multipartFile.getOriginalFilename(), e.getMessage());
             throw new ParseException("Error reading multipart file " + multipartFile.getName());
@@ -72,13 +69,21 @@ public class CsvUtil {
         }
     }
 
-    private <T> T parseCsvLineToPojo(String line, Class<T> clazz) {
+    private CsvSchema generateCsvSchema(String headerLine) {
+        CsvSchema.Builder schemaBuilder = CsvSchema.builder();
+
+        for (String header : headerLine.split(",")) {
+            schemaBuilder.addColumn(header.trim());
+        }
+
+        return schemaBuilder.build().withHeader();
+    }
+
+    private <T> T parseCsvLineToPojo(String line, Class<T> clazz, CsvSchema csvSchema) {
         try {
-            CsvMapper csvMapper = new CsvMapper();
-            CsvSchema schema = CsvSchema.emptySchema().withHeader();
-            return csvMapper.readerFor(clazz).with(schema).readValue(line);
+            return csvMapper.readerFor(clazz).with(csvSchema).readValue(line);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ParseException(e.getMessage());
         }
     }
 
@@ -90,7 +95,7 @@ public class CsvUtil {
                     .<T>readValues(multipartFile.getBytes())
                     .readAll();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ParseException(e.getMessage());
         }
     }
 }

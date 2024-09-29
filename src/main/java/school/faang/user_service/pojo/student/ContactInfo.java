@@ -1,6 +1,7 @@
 
 package school.faang.user_service.pojo.student;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -19,10 +20,12 @@ public class ContactInfo {
     @NotNull
     @NotBlank
     @Email
+    @JsonProperty("email")
     private String email;
 
     @NotNull
     @NotBlank
+    @JsonProperty("phone")
     private String phone;
 
     @JsonUnwrapped

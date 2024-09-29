@@ -27,14 +27,14 @@ class CountryServiceTest {
     @Mock
     private CountryRepository countryRepository;
 
-    private static Country country;
+    private Country country;
 
     @Nested
     class PositiveTests {
 
         @Test
-        @DisplayName("WhenEntityFoundThenNotThrownException")
-        void whenEntityFoundThenNotThrownException() {
+        @DisplayName("When entity found then not thrown exception")
+        void whenEntityFoundThenSuccess() {
             when(countryRepository.findByTitle(anyString())).thenReturn(Optional.of(new Country()));
 
             countryService.findCountryByTitle(anyString());
@@ -43,7 +43,7 @@ class CountryServiceTest {
         }
 
         @Test
-        @DisplayName("WhenEntityIsCorrectThenNotThrownException")
+        @DisplayName("When entity is correct then not thrown exception")
         void whenEntityIsCorrectThenSave() {
             country = Country.builder()
                     .title("TEST")
@@ -59,8 +59,8 @@ class CountryServiceTest {
     class NegativeTests {
 
         @Test
-        @DisplayName("WhenEntityNotFoundThenThrowEntityNotFoundException")
-        void whenEntityNotFoundThenThrowsEntityNotFoundException() {
+        @DisplayName("When entity not found then throw entity not found exception")
+        void whenEntityNotFoundThenThrowsException() {
             when(countryRepository.findByTitle(anyString())).thenReturn(Optional.empty());
 
             assertThrows(EntityNotFoundException.class,

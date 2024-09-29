@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -8,8 +9,11 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import school.faang.user_service.service.MenteeDTO;
+import school.faang.user_service.service.MenteeMapper;
 
 
 @Slf4j
@@ -19,6 +23,28 @@ public class MentorshipService {
 
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
+
+
+    public List<MenteeDTO> getMentees(long userId) {
+        List<User> mentees = mentorshipRepository.findMenteesByMentorId(userId);
+        return mentees.stream()
+                .map(MenteeMapper.INSTANCE::menteeToMenteeDTO)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteMentee(long menteeId, long mentorId) {
+        User mentee = mentorshipRepository.findMenteeByMentorIdAndMenteeId(mentorId, menteeId);
+        if (mentee != null) {
+            mentorshipRepository.delete(mentee);
+        }
+    }
+
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentor = mentorshipRepository.findMentorByMenteeIdAndMentorId(menteeId, mentorId);
+        if (mentor != null) {
+            mentorshipRepository.delete(mentor);
+        }
+    }
 
     public void stopMentorship(User mentor) {
         log.info("Остановка наставничества для пользователя с ID: {}", mentor.getId());

@@ -7,8 +7,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.controller.mentorship.MentorshipController;
+import school.faang.user_service.service.mentorship.MentorshipService;
+
 import java.util.Collections;
 import java.util.List;
+
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doNothing;
 import static org.junit.jupiter.api.Assertions.assertEquals;

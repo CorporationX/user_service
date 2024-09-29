@@ -91,6 +91,9 @@ kafka:
     user-cache-topic:
       name: user-cache
       group-id: user-cache-group
+    heat-feed-topic:
+      name: heat-feed
+      group-id: heat-feed-group
 
 cache:
   post-ttl-seconds: 86400

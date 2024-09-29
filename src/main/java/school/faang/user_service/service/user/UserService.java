@@ -12,12 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.user.UserAndFoloweeDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.producer.HeatFeedProducer;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.cache.UserCacheRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -32,6 +34,7 @@ import school.faang.user_service.dto.user.UserDto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.stream.StreamSupport;
 import java.io.InputStream;
 import java.util.List;
@@ -55,10 +58,9 @@ public class UserService {
     private final S3Service s3Service;
     private final PasswordService passwordService;
     private final UserCacheRepository userCacheRepository;
+    private final HeatFeedProducer heatFeedProducer;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
-
-
 
     public UserDto deactivate(Long userId) {
         User user = userRepository.findById(userId).get();
@@ -146,6 +148,25 @@ public class UserService {
         return allOf;
     }
 
+    @Transactional(readOnly = true)
+    @Async("taskExecutor")
+    public void getAllUsersAndFolowees() {
+        log.info("The gathering of batches to heat the feed has begun");
+        List<Long> userIds = userRepository.findAllUsersIds();
+        List<List<Long>> batches = partitionList(userIds, 100);
+
+        List<UserAndFoloweeDto> userAndFoloweeDtoList = new ArrayList<>();
+        for(List<Long> batch : batches) {
+            for(Long userId : batch) {
+                List<Long> followeeIds = userRepository.getFolloweeIdsByUserId(userId);
+                UserAndFoloweeDto userAndFoloweeDto = new UserAndFoloweeDto(userId, followeeIds);
+                userAndFoloweeDtoList.add(userAndFoloweeDto);
+            }
+            heatFeedProducer.send(userAndFoloweeDtoList);
+            userAndFoloweeDtoList = new ArrayList<>();
+        }
+    }
+
     public List<Long> getFollowerIds(Long userId) {
         return userRepository.findFollowerIdsByUserId(userId);
     }
@@ -171,5 +192,13 @@ public class UserService {
         user.setCountry(country);
         userRepository.save(user);
         log.info("Processed and saved user: {}", user.getEmail());
+    }
+
+    private List<List<Long>> partitionList(List<Long> userIds, int batchSize) {
+        List<List<Long>> partitions = new ArrayList<>();
+        for (int i = 0; i < userIds.size(); i += batchSize) {
+            partitions.add(userIds.subList(i, Math.min(i + batchSize, userIds.size())));
+        }
+        return partitions;
     }
 }

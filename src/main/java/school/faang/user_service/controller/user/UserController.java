@@ -46,6 +46,11 @@ public class UserController {
         return userMapper.toDto(userService.findUserById(userId));
     }
 
+    @PostMapping("/heat")
+    public void getAllUsersAndFolowees() {
+        userService.getAllUsersAndFolowees();
+    }
+
     @GetMapping("/follower/{userId}")
     public List<Long> getFollowerIds(@PathVariable long userId) {
         return userService.getFollowerIds(userId);

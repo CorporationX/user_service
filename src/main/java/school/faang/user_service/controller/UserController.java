@@ -3,9 +3,11 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -28,5 +30,14 @@ public class UserController {
     @PostMapping("/users")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/users/upload")
+    public List<UserDto> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            return userService.uploadFile(file.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file");
+        }
     }
 }

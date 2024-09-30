@@ -41,7 +41,7 @@ public class Event {
     private String location;
 
     @Column(name = "max_attendees")
-    private Integer maxAttendees;
+    private int maxAttendees;
 
     @ManyToMany(mappedBy = "participatedEvents")
     private List<User> attendees;

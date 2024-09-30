@@ -12,6 +12,14 @@ public class FeignUserInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
+        if (shouldSkipInterceptor(template.url(), template.method())) {
+            return;
+        }
+
         template.header("x-user-id", String.valueOf(userContext.getUserId()));
+    }
+
+    private boolean shouldSkipInterceptor(String url, String method) {
+        return url.contains("/svg") && "GET".equalsIgnoreCase(method);
     }
 }

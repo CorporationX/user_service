@@ -29,6 +29,11 @@ spring:
 server:
   port: 8080
 
+scheduler:
+  clear-events-cron: "*/20 * * * * *"
+  event-batch-size: 100
+  thread-pool-size: 4
+
 logging:
   level:
     root: info

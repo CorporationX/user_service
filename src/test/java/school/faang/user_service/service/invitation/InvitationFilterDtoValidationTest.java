@@ -49,7 +49,8 @@ public class InvitationFilterDtoValidationTest {
         Set<ConstraintViolation<InvitationFilterDto>> violations = validator.validate(invitationFilterDto);
 
         assertEquals(1, violations.size());
-        assertEquals("inviterNamePattern must not be empty, but can be null", violations.iterator().next().getMessage());
+        assertEquals("inviterNamePattern must not be empty, but can be null",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -59,7 +60,8 @@ public class InvitationFilterDtoValidationTest {
         Set<ConstraintViolation<InvitationFilterDto>> violations = validator.validate(invitationFilterDto);
 
         assertEquals(1, violations.size());
-        assertEquals("invitedNamePattern must not be empty, but can be null", violations.iterator().next().getMessage());
+        assertEquals("invitedNamePattern must not be empty, but can be null",
+                violations.iterator().next().getMessage());
     }
 
     @Test

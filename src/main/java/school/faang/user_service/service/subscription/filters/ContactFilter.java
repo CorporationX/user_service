@@ -18,7 +18,7 @@ public class ContactFilter implements UserFilter {
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
                 .filter(user -> user.getContacts() != null && user.getContacts().stream()
-                        .anyMatch(contact -> contact.getContact() != null &&
-                                contact.getContact().contains(filters.contactPattern())));
+                        .anyMatch(contact -> contact.getContact() != null
+                                && contact.getContact().contains(filters.contactPattern())));
     }
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.mentorship;
 
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,8 +31,10 @@ public class MentorshipController {
             description = "Get list of mentees of user"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = MentorshipUserDto.class))}),
-            @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema(implementation = ErrorResponseDto.class))}) })
+            @ApiResponse(responseCode = "200", content =
+                    {@Content(schema = @Schema(implementation = MentorshipUserDto.class))}),
+            @ApiResponse(responseCode = "404", content =
+                    {@Content(schema = @Schema(implementation = ErrorResponseDto.class))})})
     @GetMapping("/{userId}/mentees")
     public List<MentorshipUserDto> getMentees(@PathVariable @Positive Long userId) {
         return mentorshipService.getMentees(userId);

@@ -67,7 +67,8 @@ public class RecommendationServiceImplTest {
     @BeforeEach
     void setUp() {
         recommendationDto = new RecommendationDto(RECOMMENDATION_ID, RECEIVER_ID, AUTHOR_ID,
-                "Recommendation content", List.of(new SkillOfferDto(SKILL_ID, RECOMMENDATION_ID, SKILL_ID)), LocalDateTime.now());
+                "Recommendation content",
+                List.of(new SkillOfferDto(SKILL_ID, RECOMMENDATION_ID, SKILL_ID)), LocalDateTime.now());
 
         recommendation = Recommendation.builder().build();
         skill = Skill.builder().id(SKILL_ID).build();
@@ -75,7 +76,7 @@ public class RecommendationServiceImplTest {
 
     @Test
     @DisplayName("Обновление рекомендации: рекомендация не найдена")
-    void updateRecommendation_ShouldThrowException_WhenRecommendationNotFound() {
+    void updateRecommendation_ShouldThrowExceptionWhenRecommendationNotFound() {
         when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.empty());
 
         DataValidationException exception = assertThrows(DataValidationException.class, () ->
@@ -86,7 +87,7 @@ public class RecommendationServiceImplTest {
 
     @Test
     @DisplayName("Получение всех рекомендаций для получателя с непустым ответом")
-    void getAllUserRecommendations_ShouldReturnRecommendations_WhenValid() {
+    void getAllUserRecommendations_ShouldReturnRecommendationsWhenValid() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Recommendation> recommendationPage = new PageImpl<>(List.of(recommendation));
         when(recommendationRepository.findAllByReceiverId(RECEIVER_ID, pageable)).thenReturn(recommendationPage);
@@ -100,7 +101,7 @@ public class RecommendationServiceImplTest {
 
     @Test
     @DisplayName("Получение всех рекомендаций от автора с непустым ответом")
-    void getAllGivenRecommendations_ShouldReturnRecommendations_WhenValid() {
+    void getAllGivenRecommendations_ShouldReturnRecommendationsWhenValid() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Recommendation> recommendationPage = new PageImpl<>(List.of(recommendation));
         when(recommendationRepository.findAllByAuthorId(AUTHOR_ID, pageable)).thenReturn(recommendationPage);
@@ -154,7 +155,7 @@ public class RecommendationServiceImplTest {
 
     @Test
     @DisplayName("Удаление рекомендации: рекомендация не найдена")
-    void deleteRecommendation_ShouldThrowException_WhenRecommendationNotFound() {
+    void deleteRecommendation_ShouldThrowExceptionWhenRecommendationNotFound() {
         when(recommendationRepository.findById(RECOMMENDATION_ID)).thenReturn(Optional.empty());
 
         DataValidationException exception = assertThrows(DataValidationException.class, () ->

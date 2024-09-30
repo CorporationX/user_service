@@ -1,6 +1,15 @@
 package school.faang.user_service.entity.event;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -21,8 +30,8 @@ import java.time.LocalDateTime;
 @Table(name = "rating")
 public class Rating {
 
-    private final static int RATE_MIN_VALUE = 0;
-    private final static int RATE_MAX_VALUE = 5;
+    private static final int RATE_MIN_VALUE = 0;
+    private static final int RATE_MAX_VALUE = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

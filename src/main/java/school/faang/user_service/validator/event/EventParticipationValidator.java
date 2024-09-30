@@ -20,7 +20,8 @@ public class EventParticipationValidator {
     public void validateParticipationRegistered(long eventId, long userId) {
         User participant = eventParticipationRepository.findParticipantByIdAndEventId(eventId, userId);
         if (participant != null) {
-            throw new EventParticipationRegistrationException(USER_ALREADY_REGISTERED_MESSAGE.formatted(userId, eventId));
+            throw new EventParticipationRegistrationException(
+                    USER_ALREADY_REGISTERED_MESSAGE.formatted(userId, eventId));
         }
     }
 

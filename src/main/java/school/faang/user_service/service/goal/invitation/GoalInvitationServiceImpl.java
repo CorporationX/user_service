@@ -97,14 +97,17 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     }
 
     private GoalInvitation findGoalInvitationById(long id) {
-        return goalInvitationRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("GoalInvitation not found with id " + id));
+        return goalInvitationRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("GoalInvitation not found with id " + id));
     }
 
     private User findUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+        return userRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("User not found with id " + id));
     }
 
     private Goal findGoalById(Long id) {
-        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Goal not found with id " + id));
+        return goalRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Goal not found with id " + id));
     }
 }

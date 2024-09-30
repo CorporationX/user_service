@@ -23,8 +23,6 @@ import school.faang.user_service.service.s3.S3Service;
 
 import java.util.Optional;
 
-
-
 @ExtendWith(MockitoExtension.class)
 public class AvatarServiceTest {
     @InjectMocks
@@ -67,7 +65,7 @@ public class AvatarServiceTest {
         User user = new User();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         byte[] file = {1, 2, 3};
-        when(defaultAvatarClient.getAvatar(any(), any())).thenReturn(file);
+        when(defaultAvatarClient.getAvatar(any(), any(), any())).thenReturn(file);
         String key = "default_avatar_for_user_" + userId + "_";
 
         // Act and Assert

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.avatar;
 
-
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;

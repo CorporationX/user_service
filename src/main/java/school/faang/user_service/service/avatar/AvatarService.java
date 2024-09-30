@@ -31,12 +31,12 @@ public class AvatarService {
     private String format;
 
     public void createDefaultAvatarForUser(long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            String message = "Пользователя с id = " + userId + " нет в системе";
-            log.error(message);
-            throw new DataValidationException(message);
-        }
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+                    String message = "Пользователя с id = " + userId + " нет в системе";
+                    log.error(message);
+                    return new DataValidationException(message);
+                }
+        );
         if (user.getUserProfilePic() != null) {
             String message = "Пользователь с id = " + userId + " уже имеет аватар";
             log.error(message);

@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class AmazonS3Config {
+public class AmazonS3ConfigForAvatar {
 
     @Bean
-    public AmazonS3 amazonS3() {
+    public AmazonS3 amazonS3Bean() {
         var credentials = new BasicAWSCredentials("user", "password");
         var credentialsProvider = new AWSStaticCredentialsProvider(credentials);
         var endpointConfiguration = new AwsClientBuilder.EndpointConfiguration("http://127.0.0.1:9000/", "us-east-1");

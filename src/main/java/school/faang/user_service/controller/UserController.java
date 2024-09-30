@@ -29,6 +29,7 @@ public class UserController {
     private final UserContext userContext;
     private final UserService userService;
     private final UserLifeCycleService userLifeCycleService;
+    private final UserProfilePicServiceImpl userProfilePicService;
 
     @PutMapping("/deactivate")
     public void deactivateUser() {

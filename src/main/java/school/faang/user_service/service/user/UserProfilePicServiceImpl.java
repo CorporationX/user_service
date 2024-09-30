@@ -22,7 +22,7 @@ public class UserProfilePicServiceImpl implements UserProfilePicService {
         objectMetadata.setContentLength(file.getSize());
         objectMetadata.setContentType(file.getContentType());
         objectMetadata.setContentEncoding("utf-8");
-        String key = "Test Key";
+        String key = String.format("%s-%s", userId, file.getOriginalFilename());
         PutObjectRequest request = new PutObjectRequest("corpbucket", key, file.getInputStream(), objectMetadata);
 
         amazonS3.putObject(request);

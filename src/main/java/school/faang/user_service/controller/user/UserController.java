@@ -25,6 +25,14 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("Eblan228");
+        return userDto;
+    }
+
     @Operation(
             summary = "Получить список премиум-пользователей",
             description = "Возвращает список премиум-пользователей, отфильтрованных на основе предоставленных критериев.",

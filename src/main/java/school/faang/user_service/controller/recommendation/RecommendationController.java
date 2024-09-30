@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,32 +21,33 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/recommendations")
 @RequiredArgsConstructor
+@Validated
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(@RequestBody @Validated RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
 
     @PutMapping
-    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
+    public RecommendationDto updateRecommendation(@RequestBody @Validated RecommendationDto updated) {
         return recommendationService.update(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRecommendation(@PathVariable long id) {
+    public void deleteRecommendation(@PathVariable @Positive long id) {
         recommendationService.delete(id);
     }
 
     @GetMapping("/{receiver_id}")
-    public List<RecommendationDto> getAllUserRecommendations(@PathVariable("receiver_id") long receiverId){
+    public List<RecommendationDto> getAllUserRecommendations(@PathVariable("receiver_id") @Positive long receiverId){
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
     @GetMapping("/{receiver_id}/given_recommendations")
-    public List<RecommendationDto> getAllGivenRecommendations(@PathVariable("receiver_id") long receiverId){
+    public List<RecommendationDto> getAllGivenRecommendations(@PathVariable("receiver_id") @Positive long receiverId){
         return recommendationService.getAllGivenRecommendations(receiverId);
     }
 }

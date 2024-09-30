@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.entity.premium.Premium;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +20,15 @@ public class PremiumRemover {
     private final PremiumService premiumService;
 
     @Scheduled(cron = "${spring.scheduler.cron.premium_removal}")
-    public void removePremium() {
-
-        premiumService.removePremium(batchSize);
+    public void removePremium(int batchSize) {
+        List<Premium> premiumForRemove = premiumService.defineExpiredPremium();
+        int totalSize = premiumForRemove.size();
+        int numOfBatches = (totalSize + batchSize - 1) / batchSize;
+        for (int i = 0; i < numOfBatches; i++) {
+            int start = i * batchSize;
+            int end = Math.min(start + batchSize, totalSize);
+            List<Premium> batch = premiumForRemove.subList(start, end);
+            premiumService.removePremium(batch);
+        }
     }
 }

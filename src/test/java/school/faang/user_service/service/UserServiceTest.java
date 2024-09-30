@@ -72,7 +72,7 @@ class UserServiceTest {
     @Test
     void testSaveUserIfListIsEmpty() {
 
-        assertThrows(DataValidationException.class, () -> userService.saveUsers(null));
+        assertThrows(DataValidationException.class, () -> userService.saveUsers((List.of())));
         verify(userRepository, times(0)).saveAll(List.of());
     }
 

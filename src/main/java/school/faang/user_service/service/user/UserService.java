@@ -33,8 +33,8 @@ public class UserService {
     }
 
     public List<UserDto> saveUsers(List<User> users) {
-        if(users == null){
-            log.error("List<User> is empty. There aren't users for save");
+        if(users.isEmpty()){
+            log.error("List<UserDto> is empty. There aren't users for save");
             throw new DataValidationException("There aren't users for save");
         }
         List<User> savedUsers = userRepository.saveAll(users);

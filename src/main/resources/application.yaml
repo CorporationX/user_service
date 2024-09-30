@@ -47,9 +47,10 @@ services:
     accessKey: user
     secretKey: password
     bucketName: corpbucket
-  payment-service:
-    host: http://localhost
-    port: 9080
-  user-service:
-    host: http://localhost
-    port: 8080
+
+avatar:
+  size:
+    maxFileSize: 5242880
+
+image:
+  format: jpeg

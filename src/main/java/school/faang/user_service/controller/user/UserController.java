@@ -3,6 +3,7 @@ package school.faang.user_service.controller.user;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.ImageProcessor;
 import school.faang.user_service.service.user.UserService;
 
@@ -26,7 +28,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class UserController {
-    private static final double MAX_AVATAR_SIZE = 5_242_880L;
+
+    @Value("${avatar.size.maxFileSize}")
+    private double maxAvatarFileSize;
     private final UserService userService;
     private final ImageProcessor imageProcessor;
 
@@ -42,18 +46,23 @@ public class UserController {
 
     @PostMapping("/{userId}/avatar")
     public UserDto uploadUserAvatar(@PathVariable long userId, MultipartFile file) {
-        if (file.getSize() > MAX_AVATAR_SIZE) {
+        if (file.getSize() > maxAvatarFileSize) {
             throw new IllegalArgumentException("Avatar size is too large");
         }
         return userService.uploadUserAvatar(userId, imageProcessor.getBufferedImage(file));
     }
 
     @GetMapping("/{userId}/avatar")
-    public ResponseEntity<byte[]> getUserAvatar(@PathVariable long userId, @RequestParam String size) {
+    public ResponseEntity<byte[]> getUserAvatar(@PathVariable long userId, @RequestParam AvatarSize size) {
+        byte[] avatarBytes = userService.downloadUserAvatar(userId, size);
+        if (avatarBytes == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        byte[] avatarBytes = userService.downloadUserAvatar(userId, size);
-        return new ResponseEntity<>(avatarBytes, headers, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(avatarBytes);
     }
 
     @DeleteMapping("/{userId}/avatar")

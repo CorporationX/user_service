@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,11 +8,10 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.FileDeleteException;
-import school.faang.user_service.exception.FileDownloadException;
-import school.faang.user_service.exception.FileUploadException;
+import school.faang.user_service.exception.FileOperationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
 import school.faang.user_service.service.image.ImageProcessor;
 import school.faang.user_service.service.s3.S3Service;
@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.usersToUserDtos(users);
     }
 
+    @Transactional
     public UserDto uploadUserAvatar(Long userId, BufferedImage uploadedImage) {
         log.debug("Starting upload user avatar for user ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(
@@ -77,40 +78,31 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserDto(updateUser);
     }
 
-    public byte[] downloadUserAvatar(long userId, String size) {
+    public byte[] downloadUserAvatar(long userId, AvatarSize size) {
         log.debug("Starting download user avatar for user ID: {}, size: {}", userId, size);
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            log.error("User with id {} not found", userId);
-            throw new EntityNotFoundException("User with id %s not found".formatted(userId));
-        }
-        UserProfilePic userProfilePic = user.get().getUserProfilePic();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
+        UserProfilePic userProfilePic = user.getUserProfilePic();
         if (userProfilePic == null) {
-            log.error("User with id {} does not have an avatar", userId);
             throw new EntityNotFoundException("User with id %s does not have an avatar".formatted(userId));
         }
-        String fileId = size.equals("small") ? userProfilePic.getSmallFileId() : userProfilePic.getFileId();
+        String fileId = size == AvatarSize.SMALL ? userProfilePic.getSmallFileId() : userProfilePic.getFileId();
         try (InputStream userAvatarIS = s3Service.downloadFile(fileId)) {
             byte[] avatarBytes = userAvatarIS.readAllBytes();
             log.info("User avatar downloaded successfully for user ID: {}, size: {}", userId, size);
             return avatarBytes;
         } catch (IOException e) {
-            log.error("Failed to download user avatar for user ID: {}, size: {}", userId, size, e);
-            throw new FileDownloadException("Failed to download user avatar");
+            throw new FileOperationException("Failed to download user avatar for user ID: {}, size: {}".formatted(userId, size));
         }
     }
 
     public void deleteUserAvatar(long userId) {
         log.debug("Starting delete user avatar for user ID: {}", userId);
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            log.error("User with id {} not found", userId);
-            throw new EntityNotFoundException("User with id %s not found".formatted(userId));
-        }
-        UserProfilePic userProfilePic = user.get().getUserProfilePic();
-        log.info("Starting delete user avatar for user ID: {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
+        UserProfilePic userProfilePic = user.getUserProfilePic();
+        log.info("Delete user avatar for user ID: {}", userId);
         if (userProfilePic == null) {
-            log.error("User with id {} not found", userId);
             throw new EntityNotFoundException("User with id %s does not have an avatar".formatted(userId));
         }
         try {
@@ -118,11 +110,10 @@ public class UserServiceImpl implements UserService {
             s3Service.deleteFile(userProfilePic.getSmallFileId());
             log.info("User avatar deleted successfully for user ID: {}", userId);
         } catch (Exception e) {
-            log.error("Failed to delete user avatar for user ID: {}", userId, e);
-            throw new FileDeleteException("Failed to delete user avatar");
+            throw new FileOperationException("Failed to delete user avatar for user ID: {}".formatted(userId));
         }
-        user.get().setUserProfilePic(null);
-        userRepository.save(user.get());
+        user.setUserProfilePic(null);
+        userRepository.save(user);
         log.info("User avatar removed from user profile for user ID: {}", userId);
     }
 
@@ -133,8 +124,7 @@ public class UserServiceImpl implements UserService {
             s3Service.uploadFile(outputStream, key);
             log.info("File uploaded successfully for user ID: {}, key: {}", userId, key);
         } catch (Exception e) {
-            log.error("Failed to upload file for user ID: {}, key: {}", userId, key, e);
-            throw new FileUploadException("Failed to upload file");
+            throw new FileOperationException("Failed to upload file for user ID: {}, key: {}".formatted(userId, key));
         }
         return key;
     }

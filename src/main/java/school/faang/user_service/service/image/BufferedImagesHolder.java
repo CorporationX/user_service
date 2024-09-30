@@ -15,12 +15,8 @@ public class BufferedImagesHolder {
     public BufferedImagesHolder(BufferedImage originalPic) {
         int originalWidth = originalPic.getWidth();
         int originalHeight = originalPic.getHeight();
-        boolean maxIsWidth = originalWidth > originalHeight;
-        if (maxIsWidth) {
-            setPics(originalPic, originalWidth);
-        } else {
-            setPics(originalPic, originalHeight);
-        }
+        int maxDimension = Math.max(originalWidth, originalHeight);
+        setPics(originalPic, maxDimension);
     }
 
     private void setPics(BufferedImage originalPic, int biggerDimension) {

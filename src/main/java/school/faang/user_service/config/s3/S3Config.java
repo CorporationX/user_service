@@ -6,39 +6,30 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import jakarta.annotation.PostConstruct;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Slf4j
-@Component
-@ConfigurationProperties(prefix = "services.s3")
+@Configuration
 @ConfigurationPropertiesScan
-@Data
+@RequiredArgsConstructor
 public class S3Config {
-    private AmazonS3 s3Client;
-    private String accessKey;
-    private String secretKey;
-    private String endpoint;
-    private String bucketName;
+    private final S3Params s3Params;
 
-    @PostConstruct
-    public void setUp() {
+    @Bean
+    public AmazonS3 amazonS3(S3Params s3Params) {
         AWSCredentials credentials = new BasicAWSCredentials(
-                accessKey,
-                secretKey
+                s3Params.getAccessKey(),
+                s3Params.getSecretKey()
         );
-        s3Client = AmazonS3ClientBuilder
+        return AmazonS3ClientBuilder
                 .standard()
                 .withEndpointConfiguration
-                        (new AwsClientBuilder.EndpointConfiguration(endpoint, null))
+                        (new AwsClientBuilder.EndpointConfiguration(s3Params.getEndpoint(), null))
                 .withCredentials
                         (new AWSStaticCredentialsProvider(credentials))
                 .withPathStyleAccessEnabled(true)
                 .build();
-        log.info("Connected to AmazonS3 system.");
     }
 }

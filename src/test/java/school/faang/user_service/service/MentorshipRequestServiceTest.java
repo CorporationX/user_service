@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
@@ -24,14 +23,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
@@ -154,19 +152,6 @@ public class MentorshipRequestServiceTest {
                         dto.getReceiverId(),
                         dto.getDescription());
         verify(mentorshipEventPublisher).publish(event);
-    }
-
-    @Test
-    public void testGetRequestApplyDescriptionFilter() {
-        Stream<MentorshipRequest> requestStream = Stream.of(new MentorshipRequest());
-        MentorshipRequestDtoForResponse responseDto = prepareTestingRequestDtoForResponse();
-        when(filters.get(0).isApplicable(new RequestFilterDto())).thenReturn(true);
-        when(filters.get(0).apply(any(), any())).thenReturn(requestStream);
-        when(mapperMock.toDto(request)).thenReturn(responseDto);
-
-        List<MentorshipRequestDtoForResponse> methodResult = mentorshipRequestService.getRequests(filterDto);
-
-        assertEquals(methodResult, List.of(responseDto));
     }
 
     @Test

@@ -8,25 +8,34 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserRegistrationDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
-    private final static long USER_ID_ONE = 1L;
-    private final static long USER_ID_TWO = 2L;
+    private static final long USER_ID_ONE = 1L;
+    private static final long USER_ID_TWO = 2L;
+    private static final long COUNTRY_ID_ONE = 1L;
+
+    private static final int SIZE_USER_DTO_LIST = 2;
+    private static final int USER_DTOS_SIZE = 2;
+
+    private static final String PICTURE_ID = "1";
     private static final String USER_NAME_ONE = "name";
     private static final String USER_NAME_TWO = "Name";
-    private static final int USER_DTOS_SIZE = 2;
-    private final static int SIZE_USER_DTO_LIST = 2;
+
     @InjectMocks
     private UserMapperImpl userMapper;
+
     private User userOne;
     private User userTwo;
     private List<User> users;
@@ -96,6 +105,85 @@ class UserMapperTest {
             assertEquals(userOne.getUsername(), userDtos.get(0).getUsername());
             assertEquals(userTwo.getId(), userDtos.get(1).getId());
             assertEquals(userTwo.getUsername(), userDtos.get(1).getUsername());
+        }
+
+        @Test
+        @DisplayName("Convert User entity should be correctly converted to User dto")
+        void whenUserEntityConvertedToUserDtoThenReturnCorrectUserDto() {
+            User user = User.builder()
+                    .username("test")
+                    .email("test@test.test")
+                    .phone("123")
+                    .password("test")
+                    .aboutMe("test")
+                    .country(Country.builder()
+                            .id(COUNTRY_ID_ONE)
+                            .build())
+                    .city("test")
+                    .userProfilePic(UserProfilePic.builder()
+                            .fileId(PICTURE_ID)
+                            .build())
+                    .build();
+
+            UserDto expectedUserDto = UserDto.builder()
+                    .username("test")
+                    .email("test@test.test")
+                    .phone("123")
+                    .aboutMe("test")
+                    .countryId(COUNTRY_ID_ONE)
+                    .city("test")
+                    .userProfilePicId(PICTURE_ID)
+                    .build();
+
+            UserDto userDto = userMapper.toDto(user);
+
+            assertEquals(expectedUserDto.getUsername(), userDto.getUsername());
+            assertEquals(expectedUserDto.getEmail(), userDto.getEmail());
+            assertEquals(expectedUserDto.getPhone(), userDto.getPhone());
+            assertEquals(expectedUserDto.getAboutMe(), userDto.getAboutMe());
+            assertEquals(expectedUserDto.getCity(), userDto.getCity());
+            assertEquals(expectedUserDto.getCountryId(), userDto.getCountryId());
+            assertEquals(expectedUserDto.getUserProfilePicId(), userDto.getUserProfilePicId());
+        }
+    }
+
+    @Nested
+    class ToEntity {
+
+        @Test
+        @DisplayName("Convert userRegistration dto should be correctly converted to User entity")
+        void whenUserRegistrationDtoConvertedToEntityThenReturnCorrectEntity() {
+            UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                    .username("test")
+                    .email("test@test.test")
+                    .phone("123")
+                    .password("test")
+                    .aboutMe("test")
+                    .countryId(COUNTRY_ID_ONE)
+                    .city("test")
+                    .build();
+
+            User expectedUser = User.builder()
+                    .username("test")
+                    .email("test@test.test")
+                    .phone("123")
+                    .password("test")
+                    .aboutMe("test")
+                    .country(Country.builder()
+                            .id(COUNTRY_ID_ONE)
+                            .build())
+                    .city("test")
+                    .build();
+
+            User user = userMapper.toEntity(userRegistrationDto);
+
+            assertEquals(expectedUser.getUsername(), user.getUsername());
+            assertEquals(expectedUser.getEmail(), user.getEmail());
+            assertEquals(expectedUser.getPhone(), user.getPhone());
+            assertEquals(expectedUser.getPassword(), user.getPassword());
+            assertEquals(expectedUser.getAboutMe(), user.getAboutMe());
+            assertEquals(expectedUser.getCity(), user.getCity());
+            assertEquals(expectedUser.getCountry().getId(), user.getCountry().getId());
         }
     }
 }

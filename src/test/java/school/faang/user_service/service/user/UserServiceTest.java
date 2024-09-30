@@ -11,44 +11,65 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.image.RemoteImageService;
+import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @InjectMocks
-    private UserService userService;
-    @Mock
-    private UserRepository userRepository;
+    private static final long USER_ID = 1L;
     private static final long REQUESTER_ID = 1L;
     private static final long RECEIVER_ID = 2L;
 
-    private static final List<Long> USER_IDS = List.of(REQUESTER_ID);
     private static final String USER_NAME = "name";
+
+    private static final List<Long> USER_IDS = List.of(USER_ID);
+
+    @InjectMocks
+    private UserService userService;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private UserValidator userValidator;
+
+    @Mock
+    private RemoteImageService remoteImageService;
+
+    @Mock
+    private S3Service s3Service;
+
+    private User user;
+    private User secondUser;
     private User receiver;
     private User requester;
     private UserDto userDto;
     private List<User> users;
     private List<UserDto> userDtos;
+    private UserRegistrationDto userRegistrationDto;
 
     @BeforeEach
     public void init() {
@@ -113,7 +134,7 @@ class UserServiceTest {
 
         @Test
         @DisplayName("Doesn't throws exception when user found")
-        void whenUserNotFoundThenThrowException() {
+        void whenUserNotFoundThenNotThrownException() {
             when(userRepository.findById(anyLong()))
                     .thenReturn(Optional.of(new User()));
 
@@ -165,6 +186,88 @@ class UserServiceTest {
             assertEquals(result, users);
 
             verify(userRepository).findAllById(usersId);
+        }
+
+        @Nested
+        class UserRegistration {
+
+            @Test
+            @DisplayName("Success when user registration and got remote profile picture correct")
+            void whenUserRegistrationDtoIsValidAndRemoteServiceSendPicFoundThenSuccess() {
+                userRegistrationDto = new UserRegistrationDto();
+                user = new User();
+
+                when(userMapper.toEntity(userRegistrationDto))
+                        .thenReturn(user);
+
+                userService.registerUser(userRegistrationDto);
+
+                verify(userMapper)
+                        .toEntity(userRegistrationDto);
+                verify(userValidator)
+                        .validateUserConstrains(user);
+                verify(userRepository)
+                        .save(user);
+                verify(userMapper)
+                        .toDto(user);
+                verify(remoteImageService)
+                        .getUserProfileImageFromRemoteService();
+                verify(s3Service)
+                        .uploadHttpData(any(), anyString());
+
+            }
+
+            @Test
+            @DisplayName("Success when user registration and don't get remote profile picture then get local pic")
+            void whenUserRegistrationDtoIsValidAndRemoteServiceNotSendPicFoundThenSuccess() {
+                userRegistrationDto = new UserRegistrationDto();
+                user = new User();
+
+                when(userMapper.toEntity(userRegistrationDto))
+                        .thenReturn(user);
+                when(remoteImageService.getUserProfileImageFromRemoteService())
+                        .thenThrow(new ImageGeneratorException(null));
+                when(s3Service.isDefaultPictureExistsOnCloud())
+                        .thenReturn(Boolean.TRUE);
+
+                userService.registerUser(userRegistrationDto);
+
+                verify(userMapper)
+                        .toEntity(userRegistrationDto);
+                verify(userValidator)
+                        .validateUserConstrains(user);
+                verify(userRepository)
+                        .save(user);
+                verify(userMapper)
+                        .toDto(user);
+                verify(s3Service)
+                        .getDefaultPictureName();
+            }
+
+            @Test
+            @DisplayName("Success when user registration and don't get remote profile picture and don't get local pic")
+            void whenUserRegistrationDtoIsValidAndNoLocalOrRemotePictureThenSuccess() {
+                userRegistrationDto = new UserRegistrationDto();
+                user = new User();
+
+                when(userMapper.toEntity(userRegistrationDto))
+                        .thenReturn(user);
+                when(remoteImageService.getUserProfileImageFromRemoteService())
+                        .thenThrow(new ImageGeneratorException(null));
+                when(s3Service.isDefaultPictureExistsOnCloud())
+                        .thenReturn(Boolean.FALSE);
+
+                userService.registerUser(userRegistrationDto);
+
+                verify(userMapper)
+                        .toEntity(userRegistrationDto);
+                verify(userValidator)
+                        .validateUserConstrains(user);
+                verify(userRepository)
+                        .save(user);
+                verify(userMapper)
+                        .toDto(user);
+            }
         }
     }
 }

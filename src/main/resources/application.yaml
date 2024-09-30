@@ -8,7 +8,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -53,3 +53,13 @@ services:
     connectionTimeout: 10_000
     socketTimeout: 10_000
     bucketName: corpbucket
+    bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
+    defaultProfilePicture: defaultAvatar.png
+    remoteFilename: pic.png
+  imagegenerator:
+    endpoint: https://api.dicebear.com/9.x
+    paths:
+      get: adventurer-neutral/png
+  postService:
+    endpoint: http://localhost:8081
+    requiredHeaders: x-user-id

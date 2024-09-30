@@ -250,7 +250,7 @@ public class EventServiceTest {
     void deletePassedEvents_shouldPartitionAndDeleteInBatches() {
         // Arrange
         events = getEventList();
-        when(eventRepository.findAll()).thenReturn(events);
+        when(eventRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(events);
         // Act
         eventService.deletePassedEvents();
         // Assert
@@ -261,15 +261,12 @@ public class EventServiceTest {
         return List.of(
                 Event.builder().id(1L).endDate(LocalDateTime.now().minusDays(1)).build(),
                 Event.builder().id(2L).endDate(LocalDateTime.now().minusDays(2)).build(),
-                Event.builder().id(3L).endDate(LocalDateTime.now().plusDays(3)).build(),
-                Event.builder().id(4L).endDate(LocalDateTime.now().plusDays(3)).build(),
                 Event.builder().id(5L).endDate(LocalDateTime.now().minusDays(3)).build(),
                 Event.builder().id(6L).endDate(LocalDateTime.now().minusDays(3)).build(),
                 Event.builder().id(7L).endDate(LocalDateTime.now().minusDays(3)).build(),
                 Event.builder().id(8L).endDate(LocalDateTime.now().minusDays(3)).build(),
                 Event.builder().id(9L).endDate(LocalDateTime.now().minusDays(3)).build(),
                 Event.builder().id(10L).endDate(LocalDateTime.now().minusDays(3)).build(),
-                Event.builder().id(11L).endDate(LocalDateTime.now().plusDays(3)).build(),
                 Event.builder().id(12L).endDate(LocalDateTime.now().minusDays(3)).build()
         );
     }

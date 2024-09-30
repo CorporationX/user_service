@@ -79,9 +79,7 @@ public class EventService {
 
     @Transactional
     public void deletePassedEvents() {
-        var eventsToDelete = eventRepository.findAll().stream()
-                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
-                .toList();
+        var eventsToDelete = eventRepository.findAllByEndDateBefore(LocalDateTime.now());
         ListUtils.partition(eventsToDelete, batchSize)
                 .forEach(this::deletePassedEventsByBatches);
     }

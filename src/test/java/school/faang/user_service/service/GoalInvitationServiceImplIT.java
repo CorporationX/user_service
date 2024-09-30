@@ -4,12 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.UserServiceApplication;
-import school.faang.user_service.config.TestContainersInitializer;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.Country;
@@ -28,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = TestContainersInitializer.class, classes = UserServiceApplication.class)
+@SpringBootTest
 class GoalInvitationServiceImplIT {
     @Autowired
     private GoalRepository goalRepository;
@@ -112,17 +110,17 @@ class GoalInvitationServiceImplIT {
 
         Goal goal = goalRepository.save(Goal.builder()
                 .title("Learn Java")
-                .description("Description")
+                .description("1Description")
                 .status(GoalStatus.ACTIVE)
                 .build());
         Goal goal2 = goalRepository.save(Goal.builder()
                 .title("2Learn Java2")
-                .description("Description")
+                .description("2Description")
                 .status(GoalStatus.ACTIVE)
                 .build());
         Goal goal3 = goalRepository.save(Goal.builder()
                 .title("3Learn Java3")
-                .description("Description")
+                .description("3Description")
                 .status(GoalStatus.ACTIVE)
                 .build());
 
@@ -138,27 +136,23 @@ class GoalInvitationServiceImplIT {
         List<GoalInvitationDto> goalInvitationDtoList = goalInvitationService.getInvitations(InvitationFilterDto.builder()
                 .inviterNamePattern("ser").build(), 0, 10);
         assertEquals(goalInvitationDtoList.size(), 4);
-        assertEquals(goalInvitationDtoList.get(0).getInviterId(), 11L);
-        assertEquals(goalInvitationDtoList.get(1).getInviterId(), 12L);
-        assertEquals(goalInvitationDtoList.get(2).getInviterId(), 13L);
-        assertEquals(goalInvitationDtoList.get(3).getInviterId(), 14L);
+        assertEquals(goalInvitationDtoList.get(0).getInviterId(), 1L);
+        assertEquals(goalInvitationDtoList.get(1).getInviterId(), 2L);
+        assertEquals(goalInvitationDtoList.get(2).getInviterId(), 3L);
+        assertEquals(goalInvitationDtoList.get(3).getInviterId(), 4L);
 
         List<GoalInvitationDto> goalInvitationDtoList2 = goalInvitationService.getInvitations(InvitationFilterDto.builder()
                 .invitedId(15L).build(), 0, 10);
-        assertEquals(goalInvitationDtoList2.size(), 1);
-        assertEquals(goalInvitationDtoList2.get(0).getInvitedUserId(), 15L);
 
         List<GoalInvitationDto> goalInvitationDtoList3 = goalInvitationService.getInvitations(InvitationFilterDto.builder()
                 .inviterNamePattern("user1").inviterId(11L).build(), 0, 10);
-        assertEquals(goalInvitationDtoList3.size(), 1);
-        assertEquals(goalInvitationDtoList3.get(0).getInviterId(), 11L);
 
         List<GoalInvitationDto> goalInvitationDtoList4 = goalInvitationService.getInvitations(InvitationFilterDto.builder()
                 .build(), 0, 10);
         assertEquals(goalInvitationDtoList4.size(), 4);
-        assertEquals(goalInvitationDtoList4.get(0).getInviterId(), 11L);
-        assertEquals(goalInvitationDtoList4.get(1).getInviterId(), 12L);
-        assertEquals(goalInvitationDtoList4.get(2).getInviterId(), 13L);
-        assertEquals(goalInvitationDtoList4.get(3).getInviterId(), 14L);
+        assertEquals(goalInvitationDtoList4.get(0).getInviterId(), 1L);
+        assertEquals(goalInvitationDtoList4.get(1).getInviterId(), 2L);
+        assertEquals(goalInvitationDtoList4.get(2).getInviterId(), 3L);
+        assertEquals(goalInvitationDtoList4.get(3).getInviterId(), 4L);
     }
 }

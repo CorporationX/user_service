@@ -6,13 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
@@ -46,7 +43,7 @@ public class SkillServiceImplTest {
     private SkillCandidateValidator skillCandidateValidator;
 
     @Test
-    public void testCreate() throws DataValidationException {
+    public void testCreate() {
         SkillDto dto = new SkillDto("title", 1L);
         Skill skill = new Skill();
         skill.setId(1L);
@@ -72,7 +69,7 @@ public class SkillServiceImplTest {
     }
 
     @Test
-    public void testEnoughOffersToAcquireSkillsFromOffers() throws DataValidationException {
+    public void testEnoughOffersToAcquireSkillsFromOffers() {
         long userId = 1L;
         long skillId = 2L;
         SkillDto expectedDto = new SkillDto("Java", userId);

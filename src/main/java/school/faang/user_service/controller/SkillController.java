@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 public class SkillController implements SkillService {
     private final SkillService skillService;
 
-    public SkillDto create(Skill skill) throws DataValidationException {
+    public SkillDto create(Skill skill) {
         return skillService.create(skill);
     }
 
@@ -27,7 +26,7 @@ public class SkillController implements SkillService {
         return skillService.getOfferedSkills(userId);
     }
 
-    public SkillDto acquireSkillFromOffers(long skillId, long userId) throws DataValidationException {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

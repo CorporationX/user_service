@@ -18,25 +18,32 @@ import school.faang.user_service.listener.RedisBanMessageListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-
     private final RedisBanMessageListener banMessageListener;
     private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.host}")
     private String host;
+
     @Value("${spring.data.redis.port}")
     private int port;
 
     @Value("${spring.data.redis.channels.ban-user-channel.name}")
     private String banUserTopic;
+
     @Value("${spring.data.redis.channels.follower-event-channel.name}")
     private String followerEvent;
+
     @Value("${spring.data.redis.channels.event-start-channel.name}")
     private String eventStartTopic;
+
     @Value("${spring.data.redis.channels.recommendation-received-channel.name}")
     private String recommendationReceived;
+
     @Value("${spring.data.redis.channels.follow-project-channel.name}")
     private String followProjectTopic;
+
+    @Value("${spring.data.redis.channels.goal-completed-event-channel.name}")
+    private String goalCompletedTopic;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -91,5 +98,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic followProjectTopic() {
         return new ChannelTopic(followProjectTopic);
+    }
+
+    @Bean
+    public ChannelTopic goalCompletedTopic() {
+        return new ChannelTopic(goalCompletedTopic);
     }
 }

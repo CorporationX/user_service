@@ -4,10 +4,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.model.dto.recommendation.RecommendationDto;
+import school.faang.user_service.model.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.model.entity.recommendation.Recommendation;
+import school.faang.user_service.model.entity.recommendation.SkillOffer;
 
 import java.util.List;
 

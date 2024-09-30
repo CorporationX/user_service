@@ -2,19 +2,23 @@ package school.faang.user_service.service.impl.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.model.dto.goal.GoalDto;
+import school.faang.user_service.model.dto.goal.GoalFilterDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.goal.Goal;
+import school.faang.user_service.model.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.model.event.GoalCompletedEventDto;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +30,8 @@ public class GoalServiceImpl implements GoalService {
     private final GoalValidator goalValidator;
     private final List<GoalFilter> filters;
     private final GoalMapper goalMapper;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
+    private final UserContext userContext;
 
     @Override
     public GoalDto createGoal(long userId, GoalDto goalDto) {
@@ -51,6 +57,7 @@ public class GoalServiceImpl implements GoalService {
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
             assignGoalSkillsToUsers(goalId, skills);
+            sendEvent(goalId);
         }
         return goalMapper.toDto(goal);
     }
@@ -93,5 +100,15 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public void removeGoals(List<Goal> goals){
         goalRepository.deleteAll(goals);
+    }
+
+    private void sendEvent(long goalId) {
+        GoalCompletedEventDto event = GoalCompletedEventDto.builder()
+                .goalId(goalId)
+                .userId(userContext.getUserId())
+                .completedAt(LocalDateTime.now())
+                .build();
+
+        goalCompletedEventPublisher.publish(event);
     }
 }

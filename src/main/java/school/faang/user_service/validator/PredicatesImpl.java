@@ -1,9 +1,9 @@
 package school.faang.user_service.validator;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RequestFilter;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.RequestFilter;
+import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.predicate.NotApplicable;
 import school.faang.user_service.util.predicate.PredicateFalse;
@@ -11,7 +11,6 @@ import school.faang.user_service.util.predicate.PredicateResult;
 import school.faang.user_service.util.predicate.PredicateTrue;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

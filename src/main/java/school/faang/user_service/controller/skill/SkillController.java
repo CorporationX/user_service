@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.model.dto.skill.SkillCandidateDto;
+import school.faang.user_service.model.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.groups.CreateGroup;
 

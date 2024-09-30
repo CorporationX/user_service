@@ -45,3 +45,9 @@ springdoc:
   swagger-ui:
     enabled: true
     url: openapi.yml
+
+premium:
+  scheduled:
+    weekly: "0 0 0 * * MON"
+  pool-size: 3
+  batch-size: 100

@@ -49,7 +49,6 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/avatar")
-    @ResponseStatus(HttpStatus.OK)
     public void uploadUserAvatar(@PathVariable Long userId, @RequestBody MultipartFile file) {
         userProfilePicService.uploadUserAvatar(userId, file);
     }
@@ -59,11 +58,10 @@ public class UserController {
         byte[] img;
         try {
             img = userProfilePicService.downloadUserAvatar(userId).readAllBytes();
+            return new ResponseEntity<>(img, HttpStatus.OK);
         } catch (IOException ex) {
             throw new RuntimeException("Failed to download picture", ex.getCause());
         }
-
-        return new ResponseEntity<>(img, HttpStatus.OK);
     }
 
     @DeleteMapping("/{userId}/avatar")

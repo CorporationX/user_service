@@ -7,6 +7,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.picture.PictureValidator;
+import school.faang.user_service.validator.picture.ScaleChanger;
 
 import java.io.InputStream;
 import java.util.List;
@@ -17,6 +18,7 @@ public class UserProfilePicService {
 
     private final UserService userService;
     private final PictureValidator pictureValidator;
+    private final ScaleChanger scaleChanger;
     private final S3Service s3Service;
 
     public void uploadUserAvatar(Long userId, MultipartFile file) {
@@ -25,7 +27,7 @@ public class UserProfilePicService {
 
         String folder = user.getId() + user.getUsername();
 
-        List<byte[]> images = pictureValidator.changeFileScale(file);
+        List<byte[]> images = scaleChanger.changeFileScale(file);
         List<String> keys = images.stream()
                 .map(image -> s3Service.uploadAvatar(image, folder, file.getContentType()))
                 .toList();
@@ -35,6 +37,7 @@ public class UserProfilePicService {
         userProfilePic.setSmallFileId(keys.get(1));
 
         user.setUserProfilePic(userProfilePic);
+        deleteUserAvatar(userId);
         userService.saveUser(user);
     }
 

@@ -12,6 +12,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.validator.picture.PictureValidator;
+import school.faang.user_service.validator.picture.ScaleChanger;
 
 import java.io.InputStream;
 import java.util.List;
@@ -33,6 +34,8 @@ class UserProfilePicServiceTest {
     private UserService userService;
     @Mock
     private PictureValidator pictureValidator;
+    @Mock
+    private ScaleChanger scaleChanger;
     @Mock
     private S3Service s3Service;
     @Mock
@@ -69,15 +72,15 @@ class UserProfilePicServiceTest {
     @DisplayName("Успешное сохранение аватара")
     public void whenUploadUserAvatarThenSuccess() {
         when(userService.getUserById(ID)).thenReturn(user);
-        when(pictureValidator.changeFileScale(multipartFile)).thenReturn(List.of(image, image));
+        when(scaleChanger.changeFileScale(multipartFile)).thenReturn(List.of(image, image));
         when(s3Service.uploadAvatar(any(), anyString(), isNull())).thenReturn(KEY);
         when(userService.saveUser(user)).thenReturn(updatedUser);
 
         userProfilePicService.uploadUserAvatar(ID, multipartFile);
 
-        verify(userService).getUserById(ID);
+        verify(userService, times(2)).getUserById(ID);
         verify(pictureValidator).checkPictureSizeExceeded(multipartFile);
-        verify(pictureValidator).changeFileScale(multipartFile);
+        verify(scaleChanger).changeFileScale(multipartFile);
         verify(s3Service, times(2)).uploadAvatar(any(), anyString(), isNull());
         verify(userService).saveUser(user);
     }

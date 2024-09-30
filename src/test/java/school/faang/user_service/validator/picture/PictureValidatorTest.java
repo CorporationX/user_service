@@ -28,8 +28,7 @@ class PictureValidatorTest {
 
     @BeforeEach
     public void init() {
-        // TODO добавила setter в сущность, тк  иначе все время в тесте падала ошибка NullPointerException
-        pictureValidator.setMaxFileSize(MAX_FILE_SIZE);
+        pictureValidator = new PictureValidator(MAX_FILE_SIZE);
     }
 
     @Nested

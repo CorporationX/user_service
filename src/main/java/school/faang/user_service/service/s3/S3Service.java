@@ -8,10 +8,8 @@ import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 @Service
@@ -45,7 +43,7 @@ public class S3Service {
         try {
             s3Object = s3Client.getObject(bucketName, key);
         } catch (SdkClientException ex) {
-            throw new SdkClientException("Failed to download picture", ex.getCause());
+            throw new RuntimeException("Failed to download picture", ex.getCause());
         }
 
         return s3Object.getObjectContent();
@@ -55,7 +53,7 @@ public class S3Service {
         try {
             s3Client.deleteObject(bucketName, key);
         } catch (SdkClientException ex) {
-            throw new SdkClientException("Failed to delete picture", ex.getCause());
+            throw new RuntimeException("Failed to delete picture", ex.getCause());
         }
     }
 }

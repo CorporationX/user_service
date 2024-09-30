@@ -10,6 +10,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +50,7 @@ public class UserControllerTest {
 
     @Test
     void shouldReturnEmptyList_WhenNoPremiumUsers() {
+        userDtos = Collections.emptyList();
         when(userService.getPremiumUsers(filterDto)).thenReturn(userDtos);
 
         List<UserDto> result = userController.getPremiumUsers(filterDto);

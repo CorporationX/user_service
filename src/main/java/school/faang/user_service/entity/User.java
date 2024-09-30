@@ -40,6 +40,9 @@ public class User {
     @Column(name = "phone", length = 32, unique = true)
     private String phone;
 
+    @Column(name = "tg_chat_id")
+    private Long tgChatId;
+
     @Column(name = "password", length = 128, nullable = false)
     private String password;
 

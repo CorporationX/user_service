@@ -1,10 +1,11 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
@@ -23,12 +24,10 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto getUserById(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return userMapper.toDto(user.get());
-        } else {
-            throw new RuntimeException("user not found");
-        }
+    public UserDto getUserById(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()-> new DataValidationException(String.format("Not found user with id: %d", id)));
+
+        return userMapper.toDto(user);
     }
 }

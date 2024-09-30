@@ -1,4 +1,4 @@
-package school.faang.user_service.scheduler;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,21 +27,3 @@ public class PremiumService {
         log.info("Sublist with elements from {} to {} deleted", batch.get(0), batch.get(batch.size() - 1));
     }
 }
-
-//    @Async("executor")
-//    public void removePremium(int batchSize) {
-//        List<Premium> premiumForRemove = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
-//
-//        int totalSize = premiumForRemove.size();
-//        int numOfBatches = (totalSize + batchSize - 1) / batchSize;
-//
-//        for (int i = 0; i < numOfBatches; i++) {
-//            int start = i * batchSize;
-//            int end = Math.min(start + batchSize, totalSize);
-//
-//            List<Premium> batch = premiumForRemove.subList(start, end);
-//
-//            premiumRepository.deleteAll(batch);
-//            log.info("Sublist with elements from {} to {} deleted", start, end);
-//        }
-//    }

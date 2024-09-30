@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.scheduler.PremiumService;
+import school.faang.user_service.service.PremiumService;
 
 import java.time.LocalDateTime;
 import java.util.List;

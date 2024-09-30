@@ -56,8 +56,8 @@ public class PremiumServiceImpl implements PremiumService {
     }
 
     @Async("fixedThreadPools")
-    public void deleteExpiredPremiumsByBatches(List<Premium> expiredPremiums){
-        premiumRepository.deleteAll(expiredPremiums);
+    public void deleteExpiredPremiumsByBatches(List<Premium> expiredPremiums) {
+        premiumRepository.deleteAllInBatch(expiredPremiums);
     }
 
     private static PaymentRequestDto buildRequest(PremiumPeriod period) {

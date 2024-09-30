@@ -93,7 +93,7 @@ class PremiumServiceImplTest {
 
         premiumService.deleteExpiredPremiums();
 
-        verify(premiumRepository, times(2)).deleteAll(any());
+        verify(premiumRepository, times(2)).deleteAllInBatch(any());
     }
 
     private User buildUser() {

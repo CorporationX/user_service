@@ -1,10 +1,12 @@
 package school.faang.user_service.util.file;
 
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,43 +51,22 @@ public class CsvUtilTest {
     @InjectMocks
     private CsvUtil csvUtil;
 
+    @Spy
+    private CsvMapper csvMapper;
+
     private static MultipartFile file = null;
 
     @Nested
     class ParseCsvMultipartFile {
 
         @Test
-        @DisplayName("Assert that person is equals expected after parseCsvMultipartFile parsing")
-        void whenCorrectCsvDataThenPersonEqualsToExpected() {
+        @DisplayName("Assert that person is equals expected after parseCsvMultipartFile parsing " +
+                "if file is header and one line data")
+        void whenFileIsHeaderAndOneLineDataThenPersonEqualsToExpected() {
             file = new MockMultipartFile(NAME_MOCK, generateHeader().concat(generateData()).getBytes());
 
             Person person = csvUtil.parseCsvMultipartFile(file, Person.class).get(0);
-
-            assertEquals(FIRST_NAME, person.getFirstName());
-            assertEquals(LAST_NAME, person.getLastName());
-            assertEquals(YEAR_OF_BIRTH, person.getYearOfBirth());
-            assertEquals(GROUP, person.getGroup());
-            assertEquals(STUDENT_ID, person.getStudentID());
-            assertEquals(EMAIL, person.getContactInfo().getEmail());
-            assertEquals(PHONE, person.getContactInfo().getPhone());
-            assertEquals(STREET, person.getContactInfo().getAddress().getStreet());
-            assertEquals(CITY, person.getContactInfo().getAddress().getCity());
-            assertEquals(STATE, person.getContactInfo().getAddress().getState());
-            assertEquals(COUNTRY, person.getContactInfo().getAddress().getCountry());
-            assertEquals(POSTAL_CODE, person.getContactInfo().getAddress().getPostalCode());
-            assertEquals(FACULTY, person.getEducation().getFaculty());
-            assertEquals(MAJOR, person.getEducation().getMajor());
-            assertEquals(YEAR_OF_STUDY, person.getEducation().getYearOfStudy());
-            assertEquals(GPA, person.getEducation().getGpa());
-            assertEquals(STATUS, person.getStatus());
-            assertEquals(ADMISSION_DATE, person.getAdmissionDate());
-            assertEquals(GRADUATION_DATE, person.getGraduationDate());
-            assertEquals(DEGREE, person.getPreviousEducation().getDegree());
-            assertEquals(INSTITUTION, person.getPreviousEducation().getInstitution());
-            assertEquals(COMPLETION_YEAR, person.getPreviousEducation().getCompletionYear());
-            assertEquals(DEGREE, person.getPreviousEducation().getDegree());
-            assertTrue(person.getScholarship());
-            assertEquals(EMPLOYER, person.getEmployer());
+            checkPersonData(person);
         }
 
         @Test
@@ -95,6 +76,22 @@ public class CsvUtilTest {
 
             List<Person> person = csvUtil.parseCsvMultipartFile(file, Person.class);
             assertEquals(LIST_SIZE_ZERO, person.size());
+        }
+
+        @Test
+        @DisplayName("Assert that persons are equals expected after parseCsvMultipartFile parsing " +
+                "if file is header and two lines data")
+        void whenFileIsHeaderAndTwoLineDataThenPersonEqualsToExpected() {
+            file = new MockMultipartFile(NAME_MOCK,
+                    generateHeader().concat(generateData()).concat(generateData()).getBytes());
+
+            List<Person> persons = csvUtil.parseCsvMultipartFile(file, Person.class);
+
+            Person person = persons.get(0);
+            checkPersonData(person);
+
+            Person person1 = persons.get(1);
+            checkPersonData(person1);
         }
     }
 
@@ -107,32 +104,7 @@ public class CsvUtilTest {
             file = new MockMultipartFile(NAME_MOCK, generateHeader().concat(generateData()).getBytes());
 
             Person person = csvUtil.parseCsvToPojo(file, Person.class).get(0);
-
-            assertEquals(FIRST_NAME, person.getFirstName());
-            assertEquals(LAST_NAME, person.getLastName());
-            assertEquals(YEAR_OF_BIRTH, person.getYearOfBirth());
-            assertEquals(GROUP, person.getGroup());
-            assertEquals(STUDENT_ID, person.getStudentID());
-            assertEquals(EMAIL, person.getContactInfo().getEmail());
-            assertEquals(PHONE, person.getContactInfo().getPhone());
-            assertEquals(STREET, person.getContactInfo().getAddress().getStreet());
-            assertEquals(CITY, person.getContactInfo().getAddress().getCity());
-            assertEquals(STATE, person.getContactInfo().getAddress().getState());
-            assertEquals(COUNTRY, person.getContactInfo().getAddress().getCountry());
-            assertEquals(POSTAL_CODE, person.getContactInfo().getAddress().getPostalCode());
-            assertEquals(FACULTY, person.getEducation().getFaculty());
-            assertEquals(MAJOR, person.getEducation().getMajor());
-            assertEquals(YEAR_OF_STUDY, person.getEducation().getYearOfStudy());
-            assertEquals(GPA, person.getEducation().getGpa());
-            assertEquals(STATUS, person.getStatus());
-            assertEquals(ADMISSION_DATE, person.getAdmissionDate());
-            assertEquals(GRADUATION_DATE, person.getGraduationDate());
-            assertEquals(DEGREE, person.getPreviousEducation().getDegree());
-            assertEquals(INSTITUTION, person.getPreviousEducation().getInstitution());
-            assertEquals(COMPLETION_YEAR, person.getPreviousEducation().getCompletionYear());
-            assertEquals(DEGREE, person.getPreviousEducation().getDegree());
-            assertTrue(person.getScholarship());
-            assertEquals(EMPLOYER, person.getEmployer());
+            checkPersonData(person);
         }
 
         @Test
@@ -143,6 +115,34 @@ public class CsvUtilTest {
             List<Person> person = csvUtil.parseCsvToPojo(file, Person.class);
             assertEquals(LIST_SIZE_ZERO, person.size());
         }
+    }
+
+    private void checkPersonData(Person person) {
+        assertEquals(FIRST_NAME, person.getFirstName());
+        assertEquals(LAST_NAME, person.getLastName());
+        assertEquals(YEAR_OF_BIRTH, person.getYearOfBirth());
+        assertEquals(GROUP, person.getGroup());
+        assertEquals(STUDENT_ID, person.getStudentID());
+        assertEquals(EMAIL, person.getContactInfo().getEmail());
+        assertEquals(PHONE, person.getContactInfo().getPhone());
+        assertEquals(STREET, person.getContactInfo().getAddress().getStreet());
+        assertEquals(CITY, person.getContactInfo().getAddress().getCity());
+        assertEquals(STATE, person.getContactInfo().getAddress().getState());
+        assertEquals(COUNTRY, person.getContactInfo().getAddress().getCountry());
+        assertEquals(POSTAL_CODE, person.getContactInfo().getAddress().getPostalCode());
+        assertEquals(FACULTY, person.getEducation().getFaculty());
+        assertEquals(MAJOR, person.getEducation().getMajor());
+        assertEquals(YEAR_OF_STUDY, person.getEducation().getYearOfStudy());
+        assertEquals(GPA, person.getEducation().getGpa());
+        assertEquals(STATUS, person.getStatus());
+        assertEquals(ADMISSION_DATE, person.getAdmissionDate());
+        assertEquals(GRADUATION_DATE, person.getGraduationDate());
+        assertEquals(DEGREE, person.getPreviousEducation().getDegree());
+        assertEquals(INSTITUTION, person.getPreviousEducation().getInstitution());
+        assertEquals(COMPLETION_YEAR, person.getPreviousEducation().getCompletionYear());
+        assertEquals(DEGREE, person.getPreviousEducation().getDegree());
+        assertTrue(person.getScholarship());
+        assertEquals(EMPLOYER, person.getEmployer());
     }
 
     private static String generateHeader() {
@@ -202,7 +202,7 @@ public class CsvUtilTest {
                 .append(INSTITUTION).append(",")
                 .append(COMPLETION_YEAR).append(",")
                 .append(Boolean.TRUE).append(",")
-                .append(EMPLOYER);
+                .append(EMPLOYER).append("\n");
 
         return dataBuilder.toString();
     }

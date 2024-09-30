@@ -3,6 +3,7 @@ package school.faang.user_service.service.user;
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +20,13 @@ import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.image.RemoteImageService;
 import school.faang.user_service.service.s3.S3Service;
-import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.util.file.CsvUtil;
 import school.faang.user_service.validator.user.UserValidator;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -63,33 +62,24 @@ public class UserService {
 
     @Transactional
     public List<UserDto> saveUsersFromCsvFile(MultipartFile multipartFile) {
-        List<UserDto> response = new ArrayList<>();
+        List<Person> persons = csvUtil.parseCsvMultipartFile(multipartFile, Person.class);
+        List<User> users = userMapper.toEntities(persons);
 
-        CompletableFuture.supplyAsync(() -> csvUtil.parseCsvMultipartFile(multipartFile, Person.class))
-                .thenAccept(result -> {
-                    List<User> users = userMapper.toEntities(result);
-                    users.parallelStream()
-                            .forEach(user -> {
-                                setDefaultPassword(users);
+        users.parallelStream()
+                .forEach(user -> {
+                    setDefaultPassword(user);
 
-                                try {
-                                    Country country = countryService.findCountryByTitle(user.getCountry().getTitle());
-                                    user.setCountry(country);
-                                } catch (EntityNotFoundException e) {
-                                    Country country = countryService.saveCountry(user.getCountry());
-                                    user.setCountry(country);
-                                }
-                            });
-                    userRepository.saveAll(users);
-                    users.forEach(user -> response.add(userMapper.toDto(user)));
-                })
-                .join();
+                    Country country = countryService.findCountryAndSaveIfNotExists(user.getCountry().getTitle());
 
-        return response;
+                    user.setCountry(country);
+                });
+        userRepository.saveAll(users);
+
+        return userMapper.toDtos(users);
     }
 
-    private void setDefaultPassword(List<User> users) {
-        users.forEach(user -> user.setPassword(user.getUsername()));
+    private void setDefaultPassword(User user) {
+        user.setPassword(user.getUsername());
     }
 
     public List<User> getUsersById(List<Long> usersId) {

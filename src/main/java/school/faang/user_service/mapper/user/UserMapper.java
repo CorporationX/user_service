@@ -39,28 +39,35 @@ public interface UserMapper {
     private String concatAboutMeInformation(Person person) {
         StringBuilder sb = new StringBuilder();
 
-        if (person.getContactInfo().getAddress().getState() != null &&
-                !person.getContactInfo().getAddress().getState().isBlank()) {
+        String state = person.getContactInfo().getAddress().getState();
+        if (state != null && !state.isBlank()) {
             sb.append("Address: { State - ")
-                    .append(person.getContactInfo().getAddress().getState())
+                    .append(state)
                     .append(" } ");
         }
         if (person.getEducation() != null) {
-            if (person.getEducation().getFaculty() != null &&
-                    !person.getEducation().getFaculty().isBlank()) {
-                sb.append("\nFaculty - ").append(person.getEducation().getFaculty());
+            String faculty = person.getEducation().getFaculty();
+
+            if (faculty != null && !faculty.isBlank()) {
+                sb.append("\nFaculty - ").append(faculty);
             }
-            if (person.getEducation().getYearOfStudy() > 0) {
-                sb.append("\nYear of study - ").append(person.getEducation().getYearOfStudy());
+
+            int yearOdStudy = person.getEducation().getYearOfStudy();
+
+            if (yearOdStudy > 0) {
+                sb.append("\nYear of study - ").append(yearOdStudy);
             }
-            if (person.getEducation().getMajor() != null &&
-                    !person.getEducation().getMajor().isBlank()) {
-                sb.append("\nMajor - ").append(person.getEducation().getMajor());
+
+            String major = person.getEducation().getMajor();
+
+            if (major != null && !major.isBlank()) {
+                sb.append("\nMajor - ").append(major);
             }
         }
-        if (person.getEmployer() != null &&
-                !person.getEmployer().isBlank()) {
-            sb.append("\nEmployer - ").append(person.getEmployer());
+        String employer = person.getEmployer();
+
+        if (employer != null && !employer.isBlank()) {
+            sb.append("\nEmployer - ").append(employer);
         }
 
         return sb.toString();

@@ -2,7 +2,7 @@ package school.faang.user_service.util.file;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,17 +18,19 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CsvUtil {
 
-    private static final CsvMapper csvMapper = new CsvMapper();
+    private final CsvMapper csvMapper;
 
     public <T> List<T> parseCsvMultipartFile(MultipartFile multipartFile, Class<T> clazz) {
         log.info("Start parseCsvMultipartFile() - {}", multipartFile.getOriginalFilename());
 
-        List<CompletableFuture<T>> completableFuture = new ArrayList<>();
-        int linesParsed = 0;
+        List<CompletableFuture<T>> completableFutures = new ArrayList<>();
+        int linesReaded = 0;
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(multipartFile.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(multipartFile.getInputStream(), StandardCharsets.UTF_8))) {
             String headerLine = reader.readLine();
             CsvSchema csvSchema = generateCsvSchema(headerLine);
 
@@ -38,33 +40,25 @@ public class CsvUtil {
                     continue;
                 }
 
-                linesParsed++;
+                linesReaded++;
                 String finalLine = line;
-                completableFuture.add(CompletableFuture.supplyAsync(() ->
-                        parseCsvLineToPojo(headerLine.concat("\n" + finalLine), clazz, csvSchema)));
-/*
-finalHeaderLine.concat("\n" + finalLine) - костыль)
-никак не получается решить проблему парсинга csv, если передаем просто данные то вываливается ошибка
-Проблема в том что данные ожидаются вместе с хедером.
-Я не нашел как отдельно сделать схему для хедера и просто уже ее передавать например.
-(Вроде уже даже и схему передаю, все равно не хочет)
-com.fasterxml.jackson.databind.exc.MismatchedInputException: No content to map due to end-of-input
- */
+                completableFutures.add(CompletableFuture.supplyAsync(() ->
+                        parseCsvLineToPojo(finalLine, clazz, csvSchema)));
             }
         } catch (IOException e) {
             log.error("Exception while parsing - {}. {}", multipartFile.getOriginalFilename(), e.getMessage());
             throw new ParseException("Error reading multipart file " + multipartFile.getName());
         }
 
-        List<T> result = completableFuture.stream()
+        List<T> result = completableFutures.stream()
                 .map(CompletableFuture::join)
                 .toList();
 
-        if (linesParsed == result.size()) {
+        if (linesReaded == result.size()) {
             log.info("Finish parseCsvMultipartFile() - {}", multipartFile.getOriginalFilename());
             return result;
         } else {
-            log.error("Expected objects: {}, but parsed - {}", linesParsed, result.size());
+            log.error("Expected objects: {}, but parsed - {}", linesReaded, result.size());
             throw new ParseException("Discrepancy between expected parsed lines and obtained lines");
         }
     }
@@ -76,7 +70,7 @@ com.fasterxml.jackson.databind.exc.MismatchedInputException: No content to map d
             schemaBuilder.addColumn(header.trim());
         }
 
-        return schemaBuilder.build().withHeader();
+        return schemaBuilder.build().withoutHeader();
     }
 
     private <T> T parseCsvLineToPojo(String line, Class<T> clazz, CsvSchema csvSchema) {
@@ -87,7 +81,7 @@ com.fasterxml.jackson.databind.exc.MismatchedInputException: No content to map d
         }
     }
 
-    public <T> List<T> parseCsvToPojo(MultipartFile multipartFile, @Valid Class<T> clazz) {
+    public <T> List<T> parseCsvToPojo(MultipartFile multipartFile, Class<T> clazz) {
         try {
             return new CsvMapper()
                     .readerWithSchemaFor(clazz)

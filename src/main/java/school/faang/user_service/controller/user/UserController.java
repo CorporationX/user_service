@@ -41,7 +41,7 @@ public class UserController {
         return userService.registerUser(userRegistrationDto);
     }
 
-    @PostMapping("/parsing")
+    @PostMapping("/upload")
     public List<UserDto> parseUserCsvFile(@RequestBody MultipartFile multipartFile) {
         return userService.saveUsersFromCsvFile(multipartFile);
     }

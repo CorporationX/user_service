@@ -20,4 +20,17 @@ public class CountryService {
     public Country saveCountry(Country country) {
         return countryRepository.save(country);
     }
+
+    public Country findCountryAndSaveIfNotExists(String title) {
+        Country country = new Country();
+
+        try {
+            country = findCountryByTitle(title);
+        } catch (EntityNotFoundException e) {
+            country.setTitle(title);
+            country = saveCountry(country);
+        }
+
+        return country;
+    }
 }

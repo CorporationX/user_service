@@ -3,6 +3,7 @@ package school.faang.user_service.validator.recommendation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.time.LocalDateTime;
 
@@ -41,7 +42,7 @@ public class RecommendationRequestValidatorTest {
     // Tests for validateRequestAndCheckTimeLimit method
     @Test
     void validateRequestAndCheckTimeLimit_ShouldThrowException_WhenTimeLimitHasNotPassed() {
-        LocalDateTime lastRequestTime = LocalDateTime.now().minusMonths(1); // Assuming 1 month is the limit
+        LocalDateTime lastRequestTime = LocalDateTime.now().minusMonths(3);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () ->
                 recommendationRequestValidator.validateRequestAndCheckTimeLimit(lastRequestTime)

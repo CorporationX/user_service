@@ -23,7 +23,7 @@ public class RecommendationRequestValidatorTest {
         Long requesterId = 1L;
         Long receiverId = 1L;
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        DataValidationException exception = assertThrows(DataValidationException.class, () ->
                 recommendationRequestValidator.validateRequesterAndReceiver(requesterId, receiverId)
         );
 

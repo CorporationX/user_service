@@ -4,8 +4,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.service.UserProfilePicService;
@@ -13,14 +11,10 @@ import school.faang.user_service.service.UserProfilePicService;
 import java.io.IOException;
 
 @Service
+@RequiredArgsConstructor
 public class UserProfilePicServiceImpl implements UserProfilePicService {
 
     private final AmazonS3 amazonS3;
-
-    @Autowired
-    public UserProfilePicServiceImpl(@Qualifier("amazonS3") AmazonS3 amazonS3) {
-        this.amazonS3 = amazonS3;
-    }
 
     @Override
     public void uploadAvatar(Long userId, MultipartFile file) throws IOException {

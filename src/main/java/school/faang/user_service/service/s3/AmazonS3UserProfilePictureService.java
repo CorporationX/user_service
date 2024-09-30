@@ -18,7 +18,6 @@ import java.io.ByteArrayInputStream;
 @Service
 public class AmazonS3UserProfilePictureService implements AmazonS3Service {
 
-
     private final AmazonS3 s3Client;
 
     @Value("${services.s3.bucketName}")

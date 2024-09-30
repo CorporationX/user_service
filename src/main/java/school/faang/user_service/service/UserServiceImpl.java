@@ -26,13 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
-
-        Iterable<Premium> premiumIterable = premiumRepository.findAll();
-
-        List<Premium> premiums = StreamSupport.stream(premiumIterable.spliterator(), false)
-                .toList();
-
-        return premiums.stream()
+        return StreamSupport.stream(premiumRepository.findAll().spliterator(), false)
                 .map(premium -> userMapper.toDto(premium.getUser()))
                 .filter(userDto -> filters.stream()
                         .allMatch(filter -> filter.apply(userDto, userFilterDto)))

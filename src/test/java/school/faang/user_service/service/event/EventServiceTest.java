@@ -221,6 +221,7 @@ class EventServiceTest {
 
             when(eventRepository.findAll()).thenReturn(eventList);
             when(eventProperties.getSublistSize()).thenReturn(1);
+            when(eventProperties.getThreadsNum()).thenReturn(1);
 
             eventService.deletePastEvents();
 

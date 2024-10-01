@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class EventProperties {
-    @Value("${clean_past_events.clean_interval}")
+    @Value("${schedule.clean_past_events.clean_interval}")
     private String cleanInterval;
 
-    @Value("${clean_past_events.threads_num}")
+    @Value("${schedule.clean_past_events.threads_num}")
     private int threadsNum;
 
-    @Value("${clean_past_events.sublist_size}")
+    @Value("${schedule.clean_past_events.sublist_size}")
     private int sublistSize;
 }

@@ -2,7 +2,6 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.event.properties.EventProperties;
@@ -23,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -107,12 +109,23 @@ public class EventService {
                 .map(Event::getId)
                 .toList();
 
-        ListUtils.partition(pastEventsIds, eventProperties.getSublistSize()).forEach(this::deleteAllEventsById);
-    }
+        ListUtils.partition(pastEventsIds, eventProperties.getSublistSize()).forEach(longList -> {
+            ExecutorService executor = Executors.newFixedThreadPool(eventProperties.getThreadsNum());
 
-    @Async("fixedThreadPool")
-    void deleteAllEventsById(List<Long> eventIds) {
-        eventRepository.deleteAllById(eventIds);
+            try {
+                executor.submit(() -> eventRepository.deleteAllById(longList));
+            } finally {
+                executor.shutdown();
+                try {
+                    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                        executor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    executor.shutdownNow();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
     }
 
     private EventDto saveEvent(EventDto eventDto) {

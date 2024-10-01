@@ -140,6 +140,16 @@ public class PromotionFabric {
                 .build();
     }
 
+    public static User getUser(long id, String username, List<UserPromotion> promotions, LocalDateTime createdAt) {
+        return User
+                .builder()
+                .id(id)
+                .username(username)
+                .promotions(promotions)
+                .createdAt(createdAt)
+                .build();
+    }
+
     public static User getUser(long id, List<UserPromotion> promotions) {
         return User
                 .builder()

@@ -56,6 +56,10 @@ public class UserService {
         return userRepository.findAllById(usersId);
     }
 
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
     @Transactional
     public UserDto registerUser(UserRegistrationDto userRegistrationDto) {
         log.info("registerUser() - start : userRegistrationDto = {}", userRegistrationDto);

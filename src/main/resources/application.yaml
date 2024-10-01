@@ -26,6 +26,10 @@ spring:
         follower-event-channel:
           name: follower_event
 
+servlet:
+  multipart:
+    max-file-size: 5242880
+
 server:
   port: 8080
 

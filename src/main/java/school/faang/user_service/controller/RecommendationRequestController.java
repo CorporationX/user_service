@@ -12,7 +12,7 @@ import school.faang.user_service.dto.RequestFilterDto;
 import java.util.List;
 
 @RestController
-@RequestMapping("/recommendations")
+@RequestMapping("/api/v1/recommendation")
 @RequiredArgsConstructor
 @Validated
 public class RecommendationRequestController {

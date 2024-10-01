@@ -31,7 +31,7 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestMapper recommendationRequestMapper;
 
     @InjectMocks
-    private RecommendationRequestService recommendationRequestService;
+    private RecommendationRequestServiceImpl recommendationRequestService;
 
     private RecommendationRequest existingRequest;
 

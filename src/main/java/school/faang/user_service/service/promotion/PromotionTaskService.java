@@ -46,6 +46,23 @@ public class PromotionTaskService {
         }
     }
 
+    @Async("promotionTaskServicePool")
+    public void decrementEventPromotionViews(List<EventPromotion> eventPromotions) {
+        log.info("Decrement event promotion");
+        eventPromotions.forEach(eventPromotion -> {
+            long promotionId = eventPromotion.getId();
+            int views = eventPromotionViews.computeIfAbsent(promotionId, k -> 0);
+            eventPromotionViews.put(promotionId, ++views);
+        });
+    }
+
+    @Scheduled(cron = "${app.promotion.event__promotion_views_decrement_cron}")
+    public void executeEventPromotionViewsDecrement() {
+        if (!eventPromotionViews.isEmpty() && isEventViewsDecrementRunning.compareAndSet(false, true)) {
+            decrementEventPromotionViews();
+        }
+    }
+
     private void decrementUserPromotionView() {
         Map<Long, Integer> userPromotionViewsCopy = new HashMap<>();
         try {
@@ -62,23 +79,6 @@ public class PromotionTaskService {
             }
         } finally {
             isUserViewsDecrementRunning.set(false);
-        }
-    }
-
-    @Async("promotionTaskServicePool")
-    public void decrementEventPromotionViews(List<EventPromotion> eventPromotions) {
-        log.info("Decrement event promotion");
-        eventPromotions.forEach(eventPromotion -> {
-            long promotionId = eventPromotion.getId();
-            int views = eventPromotionViews.computeIfAbsent(promotionId, k -> 0);
-            eventPromotionViews.put(promotionId, ++views);
-        });
-    }
-
-    @Scheduled(cron = "${app.promotion.event__promotion_views_decrement_cron}")
-    public void executeEventPromotionViewsDecrement() {
-        if (!eventPromotionViews.isEmpty() && isEventViewsDecrementRunning.compareAndSet(false, true)) {
-            decrementEventPromotionViews();
         }
     }
 

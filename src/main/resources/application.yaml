@@ -43,7 +43,17 @@ payment-service:
   base-path: /api
   url: http://${payment-service.host}:${payment-service.port}${payment-service.base-path}
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger
+    tagsSorter: alpha
+    operationsSorter: alpha
+
 app:
+  goal:
+    max-active-per-user: 3
   promotion:
     user_promotion_views_decrement_cron: '*/10 * * * * *'
     event__promotion_views_decrement_cron: '*/10 * * * * *'
@@ -59,3 +69,9 @@ app:
       max_pool_size: 20
       queue_capacity: 1000
       thread_name_prefix: PromotionTaskService-Async-
+
+minio:
+  endpoint: http://localhost:9000
+  accessKey: user
+  secretKey: password
+  bucketName: corpbucket

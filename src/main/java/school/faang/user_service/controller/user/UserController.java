@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,16 +54,16 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/avatar")
-    public ResponseEntity<byte[]> getUserAvatar(@PathVariable long userId, @RequestParam AvatarSize size) {
-        byte[] avatarBytes = userService.downloadUserAvatar(userId, size);
-        if (avatarBytes == null) {
+    public ResponseEntity<Resource> getUserAvatar(@PathVariable long userId, @RequestParam AvatarSize size) {
+        Resource avatarResource = userService.downloadUserAvatar(userId, size);
+        if (avatarResource == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(avatarBytes);
+                .body(avatarResource);
     }
 
     @DeleteMapping("/{userId}/avatar")

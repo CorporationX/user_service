@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import org.springframework.core.io.Resource;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.image.AvatarSize;
 
@@ -13,7 +14,7 @@ public interface UserService {
 
     UserDto uploadUserAvatar(Long userId, BufferedImage uploadedImage);
 
-    byte[] downloadUserAvatar(long userId, AvatarSize size);
+    Resource downloadUserAvatar(long userId, AvatarSize size);
 
     void deleteUserAvatar(long userId);
 }

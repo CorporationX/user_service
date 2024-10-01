@@ -3,6 +3,8 @@ package school.faang.user_service.service.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -78,7 +80,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserDto(updateUser);
     }
 
-    public byte[] downloadUserAvatar(long userId, AvatarSize size) {
+    public Resource downloadUserAvatar(long userId, AvatarSize size) {
         log.debug("Starting download user avatar for user ID: {}, size: {}", userId, size);
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
@@ -89,10 +91,12 @@ public class UserServiceImpl implements UserService {
         String fileId = size == AvatarSize.SMALL ? userProfilePic.getSmallFileId() : userProfilePic.getFileId();
         try (InputStream userAvatarIS = s3Service.downloadFile(fileId)) {
             byte[] avatarBytes = userAvatarIS.readAllBytes();
+            Resource avatarResource = new ByteArrayResource(avatarBytes);
             log.info("User avatar downloaded successfully for user ID: {}, size: {}", userId, size);
-            return avatarBytes;
+            return avatarResource;
         } catch (IOException e) {
-            throw new FileOperationException("Failed to download user avatar for user ID: {}, size: {}".formatted(userId, size));
+            throw new FileOperationException("Failed to download user avatar for user ID: {}, size: {}"
+                    .formatted(userId, size));
         }
     }
 

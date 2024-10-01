@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -20,6 +21,7 @@ import school.faang.user_service.service.image.ImageProcessor;
 import school.faang.user_service.service.s3.S3Service;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -156,21 +158,20 @@ public class UserServiceImplTest {
         UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setSmallFileId("smallFileId");
         user.setUserProfilePic(userProfilePic);
-        InputStream inputStream = mock(InputStream.class);
         byte[] avatarBytes = new byte[10];
+        InputStream inputStream = new ByteArrayInputStream(avatarBytes);
 
         when(repository.findById(user.getId())).thenReturn(java.util.Optional.of(user));
         when(s3Service.downloadFile("smallFileId")).thenReturn(inputStream);
+
+        Resource result = service.downloadUserAvatar(user.getId(), size);
+
+        assertNotNull(result);
         try {
-            when(inputStream.readAllBytes()).thenReturn(avatarBytes);
+            assertEquals(avatarBytes.length, result.contentLength());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        byte[] result = service.downloadUserAvatar(user.getId(), size);
-
-        assertNotNull(result);
-        assertEquals(avatarBytes, result);
         verify(s3Service).downloadFile("smallFileId");
     }
 

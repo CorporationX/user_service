@@ -57,7 +57,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             Throwable.class,
-            FileOperationException.class
     })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOtherExceptions(Throwable ex) {

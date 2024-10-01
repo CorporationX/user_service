@@ -32,10 +32,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             FROM users u
             LEFT JOIN user_promotion up ON u.id = up.user_id AND up.number_of_views > 0
             ORDER BY
-                CASE WHEN up.coefficient IS NOT NULL THEN 0 ELSE 1 END,
-                up.coefficient DESC,
+                up.coefficient DESC NULLS LAST,
                 up.creation_date ASC,
-                CASE WHEN up.coefficient IS NULL THEN u.created_at END DESC
+                u.id DESC
             OFFSET :offset
             LIMIT :limit
             """)

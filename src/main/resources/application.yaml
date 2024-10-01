@@ -45,24 +45,17 @@ payment-service:
 
 app:
   promotion:
-    user_views_decrement_schedule_time: 10000
-    event_views_decrement_schedule_time: 10000
-    scheduled_decrement_pool_size: 2
+    user_promotion_views_decrement_cron: '*/10 * * * * *'
+    event__promotion_views_decrement_cron: '*/10 * * * * *'
   retryable:
     payment_service:
       send_payment:
         max_attempts: 3
         delay: 100
         multiplier: 2
-    event_promotion_repository_batch:
-      update_event_promotion:
-        max_attempts: 3
-        delay: 100
-        multiplier: 2
-    user_promotion_repository_batch:
-      update_user_promotion:
-        max_attempts: 3
-        delay: 100
-        multiplier: 2
-
-
+  async-config:
+    promotion-task-service:
+      core_pool_size: 10
+      max_pool_size: 20
+      queue_capacity: 1000
+      thread_name_prefix: PromotionTaskService-Async-

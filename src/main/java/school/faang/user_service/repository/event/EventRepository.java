@@ -29,10 +29,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             FROM event e
             LEFT JOIN event_promotion ep ON e.id = ep.event_id AND ep.number_of_views > 0
             ORDER BY
-                CASE WHEN ep.coefficient IS NOT NULL THEN 0 ELSE 1 END,
-                ep.coefficient DESC,
+                ep.coefficient DESC NULLS LAST,
                 ep.creation_date ASC,
-                CASE WHEN ep.coefficient IS NULL THEN e.created_at END DESC
+                e.id DESC
             OFFSET :offset
             LIMIT :limit
             """)

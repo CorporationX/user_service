@@ -103,22 +103,25 @@ public class UserServiceImpl implements UserService {
     public void deleteUserAvatar(long userId) {
         log.debug("Starting delete user avatar for user ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
+                () -> new EntityNotFoundException("User with id %s not found"
+                        .formatted(userId)));
         UserProfilePic userProfilePic = user.getUserProfilePic();
         log.info("Delete user avatar for user ID: {}", userId);
         if (userProfilePic == null) {
-            throw new EntityNotFoundException("User with id %s does not have an avatar".formatted(userId));
+            throw new EntityNotFoundException("User with id %s does not have an avatar"
+                    .formatted(userId));
         }
+        user.setUserProfilePic(null);
+        userRepository.save(user);
+        log.info("User avatar removed from user profile for user ID: {}", userId);
         try {
             s3Service.deleteFile(userProfilePic.getFileId());
             s3Service.deleteFile(userProfilePic.getSmallFileId());
             log.info("User avatar deleted successfully for user ID: {}", userId);
         } catch (Exception e) {
-            throw new FileOperationException("Failed to delete user avatar for user ID: {}".formatted(userId));
+            throw new FileOperationException("Failed to delete user avatar for user ID: {}"
+                    .formatted(userId));
         }
-        user.setUserProfilePic(null);
-        userRepository.save(user);
-        log.info("User avatar removed from user profile for user ID: {}", userId);
     }
 
     private String uploadFile(Long userId, ByteArrayOutputStream outputStream, String fileName) {

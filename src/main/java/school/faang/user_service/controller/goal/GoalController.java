@@ -3,7 +3,6 @@ package school.faang.user_service.controller.goal;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,32 +31,28 @@ public class GoalController {
     }
 
     @PutMapping("/{goalId}")
-    public ResponseEntity<String> updateGoal(@PathVariable Long goalId, @Valid @RequestBody GoalDto goalDto) {
+    public GoalDto updateGoal(@PathVariable Long goalId, @Valid @RequestBody GoalDto goalDto) {
         goalService.updateGoal(goalId, goalDto);
-        return ResponseEntity.ok("Цель успешно обновлена");
+        return goalDto;
     }
 
     @DeleteMapping("/{goalId}")
-    public ResponseEntity<String> deleteGoal(@PathVariable long goalId) {
+    public void deleteGoal(@PathVariable long goalId) {
         goalService.deleteGoal(goalId);
-        return ResponseEntity.ok("Цель успешно удалена");
     }
 
     @GetMapping("/{goalId}/subtasks")
-    public ResponseEntity<List<GoalDto>> findSubtasksByGoalId(
+    public List<GoalDto> findSubtasksByGoalId(
             @PathVariable long goalId,
             @RequestParam(required = false) String titleFilter) {
-        List<GoalDto> subtasks = goalService.findSubtasksByGoalId(goalId, titleFilter);
-        return ResponseEntity.ok(subtasks);
+        return goalService.findSubtasksByGoalId(goalId, titleFilter);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<GoalDto>> getGoalsByUser(
+    public List<GoalDto> getGoalsByUser(
             @PathVariable Long userId,
             @ModelAttribute GoalFilterDto filter) {
-
-        List<GoalDto> goals = goalService.findGoalsByUserId(userId, filter);
-        return ResponseEntity.ok(goals);
+        return goalService.findGoalsByUserId(userId, filter);
     }
 
 }

@@ -23,20 +23,12 @@ public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
     @PostMapping
-    public RecommendationRequestDto requestRecommendation(@RequestBody @Validated RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto == null) {
-            throw new DataValidationException("Request body cannot be null");
-        }
-
+    public RecommendationRequestDto requestRecommendation(@RequestBody @Valid @NotNull RecommendationRequestDto recommendationRequestDto) {
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
     @GetMapping
-    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
-        if (filter == null) {
-            throw new DataValidationException("Filter cannot be null");
-        }
-
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody @NotNull RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 

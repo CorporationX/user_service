@@ -44,7 +44,7 @@ public class GoalInvitationController {
     }
 
     @GetMapping
-    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
+    public List<GoalInvitationDto> getInvitations(@NotNull InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }
 }

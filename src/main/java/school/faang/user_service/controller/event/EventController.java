@@ -34,39 +34,39 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventDto create(@NotNull @Validated(CreateGroup.class) @RequestBody EventDto event) {
+    public EventDto create(@RequestBody @Validated(CreateGroup.class) @NotNull EventDto event) {
         eventValidator.validateEvent(event);
         return eventService.create(event);
     }
 
     @GetMapping("/{id}")
-    public EventDto getEvent(@PathVariable @Positive Long id) {
+    public EventDto getEvent(@PathVariable @NotNull @Positive Long id) {
         return eventService.getEvent(id);
     }
 
     @GetMapping
-    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
+    public List<EventDto> getEventsByFilter(@RequestBody @NotNull EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEvent(@PathVariable @Positive Long id) {
+    public void deleteEvent(@PathVariable @NotNull @Positive Long id) {
         eventService.deleteEvent(id);
     }
 
     @PutMapping
-    public EventDto updateEvent(@NotNull @Validated(UpdateGroup.class) @RequestBody EventDto event) {
+    public EventDto updateEvent(@RequestBody @Validated(UpdateGroup.class) @NotNull EventDto event) {
         eventValidator.validateEvent(event);
         return eventService.updateEvent(event);
     }
 
     @GetMapping("/{user_id}/owned_events")
-    public List<Event> getOwnedEvents(@PathVariable("user_id") @Positive Long userId) {
+    public List<Event> getOwnedEvents(@PathVariable("user_id") @NotNull @Positive Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
     @GetMapping("/{user_id}/participated_events")
-    public List<Event> getParticipatedEvents(@PathVariable("user_id") @Positive Long userId) {
+    public List<Event> getParticipatedEvents(@PathVariable("user_id") @NotNull @Positive Long userId) {
         return eventService.getParticipatedEvents(userId);
     }
 }

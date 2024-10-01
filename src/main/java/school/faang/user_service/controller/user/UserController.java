@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -56,7 +57,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
     })
     @GetMapping("/premium")
-    public List<UserDto> getPremiumUsers(@ParameterObject UserFilterDto filter) {
+    public List<UserDto> getPremiumUsers(@ParameterObject @NotNull UserFilterDto filter) {
         return userService.getPremiumUsers(filter);
     }
 

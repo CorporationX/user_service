@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.subscription;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +51,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/{follower_id}/follows")
-    public List<UserDto> getFollowing(@PathVariable("follower_id") @Positive long followerId, UserFilterDto filter) {
+    public List<UserDto> getFollowing(@PathVariable("follower_id") @Positive long followerId, @NotNull UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
     }
 

@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.mentorship;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class MentorshipRequestController {
     }
 
     @GetMapping
-    public void getRequests(RequestFilterDto filter) {
+    public void getRequests(@NotNull RequestFilterDto filter) {
         mentorshipRequestService.getRequests(requestMapper.toEntity(filter));
     }
 
@@ -44,7 +45,7 @@ public class MentorshipRequestController {
     }
 
     @PutMapping("/{id}")
-    public void rejectRequest(@PathVariable @Positive long id, @RequestBody @NotNull @Validated RejectionDto rejectionDto) {
+    public void rejectRequest(@PathVariable @Positive long id, @RequestBody @NotNull @Valid RejectionDto rejectionDto) {
         mentorshipRequestService.rejectRequest(id, rejectionMapper.toEntity(rejectionDto));
     }
 }

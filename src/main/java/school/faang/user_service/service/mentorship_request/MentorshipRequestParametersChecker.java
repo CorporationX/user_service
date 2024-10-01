@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.exception.BadRequestException;
+import school.faang.user_service.exception.mentorship_request.LittleTimeAfterLastRequestException;
+import school.faang.user_service.exception.mentorship_request.RequestToHimselfException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -51,7 +53,7 @@ public class MentorshipRequestParametersChecker {
     private void checkSameUserIds(long requesterId, long receiverId) {
         if (requesterId == receiverId) {
             log.error(REQUEST_TO_HIMSELF);
-            throw new BadRequestException(REQUEST_TO_HIMSELF);
+            throw new RequestToHimselfException();
         }
     }
 
@@ -69,7 +71,7 @@ public class MentorshipRequestParametersChecker {
         LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
         if (latestMentorshipRequest != null && latestMentorshipRequest.getCreatedAt().isAfter(threeMonthsAgo)) {
             log.error(ONCE_EVERY_THREE_MONTHS);
-            throw new BadRequestException(ONCE_EVERY_THREE_MONTHS);
+            throw new LittleTimeAfterLastRequestException();
         }
     }
 }

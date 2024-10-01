@@ -10,7 +10,7 @@ import school.faang.user_service.service.event.EventService;
 public class Scheduler {
     private final EventService eventService;
 
-    @Scheduled(cron = "${events.clean_interval}")
+    @Scheduled(cron = "${clean_past_events.clean_interval}")
     public void cleanEvents() {
         eventService.deletePastEvents();
     }

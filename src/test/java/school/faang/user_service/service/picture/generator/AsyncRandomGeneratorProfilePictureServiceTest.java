@@ -12,6 +12,7 @@ import school.faang.user_service.config.ProfilePictureProperties;
 import school.faang.user_service.util.BinaryFileReader;
 
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,7 +72,7 @@ class AsyncRandomGeneratorProfilePictureServiceTest {
     @Test
     void getProfilePictures_WhenExceptionFromDiceBearClient() {
         List<byte[]> correctAnswer = List.of(defaultProfilePicture, defaultSmallProfilePicture);
-        when(diceBearClient.getSvgAvatar(seed, size)).thenThrow(RuntimeException.class);
+        when(diceBearClient.getSvgAvatar(seed, size)).thenThrow(CompletionException.class);
 
         List<byte[]> result = service.getProfilePictures(seed);
 

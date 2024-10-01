@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +17,26 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/recommendation-requests")
+@Validated
 public class RecommendationRequestController {
 
     private final RecommendationRequestService recommendationRequestService;
 
     @PostMapping
-    public RecommendationRequestDto requestRecommendation(@RequestBody @NotNull @Validated RecommendationRequestDto recommendationRequestDto) {
+    public RecommendationRequestDto requestRecommendation(@RequestBody @Validated RecommendationRequestDto recommendationRequestDto) {
+        if (recommendationRequestDto == null) {
+            throw new DataValidationException("Request body cannot be null");
+        }
+
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
     @GetMapping
     public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
+        if (filter == null) {
+            throw new DataValidationException("Filter cannot be null");
+        }
+
         return recommendationRequestService.getRequests(filter);
     }
 
@@ -36,7 +46,7 @@ public class RecommendationRequestController {
     }
 
     @PutMapping("/{id}")
-    public RecommendationRequestDto rejectRequest(@PathVariable @Positive long id, @RequestBody @NotNull @Validated RejectionDto rejection) {
+    public RecommendationRequestDto rejectRequest(@PathVariable @NotNull @Positive long id, @RequestBody @Valid @NotNull RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

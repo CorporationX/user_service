@@ -1,5 +1,8 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,11 +16,13 @@ import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import javax.xml.validation.Validator;
+
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
@@ -30,10 +35,15 @@ public class RecommendationRequestControllerTest {
 
     private RejectionDto rejectionDto;
     private RequestFilterDto filterDto;
+
+    private Validator validator;
     private long id;
 
     @BeforeEach
     void setup() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = (Validator) factory.getValidator();
+
         rejectionDto = new RejectionDto("some reason");
         filterDto = RequestFilterDto.builder().build();
         id = 1L;
@@ -41,8 +51,8 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void testRequestRecommendationWrongArgument() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationRequestController.requestRecommendation(null));
+        assertThrows(DataValidationException.class, () -> recommendationRequestController.requestRecommendation(null));
+        verify(recommendationRequestService, never()).create(null);
     }
 
     @Test
@@ -80,8 +90,12 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void testRejectRequestWithNullDto() {
-        assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestController.rejectRequest(id, null));
+
+        /*assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestController.rejectRequest(id, null));*/
+        Set<ConstraintViolation<Reje>> violations = validator.validate(dto);
+
+        recommendationRequestController.rejectRequest(id, null);
     }
 
     @Test

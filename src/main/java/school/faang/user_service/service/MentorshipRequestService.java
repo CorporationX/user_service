@@ -8,8 +8,8 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.List;
 
 public interface MentorshipRequestService {
-    public void requestMentorship(MentorshipRequestDto mentorshipRequestDto);
-    public List<MentorshipRequest> getRequests(RequestFilter filter);
-    public void acceptRequest(long id) throws Exception;
-    public void rejectRequest(long id, Rejection rejection);
+    void requestMentorship(MentorshipRequestDto mentorshipRequestDto);
+    List<MentorshipRequest> getRequests(RequestFilter filter);
+    void acceptRequest(long id) throws Exception;
+    void rejectRequest(long id, Rejection rejection);
 }

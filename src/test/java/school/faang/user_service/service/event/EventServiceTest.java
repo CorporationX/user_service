@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.event.properties.EventProperties;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -43,6 +44,7 @@ class EventServiceTest {
     private EventMapper eventMapper;
     private EventServiceHelper eventValidator;
     private UserRepository userRepository;
+    private EventProperties eventProperties;
     private TestDataEvent testDataEvent;
     private EventDto eventDto;
     private User user;
@@ -53,6 +55,7 @@ class EventServiceTest {
         eventRepository = Mockito.mock(EventRepository.class);
         eventMapper = Mockito.mock(EventMapper.class);
         eventValidator = Mockito.mock(EventServiceHelper.class);
+        eventProperties = Mockito.mock(EventProperties.class);
         userRepository = Mockito.mock(UserRepository.class);
         SkillRepository skillRepository = Mockito.mock(SkillRepository.class);
         SkillMapper skillMapper = Mockito.mock(SkillMapper.class);
@@ -62,6 +65,7 @@ class EventServiceTest {
                 eventRepository,
                 eventMapper,
                 eventValidator,
+                eventProperties,
                 userRepository,
                 skillRepository,
                 skillMapper,
@@ -207,6 +211,20 @@ class EventServiceTest {
             assertEquals(eventDtoList, result);
 
             verify(eventRepository, atLeastOnce()).findParticipatedEventsByUserId(user.getId());
+        }
+
+        @Test
+        void testDeletePastEvents() {
+            Event newEvent = testDataEvent.getEvent();
+            Event oldEvent = testDataEvent.getOldEvent();
+            List<Event> eventList = List.of(newEvent, oldEvent);
+
+            when(eventRepository.findAll()).thenReturn(eventList);
+            when(eventProperties.getSublistSize()).thenReturn(1);
+
+            eventService.deletePastEvents();
+
+            verify(eventRepository, atLeastOnce()).deleteAllById(List.of(oldEvent.getId()));
         }
     }
 

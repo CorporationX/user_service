@@ -102,6 +102,22 @@ public class TestDataEvent {
                 .status(EventStatus.CANCELED)
                 .build();
     }
+
+    public Event getOldEvent() {
+        return Event.builder()
+                .id(65L)
+                .title("title65")
+                .description("desc65")
+                .startDate(LocalDateTime.now().minusDays(3))
+                .endDate(LocalDateTime.now().minusDays(2))
+                .location("location65")
+                .maxAttendees(20)
+                .owner(getUser())
+                .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
+                .type(EventType.MEETING)
+                .status(EventStatus.COMPLETED)
+                .build();
+    }
     
     public EventDto getEventDto() {
         return EventDto.builder()

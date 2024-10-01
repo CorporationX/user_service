@@ -1,8 +1,11 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.event.properties.EventProperties;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
@@ -16,6 +19,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.event.filters.EventFilter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +30,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final EventServiceHelper eventValidator;
+    private final EventProperties eventProperties;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
@@ -92,6 +97,22 @@ public class EventService {
                 .stream()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public void deletePastEvents() {
+        List<Long> pastEventsIds = eventRepository.findAll()
+                .stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .map(Event::getId)
+                .toList();
+
+        ListUtils.partition(pastEventsIds, eventProperties.getSublistSize()).forEach(this::deleteAllEventsById);
+    }
+
+    @Async("fixedThreadPool")
+    void deleteAllEventsById(List<Long> eventIds) {
+        eventRepository.deleteAllById(eventIds);
     }
 
     private EventDto saveEvent(EventDto eventDto) {

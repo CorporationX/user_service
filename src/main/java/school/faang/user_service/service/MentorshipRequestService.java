@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForRequest;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDtoForResponse;
 import school.faang.user_service.dto.mentorship_request.RejectionDto;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
 

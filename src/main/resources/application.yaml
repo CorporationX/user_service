@@ -52,7 +52,6 @@ services:
     secretKey: password
     connectionTimeout: 10_000
     socketTimeout: 10_000
-    bucketName: corpbucket
     bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
     defaultProfilePicture: defaultAvatar.png
     remoteFilename: pic.png

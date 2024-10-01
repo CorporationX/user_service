@@ -62,9 +62,8 @@ public class UserController {
 
     @GetMapping(value = "/{userId}/avatar", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> downloadUserAvatar(@PathVariable Long userId) {
-        byte[] img;
         try {
-            img = userProfilePicService.downloadUserAvatar(userId).readAllBytes();
+            byte[] img = userProfilePicService.downloadUserAvatar(userId).readAllBytes();
             return new ResponseEntity<>(img, HttpStatus.OK);
         } catch (IOException ex) {
             throw new RuntimeException("Failed to download picture", ex.getCause());

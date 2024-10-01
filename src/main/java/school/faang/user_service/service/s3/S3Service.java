@@ -1,14 +1,11 @@
 package school.faang.user_service.service.s3;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +32,6 @@ public class S3Service {
     private static final Pattern PATTERN_GET_IMAGE_NAME_FROM_HEADER = Pattern.compile(FILE_NAME_PATTERN);
 
     private final AmazonS3 s3Client;
-
-    @Value("${services.s3.bucketName}")
-    private String bucketName;
 
     @Value("${services.s3.bucketDefaultAvatarsName}")
     private String bucketDefaultAvatarsName;
@@ -73,40 +67,12 @@ public class S3Service {
         return s3Client.doesObjectExist(bucketDefaultAvatarsName.toLowerCase(), defaultPictureName);
     }
 
-    public String uploadAvatar(byte[] image, String folder, String contentType) {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(image.length);
-        objectMetadata.setContentType(contentType);
-
-        String key = String.format("%s%d%s", folder, System.currentTimeMillis(), image.length);
-        try {
-            PutObjectRequest putObjectRequest =
-                    new PutObjectRequest(bucketName, key, new ByteArrayInputStream(image), objectMetadata);
-            s3Client.putObject(putObjectRequest);
-        } catch (SdkClientException ex) {
-            throw new RuntimeException("Failed to upload picture", ex.getCause());
-        }
-
-        return key;
+    public InputStream downloadFile(String key) {
+        return s3Client.getObject(bucketDefaultAvatarsName, key).getObjectContent();
     }
 
-    public InputStream downloadAvatar(String key) {
-        S3Object s3Object;
-        try {
-            s3Object = s3Client.getObject(bucketName, key);
-        } catch (SdkClientException ex) {
-            throw new RuntimeException("Failed to download picture", ex.getCause());
-        }
-
-        return s3Object.getObjectContent();
-    }
-
-    public void deleteAvatar(String key) {
-        try {
-            s3Client.deleteObject(bucketName, key);
-        } catch (SdkClientException ex) {
-            throw new RuntimeException("Failed to delete picture", ex.getCause());
-        }
+    public void deleteFile(String key) {
+        s3Client.deleteObject(bucketDefaultAvatarsName, key);
     }
 
     private void putObjectInS3(String bucketName, String key, InputStream inputStream, ObjectMetadata objectMetadata) {
@@ -135,7 +101,7 @@ public class S3Service {
     private boolean isBucketExists(String bucketName) {
         log.info("Check does bucket with name {} exists", bucketName);
         try {
-        return s3Client.doesBucketExistV2(bucketName);
+            return s3Client.doesBucketExistV2(bucketName);
         } catch (AmazonS3Exception e) {
             log.error("Error while checking bucket existence");
             return false;

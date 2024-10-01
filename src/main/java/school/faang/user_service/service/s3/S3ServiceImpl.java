@@ -37,7 +37,7 @@ public class S3ServiceImpl implements S3Service {
             s3Client.putObject(putObjectRequest);
             log.info("File uploaded successfully to S3 with key: {}", key);
         } catch (Exception e) {
-            throw new FileOperationException("Failed to upload file to S3 with key: {}".formatted(key));
+            throw new FileOperationException("Failed to upload file to S3 with key: {}".formatted(key), e);
         }
     }
 

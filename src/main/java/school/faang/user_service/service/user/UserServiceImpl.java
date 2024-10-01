@@ -95,8 +95,8 @@ public class UserServiceImpl implements UserService {
             log.info("User avatar downloaded successfully for user ID: {}, size: {}", userId, size);
             return avatarResource;
         } catch (IOException e) {
-            throw new FileOperationException("Failed to download user avatar for user ID: {}, size: {}"
-                    .formatted(userId, size));
+            throw new FileOperationException("Failed to download user avatar for user ID: %s, size: %s"
+                    .formatted(userId, size), e);
         }
     }
 
@@ -113,14 +113,13 @@ public class UserServiceImpl implements UserService {
         }
         user.setUserProfilePic(null);
         userRepository.save(user);
-        log.info("User avatar removed from user profile for user ID: {}", userId);
         try {
             s3Service.deleteFile(userProfilePic.getFileId());
             s3Service.deleteFile(userProfilePic.getSmallFileId());
-            log.info("User avatar deleted successfully for user ID: {}", userId);
+            log.info("User avatar removed from user profile for user ID: {}", userId);
         } catch (Exception e) {
-            throw new FileOperationException("Failed to delete user avatar for user ID: {}"
-                    .formatted(userId));
+            throw new FileOperationException("Failed to delete user avatar for user ID: %s"
+                    .formatted(userId), e);
         }
     }
 
@@ -131,7 +130,8 @@ public class UserServiceImpl implements UserService {
             s3Service.uploadFile(outputStream, key);
             log.info("File uploaded successfully for user ID: {}, key: {}", userId, key);
         } catch (Exception e) {
-            throw new FileOperationException("Failed to upload file for user ID: {}, key: {}".formatted(userId, key));
+            throw new FileOperationException("Failed to upload file for user ID: %s, key: %s"
+                    .formatted(userId, key), e);
         }
         return key;
     }

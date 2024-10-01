@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.goal;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class GoalInvitationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GoalInvitationDto createInvitation(@RequestBody @Validated(CreateGroup.class) GoalInvitationDto invitation) {
+    public GoalInvitationDto createInvitation(@RequestBody @NotNull @Validated(CreateGroup.class) GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 

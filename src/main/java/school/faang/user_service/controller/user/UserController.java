@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,11 +24,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) {
+    public UserDto getUser(@PathVariable @Positive Long userId) {
+
+        // TODO:: Do normal method that communicates with database because this one is such a shit xd
+
         UserDto userDto = new UserDto();
         userDto.setId(1L);
         userDto.setUsername("Eblan228");
@@ -55,7 +61,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public void deactivateUserProfile(@PathVariable long id) {
+    public void deactivateUserProfile(@PathVariable @Positive long id) {
         userService.deactivateUserProfile(id);
     }
 }

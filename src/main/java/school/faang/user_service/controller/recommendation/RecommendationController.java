@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,12 +28,12 @@ public class RecommendationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RecommendationDto giveRecommendation(@RequestBody @Validated RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(@RequestBody @NotNull @Validated RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
 
     @PutMapping
-    public RecommendationDto updateRecommendation(@RequestBody @Validated RecommendationDto updated) {
+    public RecommendationDto updateRecommendation(@RequestBody @NotNull @Validated RecommendationDto updated) {
         return recommendationService.update(updated);
     }
 

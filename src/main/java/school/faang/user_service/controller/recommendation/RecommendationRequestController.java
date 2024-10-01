@@ -26,7 +26,7 @@ public class RecommendationRequestController {
     }
 
     @GetMapping
-    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody @NotNull RequestFilterDto filter) {
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 

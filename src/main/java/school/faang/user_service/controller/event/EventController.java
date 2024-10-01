@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventDto create(@Validated(CreateGroup.class) @RequestBody EventDto event) {
+    public EventDto create(@NotNull @Validated(CreateGroup.class) @RequestBody EventDto event) {
         eventValidator.validateEvent(event);
         return eventService.create(event);
     }
@@ -54,7 +55,7 @@ public class EventController {
     }
 
     @PutMapping
-    public EventDto updateEvent(@Validated(UpdateGroup.class) @RequestBody EventDto event) {
+    public EventDto updateEvent(@NotNull @Validated(UpdateGroup.class) @RequestBody EventDto event) {
         eventValidator.validateEvent(event);
         return eventService.updateEvent(event);
     }

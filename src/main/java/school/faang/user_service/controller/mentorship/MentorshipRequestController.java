@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.mentorship;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +29,7 @@ public class MentorshipRequestController {
     private final RejectionMapper rejectionMapper;
 
     @PostMapping
-    public void requestMentorship(@RequestBody @Validated(CreateGroup.class) MentorshipRequestDto mentorshipRequestDto) {
+    public void requestMentorship(@RequestBody @NotNull @Validated(CreateGroup.class) MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
@@ -43,7 +44,7 @@ public class MentorshipRequestController {
     }
 
     @PutMapping("/{id}")
-    public void rejectRequest(@PathVariable @Positive long id, @RequestBody @Validated RejectionDto rejectionDto) {
+    public void rejectRequest(@PathVariable @Positive long id, @RequestBody @NotNull @Validated RejectionDto rejectionDto) {
         mentorshipRequestService.rejectRequest(id, rejectionMapper.toEntity(rejectionDto));
     }
 }

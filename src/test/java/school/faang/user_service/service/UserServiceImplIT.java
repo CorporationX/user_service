@@ -3,13 +3,10 @@ package school.faang.user_service.service;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.UserServiceApplication;
-import school.faang.user_service.config.TestContainersInitializer;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -22,9 +19,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = TestContainersInitializer.class, classes = UserServiceApplication.class)
+@SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class UserServiceImplIT {
 
     @Autowired

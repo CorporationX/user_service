@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.subscription;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,42 +20,43 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/subscriptions")
 @RequiredArgsConstructor
+@Validated
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final SubscriptionValidator validator;
 
     @PostMapping("/{follower_id}/{followee_id}")
-    public void followUser(@PathVariable("follower_id") long followerId,
-                           @PathVariable("followee_id") long followeeId) {
+    public void followUser(@PathVariable("follower_id") @Positive long followerId,
+                           @PathVariable("followee_id") @Positive long followeeId) {
         validator.checkingSubscription(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     @DeleteMapping("/{follower_id}/{followee_id}")
-    public void unfollowUser(@PathVariable("follower_id") long followerId,
-                             @PathVariable("followee_id") long followeeId) {
+    public void unfollowUser(@PathVariable("follower_id") @Positive long followerId,
+                             @PathVariable("followee_id") @Positive long followeeId) {
         validator.checkingSubscription(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
     @GetMapping("/{followee_id}/followers")
-    public List<UserDto> getFollowers(@PathVariable("followee_id") long followeeId,
+    public List<UserDto> getFollowers(@PathVariable("followee_id") @Positive long followeeId,
                                       @Validated UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
     @GetMapping("/{followee_id}/followers_count")
-    public int getFollowersCount(@PathVariable("followee_id") long followeeId) {
+    public int getFollowersCount(@PathVariable("followee_id") @Positive long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
     @GetMapping("/{follower_id}/follows")
-    public List<UserDto> getFollowing(@PathVariable("follower_id") long followerId, UserFilterDto filter) {
+    public List<UserDto> getFollowing(@PathVariable("follower_id") @Positive long followerId, @NotNull UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
     }
 
     @GetMapping("/{follower_id}/follows_count")
-    public int getFollowingCount(@PathVariable("follower_id") long followerId) {
+    public int getFollowingCount(@PathVariable("follower_id") @Positive long followerId) {
         return subscriptionService.getFollowingCount(followerId);
     }
 }

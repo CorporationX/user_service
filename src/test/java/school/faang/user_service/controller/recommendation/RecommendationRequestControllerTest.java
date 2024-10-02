@@ -1,5 +1,9 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,11 +17,12 @@ import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Set;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
@@ -30,23 +35,59 @@ public class RecommendationRequestControllerTest {
 
     private RejectionDto rejectionDto;
     private RequestFilterDto filterDto;
+
+    private Validator validator;
     private long id;
 
     @BeforeEach
     void setup() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
         rejectionDto = new RejectionDto("some reason");
         filterDto = RequestFilterDto.builder().build();
         id = 1L;
     }
 
     @Test
-    void testRequestRecommendationWrongArgument() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationRequestController.requestRecommendation(null));
+    void testRequestRecommendation_WithEmptyParamDto() throws NoSuchMethodException {
+        // Arrange
+        RecommendationRequestDto recommendationRequestDto = RecommendationRequestDto.builder().build();
+
+        // Act
+        Set<ConstraintViolation<RecommendationRequestController>> violations = validator
+                .forExecutables()
+                .validateParameters(
+                        recommendationRequestController,
+                        recommendationRequestController.getClass().getMethod("requestRecommendation", RecommendationRequestDto.class),
+                        new Object[]{recommendationRequestDto}
+                );
+
+        // Assert
+        assertThat(violations).isNotEmpty();
     }
 
     @Test
-    void testRequestRecommendationIsOk() {
+    void testRequestRecommendation_WithNullParam() throws NoSuchMethodException {
+        // Arrange
+        RecommendationRequestDto recommendationRequestDto = null;
+
+        // Act
+        Set<ConstraintViolation<RecommendationRequestController>> violations = validator
+                .forExecutables()
+                .validateParameters(
+                        recommendationRequestController,
+                        recommendationRequestController.getClass().getMethod("requestRecommendation", RecommendationRequestDto.class),
+                        new Object[]{recommendationRequestDto}
+                );
+
+        // Assert
+        assertThat(violations).isNotEmpty();
+    }
+
+
+    @Test
+    void testRequestRecommendation_WithValidParam() {
         RecommendationRequestDto recommendationRequestDto = RecommendationRequestDto.builder().build();
         when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(recommendationRequestDto);
 
@@ -59,9 +100,21 @@ public class RecommendationRequestControllerTest {
     }
 
     @Test
-    void testGetRecommendationRequestsWithEmptyFilter() {
-        assertThrows(DataValidationException.class,
-                () -> recommendationRequestController.getRecommendationRequests(null));
+    void testGetRecommendationRequests_WithNullParam() throws NoSuchMethodException {
+        // Arrange
+        RequestFilterDto requestFilterDto = null;
+
+        // Act
+        Set<ConstraintViolation<RecommendationRequestController>> violations = validator
+                .forExecutables()
+                .validateParameters(
+                        recommendationRequestController,
+                        recommendationRequestController.getClass().getMethod("getRecommendationRequests", RequestFilterDto.class),
+                        new Object[]{requestFilterDto}
+                );
+
+        // Assert
+        assertThat(violations).isNotEmpty();
     }
 
     @Test
@@ -79,16 +132,43 @@ public class RecommendationRequestControllerTest {
     }
 
     @Test
-    void testRejectRequestWithNullDto() {
-        assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestController.rejectRequest(id, null));
+    void testRejectRequestWithNullDto() throws NoSuchMethodException {
+        // Arrange
+        long validId = 1L;
+        RejectionDto invalidRejectionDto = null;
+
+        // Act
+        Set<ConstraintViolation<RecommendationRequestController>> violations = validator
+                .forExecutables()
+                .validateParameters(
+                        recommendationRequestController,
+                        recommendationRequestController.getClass().getMethod("rejectRequest", long.class, RejectionDto.class),
+                        new Object[]{validId, invalidRejectionDto}
+                );
+
+        // Assert
+        assertThat(violations).isNotEmpty();
+        ConstraintViolation<RecommendationRequestController> violation = violations.iterator().next();
+        assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
 
     @Test
-    void testRejectRequestWithEmptyDto() {
-        rejectionDto.setReason("");
-        assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestController.rejectRequest(id, rejectionDto));
+    void testRejectRequestWithEmptyDto() throws NoSuchMethodException {
+        // Arrange
+        long validId = 1L;
+        RejectionDto invalidRejectionDto = RejectionDto.builder().build();
+
+        // Act
+        Set<ConstraintViolation<RecommendationRequestController>> violations = validator
+                .forExecutables()
+                .validateParameters(
+                        recommendationRequestController,
+                        recommendationRequestController.getClass().getMethod("rejectRequest", long.class, RejectionDto.class),
+                        new Object[]{validId, invalidRejectionDto}
+                );
+
+        // Assert
+        assertThat(violations).isNotEmpty();
     }
 
     @Test

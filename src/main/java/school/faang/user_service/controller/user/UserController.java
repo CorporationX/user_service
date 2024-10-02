@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -29,12 +31,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/premium")
-    public List<UserDto> getPremiumUsers(@ParameterObject UserFilterDto filter) {
+    public List<UserDto> getPremiumUsers(@ParameterObject @NotNull UserFilterDto filter) {
         return userService.getPremiumUsers(filter);
     }
 
     @PutMapping(value = "/{user_id}")
-    public ResponseEntity<String> deactivateUserProfile(@PathVariable("user_id") long id) {
+    public ResponseEntity<String> deactivateUserProfile(@PathVariable("user_id") @Positive long id) {
         userService.deactivateUserProfile(id);
         return ResponseEntity.ok("{\n\"message\": \"User deactivated successfully\"\n}");
     }
@@ -45,7 +47,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getUsersByIds(@RequestParam("user_id") List<Long> userIds) {
+    public List<UserDto> getUsersByIds(@RequestParam("user_id") @NotNull @NotEmpty List<Long> userIds) {
         return userService.getUsersByIds(userIds);
     }
 

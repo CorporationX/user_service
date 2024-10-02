@@ -34,12 +34,11 @@ class UserBanListenerTest {
     @Mock
     private Message message;
 
-    private final String json = "[1, 2, 3]";
-
     @Test
     void onMessage_shouldBanUsers_whenValidJson() throws JsonProcessingException {
         List<Long> userIds = Arrays.asList(1L, 2L, 3L);
 
+        String json = "[1, 2, 3]";
         when(message.getBody()).thenReturn(json.getBytes());
         when(objectMapper.readValue(eq(json), any(TypeReference.class))).thenReturn(userIds);
 
@@ -47,23 +46,4 @@ class UserBanListenerTest {
 
         verify(userLifeCycleService).banUsersById(userIds);
     }
-
-    /*@Test
-    void shouldLogErrorWhenIOExceptionOccurs() throws JsonProcessingException {
-        String errorMessage = "Parsing error";
-        when(message.getBody()).thenReturn(json.getBytes());
-        doThrow(new IOException(errorMessage)).when(objectMapper).readValue(eq(json), any(TypeReference.class));
-
-        ИЩУ СПОСОБ ЭТО ПРОВЕРНУТЬ!!!!!!!!!!!!!!!!!!!!!!
-
-        userBanListener.onMessage(message, null);
-
-        boolean unrecognizedToken = log.getLoggingEvents().stream()
-                .anyMatch(event -> isUnrecognizedToken(event, errorMessage));
-        assertTrue(unrecognizedToken);
-    }
-
-    private boolean isUnrecognizedToken(LoggingEvent event, String message) {
-        return event.getLevel() == Level.ERROR && event.getMessage().contains(message);
-    }*/
 }

@@ -8,6 +8,7 @@ import school.faang.user_service.dto.filter.FilterDto;
 import school.faang.user_service.entity.RequestStatus;
 
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

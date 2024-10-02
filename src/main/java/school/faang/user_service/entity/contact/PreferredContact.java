@@ -1,5 +1,8 @@
 package school.faang.user_service.entity.contact;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public enum PreferredContact {
     EMAIL, PHONE, TELEGRAM;
 

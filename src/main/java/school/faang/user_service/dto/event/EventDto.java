@@ -3,7 +3,7 @@ package school.faang.user_service.dto.event;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.Builder;
 import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,6 @@ public record EventDto(
         @Positive
         Long id,
         @NotBlank(message = "Event title can't be empty")
-        @NotNull(message = "Event title can't be null")
         String title,
         LocalDateTime startDate,
         LocalDateTime endDate,
@@ -28,6 +27,6 @@ public record EventDto(
         String location,
         @NotNull(message = "maxAttendees can't be null")
         @Positive
-        int maxAttendees
+        Integer maxAttendees
 ) {
 }

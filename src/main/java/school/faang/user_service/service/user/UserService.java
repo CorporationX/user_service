@@ -17,4 +17,8 @@ public interface UserService {
     void deactivateUserProfile(long id);
 
     void addUsersFromFile(InputStream fileStream) throws IOException;
+
+    UserDto getUser(long userId);
+
+    List<UserDto> getUsersByIds(List<Long> userIds);
 }

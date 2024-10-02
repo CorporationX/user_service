@@ -36,7 +36,7 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
-    @PostMapping("/users/{userId}/acquire/{skillId}")
+    @PostMapping("/users/{userId}/acquiring/{skillId}")
     public SkillDto acquireSkillFromOffers(@PathVariable("skillId") long skillId, @PathVariable("userId") long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }

@@ -40,4 +40,18 @@ public class RecommendationServiceValidator {
             throw new DataValidationException("Not all skills exist in database");
         }
     }
+
+    public void validateRecommendation(RecommendationDto recommendation) {
+        if (recommendation.content() == null || recommendation.content().isBlank()) {
+            throw new DataValidationException("No content for recommendation");
+        }
+
+        if (recommendation.authorId() == null) {
+            throw new DataValidationException("Author is missing in recommendation");
+        }
+
+        if (recommendation.receiverId() == null) {
+            throw new DataValidationException("Receiver is missing in recommendation");
+        }
+    }
 }

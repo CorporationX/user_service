@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deactivateUserProfile(long id) {
         User userToDeactivate = userRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Incorrect user id"));
+                .orElseThrow(() -> new EntityNotFoundException("User with ID: %d does not exist"));
 
         removeGoals(userToDeactivate);
         removeEvents(userToDeactivate);
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalStateException(
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(
                 "User with ID: %d does not exist.".formatted(userId)));
     }
 
@@ -124,6 +124,18 @@ public class UserServiceImpl implements UserService {
                 .toList();
 
         goalService.removeGoals(goalsToRemove);
+    }
+
+    @Override
+    public UserDto getUser(long userId) {
+        return userMapper.toDto(findUserById(userId));
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds).stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     private String generatePassword() {

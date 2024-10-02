@@ -42,8 +42,7 @@ class PremiumControllerTest {
                 .build();
         when(premiumService.buyPremium(any(Long.class), any(PremiumPeriod.class))).thenReturn(premiumDto);
         // when
-        mockMvc.perform(post("/api/premium")
-                        .param("days", "30")
+        mockMvc.perform(post("/api/v1/premium/30")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         // then

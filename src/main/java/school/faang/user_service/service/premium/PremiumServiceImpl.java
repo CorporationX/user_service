@@ -1,6 +1,9 @@
 package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
@@ -16,6 +19,7 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,9 @@ public class PremiumServiceImpl implements PremiumService {
     private final PremiumValidator premiumValidator;
     private final PremiumMapper premiumMapper;
 
+    @Value("${premium.batch-size}")
+    private int batchSize;
+
     @Override
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod period) {
@@ -37,6 +44,20 @@ public class PremiumServiceImpl implements PremiumService {
         premiumValidator.verifyPayment(paymentResponseDto);
         var premium = buildPremium(period, user);
         return premiumMapper.toDto(premiumRepository.save(premium));
+    }
+
+    @Override
+    @Transactional
+    public void deleteExpiredPremiums() {
+        List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
+        List<List<Premium>> expiredByBatches = ListUtils.partition(expiredPremiums, batchSize);
+
+        expiredByBatches.forEach(this::deleteExpiredPremiumsByBatches);
+    }
+
+    @Async("fixedThreadPools")
+    public void deleteExpiredPremiumsByBatches(List<Premium> expiredPremiums) {
+        premiumRepository.deleteAllInBatch(expiredPremiums);
     }
 
     private static PaymentRequestDto buildRequest(PremiumPeriod period) {

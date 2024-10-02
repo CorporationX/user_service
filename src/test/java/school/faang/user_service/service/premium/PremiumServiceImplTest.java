@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.PaymentResponseDto;
 import school.faang.user_service.dto.premium.PremiumDto;
@@ -20,10 +21,12 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumServiceImplTest {
@@ -55,6 +58,7 @@ class PremiumServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(premiumService, "batchSize", 1);
         period = PremiumPeriod.MONTH;
     }
 
@@ -78,6 +82,18 @@ class PremiumServiceImplTest {
         verify(premiumValidator).verifyPayment(paymentResponse);
         verify(premiumRepository).save(any(Premium.class));
         verify(premiumMapper).toDto(premium);
+    }
+
+    @Test
+    void testDeleteExpiredPremiums() {
+        List<Premium> expiredPremiums = List.of(Premium.builder()
+                .endDate(LocalDateTime.now().minusDays(3))
+                .build(), buildPremium());
+        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(expiredPremiums);
+
+        premiumService.deleteExpiredPremiums();
+
+        verify(premiumRepository, times(2)).deleteAllInBatch(any());
     }
 
     private User buildUser() {

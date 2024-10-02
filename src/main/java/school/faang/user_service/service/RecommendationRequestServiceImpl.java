@@ -71,6 +71,14 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     }
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        if (!userRepository.existsById(recommendationRequestDto.getRequesterId())) {
+            throw new NullPointerException("Requester not found");
+        }
+
+        if (!userRepository.existsById(recommendationRequestDto.getReceiverId())) {
+            throw new NullPointerException("Receiver not found");
+        }
+
         recommendationRequestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
                         recommendationRequestDto.getReceiverId())
                 .ifPresent(request -> {

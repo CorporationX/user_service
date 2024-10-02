@@ -15,12 +15,14 @@ import school.faang.user_service.dto.*;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.RecommendationRequestTooFrequentException;
+import school.faang.user_service.exception.SkillOwnershipException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 @SpringBootTest
-public class RecommendationRequestServiceTest {
+public class RecommendationRequestServiceImplTest {
     @Spy
     private RecommendationRequestRepository recommendationRequestRepository;
 
@@ -105,16 +107,20 @@ public class RecommendationRequestServiceTest {
 
     @Test
     void testCreate_RequesterNotFound() {
+        // Создаем DTO для запроса рекомендации
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
-        requestDto.setRequesterId(1L);
-        requestDto.setReceiverId(2L);
+        requestDto.setRequesterId(1L); // ID несуществующего Requester
+        requestDto.setReceiverId(2L);  // Существующий Receiver
 
-        when(userRepository.existsById(1L)).thenReturn(false);
+        when(userRepository.existsById(1L)).thenReturn(false); // Requester не найден
+        when(userRepository.existsById(2L)).thenReturn(true);  // Receiver существует
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
             recommendationRequestService.create(requestDto);
         });
-        Assertions.assertEquals("Requester not found", thrown.getMessage());
+
+        // Проверяем сообщение об ошибке
+        assertEquals("Requester not found", thrown.getMessage());
     }
 
     @Test
@@ -126,7 +132,7 @@ public class RecommendationRequestServiceTest {
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.existsById(2L)).thenReturn(false);
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
             recommendationRequestService.create(requestDto);
         });
         Assertions.assertEquals("Receiver not found", thrown.getMessage());
@@ -136,14 +142,17 @@ public class RecommendationRequestServiceTest {
     void testCreate_SkillsNotOwned() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setRequesterId(1L);
+        requestDto.setReceiverId(2L);  // Add a receiver
         requestDto.setSkillId(Collections.singletonList(100L));
 
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.countOwnedSkills(1L, Collections.singletonList(100L))).thenReturn(0);
+        when(userRepository.existsById(1L)).thenReturn(true);  // Mock requester exists
+        when(userRepository.existsById(2L)).thenReturn(true);  // Mock receiver exists
+        when(userRepository.countOwnedSkills(1L, Collections.singletonList(100L))).thenReturn(0);  // No skills
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+        SkillOwnershipException thrown = assertThrows(SkillOwnershipException.class, () -> {
             recommendationRequestService.create(requestDto);
         });
+
         Assertions.assertEquals("One or more skills do not exist for the requester", thrown.getMessage());
     }
 
@@ -161,7 +170,7 @@ public class RecommendationRequestServiceTest {
         when(recommendationRequestRepository.findLatestPendingRequest(1L, 2L))
                 .thenReturn(Optional.of(existingRequest));
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+        RecommendationRequestTooFrequentException thrown = assertThrows(RecommendationRequestTooFrequentException.class, () -> {
             recommendationRequestService.create(requestDto);
         });
         Assertions.assertEquals("Recommendation request can be sent only once in 6 months", thrown.getMessage());

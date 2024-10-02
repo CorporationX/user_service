@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,6 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.recommendation.DataValidationException;
 import school.faang.user_service.exception.recommendation.EntityException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
-import school.faang.user_service.publisher.RecommendationSentPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -26,10 +26,17 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static school.faang.user_service.exception.recommendation.RecommendationError.*;
+import static school.faang.user_service.exception.recommendation.RecommendationError.ENTITY_IS_NOT_FOUND;
+import static school.faang.user_service.exception.recommendation.RecommendationError.RECOMMENDATION_EXPIRATION_TIME_NOT_PASSED;
+import static school.faang.user_service.exception.recommendation.RecommendationError.RECOMMENDATION_IS_NOT_FOUND;
+import static school.faang.user_service.exception.recommendation.RecommendationError.SKILL_IS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +49,8 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final RecommendationMapper recommendationMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final RecommendationSentPublisher recommendationSentPublisher;
+    private final MessagePublisherService messagePublisherService;
+    private final ObjectMapper objectMapper;
     private final static int INTERVAL_DATE = 6;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -57,8 +65,7 @@ public class RecommendationService {
 
         processSkillAndGuarantees(recommendation);
         recommendationRepository.save(recommendation);
-
-        recommendationSentPublisher.publish(recommendationMapper.toRecommendationEventPublisher(recommendation));
+        messagePublisherService.publishRecommendationEvent(recommendation, objectMapper);
         return recommendationMapper.toDto(recommendation);
     }
 
@@ -134,19 +141,19 @@ public class RecommendationService {
     }
 
     private void validateSkill(List<SkillOfferDto> skillOffersFromDto) {
-        Set<Long> skillOffersDto = skillOffersFromDto.stream()
+        Set<Long> skillIds = skillOffersFromDto.stream()
                 .map(SkillOfferDto::getSkillId)
                 .collect(Collectors.toSet());
-        List<SkillOffer> skillOffers = skillOfferRepository.findAllById(skillOffersDto);
+        List<Skill> skills = skillRepository.findAllById(skillIds);
 
-        Set<Long> existingSkillIds = skillOffers.stream()
-                .map(skill -> skill.getSkill().getId())
+        Set<Long> existingSkillIds = skills.stream()
+                .map(Skill::getId)
                 .collect(Collectors.toSet());
 
-        skillOffersDto.removeAll(existingSkillIds);
+        skillIds.removeAll(existingSkillIds);
 
-        if (!skillOffersDto.isEmpty()) {
-            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillOffersDto.toString());
+        if (!skillIds.isEmpty()) {
+            throw new DataValidationException(SKILL_IS_NOT_FOUND, skillIds.toString());
         }
     }
 
@@ -222,5 +229,4 @@ public class RecommendationService {
 
         userSkillGuaranteeRepository.saveAll(guarantees);
     }
-
 }

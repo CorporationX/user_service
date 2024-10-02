@@ -46,4 +46,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.id = :userId
             """)
     Integer countFollowersByUserId(@Param("userId") Long userId);
+
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
 }

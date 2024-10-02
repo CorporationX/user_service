@@ -38,7 +38,7 @@ public class RecommendationRequestController {
     @PostMapping("/recommendationRequest/{id}")
     public RejectionDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         if (rejection == null) {
-            throw new DataValidationException("");
+            throw new DataValidationException("abc");
         }
         return recommendationRequestService.rejectRequest(id, rejection);
     }

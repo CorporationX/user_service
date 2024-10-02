@@ -14,10 +14,12 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.util.CsvParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +48,9 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CountryRepository countryRepository;
+
     @Spy
     private UserMapperImpl userMapper;
 
@@ -60,6 +65,9 @@ class UserServiceImplTest {
 
     @Mock
     private MentorshipService mentorshipService;
+
+    @Mock
+    private CsvParser csvParser;
 
     private long id;
     private UserDto userDto;
@@ -89,8 +97,8 @@ class UserServiceImplTest {
                 .build();
 
         filters = List.of(userFilter);
-        userService = new UserServiceImpl(userRepository, filters, userMapper, goalService,
-                eventService, mentorshipService);
+        userService = new UserServiceImpl(userRepository,countryRepository, filters, userMapper, goalService,
+                eventService, mentorshipService,csvParser);
     }
 
     @Test

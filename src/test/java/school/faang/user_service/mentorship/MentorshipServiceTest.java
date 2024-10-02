@@ -3,9 +3,11 @@ package school.faang.user_service.mentorship;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,4 +102,41 @@ public class MentorshipServiceTest {
         verify(goalRepository, never()).saveAll(any());
         assertTrue(mentee.getGoals().isEmpty());
     }
+
+    @Test
+    public void testDeleteMentee_DeletesMentee_WhenMenteeExists() {
+        long mentorId = 1L;
+        long menteeId = 2L;
+        User mentee = new User();
+        when(mentorshipRepository.findMenteeByMentorIdAndMenteeId(mentorId, menteeId)).thenReturn(mentee);
+        doNothing().when(mentorshipRepository).delete(mentee);
+        mentorshipService.deleteMentee(menteeId, mentorId);
+    }
+
+    @Test
+    public void testDeleteMentee_DoesNothing_WhenMenteeDoesNotExist() {
+        long mentorId = 1L;
+        long menteeId = 2L;
+        when(mentorshipRepository.findMenteeByMentorIdAndMenteeId(mentorId, menteeId)).thenReturn(null);
+        mentorshipService.deleteMentee(menteeId, mentorId);
+    }
+
+    @Test
+    public void testDeleteMentor_DeletesMentor_WhenMentorExists() {
+        long menteeId = 1L;
+        long mentorId = 2L;
+        User mentor = new User();
+        when(mentorshipRepository.findMentorByMenteeIdAndMentorId(menteeId, mentorId)).thenReturn(mentor);
+        doNothing().when(mentorshipRepository).delete(mentor);
+        mentorshipService.deleteMentor(menteeId, mentorId);
+    }
+
+    @Test
+    public void testDeleteMentor_DoesNothing_WhenMentorDoesNotExist() {
+        long menteeId = 1L;
+        long mentorId = 2L;
+        when(mentorshipRepository.findMentorByMenteeIdAndMentorId(menteeId, mentorId)).thenReturn(null);
+        mentorshipService.deleteMentor(menteeId, mentorId);
+    }
 }
+

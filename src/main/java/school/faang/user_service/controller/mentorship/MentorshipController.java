@@ -12,8 +12,12 @@ import java.util.List;
 @RestController
 public class MentorshipController {
 
+    private final MentorshipService mentorshipService;
+
     @Autowired
-    private MentorshipService mentorshipService;
+    public MentorshipController(MentorshipService mentorshipService) {
+        this.mentorshipService = mentorshipService;
+    }
 
     @GetMapping("/mentees/{userId}")
     public List<MenteeDTO> getMentees(@PathVariable long userId) {
@@ -21,8 +25,8 @@ public class MentorshipController {
     }
 
     @DeleteMapping("/mentees/{mentorId}/{menteeId}")
-    public void deleteMentee(@PathVariable long mentorId, @PathVariable long menteeId) {
-        mentorshipService.deleteMentee(menteeId, mentorId);
+    public void deleteMentee(@PathVariable long menteeId, @PathVariable long mentorId) {
+        mentorshipService.deleteMentee(menteeId,mentorId);
     }
 
     @DeleteMapping("/mentors/{menteeId}/{mentorId}")

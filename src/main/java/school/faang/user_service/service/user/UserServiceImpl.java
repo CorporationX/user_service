@@ -2,32 +2,45 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.student.Person;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.util.CsvParser;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
+    private final CsvParser csvParser;
 
     @Override
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
@@ -51,6 +64,36 @@ public class UserServiceImpl implements UserService {
         stopMentorship(userToDeactivate);
 
         userRepository.save(userToDeactivate);
+    }
+
+    @Override
+    @Transactional
+    public void addUsersFromFile(InputStream fileStream) {
+        List<Person> persons = csvParser.getPersonsFromFile(fileStream);
+        List<Country> countryList = countryRepository.findAll();
+        persons.stream().map(student -> {
+            var user = userMapper.personToUser(student);
+            user.setPassword(generatePassword());
+            setStudentsCountry(student, user, countryList);
+            userRepository.save(user);
+            return user;
+        }).forEach(v -> {});
+    }
+
+    private void setStudentsCountry(Person person, User user,List<Country> countryList) {
+        Optional<Country> country =  gerPersonsCountryFromDB(person, countryList);
+        country.ifPresentOrElse(user::setCountry,() -> {
+            var saved = countryRepository.save(
+                    Country.builder()
+                            .title(person.getContactInfo().getAddress().getCountry())
+                            .build()
+            );
+            user.setCountry(saved);
+        });
+    }
+
+    private Optional<Country> gerPersonsCountryFromDB(Person person, List<Country> countryList) {
+       return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
     }
 
     @Override
@@ -93,5 +136,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllById(userIds).stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    private String generatePassword() {
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        var passwordLenth = 8;
+        StringBuilder password = new StringBuilder(passwordLenth);
+        for (int i = 0; i < passwordLenth; i++) {
+            password.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+        }
+        return password.toString();
     }
 }

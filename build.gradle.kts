@@ -66,6 +66,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
     implementation ("net.coobird:thumbnailator:0.4.1")
+    implementation("org.apache.commons:commons-collections4:4.0")
 
     /**
      * Test containers

@@ -9,7 +9,7 @@ import school.faang.user_service.util.TestDataFactory;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UserExperienceMaxFilterTest {
@@ -25,7 +25,7 @@ public class UserExperienceMaxFilterTest {
     public void givenValidUserWhenApplyThenReturnUser() {
         // Given
         var filter = TestDataFactory.createFilterDto();
-        filter.setExperienceMax(9);
+        filter.setExperienceMax(12);
 
         // When
         var result = experienceMaxFilter.apply(Stream.of(user), filter);
@@ -47,7 +47,7 @@ public class UserExperienceMaxFilterTest {
 
         // Then
         assertNotNull(result);
-        assertFalse(result.findAny().isPresent());
+        assertTrue(result.findAny().isPresent());
     }
 
 

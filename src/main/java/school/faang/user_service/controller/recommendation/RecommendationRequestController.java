@@ -6,7 +6,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.recomendation.RecommendationRequestService;
+import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRequest(id);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         if (rejection == null || rejection.getReason().isBlank()) {
             throw new IllegalArgumentException("Rejection information is incorrect");

@@ -3,6 +3,8 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.client.ProjectServiceClient;
+import school.faang.user_service.controller.event.CalendarEventDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
@@ -11,6 +13,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.event.EventToCalendarEventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -30,6 +33,7 @@ public class EventService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final List<EventFilter> eventFilters;
+    private final ProjectServiceClient projectServiceClient;
 
     @Transactional
     public EventDto createEvent(EventDto eventDto) {
@@ -96,6 +100,13 @@ public class EventService {
 
     private EventDto saveEvent(EventDto eventDto) {
         Event event = eventMapper.toEntity(eventDto);
+        CalendarEventDto calendarEventDto = EventToCalendarEventMapper.INSTANCE.toCalendarEventDto(eventDto);
+        String calendarId = "kraken.stream6@gmail.com";
+        String googleCalendarEventId = projectServiceClient.createGoogleCalendarEvent(
+                1,
+                calendarId,
+                calendarEventDto
+        );
 
         Long ownerId = eventDto.getOwnerId();
         User newEventOwner = userRepository.findById(ownerId).orElseThrow(() ->
@@ -104,6 +115,8 @@ public class EventService {
         event.setOwner(newEventOwner);
 
         Event savedEvent = eventRepository.save(event);
+        savedEvent.setGoogleCalendarEventId(googleCalendarEventId);
+
         return eventMapper.toDto(savedEvent);
     }
 

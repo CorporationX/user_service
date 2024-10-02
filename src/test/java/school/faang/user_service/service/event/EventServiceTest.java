@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.client.ProjectServiceClient;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -42,6 +43,7 @@ class EventServiceTest {
     private EventRepository eventRepository;
     private EventMapper eventMapper;
     private EventServiceHelper eventValidator;
+    private ProjectServiceClient projectServiceClient;
     private UserRepository userRepository;
     private TestDataEvent testDataEvent;
     private EventDto eventDto;
@@ -54,6 +56,7 @@ class EventServiceTest {
         eventMapper = Mockito.mock(EventMapper.class);
         eventValidator = Mockito.mock(EventServiceHelper.class);
         userRepository = Mockito.mock(UserRepository.class);
+        projectServiceClient = Mockito.mock(ProjectServiceClient.class);
         SkillRepository skillRepository = Mockito.mock(SkillRepository.class);
         SkillMapper skillMapper = Mockito.mock(SkillMapper.class);
         List<EventFilter> filters = List.of(mock(EventFilter.class));
@@ -65,7 +68,8 @@ class EventServiceTest {
                 userRepository,
                 skillRepository,
                 skillMapper,
-                filters
+                filters,
+                projectServiceClient
         );
 
         testDataEvent = new TestDataEvent();

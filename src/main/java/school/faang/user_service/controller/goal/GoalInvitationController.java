@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.GoalInvitationDto;
+import school.faang.user_service.dto.SuccessResponse;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -17,25 +18,25 @@ public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
     @PostMapping("/create")
-    public ResponseEntity<GoalInvitationDto> createInvitation (@RequestBody GoalInvitationDto invitation){
-        GoalInvitationDto invitationDto = goalInvitationService.createInvitation(invitation);
-        return ResponseEntity.ok(invitationDto);
+    public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitationDTO) {
+        return goalInvitationService.createInvitation(invitationDTO);
     }
+
     @PutMapping("/accept/id")
-    public ResponseEntity<String> acceptGoalInvitation(@PathVariable long id){
+    public ResponseEntity<SuccessResponse> acceptGoalInvitation(@PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
-        return ResponseEntity.ok("Приглашение принято.");
+        return ResponseEntity.ok(new SuccessResponse("Приглашение принято."));
     }
 
     @DeleteMapping("/reject/id")
-    public ResponseEntity<String> rejectGoalInvitation(@PathVariable long id){
+    public ResponseEntity<SuccessResponse> rejectGoalInvitation(@PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
-        return ResponseEntity.ok("Приглашение отклонено.");
+        return ResponseEntity.ok(new SuccessResponse("Приглашение отклонено."));
     }
 
     @PostMapping("/getInvitations")
-    public List<GoalInvitation> getInvitations(@RequestBody InvitationFilterDto filter){
-       return goalInvitationService.getInvitations(filter);
+    public List<GoalInvitation> getInvitations(@RequestBody InvitationFilterDto filterDTO) {
+        return goalInvitationService.getInvitations(filterDTO);
     }
 }
 

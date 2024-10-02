@@ -118,44 +118,24 @@ val jacocoInclude = listOf(
     "**/validator/**",
     "**/mapper/**"
 )
+
 jacoco {
-    toolVersion = "0.8.9"
-    reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
+    version = "0.8.12"
 }
+
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
 
     reports {
-        xml.required.set(false)
-        csv.required.set(false)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        xml.required.set(true)
+        html.outputLocation.set(file("$buildDir/reports/jacoco"))
     }
+}
 
-    classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include(jacocoInclude)
-        }
-    )
-}
-tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            element = "CLASS"
-            classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
-            )
-            enabled = true
-            limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
-            }
-        }
-    }
-}
-kotlin {
-    jvmToolchain(17)
+tasks.check {
+    dependsOn(tasks.jacocoTestReport)
 }

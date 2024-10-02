@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.exception.BadRequestException;
+import school.faang.user_service.exception.mentorship_request.LittleTimeAfterLastRequestException;
+import school.faang.user_service.exception.mentorship_request.RequestToHimselfException;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -27,9 +31,7 @@ public class MentorshipRequestParametersChecker {
         if (isExist) {
             log.error("Mentorship request from user with id {} to user with id {} was accepted before",
                     requesterId, receiverId);
-            throw new IllegalArgumentException(
-                    String.format(REQUEST_IS_ACCEPTED_BEFORE, requesterId, receiverId)
-            );
+            throw new BadRequestException(REQUEST_IS_ACCEPTED_BEFORE, requesterId, receiverId);
         }
     }
 
@@ -44,21 +46,21 @@ public class MentorshipRequestParametersChecker {
     private void validateDescription(String description) {
         if (description == null || description.isBlank()) {
             log.error("Description is null or empty");
-            throw new IllegalArgumentException(EMPTY_DESCRIPTION);
+            throw new BadRequestException(EMPTY_DESCRIPTION);
         }
     }
 
     private void checkSameUserIds(long requesterId, long receiverId) {
         if (requesterId == receiverId) {
             log.error(REQUEST_TO_HIMSELF);
-            throw new RuntimeException(REQUEST_TO_HIMSELF);
+            throw new RequestToHimselfException();
         }
     }
 
     private void checkExistUserId(long id) {
         if (!userRepository.existsById(id)) {
             log.error("User with id {} not found", id);
-            throw new RuntimeException(String.format(USER_NOT_FOUND, id));
+            throw new UserNotFoundException(USER_NOT_FOUND, id);
         }
     }
 
@@ -69,7 +71,7 @@ public class MentorshipRequestParametersChecker {
         LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
         if (latestMentorshipRequest != null && latestMentorshipRequest.getCreatedAt().isAfter(threeMonthsAgo)) {
             log.error(ONCE_EVERY_THREE_MONTHS);
-            throw new RuntimeException(ONCE_EVERY_THREE_MONTHS);
+            throw new LittleTimeAfterLastRequestException();
         }
     }
 }

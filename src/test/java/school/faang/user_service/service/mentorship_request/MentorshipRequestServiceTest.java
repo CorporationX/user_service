@@ -164,7 +164,7 @@ class MentorshipRequestServiceTest {
     private void forTestRequestByIdNotFound(long id, Executable executable) {
         whenMentorshipRequestRepositoryFindById(Optional.empty(), id);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, executable);
+        RuntimeException exception = assertThrows(RuntimeException.class, executable);
         String expected = String.format(REQUEST_NOT_FOUND, id);
         assertEquals(expected, exception.getMessage());
     }

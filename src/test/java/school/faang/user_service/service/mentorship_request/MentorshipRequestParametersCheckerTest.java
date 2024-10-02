@@ -9,10 +9,11 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.service.mentorship_request.error_messages.MentorshipRequestErrorMessages.EMPTY_DESCRIPTION;
@@ -85,7 +86,8 @@ class MentorshipRequestParametersCheckerTest {
         whenExistById(requesterId, true);
         whenExistById(receiverId, true);
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
-        mentorshipRequest.setCreatedAt(LocalDate.of(2024, 7, 1).atStartOfDay());
+        LocalDateTime minusTwoMonth = LocalDateTime.now().minusMonths(2);
+        mentorshipRequest.setCreatedAt(minusTwoMonth);
         whenFindLatestRequest(mentorshipRequest, requesterId, receiverId);
 
         RuntimeException exception = assertException(requesterId, receiverId, description);

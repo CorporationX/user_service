@@ -88,9 +88,9 @@ public class UserService {
         }
 
         List<Event> plannedEvents = user.getOwnedEvents()
-            .stream()
-            .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
-            .toList();
+                .stream()
+                .filter(event -> event.getStatus().equals(EventStatus.PLANNED))
+                .toList();
 
         plannedEvents.forEach(event -> {
             event.setStatus(EventStatus.CANCELED);
@@ -119,11 +119,21 @@ public class UserService {
 
     private List<User> filterUsers(Stream<User> users, UserFilterDto userFilterDto) {
         return userFilters
-            .stream()
-            .filter(f -> f.isApplicable(userFilterDto))
-            .reduce(users,
-                (stream, filter) -> filter.apply(stream, userFilterDto),
-                (s1, s2) -> s1)
-            .toList();
+                .stream()
+                .filter(f -> f.isApplicable(userFilterDto))
+                .reduce(users,
+                        (stream, filter) -> filter.apply(stream, userFilterDto),
+                        (s1, s2) -> s1)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getUsers(List<Long> ids) {
+        return userRepository.findAllById(ids);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 }

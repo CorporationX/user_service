@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,12 +44,24 @@ public class UserController {
     public ResponseEntity<Void> deactivatedUser(@PathVariable Long userId) {
         userService.deactivateUser(userId);
 
-    return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/search")
     public List<UserResponseDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         List<User> foundUsers = userService.getPremiumUsers(userFilterDto);
         return userMapper.toDtos(foundUsers);
+    }
+
+    @GetMapping("/{userId}")
+    public UserResponseDto getUser(@PathVariable long userId) {
+        User user = userService.getUser(userId);
+        return userMapper.toDto(user);
+    }
+
+    @PostMapping()
+    List<UserResponseDto> getUsersByIds(@RequestBody List<Long> ids) {
+        List<User> users = userService.getUsers(ids);
+        return userMapper.toDtos(users);
     }
 }

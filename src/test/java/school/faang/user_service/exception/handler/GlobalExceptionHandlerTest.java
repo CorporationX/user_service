@@ -3,6 +3,8 @@ package school.faang.user_service.exception.handler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -25,8 +27,6 @@ class GlobalExceptionHandlerTest {
 
     @Value("${services.user-service.name}")
     String serviceName;
-
-    private final String message = "Test exception";
 
     @Test
     void handleFileUploadException() throws Exception {

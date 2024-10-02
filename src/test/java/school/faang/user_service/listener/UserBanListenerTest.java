@@ -10,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.service.UserLifeCycleService;
-import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +21,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserBanListenerTest {
-
-    private final TestLogger log = TestLoggerFactory.getTestLogger(UserBanListener.class);
 
     @InjectMocks
     private UserBanListener userBanListener;

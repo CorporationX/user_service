@@ -8,23 +8,23 @@ import school.faang.user_service.service.UserService;
 
 import java.util.List;
 
-@RequestMapping("/users")
+@RequestMapping("/api/v1/user")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/premiumUsers")
+    @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
     }
 
-    @GetMapping("userId")
+    @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }

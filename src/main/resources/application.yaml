@@ -41,11 +41,12 @@ payment-service:
   host: localhost
   port: 9080
 
-default-avatar_client:
+default-avatar-client:
   url: https://api.dicebear.com
   styleName: identicon
   ver: 9.x
   format: jpg
+  prefixFileName: default_avatar_for_user_
 
 
 services:

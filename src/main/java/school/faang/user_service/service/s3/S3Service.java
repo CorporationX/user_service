@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -15,8 +16,10 @@ import java.io.InputStream;
 public class S3Service {
     private final AmazonS3 s3Client;
 
-    public void uploadFile(String key, byte[] file, String bucketName) {
+    public void uploadFile(String key, byte[] file, String bucketName, long contentLength, MediaType contentType) {
         ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(contentLength);
+        metadata.setContentType(contentType.toString());
         InputStream inputStream = new ByteArrayInputStream(file);
         PutObjectRequest request = new PutObjectRequest(
                 bucketName,

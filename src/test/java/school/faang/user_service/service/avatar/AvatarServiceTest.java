@@ -25,6 +25,7 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class AvatarServiceTest {
+    
     @InjectMocks
     private AvatarService service;
     @Mock

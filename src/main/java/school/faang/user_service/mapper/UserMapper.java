@@ -1,10 +1,14 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.EventUserDto;
 import school.faang.user_service.dto.MentorshipUserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -28,4 +32,15 @@ public interface UserMapper {
     List<EventUserDto> usersToUserDtos(List<User> users);
 
     List<SubscriptionUserDto> toSubscriptionUserDtos(List<User> users);
+
+    @Mapping(source = "country.id", target = "countryId")
+    UserDto toUserDto(User user);
+
+    @Mapping(source = "countryId", target = "country", qualifiedByName = "mapToCountry")
+    User toUser(UserDto userDto);
+
+    @Named("mapToCountry")
+    default Country mapToCountry(long countryId) {
+        return Country.builder().id(countryId).build();
+    }
 }

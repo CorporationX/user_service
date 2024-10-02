@@ -21,27 +21,27 @@ import java.util.List;
 public class GoalController {
     private final GoalServiceImpl goalServiceImpl;
 
-    @PostMapping("userId/{userId}")
+    @PostMapping("/userId/{userId}")
     public GoalDto createGoal(@PathVariable @Positive long userId, @RequestBody @Validated GoalDto goalDto) {
         return goalServiceImpl.createGoal(userId, goalDto);
     }
 
-    @PutMapping("goalId/{goalId}")
+    @PutMapping("/goalId/{goalId}")
     public GoalDto update(@PathVariable @Positive long goalId, @RequestBody @Validated GoalDto goalDto) {
         return goalServiceImpl.updateGoal(goalId, goalDto);
     }
 
-    @DeleteMapping("goalId/{goalId}")
+    @DeleteMapping("/goalId/{goalId}")
     public void deleteGoal(@PathVariable @Positive long goalId) {
         goalServiceImpl.deleteGoal(goalId);
     }
 
-    @GetMapping("goalId/{goalId}")
+    @GetMapping("/goalId/{goalId}")
     public List<GoalDto> findSubtasksByGoalId(@PathVariable @Positive long goalId, @RequestBody GoalFilterDto filterDto) {
         return goalServiceImpl.findSubtasksByGoalId(goalId, filterDto);
     }
 
-    @GetMapping("userId/{userId}")
+    @GetMapping("/userId/{userId}")
     public List<GoalDto> getGoalsByUser(@PathVariable @Positive long userId, @RequestBody GoalFilterDto filterDto) {
         return goalServiceImpl.getGoalsByUser(userId, filterDto);
     }

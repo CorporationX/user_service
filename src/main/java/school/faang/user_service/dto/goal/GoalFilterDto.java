@@ -6,7 +6,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 
 @Data
 @NoArgsConstructor
-
 public class GoalFilterDto {
     private String title;
     private String description;

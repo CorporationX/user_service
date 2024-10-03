@@ -59,6 +59,7 @@ public class EventService {
         return eventMapper.toListDto(eventStream.toList());
     }
 
+    @Transactional
     public void deleteEvent(Long eventId) {
         if (eventRepository.existsById(eventId)) {
             eventRepository.deleteById(eventId);
@@ -68,6 +69,7 @@ public class EventService {
         }
     }
 
+    @Transactional
     public void deleteEvents(List<Event> events) {
         List<EventDto> eventDtos = eventMapper.toListDto(events);
         for (EventDto event : eventDtos) {

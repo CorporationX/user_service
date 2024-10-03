@@ -26,7 +26,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        System.out.println(e.getMessage());
         logger.error(e.getMessage());
         return e.getBindingResult().getAllErrors().stream()
                 .collect(Collectors.toMap(

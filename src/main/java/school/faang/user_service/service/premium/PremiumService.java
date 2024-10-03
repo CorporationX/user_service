@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -98,8 +99,9 @@ public class PremiumService {
 
     @Async("premiumRemovalAsyncExecutor")
     @Transactional
-    public void deleteExpiredPremiumsByIds(List<Long> ids) {
+    public CompletableFuture<Integer> deleteExpiredPremiumsByIds(List<Long> ids) {
         premiumRepository.deleteAllById(ids);
+        return CompletableFuture.completedFuture(ids.size());
     }
 
     private <T> List<List<T>> splitIntoBatches(List<T> list, int batchSize) {

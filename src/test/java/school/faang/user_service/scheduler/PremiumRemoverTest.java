@@ -14,6 +14,7 @@ import school.faang.user_service.service.premium.PremiumService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
@@ -47,6 +48,11 @@ class PremiumRemoverTest {
         List<List<Long>> expiredPremiumsIds = Arrays.asList(batch1, batch2);
 
         when(premiumService.findAndSplitExpiredPremiums()).thenReturn(expiredPremiumsIds);
+
+        when(premiumService.deleteExpiredPremiumsByIds(batch1))
+                .thenReturn(CompletableFuture.completedFuture(batch1.size()));
+        when(premiumService.deleteExpiredPremiumsByIds(batch2))
+                .thenReturn(CompletableFuture.completedFuture(batch2.size()));
 
         premiumRemover.removePremium();
 

@@ -26,10 +26,7 @@ public class PremiumRemover {
 
         if (!expiredPremiumsIds.isEmpty()) {
             List<CompletableFuture<Integer>> futures = expiredPremiumsIds.stream()
-                    .map(batch -> CompletableFuture.supplyAsync(() -> {
-                        premiumService.deleteExpiredPremiumsByIds(batch);
-                        return batch.size();
-                    }))
+                    .map(premiumService::deleteExpiredPremiumsByIds)
                     .toList();
 
             CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));

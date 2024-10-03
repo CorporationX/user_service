@@ -31,13 +31,13 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -193,7 +193,7 @@ public class PremiumServiceTest {
     }
 
     @Test
-    @DisplayName("Should return empty list when no expired premiums")
+    @DisplayName("Should return empty list when there are no expired premiums")
     void testFindAndSplitExpiredPremiums_EmptyList() {
         when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
                 .thenReturn(Collections.emptyList());
@@ -204,12 +204,16 @@ public class PremiumServiceTest {
     }
 
     @Test
-    @DisplayName("Should delete expired premiums by IDs")
+    @DisplayName("Should delete expired premiums by IDs and return the count of deleted records")
     void testDeleteExpiredPremiumsByIds_Success() {
         premiumIds = List.of(1L, 2L, 3L);
+        int expectedDeletedCount = premiumIds.size();
 
-        premiumService.deleteExpiredPremiumsByIds(premiumIds);
+        CompletableFuture<Integer> future = premiumService.deleteExpiredPremiumsByIds(premiumIds);
 
+        Integer totalDeletedRecords = future.join();
+
+        assertEquals(expectedDeletedCount, totalDeletedRecords);
         verify(premiumRepository, times(1)).deleteAllById(premiumIds);
     }
 }

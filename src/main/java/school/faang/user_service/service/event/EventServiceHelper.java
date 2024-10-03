@@ -36,7 +36,7 @@ public class EventServiceHelper {
         }
     }
 
-    @Async("EventThreadPool")
+    @Async("eventThreadPool")
     public void deletePastEventsById(List<Long> pastEventsIds) {
         pastEventsIds.forEach(pastEventsId -> {
             log.info("Delete event with ID: " + pastEventsId + " by " + Thread.currentThread().getName());

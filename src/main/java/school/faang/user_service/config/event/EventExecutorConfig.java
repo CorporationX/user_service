@@ -13,8 +13,8 @@ import java.util.concurrent.Executors;
 public class EventExecutorConfig {
     private final EventProperties eventProperties;
 
-    @Bean(name = "EventThreadPool")
-    public ExecutorService threadPool() {
+    @Bean
+    public ExecutorService eventThreadPool() {
         return Executors.newFixedThreadPool(eventProperties.getThreadsNum());
     }
 }

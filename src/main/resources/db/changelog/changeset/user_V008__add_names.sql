@@ -1,0 +1,10 @@
+UPDATE users SET name = 'John Doe' WHERE username = 'JohnDoe';
+UPDATE users SET name = 'Jane Smith' WHERE username = 'JaneSmith';
+UPDATE users SET name = 'Michael Johnson' WHERE username = 'MichaelJohnson';
+UPDATE users SET name = 'Emily Davis' WHERE username = 'EmilyDavis';
+UPDATE users SET name = 'William Taylor' WHERE username = 'WilliamTaylor';
+UPDATE users SET name = 'Olivia Anderson' WHERE username = 'OliviaAnderson';
+UPDATE users SET name = 'James Wilson' WHERE username = 'JamesWilson';
+UPDATE users SET name = 'Sophia Martin' WHERE username = 'SophiaMartin';
+UPDATE users SET name = 'Benjamin Thompson' WHERE username = 'BenjaminThompson';
+UPDATE users SET name = 'Ava Harris' WHERE username = 'AvaHarris';

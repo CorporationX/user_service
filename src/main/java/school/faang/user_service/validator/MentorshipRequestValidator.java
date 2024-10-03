@@ -5,5 +5,5 @@ import school.faang.user_service.validator.validatorResult.ValidationResult;
 
 
 public interface MentorshipRequestValidator {
-    public ValidationResult validate(MentorshipRequestDto mentorshipRequestDto);
+    ValidationResult validate(MentorshipRequestDto mentorshipRequestDto);
 }

@@ -48,6 +48,9 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CountryRepository countryRepository;
+
     @Spy
     private UserMapperImpl userMapper;
 
@@ -59,14 +62,12 @@ class UserServiceImplTest {
 
     @Mock
     private EventService eventService;
-    @Mock
-    private CountryRepository countryRepository;
-
-    @Mock
-    private CsvParser csvParser;
 
     @Mock
     private MentorshipService mentorshipService;
+
+    @Mock
+    private CsvParser csvParser;
 
     private long id;
     private UserDto userDto;
@@ -96,14 +97,8 @@ class UserServiceImplTest {
                 .build();
 
         filters = List.of(userFilter);
-        userService = new UserServiceImpl(userRepository,
-                countryRepository,
-                filters,
-                userMapper,
-                goalService,
-                eventService,
-                mentorshipService,
-                csvParser);
+        userService = new UserServiceImpl(userRepository,countryRepository, filters, userMapper, goalService,
+                eventService, mentorshipService,csvParser);
     }
 
     @Test
@@ -227,3 +222,4 @@ class UserServiceImplTest {
                 .build();
     }
 }
+

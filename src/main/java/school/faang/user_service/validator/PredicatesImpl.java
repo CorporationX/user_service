@@ -55,7 +55,7 @@ public class PredicatesImpl implements RequestFilterPredicate, MentorshipFilterP
         Optional<MentorshipRequest> request = repository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId());
         if (request.isEmpty()) {
             return new PredicateFalse(REQUEST_WAS_NOT_FOUND);
-        } else if (request.get().getUpdatedAt().isBefore(LocalDateTime.now().minus(3, ChronoUnit.MONTHS))) {
+        } else if (request.get().getUpdatedAt().isBefore(LocalDateTime.now().minusMonths(3))) {
             return new PredicateTrue();
         } else {
             return new PredicateFalse(REQUEST_TIME_EXEEDED);

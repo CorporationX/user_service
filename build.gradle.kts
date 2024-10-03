@@ -173,14 +173,15 @@ tasks.jacocoTestCoverageVerification {
         }
     )
 
-tasks.check {
-    dependsOn(tasks.jacocoTestCoverageVerification)
-}
+    tasks.check {
+        dependsOn(tasks.jacocoTestCoverageVerification)
+    }
 
-tasks.build {
-    dependsOn(tasks.jacocoTestCoverageVerification)
-}
+    tasks.build {
+        dependsOn(tasks.jacocoTestCoverageVerification)
+    }
 
-kotlin {
-    jvmToolchain(17)
+    kotlin {
+        jvmToolchain(17)
+    }
 }

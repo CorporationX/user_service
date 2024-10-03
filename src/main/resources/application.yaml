@@ -61,3 +61,15 @@ avatar:
 
 image:
   format: jpeg
+
+user:
+  password:
+    length: 16
+  constants:
+    upload:
+      task-executor:
+        core-pool-size: 10
+        max-pool-size: 20
+        queue-capacity: 1000
+        thread-name-prefix: "UserUpload-"
+    batch-size: 200

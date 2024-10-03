@@ -62,6 +62,8 @@ public class UserServiceImplTest {
     @Mock
     private ImageProcessor imageProcessor;
 
+
+
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
 

@@ -22,7 +22,9 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.ImageProcessor;
+import school.faang.user_service.dto.subscription.responses.SuccessResponse;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.file.ValidFile;
 
 import java.util.List;
 
@@ -75,5 +77,11 @@ public class UserController {
     @PostMapping("/registration")
     public UserDto register(@Validated @RequestBody UserDtoForRegistration userDto) {
         return userService.register(userDto);
+    }
+
+    @PostMapping("/users/upload")
+    SuccessResponse uploadUser(@RequestParam("file") @ValidFile MultipartFile file) {
+        userService.uploadUsers(file);
+        return new SuccessResponse("The file is uploaded. Processing...");
     }
 }

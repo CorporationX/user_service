@@ -3,6 +3,8 @@ package school.faang.user_service.service.user;
 import org.springframework.core.io.Resource;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.image.AvatarSize;
 
 import java.awt.image.BufferedImage;
@@ -19,4 +21,6 @@ public interface UserService {
 
     void deleteUserAvatar(long userId);
     UserDto register(UserDtoForRegistration userDto);
+
+    void uploadUsers(MultipartFile file);
 }

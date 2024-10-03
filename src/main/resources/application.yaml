@@ -41,6 +41,13 @@ payment-service:
   host: localhost
   port: 9080
 
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: user-avatar
+
 default-avatar-client:
   url: https://api.dicebear.com
   styleName: identicon
@@ -48,10 +55,9 @@ default-avatar-client:
   format: jpg
   prefixFileName: default_avatar_for_user_
 
+avatar:
+  size:
+    maxFileSize: 5242880
 
-services:
-  s3:
-    endpoint: http://127.0.0.1:9000
-    accessKey: user
-    secretKey: password
-    bucketName: user-avatar
+image:
+  format: jpeg

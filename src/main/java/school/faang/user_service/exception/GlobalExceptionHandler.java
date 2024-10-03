@@ -55,7 +55,9 @@ public class GlobalExceptionHandler {
         return new ConstraintErrorResponse(violations);
     }
 
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler({
+            Throwable.class,
+    })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOtherExceptions(Throwable ex) {
         log.error(ex.getMessage(), ex);

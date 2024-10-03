@@ -8,8 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 public class S3Params {
-    private String endpoint;
     private String accessKey;
     private String secretKey;
-    private String bucketName;
+    private String endpoint;
 }

@@ -6,7 +6,6 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
-import school.faang.user_service.dto.EventUserDto;
 import school.faang.user_service.dto.MentorshipUserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -19,17 +18,17 @@ public interface UserMapper {
 
     List<SubscriptionUserDto> toSubscriptionUserDtoList(List<User> users);
 
-    EventUserDto userToUserDto(User user);
+    UserDto userToUserDto(User user);
 
     MentorshipUserDto toMentorshipUserDto(User user);
 
-    User dtoUserToUser(EventUserDto eventUserDto);
+    User dtoUserToUser(UserDto userDto);
 
     List<MentorshipUserDto> toMentorshipUserDtos(List<User> users);
 
-    List<User> userDtosToUsers(List<EventUserDto> eventUserDtos);
+    List<User> userDtosToUsers(List<UserDto> userDtos);
 
-    List<EventUserDto> usersToUserDtos(List<User> users);
+    List<UserDto> usersToUserDtos(List<User> users);
 
     List<SubscriptionUserDto> toSubscriptionUserDtos(List<User> users);
 

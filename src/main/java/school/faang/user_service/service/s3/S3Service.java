@@ -1,32 +1,12 @@
 package school.faang.user_service.service.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-@Component
-@RequiredArgsConstructor
-public class S3Service {
-    private final AmazonS3 s3Client;
+public interface S3Service {
+    public void uploadFile(ByteArrayOutputStream outputStream, String key);
 
-    public void uploadFile(String key, byte[] file, String bucketName, long contentLength, MediaType contentType) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(contentLength);
-        metadata.setContentType(contentType.toString());
-        InputStream inputStream = new ByteArrayInputStream(file);
-        PutObjectRequest request = new PutObjectRequest(
-                bucketName,
-                key,
-                inputStream,
-                metadata
-        );
-        s3Client.putObject(request);
-    }
+    public void deleteFile(String key);
+
+    public InputStream downloadFile(String key);
 }

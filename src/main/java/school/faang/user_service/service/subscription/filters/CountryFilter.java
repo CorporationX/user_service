@@ -17,8 +17,8 @@ public class CountryFilter implements UserFilter {
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
-                .filter(user -> user.getCountry() != null &&
-                        user.getCountry().getTitle() != null &&
-                        user.getCountry().getTitle().contains(filters.countryPattern()));
+                .filter(user -> user.getCountry() != null
+                        && user.getCountry().getTitle() != null
+                        && user.getCountry().getTitle().contains(filters.countryPattern()));
     }
 }

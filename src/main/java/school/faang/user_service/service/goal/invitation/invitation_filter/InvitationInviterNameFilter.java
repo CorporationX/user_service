@@ -16,6 +16,7 @@ public class InvitationInviterNameFilter implements InvitationFilter {
 
     @Override
     public Stream<GoalInvitation> apply(Stream<GoalInvitation> invitations, InvitationFilterDto invitationFilterDto) {
-        return invitations.filter(goalInvitation -> goalInvitation.getInviter().getUsername().matches(invitationFilterDto.getInviterNamePattern()));
+        return invitations.filter(goalInvitation ->
+                goalInvitation.getInviter().getUsername().matches(invitationFilterDto.getInviterNamePattern()));
     }
 }

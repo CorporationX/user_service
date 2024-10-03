@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.premium;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
 import school.faang.user_service.dto.premium.PaymentRequest;
@@ -27,14 +28,19 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -48,6 +54,7 @@ public class PremiumServiceTest {
     private PaymentResponse unsuccessfulPaymentResponse;
     private Premium premium;
     private PremiumDto premiumDto;
+    List<Long> premiumIds;
 
     @Mock
     private PremiumRepository premiumRepository;
@@ -90,6 +97,8 @@ public class PremiumServiceTest {
                 .endDate(LocalDateTime.now().plusMonths(3))
                 .build();
         premium = new Premium();
+
+        ReflectionTestUtils.setField(premiumService, "batchSize", 2);
     }
 
     @Test
@@ -160,5 +169,47 @@ public class PremiumServiceTest {
 
         verify(premiumRepository, never()).save(any(Premium.class));
         verify(premiumMapper, never()).toPremiumDto(any(Premium.class));
+    }
+
+    @Test
+    @DisplayName("Should return split list of expired premium IDs")
+    void testFindAndSplitExpiredPremiums_Success() {
+        List<Premium> expiredPremiums = List.of(
+                new Premium(1L, user, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1)),
+                new Premium(2L, user, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1)),
+                new Premium(3L, user, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1))
+        );
+
+        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
+                .thenReturn(expiredPremiums);
+
+        List<List<Long>> result = premiumService.findAndSplitExpiredPremiums();
+
+        assertEquals(2, result.size());
+        assertEquals(2, result.get(0).size());
+        assertEquals(1, result.get(1).size());
+
+        verify(premiumRepository, times(1)).findAllByEndDateBefore(any(LocalDateTime.class));
+    }
+
+    @Test
+    @DisplayName("Should return empty list when no expired premiums")
+    void testFindAndSplitExpiredPremiums_EmptyList() {
+        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class)))
+                .thenReturn(Collections.emptyList());
+
+        List<List<Long>> result = premiumService.findAndSplitExpiredPremiums();
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should delete expired premiums by IDs")
+    void testDeleteExpiredPremiumsByIds_Success() {
+        premiumIds = List.of(1L, 2L, 3L);
+
+        premiumService.deleteExpiredPremiumsByIds(premiumIds);
+
+        verify(premiumRepository, times(1)).deleteAllById(premiumIds);
     }
 }

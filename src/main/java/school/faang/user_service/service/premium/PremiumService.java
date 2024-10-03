@@ -1,10 +1,11 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.premium;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
@@ -20,14 +21,22 @@ import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PremiumService {
+
+    @Value("${premium.removal.batch-size}")
+    private int batchSize;
+
     private final PremiumRepository premiumRepository;
     private final UserRepository userRepository;
     private final PaymentServiceClient paymentServiceClient;
@@ -78,5 +87,26 @@ public class PremiumService {
         LocalDateTime endDate = startDate.plusDays(premiumPeriod.getDays());
         premium.setEndDate(endDate);
         return premiumRepository.save(premium);
+    }
+
+    public List<List<Long>> findAndSplitExpiredPremiums() {
+        List<Long> expiredPremiumsIds = premiumRepository.findAllByEndDateBefore(LocalDateTime.now()).stream()
+                .map(Premium::getId).toList();
+
+        return splitIntoBatches(expiredPremiumsIds, batchSize);
+    }
+
+    @Async("premiumRemovalAsyncExecutor")
+    @Transactional
+    public void deleteExpiredPremiumsByIds(List<Long> ids) {
+        premiumRepository.deleteAllById(ids);
+    }
+
+    private <T> List<List<T>> splitIntoBatches(List<T> list, int batchSize) {
+        List<List<T>> batches = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += batchSize) {
+            batches.add(list.subList(i, Math.min(i + batchSize, list.size())));
+        }
+        return batches;
     }
 }

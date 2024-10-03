@@ -33,7 +33,7 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/file-upload-exception"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.serviceName").value(serviceName))
-                .andExpect(jsonPath("$.globalMessage").value("Something went wrong..."))
+                .andExpect(jsonPath("$.globalMessage").value(message))
                 .andExpect(jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 
@@ -42,7 +42,7 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/data-validation-exception"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.serviceName").value(serviceName))
-                .andExpect(jsonPath("$.globalMessage").value("Something went wrong..."))
+                .andExpect(jsonPath("$.globalMessage").value(message))
                 .andExpect(jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 

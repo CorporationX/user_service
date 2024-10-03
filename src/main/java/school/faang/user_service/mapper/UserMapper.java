@@ -18,10 +18,12 @@ public interface UserMapper {
 
     List<SubscriptionUserDto> toSubscriptionUserDtoList(List<User> users);
 
+    @Mapping(source = "country.id", target = "countryId")
     UserDto userToUserDto(User user);
 
     MentorshipUserDto toMentorshipUserDto(User user);
 
+    @Mapping(source = "countryId", target = "country", qualifiedByName = "mapToCountry")
     User dtoUserToUser(UserDto userDto);
 
     List<MentorshipUserDto> toMentorshipUserDtos(List<User> users);
@@ -31,12 +33,6 @@ public interface UserMapper {
     List<UserDto> usersToUserDtos(List<User> users);
 
     List<SubscriptionUserDto> toSubscriptionUserDtos(List<User> users);
-
-    @Mapping(source = "country.id", target = "countryId")
-    UserDto toUserDto(User user);
-
-    @Mapping(source = "countryId", target = "country", qualifiedByName = "mapToCountry")
-    User toUser(UserDto userDto);
 
     @Named("mapToCountry")
     default Country mapToCountry(long countryId) {

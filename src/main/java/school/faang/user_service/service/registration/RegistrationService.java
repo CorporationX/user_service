@@ -18,9 +18,9 @@ public class RegistrationService {
     private final AvatarService avatarService;
 
     public UserDto register(UserDto userDto) {
-        User user = userRepository.save(mapper.toUser(userDto));
+        User user = userRepository.save(mapper.dtoUserToUser(userDto));
         avatarService.createDefaultAvatarForUser(user.getId());
         log.info("User with id = %d registered".formatted(user.getId()));
-        return mapper.toUserDto(user);
+        return mapper.userToUserDto(user);
     }
 }

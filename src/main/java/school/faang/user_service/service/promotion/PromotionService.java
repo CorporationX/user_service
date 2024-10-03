@@ -75,7 +75,7 @@ public class PromotionService {
         List<UserPromotion> activeUserPromotions = promotionValidationService.getActiveUserPromotions(users);
 
         if (!activeUserPromotions.isEmpty()) {
-            promotionTaskService.decrementUserPromotionViews(activeUserPromotions);
+            promotionTaskService.incrementUserPromotionViews(activeUserPromotions);
         }
         return users;
     }
@@ -87,7 +87,7 @@ public class PromotionService {
         List<EventPromotion> activeEventPromotions = promotionValidationService.getActiveEventPromotions(events);
 
         if (!activeEventPromotions.isEmpty()) {
-            promotionTaskService.decrementEventPromotionViews(activeEventPromotions);
+            promotionTaskService.batchDecrementEventPromotionViews(activeEventPromotions);
         }
         return events;
     }

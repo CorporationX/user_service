@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
@@ -26,11 +25,9 @@ public class PromotionTaskService {
     private final EventPromotionRepositoryBatch eventPromotionRepositoryBatch;
     private final Map<Long, Integer> userPromotionViews = new ConcurrentHashMap<>();
     private final Map<Long, Integer> eventPromotionViews = new ConcurrentHashMap<>();
-    private final AtomicBoolean isUserViewsDecrementRunning = new AtomicBoolean(false);
-    private final AtomicBoolean isEventViewsDecrementRunning = new AtomicBoolean(false);
 
     @Async("promotionTaskServicePool")
-    public void decrementUserPromotionViews(List<UserPromotion> userPromotions) {
+    public void incrementUserPromotionViews(List<UserPromotion> userPromotions) {
         log.info("Decrement user promotion views");
         userPromotions.forEach(userPromotion -> {
             long promotionId = userPromotion.getId();
@@ -40,14 +37,14 @@ public class PromotionTaskService {
     }
 
     @Scheduled(cron = "${app.promotion.user_promotion_views_decrement_cron}")
-    public void executeUserPromotionViewsDecrement() {
-        if (!userPromotionViews.isEmpty() && isUserViewsDecrementRunning.compareAndSet(false, true)) {
-            decrementUserPromotionView();
+    public void scheduleUserPromotionViewsBatchDecrement() {
+        if (!userPromotionViews.isEmpty()) {
+            batchDecrementUserPromotionView();
         }
     }
 
     @Async("promotionTaskServicePool")
-    public void decrementEventPromotionViews(List<EventPromotion> eventPromotions) {
+    public void batchDecrementEventPromotionViews(List<EventPromotion> eventPromotions) {
         log.info("Decrement event promotion");
         eventPromotions.forEach(eventPromotion -> {
             long promotionId = eventPromotion.getId();
@@ -57,47 +54,49 @@ public class PromotionTaskService {
     }
 
     @Scheduled(cron = "${app.promotion.event__promotion_views_decrement_cron}")
-    public void executeEventPromotionViewsDecrement() {
-        if (!eventPromotionViews.isEmpty() && isEventViewsDecrementRunning.compareAndSet(false, true)) {
-            decrementEventPromotionViews();
+    public void scheduleEventPromotionViewsBatchDecrement() {
+        if (!eventPromotionViews.isEmpty()) {
+            batchDecrementEventPromotionViews();
         }
     }
 
-    private void decrementUserPromotionView() {
+    private void batchDecrementUserPromotionView() {
         Map<Long, Integer> userPromotionViewsCopy = new HashMap<>();
         try {
-            log.info("User promotion views batch decrement: {}", userPromotionViews);
             synchronized (userPromotionViews) {
+                log.info("User promotion views batch decrement: {}", userPromotionViews);
                 userPromotionViewsCopy = new HashMap<>(userPromotionViews);
                 userPromotionViews.clear();
             }
             userPromotionRepositoryBatch.updateUserPromotions(userPromotionViewsCopy);
         } catch (SQLException | UncategorizedSQLException e) {
-            log.error("SQL Exception when decrement user promotion views: {}", e.getMessage());
             synchronized (userPromotionViews) {
-                userPromotionViews.putAll(userPromotionViewsCopy);
+                log.error("SQL Exception when decrement user promotion views: {}", e.getMessage());
+                userPromotionViewsCopy.forEach((id, views) -> {
+                    int primalViews = userPromotionViews.computeIfAbsent(id, k -> 0);
+                    userPromotionViews.put(id, primalViews + views);
+                });
             }
-        } finally {
-            isUserViewsDecrementRunning.set(false);
         }
     }
 
-    private void decrementEventPromotionViews() {
+    private void batchDecrementEventPromotionViews() {
         Map<Long, Integer> eventPromotionViewsCopy = new HashMap<>();
         try {
-            log.info("Event promotion views batch decrement: {}", eventPromotionViews);
             synchronized (eventPromotionViews) {
+                log.info("Event promotion views batch decrement: {}", eventPromotionViews);
                 eventPromotionViewsCopy = new HashMap<>(eventPromotionViews);
                 eventPromotionViews.clear();
             }
             eventPromotionRepositoryBatch.updateEventPromotions(eventPromotionViewsCopy);
         } catch (SQLException | UncategorizedSQLException e) {
-            log.error("SQL Exception when decrement event promotion views: {}", e.getMessage());
             synchronized (eventPromotionViews) {
-                eventPromotionViews.putAll(eventPromotionViewsCopy);
+                log.error("SQL Exception when decrement event promotion views: {}", e.getMessage());
+                eventPromotionViewsCopy.forEach((id, views) -> {
+                    int primalViews = eventPromotionViews.computeIfAbsent(id, k -> 0);
+                    eventPromotionViews.put(id, primalViews + views);
+                });
             }
-        } finally {
-            isEventViewsDecrementRunning.set(false);
         }
     }
 }

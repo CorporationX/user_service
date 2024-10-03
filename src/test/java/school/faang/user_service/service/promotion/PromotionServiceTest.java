@@ -137,7 +137,7 @@ class PromotionServiceTest {
 
         assertThat(promotionService.getPromotedUsersBeforeAllPerPage(OFFSET, LIMIT))
                 .isEqualTo(users);
-        verify(promotionTaskService).decrementUserPromotionViews(activePromotions);
+        verify(promotionTaskService).incrementUserPromotionViews(activePromotions);
     }
 
     @Test
@@ -150,7 +150,7 @@ class PromotionServiceTest {
 
         assertThat(promotionService.getPromotedUsersBeforeAllPerPage(OFFSET, LIMIT))
                 .isEqualTo(users);
-        verify(promotionTaskService, never()).decrementUserPromotionViews(activePromotions);
+        verify(promotionTaskService, never()).incrementUserPromotionViews(activePromotions);
     }
 
     @Test
@@ -163,7 +163,7 @@ class PromotionServiceTest {
 
         assertThat(promotionService.getPromotedEventsBeforeAllPerPage(OFFSET, LIMIT))
                 .isEqualTo(events);
-        verify(promotionTaskService).decrementEventPromotionViews(eventPromotions);
+        verify(promotionTaskService).batchDecrementEventPromotionViews(eventPromotions);
     }
 
     @Test
@@ -176,6 +176,6 @@ class PromotionServiceTest {
 
         assertThat(promotionService.getPromotedEventsBeforeAllPerPage(OFFSET, LIMIT))
                 .isEqualTo(events);
-        verify(promotionTaskService, never()).decrementEventPromotionViews(activePromotions);
+        verify(promotionTaskService, never()).batchDecrementEventPromotionViews(activePromotions);
     }
 }

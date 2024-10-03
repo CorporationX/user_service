@@ -31,7 +31,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             ORDER BY
                 ep.coefficient DESC NULLS LAST,
                 ep.creation_date ASC,
-                e.id DESC
+                e.created_at DESC
             OFFSET :offset
             LIMIT :limit
             """)

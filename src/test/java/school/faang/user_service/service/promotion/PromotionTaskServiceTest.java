@@ -15,7 +15,6 @@ import school.faang.user_service.repository.promotion.batch.UserPromotionReposit
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -41,9 +40,9 @@ class PromotionTaskServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("Given user promotion and increment user promotion views for batch decrement")
-    void testDecrementUserPromotionViewsIncrementViews() {
+    void testIncrementUserPromotionViewsSuccessful() {
         List<UserPromotion> userPromotions = List.of(buildActiveUserPromotion(PROMOTION_ID));
-        promotionTaskService.decrementUserPromotionViews(userPromotions);
+        promotionTaskService.incrementUserPromotionViews(userPromotions);
 
         Map<Long, Integer> userPromotionViews =
                 (Map<Long, Integer>) ReflectionTestUtils.getField(promotionTaskService, "userPromotionViews");
@@ -55,19 +54,8 @@ class PromotionTaskServiceTest {
 
     @Test
     @DisplayName("Given empty user promo views when check then don't execute decrement")
-    void testExecuteUserPromotionViewsDecrementEmptyPromotionViews() throws SQLException {
-        promotionTaskService.executeUserPromotionViewsDecrement();
-
-        verify(userPromotionRepositoryBatch, never()).updateUserPromotions(anyMap());
-    }
-
-    @Test
-    @DisplayName("Given already running user promo decrement process when check then don't execute decrement")
-    void testExecuteUserPromotionViewsDecrementDecrementAlreadyRunning() throws SQLException {
-        List<UserPromotion> userPromotions = List.of(buildActiveUserPromotion(PROMOTION_ID));
-        ReflectionTestUtils.setField(promotionTaskService, "isUserViewsDecrementRunning", new AtomicBoolean(true));
-        promotionTaskService.decrementUserPromotionViews(userPromotions);
-        promotionTaskService.executeUserPromotionViewsDecrement();
+    void testScheduleUserPromotionViewsBatchDecrementEmptyPromotionViews() throws SQLException {
+        promotionTaskService.scheduleUserPromotionViewsBatchDecrement();
 
         verify(userPromotionRepositoryBatch, never()).updateUserPromotions(anyMap());
     }
@@ -75,11 +63,11 @@ class PromotionTaskServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("Execute user promotion views decrement successful ")
-    void testExecuteUserPromotionViewsDecrementSuccessful() throws SQLException {
+    void testScheduleUserPromotionViewsBatchDecrementSuccessful() throws SQLException {
         List<UserPromotion> userPromotions = List.of(buildActiveUserPromotion(PROMOTION_ID));
 
-        promotionTaskService.decrementUserPromotionViews(userPromotions);
-        promotionTaskService.executeUserPromotionViewsDecrement();
+        promotionTaskService.incrementUserPromotionViews(userPromotions);
+        promotionTaskService.scheduleUserPromotionViewsBatchDecrement();
         Map<Long, Integer> userPromotionViews =
                 (Map<Long, Integer>) ReflectionTestUtils.getField(promotionTaskService, "userPromotionViews");
 
@@ -89,13 +77,13 @@ class PromotionTaskServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    @DisplayName("When updating user promotion views throw exception then return the show to the list")
-    void testExecuteUserPromotionViewsDecrementSQLException() throws SQLException {
+    @DisplayName("When updating user promotion views throw exception then return the shows to the list")
+    void testScheduleUserPromotionViewsBatchDecrementSQLException() throws SQLException {
         List<UserPromotion> userPromotions = List.of(buildActiveUserPromotion(PROMOTION_ID));
         doThrow(new SQLException()).when(userPromotionRepositoryBatch).updateUserPromotions(anyMap());
 
-        promotionTaskService.decrementUserPromotionViews(userPromotions);
-        promotionTaskService.executeUserPromotionViewsDecrement();
+        promotionTaskService.incrementUserPromotionViews(userPromotions);
+        promotionTaskService.scheduleUserPromotionViewsBatchDecrement();
         Map<Long, Integer> userPromotionViews =
                 (Map<Long, Integer>) ReflectionTestUtils.getField(promotionTaskService, "userPromotionViews");
 
@@ -106,9 +94,9 @@ class PromotionTaskServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("Given event promotion and increment user promotion views for batch decrement")
-    void testDecrementEventPromotionViewsIncrementViews() {
+    void testIncrementEventPromotionViewsIncrementViews() {
         List<EventPromotion> eventPromotions = List.of(buildActiveEventPromotion(PROMOTION_ID));
-        promotionTaskService.decrementEventPromotionViews(eventPromotions);
+        promotionTaskService.batchDecrementEventPromotionViews(eventPromotions);
 
         Map<Long, Integer> eventPromotionViews =
                 (Map<Long, Integer>) ReflectionTestUtils.getField(promotionTaskService, "eventPromotionViews");
@@ -120,19 +108,8 @@ class PromotionTaskServiceTest {
 
     @Test
     @DisplayName("Given empty event promo views when check then don't execute decrement")
-    void testExecuteEventPromotionViewsDecrementEmptyPromotionViews() throws SQLException {
-        promotionTaskService.executeEventPromotionViewsDecrement();
-
-        verify(eventPromotionRepositoryBatch, never()).updateEventPromotions(anyMap());
-    }
-
-    @Test
-    @DisplayName("Given already running event promo decrement process when check then don't execute decrement")
-    void testExecuteEventPromotionViewsDecrementDecrementAlreadyRunning() throws SQLException {
-        List<EventPromotion> eventPromotions = List.of(buildActiveEventPromotion(PROMOTION_ID));
-        ReflectionTestUtils.setField(promotionTaskService, "isEventViewsDecrementRunning", new AtomicBoolean(true));
-        promotionTaskService.decrementEventPromotionViews(eventPromotions);
-        promotionTaskService.executeEventPromotionViewsDecrement();
+    void testScheduleEventPromotionViewsBatchDecrementEmptyPromotionViews() throws SQLException {
+        promotionTaskService.scheduleEventPromotionViewsBatchDecrement();
 
         verify(eventPromotionRepositoryBatch, never()).updateEventPromotions(anyMap());
     }
@@ -140,11 +117,11 @@ class PromotionTaskServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("Execute event promotion views decrement successful ")
-    void testExecuteEventPromotionViewsDecrementSuccessful() throws SQLException {
+    void testScheduleEventPromotionViewsBatchDecrementSuccessful() throws SQLException {
         List<EventPromotion> eventPromotions = List.of(buildActiveEventPromotion(PROMOTION_ID));
 
-        promotionTaskService.decrementEventPromotionViews(eventPromotions);
-        promotionTaskService.executeEventPromotionViewsDecrement();
+        promotionTaskService.batchDecrementEventPromotionViews(eventPromotions);
+        promotionTaskService.scheduleEventPromotionViewsBatchDecrement();
         Map<Long, Integer> eventPromotionViews =
                 (Map<Long, Integer>) ReflectionTestUtils.getField(promotionTaskService, "eventPromotionViews");
 
@@ -155,12 +132,12 @@ class PromotionTaskServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("When updating event promotion views throw exception then return the show to the list")
-    void testExecuteEventPromotionViewsDecrementSQLException() throws SQLException {
+    void testScheduleEventPromotionViewsBatchDecrementSQLException() throws SQLException {
         List<EventPromotion> eventPromotions = List.of(buildActiveEventPromotion(PROMOTION_ID));
         doThrow(new SQLException()).when(eventPromotionRepositoryBatch).updateEventPromotions(anyMap());
 
-        promotionTaskService.decrementEventPromotionViews(eventPromotions);
-        promotionTaskService.executeEventPromotionViewsDecrement();
+        promotionTaskService.batchDecrementEventPromotionViews(eventPromotions);
+        promotionTaskService.scheduleEventPromotionViewsBatchDecrement();
         Map<Long, Integer> eventPromotionViews =
                 (Map<Long, Integer>) ReflectionTestUtils.getField(promotionTaskService, "eventPromotionViews");
 

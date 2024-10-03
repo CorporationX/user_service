@@ -34,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             ORDER BY
                 up.coefficient DESC NULLS LAST,
                 up.creation_date ASC,
-                u.id DESC
+                u.created_at DESC
             OFFSET :offset
             LIMIT :limit
             """)

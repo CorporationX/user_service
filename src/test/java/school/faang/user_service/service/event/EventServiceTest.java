@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -32,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +68,7 @@ public class EventServiceTest {
     private Event event2;
 
     private EventFilterDto eventFilterDto;
-
+    private List<Event> events;
 
 
     @BeforeEach
@@ -116,6 +119,8 @@ public class EventServiceTest {
                 .title("Event 2")
                 .startDate(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(eventService, "batchSize", 3);
     }
 
     @Test
@@ -195,7 +200,7 @@ public class EventServiceTest {
         verify(eventRepository, never()).deleteById(eventId);
         verify(eventRepository).existsById(eventId);
     }
-    
+
     @Test
     void updateEvent_shouldReturnUpdatedEventDto() {
         // Arrange
@@ -240,4 +245,30 @@ public class EventServiceTest {
         assertEquals(expectedEvents, result);
         verify(eventRepository).findParticipatedEventsByUserId(userId);
     }
+
+    @Test
+    void deletePassedEvents_shouldPartitionAndDeleteInBatches() {
+        // Arrange
+        events = getEventList();
+        when(eventRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(events);
+        // Act
+        eventService.deletePassedEvents();
+        // Assert
+        verify(eventRepository, times(3)).deleteAllInBatch(any());
+    }
+
+    private static @NotNull List<Event> getEventList() {
+        return List.of(
+                Event.builder().id(1L).endDate(LocalDateTime.now().minusDays(1)).build(),
+                Event.builder().id(2L).endDate(LocalDateTime.now().minusDays(2)).build(),
+                Event.builder().id(5L).endDate(LocalDateTime.now().minusDays(3)).build(),
+                Event.builder().id(6L).endDate(LocalDateTime.now().minusDays(3)).build(),
+                Event.builder().id(7L).endDate(LocalDateTime.now().minusDays(3)).build(),
+                Event.builder().id(8L).endDate(LocalDateTime.now().minusDays(3)).build(),
+                Event.builder().id(9L).endDate(LocalDateTime.now().minusDays(3)).build(),
+                Event.builder().id(10L).endDate(LocalDateTime.now().minusDays(3)).build(),
+                Event.builder().id(12L).endDate(LocalDateTime.now().minusDays(3)).build()
+        );
+    }
+
 }

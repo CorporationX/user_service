@@ -2,6 +2,9 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
@@ -13,6 +16,7 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -24,6 +28,8 @@ public class EventService {
     private final EventMapper eventMapper;
     private final EventValidator eventValidator;
     private final List<EventFilter> eventFilters;
+    @Value("${scheduler.event-batch-size}")
+    private int batchSize;
 
     @Transactional
     public EventDto create(EventDto event) {
@@ -69,6 +75,19 @@ public class EventService {
         }
 
         eventRepository.deleteAll(events);
+    }
+
+    @Transactional
+    public void deletePassedEvents() {
+        var eventsToDelete = eventRepository.findAllByEndDateBefore(LocalDateTime.now());
+        ListUtils.partition(eventsToDelete, batchSize)
+                .forEach(this::deletePassedEventsByBatches);
+    }
+
+    @Async("threadPool")
+    public void deletePassedEventsByBatches(List<Event> events) {
+        events.forEach((event) -> log.info("Deleting passed event with ID: {}", event.getId()));
+        eventRepository.deleteAllInBatch(events);
     }
 
     public EventDto updateEvent(EventDto eventDto) {

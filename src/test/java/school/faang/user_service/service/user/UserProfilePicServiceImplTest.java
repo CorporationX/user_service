@@ -3,45 +3,49 @@ package school.faang.user_service.service.user;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
+import school.faang.user_service.config.context.UserContext;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserProfilePicServiceImplTest {
 
     @Mock
     private AmazonS3 amazonS3;
 
+    @Mock
+    private UserContext userContext;
+
     @InjectMocks
     private UserProfilePicServiceImpl userProfilePicService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @Value("${services.s3.bucketName}")
+    private String bucketName;
 
     @Test
     void testUploadAvatar() throws IOException {
         MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "image-content".getBytes());
         Long userId = 1L;
+        when(userContext.getUserId()).thenReturn(userId);
 
-        userProfilePicService.uploadAvatar(userId, file);
+        userProfilePicService.uploadAvatar(file);
 
         ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
         verify(amazonS3, times(1)).putObject(captor.capture());
 
         PutObjectRequest request = captor.getValue();
-        assertEquals("corpbucket", request.getBucketName());
+        assertEquals(bucketName, request.getBucketName());
         assertEquals(String.format("%s-%s", userId, file.getOriginalFilename()), request.getKey());
 
         ObjectMetadata metadata = request.getMetadata();

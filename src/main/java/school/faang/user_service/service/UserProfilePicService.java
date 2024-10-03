@@ -6,5 +6,5 @@ import java.io.IOException;
 
 public interface UserProfilePicService {
 
-    void uploadAvatar(Long userId, MultipartFile file) throws IOException;
+    void uploadAvatar(MultipartFile file);
 }

@@ -14,6 +14,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileUploadException;
 import school.faang.user_service.exception.NonUniqueFieldsException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class})
+    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class, IOException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataExceptions(RuntimeException exception) {
         String message = exception.getMessage();

@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/avatar")
-    public void uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException {
-        userProfilePicService.uploadAvatar(userId, file);
+    public void uploadAvatar(@RequestParam("file") MultipartFile file) {
+        userProfilePicService.uploadAvatar(file);
     }
 }

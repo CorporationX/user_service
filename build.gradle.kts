@@ -139,8 +139,6 @@ tasks.jacocoTestReport {
         html.required.set(true)
         xml.required.set(false)
         csv.required.set(false)
-        html.required.set(true)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 
     // Include only the specified directories in the coverage report
@@ -174,7 +172,6 @@ tasks.jacocoTestCoverageVerification {
             exclude(jacocoExclude)
         }
     )
-}
 
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)

@@ -41,6 +41,20 @@ payment-service:
   host: localhost
   port: 9080
 
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+
+avatar:
+  size:
+    maxFileSize: 5242880
+
+image:
+  format: jpeg
+
 user:
   password:
     length: 16

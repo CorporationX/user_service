@@ -161,10 +161,10 @@ public class EventParticipationServiceImplTest {
 
         List<UserDto> result = eventParticipationService.getParticipants(eventId);
 
+        assertTrue(result.isEmpty());
         verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).findAllParticipantsByEventId(eventId);
         verify(userMapper, times(1)).usersToUserDtos(anyList());
-        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -187,9 +187,9 @@ public class EventParticipationServiceImplTest {
 
         EventParticipantsDto result = eventParticipationService.getParticipantsCount(eventId);
 
+        assertEquals(participantsCountDto, result);
         verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).countParticipants(eventId);
-        assertEquals(participantsCountDto, result);
     }
 
     @Test
@@ -211,9 +211,9 @@ public class EventParticipationServiceImplTest {
 
         EventParticipantsDto result = eventParticipationService.getParticipantsCount(eventId);
 
+        assertEquals(participantsCountDto, result);
         verify(eventParticipationValidator, times(1)).checkEventExists(eventId);
         verify(eventParticipationRepository, times(1)).countParticipants(eventId);
-        assertEquals(participantsCountDto, result);
     }
 
     private void setUpCheckEventExistsResult(boolean generateException) {

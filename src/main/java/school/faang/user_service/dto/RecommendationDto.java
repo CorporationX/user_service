@@ -3,7 +3,7 @@ package school.faang.user_service.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record RecommendationDto (
+public record RecommendationDto(
         Long id,
         Long authorId,
         Long receiverId,

@@ -17,8 +17,8 @@ public class SkillFilter implements UserFilter {
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
         return users
-                .filter(user -> user.getSkills() != null && user.getSkills().stream()
-                        .anyMatch(skill -> skill.getTitle() != null &&
-                                skill.getTitle().contains(filters.skillPattern())));
+                .filter(user -> user.getSkills() != null
+                        && user.getSkills().stream().anyMatch(skill -> skill.getTitle() != null
+                        && skill.getTitle().contains(filters.skillPattern())));
     }
 }

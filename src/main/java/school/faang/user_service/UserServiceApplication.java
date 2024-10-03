@@ -13,8 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")
-@EnableScheduling
-@EnableAsync
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",

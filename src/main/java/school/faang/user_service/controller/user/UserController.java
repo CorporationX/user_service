@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserDtoForRegistration;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.ImageProcessor;
 import school.faang.user_service.service.user.UserService;
@@ -69,5 +70,10 @@ public class UserController {
     @DeleteMapping("/{userId}/avatar")
     public void deleteUserAvatar(@PathVariable long userId) {
         userService.deleteUserAvatar(userId);
+    }
+
+    @PostMapping("/registration")
+    public UserDto register(@Validated @RequestBody UserDtoForRegistration userDto) {
+        return userService.register(userDto);
     }
 }

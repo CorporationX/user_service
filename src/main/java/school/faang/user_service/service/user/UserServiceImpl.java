@@ -7,12 +7,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserDtoForRegistration;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.FileOperationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
 import school.faang.user_service.service.image.ImageProcessor;
@@ -33,6 +35,7 @@ public class UserServiceImpl implements UserService {
     public static final String SMALL_AVATAR_PICTURE_NAME = "smallPicture";
     public static final String FOLDER_PREFIX = "user";
     private final UserRepository userRepository;
+    private final AvatarService avatarService;
     private final UserMapper userMapper;
     private final ImageProcessor imageProcessor;
     private final S3Service s3Service;
@@ -121,6 +124,14 @@ public class UserServiceImpl implements UserService {
             throw new FileOperationException("Failed to delete user avatar for user ID: %s"
                     .formatted(userId), e);
         }
+    }
+
+    @Override
+    public UserDto register(UserDtoForRegistration userDto) {
+        User user = userRepository.save(userMapper.toUser(userDto));
+        avatarService.createDefaultAvatarForUser(user.getId());
+        log.info("User with id = %d registered".formatted(user.getId()));
+        return userMapper.userToUserDto(user);
     }
 
     private String uploadFile(Long userId, ByteArrayOutputStream outputStream, String fileName) {

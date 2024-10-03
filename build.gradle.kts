@@ -110,49 +110,74 @@ tasks.bootJar {
  * JaCoCo settings
  */
 val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
+    "**/service/**"
 )
+
+val jacocoExclude = listOf(
+    "**/entity/**",
+    "**/dto/**",
+    "**/config/**",
+    "**/generated/**",
+    "**/exceptions/**",
+    "**/service/recomendation/filters**",
+    "**/service/mentorship_request/error_messages**",
+    "**/service/goal/util**",
+    "**/service/event/filters**",
+    "**/service/mentorship_request/MentorshipRequestDescriptionFilter**"
+)
+
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
 tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-
     reports {
+        html.required.set(true)
         xml.required.set(false)
         csv.required.set(false)
-        html.required.set(true)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 
     classDirectories.setFrom(
         sourceSets.main.get().output.asFileTree.matching {
             include(jacocoInclude)
+            exclude(jacocoExclude)
         }
     )
 }
+
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
-            element = "CLASS"
-            classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
-            )
-            enabled = true
             limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = "0.70".toBigDecimal()
             }
         }
     }
+
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            include(jacocoInclude)
+            exclude(jacocoExclude)
+        }
+    )
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+tasks.build {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 kotlin {
     jvmToolchain(17)

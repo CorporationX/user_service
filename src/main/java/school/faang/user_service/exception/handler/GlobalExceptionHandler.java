@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         log.info("DataValidationException found and occurred: {}", e.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
+                .globalMessage(e.getMessage())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
     }
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
         log.error("Error occurred: {}", exception.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
+                .globalMessage(exception.getMessage())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
     }
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
         log.info("NoSuchElementException found and occurred: {}", e.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
+                .globalMessage(e.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
         log.info("NonUniqueFieldsException found and occurred: {}", e.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
+                .globalMessage(e.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
@@ -91,24 +91,13 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
-        log.info("IllegalArgumentException found and occurred: {}", e.getMessage());
-        return ErrorResponse.builder()
-                .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-    }
-
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(EntityNotFoundException e) {
         log.info("EntityNotFoundException occurred: {}", e.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
+                .globalMessage(e.getMessage())
                 .status(HttpStatus.NOT_FOUND.value())
                 .build();
     }
@@ -119,20 +108,8 @@ public class GlobalExceptionHandler {
         log.info("AuthenticationException occurred: {}", e.getMessage());
         return ErrorResponse.builder()
                 .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
+                .globalMessage(e.getMessage())
                 .status(HttpStatus.UNAUTHORIZED.value())
-                .build();
-    }
-
-
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
-    public ErrorResponse handleRuntimeException(RuntimeException e) {
-        log.info("RuntimeException occurred: {}", e.getMessage());
-        return ErrorResponse.builder()
-                .serviceName(serviceName)
-                .globalMessage("Something went wrong...")
-                .status(HttpStatus.REQUEST_TIMEOUT.value())
                 .build();
     }
 }

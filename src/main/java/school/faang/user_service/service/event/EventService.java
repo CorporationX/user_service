@@ -22,16 +22,13 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final EventServiceHelper eventValidator;
+    private final EventServiceHelper eventServiceHelper;
     private final EventProperties eventProperties;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
@@ -40,11 +37,11 @@ public class EventService {
 
     @Transactional
     public EventDto createEvent(EventDto eventDto) {
-        eventValidator.eventDatesValidation(eventDto);
+        eventServiceHelper.eventDatesValidation(eventDto);
 
         List<SkillDto> ownerSkillsList = getUserSkills(eventDto.getOwnerId());
         Set<SkillDto> ownerSkillsSet = new HashSet<>(ownerSkillsList);
-        eventValidator.relatedSkillsValidation(eventDto, ownerSkillsSet);
+        eventServiceHelper.relatedSkillsValidation(eventDto, ownerSkillsSet);
 
         return saveEvent(eventDto);
     }
@@ -67,20 +64,20 @@ public class EventService {
 
     @Transactional
     public void deleteEvent(Long eventId) {
-        eventValidator.eventExistByIdValidation(eventId);
+        eventServiceHelper.eventExistByIdValidation(eventId);
         eventRepository.deleteById(eventId);
     }
 
     @Transactional
     public EventDto updateEvent(EventDto eventDto) {
-        eventValidator.eventDatesValidation(eventDto);
+        eventServiceHelper.eventDatesValidation(eventDto);
 
         Long eventDtoId = eventDto.getId();
-        eventValidator.eventExistByIdValidation(eventDtoId);
+        eventServiceHelper.eventExistByIdValidation(eventDtoId);
 
         List<SkillDto> ownerSkillsList = getUserSkills(eventDto.getOwnerId());
         Set<SkillDto> ownerSkillsSet = new HashSet<>(ownerSkillsList);
-        eventValidator.relatedSkillsValidation(eventDto, ownerSkillsSet);
+        eventServiceHelper.relatedSkillsValidation(eventDto, ownerSkillsSet);
 
         return saveEvent(eventDto);
     }
@@ -103,29 +100,13 @@ public class EventService {
 
     @Transactional
     public void deletePastEvents() {
-        List<Long> pastEventsIds = eventRepository.findAll()
+        List<Long> pastEventsIds = eventRepository.findAllByEndDateBefore(LocalDateTime.now())
                 .stream()
-                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
                 .map(Event::getId)
                 .toList();
 
-        ListUtils.partition(pastEventsIds, eventProperties.getSublistSize()).forEach(longList -> {
-            ExecutorService executor = Executors.newFixedThreadPool(eventProperties.getThreadsNum());
-
-            try {
-                executor.submit(() -> eventRepository.deleteAllById(longList));
-            } finally {
-                executor.shutdown();
-                try {
-                    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                        executor.shutdownNow();
-                    }
-                } catch (InterruptedException e) {
-                    executor.shutdownNow();
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
+        ListUtils.partition(pastEventsIds, eventProperties.getSublistSize())
+                .forEach(eventServiceHelper::deletePastEventsById);
     }
 
     private EventDto saveEvent(EventDto eventDto) {

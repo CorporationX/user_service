@@ -18,6 +18,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
                 title = "User Service",
                 version = "1.0.0")
 )
+@EnableScheduling
+@EnableAsync
 public class UserServiceApplication {
 
     public static void main(String[] args) {

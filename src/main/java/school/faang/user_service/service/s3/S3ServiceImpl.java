@@ -52,4 +52,19 @@ public class S3ServiceImpl implements S3Service {
         log.debug("Starting file download from S3 with key: {}", key);
         return s3Client.getObject(bucketName, key).getObjectContent();
     }
+
+    @Override
+    public void uploadFile(String key, byte[] file, String bucketName, long contentLength, MediaType contentType) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(contentLength);
+        metadata.setContentType(contentType.toString());
+        InputStream inputStream = new ByteArrayInputStream(file);
+        PutObjectRequest request = new PutObjectRequest(
+                bucketName,
+                key,
+                inputStream,
+                metadata
+        );
+        s3Client.putObject(request);
+    }
 }

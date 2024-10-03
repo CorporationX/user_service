@@ -11,6 +11,7 @@ import school.faang.user_service.dto.responses.ErrorResponse;
 import school.faang.user_service.dto.responses.Violation;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
+import school.faang.user_service.exception.user.FileUploadedException;
 
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class GlobalExceptionHandler {
             DataValidationException.class,
             SubscriptionAlreadyExistException.class,
             IllegalArgumentException.class,
-            EventParticipationRegistrationException.class
+            EventParticipationRegistrationException.class,
+            FileUploadedException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleExceptionWithBadRequest(RuntimeException ex) {

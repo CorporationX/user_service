@@ -1,29 +1,37 @@
 package school.faang.user_service.service.user;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.FileOperationException;
+import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
 import school.faang.user_service.service.image.ImageProcessor;
 import school.faang.user_service.service.s3.S3Service;
+import school.faang.user_service.service.user.upload.CsvLoader;
+import school.faang.user_service.service.user.upload.UserUploadService;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +40,13 @@ public class UserServiceImpl implements UserService {
     public static final String BIG_AVATAR_PICTURE_NAME = "bigPicture";
     public static final String SMALL_AVATAR_PICTURE_NAME = "smallPicture";
     public static final String FOLDER_PREFIX = "user";
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final ImageProcessor imageProcessor;
     private final S3Service s3Service;
+    private final UserUploadService userUploadService;
+    private final CsvLoader csvLoader;
 
     @Override
     public UserDto getUser(long userId) {
@@ -134,5 +145,21 @@ public class UserServiceImpl implements UserService {
                     .formatted(userId, key), e);
         }
         return key;
+    }
+
+    @Override
+    @Transactional
+    public void uploadUsers(MultipartFile file) {
+        CompletableFuture<List<User>> futureUploadedUsers = csvLoader.parseCsvToUsers(file);
+        CompletableFuture<Map<String, Country>> futureCountries = userUploadService.getAllCountries();
+
+        CompletableFuture<List<User>> futureUsers = futureUploadedUsers.thenCombine(futureCountries,
+                        userUploadService::setCountriesToUsers)
+                .thenCompose(Function.identity());
+
+        futureUsers.thenAccept(userUploadService::saveUsers)
+                .exceptionally(e -> {
+                    throw new EntitySaveException("Users were not saved", e);
+                });
     }
 }

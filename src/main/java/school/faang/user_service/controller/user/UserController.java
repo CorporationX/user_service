@@ -21,7 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.ImageProcessor;
+import school.faang.user_service.dto.subscription.responses.SuccessResponse;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.file.ValidFile;
 
 import java.util.List;
 
@@ -69,5 +71,11 @@ public class UserController {
     @DeleteMapping("/{userId}/avatar")
     public void deleteUserAvatar(@PathVariable long userId) {
         userService.deleteUserAvatar(userId);
+    }
+
+    @PostMapping("/users/upload")
+    SuccessResponse uploadUser(@RequestParam("file") @ValidFile MultipartFile file) {
+        userService.uploadUsers(file);
+        return new SuccessResponse("The file is uploaded. Processing...");
     }
 }

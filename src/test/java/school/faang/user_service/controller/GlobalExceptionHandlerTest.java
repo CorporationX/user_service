@@ -17,6 +17,7 @@ class GlobalExceptionHandlerTest {
     @InjectMocks
     private GlobalExceptionHandler globalExceptionHandler;
 
+
     @Test
     public void handleMethodArgumentNotValidTest() {
 

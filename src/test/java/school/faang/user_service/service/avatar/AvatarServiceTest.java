@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import school.faang.user_service.client.DefaultAvatarClient;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -66,7 +67,8 @@ public class AvatarServiceTest {
         User user = new User();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         byte[] file = {1, 2, 3};
-        when(defaultAvatarClient.getAvatar(any(), any(), any())).thenReturn(file);
+        ResponseEntity<byte[]> fileResponse = ResponseEntity.of(Optional.of(file));
+        when(defaultAvatarClient.getAvatar(any(), any(), any())).thenReturn(fileResponse);
         String key = "default_avatar_for_user_" + userId + "_";
 
         // Act and Assert

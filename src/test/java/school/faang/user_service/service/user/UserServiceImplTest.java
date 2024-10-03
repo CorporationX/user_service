@@ -2,10 +2,8 @@ package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -13,10 +11,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.upload.CsvLoader;
-import school.faang.user_service.service.user.upload.UserUploadService;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
 import school.faang.user_service.service.image.ImageProcessor;
@@ -63,10 +58,6 @@ public class UserServiceImplTest {
 
     @Mock
     private ImageProcessor imageProcessor;
-
-
-    @Spy
-    private UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
     @Test
     public void getUser_Success() {
@@ -196,13 +187,12 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void uploadFileTest_Success() throws Exception {
+    void uploadFileTest_Success() {
         Long userId = 1L;
         ByteArrayOutputStream outputStream = mock(ByteArrayOutputStream.class);
         String fileName = "fileName";
-        String key = "key";
 
-        String result = (String) ReflectionTestUtils.invokeMethod(service, "uploadFile", userId, outputStream, fileName);
+        String result = ReflectionTestUtils.invokeMethod(service, "uploadFile", userId, outputStream, fileName);
 
         assertNotNull(result);
         verify(s3Service).uploadFile(eq(outputStream), anyString());

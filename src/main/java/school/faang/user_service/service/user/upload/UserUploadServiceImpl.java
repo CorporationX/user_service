@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.common.PasswordCipher;
+import school.faang.user_service.common.PasswordGenerator;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.CountryRepository;
@@ -14,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,6 +25,8 @@ public class UserUploadServiceImpl implements UserUploadService {
 
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
+    private final PasswordGenerator passwordGenerator;
+    private final PasswordCipher passwordCipher;
 
     @Async("taskExecutor")
     @Override
@@ -48,7 +51,7 @@ public class UserUploadServiceImpl implements UserUploadService {
         });
         List<Country> savedCountries = countryRepository.saveAll(unsavedCountries);
         log.info("{} countries saved", savedCountries.size());
-        savedCountries.forEach(country -> countries.computeIfAbsent(country.getTitle(), c -> country));
+        savedCountries.forEach(country -> countries.put(country.getTitle(), country));
         users.stream()
                 .filter(user -> user.getCountry().getId() == 0)
                 .forEach(user -> user.setCountry(countries.get(user.getCountry().getTitle())));
@@ -58,29 +61,8 @@ public class UserUploadServiceImpl implements UserUploadService {
     @Async("taskExecutor")
     @Override
     public void saveUsers(List<User> users) {
-        Set<String> usernames = new HashSet<>(getUniqueListOfField(users, User::getUsername));
-        Set<String> emails = new HashSet<>(getUniqueListOfField(users, User::getEmail));
-        Set<String> phoneNumbers = new HashSet<>(getUniqueListOfField(users, User::getPhone));
-
-        List<User> alreadySavedUsers = userRepository.findExistingUsers(usernames, emails, phoneNumbers);
-
-        usernames.retainAll(getUniqueListOfField(alreadySavedUsers, User::getUsername));
-        emails.retainAll(getUniqueListOfField(alreadySavedUsers, User::getEmail));
-        phoneNumbers.retainAll(getUniqueListOfField(alreadySavedUsers, User::getPhone));
-
-        List<User> unsavedUsers = users.stream()
-                .filter(user -> !usernames.contains(user.getUsername()) &&
-                        !emails.contains(user.getEmail()) &&
-                        !phoneNumbers.contains(user.getPhone()))
-                .toList();
-        userRepository.saveAll(unsavedUsers);
-        log.info("{} already saved users", alreadySavedUsers.size());
-        log.info("{} users saved", unsavedUsers.size());
-    }
-
-    private Set<String> getUniqueListOfField(List<User> users, Function<User, String> function) {
-        return users.stream()
-                .map(function)
-                .collect(Collectors.toSet());
+        users.forEach(user -> user.setPassword(passwordCipher.encryptPassword(passwordGenerator.generatePassword(user.getUsername()))));
+        log.info("{} users to save", users.size());
+        userRepository.batchInsertUsers(users);
     }
 }

@@ -33,7 +33,6 @@ public interface UserMapper {
     List<SubscriptionUserDto> toSubscriptionUserDtos(List<User> users);
 
     @Mapping(target = "username", source = "person", qualifiedByName = {"UserMapperUtil", "getUserName"})
-    @Mapping(target = "password", source = "person.firstName", qualifiedByName = {"UserMapperUtil", "getGeneratedPassword"})
     @Mapping(target = "email", source = "contactInfo.email")
     @Mapping(target = "phone", source = "contactInfo.phone")
     @Mapping(target = "city", source = "contactInfo.address.city")

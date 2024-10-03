@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.common.PasswordCipher;
+import school.faang.user_service.common.PasswordGenerator;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.CountryRepository;
@@ -22,8 +24,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +38,12 @@ public class UserUploadServiceTest {
 
     @Mock
     private CountryRepository countryRepository;
+
+    @Mock
+    private PasswordGenerator passwordGenerator;
+
+    @Mock
+    private PasswordCipher passwordCipher;
 
     @InjectMocks
     private UserUploadServiceImpl userUploadService;
@@ -112,13 +121,30 @@ public class UserUploadServiceTest {
     @Test
     @DisplayName("Successfully saving users")
     public void testSaveUsersSuccess() {
-        when(userRepository.saveAll(anyList())).thenReturn(users);
-        when(userRepository.findExistingUsers(anySet(), anySet(), anySet())).thenReturn(new ArrayList<>());
+        when(passwordGenerator.generatePassword(anyString())).thenReturn("password");
+        when(passwordCipher.encryptPassword(anyString())).thenReturn("password");
 
         userUploadService.saveUsers(users);
 
-        verify(userRepository).saveAll(anyList());
+        verify(userRepository).batchInsertUsers(anyList());
         assertEquals(3, users.size());
         assertNotNull(users.get(0).getId());
+    }
+
+    @Test
+    public void testSavedAlreadySavedUser() {
+        users = List.of(User.builder()
+                .username("Stan Marsh")
+                .email("stan.marsh@example.com")
+                .country(country)
+                .phone("+313131301413")
+                .build());
+        when(passwordGenerator.generatePassword(anyString())).thenReturn("password");
+        when(passwordCipher.encryptPassword(anyString())).thenReturn("password");
+
+        userUploadService.saveUsers(users);
+
+        verify(userRepository).batchInsertUsers(anyList());
+        assertNull(users.get(0).getId());
     }
 }

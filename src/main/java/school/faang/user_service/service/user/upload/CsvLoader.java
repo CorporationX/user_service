@@ -35,7 +35,7 @@ public class CsvLoader {
                     .toList();
             log.info("{} : process {} persons", Thread.currentThread().getName(), users.size());
         } catch (IOException e) {
-            throw new FileUploadedException("Fail while uploading the file - " + file.getOriginalFilename());
+            throw new FileUploadedException("Fail while uploading the file - " + file.getOriginalFilename(), e);
         }
         return CompletableFuture.completedFuture(users);
     }

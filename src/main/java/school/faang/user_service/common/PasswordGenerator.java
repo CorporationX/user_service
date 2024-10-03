@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
 import java.util.Random;
 
 @Component
@@ -12,15 +11,13 @@ import java.util.Random;
 public class PasswordGenerator {
 
     private final Random random;
+    private static final String SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" +
+            "0123456789!@#$%^&*()-_+=<>?/{}[]|\\:;\"',.";
 
     @Value("${user.password.length}")
     private int passwordLength;
 
     public String generatePassword(String keyWord) {
-        String symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                "abcdefghijklmnopqrstuvwxyz" +
-                "0123456789" +
-                "!@#$%^&*()-_+=<>?/{}[]|\\:;\"',.";
         StringBuilder password = new StringBuilder();
         if (keyWord.length() < passwordLength) {
             password.append(keyWord);
@@ -28,8 +25,8 @@ public class PasswordGenerator {
             password.append(keyWord, 0, passwordLength);
         }
         for (int i = keyWord.length(); i <= passwordLength; i++) {
-            password.append(symbols.charAt(random.nextInt(symbols.length())));
+            password.append(SYMBOLS.charAt(random.nextInt(SYMBOLS.length())));
         }
-        return Base64.getEncoder().encodeToString(password.toString().getBytes());
+        return password.toString();
     }
 }

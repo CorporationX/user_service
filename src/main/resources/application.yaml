@@ -65,3 +65,4 @@ user:
         max-pool-size: 20
         queue-capacity: 1000
         thread-name-prefix: "UserUpload-"
+    batch-size: 200

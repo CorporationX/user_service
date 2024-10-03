@@ -1,6 +1,5 @@
 package school.faang.user_service.service.user;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -160,7 +159,7 @@ public class UserServiceImpl implements UserService {
 
         futureUsers.thenAccept(userUploadService::saveUsers)
                 .exceptionally(e -> {
-                    throw new EntitySaveException("Users were not saved");
+                    throw new EntitySaveException("Users were not saved", e);
                 });
     }
 }

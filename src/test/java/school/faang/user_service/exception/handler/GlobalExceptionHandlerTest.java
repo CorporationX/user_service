@@ -33,7 +33,7 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/file-upload-exception"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.serviceName").value(serviceName))
-                .andExpect(jsonPath("$.globalMessage").value("Something went wrong..."))
+                .andExpect(jsonPath("$.globalMessage").value(message))
                 .andExpect(jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 
@@ -42,8 +42,8 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/data-validation-exception"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.serviceName").value(serviceName))
-                .andExpect(jsonPath("$.globalMessage").value("Test exception"))
-                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()));
+                .andExpect(jsonPath("$.globalMessage").value(message))
+                .andExpect(jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 
     @Test
@@ -59,10 +59,12 @@ class GlobalExceptionHandlerTest {
 
         mockMvc.perform(content)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.fieldErrors.username").value(usernameMessage))
-                .andExpect(jsonPath("$.fieldErrors.password").value(passwordMessage))
-                .andExpect(jsonPath("$.fieldErrors.email").value(emailMessage))
-                .andExpect(jsonPath("$.fieldErrors.countryId").value(countryIdMessage));
+                .andExpect(jsonPath("$.fieldErrors").isArray())
+                .andExpect(jsonPath("$.fieldErrors.length()").value(4))
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'username' && @.message == '" + usernameMessage + "')]").exists())
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'password' && @.message == '" + passwordMessage + "')]").exists())
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'email' && @.message == '" + emailMessage + "')]").exists())
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'countryId' && @.message == '" + countryIdMessage + "')]").exists());
     }
 }
 

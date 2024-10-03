@@ -8,7 +8,6 @@ import school.faang.user_service.dto.UserDto;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserRegistrationDto;
@@ -18,9 +17,8 @@ import school.faang.user_service.service.UserService;
 import java.util.List;
 
 @Slf4j
-@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RestController("/api/v1/users")
 public class UserController {
 
     private final UserContext userContext;
@@ -32,20 +30,22 @@ public class UserController {
         long id = userContext.getUserId();
         userLifeCycleService.deactivateUser(id);
     }
-
+    @PutMapping("/deactivate/{id}")
+    public void deactivateUser(@PathVariable Long id) {
+        userLifeCycleService.deactivateUser(id);
+    }
     @PostMapping("/registration")
     public void registrationUser(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         log.info("Register user: {}", userRegistrationDto);
         userLifeCycleService.registrationUser(userRegistrationDto);
         log.info("User registration successful");
     }
-
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
 
-    @PostMapping
+    @GetMapping("/users")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }

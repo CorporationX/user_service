@@ -2,10 +2,7 @@ package school.faang.user_service.controller.mentorshiprequest;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
@@ -28,13 +25,13 @@ public class MentorshipRequestController {
         return mentorshipRequestService.getRequests(filter);
     }
 
-    @PutMapping("/acceptRequest")
-    public MentorshipRequestDto acceptRequest(@RequestBody long id) {
+    @PutMapping("/acceptRequest/{id}")
+    public MentorshipRequestDto acceptRequest(@PathVariable long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
 
-    @PostMapping("/rejectRequest")
-    public MentorshipRequestDto rejectRequest(@RequestBody long id, @NotNull @RequestBody RejectionDto rejection) {
+    @PostMapping("/rejectRequest/{id}")
+    public MentorshipRequestDto rejectRequest(@PathVariable long id, @NotNull @RequestBody RejectionDto rejection) {
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

@@ -26,11 +26,6 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
 
 services:
   s3:
@@ -54,3 +49,7 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+redis:
+  channels:
+    user-ban: user_ban

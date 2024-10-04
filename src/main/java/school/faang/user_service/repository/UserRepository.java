@@ -45,4 +45,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Modifying
     @Query("UPDATE User u SET u.userProfilePic = null WHERE u.id = ?1")
     void deleteUserProfilePicByUserId(Long userId);
+
+    @Query("SELECT MAX(u.id) FROM User u")
+    Long findMaxUserId();
 }

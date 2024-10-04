@@ -16,6 +16,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.redis.UserBanSubscriber;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -46,6 +47,7 @@ public class UserService {
     private final PromotionRepository promotionRepository;
     private final List<UserFilter> userFilters;
     private final S3service s3service;
+    private final UserBanSubscriber userBanSubscriber;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -189,6 +191,10 @@ public class UserService {
         s3service.deleteFile(profilePic.getFileId());
         s3service.deleteFile(profilePic.getSmallFileId());
         userRepository.deleteUserProfilePicByUserId(userId);
+    }
+
+    public Long getMaxUserId() {
+        return userRepository.findMaxUserId();
     }
 
     private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {

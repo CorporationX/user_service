@@ -98,4 +98,8 @@ public class UserController {
         userService.deleteAvatar(userId);
     }
 
+    @GetMapping("/maxId")
+    public Long getMaxUserId() {
+        return userService.getMaxUserId();
+    }
 }

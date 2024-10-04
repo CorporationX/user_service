@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V009__BJS2-27201_insert_premium_users.sql
   - include:
       file: db/changelog/changeset/user_V010_BJS2-27199.sql
+  - include:
+      file: db/changelog/changeset/user_V011_BJS2-27267_add_version_banned_columns.sql

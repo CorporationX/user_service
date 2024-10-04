@@ -40,12 +40,8 @@ public class AvatarService {
     public UserProfilePic generateAndSaveAvatar(AvatarStyle style) {
         log.info("Generating avatar for style: {}", style.getStyleName());
 
-        byte[] largeAvatarData = getRandomAvatar(style, "png", LARGE_AVATAR_SIZE);
-        byte[] smallAvatarData = getRandomAvatar(style, "png", SMALL_AVATAR_SIZE);
-        String largeAvatarFileName = UUID.randomUUID() + ".png";
-        String smallAvatarFileName = UUID.randomUUID() + ".png";
-        uploadAvatar(largeAvatarData, smallAvatarFileName, AVATAR_CONTENT_TYPE);
-        uploadAvatar(smallAvatarData, largeAvatarFileName, AVATAR_CONTENT_TYPE);
+        String largeAvatarFileName = uploadAvatar(style, LARGE_AVATAR_SIZE, AVATAR_CONTENT_TYPE);
+        String smallAvatarFileName = uploadAvatar(style, SMALL_AVATAR_SIZE, AVATAR_CONTENT_TYPE);
 
         UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setFileId(largeAvatarFileName);
@@ -54,9 +50,13 @@ public class AvatarService {
         return userProfilePic;
     }
 
-    private void uploadAvatar(byte[] avatarData, String avatarFileName, String contentType) {
+    private String uploadAvatar(AvatarStyle style, int size, String contentType) {
+        byte[] avatarData = getRandomAvatar(style, "png", size);
+        String avatarFileName = UUID.randomUUID() + ".png";
+
         log.info("Saving avatar with name: {}", avatarFileName);
         minioService.uploadFile(avatarFileName, avatarData, contentType);
+        return avatarFileName;
     }
 
     public byte[] getRandomAvatar(AvatarStyle style, String format, Integer size) {
@@ -125,7 +125,8 @@ public class AvatarService {
         }
         log.info(avatarFile.getContentType());
         String avatarFileName = UUID.randomUUID() + ".png";
-        uploadAvatar(avatarData, avatarFileName, AVATAR_CONTENT_TYPE);
+        log.info("Saving avatar with name: {}", avatarFileName);
+        minioService.uploadFile(avatarFileName, avatarData, AVATAR_CONTENT_TYPE);
         return avatarFileName;
     }
 

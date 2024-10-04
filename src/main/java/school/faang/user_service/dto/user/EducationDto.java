@@ -11,4 +11,5 @@ public class EducationDto {
     private String faculty;
     private int yearOfStudy;
     private String major;
+    private double GPA;
 }

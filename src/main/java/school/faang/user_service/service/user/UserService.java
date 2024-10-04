@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.batch.user.UserBatch;
 import school.faang.user_service.dto.user.UserAndFoloweeDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -153,17 +154,16 @@ public class UserService {
     public void getAllUsersAndFolowees() {
         log.info("The gathering of batches to heat the feed has begun");
         List<Long> userIds = userRepository.findAllUsersIds();
-        List<List<Long>> batches = partitionList(userIds, 100);
+        List<UserBatch> batches = partitionList(userIds, 100);
 
-        List<UserAndFoloweeDto> userAndFoloweeDtoList = new ArrayList<>();
-        for(List<Long> batch : batches) {
-            for(Long userId : batch) {
+        for(UserBatch batch : batches) {
+            List<UserAndFoloweeDto> userAndFoloweeDtoList = new ArrayList<>();
+            for(Long userId : batch.getUserIds()) {
                 List<Long> followeeIds = userRepository.getFolloweeIdsByUserId(userId);
                 UserAndFoloweeDto userAndFoloweeDto = new UserAndFoloweeDto(userId, followeeIds);
                 userAndFoloweeDtoList.add(userAndFoloweeDto);
             }
             heatFeedProducer.send(userAndFoloweeDtoList);
-            userAndFoloweeDtoList = new ArrayList<>();
         }
     }
 
@@ -194,10 +194,10 @@ public class UserService {
         log.info("Processed and saved user: {}", user.getEmail());
     }
 
-    private List<List<Long>> partitionList(List<Long> userIds, int batchSize) {
-        List<List<Long>> partitions = new ArrayList<>();
+    private List<UserBatch> partitionList(List<Long> userIds, int batchSize) {
+        List<UserBatch> partitions = new ArrayList<>();
         for (int i = 0; i < userIds.size(); i += batchSize) {
-            partitions.add(userIds.subList(i, Math.min(i + batchSize, userIds.size())));
+            partitions.add(new UserBatch(userIds.subList(i, Math.min(i + batchSize, userIds.size()))));
         }
         return partitions;
     }

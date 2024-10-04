@@ -83,4 +83,16 @@ public class AvatarServiceTest {
 
         verify(restTemplate, times(1)).getForEntity(anyString(), eq(byte[].class));
     }
+
+    @Test
+    void uploadUserAvatar() {
+    }
+
+    @Test
+    void getUserAvatar() {
+    }
+
+    @Test
+    void deleteUserAvatar() {
+    }
 }

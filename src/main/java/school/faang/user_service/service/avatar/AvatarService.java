@@ -115,7 +115,7 @@ public class AvatarService {
         return imageInByte;
     }
 
-    private String shrinkAndUploadImage(Long userId, MultipartFile avatarFile, int constraint){
+    String shrinkAndUploadImage(Long userId, MultipartFile avatarFile, int constraint){
         byte[] avatarData = null;
         try {
             avatarData = resizeImage(constraint, avatarFile);

@@ -217,9 +217,9 @@ class EventServiceTest {
         @Test
         void testDeletePastEvents() {
             Event oldEvent = testDataEvent.getOldEvent();
-            List<Event> pastEventList = List.of(oldEvent);
+            List<Long> pastEventList = List.of(oldEvent.getId());
 
-            when(eventRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(pastEventList);
+            when(eventRepository.findIdByEndDateBefore(any(LocalDateTime.class))).thenReturn(pastEventList);
             when(eventProperties.getSublistSize()).thenReturn(1);
 
             eventService.deletePastEvents();

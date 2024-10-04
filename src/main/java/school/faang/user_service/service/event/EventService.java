@@ -100,10 +100,7 @@ public class EventService {
 
     @Transactional
     public void deletePastEvents() {
-        List<Long> pastEventsIds = eventRepository.findAllByEndDateBefore(LocalDateTime.now())
-                .stream()
-                .map(Event::getId)
-                .toList();
+        List<Long> pastEventsIds = eventRepository.findIdByEndDateBefore(LocalDateTime.now());
 
         ListUtils.partition(pastEventsIds, eventProperties.getSublistSize())
                 .forEach(eventServiceHelper::deletePastEventsById);

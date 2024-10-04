@@ -9,7 +9,7 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -31,7 +31,7 @@ public class RecommendationServiceImpl implements RecommendationService{
 
     @Override
     public RecommendationDto create(RecommendationDto recommendation) {
-        validateRecContentIsBlankAndSkillInSystem(recommendation);
+        validateSkillInSystem(recommendation);
 
         validateRecommendationForPeriod(recommendation);
 
@@ -48,7 +48,7 @@ public class RecommendationServiceImpl implements RecommendationService{
     @Override
     @Transactional
     public RecommendationDto update(RecommendationDto recommendation) {
-        validateRecContentIsBlankAndSkillInSystem(recommendation);
+        validateSkillInSystem(recommendation);
 
         recommendationRepository.update(recommendation.getAuthorId(), recommendation.getReceiverId(),
                 recommendation.getContent());
@@ -87,9 +87,9 @@ public class RecommendationServiceImpl implements RecommendationService{
                 .toList();
     }
 
-    public void validateRecContentIsBlankAndSkillInSystem(RecommendationDto recommendation) {
-        if (recommendation.getContent() == null || recommendation.getContent().isBlank()) {
-            throw new DataValidationException("Recommendation text cannot be empty.");
+    public void validateSkillInSystem(RecommendationDto recommendation) {
+        if (recommendation.getContent().isBlank()) {
+            throw new DataValidationException("Recommendation text cannot be empty");
         }
 
         List<Long> skillIds = getSkillIds(recommendation);

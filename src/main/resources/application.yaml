@@ -73,13 +73,16 @@ scheduling:
 ---
 
 spring:
-  profiles:
-    active: normal
+  config:
+    activate:
+      on-profile: normal
 
 ---
 
 spring:
-  profiles: normal
+  config:
+    activate:
+      on-profile: normal
   async:
     pool:
       size: 5
@@ -87,7 +90,9 @@ spring:
 ---
 
 spring:
-  profiles: hard
+  config:
+    activate:
+      on-profile: hard
   async:
     pool:
       size: 10
@@ -95,7 +100,9 @@ spring:
 ---
 
 spring:
-  profiles: light
+  config:
+    activate:
+      on-profile: light
   async:
     pool:
       size: 3

@@ -26,7 +26,7 @@ import java.util.concurrent.Executor;
 )
 public class UserServiceApplication {
 
-    @Value("${spring.async.pool.size}")
+    @Value("${spring.async.pool.size:5}")
     private int threadPoolSize;
 
     @Value("${spring.async.queue.capacity:300}")

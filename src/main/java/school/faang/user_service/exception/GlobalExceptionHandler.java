@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             AvatarFetchException.class,
-            MinioUploadException.class,
+            MinioException.class,
             RuntimeException.class
     })
     @ResponseStatus(INTERNAL_SERVER_ERROR)

@@ -65,3 +65,37 @@ profile-picture:
   small:
     path: image/default-small-profile-picture.svg
     size: 110
+
+scheduling:
+  cron: "0 0 0 * * ?"
+  expiration: 1
+
+---
+
+spring:
+  profiles:
+    active: normal
+
+---
+
+spring:
+  profiles: normal
+  async:
+    pool:
+      size: 5
+
+---
+
+spring:
+  profiles: hard
+  async:
+    pool:
+      size: 10
+
+---
+
+spring:
+  profiles: light
+  async:
+    pool:
+      size: 3

@@ -25,6 +25,11 @@ public class CountryService {
                 .filter(country -> country.getTitle().equalsIgnoreCase(countryName))
                 .findFirst();
 
-        return countryOptional.orElseGet(() -> new Country(0, countryName, null));
+        if (countryOptional.isPresent()) {
+            return countryOptional.get();
+        } else {
+            Country newCountry = new Country(0, countryName, null);
+            return countryRepository.save(newCountry);
+        }
     }
 }

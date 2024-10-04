@@ -230,43 +230,73 @@ public class UserService {
         return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
     }
 
-    //*********************************************************
-
     @Transactional
     public void processCsvFile(InputStream inputStream) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
+            reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] fields = line.split(",");
-                if (fields.length < 6) continue;
+                if (fields.length < 21) continue;
 
                 PersonDto personDto = new PersonDto();
                 personDto.setFirstName(fields[0].trim());
                 personDto.setLastName(fields[1].trim());
 
                 ContactInfoDto contactInfoDto = new ContactInfoDto();
-                contactInfoDto.setEmail(fields[2].trim());
-                contactInfoDto.setPhone(fields[3].trim());
+                contactInfoDto.setEmail(fields[5].trim());
+                contactInfoDto.setPhone(fields[6].trim());
 
                 Address address = new Address();
-                address.setCity(fields[4].trim());
-                address.setState(fields[5].trim());
+                address.setStreet(fields[7].trim());
+                address.setCity(fields[8].trim());
+                address.setState(fields[9].trim());
+                address.setCountry(fields[10].trim());
+                address.setPostalCode(fields[11].trim());
 
                 contactInfoDto.setAddress(address);
                 personDto.setContactInfo(contactInfoDto);
+
+                EducationDto educationDto = new EducationDto();
+                educationDto.setFaculty(fields[12].trim());
+                educationDto.setYearOfStudy(Integer.parseInt(fields[13].trim()));
+                educationDto.setMajor(fields[14].trim());
+                educationDto.setGPA(Double.parseDouble(fields[15].trim()));
+                personDto.setEducation(educationDto);
+
+                personDto.setYearOfBirth(Integer.parseInt(fields[2].trim()));
+                personDto.setGroup(fields[3].trim());
+                personDto.setStudentID(fields[4].trim());
 
                 String countryName = address.getCountry();
                 Country country = countryService.findOrCreateCountry(countryName);
 
                 User user = personToUserMapper.personToUser(personDto);
-
+                user.setPassword(generatePassword());
                 user.setCountry(country);
+                user.setAboutMe(generateAboutMe(personDto));
 
                 userRepository.save(user);
             }
         } catch (IOException e) {
             log.error("Ошибка при обработке CSV файла: {}", e.getMessage());
         }
+    }
+
+    private String generateAboutMe(PersonDto personDto) {
+        StringBuilder aboutMe = new StringBuilder();
+        if (personDto.getContactInfo().getAddress().getState() != null && !personDto.getContactInfo().getAddress().getState().isEmpty()) {
+            aboutMe.append(personDto.getContactInfo().getAddress().getState()).append(", ");
+        }
+        if (personDto.getEducation() != null) {
+            aboutMe.append(personDto.getEducation().getFaculty()).append(", ")
+                    .append(personDto.getEducation().getYearOfStudy()).append(", ")
+                    .append(personDto.getEducation().getMajor()).append(", ");
+        }
+        if (personDto.getEmployer() != null && !personDto.getEmployer().isEmpty()) {
+            aboutMe.append(personDto.getEmployer());
+        }
+        return aboutMe.toString().trim();
     }
 
     private String generatePassword() {

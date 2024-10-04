@@ -1,18 +1,20 @@
 package school.faang.user_service.service.user;
 
+import com.json.student.Address;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.*;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -20,11 +22,11 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -40,6 +42,8 @@ public class UserService {
     private final EventRepository eventRepository;
     private final PromotionRepository promotionRepository;
     private final List<UserFilter> userFilters;
+    private final PersonToUserMapper personToUserMapper;
+    private final CountryService countryService;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -224,5 +228,55 @@ public class UserService {
         Promotion targetPromotion = getTargetPromotion(user);
 
         return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
+    }
+
+    //*********************************************************
+
+    @Transactional
+    public void processCsvFile(InputStream inputStream) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields.length < 6) continue;
+
+                PersonDto personDto = new PersonDto();
+                personDto.setFirstName(fields[0].trim());
+                personDto.setLastName(fields[1].trim());
+
+                ContactInfoDto contactInfoDto = new ContactInfoDto();
+                contactInfoDto.setEmail(fields[2].trim());
+                contactInfoDto.setPhone(fields[3].trim());
+
+                Address address = new Address();
+                address.setCity(fields[4].trim());
+                address.setState(fields[5].trim());
+
+                contactInfoDto.setAddress(address);
+                personDto.setContactInfo(contactInfoDto);
+
+                String countryName = address.getCountry();
+                Country country = countryService.findOrCreateCountry(countryName);
+
+                User user = personToUserMapper.personToUser(personDto);
+
+                user.setCountry(country);
+
+                userRepository.save(user);
+            }
+        } catch (IOException e) {
+            log.error("Ошибка при обработке CSV файла: {}", e.getMessage());
+        }
+    }
+
+    private String generatePassword() {
+        int length = 10;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        StringBuilder password = new StringBuilder(length);
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return password.toString();
     }
 }

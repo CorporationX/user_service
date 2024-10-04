@@ -88,6 +88,4 @@ public class UserController {
         avatarService.deleteUserAvatar(userId);
         return ResponseEntity.ok("Avatar deleted successfully.");
     }
-
-
 }

@@ -39,14 +39,8 @@ public class MinioService {
         try (InputStream inputStream = new ByteArrayInputStream(data)) {
             log.info("Uploading file {} to bucket {}", fileName, bucketName);
 
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .stream(inputStream, data.length, -1)
-                            .contentType(contentType)
-                            .build()
-            );
+            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(fileName).stream(inputStream,
+                    data.length, -1).contentType(contentType).build());
         } catch (Exception e) {
             log.error("Error uploading file to MinIO: {}", e.getMessage());
             throw new MinioException("Error uploading file to MinIO", e);
@@ -55,11 +49,8 @@ public class MinioService {
 
     public byte[] downloadFile(String objectKey) {
         byte[] file;
-        try (InputStream stream = minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectKey)
-                        .build())) {
+        try (InputStream stream =
+                     minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectKey).build())) {
             file = stream.readAllBytes();
         } catch (IOException | ErrorResponseException | InsufficientDataException | InternalException |
                  InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
@@ -72,11 +63,7 @@ public class MinioService {
 
     public void deleteFile(String objectKey) {
         try {
-            minioClient.removeObject(
-                    RemoveObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(objectKey)
-                            .build());
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectKey).build());
         } catch (ErrorResponseException | ServerException | InsufficientDataException | InternalException |
                  InvalidKeyException | InvalidResponseException | IOException | NoSuchAlgorithmException |
                  XmlParserException e) {

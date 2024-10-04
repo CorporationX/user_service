@@ -19,7 +19,6 @@ import school.faang.user_service.service.minio.MinioService;
 import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-
 import javax.imageio.ImageIO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,6 +53,7 @@ public class AvatarServiceTest {
     private UserRepository userRepository;
     @Mock
     private MultipartFile avatarFile;
+    private byte[] mockImageData;
 
     @BeforeEach
     public void setup() {
@@ -63,8 +63,8 @@ public class AvatarServiceTest {
 
     @Test
     public void testGenerateAndSaveAvatar_Success() {
-        when(restTemplate.getForEntity(anyString(), eq(byte[].class)))
-                .thenReturn(new ResponseEntity<>(avatarData, HttpStatus.OK));
+        when(restTemplate.getForEntity(anyString(), eq(byte[].class))).thenReturn(new ResponseEntity<>(avatarData,
+                HttpStatus.OK));
         doNothing().when(minioService).uploadFile(anyString(), any(byte[].class), anyString());
 
         UserProfilePic userProfilePic = avatarService.generateAndSaveAvatar(style);
@@ -73,15 +73,14 @@ public class AvatarServiceTest {
         assertNotNull(userProfilePic.getFileId());
         assertNotNull(userProfilePic.getSmallFileId());
 
-        verify(minioService, times(2)).
-                uploadFile(anyString(), eq(avatarData), eq("image/png"));
+        verify(minioService, times(2)).uploadFile(anyString(), eq(avatarData), eq("image/png"));
         verify(restTemplate, times(2)).getForEntity(anyString(), eq(byte[].class));
     }
 
     @Test
     public void testGetRandomAvatar_Success() {
-        when(restTemplate.getForEntity(anyString(), eq(byte[].class)))
-                .thenReturn(new ResponseEntity<>(avatarData, HttpStatus.OK));
+        when(restTemplate.getForEntity(anyString(), eq(byte[].class))).thenReturn(new ResponseEntity<>(avatarData,
+                HttpStatus.OK));
 
         byte[] result = avatarService.getRandomAvatar(style, "png", 200);
 
@@ -93,8 +92,7 @@ public class AvatarServiceTest {
 
     @Test
     public void testGetRandomAvatar_Failure() {
-        when(restTemplate.getForEntity(anyString(), eq(byte[].class)))
-                .thenReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(restTemplate.getForEntity(anyString(), eq(byte[].class))).thenReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 
         assertThrows(AvatarFetchException.class, () -> {
             avatarService.getRandomAvatar(style, "png", 200);
@@ -119,7 +117,7 @@ public class AvatarServiceTest {
     }
 
 
-@Test
+    @Test
     void uploadUserAvatar_TooLarge() {
         when(avatarFile.getSize()).thenReturn(6 * 1024 * 1024L); // 6MB
 

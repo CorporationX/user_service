@@ -22,7 +22,6 @@ public class EventServiceImpl implements EventService {
     @Value("${scheduling.expiration}")
     private long expirationWeeks;
 
-
     @Override
     @Async("poolThreads")
     public void deletingExpiredEvents() {

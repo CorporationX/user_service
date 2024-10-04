@@ -2,22 +2,36 @@ package school.faang.user_service.mapper.event;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventWithSubscribersDto;
+import school.faang.user_service.dto.promotion.PromotedEventResponseDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.entity.promotion.EventPromotion;
+import school.faang.user_service.entity.promotion.PromotionTariff;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static school.faang.user_service.util.premium.PremiumFabric.getUser;
+import static school.faang.user_service.util.promotion.PromotionFabric.getEvent;
+import static school.faang.user_service.util.promotion.PromotionFabric.getEventPromotion;
+
 public class EventMapperTest {
+    private static final long USER_ID = 1;
+    private static final long EVENT_ID = 1;
+    private static final String TITLE = "test title";
+    private static final PromotionTariff TARIFF = PromotionTariff.STANDARD;
+
     private final EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
     private Event event;
     private User user;
@@ -140,6 +154,18 @@ public class EventMapperTest {
                 .isEqualTo(expectedDtos);
     }
 
+    @Test
+    @DisplayName("Test converting event to response event")
+    void testToDto() {
+        User user = getUser(USER_ID);
+        EventPromotion eventPromotion = getEventPromotion(TARIFF, TARIFF.getNumberOfViews());
+        Event event = getEvent(EVENT_ID, TITLE, user, List.of(eventPromotion));
+        var responseDto = new PromotedEventResponseDto(EVENT_ID, TITLE, USER_ID, TARIFF.toString(),
+                TARIFF.getNumberOfViews(), null);
+
+        assertThat(eventMapper.toPromotedEventResponseDto(event)).isEqualTo(responseDto);
+    }
+
     private Event createEvent(Long id, String title, User owner, List<Skill> relatedSkills, String location, int maxAttendees) {
         return Event.builder()
                 .id(id)
@@ -168,6 +194,7 @@ public class EventMapperTest {
                 .title(title)
                 .build();
     }
+
     private List<Long> getSkillsIds(List<Skill> skills) {
         return skills.stream()
                 .map(Skill::getId)

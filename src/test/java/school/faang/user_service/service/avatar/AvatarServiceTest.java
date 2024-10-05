@@ -14,7 +14,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.UserServiceApplication;
 import school.faang.user_service.client.DefaultAvatarClient;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -26,6 +32,7 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class AvatarServiceTest {
+    private String prefixFileName = "default_avatar_for_user_";
     
     @InjectMocks
     private AvatarService service;
@@ -46,7 +53,7 @@ public class AvatarServiceTest {
 
         // Act & Assert
         Exception exception = Assertions.assertThrows(DataValidationException.class,() -> service.createDefaultAvatarForUser(userId));
-        Assertions.assertEquals(exception.getMessage(), "Пользователя с id = " + userId + " нет в системе");
+        Assertions.assertEquals(exception.getMessage(), String.format("User with id = %d has not in system", userId));
     }
 
     @Test
@@ -58,18 +65,19 @@ public class AvatarServiceTest {
 
         // Act & Assert
         Exception exception = Assertions.assertThrows(DataValidationException.class,() -> service.createDefaultAvatarForUser(userId));
-        Assertions.assertEquals(exception.getMessage(), "Пользователь с id = " + userId + " уже имеет аватар");
+        Assertions.assertEquals(String.format("User with id = %d already has an avatar", userId), exception.getMessage());
     }
 
     @Test
     public void createDefaultAvatarForUser() {
         // Arrange
-        User user = new User();
+        User user = User.builder().id(1L).build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         byte[] file = {1, 2, 3};
         ResponseEntity<byte[]> fileResponse = ResponseEntity.of(Optional.of(file));
         when(defaultAvatarClient.getAvatar(any(), any(), any())).thenReturn(fileResponse);
-        String key = "default_avatar_for_user_" + userId + "_";
+        String key = prefixFileName + userId + "_";
+        ReflectionTestUtils.setField(service, "prefixFileName", prefixFileName);
 
         // Act and Assert
         service.createDefaultAvatarForUser(userId);

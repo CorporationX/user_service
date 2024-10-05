@@ -9,7 +9,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;

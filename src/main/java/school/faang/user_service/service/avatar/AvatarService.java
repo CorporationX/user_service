@@ -46,7 +46,7 @@ public class AvatarService {
                 }
         );
         if (user.getUserProfilePic() != null) {
-            String message = "User with id =  " + userId + " already has an avatar";
+            String message = "User with id = " + userId + " already has an avatar";
             throw new DataValidationException(message);
         }
         List<String> backgroundColors = getRandomBackGroundColorAvatar();

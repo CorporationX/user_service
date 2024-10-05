@@ -15,6 +15,7 @@ import school.faang.user_service.publis.listener.UserBanListener;
 @RequiredArgsConstructor
 public class RedisConfig {
     private final RedisProperties redisProperties;
+    private final UserBanListener userBanListener;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -22,22 +23,22 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter userBanAdapter(UserBanListener userBanListener) {
+    public RedisMessageListenerContainer userBanListenerContainer(RedisConnectionFactory redisConnectionFactory) {
+        RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
+        redisContainer.setConnectionFactory(redisConnectionFactory);
+
+        redisContainer.addMessageListener(userBanAdapter(), userBanTopic());
+
+        return redisContainer;
+    }
+
+    @Bean
+    public MessageListenerAdapter userBanAdapter() {
         return new MessageListenerAdapter(userBanListener);
     }
 
     @Bean
     public Topic userBanTopic() {
         return new ChannelTopic(redisProperties.getUserBanChannelName());
-    }
-
-    @Bean
-    public RedisMessageListenerContainer userBanListenerContainer(RedisConnectionFactory connectionFactory, MessageListenerAdapter userBanAdapter) {
-        RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
-        redisContainer.setConnectionFactory(connectionFactory);
-
-        redisContainer.addMessageListener(userBanAdapter, userBanTopic());
-
-        return redisContainer;
     }
 }

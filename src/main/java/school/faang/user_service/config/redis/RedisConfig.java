@@ -5,18 +5,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import school.faang.user_service.publis.listener.UserBanListener;
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
     private final RedisProperties redisProperties;
-    private final UserBanListener userBanListener;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -24,23 +22,21 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-
-        return redisTemplate;
+    public MessageListenerAdapter userBanAdapter(UserBanListener userBanListener) {
+        return new MessageListenerAdapter(userBanListener);
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+    public Topic userBanTopic() {
+        return new ChannelTopic(redisProperties.getUserBanChannelName());
+    }
+
+    @Bean
+    public RedisMessageListenerContainer userBanListenerContainer(RedisConnectionFactory connectionFactory, MessageListenerAdapter userBanAdapter) {
         RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
         redisContainer.setConnectionFactory(connectionFactory);
 
-        Topic banUserTopic = new ChannelTopic(redisProperties.getUserBanChannelName());
-        redisContainer.addMessageListener(userBanListener, banUserTopic);
+        redisContainer.addMessageListener(userBanAdapter, userBanTopic());
 
         return redisContainer;
     }

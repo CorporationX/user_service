@@ -23,7 +23,6 @@ public class PremiumRemoveQuartzConfig {
     @Bean
     public Trigger premiumRemoveTrigger() {
         CronScheduleBuilder croneScheduler = CronScheduleBuilder.cronSchedule("0 0 0 ? * SUN *");
-
         return TriggerBuilder.newTrigger()
                 .forJob(premiumRemoveJobDetail())
                 .withIdentity("premiumRemoveJobTrigger", "premium")

@@ -41,6 +41,6 @@ class PremiumServiceTest {
         List<Premium> premiums = buildPremiums(NUMBER_OF_PREMIUMS);
         premiumService.deleteAllPremiumsByIdAsync(premiums);
 
-        verify(premiumRepository).deleteByIdInBatch(anyList());
+        verify(premiumRepository).deleteAllInBatch(anyList());
     }
 }

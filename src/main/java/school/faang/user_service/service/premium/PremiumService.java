@@ -25,10 +25,7 @@ public class PremiumService {
     @Async("premiumServicePool")
     @Transactional
     public void deleteAllPremiumsByIdAsync(List<Premium> premiums) {
-        List<Long> premiumIds = premiums.stream()
-                .map(Premium::getId)
-                .toList();
-        log.info("Delete all premiums by id: {}", premiumIds);
-        premiumRepository.deleteByIdInBatch(premiumIds);
+        log.info("Delete all premiums");
+        premiumRepository.deleteAllInBatch(premiums);
     }
 }

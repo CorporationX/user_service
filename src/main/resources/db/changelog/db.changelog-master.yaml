@@ -14,4 +14,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
-      file: db/changelog/changeset/user_V008__add_column_banned_to_table_user.sql
+      file: db/changelog/changeset/user_V010__add_column_banned_to_table_user.sql

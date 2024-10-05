@@ -3,6 +3,7 @@ package school.faang.user_service.config.redis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -23,22 +24,21 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer userBanListenerContainer(RedisConnectionFactory redisConnectionFactory) {
-        RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
-        redisContainer.setConnectionFactory(redisConnectionFactory);
-
-        redisContainer.addMessageListener(userBanAdapter(), userBanTopic());
-
-        return redisContainer;
-    }
-
-    @Bean
-    public MessageListenerAdapter userBanAdapter() {
+    public MessageListener userBanAdapter() {
         return new MessageListenerAdapter(userBanListener);
     }
 
     @Bean
     public Topic userBanTopic() {
         return new ChannelTopic(redisProperties.getUserBanChannelName());
+    }
+    @Bean
+    public RedisMessageListenerContainer redisContainer() {
+        RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
+        redisContainer.setConnectionFactory(redisConnectionFactory());
+
+        redisContainer.addMessageListener(userBanAdapter(), userBanTopic());
+
+        return redisContainer;
     }
 }

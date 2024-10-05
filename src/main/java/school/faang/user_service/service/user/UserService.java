@@ -21,4 +21,6 @@ public interface UserService {
     List<UserDto> getUsersByIds(List<Long> userIds);
 
     void addUsersFromFile(InputStream fileStream) throws IOException;
+
+    void banUser(long id);
 }

@@ -77,12 +77,40 @@ public class UserServiceImpl implements UserService {
             setStudentsCountry(student, user, countryList);
             userRepository.save(user);
             return user;
-        }).forEach(v -> {});
+        }).forEach(v -> {
+        });
     }
 
-    private void setStudentsCountry(Person person, User user,List<Country> countryList) {
-        Optional<Country> country =  gerPersonsCountryFromDB(person, countryList);
-        country.ifPresentOrElse(user::setCountry,() -> {
+    @Override
+    public User findUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(
+                "User with ID: %d does not exist.".formatted(userId)));
+    }
+
+    @Override
+    public UserDto getUser(long userId) {
+        return userMapper.toDto(findUserById(userId));
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds).stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void banUser(long id) {
+        User user = findUserById(id);
+        user.setBanned(true);
+
+        userRepository.save(user);
+    }
+
+    private void setStudentsCountry(Person person, User user, List<Country> countryList) {
+        Optional<Country> country = gerPersonsCountryFromDB(person, countryList);
+        country.ifPresentOrElse(user::setCountry, () -> {
             var saved = countryRepository.save(
                     Country.builder()
                             .title(person.getContactInfo().getAddress().getCountry())
@@ -93,13 +121,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private Optional<Country> gerPersonsCountryFromDB(Person person, List<Country> countryList) {
-       return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
-    }
-
-    @Override
-    public User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(
-                "User with ID: %d does not exist.".formatted(userId)));
+        return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
     }
 
     private void stopMentorship(User userToDeactivate) {
@@ -124,18 +146,6 @@ public class UserServiceImpl implements UserService {
                 .toList();
 
         goalService.removeGoals(goalsToRemove);
-    }
-
-    @Override
-    public UserDto getUser(long userId) {
-        return userMapper.toDto(findUserById(userId));
-    }
-
-    @Override
-    public List<UserDto> getUsersByIds(List<Long> userIds) {
-        return userRepository.findAllById(userIds).stream()
-                .map(userMapper::toDto)
-                .toList();
     }
 
     private String generatePassword() {

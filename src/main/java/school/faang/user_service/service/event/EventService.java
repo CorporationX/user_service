@@ -19,7 +19,7 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.promotion.PromotionService;
+import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.*;
@@ -37,7 +37,7 @@ public class EventService {
     private final EventValidator eventValidator;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
-    private final PromotionService promotionService;
+    private final PromotionManagementService promotionManagementService;
 
     private Event getEventOrThrow(long eventId) {
         return eventRepository.findById(eventId)
@@ -82,11 +82,7 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        if (filter == null) {
-            throw new DataValidationException("filters is null");
-        }
-
-        promotionService.removeExpiredPromotions();
+        promotionManagementService.removeExpiredPromotions();
 
         List<Event> filteredEvents = filteredEvents(filter);
         List<Event> prioritizedEvents = prioritizedEvents(filteredEvents);
@@ -173,10 +169,12 @@ public class EventService {
                 .map(Event::getOwner)
                 .map(User::getPromotions)
                 .filter(promotions -> !promotions.isEmpty())
-                .flatMap(promotions -> promotions.stream().filter(promotion -> PromotionTarget.EVENTS.name().equals(promotion.getTarget())))
+                .flatMap(promotions -> promotions.stream().filter(
+                        promotion -> PromotionTarget.EVENTS.name().equals(promotion.getTarget()))
+                )
                 .map(Promotion::getId)
                 .toList();
 
-        promotionService.markAsShowPromotions(promotionIds);
+        promotionManagementService.markAsShowPromotions(promotionIds);
     }
 }

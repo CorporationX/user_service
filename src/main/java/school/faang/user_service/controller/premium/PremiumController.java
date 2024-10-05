@@ -8,22 +8,22 @@ import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.dto.premium.PremiumPeriod;
-import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.service.premium.PremiumPurchaseService;
 
 @RestController
-@RequestMapping("/premuim")
+@RequestMapping("/v1/premuim")
 @AllArgsConstructor
 public class PremiumController {
 
-    private final PremiumService premiumService;
+    private final PremiumPurchaseService premiumPurchaseService;
     private final UserContext userContext;
 
     @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public PremiumDto buyPremium(@RequestBody @NonNull @Positive Integer days) {
         Long userId = userContext.getUserId();
         PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
 
-        return premiumService.buy(userId, premiumPeriod);
+        return premiumPurchaseService.buy(userId, premiumPeriod);
     }
 }

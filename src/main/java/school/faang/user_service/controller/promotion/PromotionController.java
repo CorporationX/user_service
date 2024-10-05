@@ -7,21 +7,22 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.promotion.PromotionDto;
 import school.faang.user_service.dto.promotion.PromotionType;
 import school.faang.user_service.dto.promotion.PromotionTarget;
-import school.faang.user_service.service.promotion.PromotionService;
+import school.faang.user_service.service.promotion.PromotionPurchaseService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/promotion")
+@RequestMapping("/v1/promotion")
 public class PromotionController {
 
-    private final PromotionService promotionService;
+    private final PromotionPurchaseService promotionPurchaseService;
     private final UserContext userContext;
 
     @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    public PromotionDto buyPromotion(@RequestParam(required = true) PromotionType promotionType, @RequestParam(required = true) PromotionTarget promotionTarget) {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PromotionDto buyPromotion(@RequestParam PromotionType promotionType,
+                                     @RequestParam PromotionTarget promotionTarget) {
         long userId = userContext.getUserId();
 
-        return promotionService.buyPromotion(userId, promotionType, promotionTarget);
+        return promotionPurchaseService.buyPromotion(userId, promotionType, promotionTarget);
     }
 }

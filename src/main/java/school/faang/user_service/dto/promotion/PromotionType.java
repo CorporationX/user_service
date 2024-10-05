@@ -7,11 +7,11 @@ public enum PromotionType {
     BASIC( 10, 100, 1),
     PREMIUM(40, 500, 2);
 
-    private final double price;
+    private final long price;
     private final int showCount;
     private final int priority;
 
-    PromotionType(double price, int showCount, int priority) {
+    PromotionType(long price, int showCount, int priority) {
         this.price = price;
         this.showCount = showCount;
         this.priority = priority;

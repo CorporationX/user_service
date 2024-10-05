@@ -6,7 +6,3 @@ CREATE TABLE user_premium (
 
     CONSTRAINT fk_user_premium_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
-
-CREATE SEQUENCE premium_payment_number_sequence
-    INCREMENT BY 1
-    START WITH 1;

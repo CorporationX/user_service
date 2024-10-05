@@ -13,6 +13,7 @@ import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.recommendation.RecommendationDtoValidator;
+import school.faang.user_service.service.SkillOfferService;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final RecommendationDtoValidator recommendationDtoValidator;
     private final SkillService skillService;
-    private final school.faang.user_service.service.SkillOfferService skillOfferService;
+    private final SkillOfferService skillOfferService;
     private final RecommendationMapper recommendationMapper;
 
     public RecommendationDto create(RecommendationDto recommendation) {

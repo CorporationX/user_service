@@ -41,7 +41,7 @@ public class UserController {
         userDeactivationService.deactivateAccount(userId);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<UserDto> getFilteredUsers(@RequestBody @Valid UserFilterDto filter) {
         return userService.users(filter);
     }

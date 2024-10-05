@@ -14,7 +14,7 @@ import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.promotion.PromotionService;
+import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.Collections;
@@ -30,7 +30,7 @@ public class UserService {
     private final UserValidator userValidator;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
-    private final PromotionService promotionService;
+    private final PromotionManagementService promotionManagementService;
 
     @Transactional
     public User getUserById(Long userId) {
@@ -60,7 +60,7 @@ public class UserService {
 
     @Transactional
     public List<UserDto> users(UserFilterDto filterDto) {
-        promotionService.removeExpiredPromotions();
+        promotionManagementService.removeExpiredPromotions();
 
         List<User> filteredUsers = filteredUsers(filterDto);
         List<User> prioritizedUsers = prioritizedUsers(filteredUsers);
@@ -99,12 +99,12 @@ public class UserService {
         List<Long> promotionIds = users.stream()
                 .map(User::getPromotions)
                 .filter(promotions -> !promotions.isEmpty())
-                .flatMap(promotions -> {
-                    return promotions.stream().filter(promotion -> PromotionTarget.PROFILE.name().equals(promotion.getTarget()));
-                })
+                .flatMap(promotions -> promotions.stream().filter(
+                        promotion -> PromotionTarget.PROFILE.name().equals(promotion.getTarget()))
+                )
                 .map(Promotion::getId)
                 .toList();
 
-        promotionService.markAsShowPromotions(promotionIds);
+        promotionManagementService.markAsShowPromotions(promotionIds);
     }
 }

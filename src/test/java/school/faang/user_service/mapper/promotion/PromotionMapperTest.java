@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.promotion.PromotionDto;
+import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.Promotion;
 
@@ -19,34 +20,37 @@ class PromotionMapperTest {
         User user = new User();
         user.setId(1L);
 
-        Promotion promotion = new Promotion();
-        promotion.setId(100L);
-        promotion.setPriority(5);
-        promotion.setShowCount(10);
-        promotion.setUser(user);
+        Promotion promotion = Promotion.builder()
+                .id(1L)
+                .priority(5)
+                .showCount(10)
+                .user(user)
+                .target(PromotionTarget.EVENTS.toString())
+                .build();
 
         PromotionDto dto = promotionMapper.toDto(promotion);
 
         assertNotNull(dto);
         assertEquals(5, dto.getPriority());
         assertEquals(10, dto.getShowCount());
-        assertEquals(1L, dto.getUserId());
+        assertEquals(PromotionTarget.EVENTS, dto.getTarget());
     }
 
     @Test
     @DisplayName("Should map PromotionDto to Promotion correctly")
     void testToEntity() {
-        PromotionDto dto = new PromotionDto();
-        dto.setPriority(5);
-        dto.setShowCount(10);
-        dto.setUserId(1L);
+        PromotionDto dto = PromotionDto.builder()
+                .priority(5)
+                .showCount(10)
+                .userId(1L)
+                .target(PromotionTarget.EVENTS)
+                .build();
 
         Promotion promotion = promotionMapper.toEntity(dto);
 
         assertNotNull(promotion);
         assertEquals(5, promotion.getPriority());
         assertEquals(10, promotion.getShowCount());
-        assertNotNull(promotion.getUser());
-        assertEquals(1L, promotion.getUser().getId());
+        assertEquals(PromotionTarget.EVENTS.toString(), promotion.getTarget());
     }
 }

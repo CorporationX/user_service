@@ -2,9 +2,10 @@ package school.faang.user_service.dto.promotion;
 
 import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class PromotionDto {
 
     @NonNull

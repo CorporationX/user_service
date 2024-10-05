@@ -24,7 +24,7 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.promotion.PromotionService;
+import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -44,7 +44,6 @@ class EventServiceTest {
     private static final long EVENT_ID_TWO = 2L;
     private static final long USER_ID_IS_ONE = 1L;
     private EventDto eventDto;
-    private User user;
     private Skill skill1;
     private Skill skill2;
     private List<Skill> skills;
@@ -72,7 +71,7 @@ class EventServiceTest {
     private EventParticipationService eventParticipationService;
 
     @Mock
-    private PromotionService promotionService;
+    private PromotionManagementService promotionManagementService;
 
     @Mock
     private List<EventFilter> eventFilters;
@@ -308,21 +307,12 @@ class EventServiceTest {
         }
 
         @Test
-        void testGetEventsByFilterWhenFiltersAreNull() {
-            EventFilterDto filters = null;
-
-            DataValidationException exception = assertThrows(DataValidationException.class,
-                    () -> eventService.getEventsByFilter(filters));
-            assertEquals("filters is null", exception.getMessage());
-        }
-
-        @Test
         @DisplayName("Successfully get filtered and prioritized events")
         void whenGetEventsByFilterThenSuccess() {
             EventFilterDto filterDto = new EventFilterDto();
             List<Event> filteredEvents = List.of(event);
 
-            doNothing().when(promotionService).removeExpiredPromotions();
+            doNothing().when(promotionManagementService).removeExpiredPromotions();
             when(eventFilters.stream()).thenReturn(Stream.of(eventFilter));
             when(eventFilter.isApplicable(filterDto)).thenReturn(true);
             when(eventFilter.toSpecification(filterDto)).thenReturn(mock(Specification.class));

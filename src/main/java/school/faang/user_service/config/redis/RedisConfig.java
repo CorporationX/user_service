@@ -24,21 +24,22 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListener userBanAdapter() {
+    public RedisMessageListenerContainer redisContainer() {
+        RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
+        redisContainer.setConnectionFactory(redisConnectionFactory());
+
+        redisContainer.addMessageListener(userBanListenerAdapter(), userBanTopic());
+
+        return redisContainer;
+    }
+
+    @Bean
+    public MessageListener userBanListenerAdapter() {
         return new MessageListenerAdapter(userBanListener);
     }
 
     @Bean
     public Topic userBanTopic() {
         return new ChannelTopic(redisProperties.getUserBanChannelName());
-    }
-    @Bean
-    public RedisMessageListenerContainer redisContainer() {
-        RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
-        redisContainer.setConnectionFactory(redisConnectionFactory());
-
-        redisContainer.addMessageListener(userBanAdapter(), userBanTopic());
-
-        return redisContainer;
     }
 }

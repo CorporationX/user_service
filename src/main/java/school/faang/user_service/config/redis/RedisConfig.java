@@ -1,5 +1,6 @@
 package school.faang.user_service.config.redis;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +12,20 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.service.user.UserIdsSubscriber;
+import school.faang.user_service.consumer.RedisBanMessageListener;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
+
+    private final RedisBanMessageListener banMessageListener;
+
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.ban-user-channel.name}")
+    private String banTopic;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -32,11 +39,7 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
 
-        // Using StringRedisSerializer for keys
         template.setKeySerializer(new StringRedisSerializer());
-
-
-        // Setting up serializers for values
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
@@ -44,22 +47,21 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(JedisConnectionFactory jedisConnectionFactory,
-                                                                       MessageListenerAdapter messageListenerAdapter,
-                                                                       ChannelTopic channelTopic) {
+    public ChannelTopic channelTopic(){
+        return new ChannelTopic(banTopic);
+    }
+
+    @Bean
+    public MessageListenerAdapter banMessageListenerAdapter(){
+        return new MessageListenerAdapter(banMessageListener);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory);
-        container.addMessageListener(messageListenerAdapter, channelTopic);
+        container.setConnectionFactory(redisConnectionFactory());
+        container.addMessageListener(banMessageListenerAdapter(), channelTopic());
+
         return container;
-    }
-
-    @Bean
-    public MessageListenerAdapter messageListenerAdapter(UserIdsSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber, "handleMessage");
-    }
-
-    @Bean
-    public ChannelTopic channelTopic() {
-        return new ChannelTopic("ban-commenters-by-id");
     }
 }

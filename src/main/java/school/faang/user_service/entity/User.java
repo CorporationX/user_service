@@ -111,7 +111,7 @@ public class User {
     private List<Skill> skills;
 
     @Column(name = "banned")
-    private boolean banned;
+    private Boolean banned;
 
     @ManyToMany
     @JoinTable(

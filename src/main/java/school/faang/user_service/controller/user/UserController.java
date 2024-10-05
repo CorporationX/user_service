@@ -56,4 +56,11 @@ public class UserController {
       userService.addUsersFromFile(file.getInputStream());
       return ResponseEntity.ok("sucessfuly uploaded");
     }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        return userDto;
+    }
 }

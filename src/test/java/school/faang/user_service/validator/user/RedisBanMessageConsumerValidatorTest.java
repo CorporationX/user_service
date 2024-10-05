@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserIdsSubscriberValidatorTest {
+public class RedisBanMessageConsumerValidatorTest {
     @Mock
     private UserRepository userRepository;
 

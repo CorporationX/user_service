@@ -138,6 +138,17 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public void banUser(Long id) {
+        User userToBan = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        userToBan.setBanned(true);
+
+        userRepository.save(userToBan);
+        log.info("Banned user with ID {}", id);
+    }
+
     private String generatePassword() {
         String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();

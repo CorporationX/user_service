@@ -1,19 +1,17 @@
 package school.faang.user_service.service.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.consumer.RedisBanMessageListener;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.user.UserIdsSubscriberValidator;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +19,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserIdsSubscriberTest {
+public class RedisBanMessageConsumerTest {
     @Mock
     private UserRepository userRepository;
 
@@ -32,7 +30,7 @@ public class UserIdsSubscriberTest {
     private ObjectMapper objectMapper;
 
     @InjectMocks
-    private UserIdsSubscriber userIdsSubscriber;
+    private RedisBanMessageListener redisBanMessageConsumer;
 
     @Test
     public void testHandleMessage_ValidUserIds() {
@@ -49,7 +47,7 @@ public class UserIdsSubscriberTest {
         doNothing().when(userIdsSubscriberValidator).validateId(userId);
 
         // When
-        userIdsSubscriber.handleMessage(userIds);
+        redisBanMessageConsumer.handleMessage(userIds);
 
         // Then
         verify(userIdsSubscriberValidator, times(1)).parseUserIds(userIds);
@@ -70,7 +68,7 @@ public class UserIdsSubscriberTest {
 
         // When & Then
         assertThrows(DataValidationException.class, () -> {
-            userIdsSubscriber.handleMessage(userIds);
+            redisBanMessageConsumer.handleMessage(userIds);
         });
 
         verify(userIdsSubscriberValidator, times(1)).parseUserIds(userIds);
@@ -83,7 +81,7 @@ public class UserIdsSubscriberTest {
         Object invalidMessage = new Object();
 
         // When
-        userIdsSubscriber.handleMessage(invalidMessage);
+        redisBanMessageConsumer.handleMessage(invalidMessage);
 
         // Then
         verify(userIdsSubscriberValidator, times(1)).parseUserIds(invalidMessage);

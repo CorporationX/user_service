@@ -103,6 +103,13 @@ public class GlobalExceptionHandler {
         return getResponse(ex);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("IllegalArgumentException occurred: {}", ex.getMessage(), ex);
+        return getResponse(ex);
+    }
+
     private ErrorResponse getResponse(Exception ex) {
         log.error("Exception occurred: {}", ex.toString());
         return new ErrorResponse(ex.getMessage());

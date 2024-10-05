@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -213,5 +214,30 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(EMAIL, resultFound.get(0).getEmail());
 
         assertEquals(0, resultNotFound.size());
+    }
+
+    @Test
+    void testGetOnlyActiveUsersFromList_success_notEmptyIds() {
+        List<Long> ids = Arrays.asList(1L, 2L, 3L);
+        List<Long> expectedActiveUserIds = Arrays.asList(1L, 2L);
+
+        when(userRepository.findActiveUserIdsByIds(ids)).thenReturn(expectedActiveUserIds);
+
+        List<Long> activeUserIds = userService.getOnlyActiveUsersFromList(ids);
+
+        assertNotNull(activeUserIds);
+        assertEquals(expectedActiveUserIds, activeUserIds);
+        verify(userRepository, times(1)).findActiveUserIdsByIds(ids);
+    }
+
+    @Test
+    public void testGetOnlyActiveUsersFromList_failed_EmptyIds() {
+        List<Long> ids = Collections.emptyList();
+
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+                () -> userService.getOnlyActiveUsersFromList(ids));
+
+        assertEquals("User ID list cannot be empty", thrown.getMessage());
+        verify(userRepository, never()).findActiveUserIdsByIds(any());
     }
 }

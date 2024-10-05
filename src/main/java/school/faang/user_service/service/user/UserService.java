@@ -149,4 +149,12 @@ public class UserService {
     public User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> getOnlyActiveUsersFromList(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("User ID list cannot be empty");
+        }
+        return userRepository.findActiveUserIdsByIds(ids);
+    }
 }

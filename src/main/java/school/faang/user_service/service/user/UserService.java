@@ -22,4 +22,6 @@ public interface UserService {
     UserDto register(UserDtoForRegistration userDto);
 
     void uploadUsers(MultipartFile file);
+
+    void banUserById(long userId);
 }

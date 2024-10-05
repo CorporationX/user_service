@@ -41,10 +41,20 @@ public class RedisConfig {
         RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
         redisContainer.setConnectionFactory(connectionFactory);
 
-        MessageListener userBanMessageListener = new MessageListenerAdapter(userBanListener);
-        Topic banUserTopic = new ChannelTopic(redisProperties.getUserBanChannelName());
+        MessageListener userBanMessageListener = userBanListenerAdapter(userBanListener);
+        Topic banUserTopic = banUserTopic();
         redisContainer.addMessageListener(userBanMessageListener, banUserTopic);
 
         return redisContainer;
+    }
+
+    @Bean
+    public ChannelTopic banUserTopic() {
+        return new ChannelTopic(redisProperties.getUserBanChannelName());
+    }
+
+    @Bean
+    public MessageListenerAdapter userBanListenerAdapter(UserBanListener userBanListener) {
+        return new MessageListenerAdapter(userBanListener);
     }
 }

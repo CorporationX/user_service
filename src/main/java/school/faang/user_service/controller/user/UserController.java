@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import school.faang.user_service.validator.file.FileValidator;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +44,16 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userMapper.toDto(userService.findUserById(userId));
+    }
+
+    @PostMapping("/heat")
+    public void getAllUsersAndFolowees() {
+        userService.getAllUsersAndFolowees();
+    }
+
+    @GetMapping("/follower/{userId}")
+    public List<Long> getFollowerIds(@PathVariable long userId) {
+        return userService.getFollowerIds(userId);
     }
 
     @PostMapping("/{userId}/avatar")

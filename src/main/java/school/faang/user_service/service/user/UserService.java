@@ -12,13 +12,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.batch.user.UserBatch;
+import school.faang.user_service.dto.user.UserAndFoloweeDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.producer.HeatFeedProducer;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.cache.UserCacheRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
@@ -31,6 +35,7 @@ import school.faang.user_service.dto.user.UserDto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.stream.StreamSupport;
 import java.io.InputStream;
 import java.util.List;
@@ -53,10 +58,10 @@ public class UserService {
     private final CountryService countryService;
     private final S3Service s3Service;
     private final PasswordService passwordService;
+    private final UserCacheRepository userCacheRepository;
+    private final HeatFeedProducer heatFeedProducer;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
-
-
 
     public UserDto deactivate(Long userId) {
         User user = userRepository.findById(userId).get();
@@ -144,6 +149,34 @@ public class UserService {
         return allOf;
     }
 
+    @Transactional(readOnly = true)
+    @Async("taskExecutor")
+    public void getAllUsersAndFolowees() {
+        log.info("The gathering of batches to heat the feed has begun");
+        List<Long> userIds = userRepository.findAllUsersIds();
+        List<UserBatch> batches = partitionList(userIds, 100);
+
+        for(UserBatch batch : batches) {
+            List<UserAndFoloweeDto> userAndFoloweeDtoList = new ArrayList<>();
+            for(Long userId : batch.getUserIds()) {
+                List<Long> followeeIds = userRepository.getFolloweeIdsByUserId(userId);
+                UserAndFoloweeDto userAndFoloweeDto = new UserAndFoloweeDto(userId, followeeIds);
+                userAndFoloweeDtoList.add(userAndFoloweeDto);
+            }
+            heatFeedProducer.send(userAndFoloweeDtoList);
+        }
+    }
+
+    public List<Long> getFollowerIds(Long userId) {
+        return userRepository.findFollowerIdsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public void cacheUser(long userId) {
+        User user = findUserById(userId);
+        userCacheRepository.save(userId, userMapper.toDto(user));
+    }
+
     private List<Person> readPersonsFromCSV(InputStream file) throws IOException {
         ObjectReader csvOpenReader = new CsvMapper()
                 .readerFor(Person.class)
@@ -159,5 +192,13 @@ public class UserService {
         user.setCountry(country);
         userRepository.save(user);
         log.info("Processed and saved user: {}", user.getEmail());
+    }
+
+    private List<UserBatch> partitionList(List<Long> userIds, int batchSize) {
+        List<UserBatch> partitions = new ArrayList<>();
+        for (int i = 0; i < userIds.size(); i += batchSize) {
+            partitions.add(new UserBatch(userIds.subList(i, Math.min(i + batchSize, userIds.size()))));
+        }
+        return partitions;
     }
 }

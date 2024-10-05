@@ -59,6 +59,17 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
     /**
+     * kafka
+     */
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+
+    /**
+     * jackson-datatype-jsr310(for a date in redis)
+     */
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    /**
      * Test containers
      */
     implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))

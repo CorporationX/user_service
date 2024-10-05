@@ -3,6 +3,7 @@ package school.faang.user_service.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import school.faang.user_service.dto.user.UserAndFoloweeDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -30,4 +31,19 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     Optional<User> findByPhone(String phone);
+
+    @Query(value = """
+            SELECT u.id FROM User u 
+            JOIN u.followees f WHERE f.id = :userId
+            """)
+    List<Long> findFollowerIdsByUserId(long userId);
+
+    @Query(value = """
+            SELECT u.id FROM User u 
+            JOIN u.followers f WHERE f.id = :userId
+            """)
+    List<Long> getFolloweeIdsByUserId(long userId);
+
+    @Query("SELECT u.id FROM User u")
+    List<Long> findAllUsersIds();
 }

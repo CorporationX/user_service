@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;

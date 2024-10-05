@@ -1,21 +1,23 @@
 package school.faang.user_service.service.event;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.filter.EventFilter;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,7 +42,7 @@ public class EventServiceImpl implements EventService {
 
     @Transactional(readOnly = true)
     public EventDto getEvent(long eventId) {
-         return eventMapper.toDto(eventRepository.findById(eventId).orElseThrow(() -> new DataValidationException("Ивента нет в базе")));
+        return eventMapper.toDto(eventRepository.findById(eventId).orElseThrow(() -> new DataValidationException("Ивента нет в базе")));
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +75,7 @@ public class EventServiceImpl implements EventService {
 
     @Transactional(readOnly = true)
     public List<EventDto> getParticipatedEvents(long userId) {
-        return  eventRepository.findParticipatedEventsByUserId(userId)
+        return eventRepository.findParticipatedEventsByUserId(userId)
                 .stream()
                 .map(eventMapper::toDto)
                 .toList();
@@ -95,4 +97,12 @@ public class EventServiceImpl implements EventService {
             throw new DataValidationException("Пользователь не имеет всех необходимых навыков");
         }
     }
+
+    @Async
+    public CompletableFuture<Void> clearOutdatedEvents(List<Event> events) {
+        events.forEach(event -> deleteEvent(event.getId()));
+        return CompletableFuture.completedFuture(null);
+    }
 }
+
+

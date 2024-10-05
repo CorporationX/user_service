@@ -37,10 +37,8 @@ public class EventServiceHelper {
     }
 
     @Async("eventThreadPool")
-    public void deletePastEventsById(List<Long> pastEventsIds) {
-        pastEventsIds.forEach(pastEventsId -> {
-            log.info("Delete event with ID: " + pastEventsId + " by " + Thread.currentThread().getName());
-            eventRepository.deleteById(pastEventsId);
-        });
+    public void deletePastEventsById(List<Long> sublistPastEventsIds) {
+        log.info("Delete event with IDs: " + sublistPastEventsIds);
+        eventRepository.deleteAllByIdInBatch(sublistPastEventsIds);
     }
 }

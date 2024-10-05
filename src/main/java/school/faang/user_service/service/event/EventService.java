@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -102,8 +104,8 @@ public class EventService {
     public void deletePastEvents() {
         List<Long> pastEventsIds = eventRepository.findIdByEndDateBefore(LocalDateTime.now());
 
-        ListUtils.partition(pastEventsIds, eventProperties.getSublistSize())
-                .forEach(eventServiceHelper::deletePastEventsById);
+        var sublist = ListUtils.partition(pastEventsIds, eventProperties.getSublistSize());
+        sublist.forEach(eventServiceHelper::deletePastEventsById);
     }
 
     private EventDto saveEvent(EventDto eventDto) {

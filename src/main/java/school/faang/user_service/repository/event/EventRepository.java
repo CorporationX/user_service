@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findParticipatedEventsByUserId(long userId);
 
     @Query(nativeQuery = true, value = """
-            SELECT id FROM event WHERE event.end_date < :endDate;
+            SELECT id FROM event WHERE event.end_date < :endDate
             """)
     List<Long> findIdByEndDateBefore(LocalDateTime endDate);
 }

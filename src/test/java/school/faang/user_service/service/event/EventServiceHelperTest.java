@@ -70,9 +70,7 @@ class EventServiceHelperTest {
 
             eventServiceHelper.deletePastEventsById(pastEventsIds);
 
-            pastEventsIds.forEach(pastEventsId ->
-                    verify(eventRepository, atLeastOnce()).deleteById(pastEventsId)
-            );
+            verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(pastEventsIds);
         }
     }
 

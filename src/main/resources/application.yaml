@@ -40,3 +40,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+premium:
+  scheduled:
+    daily: "0 0 0 * * *"
+  thread-pool-size: 5
+  batch-size: 100

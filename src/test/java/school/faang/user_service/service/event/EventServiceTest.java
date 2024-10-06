@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -171,7 +173,7 @@ public class EventServiceTest {
     }
 
     @Test
-    void testClearPastEvents() {
+    void testClearPastEvents() throws InterruptedException {
         Event firstEvent = new Event();
         firstEvent.setId(1L);
         firstEvent.setEndDate(LocalDateTime.now().minusDays(1));
@@ -186,10 +188,18 @@ public class EventServiceTest {
 
         events = Arrays.asList(firstEvent, secondEvent, thirdEvent);
         when(eventRepository.findAll()).thenReturn(events);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        doAnswer(invocationOnMock ->{
+            latch.countDown();
+            return null;
+        }).when(eventRepository).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
 
         eventService.clearPastEvents();
-        verify(eventRepository, times(1)).findAll();
+
+        latch.await();
+
         verify(eventRepository, times(1)).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
-        verify(eventRepository, never()).deleteAllByIdInBatch(Arrays.asList(3L));
+        verify(eventRepository, never()).deleteAllByIdInBatch(List.of(3L));
     }
 }

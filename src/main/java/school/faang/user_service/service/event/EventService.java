@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
@@ -134,19 +135,25 @@ public class EventService {
 
     public void clearPastEvents() {
         List<Event> events = eventRepository.findAll();
-        if (events.size() > 0) {
-            List<Event> pastEvents = events.stream()
-                    .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
-                    .toList();
+        Optional<List<Event>> pastEventsOptional = Optional.of(events)
+                .filter(e -> !e.isEmpty())
+                .map(e -> e.stream()
+                        .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                        .toList())
+                .filter(pastEvents -> !pastEvents.isEmpty());
+
+        pastEventsOptional.ifPresent(pastEvents -> {
             List<List<Event>> partitions = partitionList(pastEvents, batchSize);
             ExecutorService executor = Executors.newFixedThreadPool(partitions.size());
+
             for (List<Event> partition : partitions) {
+                List<Long> deletableIds = partition.stream().map(Event::getId).toList();
                 executor.submit(() -> eventRepository.deleteAllByIdInBatch(
-                        partition.stream().map(Event::getId).toList()
+                        deletableIds
                 ));
             }
             executor.shutdown();
-        }
+        });
     }
 
     private <T> List<List<T>> partitionList(List<T> list, int size) {

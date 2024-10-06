@@ -28,8 +28,6 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
-@ActiveProfiles("test") // Убедитесь, что вы используете профиль тестирования
-@AutoConfigureMockMvc
 public class RecommendationRequestServiceImplTest {
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;

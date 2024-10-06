@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -20,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class SkillServiceImpl implements SkillService {
     private final SkillRepository skillRepository;
@@ -60,6 +61,7 @@ public class SkillServiceImpl implements SkillService {
             skillCandidateDto.setOffersAmount(entry.getValue());
             result.add(skillCandidateDto);
         }
+
         return result;
     }
 
@@ -80,9 +82,12 @@ public class SkillServiceImpl implements SkillService {
                 guarantee.setSkill(skill);
                 guarantee.setGuarantor(guarantorUser);
                 userSkillGuaranteeList.add(guarantee);
+
             });
             skill.setGuarantees(userSkillGuaranteeList);
+            skillRepository.save(skill);
         }
+
         return skillMapper.toDto(skill);
     }
 }

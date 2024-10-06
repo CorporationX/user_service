@@ -37,7 +37,6 @@ public class EventServiceHelper {
         }
     }
 
-    @Transactional
     @Async("deletePastEventsThreadPool")
     public void asyncDeletePastEvents(List<Long> sublistPastEventsIds) {
         batchDeletePastEvents(sublistPastEventsIds);

@@ -14,6 +14,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileUploadException;
 import school.faang.user_service.exception.NonUniqueFieldsException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;

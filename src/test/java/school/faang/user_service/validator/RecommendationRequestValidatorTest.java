@@ -1,9 +1,8 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.validator.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.time.LocalDateTime;
 

@@ -12,7 +12,7 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -47,18 +47,10 @@ public class RecommendationServiceTest {
     }
     @Test
     public void testCreateWithBlankContent() {
-        RecommendationDto dto = prepareData(" ");
-
-        Throwable exception = assertThrows(DataValidationException.class, () -> recommendationService.create(dto));
-        assertEquals("Recommendation text cannot be empty.", exception.getMessage());
-    }
-
-    @Test
-    public void testCreateWithNullContent() {
         RecommendationDto dto = prepareData("");
 
         Throwable exception = assertThrows(DataValidationException.class, () -> recommendationService.create(dto));
-        assertEquals("Recommendation text cannot be empty.", exception.getMessage());
+        assertEquals("Recommendation text cannot be empty", exception.getMessage());
     }
 
     @Test

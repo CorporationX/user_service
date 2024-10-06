@@ -1,10 +1,12 @@
 package school.faang.user_service.service;
 
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import org.springframework.test.context.ActiveProfiles;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RecommendationRequestTooFrequentException;
@@ -26,6 +28,8 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
+@ActiveProfiles("test") // Убедитесь, что вы используете профиль тестирования
+@AutoConfigureMockMvc
 public class RecommendationRequestServiceImplTest {
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;

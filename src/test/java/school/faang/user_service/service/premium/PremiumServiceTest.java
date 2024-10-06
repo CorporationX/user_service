@@ -25,6 +25,7 @@ import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.scheduler.PremiumRemoverTransactions;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -58,6 +60,9 @@ public class PremiumServiceTest {
 
     @Mock
     private PremiumRepository premiumRepository;
+
+    @Mock
+    private PremiumRemoverTransactions premiumRemoverTransactions;
 
     @Mock
     private UserRepository userRepository;
@@ -206,14 +211,16 @@ public class PremiumServiceTest {
     @Test
     @DisplayName("Should delete expired premiums by IDs and return the count of deleted records")
     void testDeleteExpiredPremiumsByIds_Success() {
-        premiumIds = List.of(1L, 2L, 3L);
+        List<Long> premiumIds = List.of(1L, 2L, 3L);
         int expectedDeletedCount = premiumIds.size();
+
+        doReturn(expectedDeletedCount).when(premiumRemoverTransactions).deletePremiums(premiumIds);
 
         CompletableFuture<Integer> future = premiumService.deleteExpiredPremiumsByIds(premiumIds);
 
         Integer totalDeletedRecords = future.join();
 
         assertEquals(expectedDeletedCount, totalDeletedRecords);
-        verify(premiumRepository, times(1)).deleteAllById(premiumIds);
+        verify(premiumRemoverTransactions, times(1)).deletePremiums(premiumIds);
     }
 }

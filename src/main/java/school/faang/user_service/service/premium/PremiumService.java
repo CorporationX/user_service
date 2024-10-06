@@ -22,10 +22,10 @@ import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import org.springframework.beans.factory.annotation.Value;
+import school.faang.user_service.scheduler.PremiumRemoverTransactions;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -42,6 +42,7 @@ public class PremiumService {
     private final UserRepository userRepository;
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumMapper premiumMapper;
+    private final PremiumRemoverTransactions premiumRemoverTransactions;
 
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
@@ -98,10 +99,8 @@ public class PremiumService {
     }
 
     @Async("premiumRemovalAsyncExecutor")
-    @Transactional
     public CompletableFuture<Integer> deleteExpiredPremiumsByIds(List<Long> ids) {
-        premiumRepository.deleteAllById(ids);
-        return CompletableFuture.completedFuture(ids.size());
+        return CompletableFuture.supplyAsync(() -> premiumRemoverTransactions.deletePremiums(ids));
     }
 
     private <T> List<List<T>> splitIntoBatches(List<T> list, int batchSize) {

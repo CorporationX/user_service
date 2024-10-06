@@ -65,7 +65,7 @@ image:
 events:
   batch:
     size: 3
-  cron: "0 0 0 * * 0"
+  cron: "0 0 0 * * *"
   task-executor:
     core-pool-size: 10
     max-pool-size: 20

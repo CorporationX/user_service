@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.*;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
@@ -21,6 +23,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.minio.S3service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,6 +47,7 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final PersonToUserMapper personToUserMapper;
     private final CountryService countryService;
+    private final S3service s3service;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -148,6 +152,45 @@ public class UserService {
         return priorityFilteredUsers.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public void saveAvatar(long userId, MultipartFile file) {
+        UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);
+        if (profilePic != null) {
+            s3service.deleteFile(profilePic.getFileId());
+            s3service.deleteFile(profilePic.getSmallFileId());
+            userRepository.deleteUserProfilePicByUserId(userId);
+        }
+
+        UserProfilePic userProfilePic = s3service.uploadFile(file, userId);
+        userRepository.saveUserProfilePic(userId, userProfilePic);
+    }
+
+    public byte[] getAvatar(long userId) {
+        UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);
+        if (profilePic == null) {
+            throw new EntityNotFoundException("User avatar not found");
+        }
+
+        String largeFileId = profilePic.getFileId();
+        try (InputStream inputStream = s3service.downloadFile(largeFileId)) {
+            return inputStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Error downloading file from S3", e);
+        }
+    }
+
+    @Transactional
+    public void deleteAvatar(long userId) {
+        UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);
+        if (profilePic == null) {
+            throw new EntityNotFoundException("User avatar not found");
+        }
+
+        s3service.deleteFile(profilePic.getFileId());
+        s3service.deleteFile(profilePic.getSmallFileId());
+        userRepository.deleteUserProfilePicByUserId(userId);
     }
 
     private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {

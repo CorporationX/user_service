@@ -2,6 +2,8 @@ package school.faang.user_service.service.event;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
@@ -15,9 +17,13 @@ import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
@@ -30,6 +36,10 @@ public class EventService {
     private final PromotionRepository promotionRepository;
     private final List<EventFilter> eventFilters;
     private final EventMapper mapper;
+
+    @Value("${scheduler.clear-events.batchSize}")
+    @Setter
+    private int batchSize;
 
     @Transactional
     public List<EventDto> getFilteredEvents(EventFilterDto filterDto, Long callingUserId) {
@@ -120,5 +130,29 @@ public class EventService {
 
         Promotion targetPromotion = getTargetPromotion(event);
         return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
+    }
+
+    public void clearPastEvents() {
+        List<Event> events = eventRepository.findAll();
+        if (events.size() > 0) {
+            List<Event> pastEvents = events.stream()
+                    .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                    .toList();
+            List<List<Event>> partitions = partitionList(pastEvents, batchSize);
+            ExecutorService executor = Executors.newFixedThreadPool(partitions.size());
+            for (List<Event> partition : partitions) {
+                executor.submit(() -> eventRepository.deleteAllByIdInBatch(
+                        partition.stream().map(Event::getId).toList()
+                ));
+            }
+            executor.shutdown();
+        }
+    }
+
+    private <T> List<List<T>> partitionList(List<T> list, int size) {
+        int numPartitions = (list.size() + size - 1) / size;
+        return IntStream.range(0, numPartitions)
+                .mapToObj(i -> list.subList(i * size, Math.min((i + 1) * size, list.size())))
+                .toList();
     }
 }

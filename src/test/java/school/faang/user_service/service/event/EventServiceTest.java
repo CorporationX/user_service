@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,15 +25,20 @@ import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,15 +64,22 @@ public class EventServiceTest {
     @Mock
     private EventMaxAttendeesFilter eventMaxAttendeesFilter;
 
+    @Mock
+    private ExecutorService executorService;
+
+    @InjectMocks
     private EventService eventService;
+
+    private List<Event> events;
 
     @BeforeEach
     public void setUp() {
         eventFilters = new ArrayList<>();
         eventFilters.add(eventTitleFilter);
         eventFilters.add(eventMaxAttendeesFilter);
-
         eventService = new EventService(eventRepository, userRepository, promotionRepository, eventFilters, eventMapper);
+        events = new ArrayList<>();
+        eventService.setBatchSize(10);
     }
 
     @Test
@@ -155,5 +168,28 @@ public class EventServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> eventService.getFilteredEvents(filterDto, 1L));
+    }
+
+    @Test
+    void testClearPastEvents() {
+        Event firstEvent = new Event();
+        firstEvent.setId(1L);
+        firstEvent.setEndDate(LocalDateTime.now().minusDays(1));
+
+        Event secondEvent = new Event();
+        secondEvent.setId(2L);
+        secondEvent.setEndDate(LocalDateTime.now().minusDays(2));
+
+        Event thirdEvent = new Event();
+        thirdEvent.setId(3L);
+        thirdEvent.setEndDate(LocalDateTime.now().plusDays(1));
+
+        events = Arrays.asList(firstEvent, secondEvent, thirdEvent);
+        when(eventRepository.findAll()).thenReturn(events);
+
+        eventService.clearPastEvents();
+        verify(eventRepository, times(1)).findAll();
+        verify(eventRepository, times(1)).deleteAllByIdInBatch(Arrays.asList(1L, 2L));
+        verify(eventRepository, never()).deleteAllByIdInBatch(Arrays.asList(3L));
     }
 }

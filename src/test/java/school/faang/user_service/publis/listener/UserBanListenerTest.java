@@ -8,8 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.connection.Message;
 import school.faang.user_service.service.user.UserService;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,17 +26,18 @@ class UserBanListenerTest {
 
 
     @Test
-    public void testOnMessageSuccess() {
-        String json = "[1, 2, 3]";
-        byte[] pattern = new byte[]{};
+    public void testOnMessage_Success() {
+        String messageBody = "[1, 2, 3]";
+        byte[] pattern = {};
 
-        when(message.toString()).thenReturn(json);
+        when(message.getBody()).thenReturn(messageBody.getBytes());
 
         userBanListener.onMessage(message, pattern);
 
         verify(userService, atLeastOnce()).banUser(1L);
         verify(userService, atLeastOnce()).banUser(2L);
         verify(userService, atLeastOnce()).banUser(3L);
+        verify(userService, times(3)).banUser(any(Long.class));
         verify(userService, never()).banUser(4L);
     }
 }

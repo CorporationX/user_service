@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventFilterDto {
-    @Size(max = 0)
+    @Size(max = 255)
     private String eventTitle;
 }

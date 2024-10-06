@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Validated
 public class EventController {
 
     private final EventService eventService;
@@ -25,7 +28,7 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+    public List<EventDto> getEventsByFilter(@Valid EventFilterDto filter) {
       return eventService.getEventsByFilter(filter);
     }
 

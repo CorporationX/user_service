@@ -10,6 +10,7 @@ public class UserFilterDto {
     @Size(max = 255)
     private String namePattern;
     private String aboutPattern;
+    @Size(max = 255)
     private String emailPattern;
     private String contactPattern;
     private String countryPattern;

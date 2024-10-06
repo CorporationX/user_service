@@ -1,6 +1,8 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -11,11 +13,12 @@ import java.util.List;
 @RequestMapping("/api/v1/user")
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/premium")
-    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+    public List<UserDto> getPremiumUsers(@Valid UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
     }
 

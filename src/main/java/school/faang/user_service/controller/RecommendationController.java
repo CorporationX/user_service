@@ -23,15 +23,15 @@ public class RecommendationController {
         recommendationService.update(updated);
     }
 
-    public void deleteRecommendation(@Valid long id) {
+    public void deleteRecommendation(long id) {
         recommendationService.delete(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(@Valid long receiverId) {
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(@Valid long authorId) {
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         return recommendationService.getAllGivenRecommendations(authorId);
     }
 

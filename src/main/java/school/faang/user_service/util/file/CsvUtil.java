@@ -66,7 +66,7 @@ public class CsvUtil {
     private CsvSchema generateCsvSchema(String headerLine) {
         CsvSchema.Builder schemaBuilder = CsvSchema.builder();
 
-        for (String header : headerLine.split(",")) {
+        for (String header : headerLine.replace("\uFEFF", "").split(",")) {
             schemaBuilder.addColumn(header.trim());
         }
 

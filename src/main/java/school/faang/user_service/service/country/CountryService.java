@@ -1,10 +1,11 @@
 package school.faang.user_service.service.country;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.repository.CountryRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -12,9 +13,8 @@ public class CountryService {
 
     private final CountryRepository countryRepository;
 
-    public Country findCountryByTitle(String title) {
-        return countryRepository.findByTitle(title)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+    public Optional<Country> findCountryByTitle(String title) {
+        return countryRepository.findByTitle(title);
     }
 
     public Country saveCountry(Country country) {
@@ -22,15 +22,7 @@ public class CountryService {
     }
 
     public Country findCountryAndSaveIfNotExists(String title) {
-        Country country = new Country();
-
-        try {
-            country = findCountryByTitle(title);
-        } catch (EntityNotFoundException e) {
-            country.setTitle(title);
-            country = saveCountry(country);
-        }
-
-        return country;
+        return findCountryByTitle(title)
+                .orElse(saveCountry(Country.builder().build()));
     }
 }

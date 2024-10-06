@@ -34,9 +34,9 @@ public class UserService {
     @Value("${services.s3.bucketName}")
     private String bucketName;
     private final S3ServiceImpl s3Service;
-    @Value("${reduce.max-pixel-size.large-image}")
+    @Value("${image-limitations.max-pixel-size.large-image}")
     private int largeImage;
-    @Value("${reduce.max-pixel-size.small-image}")
+    @Value("${image-limitations.max-pixel-size.small-image}")
     private int smallImage;
 
     @Transactional(readOnly = true)

@@ -57,7 +57,7 @@ services:
     bucketName: corpbucket
     region: us-east-1
 
-reduce:
+image-limitations:
   picture-allowed-types: image/jpeg, image/png
   max-pixel-size:
     large-image: 1080

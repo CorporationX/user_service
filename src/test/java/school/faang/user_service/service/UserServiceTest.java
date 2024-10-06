@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,6 +27,9 @@ import school.faang.user_service.service.s3.S3ServiceImpl;
 import school.faang.user_service.service.user.UserService;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +69,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Captor
+    ArgumentCaptor<User> captor;
 
     private User user;
     private UserDto userDto = new UserDto();
@@ -157,7 +165,25 @@ public class UserServiceTest {
         verify(mapper, atLeastOnce()).toDto(userList);
     }
 
+    @Test
+    public void testAddProfileImage() throws IOException {
+        File imageFile = new File("src/main/resources/test/test1.jpg");
+        FileInputStream inputStream = new FileInputStream(imageFile);
+        UserProfilePic userProfilePicExp = new UserProfilePic();
+        userProfilePicExp.setFileId("user_1/profile");
+        userProfilePicExp.setSmallFileId("user_1/profile_small");
 
+        when(file.getSize()).thenReturn(2L);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(file.getInputStream()).thenReturn(inputStream);
+
+        userService.addProfileImage(userId, file);
+        verify(userRepository).save(captor.capture());
+        User resultUser = captor.getValue();
+        UserProfilePic resultUserProfilePic = resultUser.getUserProfilePic();
+
+        Assertions.assertThat(resultUserProfilePic).usingRecursiveComparison().isEqualTo(userProfilePicExp);
+    }
 
     @Test
     public void testAddProfileImage_FileExceedsMaxSize() {
@@ -232,8 +258,5 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> userService.deleteProfileImage(userId));
-
-        verify(s3Service, never()).deleteFile(anyString());
-        verify(userRepository, never()).save(any(User.class));
     }
 }

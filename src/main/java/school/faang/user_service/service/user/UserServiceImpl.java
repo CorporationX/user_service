@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void banUser(Long id) {
+    public void banUserById(Long id) {
         User userToBan = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         userToBan.setBanned(true);

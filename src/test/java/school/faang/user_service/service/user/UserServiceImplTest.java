@@ -27,9 +27,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -94,6 +92,7 @@ class UserServiceImplTest {
                 .phone("0987654321")
                 .aboutMe("About Jane Smith")
                 .experience(5)
+                .banned(false)
                 .build();
 
         filters = List.of(userFilter);
@@ -214,6 +213,18 @@ class UserServiceImplTest {
         verify(userRepository).findAllById(List.of(1L, 2L));
         verify(userMapper).toDto(user);
         assertThat(result).isNotNull().hasSize(2).isEqualTo(List.of(userDto, userDto2));
+    }
+
+    @Test
+    void banUserById() {
+        // Arrange
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
+
+        // Act
+        userService.banUserById(1L);
+
+        // Assert
+        assertTrue(user.getBanned());
     }
 
     private User buildUser() {

@@ -12,7 +12,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.consumer.RedisBanMessageListener;
+import school.faang.user_service.listener.RedisBanMessageListener;
 
 @Configuration
 @RequiredArgsConstructor

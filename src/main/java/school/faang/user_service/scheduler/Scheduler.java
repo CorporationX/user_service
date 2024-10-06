@@ -13,7 +13,7 @@ public class Scheduler {
 
     private final EventService eventService;
 
-    @Scheduled(cron = "${scheduling.cron}")
+    @Scheduled(cron = "${event.cron}")
     public void clearEvents() {
         log.info("Schedule used {}", eventService);
         eventService.deleteExpiredEvents();

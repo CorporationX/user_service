@@ -51,9 +51,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private User getUserById(Long eventId) {
-        return userRepository.findById(eventId).orElseThrow(() ->
-                new DataValidationException("User with ID: " + eventId + " not found.")
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new DataValidationException("User with ID: " + userId + " not found.")
         );
     }
 }

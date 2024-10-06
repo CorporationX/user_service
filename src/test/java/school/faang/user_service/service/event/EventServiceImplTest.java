@@ -24,7 +24,7 @@ public class EventServiceImplTest {
     private EventRepository eventRepository;
 
     @Test
-    void deletingExpiredEvents() {
+    void deleteExpiredEvents() {
         Event event1 = new Event();
         Event event2 = new Event();
         event1.setCreatedAt(LocalDateTime.now());
@@ -34,7 +34,7 @@ public class EventServiceImplTest {
 
         when(eventRepository.findAll()).thenReturn(allEvents);
 
-        eventService.deletingExpiredEvents();
+        eventService.deleteExpiredEvents();
 
         assertEquals(allEvents.get(0), event1);
     }

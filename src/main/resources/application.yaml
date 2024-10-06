@@ -66,7 +66,7 @@ profile-picture:
     path: image/default-small-profile-picture.svg
     size: 110
 
-scheduling:
+event:
   cron: "0 0 0 * * ?"
   expiration: 1
 
@@ -80,29 +80,6 @@ spring:
 ---
 
 spring:
-  config:
-    activate:
-      on-profile: normal
-  async:
-    pool:
-      size: 5
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: hard
-  async:
-    pool:
-      size: 10
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: light
-  async:
-    pool:
-      size: 3
+  threads:
+    thread-pool-size: 5
+    queue-capacity: 300

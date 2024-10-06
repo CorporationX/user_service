@@ -3,7 +3,6 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.event.Event;
@@ -19,12 +18,12 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
 
-    @Value("${scheduling.expiration}")
+    @Value("${event.expiration}")
     private long expirationWeeks;
 
     @Override
     @Async("poolThreads")
-    public void deletingExpiredEvents() {
+    public void deleteExpiredEvents() {
         LocalDateTime overdueDate = LocalDateTime.now().minusWeeks(expirationWeeks);
 
         try {
@@ -39,9 +38,6 @@ public class EventServiceImpl implements EventService {
             } else {
                 log.info("No expired events.");
             }
-
-        } catch (DataAccessException e) {
-            log.error("Error while accessing the database: {}", e.getMessage());
 
         } catch (Exception e) {
             log.error("An unexpected error occurred: {}", e.getMessage());

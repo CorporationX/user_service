@@ -2,18 +2,15 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.springframework.test.context.ActiveProfiles;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.RecommendationRequestTooFrequentException;
+import school.faang.user_service.exception.RecommendationRequestException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -140,8 +137,8 @@ public class RecommendationRequestServiceImplTest {
         when(recommendationRequestRepository.findLatestPendingRequest(1L, 2L))
                 .thenReturn(Optional.of(existingRequest));
 
-        RecommendationRequestTooFrequentException thrown = assertThrows(
-                RecommendationRequestTooFrequentException.class, () -> {
+        RecommendationRequestException thrown = assertThrows(
+                RecommendationRequestException.class, () -> {
             recommendationRequestService.create(recommendationRequestDto);
         });
         assertEquals("Recommendation request can be sent only once in 6 months", thrown.getMessage());

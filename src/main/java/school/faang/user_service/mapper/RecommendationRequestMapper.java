@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.mapper;
+package school.faang.user_service.mapper;
 
 
 import org.mapstruct.*;
@@ -21,6 +21,8 @@ public interface RecommendationRequestMapper {
 
     @Named("map")
     default List<Long> map(List<SkillRequest> skillRequests) {
-        return skillRequests.stream().map(SkillRequest::getId).toList();
+        return skillRequests.stream()
+                .map(SkillRequest::getId)
+                .toList();
     }
 }

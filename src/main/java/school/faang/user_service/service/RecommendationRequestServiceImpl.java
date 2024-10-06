@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -8,16 +7,13 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.RecommendationRequestAlreadyProcessedException;
-import school.faang.user_service.exception.RecommendationRequestNotFoundException;
-import school.faang.user_service.exception.RecommendationRequestTooFrequentException;
-import school.faang.user_service.exception.SkillOwnershipException;
+import school.faang.user_service.exception.RecommendationRequestException;
 import school.faang.user_service.filter.ReceiverIdFilter;
 import school.faang.user_service.filter.RequesterIdFilter;
 import school.faang.user_service.filter.StatusFilter;
 import school.faang.user_service.repository.RequestFilter;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
@@ -37,10 +33,10 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Recommendation request not found for id: " + id));
+                .orElseThrow(() -> new NullPointerException("Recommendation request not found for id: " + id));
 
         if (recommendationRequest.getStatus() != RequestStatus.PENDING) {
-            throw new RecommendationRequestAlreadyProcessedException("Recommendation request has already been processed (accepted or rejected).");
+            throw new RecommendationRequestException("Recommendation request has already been processed (accepted or rejected).");
         }
 
         recommendationRequest.setStatus(RequestStatus.REJECTED);
@@ -53,7 +49,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new RecommendationRequestNotFoundException("Recommendation Request not found for id: " + id));
+                .orElseThrow(() -> new RecommendationRequestException("Recommendation Request not found for id: " + id));
 
         return recommendationRequestMapper.toDto(recommendationRequest);
     }
@@ -83,7 +79,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
                         recommendationRequestDto.getReceiverId())
                 .ifPresent(request -> {
                     if (ChronoUnit.MONTHS.between(request.getCreatedAt(), LocalDateTime.now()) < 6) {
-                        throw new RecommendationRequestTooFrequentException("Recommendation request can be sent only once in 6 months");
+                        throw new RecommendationRequestException("Recommendation request can be sent only once in 6 months");
                     }
                 });
 
@@ -104,7 +100,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         if (skillIds != null && !skillIds.isEmpty()) {
             int ownedSkillsCount = userRepository.countOwnedSkills(requesterId, skillIds);
             if (ownedSkillsCount != skillIds.size()) {
-                throw new SkillOwnershipException("One or more skills do not exist for the requester");
+                throw new RecommendationRequestException("One or more skills do not exist for the requester");
             }
         }
     }

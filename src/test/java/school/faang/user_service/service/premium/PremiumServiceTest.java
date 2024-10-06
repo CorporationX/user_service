@@ -89,7 +89,7 @@ class PremiumServiceTest {
     @DisplayName("Delete all premiums by id successful")
     void testDeleteAllPremiumsByIdAsyncSuccessful() {
         List<Premium> premiums = buildPremiums(NUMBER_OF_PREMIUMS);
-        premiumService.deleteAllPremiumsByIdAsync(premiums);
+        premiumService.deleteAllPremiumsById(premiums);
 
         verify(premiumRepository).deleteAllInBatch(anyList());
     }

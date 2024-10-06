@@ -11,6 +11,7 @@ import org.quartz.JobExecutionContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.service.premium.async.AsyncPremiumService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +32,9 @@ class PremiumRemoveJobTest {
     @Mock
     private PremiumService premiumService;
 
+    @Mock
+    private AsyncPremiumService asyncPremiumService;
+
     @InjectMocks
     private PremiumRemoveJob premiumRemoveJob;
 
@@ -46,6 +50,7 @@ class PremiumRemoveJobTest {
         when(premiumService.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(premiums);
         premiumRemoveJob.execute(mock(JobExecutionContext.class));
 
-        verify(premiumService, times(NUMBER_OF_PREMIUMS / BATCH_SIZE)).deleteAllPremiumsByIdAsync(anyList());
+        verify(asyncPremiumService, times(NUMBER_OF_PREMIUMS / BATCH_SIZE))
+                .deleteAllPremiumsByIdAsync(anyList());
     }
 }

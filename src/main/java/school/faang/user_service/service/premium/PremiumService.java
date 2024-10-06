@@ -2,7 +2,6 @@ package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.entity.User;
@@ -50,9 +49,8 @@ public class PremiumService {
         return premiumRepository.findAllByEndDateBefore(endDate);
     }
 
-    @Async("premiumServicePool")
-    @org.springframework.transaction.annotation.Transactional
-    public void deleteAllPremiumsByIdAsync(List<Premium> premiums) {
+    @Transactional
+    public void deleteAllPremiumsById(List<Premium> premiums) {
         log.info("Delete all premiums");
         premiumRepository.deleteAllInBatch(premiums);
     }

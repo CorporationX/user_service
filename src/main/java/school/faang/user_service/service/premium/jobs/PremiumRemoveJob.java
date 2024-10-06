@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.service.premium.async.AsyncPremiumService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +22,7 @@ public class PremiumRemoveJob implements Job {
     private int batchSize;
 
     private final PremiumService premiumService;
+    private final AsyncPremiumService asyncPremiumService;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
@@ -28,6 +30,6 @@ public class PremiumRemoveJob implements Job {
         List<Premium> premiums = premiumService.findAllByEndDateBefore(LocalDateTime.now());
         List<List<Premium>> batches = ListUtils.partition(premiums, batchSize);
 
-        batches.forEach(premiumService::deleteAllPremiumsByIdAsync);
+        batches.forEach(asyncPremiumService::deleteAllPremiumsByIdAsync);
     }
 }

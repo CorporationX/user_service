@@ -12,16 +12,16 @@ import java.util.concurrent.Executor;
 @Configuration
 public class PremiumServiceAsyncConfig {
     @Value("${app.async-config.premium-service-sync.core_pool_size}")
-    private int corePoolSize = 10;
+    private int corePoolSize;
 
     @Value("${app.async-config.premium-service-sync.max_pool_size}")
-    private int maxPoolSize = 20;
+    private int maxPoolSize;
 
     @Value("${app.async-config.premium-service-sync.queue_capacity}")
-    private int queueCapacity = 1000;
+    private int queueCapacity;
 
     @Value("${app.async-config.premium-service-sync.thread_name_prefix}")
-    private String threadNamePrefix = "PremiumService Async-";
+    private String threadNamePrefix;
 
     @Bean
     public Executor premiumServicePool() {

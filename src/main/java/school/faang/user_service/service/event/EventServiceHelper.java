@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -36,9 +37,15 @@ public class EventServiceHelper {
         }
     }
 
-    @Async("eventThreadPool")
-    public void deletePastEventsById(List<Long> sublistPastEventsIds) {
-        log.info("Delete event with IDs: " + sublistPastEventsIds);
+    @Transactional
+    @Async("deletePastEventsThreadPool")
+    public void asyncDeletePastEvents(List<Long> sublistPastEventsIds) {
+        batchDeletePastEvents(sublistPastEventsIds);
+    }
+
+    @Transactional
+    public void batchDeletePastEvents(List<Long> sublistPastEventsIds) {
+        log.info("Delete events with IDs: " + sublistPastEventsIds);
         eventRepository.deleteAllByIdInBatch(sublistPastEventsIds);
     }
 }

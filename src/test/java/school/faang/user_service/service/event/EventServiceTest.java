@@ -215,16 +215,16 @@ class EventServiceTest {
         }
 
         @Test
-        void testDeletePastEvents() {
+        void testDeletePastEvents_Success() {
             Event oldEvent = testDataEvent.getOldEvent();
             List<Long> pastEventList = List.of(oldEvent.getId());
 
-            when(eventRepository.findIdByEndDateBefore(any(LocalDateTime.class))).thenReturn(pastEventList);
+            when(eventRepository.findEventIdsByEndDateBefore(any(LocalDateTime.class))).thenReturn(pastEventList);
             when(eventProperties.getSublistSize()).thenReturn(1);
 
             eventService.deletePastEvents();
 
-            verify(eventServiceHelper, atLeastOnce()).deletePastEventsById(List.of(oldEvent.getId()));
+            verify(eventServiceHelper, atLeastOnce()).asyncDeletePastEvents(List.of(oldEvent.getId()));
         }
     }
 

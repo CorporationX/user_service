@@ -1,0 +1,263 @@
+2024-10-06 12:58:36.919 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final 
+2024-10-06 12:58:36.962 [main] INFO  s.f.u.UserServiceApplication - Starting UserServiceApplication using Java 17.0.12 with PID 2848 (C:\Projects\CorporationX\user_service\build\classes\java\main started by energ in C:\Projects\CorporationX\user_service) 
+2024-10-06 12:58:36.963 [main] INFO  s.f.u.UserServiceApplication - No active profile set, falling back to 1 default profile: "default" 
+2024-10-06 12:58:37.792 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode 
+2024-10-06 12:58:37.793 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode. 
+2024-10-06 12:58:37.827 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactPreferenceRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.828 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.829 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ContentDataRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.830 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.CountryRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.831 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventParticipationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.832 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.833 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.FollowerRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.834 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalInvitationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.835 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.835 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.836 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.837 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.premium.PremiumRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.838 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ProjectSubscriptionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.839 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.840 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.841 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillOfferRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.842 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.844 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SkillRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.844 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SubscriptionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.844 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.845 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserSkillGuaranteeRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. 
+2024-10-06 12:58:37.845 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 49 ms. Found 0 JDBC repository interfaces. 
+2024-10-06 12:58:37.853 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode 
+2024-10-06 12:58:37.854 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 
+2024-10-06 12:58:37.998 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 141 ms. Found 21 JPA repository interfaces. 
+2024-10-06 12:58:38.015 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode 
+2024-10-06 12:58:38.017 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode. 
+2024-10-06 12:58:38.032 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactPreferenceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ContentDataRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.CountryRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventParticipationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.FollowerRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.033 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalInvitationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRequestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.premium.PremiumRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ProjectSubscriptionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRequestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillOfferRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillRequestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SkillRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SubscriptionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserSkillGuaranteeRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository 
+2024-10-06 12:58:38.035 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces. 
+2024-10-06 12:58:38.223 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=8c8aec44-c873-3076-9704-bd9cee3f4de7 
+2024-10-06 12:58:38.573 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http) 
+2024-10-06 12:58:38.580 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"] 
+2024-10-06 12:58:38.581 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat] 
+2024-10-06 12:58:38.581 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.8] 
+2024-10-06 12:58:38.672 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext 
+2024-10-06 12:58:38.672 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1653 ms 
+2024-10-06 12:58:38.774 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... 
+2024-10-06 12:58:38.863 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5d84e363 
+2024-10-06 12:58:38.865 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. 
+2024-10-06 12:58:38.969 [main] INFO  liquibase.database - Set default schema name to public 
+2024-10-06 12:58:39.045 [main] INFO  liquibase.lockservice - Successfully acquired change log lock 
+2024-10-06 12:58:39.137 [main] INFO  liquibase.changelog - Reading from public.databasechangelog 
+2024-10-06 12:58:39.199 [main] INFO  liquibase.lockservice - Successfully released change log lock 
+2024-10-06 12:58:39.272 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] 
+2024-10-06 12:58:39.316 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.1.7.Final 
+2024-10-06 12:58:39.574 [main] INFO  SQL dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect 
+2024-10-06 12:58:40.580 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform] 
+2024-10-06 12:58:40.589 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 
+2024-10-06 12:58:41.445 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning 
+2024-10-06 12:58:42.815 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"] 
+2024-10-06 12:58:42.835 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path '' 
+2024-10-06 12:58:42.923 [main] INFO  s.f.u.UserServiceApplication - Started UserServiceApplication in 6.383 seconds (process running for 7.022) 
+Hibernate: 
+    SELECT
+        id 
+    FROM
+        event 
+    WHERE
+        end_date < ? 
+2024-10-06 12:59:00.084 [scheduling-1] INFO  s.f.u.service.event.EventService - Total past event: 55 
+2024-10-06 12:59:00.086 [scheduling-1] INFO  s.f.u.service.event.EventService - Partition on 6 sublist 
+2024-10-06 12:59:00.090 [pool-2-thread-3] INFO  s.f.u.s.event.EventServiceHelper - Delete events with IDs: [501, 502, 503, 504, 505, 506, 507, 508, 509, 510] 
+2024-10-06 12:59:00.090 [pool-2-thread-4] INFO  s.f.u.s.event.EventServiceHelper - Delete events with IDs: [511, 512, 513, 514, 515, 516, 517, 518, 519, 520] 
+2024-10-06 12:59:00.090 [pool-2-thread-1] INFO  s.f.u.s.event.EventServiceHelper - Delete events with IDs: [481, 482, 483, 484, 485, 486, 487, 488, 489, 490] 
+2024-10-06 12:59:00.090 [pool-2-thread-2] INFO  s.f.u.s.event.EventServiceHelper - Delete events with IDs: [491, 492, 493, 494, 495, 496, 497, 498, 499, 500] 
+Hibernate: 
+    delete 
+    from
+        user_event 
+    where
+        user_event.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        user_event 
+    where
+        user_event.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        user_event 
+    where
+        user_event.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        user_event 
+    where
+        user_event.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event_skill 
+    where
+        event_skill.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event_skill 
+    where
+        event_skill.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event_skill 
+    where
+        event_skill.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event_skill 
+    where
+        event_skill.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event 
+    where
+        id in(?,?,?,?,?,?,?,?,?,?)
+Hibernate: 
+    delete 
+    from
+        event 
+    where
+        id in(?,?,?,?,?,?,?,?,?,?)
+Hibernate: 
+    delete 
+    from
+        event 
+    where
+        id in(?,?,?,?,?,?,?,?,?,?)
+Hibernate: 
+    delete 
+    from
+        event 
+    where
+        id in(?,?,?,?,?,?,?,?,?,?)
+2024-10-06 12:59:00.150 [pool-2-thread-2] INFO  s.f.u.s.event.EventServiceHelper - Delete events with IDs: [521, 522, 523, 524, 525, 526, 527, 528, 529, 530] 
+Hibernate: 
+    delete 
+    from
+        user_event 
+    where
+        user_event.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+2024-10-06 12:59:00.151 [pool-2-thread-3] INFO  s.f.u.s.event.EventServiceHelper - Delete events with IDs: [531, 532, 533, 534, 535] 
+Hibernate: 
+    delete 
+    from
+        event_skill 
+    where
+        event_skill.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?,?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        user_event 
+    where
+        user_event.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event 
+    where
+        id in(?,?,?,?,?,?,?,?,?,?)
+Hibernate: 
+    delete 
+    from
+        event_skill 
+    where
+        event_skill.event_id in(select
+            e1_0.id 
+        from
+            event e1_0 
+        where
+            e1_0.id in(?,?,?,?,?))
+Hibernate: 
+    delete 
+    from
+        event 
+    where
+        id in(?,?,?,?,?)
+2024-10-06 12:59:52.601 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 
+2024-10-06 12:59:52.603 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated... 
+2024-10-06 12:59:52.606 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed. 

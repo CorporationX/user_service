@@ -100,12 +100,15 @@ public class EventService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void deletePastEvents() {
-        List<Long> pastEventsIds = eventRepository.findIdByEndDateBefore(LocalDateTime.now());
+        List<Long> pastEventsIds = eventRepository.findEventIdsByEndDateBefore(LocalDateTime.now());
+        log.info("Total past event: " + pastEventsIds.size());
 
-        var sublist = ListUtils.partition(pastEventsIds, eventProperties.getSublistSize());
-        sublist.forEach(eventServiceHelper::deletePastEventsById);
+        List<List<Long>> partitionPastEventsIds = ListUtils.partition(pastEventsIds, eventProperties.getSublistSize());
+        log.info("Partition on " + partitionPastEventsIds.size() + " sublist");
+
+        partitionPastEventsIds.forEach(eventServiceHelper::asyncDeletePastEvents);
     }
 
     private EventDto saveEvent(EventDto eventDto) {

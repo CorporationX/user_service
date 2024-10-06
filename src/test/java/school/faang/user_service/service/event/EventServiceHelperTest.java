@@ -65,12 +65,21 @@ class EventServiceHelperTest {
         }
 
         @Test
-        void testDeletePastEventsById() {
-            List<Long> pastEventsIds = List.of(1L, 2L, 103L, 44L, 555L);
+        void testAsyncDeletePastEvents_Success() {
+            List<Long> sublistPastEventsIds = List.of(1L, 2L, 103L, 44L, 555L);
 
-            eventServiceHelper.deletePastEventsById(pastEventsIds);
+            eventServiceHelper.asyncDeletePastEvents(sublistPastEventsIds);
 
-            verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(pastEventsIds);
+            verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(sublistPastEventsIds);
+        }
+
+        @Test
+        void testBatchDeletePastEvents_Success() {
+            List<Long> sublistPastEventsIds = List.of(1L, 2L, 103L, 44L, 555L);
+
+            eventServiceHelper.batchDeletePastEvents(sublistPastEventsIds);
+
+            verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(sublistPastEventsIds);
         }
     }
 

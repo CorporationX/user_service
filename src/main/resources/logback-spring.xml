@@ -1,0 +1,29 @@
+<configuration>
+    <!-- ВНИМАНИЕ!!! ATTENTION!!! -->
+    <!-- Для логов с DEBUG на INFO заходим в application.yaml
+     и устанавливаем значение active: prod(info) / local(debug) -->
+    <!-- If you want to change logs level go to application.yaml file and set active: local / prod -->
+
+    <!-- local profile set on DEBUG level -->
+    <springProfile name="local">
+        <logger name="school.faang.user_service" level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+    </springProfile>
+    <!-- prod profile set on INFO level -->
+    <springProfile name="prod">
+        <logger name="school.faang.user_service" level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+    </springProfile>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%yellow(%d{HH:mm:ss.SSS}) [%thread] %highlight(%level) %logger{36} - %cyan(%msg%n)</pattern>
+        </encoder>
+    </appender>
+    <!-- BASE ROOT set on INFO level -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>

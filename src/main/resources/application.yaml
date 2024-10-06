@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -25,6 +27,10 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+
+servlet:
+  multipart:
+    max-file-size: 5242880
 
 server:
   port: 8080

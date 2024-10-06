@@ -67,6 +67,14 @@ public class S3Service {
         return s3Client.doesObjectExist(bucketDefaultAvatarsName.toLowerCase(), defaultPictureName);
     }
 
+    public InputStream downloadFile(String key) {
+        return s3Client.getObject(bucketDefaultAvatarsName, key).getObjectContent();
+    }
+
+    public void deleteFile(String key) {
+        s3Client.deleteObject(bucketDefaultAvatarsName, key);
+    }
+
     private void putObjectInS3(String bucketName, String key, InputStream inputStream, ObjectMetadata objectMetadata) {
         log.info("Trying to save data in s3. BucketName = {}, key = {}", bucketName, key);
 
@@ -92,7 +100,6 @@ public class S3Service {
 
     private boolean isBucketExists(String bucketName) {
         log.info("Check does bucket with name {} exists", bucketName);
-
         try {
             return s3Client.doesBucketExistV2(bucketName);
         } catch (AmazonS3Exception e) {

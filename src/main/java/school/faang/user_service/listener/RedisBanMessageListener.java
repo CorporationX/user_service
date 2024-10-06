@@ -1,5 +1,6 @@
 package school.faang.user_service.listener;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class RedisBanMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);
+            BanEvent banEvent = objectMapper.readValue(message.getBody(), new TypeReference<>() {});
             userService.banUserById(banEvent.getId());
         } catch (IOException e) {
             log.error("Received message parsing failed, {}", e.getMessage());

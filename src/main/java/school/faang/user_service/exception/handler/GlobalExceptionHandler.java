@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class, IOException.class})
+    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataExceptions(RuntimeException exception) {
         String message = exception.getMessage();

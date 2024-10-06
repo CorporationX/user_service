@@ -24,7 +24,7 @@ public class AmazonS3UserProfilePictureService implements AmazonS3Service {
     private String bucketName;
 
     @Autowired
-    public AmazonS3UserProfilePictureService(@Qualifier("amazonS3") AmazonS3 s3Client) {
+    public AmazonS3UserProfilePictureService(AmazonS3 s3Client) {
         this.s3Client = s3Client;
     }
 

@@ -6,6 +6,7 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.pojo.student.Person;
 
 import java.util.List;
 
@@ -20,4 +21,55 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     List<UserDto> toDtos(List<User> users);
+
+    List<User> toEntities(List<Person> persons);
+
+    @Mapping(target = "username", expression = "java(person.getFirstName() + \" \" + person.getLastName())")
+    @Mapping(target = "email", source = "contactInfo.email")
+    @Mapping(target = "phone", source = "contactInfo.phone")
+    @Mapping(target = "city", source = "contactInfo.address.city")
+    @Mapping(target = "country.title", source = "contactInfo.address.country")
+    @Mapping(target = "aboutMe", expression = "java(mapAboutMeFromPerson(person))")
+    User toEntity(Person person);
+
+    default String mapAboutMeFromPerson(Person person) {
+        return concatAboutMeInformation(person);
+    }
+
+    private String concatAboutMeInformation(Person person) {
+        StringBuilder sb = new StringBuilder();
+
+        String state = person.getContactInfo().getAddress().getState();
+        if (state != null && !state.isBlank()) {
+            sb.append("Address: { State - ")
+                    .append(state)
+                    .append(" } ");
+        }
+        if (person.getEducation() != null) {
+            String faculty = person.getEducation().getFaculty();
+
+            if (faculty != null && !faculty.isBlank()) {
+                sb.append("\nFaculty - ").append(faculty);
+            }
+
+            int yearOdStudy = person.getEducation().getYearOfStudy();
+
+            if (yearOdStudy > 0) {
+                sb.append("\nYear of study - ").append(yearOdStudy);
+            }
+
+            String major = person.getEducation().getMajor();
+
+            if (major != null && !major.isBlank()) {
+                sb.append("\nMajor - ").append(major);
+            }
+        }
+        String employer = person.getEmployer();
+
+        if (employer != null && !employer.isBlank()) {
+            sb.append("\nEmployer - ").append(employer);
+        }
+
+        return sb.toString();
+    }
 }

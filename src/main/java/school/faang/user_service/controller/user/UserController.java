@@ -75,4 +75,9 @@ public class UserController {
     public void deleteUserAvatar(@PathVariable Long userId) {
         userProfilePicService.deleteUserAvatar(userId);
     }
+
+    @PostMapping("/upload")
+    public List<UserDto> parseUserCsvFile(@RequestBody MultipartFile multipartFile) {
+        return userService.saveUsersFromCsvFile(multipartFile);
+    }
 }

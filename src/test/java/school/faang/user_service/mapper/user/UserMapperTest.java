@@ -12,6 +12,9 @@ import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.pojo.student.Address;
+import school.faang.user_service.pojo.student.ContactInfo;
+import school.faang.user_service.pojo.student.Person;
 
 import java.util.List;
 
@@ -184,6 +187,46 @@ class UserMapperTest {
             assertEquals(expectedUser.getAboutMe(), user.getAboutMe());
             assertEquals(expectedUser.getCity(), user.getCity());
             assertEquals(expectedUser.getCountry().getId(), user.getCountry().getId());
+        }
+    }
+
+    @Nested
+    class PojoToEntity {
+
+        private static final String FIRST_NAME = "John";
+        private static final String LAST_NAME = "Doe";
+        private static final String EMAIL = "johndoe@example.com";
+        private static final String PHONE = "+1-123-456-7890";
+        private static final String COUNTRY = "USA";
+
+        private static Person person;
+
+        @BeforeEach
+        void init() {
+            person = Person.builder()
+                    .firstName(FIRST_NAME)
+                    .lastName(LAST_NAME)
+                    .contactInfo(ContactInfo.builder()
+                            .phone(PHONE)
+                            .email(EMAIL)
+                            .address(Address.builder()
+                                    .country(COUNTRY)
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Test
+        @DisplayName("Assert that fields from Person pojo are equals to User fields")
+        void whenPersonPojoMappedToUserThenFieldsShouldBeEquals() {
+            User user = userMapper.toEntity(person);
+
+            String expectedUsername = FIRST_NAME + " " + LAST_NAME;
+
+            assertEquals(expectedUsername, user.getUsername());
+            assertEquals(EMAIL, user.getEmail());
+            assertEquals(PHONE, user.getPhone());
+            assertEquals(COUNTRY, user.getCountry().getTitle());
         }
     }
 }

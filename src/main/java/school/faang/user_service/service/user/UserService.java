@@ -3,21 +3,27 @@ package school.faang.user_service.service.user;
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.remote.AmazonS3CustomException;
 import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.image.RemoteImageService;
 import school.faang.user_service.service.s3.S3Service;
+import school.faang.user_service.util.file.CsvUtil;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
@@ -32,6 +38,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final RemoteImageService remoteImageService;
     private final S3Service s3Service;
+    private final CsvUtil csvUtil;
+    private final CountryService countryService;
 
     @Transactional
     public User getUserById(Long userId) {
@@ -50,6 +58,28 @@ public class UserService {
         ids.forEach(userValidator::validateUserIdIsPositiveAndNotNull);
 
         return userMapper.toDtos(userRepository.findAllById(ids));
+    }
+
+    @Transactional
+    public List<UserDto> saveUsersFromCsvFile(MultipartFile multipartFile) {
+        List<Person> persons = csvUtil.parseCsvMultipartFile(multipartFile, Person.class);
+        List<User> users = userMapper.toEntities(persons);
+
+        users.parallelStream()
+                .forEach(user -> {
+                    setDefaultPassword(user);
+
+                    Country country = countryService.findCountryAndSaveIfNotExists(user.getCountry().getTitle());
+
+                    user.setCountry(country);
+                });
+        userRepository.saveAll(users);
+
+        return userMapper.toDtos(users);
+    }
+
+    private void setDefaultPassword(User user) {
+        user.setPassword(user.getUsername());
     }
 
     public List<User> getUsersById(List<Long> usersId) {

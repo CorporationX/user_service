@@ -38,7 +38,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(getRecommendation(recommendationId));
     }
 
-    public RecommendationDto update(long id, @Valid RecommendationDto recommendation) {
+    public RecommendationDto update(long id, RecommendationDto recommendation) {
         recommendationDtoValidator.validateRecommendation(recommendation);
         List<Skill> skills = getSkills(recommendation);
 

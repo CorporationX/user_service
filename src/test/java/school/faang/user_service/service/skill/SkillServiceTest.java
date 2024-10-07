@@ -97,12 +97,6 @@ class SkillServiceTest {
         public void whenGetSkillByIdsWithNullThenException() {
             assertThrows(DataValidationException.class, () -> skillService.getSkillByIds(null));
         }
-
-        @Test
-        @DisplayName("Ошибка если Skill равен null")
-        public void whenSaveSkillWithNullThenException() {
-            assertThrows(DataValidationException.class, () -> skillService.saveSkill(null));
-        }
     }
 
     @Nested

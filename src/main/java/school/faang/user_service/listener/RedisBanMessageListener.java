@@ -23,7 +23,7 @@ public class RedisBanMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            BanEvent banEvent = objectMapper.readValue(message.getBody(), new TypeReference<>() {});
+            BanEvent banEvent = objectMapper.readValue(message.getBody(), BanEvent.class);
             userService.banUserById(banEvent.getId());
         } catch (IOException e) {
             log.error("Received message parsing failed, {}", e.getMessage());

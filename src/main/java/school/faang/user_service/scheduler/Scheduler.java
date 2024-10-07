@@ -24,10 +24,14 @@ public class Scheduler {
     @Scheduled(cron = "${events.cron}")
     public void clearEvents() {
         List<Event> events = eventService.getPastEvents();
-        if (!events.isEmpty()) {
-            ListUtils.partition(events, batchSize).forEach(
-                    list -> eventService.deleteEventsByIds(list.stream().map(Event::getId).toList())
-            );
+        try {
+            if (!events.isEmpty()) {
+                ListUtils.partition(events, batchSize).forEach(
+                        list -> eventService.deleteEventsByIds(list.stream().map(Event::getId).toList())
+                );
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 }

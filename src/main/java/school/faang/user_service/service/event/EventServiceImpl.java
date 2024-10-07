@@ -23,9 +23,9 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findAllByEndDateBefore(LocalDateTime.now());
     }
 
-    @Async("eventTaskExecutor")
+    @Async("taskExecutor")
     public void deleteEventsByIds(List<Long> ids) {
         eventRepository.deleteAllById(ids);
-        log.info("Удалены прошедшие события с идентификаторами: {}", ids);
+        log.info("Deleted {} past events with ids: {}", ids.size(), ids);
     }
 }

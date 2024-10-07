@@ -10,17 +10,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 @Configuration
-@EnableConfigurationProperties(ConfigProperties.class)
+@EnableConfigurationProperties(PropertiesOfAsyncThreads.class)
 @RequiredArgsConstructor
 public class AsyncExecutor {
 
-    private final ConfigProperties configProperties;
+    private final PropertiesOfAsyncThreads propertiesOfAsyncThreads;
 
     @Bean(name = "poolThreads")
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(configProperties.getThreadPoolSize());
-        executor.setQueueCapacity(configProperties.getQueueCapacity());
+        executor.setCorePoolSize(propertiesOfAsyncThreads.getThreadPoolSize());
+        executor.setQueueCapacity(propertiesOfAsyncThreads.getQueueCapacity());
         executor.initialize();
         return executor;
     }

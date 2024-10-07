@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "threads")
 @Data
-public class ConfigProperties {
+public class PropertiesOfAsyncThreads {
 
     private int threadPoolSize;
     private int queueCapacity;

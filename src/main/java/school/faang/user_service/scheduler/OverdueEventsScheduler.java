@@ -9,7 +9,7 @@ import school.faang.user_service.service.event.EventService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class Scheduler {
+public class OverdueEventsScheduler {
 
     private final EventService eventService;
 

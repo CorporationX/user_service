@@ -11,11 +11,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import school.faang.user_service.config.ConfigProperties;
+import school.faang.user_service.config.PropertiesOfAsyncThreads;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")
-@EnableConfigurationProperties(ConfigProperties.class)
+@EnableConfigurationProperties(PropertiesOfAsyncThreads.class)
 @ConfigurationPropertiesScan
 @EnableScheduling
 @OpenAPIDefinition(

@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.recommendation;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@NotNull(message = "Recommendation dto can't be null!")
 public class RecommendationDto {
     private Long id;
     private Long authorId;

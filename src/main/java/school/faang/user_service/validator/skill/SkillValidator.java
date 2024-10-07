@@ -26,12 +26,6 @@ public class SkillValidator {
     }
 
     public void validateSkill(SkillDto skill) {
-        if (skill == null) {
-            throw new DataValidationException("SkillDto can't be null");
-        }
-        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
-            throw new DataValidationException("Skill title can't be blank or null");
-        }
         if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException("Skill \"" + skill.getTitle() + "\" already exist");
         }

@@ -18,12 +18,12 @@ public class RecommendationRequestValidator {
 
     private static final int MONTHS_BEFORE_NEXT_REQUEST = 6;
 
-    public void validateRecommendationRequestMessageNotNull(RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
-            log.error("Error! Invalid request message!");
-            throw new DataValidationException("Recommendation request message text can't be null or empty!");
-        }
-    }
+//    public void validateRecommendationRequestMessageNotNull(RecommendationRequestDto recommendationRequest) {
+//        if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
+//            log.error("Error! Invalid request message!");
+//            throw new DataValidationException("Recommendation request message text can't be null or empty!");
+//        }
+//    }
 
     public void validateRequestStatus(RecommendationRequest request) {
         if (request.getStatus() != RequestStatus.PENDING) {

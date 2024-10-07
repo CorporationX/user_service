@@ -9,14 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.event.EventStartEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,6 +32,8 @@ public class EventService {
     private final EventMapper eventMapper;
     private final EventValidator eventValidator;
     private final List<EventFilter> eventFilters;
+    private final EventStartEventPublisher publisher;
+
     @Value("${scheduler.event-batch-size}")
     private int batchSize;
 
@@ -105,5 +111,18 @@ public class EventService {
 
     public List<Event> getParticipatedEvents(Long userId) {
         return eventRepository.findParticipatedEventsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public void findEventsStartingRightNow() {
+        List<Event> events = eventRepository.findAllByStartDate(LocalDateTime.parse("2024-10-07 10:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))/*LocalDateTime.now()*/);
+
+        events.forEach(event -> {
+            List<Long> participantsIds = event.getAttendees().stream()
+                    .map(User::getId)
+                    .toList();
+
+            publisher.publish(new EventStartEvent(event.getId(), participantsIds));
+        });
     }
 }

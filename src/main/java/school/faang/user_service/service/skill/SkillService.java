@@ -72,4 +72,17 @@ public class SkillService {
                 .toList();
         userSkillGuaranteeRepository.saveAll(guarantees);
     }
+
+    public List<Skill> getSkillsByTitle(List<String> skillsTitle) {
+        skillValidator.validateSkill(skillsTitle, skillRepository);
+        return skillRepository.findByTitleIn(skillsTitle);
+    }
+
+    public void assignSkillToUser(long skillId, long userId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
+    public void deleteSkillFromGoal(long goalId) {
+        skillRepository.deleteAll(skillRepository.findSkillsByGoalId(goalId));
+    }
 }

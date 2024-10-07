@@ -20,7 +20,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -115,7 +114,7 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public void findEventsStartingRightNow() {
-        List<Event> events = eventRepository.findAllByStartDate(LocalDateTime.parse("2024-10-07 10:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))/*LocalDateTime.now()*/);
+        List<Event> events = eventRepository.findAllByStartDate(LocalDateTime.now());
 
         events.forEach(event -> {
             List<Long> participantsIds = event.getAttendees().stream()

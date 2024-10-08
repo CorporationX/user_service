@@ -19,14 +19,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 public class RedisConfig {
 
-//    private final RedisBanMessageListener banMessageListener;
-
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-//    @Value("${spring.data.redis.channels.ban-user-channel.name}")
-//    private String banTopic;
 
     @Value("${spring.data.redis.channels.event-start-channel.name}")
     private String eventStartTopic;
@@ -55,21 +51,10 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-//    @Bean
-//    public ChannelTopic channelTopic() {
-//        return new ChannelTopic(banTopic);
-//    }
-
-//    @Bean
-//    public MessageListenerAdapter banMessageListenerAdapter() {
-//        return new MessageListenerAdapter(banMessageListener);
-//    }
-
     @Bean
     public RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
-//        container.addMessageListener(banMessageListenerAdapter(), channelTopic());
 
         return container;
     }

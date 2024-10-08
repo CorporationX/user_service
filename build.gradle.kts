@@ -82,6 +82,10 @@ dependencies {
     testImplementation("com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.postgresql:postgresql:42.5.0")
+    testImplementation("it.ozimov:embedded-redis:0.7.3") {
+        exclude(group = "org.slf4j", module = "slf4j-simple")
+    }
+
     /**
      * Tests
      */
@@ -90,6 +94,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2:2.3.232")
     implementation(kotlin("stdlib-jdk8"))
+    testImplementation("uk.org.lidalia:slf4j-test:1.2.0")
+
 }
 
 jsonSchema2Pojo {

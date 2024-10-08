@@ -25,10 +25,9 @@ spring:
       port: 6379
       host: localhost
       channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+        mentorship-channel: mentorship_channel
+        follower-event-channel: follower_event
+        user-service: ban_user_channel
   cloud:
     openfeign:
       client:

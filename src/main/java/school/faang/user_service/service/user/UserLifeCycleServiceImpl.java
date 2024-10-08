@@ -21,6 +21,8 @@ import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.ProfilePictureService;
 import school.faang.user_service.service.UserLifeCycleService;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,11 @@ public class UserLifeCycleServiceImpl implements UserLifeCycleService {
         UserProfilePic userProfilePic = profilePictureService.saveProfilePictures(userRegistrationDto);
         User user = configureUser(userRegistrationDto, userProfilePic, country);
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Override
+    public void banUsersById(List<Long> ids) {
+        userRepository.banUsersById(ids);
     }
 
     private void existsByUsernameEmailAndPhone(UserRegistrationDto dto) {

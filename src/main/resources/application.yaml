@@ -66,11 +66,6 @@ events:
   batch:
     size: 3
   cron: "0 0 0 * * *"
-  task-executor:
-    core-pool-size: 10
-    max-pool-size: 20
-    queue-capacity: 1000
-    thread-name-prefix: "ClearEvents-"
 
 user:
   password:

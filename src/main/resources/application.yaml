@@ -60,7 +60,8 @@ services:
     requiredHeaders: x-user-id
 
 premium:
-  scheduled:
-    daily: "0 0 0 * * *"
-  thread-pool-size: 5
+  schedule: "0 0 0 * * *"
   batch-size: 100
+
+thread-pool-config:
+  size: 5

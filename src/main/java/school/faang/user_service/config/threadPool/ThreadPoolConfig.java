@@ -10,11 +10,11 @@ import java.util.concurrent.Executors;
 @Configuration
 public class ThreadPoolConfig {
 
-    @Value("${premium.thread-pool-size}")
-    private int premiumThreadPoolSize;
+    @Value("${thread-pool-config.size}")
+    private int threadPoolSize;
 
     @Bean
-    public ExecutorService premiumThreadPools(){
-        return Executors.newFixedThreadPool(premiumThreadPoolSize);
+    public ExecutorService threadPools(){
+        return Executors.newFixedThreadPool(threadPoolSize);
     }
 }

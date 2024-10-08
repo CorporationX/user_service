@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.EventService;
 import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.validator.groups.CreateGroup;
 import school.faang.user_service.validator.groups.UpdateGroup;

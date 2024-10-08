@@ -16,9 +16,10 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.impl.event.EventServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.mentorship.MentorshipServiceImpl;
+import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.util.CsvParser;
 
 import java.util.List;
@@ -56,13 +57,13 @@ class UserServiceImplTest {
     private UserFilter userFilter;
 
     @Mock
-    private GoalService goalService;
+    private GoalServiceImpl goalService;
 
     @Mock
-    private EventService eventService;
+    private EventServiceImpl eventServiceImpl;
 
     @Mock
-    private MentorshipService mentorshipService;
+    private MentorshipServiceImpl mentorshipService;
 
     @Mock
     private CsvParser csvParser;
@@ -96,8 +97,8 @@ class UserServiceImplTest {
                 .build();
 
         filters = List.of(userFilter);
-        userService = new UserServiceImpl(userRepository,countryRepository, filters, userMapper, goalService,
-                eventService, mentorshipService,csvParser);
+
+        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService, eventServiceImpl, mentorshipService, csvParser);
     }
 
     @Test
@@ -155,7 +156,7 @@ class UserServiceImplTest {
 
         verify(userRepository).findById(id);
         verify(goalService).removeGoals(List.of());
-        verify(eventService).deleteEvents(List.of());
+        verify(eventServiceImpl).deleteEvents(List.of());
         verify(mentorshipService).deleteMentorFromMentees(anyLong(), any());
         verify(userRepository).save(any());
     }

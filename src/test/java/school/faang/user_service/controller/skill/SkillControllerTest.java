@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.impl.skill.SkillServiceImpl;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ class SkillControllerTest {
     private SkillController skillController;
 
     @Mock
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
 
     private SkillDto skillDto;
 

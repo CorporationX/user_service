@@ -3,6 +3,7 @@ package school.faang.user_service.exception.handler;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -56,7 +57,7 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class})
+    @ExceptionHandler({NonUniqueFieldsException.class, EntityNotFoundException.class, DataValidationException.class, DataAccessException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataExceptions(RuntimeException exception) {
         String message = exception.getMessage();

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.student.Person;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -41,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final EventService eventService;
     private final MentorshipService mentorshipService;
     private final CsvParser csvParser;
+    private final UserContext userContext;
 
     @Override
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
@@ -128,6 +130,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(long userId) {
+        userContext.getUserId();
         return userMapper.toDto(findUserById(userId));
     }
 

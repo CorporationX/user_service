@@ -40,6 +40,8 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  base-path: /api
+  url: http://${payment-service.host}:${payment-service.port}${payment-service.base-path}
 
 springdoc:
   api-docs:
@@ -52,6 +54,21 @@ springdoc:
 app:
   goal:
     max-active-per-user: 3
+  promotion:
+    user_promotion_views_decrement_cron: '*/10 * * * * *'
+    event__promotion_views_decrement_cron: '*/10 * * * * *'
+  retryable:
+    payment_service:
+      send_payment:
+        max_attempts: 3
+        delay: 100
+        multiplier: 2
+  async-config:
+    promotion-task-service:
+      core_pool_size: 10
+      max_pool_size: 20
+      queue_capacity: 1000
+      thread_name_prefix: PromotionTaskService-Async-
 
 minio:
   endpoint: http://localhost:9000

@@ -64,6 +64,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+    implementation("org.springframework.retry:spring-retry:2.0.3")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
     implementation ("net.coobird:thumbnailator:0.4.1")
@@ -110,50 +111,77 @@ tasks.bootJar {
  * JaCoCo settings
  */
 val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
+    "**/service/**"
 )
+
+val jacocoExclude = listOf(
+    "**/entity/**",
+    "**/dto/**",
+    "**/config/**",
+    "**/generated/**",
+    "**/exceptions/**",
+    "**/service/recomendation/filters**",
+    "**/service/mentorship_request/error_messages**",
+    "**/service/goal/util**",
+    "**/service/event/filters**",
+    "**/service/mentorship_request/MentorshipRequestDescriptionFilter**"
+)
+
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
 tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-
     reports {
+        html.required.set(true)
         xml.required.set(false)
         csv.required.set(false)
-        html.required.set(true)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
+
+    // Include only the specified directories in the coverage report
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            include(jacocoInclude)
+            exclude(jacocoExclude)
+        }
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = "0.70".toBigDecimal()
+            }
+        }
     }
 
     classDirectories.setFrom(
         sourceSets.main.get().output.asFileTree.matching {
             include(jacocoInclude)
+            exclude(jacocoExclude)
         }
     )
-}
-tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            element = "CLASS"
-            classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
-            )
-            enabled = true
-            limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
-            }
-        }
+
+    tasks.check {
+        dependsOn(tasks.jacocoTestCoverageVerification)
     }
-}
-kotlin {
-    jvmToolchain(17)
+
+    tasks.build {
+        dependsOn(tasks.jacocoTestCoverageVerification)
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }

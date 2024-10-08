@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -71,8 +72,7 @@ public class MentorshipRequestService {
         return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Request with id {} not found", id);
-                    return new IllegalArgumentException(
-                            String.format(REQUEST_NOT_FOUND, id));
+                    return new BadRequestException(REQUEST_NOT_FOUND, id);
                 });
     }
 }

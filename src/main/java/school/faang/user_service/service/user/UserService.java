@@ -29,6 +29,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final UserMapper userMapper;
+    private final RemoteImageService remoteImageService;
+    private final S3Service s3Service;
+    private final CsvUtil csvUtil;
+    private final CountryService countryService;
     private final List<UserFilter> userFilters;
     private final PromotionManagementService promotionManagementService;
 
@@ -38,7 +42,6 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with this id does not exist in the database"));
     }
 
-    @Transactional
     public UserDto getUser(long userId) {
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
@@ -46,7 +49,6 @@ public class UserService {
         return userMapper.toDto(existedUser);
     }
 
-    @Transactional
     public List<UserDto> getUsersByIds(List<Long> ids) {
         ids.forEach(userValidator::validateUserIdIsPositiveAndNotNull);
 
@@ -54,9 +56,51 @@ public class UserService {
     }
 
     @Transactional
+    public List<UserDto> saveUsersFromCsvFile(MultipartFile multipartFile) {
+        List<Person> persons = csvUtil.parseCsvMultipartFile(multipartFile, Person.class);
+        List<User> users = userMapper.toEntities(persons);
+
+        users.parallelStream()
+                .forEach(user -> {
+                    setDefaultPassword(user);
+
+                    Country country = countryService.findCountryAndSaveIfNotExists(user.getCountry().getTitle());
+
+                    user.setCountry(country);
+                });
+        userRepository.saveAll(users);
+
+        return userMapper.toDtos(users);
+    }
+
+    private void setDefaultPassword(User user) {
+        user.setPassword(user.getUsername());
+    }
+
     public List<User> getUsersById(List<Long> usersId) {
         return userRepository.findAllById(usersId);
     }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public UserDto registerUser(UserRegistrationDto userRegistrationDto) {
+        log.info("registerUser() - start : userRegistrationDto = {}", userRegistrationDto);
+
+        User user = userMapper.toEntity(userRegistrationDto);
+        userValidator.validateUserConstrains(user);
+
+        setUserDefaultAvatar(user);
+        log.info("Trying save new user {}", user);
+        userRepository.save(user);
+
+        log.info("registerUser() - end : user = {}", user);
+        return userMapper.toDto(user);
+    }
+
+
 
     @Transactional
     public List<UserDto> users(UserFilterDto filterDto) {
@@ -106,5 +150,44 @@ public class UserService {
                 .toList();
 
         promotionManagementService.markAsShowPromotions(promotionIds);
+    }
+
+    private void setUserDefaultAvatar(User user) {
+        String key;
+
+        try {
+            key = assignUserRemoteRandomPicture(user);
+        } catch (Exception e) {
+            log.info("Couldn't apply remote picture to user profile. Trying to apply default picture from cloud");
+
+            if (s3Service.isDefaultPictureExistsOnCloud()) {
+                log.info("Found default picture on cloud");
+
+                key = s3Service.getDefaultPictureName();
+            } else {
+                log.info("Couldn't found default picture on cloud");
+                return;
+            }
+        }
+
+        user.setUserProfilePic(UserProfilePic.builder()
+                .fileId(key)
+                .build());
+
+        log.info("Finish assignment random picture for user {}", user);
+    }
+
+    private String assignUserRemoteRandomPicture(User user) {
+        log.info("Trying to assign random picture for user {}", user);
+
+        try {
+            ResponseEntity<byte[]> pictureContent = remoteImageService.getUserProfileImageFromRemoteService();
+
+            String s3Folder = user.getUsername() + user.getId() + "profilePic";
+            return s3Service.uploadHttpData(pictureContent, s3Folder);
+        } catch (FeignException | AmazonS3CustomException e) {
+            log.error(e.getMessage());
+            throw new ImageGeneratorException(e.getMessage());
+        }
     }
 }

@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -8,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -26,6 +28,10 @@ spring:
         follower-event-channel:
           name: follower_event
 
+servlet:
+  multipart:
+    max-file-size: 5242880
+
 server:
   port: 8080
 
@@ -40,3 +46,21 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    connectionTimeout: 10_000
+    socketTimeout: 10_000
+    bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
+    defaultProfilePicture: defaultAvatar.png
+    remoteFilename: pic.png
+  imagegenerator:
+    endpoint: https://api.dicebear.com/9.x
+    paths:
+      get: adventurer-neutral/png
+  postService:
+    endpoint: http://localhost:8081
+    requiredHeaders: x-user-id

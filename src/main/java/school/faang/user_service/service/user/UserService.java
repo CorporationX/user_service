@@ -1,20 +1,34 @@
 package school.faang.user_service.service.user;
 
+import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserRegistrationDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.promotion.Promotion;
+import school.faang.user_service.exception.remote.AmazonS3CustomException;
+import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.country.CountryService;
+import school.faang.user_service.service.image.RemoteImageService;
 import school.faang.user_service.service.promotion.PromotionManagementService;
+import school.faang.user_service.service.s3.S3Service;
+import school.faang.user_service.util.file.CsvUtil;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.Collections;
@@ -22,6 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -99,8 +114,6 @@ public class UserService {
         log.info("registerUser() - end : user = {}", user);
         return userMapper.toDto(user);
     }
-
-
 
     @Transactional
     public List<UserDto> users(UserFilterDto filterDto) {

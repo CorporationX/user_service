@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service.impl.user;
 
 import java.util.function.Function;
 

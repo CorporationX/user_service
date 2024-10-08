@@ -6,7 +6,7 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.student.Person;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.user.SafeExtractor;
+import school.faang.user_service.service.impl.user.SafeExtractor;
 
 import java.util.List;
 import java.util.Objects;

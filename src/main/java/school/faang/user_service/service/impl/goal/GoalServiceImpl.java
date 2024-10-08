@@ -12,7 +12,7 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;

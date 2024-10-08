@@ -26,12 +26,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SkillServiceImplTest {
@@ -59,6 +54,12 @@ class SkillServiceImplTest {
     private Skill skill;
     private SkillDto skillDto;
 
+    private List<String> titleSkills;
+    private List<Skill> skills;
+    private long skillId;
+    private long userId;
+    private long goalId;
+
     @BeforeEach
     void setUp() {
         skill = Skill.builder()
@@ -69,32 +70,32 @@ class SkillServiceImplTest {
                 .id(1L)
                 .title("Title")
                 .build();
+
+        titleSkills = List.of("title");
+        skills = List.of(new Skill());
+        skillId = 1;
+        userId = 1;
+        goalId = 1;
     }
 
     @Test
     void create_shouldSaveSkill() {
-        // given
         Skill skillEntity = skillMapper.toEntity(skillDto);
         when(skillRepository.save(skillEntity)).thenReturn(skillEntity);
-        // when
         SkillDto result = skillService.create(skillDto);
-        // then
         verify(skillRepository, times(1)).save(skillCaptor.capture());
-        Skill skill = skillCaptor.getValue();
-        assertEquals(skillDto.id(), skill.getId());
-        assertEquals(skillDto.title(), skill.getTitle());
+        Skill capturedSkill = skillCaptor.getValue();
+        assertEquals(skillDto.id(), capturedSkill.getId());
+        assertEquals(skillDto.title(), capturedSkill.getTitle());
         assertEquals(skillDto.title(), result.title());
     }
 
     @Test
     void getUserSkills_shouldReturnSkillDtoList() {
-        // given
         long userId = 1L;
         List<Skill> skills = List.of(skill);
         when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
-        // when
         List<SkillDto> result = skillService.getUserSkills(userId);
-        // then
         assertEquals(1, result.size());
         assertEquals("Title", result.get(0).title());
         verify(skillRepository, times(1)).findAllByUserId(userId);
@@ -102,14 +103,11 @@ class SkillServiceImplTest {
 
     @Test
     void getOfferedSkills_shouldReturnSkillCandidateDtoList() {
-        // given
         long userId = 1L;
         SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto, 1L);
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(skill));
         skillCandidateMapper.toDto(skill, 2L);
-        // when
         List<SkillCandidateDto> result = skillService.getOfferedSkills(userId);
-        // then
         assertEquals(1, result.size());
         assertEquals(skillCandidateDto, result.get(0));
         verify(skillRepository, times(1)).findSkillsOfferedToUser(userId);
@@ -117,16 +115,37 @@ class SkillServiceImplTest {
 
     @Test
     void acquireSkillFromOffers_whenNotEnoughOffers_shouldThrowDataValidationException() {
-        // given
         long skillId = 1L;
         long userId = 1L;
         List<SkillOffer> offers = List.of();
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(offers);
-        // when
         doNothing().when(skillServiceValidator).validateOfferedSkill(skillId, userId);
         doThrow(new DataValidationException("Not enough offers")).when(skillServiceValidator).validateSkillByMinSkillOffers(0, skillId, userId);
-        // then
         assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
         verify(skillRepository, never()).assignSkillToUser(anyLong(), anyLong());
+    }
+
+    // Merged test methods from SkillServiceTest
+
+    @Test
+    void getSkillsByTitle() {
+        doNothing().when(skillServiceValidator).validateSkill(titleSkills, skillRepository);
+        when(skillRepository.findByTitleIn(titleSkills)).thenReturn(skills);
+        var result = skillService.getSkillsByTitle(titleSkills);
+        assertEquals(result, skills);
+    }
+
+    @Test
+    void assignSkillToUser() {
+        skillService.assignSkillToUser(skillId, userId);
+        verify(skillRepository).assignSkillToUser(skillId, userId);
+    }
+
+    @Test
+    void deleteSkillFromGoal() {
+        when(skillRepository.findSkillsByGoalId(goalId)).thenReturn(skills);
+        skillService.deleteSkillFromGoal(goalId);
+        verify(skillRepository).findSkillsByGoalId(goalId);
+        verify(skillRepository).deleteAll(skills);
     }
 }

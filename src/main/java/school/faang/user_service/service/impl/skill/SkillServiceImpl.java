@@ -78,15 +78,18 @@ public class SkillServiceImpl implements SkillService {
         userSkillGuaranteeRepository.saveAll(guarantees);
     }
 
+    @Override
     public List<Skill> getSkillsByTitle(List<String> skillsTitle) {
         skillValidator.validateSkill(skillsTitle, skillRepository);
         return skillRepository.findByTitleIn(skillsTitle);
     }
 
+    @Override
     public void assignSkillToUser(long skillId, long userId) {
         skillRepository.assignSkillToUser(skillId, userId);
     }
 
+    @Override
     public void deleteSkillFromGoal(long goalId) {
         skillRepository.deleteAll(skillRepository.findSkillsByGoalId(goalId));
     }

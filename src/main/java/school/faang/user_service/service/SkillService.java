@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 
 import java.util.List;
 
@@ -15,4 +16,9 @@ public interface SkillService {
     SkillDto acquireSkillFromOffers(long skillId, long userId);
 
 
+    List<Skill> getSkillsByTitle(List<String> skillsTitle);
+
+    void assignSkillToUser(long skillId, long userId);
+
+    void deleteSkillFromGoal(long goalId);
 }

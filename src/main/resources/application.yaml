@@ -69,6 +69,8 @@ app:
       max_pool_size: 20
       queue_capacity: 1000
       thread_name_prefix: PromotionTaskService-Async-
+  user-redis-config:
+    profile_view_event_topic: profileViewEvent
 
 minio:
   endpoint: http://localhost:9000

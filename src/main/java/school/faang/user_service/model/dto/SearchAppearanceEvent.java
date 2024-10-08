@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class SearchAppearanceEvent {
-    private Long userId;
+    private Long receiverId;
     private Long actorId;
     private LocalDateTime receivedAt;
 }

@@ -2,14 +2,15 @@ package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.AvatarStyle;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -20,8 +21,8 @@ import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserEmailFilter;
@@ -37,8 +38,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,8 +56,10 @@ class UserServiceTest extends AbstractUserServiceTest {
     private MentorshipService mentorshipService;
     @Mock
     private AvatarService avatarService;
-    @Mock  
+    @Mock
     private PremiumRepository premiumRepository;
+    @Mock
+    private ProfileViewService profileViewService;
     @InjectMocks
     private UserService userService;
 
@@ -131,7 +134,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertThrows(UserDeactivatedException.class, () -> userService.deactivateUser(userId));
     }
-  
+
     @Test
     public void testRegisterUser() {
         User user = new User();
@@ -177,6 +180,8 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(1, result.size());
         assertEquals(USERNAME, result.get(0).getUsername());
         assertEquals(EMAIL, result.get(0).getEmail());
+
+        verify(profileViewService).publish(anyList());
     }
 
 
@@ -194,6 +199,8 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(EMAIL, resultFound.getEmail());
 
         assertThrows(UserNotFoundException.class, () -> userService.getUser(notFoundId));
+
+        verify(profileViewService).publish(foundId);
     }
 
     @Test
@@ -213,5 +220,16 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(EMAIL, resultFound.get(0).getEmail());
 
         assertEquals(0, resultNotFound.size());
+
+        verify(profileViewService, times(2)).publish(anyList());
+    }
+
+    @Test
+    @DisplayName("Find by id successful")
+    void testFindById() {
+        User user = createUser(USERNAME, EMAIL);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.findById(1L);
+        verify(profileViewService).publish(1L);
     }
 }

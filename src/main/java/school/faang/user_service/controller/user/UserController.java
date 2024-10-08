@@ -27,7 +27,6 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-
     private final UserMapper userMapper;
 
     @Operation(summary = "Register a new user", description = "Registers a new user and returns the created user data.")

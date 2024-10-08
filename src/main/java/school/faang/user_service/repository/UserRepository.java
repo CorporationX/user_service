@@ -28,6 +28,12 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             """)
     Stream<User> findPremiumUsers();
 
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findByPhone(String phone);
+
+    Optional<User> findByUsername(String username);
+
     Optional<User> findUserById(Long id);
 
 }

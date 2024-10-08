@@ -41,6 +41,24 @@ payment-service:
   host: localhost
   port: 9080
 
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    connectionTimeout: 10_000
+    socketTimeout: 10_000
+    bucketDefaultAvatarsName: usersdefaultavatars #should be lowerCase
+    defaultProfilePicture: defaultAvatar.png
+    remoteFilename: pic.png
+  imagegenerator:
+    endpoint: https://api.dicebear.com/9.x
+    paths:
+      get: adventurer-neutral/png
+  postService:
+    endpoint: http://localhost:8081
+    requiredHeaders: x-user-id
+
 premium:
   scheduled:
     daily: "0 0 0 * * *"

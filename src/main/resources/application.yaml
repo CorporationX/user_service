@@ -2,9 +2,9 @@ app:
   max-active-user-goals: 3
 
 spring:
-  mvc:
-    servlet:
-      path: /api/v1
+  #mvc:
+    #servlet:
+      #path: /api/v1
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -31,6 +31,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        goal-completed-channel:
+          name: goal_completed
 
 services:
   s3:

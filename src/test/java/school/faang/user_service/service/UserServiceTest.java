@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -83,6 +85,10 @@ public class UserServiceTest {
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @Mock
     private List<UserFilter> userFilters;
+    @Mock
+    private ObjectMapper objectMapper;
+    @Mock
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -356,6 +362,7 @@ public class UserServiceTest {
         verify(userMapper).toDto(callingUser);
         verify(userMapper).toDto(promoted1);
         verify(userMapper).toDto(promoted2);
+        verify(searchAppearanceEventPublisher,times(3)).publish(any());
 
         assertAll(
                 () -> assertNotNull(result),

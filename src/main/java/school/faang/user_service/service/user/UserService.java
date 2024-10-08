@@ -1,5 +1,7 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.model.dto.SearchAppearanceEvent;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -25,6 +29,7 @@ import school.faang.user_service.service.minio.S3service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,6 +51,8 @@ public class UserService {
     private final PromotionRepository promotionRepository;
     private final List<UserFilter> userFilters;
     private final S3service s3service;
+    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -142,6 +149,13 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<User> filteredUsers = getFilteredUsersFromRepository(filterDto);
+
+        if (!filteredUsers.isEmpty()) {
+            filteredUsers.stream()
+                    .map(user -> new SearchAppearanceEvent(user.getId(), callingUserId, LocalDateTime.now()))
+                    .forEach(this::publishSearchAppearanceEvent);
+        }
+
         List<User> priorityFilteredUsers = getPriorityFilteredUsers(filteredUsers, callingUser);
 
         decrementRemainingShows(priorityFilteredUsers);
@@ -269,5 +283,14 @@ public class UserService {
         Promotion targetPromotion = getTargetPromotion(user);
 
         return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
+    }
+
+    private void publishSearchAppearanceEvent(SearchAppearanceEvent event) {
+        try {
+            String message = objectMapper.writeValueAsString(event);
+            searchAppearanceEventPublisher.publish(message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

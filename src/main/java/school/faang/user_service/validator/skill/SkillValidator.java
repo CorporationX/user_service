@@ -6,6 +6,8 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class SkillValidator {
@@ -27,6 +29,11 @@ public class SkillValidator {
     public void validateSkillByMinSkillOffers(int skillOffers, long skillId, long userId) {
         if (skillOffers < MIN_SKILL_OFFERS) {
             throw new DataValidationException("User " + userId + "doesn't have enough skill offers to acquire the skill with ID: " + skillId);
+        }
+    }
+    public void validateSkill(List<String> skills, SkillRepository skillRepository) {
+        if (!skills.stream().allMatch(skillRepository::existsByTitle)) {
+            throw new DataValidationException("Skills don't exist");
         }
     }
 }

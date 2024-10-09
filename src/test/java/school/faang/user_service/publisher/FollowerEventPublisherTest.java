@@ -1,7 +1,5 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,20 +12,15 @@ import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FollowerEventPublisherTest {
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
-
-    @Mock
-    private ObjectMapper objectMapper;
 
     @InjectMocks
     private FollowerEventPublisher followerEventPublisher;
@@ -43,24 +36,23 @@ class FollowerEventPublisherTest {
     }
 
     @Test
-    void publish_shouldConvertAndSendEvent() throws JsonProcessingException {
+    void publish_shouldConvertAndSendEvent() {
         // given
-        event = FollowerEventDto.builder().build();
-        String json = "{\"userId\": 1, \"followerId\": 2}";
-        when(objectMapper.writeValueAsString(event)).thenReturn(json);
+        event = FollowerEventDto.builder().followerId(1L).followeeId(2L).build();
         // when
         followerEventPublisher.publish(event);
         // then
-        verify(redisTemplate).convertAndSend(eq(followerEvent), eq(json));
+        verify(redisTemplate).convertAndSend(eq(followerEvent), eq(event));
     }
 
     @Test
-    void convertAndSend_shouldThrowRuntimeException_whenJsonProcessingExceptionOccurs() throws JsonProcessingException {
+    void convertAndSend_shouldThrowRuntimeException_whenSerializationFails() {
         // given
         event = FollowerEventDto.builder().followerId(1L).followeeId(2L).build();
-        when(objectMapper.writeValueAsString(event)).thenThrow(new JsonProcessingException("Test exception") {});
+        doThrow(new RuntimeException("Serialization error")).when(redisTemplate)
+                .convertAndSend(eq(followerEvent), eq(event));
         // when & then
         assertThrows(RuntimeException.class, () -> followerEventPublisher.publish(event));
-        verify(redisTemplate, never()).convertAndSend(anyString(), anyString());
+        verify(redisTemplate).convertAndSend(eq(followerEvent), eq(event));
     }
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -12,8 +11,8 @@ public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEvent
     @Value("${spring.data.redis.channels.follower-event-channel.name}")
     private String followerEvent;
 
-    public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
-        super(redisTemplate, objectMapper);
+    public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate) {
+        super(redisTemplate);
     }
 
     @Override

@@ -10,6 +10,8 @@ import org.hibernate.sql.Update;
 import school.faang.user_service.dto.validatedto.Create;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Data
 public class UserDto {
@@ -24,7 +26,7 @@ public class UserDto {
     @Email
     @NotBlank(message = "email should not be blank", groups = {Create.class, Update.class})
     private String email;
-
+    private List<Long> followees;
     private String phone;
 
     private PreferredContact preference;

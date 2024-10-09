@@ -26,4 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     Stream<User> findPremiumUsers();
 
+    @Query(nativeQuery = true, value = "select * from users")
+    List<User> findAllUsers();
+
 }

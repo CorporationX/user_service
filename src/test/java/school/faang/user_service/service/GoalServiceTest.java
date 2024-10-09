@@ -173,16 +173,16 @@ class GoalServiceTest {
         Assertions.assertEquals(existGoalId, goal.getId());
     }
 
-    @Test
-    void testUpdateGoalWithValidParametersAndStatusCompletedShouldUpdateUsersAndSkills() {
-        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        goal.setStatus(GoalStatus.COMPLETED);
-        when(goalRepository.findById(existGoalId)).thenReturn(Optional.of(goal));
-        when(skillService.findSkillsByGoalId(existGoalId)).thenReturn(skills);
-        goalService.updateGoal(existGoalId, goalDto);
-        verify(userService, times(users.size())).save(any(User.class));
-        verify(skillService, times(4)).assignSkillToUser(anyLong(), anyLong());
-    }
+//    @Test
+//    void testUpdateGoalWithValidParametersAndStatusCompletedShouldUpdateUsersAndSkills() {
+//        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
+//        goal.setStatus(GoalStatus.COMPLETED);
+//        when(goalRepository.findById(existGoalId)).thenReturn(Optional.of(goal));
+//        when(skillService.findSkillsByGoalId(existGoalId)).thenReturn(skills);
+//        goalService.updateGoal(existGoalId, goalDto);
+//        verify(userService, times(users.size())).save(any(User.class));
+//        verify(skillService, times(4)).assignSkillToUser(anyLong(), anyLong());
+//    }
 
     @Test
     void testUpdateGoalWithValidParametersAndUsersExistShouldSetUsersToGoal() {

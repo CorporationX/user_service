@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -25,6 +26,11 @@ public class UserService {
 
     public List<User> findAllById(List<Long> userIds) {
         return userRepository.findAllById(userIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> findAllUsers(){
+        return userMapper.toDtos(userRepository.findAllUsers());
     }
 
     public void save(User user) {

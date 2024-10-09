@@ -102,7 +102,8 @@ public class UserService {
         if (!countryRepository.existsById(countryId)) {
             throw new IllegalStateException(String.format("Country with ID %d does not exist", countryId));
         }
-      
+    }
+
     public void banUser(Long userId) {
         User user = getUserById(userId);
         user.setBanned(true);

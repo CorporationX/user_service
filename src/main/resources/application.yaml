@@ -80,3 +80,7 @@ minio:
   accessKey: user
   secretKey: password
   bucketName: corpbucket
+
+redis:
+  banner:
+    topic: "user_ban"

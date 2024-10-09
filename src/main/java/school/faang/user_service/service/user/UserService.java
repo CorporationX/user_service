@@ -70,6 +70,14 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
+    @Transactional
+    public void bannedUser(Long userId) {
+        User user = findById(userId);
+        user.setBanned(true);
+        log.info("User banned: {}", userId);
+        userRepository.save(user);
+    }
+
     private void removeUserGoals(User user) {
         user.getGoals().forEach(goal -> {
             if (goal.getUsers().size() == 1) {

@@ -10,7 +10,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +100,22 @@ public class TestDataEvent {
                 .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
                 .type(EventType.GIVEAWAY)
                 .status(EventStatus.CANCELED)
+                .build();
+    }
+
+    public Event getOldEvent() {
+        return Event.builder()
+                .id(65L)
+                .title("title65")
+                .description("desc65")
+                .startDate(LocalDateTime.now().minusDays(3))
+                .endDate(LocalDateTime.now().minusDays(2))
+                .location("location65")
+                .maxAttendees(20)
+                .owner(getUser())
+                .relatedSkills(new ArrayList<>(List.of(getSkill1(), getSkill2())))
+                .type(EventType.MEETING)
+                .status(EventStatus.COMPLETED)
                 .build();
     }
     

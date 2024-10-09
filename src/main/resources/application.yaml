@@ -44,10 +44,6 @@ avatar_api:
 server:
   port: 8080
 
-logging:
-  level:
-    root: info
-
 project-service:
   host: localhost
   port: 8082
@@ -55,3 +51,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+schedule:
+  clean_past_events:
+      clean_interval: "0 0 6 * * 1"
+      threads_num: 4
+      sublist_size: 10

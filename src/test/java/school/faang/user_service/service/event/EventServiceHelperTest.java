@@ -15,6 +15,7 @@ import school.faang.user_service.test_data.event.TestDataEvent;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertThrows;
@@ -29,7 +30,7 @@ class EventServiceHelperTest {
     @Mock
     private EventRepository eventRepository;
     @InjectMocks
-    private EventServiceHelper eventValidator;
+    private EventServiceHelper eventServiceHelper;
 
     private TestDataEvent testDataEvent;
     private EventDto eventDto;
@@ -45,7 +46,7 @@ class EventServiceHelperTest {
     class PositiveTests {
         @Test
         public void eventDatesValidation_Success() {
-            assertDoesNotThrow(() -> eventValidator.eventDatesValidation(eventDto));
+            assertDoesNotThrow(() -> eventServiceHelper.eventDatesValidation(eventDto));
         }
 
 
@@ -53,14 +54,32 @@ class EventServiceHelperTest {
         public void testRelatedSkillsValidation_Success() {
             HashSet<SkillDto> ownerSkills = new HashSet<>(eventDto.getRelatedSkills());
 
-            assertDoesNotThrow(() -> eventValidator.relatedSkillsValidation(eventDto, ownerSkills));
+            assertDoesNotThrow(() -> eventServiceHelper.relatedSkillsValidation(eventDto, ownerSkills));
         }
 
         @Test
         public void testEventExistByIdValidation_Success() {
             when(eventRepository.existsById(eventDto.getId())).thenReturn(true);
 
-            assertDoesNotThrow(() -> eventValidator.eventExistByIdValidation(eventDto.getId()));
+            assertDoesNotThrow(() -> eventServiceHelper.eventExistByIdValidation(eventDto.getId()));
+        }
+
+        @Test
+        void testAsyncDeletePastEvents_Success() {
+            List<Long> sublistPastEventsIds = List.of(1L, 2L, 103L, 44L, 555L);
+
+            eventServiceHelper.asyncDeletePastEvents(sublistPastEventsIds);
+
+            verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(sublistPastEventsIds);
+        }
+
+        @Test
+        void testBatchDeletePastEvents_Success() {
+            List<Long> sublistPastEventsIds = List.of(1L, 2L, 103L, 44L, 555L);
+
+            eventServiceHelper.batchDeletePastEvents(sublistPastEventsIds);
+
+            verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(sublistPastEventsIds);
         }
     }
 
@@ -72,7 +91,7 @@ class EventServiceHelperTest {
             eventDto.setEndDate(LocalDateTime.now().plusDays(1));
 
             var exception = assertThrows(DataValidationException.class,
-                    () -> eventValidator.eventDatesValidation(eventDto)
+                    () -> eventServiceHelper.eventDatesValidation(eventDto)
             );
 
             assertEquals("Start_date cannot be after end_date.", exception.getMessage());
@@ -84,7 +103,7 @@ class EventServiceHelperTest {
             Set<SkillDto> invalidSkillDtoList = Set.of(invalidSkillDto);
 
             var exception = assertThrows(DataValidationException.class,
-                    () -> eventValidator.relatedSkillsValidation(eventDto, invalidSkillDtoList)
+                    () -> eventServiceHelper.relatedSkillsValidation(eventDto, invalidSkillDtoList)
             );
 
             assertEquals("Owner must have valid skills.", exception.getMessage());
@@ -95,7 +114,7 @@ class EventServiceHelperTest {
             when(eventRepository.existsById(eventDto.getId())).thenReturn(false);
 
             var exception = assertThrows(DataValidationException.class,
-                    () -> eventValidator.eventExistByIdValidation(eventDto.getId())
+                    () -> eventServiceHelper.eventExistByIdValidation(eventDto.getId())
             );
 
             assertEquals("Event by ID: 1 dont exist.", exception.getMessage());

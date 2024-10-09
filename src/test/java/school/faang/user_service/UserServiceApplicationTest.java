@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.event.EventMapper;
+
 import school.faang.user_service.repository.event.filters.EventDescriptionFilter;
 import school.faang.user_service.repository.event.filters.EventEndDateAfterFilter;
 import school.faang.user_service.repository.event.filters.EventEndDateBeforeFilter;
@@ -23,9 +24,9 @@ import school.faang.user_service.repository.event.filters.EventStartDateBeforeFi
 import school.faang.user_service.repository.event.filters.EventStatusFilter;
 import school.faang.user_service.repository.event.filters.EventTitleFilter;
 import school.faang.user_service.repository.event.filters.EventTypeFilter;
-import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.service.event.EventServiceHelper;
+import school.faang.user_service.service.goal.GoalInvitationService;
 import school.faang.user_service.service.goal.GoalService;
 
 import static org.assertj.core.api.Assertions.assertThat;

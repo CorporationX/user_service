@@ -21,7 +21,7 @@ public class RedisConfig {
         void publish(T redisEvent);
     }
 
-    @Value("${spring.data.redis.channels.search-appearance-channel.name}")
+    @Value("${redis.channels.search-appearance-channel}")
     private String searchAppearanceChannelName;
 
     @Value("${spring.data.redis.channels.profile-view-channel.name}")

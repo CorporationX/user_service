@@ -182,9 +182,6 @@ sourceSets {
         proto {
             srcDir("src/main/java/school/faang/user_service/protobuf/proto")
         }
-        java {
-            srcDir("src/main/java/school/faang/user_service/protobuf/generate")
-        }
     }
 }
 

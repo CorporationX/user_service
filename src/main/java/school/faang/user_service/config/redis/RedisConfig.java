@@ -1,5 +1,6 @@
 package school.faang.user_service.config.redis;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -11,6 +12,9 @@ import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
 @Configuration
 public class RedisConfig {
 
+    @Value("${redis.topic.user-ban}")
+    private String userBanTopicName;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         return new JedisConnectionFactory();
@@ -18,7 +22,7 @@ public class RedisConfig {
 
     @Bean
     public ChannelTopic channelTopic() {
-        return new ChannelTopic("user_ban");
+        return new ChannelTopic(userBanTopicName);
     }
 
     @Bean

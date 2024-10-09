@@ -122,6 +122,7 @@ public class EventService {
                     .toList();
 
             publisher.publish(new EventStartEvent(event.getId(), participantsIds));
+            log.info("Event with id {} was sent to broker", event.getId());
         });
     }
 }

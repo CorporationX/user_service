@@ -7,7 +7,7 @@ spring:
       path: /api/v1
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://192.168.43.78:5432/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
   jpa:
@@ -25,7 +25,7 @@ spring:
   data:
     redis:
       port: 6379
-      host: 192.168.43.78
+      host: localhost
       channels:
         mentorship-channel:
           name: mentorship_channel

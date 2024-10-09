@@ -57,7 +57,7 @@ public class UserService {
     }
 
     private void setAvatarKeyForUser(User toUpdate, String fileKey) {
-        UserProfilePic profilePic = toUpdate.getUserProfilePic();
+        UserProfilePic profilePic = new UserProfilePic();
         profilePic.setFileId(fileKey);
         profilePic.setSmallFileId(fileKey);
         toUpdate.setUserProfilePic(profilePic);

@@ -13,6 +13,5 @@ public interface PremiumService {
 
     void deleteExpiredPremiums();
 
-    @Async("fixedThreadPools")
     void deleteExpiredPremiumsByBatches(List<Premium> expiredPremiums);
 }

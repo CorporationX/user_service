@@ -17,9 +17,9 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.EventService;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.service.impl.event.EventServiceImpl;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.util.CsvParser;
 
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
     private final GoalService goalService;
-    private final EventServiceImpl eventServiceImpl;
+    private final EventService eventServiceImpl;
     private final MentorshipService mentorshipService;
     private final CsvParser csvParser;
 

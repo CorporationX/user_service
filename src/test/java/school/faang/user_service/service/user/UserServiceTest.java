@@ -184,9 +184,6 @@ public class UserServiceTest {
         profilePic.setSmallFileId(fileKeyMocked);
         expectedUser.setUserProfilePic(profilePic);
 
-//        when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
-//        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
-//        when(userRepository.existsByPhone(user.getPhone())).thenReturn(true);
         when(countryRepository.existsById(country.getId())).thenReturn(true);
         when(userRepository.save(user)).thenReturn(user);
 
@@ -195,7 +192,6 @@ public class UserServiceTest {
 
         User actual = userService.registerNewUser(user);
         assertNotNull(actual);
-        // verify chain
         assertThat(expectedUser).usingRecursiveComparison().isEqualTo(actual);
     }
 }

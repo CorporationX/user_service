@@ -1,6 +1,5 @@
 package school.faang.user_service.service.user;
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,11 +10,9 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
-import school.faang.user_service.service.s3.S3Service;
-import school.faang.user_service.service.util.AvatarApiService;
-import java.io.ByteArrayInputStream;
+import school.faang.user_service.service.s3.S3CompatibleService;
+import school.faang.user_service.service.avatar_api.AvatarApiService;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -26,7 +23,9 @@ public class UserService {
     private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
     private final AvatarApiService avatarApiService;
-    private final S3Service s3Service;
+    private final S3CompatibleService s3Service;
+
+    private final String DEFAULT_AVATAR_FORMAT = "user_%d/default_profile";
 
     @Transactional(readOnly = true)
     public List<User> findPremiumUser(UserFilterDto filterDto) {
@@ -44,30 +43,24 @@ public class UserService {
         validatePhone(newUser.getPhone());
         validateCountry(newUser.getCountry().getId());
 
-        User withId = userRepository.save(newUser);
-        byte[] avatarData = avatarApiService.getDefaultAvatar(newUser.getUsername())
-                .orElseThrow(() -> new RuntimeException("Avatar not found"));
-        ObjectMetadata metadata = prepareFileMetadata("image/svg+xml", avatarData.length);
-        uploadDefaultAvatar(withId, avatarData, metadata);
-
+        User saved = userRepository.save(newUser);
+        generateAndSaveDefaultAvatar(saved);
+        log.info("Successfully registered a new user (ID={})", saved.getId());
         return userRepository.save(newUser);
     }
 
-    private void uploadDefaultAvatar(User toUpdate, byte[] fileBytes, ObjectMetadata metadata) {
-        String folder = String.format("user_%d/profile", toUpdate.getId());
-        String fileKey = s3Service.uploadFile(new ByteArrayInputStream(fileBytes), metadata, folder, toUpdate.getId());
-        UserProfilePic profilePic = new UserProfilePic();
+    private void generateAndSaveDefaultAvatar(User created) {
+        byte[] defaultAvatarData = avatarApiService.generateDefaultAvatar(created.getUsername());
+        String fileKey = String.format(DEFAULT_AVATAR_FORMAT, created.getId());
+        s3Service.uploadFile(defaultAvatarData, fileKey, "image/svg+xml");
+        setAvatarKeyForUser(created, fileKey);
+    }
+
+    private void setAvatarKeyForUser(User toUpdate, String fileKey) {
+        UserProfilePic profilePic = toUpdate.getUserProfilePic();
         profilePic.setFileId(fileKey);
         profilePic.setSmallFileId(fileKey);
         toUpdate.setUserProfilePic(profilePic);
-        log.info("Registered user(userId={}), with default avatar(fileKey={})", toUpdate.getId(), fileKey);
-    }
-
-    private ObjectMetadata prepareFileMetadata(String contentType, long sizeInBytes) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-        metadata.setContentLength(sizeInBytes);
-        return metadata;
     }
 
     private void validateUsername(String username) {

@@ -37,6 +37,10 @@ services:
     region: us-east-1
     bucketName: corpbucket
 
+avatar_api:
+  dice_bear:
+    url: "https://api.dicebear.com/9.x/initials/svg?scale=50&backgroundType=gradientLinear&radius=50&seed="
+
 server:
   port: 8080
 

@@ -1,53 +1,37 @@
 package school.faang.user_service.controller.advice;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.RestClientException;
-import school.faang.user_service.controller.goal.GoalInvitationController;
-import school.faang.user_service.controller.user.UserController;
-
 import java.util.stream.Collectors;
 
-@RestControllerAdvice(assignableTypes = {
-        GoalInvitationController.class,
-        UserController.class })
+@RestControllerAdvice
 public class ControllerAdvice {
-
-    // Validator exceptions, based on convention chosen by the team
-    @ExceptionHandler({
-            IllegalArgumentException.class,
-            IllegalStateException.class,
-            RestClientException.class })
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationNotPassedHandler(RuntimeException ex) {
-        return new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage()
-        );
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> businessLogicHandler(Exception ex) {
+        HttpStatus status;
+        if (ex instanceof EntityNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (ex instanceof RuntimeException) {
+            status = HttpStatus.BAD_REQUEST;
+        } else {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        ErrorResponse response = ErrorResponse.of(status, ex.getMessage());
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse dtoNotValidHandler(MethodArgumentNotValidException ex) {
-        return new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getBindingResult().getAllErrors().stream()
-                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                        .collect(Collectors.joining(", "))
-        );
-    }
-
-    // Internal exceptions, not caught by first two cases
-    @ExceptionHandler({ Exception.class })
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse genericExceptionHandler(Exception e) {
-        return new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage()
-        );
+    public ErrorResponse dtoValidationHandler(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
     }
 }

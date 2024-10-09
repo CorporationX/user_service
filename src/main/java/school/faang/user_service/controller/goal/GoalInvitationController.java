@@ -28,7 +28,6 @@ public class GoalInvitationController {
     @ResponseStatus(HttpStatus.CREATED)
     public GoalInvitationDto createInvitation(@RequestBody @Valid GoalInvitationDto dto) {
         GoalInvitation toSave = mapper.toEntity(dto);
-        System.out.println(toSave);
         GoalInvitation savedInvitation = goalInvitationService.createInvitation(toSave);
         return mapper.toDto(savedInvitation);
     }

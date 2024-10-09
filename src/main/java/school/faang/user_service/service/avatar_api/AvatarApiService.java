@@ -23,7 +23,7 @@ public class AvatarApiService {
             }
             return data;
         } catch(RestClientException e) {
-            throw new RestClientException("Couldn't the call to generate a default avatar failed");
+            throw new RestClientException("A call to generate a default avatar has failed");
         }
     }
 }

@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
@@ -26,9 +27,10 @@ public class UserService {
     private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
     private final AvatarApiService avatarApiService;
-    private final S3CompatibleService s3Service;
+    private final S3CompatibleService s3CompatibleService;
 
-    private final String DEFAULT_AVATAR_FORMAT = "user_%d/default_profile";
+    @Value("${avatar_api.dice_bear.url_format}")
+    private String DEFAULT_AVATAR_FORMAT;
 
     @Transactional(readOnly = true)
     public List<User> findPremiumUser(UserFilterDto filterDto) {
@@ -66,7 +68,7 @@ public class UserService {
     private void generateAndSaveDefaultAvatar(User created) {
         byte[] defaultAvatarData = avatarApiService.generateDefaultAvatar(created.getUsername());
         String fileKey = String.format(DEFAULT_AVATAR_FORMAT, created.getId());
-        s3Service.uploadFile(defaultAvatarData, fileKey, "image/svg+xml");
+        s3CompatibleService.uploadFile(defaultAvatarData, fileKey, "image/svg+xml");
         setAvatarKeyForUser(created, fileKey);
     }
 

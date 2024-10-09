@@ -24,11 +24,11 @@ public class RedisConfig {
 
     @Bean
     public MessagePublisher redisPublisher() {
-        return new SearchAppearanceEventPublisher(redisTemplate(), topic());
+        return new SearchAppearanceEventPublisher(redisTemplate(), searchAppearanceTopic());
     }
 
     @Bean
-    ChannelTopic topic() {
+    ChannelTopic searchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceChannelName);
     }
 

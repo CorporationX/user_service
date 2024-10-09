@@ -87,7 +87,6 @@ dependencies {
     testImplementation("it.ozimov:embedded-redis:0.7.3") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
-    testImplementation("org.springframework.kafka:spring-kafka-test:3.2.4")
 
     /**
      * Tests

@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ErrorResponse;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -22,32 +21,33 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    public List<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
         return e.getBindingResult().getAllErrors().stream()
-                .collect(Collectors.toMap(
-                        error -> ((FieldError) error).getField(),
-                        error -> Objects.requireNonNullElse(error.getDefaultMessage(), " ")));
+                .map(error -> new ErrorResponse(
+                        ((FieldError) error).getField(),
+                        Objects.requireNonNullElse(error.getDefaultMessage(), " ")))
+                .toList();
     }
 
     @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidation(DataValidationException e) {
-        log.error(e.getMessage(), HttpStatus.BAD_REQUEST);
-        return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleEntityNotFound(EntityNotFoundException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntime(RuntimeException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 }

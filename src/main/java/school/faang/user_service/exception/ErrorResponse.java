@@ -2,11 +2,16 @@ package school.faang.user_service.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
+@Setter
 public class ErrorResponse {
-    private String error;
-    private HttpStatus httpStatus;
+    private String errorDescription;
+    private String Description;
+
+    public ErrorResponse(String errorDescription) {
+        this.errorDescription = errorDescription;
+    }
 }

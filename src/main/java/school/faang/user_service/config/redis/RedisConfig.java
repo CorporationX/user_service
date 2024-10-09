@@ -24,6 +24,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.search-appearance-channel.name}")
     private String searchAppearanceChannelName;
 
+    @Value("${spring.data.redis.channels.profile-view-channel.name}")
+    private String profileViewChannelName;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(redisHost, redisPort);
@@ -39,9 +42,13 @@ public class RedisConfig {
         return template;
     }
 
-
     @Bean
     ChannelTopic searchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceChannelName);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewChannelName);
     }
 }

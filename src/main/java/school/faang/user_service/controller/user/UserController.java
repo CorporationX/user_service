@@ -30,7 +30,7 @@ public class UserController {
         return userMapper.toDto(premiumUsers);
     }
     
-    @PostMapping
+    @PostMapping("/register")
     public UserDto registerUser(@RequestBody @Valid ConfidentialUserDto dto) {
         User toRegister = userMapper.toEntity(dto);
         User registered = userService.registerNewUser(toRegister);
@@ -42,7 +42,7 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @PostMapping()
+    @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
         return userService.getUsersByIds(ids);
     }

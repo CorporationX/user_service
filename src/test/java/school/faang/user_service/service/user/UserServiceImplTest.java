@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -68,7 +69,8 @@ class UserServiceImplTest {
 
     @Mock
     private CsvParser csvParser;
-
+    @Mock
+    private UserContext userContext;
     private long id;
     private UserDto userDto;
     private UserFilterDto userFilterDto;
@@ -98,7 +100,7 @@ class UserServiceImplTest {
 
         filters = List.of(userFilter);
         userService = new UserServiceImpl(userRepository,countryRepository, filters, userMapper, goalService,
-                eventService, mentorshipService,csvParser);
+                eventService, mentorshipService,csvParser,userContext);
     }
 
     @Test

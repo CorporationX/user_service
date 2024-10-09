@@ -20,10 +20,10 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${spring.data.redis.channel.event-starter}")
+    @Value("${spring.data.redis.channels.event-starter}")
     private String eventStarter;
 
-    @Value("${spring.data.redis.channel.profile-view}")
+    @Value("${spring.data.redis.channels.profile-view}")
     private String profileView;
 
     @Bean
@@ -43,14 +43,6 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean
-    public RedisMessageListenerContainer redisContainer() {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-
-        container.setConnectionFactory(redisConnectionFactory());
-        //container.addMessageListener(messageListener(),topic());
-        return container;
-    }
     @Bean
     public ChannelTopic topic() {
         return new ChannelTopic(profileView);

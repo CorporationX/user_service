@@ -14,8 +14,10 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.ProfileViewEventDto;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
@@ -24,6 +26,7 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.util.CsvParser;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
     private final CsvParser csvParser;
     private final UserContext userContext;
 
@@ -79,12 +83,13 @@ public class UserServiceImpl implements UserService {
             setStudentsCountry(student, user, countryList);
             userRepository.save(user);
             return user;
-        }).forEach(v -> {});
+        }).forEach(v -> {
+        });
     }
 
-    private void setStudentsCountry(Person person, User user,List<Country> countryList) {
-        Optional<Country> country =  gerPersonsCountryFromDB(person, countryList);
-        country.ifPresentOrElse(user::setCountry,() -> {
+    private void setStudentsCountry(Person person, User user, List<Country> countryList) {
+        Optional<Country> country = gerPersonsCountryFromDB(person, countryList);
+        country.ifPresentOrElse(user::setCountry, () -> {
             var saved = countryRepository.save(
                     Country.builder()
                             .title(person.getContactInfo().getAddress().getCountry())
@@ -95,7 +100,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private Optional<Country> gerPersonsCountryFromDB(Person person, List<Country> countryList) {
-       return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
+        return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
     }
 
     @Override
@@ -130,7 +135,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(long userId) {
-        userContext.getUserId();
+        Long senderId = userContext.getUserId();
+        ProfileViewEventDto profileViewEventDto = ProfileViewEventDto
+                .builder()
+                .sender_id(senderId)
+                .receiver_id(userId)
+                .dateTime(LocalDateTime.now())
+                .build();
+        profileViewEventPublisher.publish(profileViewEventDto);
         return userMapper.toDto(findUserById(userId));
     }
 

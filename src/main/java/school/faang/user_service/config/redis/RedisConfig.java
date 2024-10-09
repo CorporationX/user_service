@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,13 +29,12 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connection,
-                                                        MessageListenerAdapter listenerAdapter) {
+    public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connection, MessageListenerAdapter adapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connection);
 
         String topicName = redisProperties.getChannels().get("user-service");
-        container.addMessageListener(listenerAdapter, new PatternTopic(topicName));
+        container.addMessageListener(adapter, new PatternTopic(topicName));
         return container;
     }
 }

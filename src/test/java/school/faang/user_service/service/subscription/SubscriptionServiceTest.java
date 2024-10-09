@@ -13,6 +13,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.util.TestDataFactory;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
@@ -40,6 +41,9 @@ public class SubscriptionServiceTest {
 
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
 
     Long firstUserId;
     Long secondUserId;

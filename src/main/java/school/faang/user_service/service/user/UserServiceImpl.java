@@ -135,15 +135,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(long userId) {
+        return userMapper.toDto(findUserById(userId));
+    }
+
+    @Override
+    public UserDto getUserProfile(long userId) {
         Long senderId = userContext.getUserId();
         ProfileViewEventDto profileViewEventDto = ProfileViewEventDto
                 .builder()
-                .sender_id(senderId)
-                .receiver_id(userId)
+                .senderId(senderId)
+                .receiverId(userId)
                 .dateTime(LocalDateTime.now())
                 .build();
         profileViewEventPublisher.publish(profileViewEventDto);
-        return userMapper.toDto(findUserById(userId));
+        return getUser(userId);
     }
 
     @Override

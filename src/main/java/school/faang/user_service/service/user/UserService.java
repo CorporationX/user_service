@@ -17,6 +17,7 @@ public interface UserService {
     void deactivateUserProfile(long id);
 
     UserDto getUser(long userId);
+    UserDto getUserProfile(long userId);
 
     List<UserDto> getUsersByIds(List<Long> userIds);
 

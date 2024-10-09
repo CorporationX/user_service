@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.repository.CountryRepository;
@@ -101,5 +102,17 @@ public class UserService {
         if (!countryRepository.existsById(countryId)) {
             throw new IllegalStateException(String.format("Country with ID %d does not exist", countryId));
         }
+      
+    public void banUser(Long userId) {
+        User user = getUserById(userId);
+        user.setBanned(true);
+        log.info("User with ID: " + userId + " banned.");
+        userRepository.save(user);
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new DataValidationException("User with ID: " + userId + " not found.")
+        );
     }
 }

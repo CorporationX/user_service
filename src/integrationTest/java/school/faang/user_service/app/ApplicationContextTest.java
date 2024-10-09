@@ -1,11 +1,9 @@
-package school.faang.user_service;
+package school.faang.user_service.app;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import school.faang.user_service.CommonIntegrationTest;
 import school.faang.user_service.controller.mentorship_request.MentorshipRequestController;
 import school.faang.user_service.service.event.EventServiceImpl;
 import school.faang.user_service.service.goal.GoalServiceImpl;
@@ -14,9 +12,7 @@ import school.faang.user_service.service.recomendation.RecommendationRequestServ
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ApplicationContextTest {
+public class ApplicationContextTest extends CommonIntegrationTest {
     @Autowired
     private ApplicationContext context;
 

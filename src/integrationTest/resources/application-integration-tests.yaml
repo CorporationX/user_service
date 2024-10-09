@@ -1,0 +1,10 @@
+postgres:
+  version: 13.3
+
+spring:
+  config:
+    import: classpath:application.yaml
+
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:${postgres.version}:///postgres

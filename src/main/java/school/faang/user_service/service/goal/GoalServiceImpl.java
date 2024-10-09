@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
@@ -15,7 +16,7 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public void completeUserGoal(long userId, long goalId) {
         // TODO: реализовать метод перед отправкой  в прод
-        GoalCompletedEventDto goalCompletedEventDto = new GoalCompletedEventDto(userId, goalId, LocalDateTime.now());
+        GoalCompletedEventDto goalCompletedEventDto = new GoalCompletedEventDto(userId, goalId, String.valueOf(LocalDateTime.now()));
         goalCompletedPublisher.publish(goalCompletedEventDto);
     }
 }

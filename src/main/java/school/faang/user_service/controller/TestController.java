@@ -21,7 +21,7 @@ public class TestController {
     private final ObjectMapper objectMapper;
     private final GoalCompletedRedisEventPublisher goalCompletedRedisEventPublisher;
 
-    @Value("${spring.data.redis.channels.goal-completed-channel.name}")
+    @Value("${redis.channels.goal-completed-channel}")
     private String goalCompletedChannel;
 
     @PostMapping("/goal-completed")

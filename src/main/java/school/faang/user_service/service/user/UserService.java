@@ -1,7 +1,5 @@
 package school.faang.user_service.service.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +50,6 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final S3service s3service;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
-    private final ObjectMapper objectMapper;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -153,7 +150,7 @@ public class UserService {
         if (!filteredUsers.isEmpty()) {
             filteredUsers.stream()
                     .map(user -> new SearchAppearanceEvent(user.getId(), callingUserId, LocalDateTime.now()))
-                    .forEach(this::publishSearchAppearanceEvent);
+                    .forEach(searchAppearanceEventPublisher::publish);
         }
 
         List<User> priorityFilteredUsers = getPriorityFilteredUsers(filteredUsers, callingUser);
@@ -283,14 +280,5 @@ public class UserService {
         Promotion targetPromotion = getTargetPromotion(user);
 
         return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
-    }
-
-    private void publishSearchAppearanceEvent(SearchAppearanceEvent event) {
-        try {
-            String message = objectMapper.writeValueAsString(event);
-            searchAppearanceEventPublisher.publish(message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

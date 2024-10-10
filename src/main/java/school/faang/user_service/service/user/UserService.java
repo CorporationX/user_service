@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,7 +17,9 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.model.dto.ProfileViewEvent;
 import school.faang.user_service.model.dto.SearchAppearanceEvent;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -49,7 +52,9 @@ public class UserService {
     private final PromotionRepository promotionRepository;
     private final List<UserFilter> userFilters;
     private final S3service s3service;
+    private final UserContext userContext;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -129,6 +134,7 @@ public class UserService {
 
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        profileViewEventPublisher.publish(new ProfileViewEvent(userId, userContext.getUserId(), LocalDateTime.now()));
 
         return userMapper.toDto(user);
     }

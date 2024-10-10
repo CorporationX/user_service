@@ -24,7 +24,7 @@ public class RedisConfig {
     @Value("${redis.channels.search-appearance-channel}")
     private String searchAppearanceChannelName;
 
-    @Value("${spring.data.redis.channels.profile-view-channel.name}")
+    @Value("${redis.channels.profile-view-channel}")
     private String profileViewChannelName;
 
     @Bean

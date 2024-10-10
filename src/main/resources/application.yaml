@@ -14,7 +14,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
@@ -27,6 +26,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        goal-completed-event-channel:
+          name: goal_completed_event_channel
 
 servlet:
   multipart:

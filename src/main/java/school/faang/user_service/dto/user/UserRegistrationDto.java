@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Getter
 @Builder
@@ -40,6 +41,9 @@ public class UserRegistrationDto {
 
     @NotNull
     private String city;
+
+    @NotNull
+    private PreferredContact notifyPreference;
 
     @Override
     public String toString() {

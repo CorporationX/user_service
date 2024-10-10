@@ -12,15 +12,14 @@ import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.pojo.student.Address;
 import school.faang.user_service.pojo.student.ContactInfo;
 import school.faang.user_service.pojo.student.Person;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
@@ -164,6 +163,7 @@ class UserMapperTest {
                     .aboutMe("test")
                     .countryId(COUNTRY_ID_ONE)
                     .city("test")
+                    .notifyPreference(PreferredContact.EMAIL)
                     .build();
 
             User expectedUser = User.builder()
@@ -176,6 +176,7 @@ class UserMapperTest {
                             .id(COUNTRY_ID_ONE)
                             .build())
                     .city("test")
+                    .notifyPreference(PreferredContact.TELEGRAM)
                     .build();
 
             User user = userMapper.toEntity(userRegistrationDto);
@@ -187,6 +188,7 @@ class UserMapperTest {
             assertEquals(expectedUser.getAboutMe(), user.getAboutMe());
             assertEquals(expectedUser.getCity(), user.getCity());
             assertEquals(expectedUser.getCountry().getId(), user.getCountry().getId());
+            assertEquals(expectedUser.getContactPreference(), user.getContactPreference());
         }
     }
 

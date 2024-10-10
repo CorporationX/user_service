@@ -16,10 +16,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EventClearScheduler {
-
     private final EventRepository eventRepository;
     private final EventService eventService;
-
     @Setter
     @Value("${scheduler.thread-count}")
     private int threadCounts;

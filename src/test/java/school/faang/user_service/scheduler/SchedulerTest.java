@@ -40,9 +40,6 @@ class SchedulerTest {
     @Value("${scheduler.thread-count}")
     private int threadCounts;
 
-    @Value("${scheduler.cron}")
-    private String cron;
-
     @BeforeEach
     void setUp() {
         expiredEvent = new Event();
@@ -65,9 +62,8 @@ class SchedulerTest {
 
     @Test
     void testClearEvents() {
-        when(eventRepository.findAll()).thenReturn(eventList);
+        when(eventRepository.getOutdatedEvents()).thenReturn(eventList);
 
-        eventClearScheduler.setCron(cron);
         eventClearScheduler.setThreadCounts(threadCounts);
 
         eventClearScheduler.clearEvents();

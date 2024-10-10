@@ -18,28 +18,15 @@ import java.util.List;
 public class EventClearScheduler {
 
     private final EventRepository eventRepository;
-
     private final EventService eventService;
 
     @Setter
     @Value("${scheduler.thread-count}")
     private int threadCounts;
 
-    @Setter
-    @Value("${scheduler.cron}")
-    private String cron;
-
     @Scheduled(cron = "${scheduler.cron}")
     public void clearEvents() {
-
-        System.out.println(threadCounts);
-        System.out.println(cron);
-
-        List<Event> events = eventRepository.findAll();
-        List<Event> outdatedEvents = events.stream()
-                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
-                .toList();
-
+        List<Event> outdatedEvents = eventRepository.getOutdatedEvents();
         long eventsPerList = outdatedEvents.size() / threadCounts;
         long remainder = outdatedEvents.size() % threadCounts;
 

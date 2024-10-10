@@ -81,6 +81,16 @@ public class EventServiceImpl implements EventService {
                 .toList();
     }
 
+    @Async("taskExecutor")
+    public CompletableFuture<Void> clearOutdatedEvents(List<Event> events) {
+        List<Long> ids = events.stream()
+                .map(Event::getId)
+                .toList();
+
+        eventRepository.deleteAllById(ids);
+        return CompletableFuture.completedFuture(null);
+    }
+
     private void skillCheck(EventDto eventDto) {
         List<Long> eventSkills = eventDto.getRelatedSkillsIds();
 
@@ -98,11 +108,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    @Async
-    public CompletableFuture<Void> clearOutdatedEvents(List<Event> events) {
-        events.forEach(event -> deleteEvent(event.getId()));
-        return CompletableFuture.completedFuture(null);
-    }
 }
 
 

@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -169,5 +170,13 @@ public class EventServiceTest {
         verify(eventRepository).findParticipatedEventsByUserId(userId);
 
         verify(eventMapper, Mockito.times(events.size())).toDto(any(Event.class));
+    }
+
+    @Test
+    void testClearOutdatedEvents() {
+        Event event = new Event();
+        event.setId(1L);
+
+        assertDoesNotThrow(() -> eventService.clearOutdatedEvents(List.of(event)));
     }
 }

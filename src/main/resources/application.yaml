@@ -40,3 +40,7 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+scheduler:
+  cron: 0 0 0 * * *
+  thread-count: 10

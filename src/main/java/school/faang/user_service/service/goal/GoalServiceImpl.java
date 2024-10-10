@@ -110,6 +110,6 @@ public class GoalServiceImpl implements GoalService {
 
     private void sendEventToAnalyticsService(long goalId) {
         GoalCompletedEventDto event = buildEvent(goalId);
-        goalCompletedEventPublisher.publish(event);
+        goalCompletedEventPublisher.sendEvent(event);
     }
 }

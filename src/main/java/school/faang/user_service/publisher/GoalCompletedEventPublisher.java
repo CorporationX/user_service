@@ -1,22 +1,22 @@
 package school.faang.user_service.publisher;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.event.GoalCompletedEventDto;
 
 @Component
 public class GoalCompletedEventPublisher extends AbstractEventPublisher<GoalCompletedEventDto> {
 
-    @Value("${spring.data.redis.channels.goal-completed-event-channel.name}")
-    private String goalCompletedEvent;
+    private final ChannelTopic goalCompletedEventTopic;
 
-    public GoalCompletedEventPublisher(RedisTemplate<String, Object> redisTemplate) {
+    public GoalCompletedEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                       ChannelTopic topic) {
         super(redisTemplate);
+        this.goalCompletedEventTopic = topic;
     }
 
-    @Override
-    public void publish(GoalCompletedEventDto event) {
-        convertAndSend(event, goalCompletedEvent);
+    public void sendEvent(GoalCompletedEventDto event) {
+        publish(goalCompletedEventTopic, event);
     }
 }

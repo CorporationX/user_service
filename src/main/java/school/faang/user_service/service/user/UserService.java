@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,66 +68,34 @@ public class UserService {
         validateSizeImage(file);
         User user = userRepository.findById(userId).orElseThrow();
 
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
         String filePath = String.format("user_%d/profile", userId);
-
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
 
-        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-        int width = originalImage.getWidth();
-        int height = originalImage.getHeight();
+        String largeImagePath = processAndUploadImage(originalImage, metadata, filePath, largeImage, userId);
+        String smallImagePath = processAndUploadImage(originalImage, metadata, filePath + "_small", smallImage, userId);
 
         UserProfilePic userProfilePic = new UserProfilePic();
+        userProfilePic.setFileId(largeImagePath);
+        userProfilePic.setSmallFileId(smallImagePath);
 
-        if (width <= largeImage && height <= largeImage) {
-            InputStream ImageStream = bufferedImageToInputStream(originalImage, "jpg");
-            s3Service.uploadFile(ImageStream, metadata, filePath, userId);
-            userProfilePic.setFileId(filePath);
-        } else {
-            double scaleFactor = width > height ?
-                    (double) largeImage / width :
-                    (double) largeImage / height;
-
-            int targetWidth = (int) (width * scaleFactor);
-            int targetHeight = (int) (height * scaleFactor);
-
-            BufferedImage maxLargeImage = resizeImage(originalImage, targetWidth, targetHeight);
-            InputStream largeImageStream = bufferedImageToInputStream(maxLargeImage, "jpg");
-
-            s3Service.uploadFile(largeImageStream, metadata, filePath, userId);
-            userProfilePic.setFileId(filePath);
-        }
-
-        if (width > smallImage || height > smallImage) {
-
-            double scaleFactor = width > height ?
-                    (double) smallImage / width :
-                    (double) smallImage / height;
-
-            int targetWidth = (int) (width * scaleFactor);
-            int targetHeight = (int) (height * scaleFactor);
-
-            BufferedImage maxSmallImage = resizeImage(originalImage, targetWidth, targetHeight);
-            InputStream smallImageStream = bufferedImageToInputStream(maxSmallImage, "jpg");
-            String filePathSmallImage = filePath + "_small";
-
-            s3Service.uploadFile(smallImageStream, metadata, filePathSmallImage, userId);
-            userProfilePic.setSmallFileId(filePathSmallImage);
-        }
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
-    public InputStream getBigImageFromProfile(Long userId) {
+    public Resource getBigImageFromProfile(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        return s3Service.downloadFile(user.getUserProfilePic().getFileId());
+        InputStream bigImageStream = s3Service.downloadFile(user.getUserProfilePic().getFileId());
+
+        return new InputStreamResource(bigImageStream);
     }
 
-    @Transactional(readOnly = true)
-    public InputStream getSmallImageFromProfile(Long userId) {
+    public Resource getSmallImageFromProfile(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        return s3Service.downloadFile(user.getUserProfilePic().getSmallFileId());
+        InputStream smallImageStream = s3Service.downloadFile(user.getUserProfilePic().getSmallFileId());
+
+        return new InputStreamResource(smallImageStream);
     }
 
     @Transactional
@@ -141,6 +111,35 @@ public class UserService {
         userRepository.save(user);
     }
 
+    private String processAndUploadImage(BufferedImage originalImage,
+                                         ObjectMetadata metadata,
+                                         String filePath,
+                                         int maxSize,
+                                         Long userId) throws IOException {
+        BufferedImage finalImage = originalImage;
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+
+        if (width > maxSize || height > maxSize) {
+            double scaleFactor = Math.min((double) maxSize / width, (double) maxSize / height);
+            int targetWidth = (int) (width * scaleFactor);
+            int targetHeight = (int) (height * scaleFactor);
+            finalImage = resizeImage(originalImage, targetWidth, targetHeight);
+        }
+
+        uploadToS3(finalImage, "jpg", metadata, filePath, userId);
+        return filePath;
+    }
+
+    private void uploadToS3(BufferedImage image, String format, ObjectMetadata metadata, String filePath, Long userId) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(image, format, os);
+
+        try (InputStream imageStream = new ByteArrayInputStream(os.toByteArray())) {
+            s3Service.uploadFile(imageStream, metadata, filePath, userId);
+        }
+    }
+
     private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
         return Scalr.resize(originalImage,
                 Scalr.Method.AUTOMATIC,
@@ -150,12 +149,7 @@ public class UserService {
                 Scalr.OP_ANTIALIAS);
     }
 
-    private InputStream bufferedImageToInputStream(BufferedImage image, String format) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, format, os);
-        return new ByteArrayInputStream(os.toByteArray());
-    }
-
+    //todo: yaml
     private void validateSizeImage(MultipartFile file) {
         int maxSizeFile = 5 * 1024 * 1024;
         if (file.getSize() > maxSizeFile) {

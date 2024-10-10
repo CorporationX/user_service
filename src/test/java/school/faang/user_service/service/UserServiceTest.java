@@ -212,7 +212,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(s3Service.downloadFile("largeImage.jpg")).thenReturn(imageStream);
 
-        InputStream result = userService.getBigImageFromProfile(userId);
+        InputStream result = (InputStream) userService.getBigImageFromProfile(userId);
 
         assertEquals(imageStream, result);
         verify(userRepository, times(1)).findById(userId);
@@ -229,7 +229,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(s3Service.downloadFile("smallImage.jpg")).thenReturn(imageStream);
 
-        InputStream result = userService.getSmallImageFromProfile(userId);
+        InputStream result = (InputStream) userService.getSmallImageFromProfile(userId);
 
         assertEquals(imageStream, result);
         verify(userRepository, times(1)).findById(userId);

@@ -32,12 +32,12 @@ public class MinioService implements S3CompatibleService {
     }
 
     @Override
-    public byte[] downloadFile(String fileName) {
+    public byte[] downloadFile(String fileKey) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void deleteFile(String fileName) {
+    public void deleteFile(String fileKey) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

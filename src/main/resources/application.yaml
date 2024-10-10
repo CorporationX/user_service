@@ -41,7 +41,6 @@ services:
 
 avatar_api:
   dice_bear:
-    url_format: "user_%d/default_profile"
     url: "https://api.dicebear.com/9.x/initials/svg?scale=50&backgroundType=gradientLinear&radius=50&seed="
 
 server:

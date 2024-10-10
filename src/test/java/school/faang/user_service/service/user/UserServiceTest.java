@@ -2,7 +2,6 @@ package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,17 +23,14 @@ import school.faang.user_service.service.filters.UserCityPattern;
 import school.faang.user_service.service.filters.UserFilter;
 import school.faang.user_service.service.filters.UserSkillPattern;
 import school.faang.user_service.service.s3.S3CompatibleService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,8 +57,6 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private String DEFAULT_AVATAR_FORMAT = "user_%d/default_profile.svg";
-
     private User user;
     private UserDto userDto = new UserDto();
     private Long userId = 1L;
@@ -74,7 +68,7 @@ public class UserServiceTest {
     public void setUp() {
         user = new User();
         user.setId(userId);
-        ReflectionTestUtils.setField(userService, "DEFAULT_AVATAR_FORMAT", DEFAULT_AVATAR_FORMAT);
+        ReflectionTestUtils.setField(userService, "DEFAULT_AVATAR_FILENAME", "default_avatar");
     }
 
     @Test
@@ -161,8 +155,6 @@ public class UserServiceTest {
         Country country = new Country();
         country.setId(1L);
 
-        String fileKeyMocked = String.format("user_%d/default_profile.svg", user.getId());
-
         User user = new User();
         user.setId(1L);
         user.setUsername("username");
@@ -181,18 +173,17 @@ public class UserServiceTest {
         expectedUser.setCountry(country);
         expectedUser.setActive(true);
         UserProfilePic profilePic = new UserProfilePic();
-        profilePic.setFileId(fileKeyMocked);
-        profilePic.setSmallFileId(fileKeyMocked);
         expectedUser.setUserProfilePic(profilePic);
 
         when(countryRepository.existsById(country.getId())).thenReturn(true);
         when(userRepository.save(user)).thenReturn(user);
 
         when(avatarApiService.generateDefaultAvatar(user.getUsername())).thenReturn(expectedApiResponse);
-        doNothing().when(s3CompatibleService).uploadFile(expectedApiResponse, fileKeyMocked, "image/svg+xml");
 
         User actual = userService.registerNewUser(user);
         assertNotNull(actual);
-        assertThat(expectedUser).usingRecursiveComparison().isEqualTo(actual);
+        assertThat(expectedUser).usingRecursiveComparison()
+                .ignoringFields("userProfilePic")
+                .isEqualTo(actual);
     }
 }

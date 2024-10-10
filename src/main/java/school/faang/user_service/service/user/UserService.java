@@ -2,7 +2,6 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
@@ -17,6 +16,7 @@ import school.faang.user_service.service.filters.UserFilter;
 import school.faang.user_service.service.s3.S3CompatibleService;
 import school.faang.user_service.service.avatar_api.AvatarApiService;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -30,8 +30,7 @@ public class UserService {
     private final AvatarApiService avatarApiService;
     private final S3CompatibleService s3CompatibleService;
 
-    @Value("${avatar_api.dice_bear.url_format}")
-    private String DEFAULT_AVATAR_FORMAT;
+    private final String DEFAULT_AVATAR_FILENAME = "default_profile";
 
     @Transactional(readOnly = true)
     public List<User> findPremiumUser(UserFilterDto filterDto) {
@@ -53,24 +52,23 @@ public class UserService {
         return userMapper.toDto(users);
     }
 
-    @Transactional
     public User registerNewUser(User newUser) {
         validateUsername(newUser.getUsername());
         validateEmail(newUser.getEmail());
         validatePhone(newUser.getPhone());
         validateCountry(newUser.getCountry().getId());
 
-        User saved = userRepository.save(newUser);
-        generateAndSaveDefaultAvatar(saved);
-        log.info("Successfully registered a new user (ID={})", saved.getId());
-        return userRepository.save(newUser);
+        generateAndSaveDefaultAvatar(newUser);
+        User created = userRepository.save(newUser);
+        log.info("Successfully registered a new user (ID={})", created.getId());
+        return created;
     }
 
-    private void generateAndSaveDefaultAvatar(User created) {
-        byte[] defaultAvatarData = avatarApiService.generateDefaultAvatar(created.getUsername());
-        String fileKey = String.format(DEFAULT_AVATAR_FORMAT, created.getId());
+    private void generateAndSaveDefaultAvatar(User toCreate) {
+        byte[] defaultAvatarData = avatarApiService.generateDefaultAvatar(toCreate.getUsername());
+        String fileKey = String.format("%s/%s", UUID.randomUUID(), DEFAULT_AVATAR_FILENAME);
         s3CompatibleService.uploadFile(defaultAvatarData, fileKey, "image/svg+xml");
-        setAvatarKeyForUser(created, fileKey);
+        setAvatarKeyForUser(toCreate, fileKey);
     }
 
     private void setAvatarKeyForUser(User toUpdate, String fileKey) {

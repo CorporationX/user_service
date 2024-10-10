@@ -12,6 +12,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorshipRequest.MentorshipRequestMapper;
+import school.faang.user_service.model.dto.MentorshipAcceptedRedisEvent;
+import school.faang.user_service.publisher.MentorshipAcceptedRedisEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
@@ -28,6 +30,7 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    private final MentorshipAcceptedRedisEventPublisher mentorshipAcceptedPublisher;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.descriptionValidation(mentorshipRequestDto);
@@ -66,6 +69,8 @@ public class MentorshipRequestService {
         if (requestMentee.getMentors().stream().noneMatch(mentor -> mentor.equals(requestMentor))) {
             requestMentee.getMentors().add(requestMentor);
             log.info("Запрос на менторство id{} принят", id);
+            mentorshipAcceptedPublisher.publish(new MentorshipAcceptedRedisEvent(
+                    id, requestMentee.getId(), requestMentor.getId()));
         } else {
             log.info("Пользователь id{} уже является ментором отправителя id{}", requestMentor.getId(), requestMentee.getId());
             throw new DataValidationException("Пользователь id" + requestMentor.getId() + " уже является ментором отправителя id" + requestMentee.getId());

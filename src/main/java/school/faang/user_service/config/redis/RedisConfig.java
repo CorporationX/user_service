@@ -21,6 +21,7 @@ import school.faang.user_service.listener.RedisBanMessageListener;
 public class RedisConfig {
 
     private final RedisBanMessageListener banMessageListener;
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.host}")
     private String host;
@@ -29,28 +30,28 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.ban-user-channel.name}")
     private String banUserTopic;
+    @Value("${spring.data.redis.channels.follower-event-channel.name}")
+    private String followerEvent;
+    @Value("${spring.data.redis.channels.event-start-channel.name}")
+    private String eventStartTopic;
 
     @Bean
-    public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
+    public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
                 new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
-
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
-
         return redisTemplate;
     }
 
@@ -67,10 +68,20 @@ public class RedisConfig {
     @Bean
     public RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
+        container.setConnectionFactory(jedisConnectionFactory());
 
         container.addMessageListener(banUserMessageListenerAdapter(), banUserChannelTopic());
 
         return container;
+    }
+
+    @Bean
+    ChannelTopic followerTopic() {
+        return new ChannelTopic(followerEvent);
+    }
+
+    @Bean
+    public ChannelTopic eventStartTopic() {
+        return new ChannelTopic(eventStartTopic);
     }
 }

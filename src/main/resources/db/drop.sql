@@ -20,10 +20,10 @@ DROP TABLE rating;
 DROP TABLE event;
 DROP TABLE goal;
 DROP TABLE user_skill_guarantee;
-DROP TABLE skill;
+DROP TABLE skill CASCADE;
+DROP TABLE users CASCADE;
+DROP TABLE country CASCADE;
 DROP TABLE meet_participant;
 DROP TABLE meet;
-DROP TABLE users;
-DROP TABLE country;
 
 DELETE FROM databasechangelog;

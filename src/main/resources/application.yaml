@@ -24,7 +24,9 @@ spring:
         mentorship-channel:
           name: mentorship_channel
         follower-event-channel:
-          name: follower_event
+          name: follower_event_channel
+        event-start-channel:
+          name: event_start_channel
         ban-user-channel:
           name: user_ban
 
@@ -35,6 +37,9 @@ scheduler:
   clear-events-cron: "@weekly"
   event-batch-size: 100
   thread-pool-size: 4
+  event-start:
+    cron: "0 * * * * ?" # every minute
+
 
 logging:
   level:

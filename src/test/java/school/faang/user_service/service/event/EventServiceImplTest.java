@@ -5,9 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.event.EventDto;
@@ -16,9 +14,11 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.event.EventStartEvent;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
@@ -63,6 +63,12 @@ public class EventServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private EventStartEventPublisher publisher;
+
+    @Captor
+    private ArgumentCaptor<EventStartEvent> eventStartCaptor;
+
     private Event event;
     private EventDto eventDto;
     private Event event1;
@@ -80,6 +86,10 @@ public class EventServiceImplTest {
                 .email("user1@example.com")
                 .build();
 
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+        List<User> attendees = List.of(user2, user1);
+
         Skill skill = Skill.builder()
                 .id(1L)
                 .title("Skill1")
@@ -95,6 +105,7 @@ public class EventServiceImplTest {
                 .maxAttendees(100)
                 .owner(owner)
                 .relatedSkills(Collections.singletonList(skill))
+                .attendees(attendees)
                 .build();
 
         eventDto = EventDto.builder()
@@ -161,7 +172,7 @@ public class EventServiceImplTest {
         when(eventFilter.isApplicable(filterDto)).thenReturn(true);
         when(eventFilter.apply(any(Stream.class), any(EventFilterDto.class))).thenReturn(events.stream());
 
-        eventServiceImpl = new EventServiceImpl(eventRepository, eventMapper, eventValidator, List.of(eventFilter));
+        eventServiceImpl = new EventServiceImpl(eventRepository, eventMapper, eventValidator, List.of(eventFilter), publisher);
 
         // Act
         List<EventDto> result = eventServiceImpl.getEventsByFilter(filterDto);
@@ -256,6 +267,18 @@ public class EventServiceImplTest {
         eventServiceImpl.deletePassedEvents();
         // Assert
         verify(eventRepository, times(3)).deleteAllInBatch(any());
+    }
+
+    @Test
+    void testFindEventsStartingRightNow(){
+        when(eventRepository.findAllByStartDate(any())).thenReturn(List.of(event));
+
+        eventServiceImpl.findEventsStartingRightNow();
+
+        verify(publisher).publish(eventStartCaptor.capture());
+
+        assertEquals(1L, eventStartCaptor.getValue().id());
+        assertEquals(List.of(2L, 1L), eventStartCaptor.getValue().userIds());
     }
 
     private static @NotNull List<Event> getEventList() {

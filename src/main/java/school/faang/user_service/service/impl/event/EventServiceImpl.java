@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.event.EventStartEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.EventService;
 import school.faang.user_service.validator.event.EventValidator;
@@ -29,6 +32,8 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final EventValidator eventValidator;
     private final List<EventFilter> eventFilters;
+    private final EventStartEventPublisher publisher;
+
     @Value("${scheduler.event-batch-size}")
     private int batchSize;
 
@@ -116,5 +121,19 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getParticipatedEvents(Long userId) {
         return eventRepository.findParticipatedEventsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public void findEventsStartingRightNow() {
+        List<Event> events = eventRepository.findAllByStartDate(LocalDateTime.now());
+
+        events.forEach(event -> {
+            List<Long> participantsIds = event.getAttendees().stream()
+                    .map(User::getId)
+                    .toList();
+
+            publisher.publish(new EventStartEvent(event.getId(), participantsIds));
+            log.info("Event with id {} was sent to broker", event.getId());
+        });
     }
 }

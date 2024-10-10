@@ -39,3 +39,9 @@ jobs:
 
       - name: Run tests with Gradle
         run: ./gradlew test
+
+    services:
+      redis:
+        image: redis/redis-stack:latest
+        ports:
+          - 6379:6379

@@ -28,6 +28,20 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        user_ban_channel:
+          name: user_ban
+
+services:
+  s3:
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    region: us-east-1
+    bucketName: corpbucket
+
+avatar_api:
+  dice_bear:
+    url: "https://api.dicebear.com/9.x/initials/svg?scale=50&backgroundType=gradientLinear&radius=50&seed="
 
 server:
   port: 8080

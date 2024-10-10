@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.ConfidentialUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -21,12 +22,19 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final UserMapper mapper;
+    private final UserMapper userMapper;
 
     @PostMapping("/premium")
     public List<UserDto> getPremiumUser(@RequestBody @Valid UserFilterDto filterDto) {
         List<User> premiumUsers = userService.findPremiumUser(filterDto);
-        return mapper.toDto(premiumUsers);
+        return userMapper.toDto(premiumUsers);
+    }
+    
+    @PostMapping("/register")
+    public UserDto registerUser(@RequestBody @Valid ConfidentialUserDto dto) {
+        User toRegister = userMapper.toEntity(dto);
+        User registered = userService.registerNewUser(toRegister);
+        return userMapper.toDto(registered);
     }
 
     @GetMapping("/{userId}")
@@ -34,7 +42,7 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @PostMapping()
+    @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids){
         return userService.getUsersByIds(ids);
     }

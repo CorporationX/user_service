@@ -49,20 +49,11 @@ public class RedisConfig {
 
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
                 new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
+
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
         return redisTemplate;
-    }
-
-    @Bean
-    public ChannelTopic banUserChannelTopic() {
-        return new ChannelTopic(banUserTopic);
-    }
-
-    @Bean
-    public MessageListenerAdapter banUserMessageListenerAdapter() {
-        return new MessageListenerAdapter(banMessageListener);
     }
 
     @Bean
@@ -73,6 +64,16 @@ public class RedisConfig {
         container.addMessageListener(banUserMessageListenerAdapter(), banUserChannelTopic());
 
         return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter banUserMessageListenerAdapter() {
+        return new MessageListenerAdapter(banMessageListener);
+    }
+
+    @Bean
+    public ChannelTopic banUserChannelTopic() {
+        return new ChannelTopic(banUserTopic);
     }
 
     @Bean

@@ -3,7 +3,7 @@ package school.faang.user_service.event;
 import lombok.Builder;
 
 @Builder
-public record BanEvent(
+public record UserBanEvent(
         Long id
 ) {
 }

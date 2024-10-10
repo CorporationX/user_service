@@ -26,4 +26,6 @@ public interface EventService {
     List<Event> getOwnedEvents(Long userId);
 
     List<Event> getParticipatedEvents(Long userId);
+
+    void findEventsStartingRightNow();
 }

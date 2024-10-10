@@ -3,6 +3,7 @@ package school.faang.user_service.service.impl.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.student.Person;
@@ -13,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.UserBanEvent;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
@@ -39,7 +41,7 @@ public class UserServiceImpl implements UserService {
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
     private final GoalService goalService;
-    private final EventService eventServiceImpl;
+    private final EventService eventService;
     private final MentorshipService mentorshipService;
     private final CsvParser csvParser;
 
@@ -114,7 +116,7 @@ public class UserServiceImpl implements UserService {
                 .peek(event -> event.setStatus(EventStatus.CANCELED))
                 .toList();
 
-        eventServiceImpl.deleteEvents(eventsToRemove);
+        eventService.deleteEvents(eventsToRemove);
     }
 
     private void removeGoals(User userToDeactivate) { // Move to goalService

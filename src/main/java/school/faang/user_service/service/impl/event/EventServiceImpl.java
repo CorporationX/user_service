@@ -123,6 +123,7 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findParticipatedEventsByUserId(userId);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public void findEventsStartingRightNow() {
         List<Event> events = eventRepository.findAllByStartDate(LocalDateTime.now());

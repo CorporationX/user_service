@@ -1,5 +1,6 @@
 package school.faang.user_service.config.redis;
 
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +9,9 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@Setter
 @Configuration
-@ConfigurationProperties(prefix = "${spring.data.redis}")
+@ConfigurationProperties(prefix = "spring.data.redis")
 public class RedisConfig {
     private int port;
     private String host;

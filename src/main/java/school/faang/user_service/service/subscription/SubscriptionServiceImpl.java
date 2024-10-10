@@ -23,7 +23,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserFiltersApplier userFilterApplier;
     private final UserMapper userMapper;
     private final SubscriptionValidator validator;
-    private FollowerEventPublisher eventPublisher;
+    private final FollowerEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -33,8 +33,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validator.validateUserIds(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
         FollowerEventDto followerEvent = FollowerEventDto.builder()
-                .followerId(followerId)
-                .followeeId(followeeId)
+                .actorId(followerId)
+                .receiverId(followeeId)
                 .timestamp(LocalDateTime.now())
                 .build();
         eventPublisher.publish(followerEvent);

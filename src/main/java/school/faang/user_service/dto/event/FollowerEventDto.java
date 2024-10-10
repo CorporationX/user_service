@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record FollowerEventDto(
-        Long followerId,
-        Long followeeId,
+        Long receiverId,
+        Long actorId,
         LocalDateTime timestamp) {
 }

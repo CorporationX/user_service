@@ -6,32 +6,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ControllerAdvice {
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> businessLogicHandler(Exception ex) {
-        HttpStatus status;
-        if (ex instanceof EntityNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
-        } else if (ex instanceof RuntimeException) {
-            status = HttpStatus.BAD_REQUEST;
-        } else {
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-        }
-        ErrorResponse response = ErrorResponse.of(status, ex.getMessage());
-        return new ResponseEntity<>(response, status);
-    }
+    private final Map<Class<? extends Exception>, HttpStatus> exceptionStatus = Map.of(
+            EntityNotFoundException.class, HttpStatus.NOT_FOUND,
+            MethodArgumentNotValidException.class, HttpStatus.BAD_REQUEST,
+            IllegalArgumentException.class, HttpStatus.BAD_REQUEST,
+            IllegalStateException.class, HttpStatus.BAD_REQUEST,
+            SecurityException.class, HttpStatus.UNAUTHORIZED
+    );
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse dtoValidationHandler(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getAllErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> businessLogicHandler(Exception e) {
+        HttpStatus status = exceptionStatus.getOrDefault(e.getClass(), HttpStatus.INTERNAL_SERVER_ERROR);
+        String message = e instanceof MethodArgumentNotValidException ex ?
+                ex.getBindingResult().getAllErrors().stream()
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .collect(Collectors.joining(", "))
+                : e.getMessage();
+        ErrorResponse response = ErrorResponse.of(status, message);
+        return new ResponseEntity<>(response, status);
     }
 }

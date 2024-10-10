@@ -1,6 +1,5 @@
 package school.faang.user_service.service.avatar_api;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -8,11 +7,18 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 public class AvatarApiService {
-    @Value("${avatar_api.dice_bear.url}")
-    private String apiUrl;
+
+    private final String apiUrl;
     private final RestTemplate restTemplate;
+
+    public AvatarApiService(@Value("${avatar_api.dice_bear.url}")String apiUrl, RestTemplate restTemplate) {
+        if (apiUrl.isBlank()) {
+            throw new IllegalArgumentException("API url for avatar generation can't be null/empty");
+        }
+        this.apiUrl = apiUrl;
+        this.restTemplate = restTemplate;
+    }
 
     public byte[] generateDefaultAvatar(String username) {
         String url = apiUrl + username;

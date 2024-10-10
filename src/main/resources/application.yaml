@@ -12,6 +12,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 100
+          batch_versioned_data: true
+        order_updates: true
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -28,10 +32,6 @@ spring:
 
 server:
   port: 8080
-
-logging:
-  level:
-    root: info
 
 project-service:
   host: localhost
@@ -69,6 +69,11 @@ app:
       max_pool_size: 20
       queue_capacity: 1000
       thread_name_prefix: PromotionTaskService-Async-
+    premium-service-sync:
+      core_pool_size: 10
+      max_pool_size: 20
+      queue_capacity: 1000
+      thread_name_prefix: PremiumService-Async-
   user-redis-config:
     profile_view_event_topic: profileViewEvent
 
@@ -77,3 +82,7 @@ minio:
   accessKey: user
   secretKey: password
   bucketName: corpbucket
+
+redis:
+  banner:
+    topic: "user_ban"

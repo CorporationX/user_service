@@ -232,4 +232,15 @@ class UserServiceTest extends AbstractUserServiceTest {
         userService.findById(1L);
         verify(profileViewService).publish(1L);
     }
+
+    @Test
+    void testBannedUser() {
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.bannedUser(userId);
+
+        assertTrue(user.isBanned());
+        verify(userRepository).save(user);
+    }
 }

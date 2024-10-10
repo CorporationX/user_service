@@ -25,4 +25,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    boolean existsByUsername(String username);
+
+    boolean existsByPhone(String phoneNumber);
+
+    boolean existsByEmail(String email);
 }

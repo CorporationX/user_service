@@ -9,10 +9,14 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
-
+import school.faang.user_service.service.s3.S3CompatibleService;
+import school.faang.user_service.service.avatar_api.AvatarApiService;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -21,7 +25,12 @@ import java.util.stream.Stream;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
+    private final AvatarApiService avatarApiService;
+    private final S3CompatibleService s3CompatibleService;
+
+    private final String DEFAULT_AVATAR_FILENAME = "default_profile";
 
     @Transactional(readOnly = true)
     public List<User> findPremiumUser(UserFilterDto filterDto) {
@@ -43,7 +52,56 @@ public class UserService {
         return userMapper.toDto(users);
     }
 
-    @Transactional
+    public User registerNewUser(User newUser) {
+        validateUsername(newUser.getUsername());
+        validateEmail(newUser.getEmail());
+        validatePhone(newUser.getPhone());
+        validateCountry(newUser.getCountry().getId());
+
+        generateAndSaveDefaultAvatar(newUser);
+        User created = userRepository.save(newUser);
+        log.info("Successfully registered a new user (ID={})", created.getId());
+        return created;
+    }
+
+    private void generateAndSaveDefaultAvatar(User toCreate) {
+        byte[] defaultAvatarData = avatarApiService.generateDefaultAvatar(toCreate.getUsername());
+        String fileKey = String.format("%s/%s", UUID.randomUUID(), DEFAULT_AVATAR_FILENAME);
+        s3CompatibleService.uploadFile(defaultAvatarData, fileKey, "image/svg+xml");
+        setAvatarKeyForUser(toCreate, fileKey);
+    }
+
+    private void setAvatarKeyForUser(User toUpdate, String fileKey) {
+        UserProfilePic profilePic = new UserProfilePic();
+        profilePic.setFileId(fileKey);
+        profilePic.setSmallFileId(fileKey);
+        toUpdate.setUserProfilePic(profilePic);
+    }
+
+    private void validateUsername(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalStateException(String.format("Username %s is already in use", username));
+        }
+    }
+
+    private void validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalStateException(String.format("Email %s is already in use", email));
+        }
+    }
+
+    private void validatePhone(String phone) {
+        if (userRepository.existsByPhone(phone)) {
+            throw new IllegalStateException(String.format("Phone %s is already in use", phone));
+        }
+    }
+
+    private void validateCountry(Long countryId) {
+        if (!countryRepository.existsById(countryId)) {
+            throw new IllegalStateException(String.format("Country with ID %d does not exist", countryId));
+        }
+    }
+
     public void banUser(Long userId) {
         User user = getUserById(userId);
         user.setBanned(true);

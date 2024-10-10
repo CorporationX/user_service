@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +16,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.service.filters.RequestFilter;
 import school.faang.user_service.service.filters.RequestFilterByDescription;
 import school.faang.user_service.service.filters.RequestFilterByReceiver;

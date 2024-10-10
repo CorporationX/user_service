@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +12,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SubscriptionRequirementsException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.service.filters.UserAboutFilter;
 import school.faang.user_service.service.filters.UserExperienceMinFilter;
 import school.faang.user_service.service.filters.UserFilter;

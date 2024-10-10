@@ -1,4 +1,10 @@
+app:
+  max-active-user-goals: 3
+
 spring:
+  mvc:
+    servlet:
+      path: /api/v1
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -25,6 +31,14 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+
+services:
+  s3:
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    max-image-size-mb: 5
 
 server:
   port: 8080

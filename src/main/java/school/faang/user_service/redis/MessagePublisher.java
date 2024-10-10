@@ -1,6 +1,6 @@
 package school.faang.user_service.redis;
 
-public interface MessagePublisher {
+public interface MessagePublisher <T> {
 
-    void publish(String message);
+    void publish(T message);
 }

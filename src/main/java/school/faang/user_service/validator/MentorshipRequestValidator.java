@@ -19,7 +19,6 @@ public class MentorshipRequestValidator {
     private final int MONTHS = 3;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
-    private final MentorshipRequestMapper mentorshipRequestMapper;
 
     public void mentorshipRequestValidation(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().trim().isEmpty()) {

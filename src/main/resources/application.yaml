@@ -54,3 +54,11 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+scheduler:
+  clear-events:
+    cron: "0 0 0 * * SUN"
+    batchSize: 10
+
+executorConfig:
+  thread-pool-size: 10

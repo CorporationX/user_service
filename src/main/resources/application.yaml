@@ -25,6 +25,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        event-start-channel:
+          name: event_start_channel
 
 server:
   port: 8080
@@ -33,6 +35,9 @@ scheduler:
   clear-events-cron: "@weekly"
   event-batch-size: 100
   thread-pool-size: 4
+  event-start:
+    cron: "0 * * * * ?" # every minute
+
 
 logging:
   level:

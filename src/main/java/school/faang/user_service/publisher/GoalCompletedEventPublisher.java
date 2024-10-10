@@ -12,7 +12,7 @@ import school.faang.user_service.dto.event.GoalCompletedEventDto;
 public class GoalCompletedEventPublisher implements MessagePublisher<GoalCompletedEventDto> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.channels.goal-event-channel.name}")
     private String topic;

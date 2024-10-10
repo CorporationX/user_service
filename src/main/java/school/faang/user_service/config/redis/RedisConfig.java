@@ -8,8 +8,6 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.publisher.GoalCompletedEventPublisher;
-import school.faang.user_service.publisher.MessagePublisher;
 
 @Configuration
 public class RedisConfig {
@@ -34,10 +32,5 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
         return template;
-    }
-
-    @Bean
-    MessagePublisher goalCompletedPublisher(RedisTemplate<String, Object> redisTemplate) {
-        return new GoalCompletedEventPublisher(redisTemplate);
     }
 }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 public class AvatarApiServiceTest {
-    @InjectMocks
     private AvatarApiService avatarApiService;
     @Mock
     private RestTemplate restTemplate;
@@ -23,7 +21,7 @@ public class AvatarApiServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(avatarApiService, "apiUrl", apiUrl);
+        avatarApiService = new AvatarApiService(apiUrl, restTemplate);
     }
 
     @Test
@@ -41,7 +39,7 @@ public class AvatarApiServiceTest {
     }
 
     @Test
-    @DisplayName("+ API call for default avatar")
+    @DisplayName("- API call for default avatar: call failed")
     public void generateDefaultAvatarTest_() {
         assertThrows(RuntimeException.class, () -> avatarApiService.generateDefaultAvatar("Alex.Cheremisin"));
     }

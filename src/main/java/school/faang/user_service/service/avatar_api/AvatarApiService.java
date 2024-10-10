@@ -12,7 +12,7 @@ public class AvatarApiService {
     private final String apiUrl;
     private final RestTemplate restTemplate;
 
-    public AvatarApiService(@Value("${avatar_api.dice_bear.url}")String apiUrl, RestTemplate restTemplate) {
+    public AvatarApiService(@Value("${avatar_api.dice_bear.url}") String apiUrl, RestTemplate restTemplate) {
         if (apiUrl.isBlank()) {
             throw new IllegalArgumentException("API url for avatar generation can't be null/empty");
         }

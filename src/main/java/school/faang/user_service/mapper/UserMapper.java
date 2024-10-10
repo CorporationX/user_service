@@ -8,7 +8,9 @@ import school.faang.user_service.dto.user.PersonDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {ContactInfoMapper.class, AddressMapper.class, EducationMapper.class})
@@ -21,14 +23,23 @@ public interface UserMapper {
     User toEntity(PersonDto personDto);
 
     @AfterMapping
-    default void mapUsernameToPerson(@MappingTarget PersonDto personDto, User user) {
+    default PersonDto mapUsernameToPerson(@MappingTarget PersonDto personDto, User user) {
         String[] names = user.getUsername().split(" ");
-        personDto.setFirstName(names[0]);
-        personDto.setLastName(names.length > 1 ? names[1] : "");
-    }
 
-    @AfterMapping
-    default void mapPersonToUsername(@MappingTarget User user, PersonDto personDto) {
-        user.setUsername(personDto.getFirstName() + " " + personDto.getLastName());
+        List<String> nameList = Arrays.stream(names)
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.toList());
+
+        return new PersonDto(
+                nameList.stream().findFirst().orElse(""), // firstName
+                nameList.size() > 1 ? nameList.get(1) : "", // lastName
+                personDto.contactInfo(),
+                personDto.education(),
+                personDto.employer(),
+                personDto.yearOfBirth(),
+                personDto.group(),
+                personDto.studentID()
+        );
     }
 }

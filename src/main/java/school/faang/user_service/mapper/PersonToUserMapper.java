@@ -9,7 +9,7 @@ import school.faang.user_service.entity.User;
 @Mapper(componentModel = "spring", uses = {ContactInfoMapper.class, AddressMapper.class, EducationMapper.class})
 public interface PersonToUserMapper {
 
-    @Mapping(target = "username", expression = "java(person.getFirstName() + \" \" + person.getLastName())")
+    @Mapping(target = "username", expression = "java(person.firstName() + \" \" + person.lastName())") // Изменено
     @Mapping(target = "email", source = "contactInfo.email")
     @Mapping(target = "phone", source = "contactInfo.phone")
     @Mapping(target = "city", source = "contactInfo.address.city")
@@ -23,20 +23,20 @@ public interface PersonToUserMapper {
 
     default String mapAboutMe(PersonDto person) {
         StringBuilder aboutMe = new StringBuilder();
-        if (person.getContactInfo() != null && person.getContactInfo().getAddress() != null
-                && person.getContactInfo().getAddress().getState() != null) {
-            aboutMe.append(person.getContactInfo().getAddress().getState()).append(", ");
+        if (person.contactInfo() != null && person.contactInfo().address() != null
+                && person.contactInfo().address().getState() != null) {
+            aboutMe.append(person.contactInfo().address().getState()).append(", ");
         }
-        if (person.getEducation() != null) {
-            aboutMe.append(person.getEducation().getFaculty())
+        if (person.education() != null) {
+            aboutMe.append(person.education().faculty())
                     .append(", ")
-                    .append(person.getEducation().getYearOfStudy())
+                    .append(person.education().yearOfStudy())
                     .append(", ")
-                    .append(person.getEducation().getMajor());
+                    .append(person.education().major());
         }
 
-        if (person.getEmployer() != null) {
-            aboutMe.append(", ").append(person.getEmployer());
+        if (person.employer() != null) {
+            aboutMe.append(", ").append(person.employer());
         }
         return aboutMe.toString();
     }

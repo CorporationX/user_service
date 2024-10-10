@@ -282,14 +282,6 @@ public class UserService {
                 String[] fields = line.split(",");
                 if (fields.length < 21) continue;
 
-                PersonDto personDto = new PersonDto();
-                personDto.setFirstName(fields[0].trim());
-                personDto.setLastName(fields[1].trim());
-
-                ContactInfoDto contactInfoDto = new ContactInfoDto();
-                contactInfoDto.setEmail(fields[5].trim());
-                contactInfoDto.setPhone(fields[6].trim());
-
                 Address address = new Address();
                 address.setStreet(fields[7].trim());
                 address.setCity(fields[8].trim());
@@ -297,21 +289,27 @@ public class UserService {
                 address.setCountry(fields[10].trim());
                 address.setPostalCode(fields[11].trim());
 
-                contactInfoDto.setAddress(address);
-                personDto.setContactInfo(contactInfoDto);
+                ContactInfoDto contactInfoDto = new ContactInfoDto(fields[5].trim(), fields[6].trim(), address);
 
-                EducationDto educationDto = new EducationDto();
-                educationDto.setFaculty(fields[12].trim());
-                educationDto.setYearOfStudy(Integer.parseInt(fields[13].trim()));
-                educationDto.setMajor(fields[14].trim());
-                educationDto.setGPA(Double.parseDouble(fields[15].trim()));
-                personDto.setEducation(educationDto);
+                EducationDto educationDto = new EducationDto(
+                        fields[12].trim(),  // faculty
+                        Integer.parseInt(fields[13].trim()),
+                        fields[14].trim(),  // major
+                        Double.parseDouble(fields[15].trim())
+                );
 
-                personDto.setYearOfBirth(Integer.parseInt(fields[2].trim()));
-                personDto.setGroup(fields[3].trim());
-                personDto.setStudentID(fields[4].trim());
+                PersonDto personDto = new PersonDto(
+                        fields[0].trim(),
+                        fields[1].trim(),
+                        contactInfoDto,
+                        educationDto,
+                        null,
+                        Integer.parseInt(fields[2].trim()),
+                        fields[3].trim(),
+                        fields[4].trim()
+                );
 
-                String countryName = address.getCountry();
+                String countryName = contactInfoDto.address().getCountry();
                 Country country = countryService.findOrCreateCountry(countryName);
 
                 User user = personToUserMapper.personToUser(personDto);
@@ -328,17 +326,24 @@ public class UserService {
 
     private String generateAboutMe(PersonDto personDto) {
         StringBuilder aboutMe = new StringBuilder();
-        if (personDto.getContactInfo().getAddress().getState() != null && !personDto.getContactInfo().getAddress().getState().isEmpty()) {
-            aboutMe.append(personDto.getContactInfo().getAddress().getState()).append(", ");
+
+        if (personDto.contactInfo() != null && personDto.contactInfo().address() != null) {
+            String state = personDto.contactInfo().address().getState();
+            if (state != null && !state.isEmpty()) {
+                aboutMe.append(state).append(", ");
+            }
         }
-        if (personDto.getEducation() != null) {
-            aboutMe.append(personDto.getEducation().getFaculty()).append(", ")
-                    .append(personDto.getEducation().getYearOfStudy()).append(", ")
-                    .append(personDto.getEducation().getMajor()).append(", ");
+
+        if (personDto.education() != null) {
+            aboutMe.append(personDto.education().faculty()).append(", ")
+                    .append(personDto.education().yearOfStudy()).append(", ")
+                    .append(personDto.education().major()).append(", ");
         }
-        if (personDto.getEmployer() != null && !personDto.getEmployer().isEmpty()) {
-            aboutMe.append(personDto.getEmployer());
+
+        if (personDto.employer() != null && !personDto.employer().isEmpty()) {
+            aboutMe.append(personDto.employer());
         }
+
         return aboutMe.toString().trim();
     }
 

@@ -53,4 +53,9 @@ public final class ExceptionMessages {
 
   // avatars
   public static final String IMAGE_BYTES_EMPTY = "Image bytes cannot be empty.";
+
+  // event
+  public static final String SKILLS_IN_EVENT_EXCEPTION_FOR_LOG = "User with ID {} cannot run such an event with the required skills: {}";
+  public static final String SKILLS_IN_EVENT_EXCEPTION = "User does not have the required skills to run this event.";
+  public static final String EVENT_NOT_FOUND = "Event for such ID: {} not in database.";
 }

@@ -16,6 +16,7 @@ public final class ApiPath {
   public static final String FOLLOWERS_COUNT = FOLLOWERS + "/count";
   public static final String FOLLOWING = "/following";
   public static final String FOLLOWING_COUNT = FOLLOWING + "/count";
+  public static final String EVENT = "/event";
 
   private ApiPath() {}
 }

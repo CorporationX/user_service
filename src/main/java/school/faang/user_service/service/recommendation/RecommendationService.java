@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendation;
 
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 

@@ -5,11 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import school.faang.user_service.controller.subscription.SubscriptionController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.SubscriptionServiceImpl;
+import school.faang.user_service.service.subscription.SubscriptionServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;

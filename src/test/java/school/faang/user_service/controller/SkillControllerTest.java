@@ -7,10 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import school.faang.user_service.controller.skill.SkillController;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +22,17 @@ class SkillControllerTest {
 
     @InjectMocks
     private SkillController skillController;
+
+    @Test
+    void testEmptyTitleCreate() {
+        SkillDto skillDto1 = new SkillDto();
+        skillDto1.setTitle("");
+        SkillDto skillDto2 = new SkillDto();
+        skillDto2.setTitle(" ");
+
+        Assert.assertThrows(DataValidationException.class, () -> skillController.create(skillDto1));
+        Assert.assertThrows(DataValidationException.class, () -> skillController.create(skillDto2));
+    }
 
     @Test
     void testNormalTitleCreate() {

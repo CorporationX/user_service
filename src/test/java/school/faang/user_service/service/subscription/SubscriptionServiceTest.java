@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

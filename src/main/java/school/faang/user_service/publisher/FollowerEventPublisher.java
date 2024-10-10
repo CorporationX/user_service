@@ -11,9 +11,9 @@ public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEvent
     private final ChannelTopic followerTopic;
 
     public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                  ChannelTopic topic) {
+                                  ChannelTopic followerTopic) {
         super(redisTemplate);
-        this.followerTopic = topic;
+        this.followerTopic = followerTopic;
     }
 
     public void sendEvent(FollowerEventDto event) {

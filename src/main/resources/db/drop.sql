@@ -17,8 +17,11 @@ DROP TABLE user_event;
 DROP TABLE rating;
 DROP TABLE event;
 DROP TABLE goal;
-DROP TABLE skill;
-DROP TABLE users;
-DROP TABLE country;
+drop table user_skill_guarantee;
+drop table contact_preferences;
+drop table user_premium;
+DROP TABLE skill CASCADE ;
+DROP TABLE users cascade;
+DROP TABLE country cascade;
 
 DELETE FROM databasechangelog;

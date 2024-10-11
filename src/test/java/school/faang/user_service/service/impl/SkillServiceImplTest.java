@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.impl;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +16,8 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.model.dto.SkillAcquiredEvent;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.entity.recommendation.SkillOffer;
@@ -42,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SkillServiceTest {
+public class SkillServiceImplTest {
     private final Long id = 1L;
     private SkillDto skillDto;
     private SkillDto anotherSkillDto;
@@ -64,8 +66,11 @@ public class SkillServiceTest {
     @Mock
     private SkillMapper mapper;
 
+    @Mock
+    SkillAcquiredEventPublisher skillAcquiredEventPublisher;
+
     @InjectMocks
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
 
     @BeforeEach
     public void setUp() {
@@ -224,6 +229,8 @@ public class SkillServiceTest {
         );
 
         verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
+        verify(skillAcquiredEventPublisher, times(1)).
+                publish(new SkillAcquiredEvent(id, skillEntity.getId()));
     }
 
     @Test

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,20 +22,23 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"skills"})
+@ToString(exclude = {"skills", "country"})
 @Entity
 @Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "username", length = 64, nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private String username;
 
     @Column(name = "email", length = 64, nullable = false, unique = true)

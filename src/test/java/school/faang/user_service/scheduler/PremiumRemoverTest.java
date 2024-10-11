@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.service.PremiumService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,9 +25,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumRemoverTest {
-
     @Mock
-    private PremiumService premiumService;
+    PremiumService premiumService;
 
     @InjectMocks
     private PremiumRemover premiumRemover;

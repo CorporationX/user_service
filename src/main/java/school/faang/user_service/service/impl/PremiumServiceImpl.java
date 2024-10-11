@@ -1,4 +1,4 @@
-package school.faang.user_service.service.premium;
+package school.faang.user_service.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,6 +23,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.scheduler.PremiumRemoverTransactions;
+import school.faang.user_service.service.PremiumService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PremiumService {
+public class PremiumServiceImpl implements PremiumService {
 
     @Value("${premium.removal.batch-size}")
     private int batchSize;
@@ -44,6 +45,7 @@ public class PremiumService {
     private final PremiumMapper premiumMapper;
     private final PremiumRemoverTransactions premiumRemoverTransactions;
 
+    @Override
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         User user = userRepository.findById(userId)
@@ -91,6 +93,7 @@ public class PremiumService {
         return premiumRepository.save(premium);
     }
 
+    @Override
     public List<List<Long>> findAndSplitExpiredPremiums() {
         List<Long> expiredPremiumsIds = premiumRepository.findAllByEndDateBefore(LocalDateTime.now()).stream()
                 .map(Premium::getId).toList();
@@ -98,6 +101,7 @@ public class PremiumService {
         return splitIntoBatches(expiredPremiumsIds, batchSize);
     }
 
+    @Override
     @Async("premiumRemovalAsyncExecutor")
     public CompletableFuture<Integer> deleteExpiredPremiumsByIds(List<Long> ids) {
         return CompletableFuture.supplyAsync(() -> premiumRemoverTransactions.deletePremiums(ids));

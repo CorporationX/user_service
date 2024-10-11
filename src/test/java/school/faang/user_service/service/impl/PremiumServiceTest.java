@@ -1,4 +1,4 @@
-package school.faang.user_service.service.premium;
+package school.faang.user_service.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +74,7 @@ public class PremiumServiceTest {
     private PremiumMapper premiumMapper;
 
     @InjectMocks
-    private PremiumService premiumService;
+    private PremiumServiceImpl premiumService;
 
     @BeforeEach
     void setUp() {

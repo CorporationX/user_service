@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.premium.PremiumPeriod;
-import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.service.PremiumService;
 
 @RestController
 @RequestMapping("/premium")

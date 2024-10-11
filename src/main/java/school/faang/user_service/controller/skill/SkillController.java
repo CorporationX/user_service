@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.skill;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,8 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.service.SkillService;
-
+import school.faang.user_service.service.skill.SkillService;
 import java.util.List;
 
 @RestController

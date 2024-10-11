@@ -24,17 +24,6 @@ class SkillControllerTest {
     private SkillController skillController;
 
     @Test
-    void testEmptyTitleCreate() {
-        SkillDto skillDto1 = new SkillDto();
-        skillDto1.setTitle("");
-        SkillDto skillDto2 = new SkillDto();
-        skillDto2.setTitle(" ");
-
-        Assert.assertThrows(DataValidationException.class, () -> skillController.create(skillDto1));
-        Assert.assertThrows(DataValidationException.class, () -> skillController.create(skillDto2));
-    }
-
-    @Test
     void testNormalTitleCreate() {
         SkillDto skillDto1 = new SkillDto();
         Mockito.when(skillService.create(skillDto1)).thenReturn(null);

@@ -7,6 +7,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -28,9 +29,9 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public void completeUserGoal(long userId, long goalId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new IllegalArgumentException("Goal not found with id: " + goalId));
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
 
         validateUserGoal(user, goal);
         updateSkills(user, goalId);

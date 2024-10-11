@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class GoalInvitationServiceImplTest {
+class GoalInvitationServiceImplIT {
 
     private GoalRepository goalRepository;
     private UserRepository userRepository;

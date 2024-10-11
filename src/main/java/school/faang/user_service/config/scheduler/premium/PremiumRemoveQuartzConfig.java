@@ -13,7 +13,7 @@ import school.faang.user_service.service.premium.jobs.PremiumRemoveJob;
 @Configuration
 public class PremiumRemoveQuartzConfig {
     @Value("${app.premium.cron.premium_remove_scheduler}")
-    private String premiumRemoveCron;
+    private String expiredPremiumRemoveCron;
 
     @Bean
     public JobDetail premiumRemoveJobDetail() {
@@ -25,7 +25,7 @@ public class PremiumRemoveQuartzConfig {
 
     @Bean
     public Trigger premiumRemoveTrigger() {
-        CronScheduleBuilder croneScheduler = CronScheduleBuilder.cronSchedule(premiumRemoveCron);
+        CronScheduleBuilder croneScheduler = CronScheduleBuilder.cronSchedule(expiredPremiumRemoveCron);
         return TriggerBuilder.newTrigger()
                 .forJob(premiumRemoveJobDetail())
                 .withIdentity("premiumRemoveJobTrigger", "premium")

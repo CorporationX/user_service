@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.model.dto.MentorshipAcceptedRedisEvent;
+import school.faang.user_service.model.dto.MentorshipAcceptedEvent;
 
 @Component
-public class MentorshipAcceptedRedisEventPublisher extends RedisEventPublisher<MentorshipAcceptedRedisEvent> {
-    public MentorshipAcceptedRedisEventPublisher(RedisTemplate<String, Object> redisTemplate,
+public class MentorshipAcceptedEventPublisher extends RedisEventPublisher<MentorshipAcceptedEvent> {
+    public MentorshipAcceptedEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                             ObjectMapper objectMapper,
                                             @Qualifier("mentorshipAcceptedTopic") ChannelTopic topic) {
         super(redisTemplate, objectMapper, topic);

@@ -61,6 +61,9 @@ app:
   promotion:
     user_promotion_views_decrement_cron: '*/10 * * * * *'
     event__promotion_views_decrement_cron: '*/10 * * * * *'
+  premium:
+    cron:
+      premium_remove_scheduler: '0 0 0 ? * SUN *'
   retryable:
     payment_service:
       send_payment:

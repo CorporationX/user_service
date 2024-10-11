@@ -2,6 +2,9 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -11,11 +14,13 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/mentorship_request/")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    @PostMapping
+    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 

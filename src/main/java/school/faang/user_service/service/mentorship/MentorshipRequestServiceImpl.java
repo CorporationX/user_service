@@ -11,6 +11,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.RejectionMapper;
+import school.faang.user_service.redis.MentorshipRequestEvent;
+import school.faang.user_service.redis.RedisMessageMentorshipRequestsPublisher;
 import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.validator.MentorshipRequestValidator;
@@ -28,12 +30,14 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestValidator validator;
     private final RejectionMapper rejectionMapper;
+    private final RedisMessageMentorshipRequestsPublisher redisMessageMentorshipRequestsPublisher;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         validator.mentorshipRequestValidation(mentorshipRequestDto);
         mentorshipRequestDto = validator.checkingUsersInRepository(mentorshipRequestDto);
         validator.checkingForIdenticalIdsUsers(mentorshipRequestDto);
         validator.spamCheck(mentorshipRequestDto);
+        publishEvent(mentorshipRequestDto);
         return mentorshipRequestDto;
     }
 
@@ -84,5 +88,13 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         mentorshipRequestRepository.save(entity);
 
         return rejectionMapper.toDto(entity);
+    }
+
+    private void publishEvent(MentorshipRequestDto mentorshipRequestDto) {
+        MentorshipRequestEvent event = new MentorshipRequestEvent();
+        event.setRequesterId(mentorshipRequestDto.getRequesterId());
+        event.setReceiverId(mentorshipRequestDto.getReceiverId());
+        event.setRequestTime(mentorshipRequestDto.getCreatedAt());
+        redisMessageMentorshipRequestsPublisher.publish(event);
     }
 }

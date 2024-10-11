@@ -17,6 +17,7 @@ import school.faang.user_service.filter.mentorship.DescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.RejectionMapper;
+import school.faang.user_service.redis.RedisMessageMentorshipRequestsPublisher;
 import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 import school.faang.user_service.validator.MentorshipRequestValidator;
@@ -38,6 +39,8 @@ public class MentorshipRequestServiceImplTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private MentorshipRequestValidator validator;
+    @Mock
+    private RedisMessageMentorshipRequestsPublisher redisMessageMentorshipRequestsPublisher;
     @Spy
     private RejectionMapper rejectionMapper = Mappers.getMapper(RejectionMapper.class);
     @Spy
@@ -66,13 +69,13 @@ public class MentorshipRequestServiceImplTest {
 
         MentorshipRequestDto expected = new MentorshipRequestDto();
         expected.setDescription("First");
-        expected.setId(0l);
+        expected.setId(0L);
         expected.setStatus(RequestStatus.ACCEPTED);
-        expected.setRequesterId(1l);
-        expected.setReceiverId(2l);
+        expected.setRequesterId(1L);
+        expected.setReceiverId(2L);
 
         mentorshipRequestService = new MentorshipRequestServiceImpl(mentorshipRequestRepository,
-                mentorshipRequestMapper, filters, validator, rejectionMapper);
+                mentorshipRequestMapper, filters, validator, rejectionMapper, redisMessageMentorshipRequestsPublisher);
 
         List<MentorshipRequestDto> result = mentorshipRequestService.getRequests(filterDto);
 

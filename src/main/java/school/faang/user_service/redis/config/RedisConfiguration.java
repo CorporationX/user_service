@@ -11,14 +11,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.config.RedisProperties;
 
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfiguration {
 
-    @Value("${spring.data.redis.channels.mentorship-channel.name}")
-    private String topicName;
+    private final RedisProperties redisProperties;
 
     private final ObjectMapper objectMapper;
 
@@ -33,6 +33,6 @@ public class RedisConfiguration {
 
     @Bean
     public ChannelTopic topic() {
-        return new ChannelTopic(topicName);
+        return new ChannelTopic(redisProperties.getChannels().get("mentorship-channel"));
     }
 }

@@ -2,16 +2,13 @@ package school.faang.user_service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.ResourceUtils;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalResponseDto;
 import school.faang.user_service.entity.Country;
@@ -20,11 +17,7 @@ import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,6 +26,7 @@ import static school.faang.user_service.factory.CountryFactory.buildDefaultCount
 import static school.faang.user_service.factory.GoalFactory.buildDefaultCreateGoalDto;
 import static school.faang.user_service.factory.UserFactory.buildDefaultUser;
 
+@Sql(scripts = "/truncate-tables.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-tests")
 @SpringBootTest
@@ -51,22 +45,6 @@ public abstract class CommonIntegrationTest {
 
     @Autowired
     protected GoalRepository goalRepository;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private String truncateTablesSql;
-
-    @PostConstruct
-    public void init() throws IOException {
-        File sqlFile = ResourceUtils.getFile("classpath:truncate-tables.sql");
-        truncateTablesSql = new String(Files.readAllBytes(Paths.get(sqlFile.toURI())));
-    }
-
-    @AfterEach
-    public void afterEach() {
-        jdbcTemplate.execute(truncateTablesSql);
-    }
 
     protected Country saveDefaultCountry() {
         Country country = buildDefaultCountry();

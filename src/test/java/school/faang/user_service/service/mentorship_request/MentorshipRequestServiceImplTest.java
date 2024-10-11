@@ -69,10 +69,10 @@ public class MentorshipRequestServiceImplTest {
 
         MentorshipRequestDto expected = new MentorshipRequestDto();
         expected.setDescription("First");
-        expected.setId(0l);
+        expected.setId(0L);
         expected.setStatus(RequestStatus.ACCEPTED);
-        expected.setRequesterId(1l);
-        expected.setReceiverId(2l);
+        expected.setRequesterId(1L);
+        expected.setReceiverId(2L);
 
         mentorshipRequestService = new MentorshipRequestServiceImpl(mentorshipRequestRepository,
                 mentorshipRequestMapper, filters, validator, rejectionMapper, redisMessageMentorshipRequestsPublisher);

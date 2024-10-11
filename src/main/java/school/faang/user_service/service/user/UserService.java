@@ -21,6 +21,7 @@ import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.service.user.view.ProfileViewService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,7 +70,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        profileViewService.publish(userId);
+        profileViewService.addToPublish(userId);
         return user;
     }
 
@@ -127,7 +128,7 @@ public class UserService {
         List<Premium> premiums = premiumRepository.findAll();
         Stream<User> users = premiums.stream().map(Premium::getUser);
         List<User> filteredUsers = filterUsers(users, userFilterDto);
-        profileViewService.publish(filteredUsers);
+        profileViewService.addToPublish(filteredUsers);
         return filteredUsers;
     }
 
@@ -144,14 +145,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> getUsers(List<Long> ids) {
         List<User> users = userRepository.findAllById(ids);
-        profileViewService.publish(users);
+        profileViewService.addToPublish(users);
         return users;
     }
 
     @Transactional(readOnly = true)
     public User getUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        profileViewService.publish(userId);
+        profileViewService.addToPublish(userId);
         return user;
     }
 }

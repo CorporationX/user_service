@@ -28,6 +28,7 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserEmailFilter;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.service.user.filter.UserUsernameFilter;
+import school.faang.user_service.service.user.view.ProfileViewService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +183,7 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(USERNAME, result.get(0).getUsername());
         assertEquals(EMAIL, result.get(0).getEmail());
 
-        verify(profileViewService).publish(anyList());
+        verify(profileViewService).addToPublish(anyList());
     }
 
 
@@ -201,7 +202,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertThrows(UserNotFoundException.class, () -> userService.getUser(notFoundId));
 
-        verify(profileViewService).publish(foundId);
+        verify(profileViewService).addToPublish(foundId);
     }
 
     @Test
@@ -222,7 +223,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertEquals(0, resultNotFound.size());
 
-        verify(profileViewService, times(2)).publish(anyList());
+        verify(profileViewService, times(2)).addToPublish(anyList());
     }
 
     @Test
@@ -231,7 +232,7 @@ class UserServiceTest extends AbstractUserServiceTest {
         User user = createUser(USERNAME, EMAIL);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.findById(1L);
-        verify(profileViewService).publish(1L);
+        verify(profileViewService).addToPublish(1L);
     }
 
     @Test

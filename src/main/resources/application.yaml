@@ -40,3 +40,8 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+redis:
+  pubsub:
+    topics:
+      - search-appearance

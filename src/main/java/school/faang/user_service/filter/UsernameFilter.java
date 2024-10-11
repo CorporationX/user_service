@@ -1,8 +1,8 @@
 package school.faang.user_service.filter;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 
 @Component
 public class UsernameFilter implements UserFilter {

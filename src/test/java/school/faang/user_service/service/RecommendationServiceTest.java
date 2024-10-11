@@ -17,6 +17,7 @@ import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.recommendation.RecommendationServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;

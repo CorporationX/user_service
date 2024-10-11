@@ -1,7 +1,7 @@
 package school.faang.user_service.filter;
 
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 
 public class EmailFilter implements UserFilter{
     @Override

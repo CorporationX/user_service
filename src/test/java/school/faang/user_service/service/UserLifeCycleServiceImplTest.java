@@ -20,15 +20,13 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserLifeCycleServiceImpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserLifeCycleServiceImplTest {
@@ -156,5 +154,14 @@ class UserLifeCycleServiceImplTest {
                 () -> userService.registrationUser(registrationDto));
 
         assertEquals(invalidDataMessage, exception.getMessage());
+    }
+
+    @Test
+    void banUsersById() {
+        List<Long> ids = List.of(1L, 2L, 3L);
+
+        userService.banUsersById(ids);
+
+        verify(userRepository).banUsersById(ids);
     }
 }

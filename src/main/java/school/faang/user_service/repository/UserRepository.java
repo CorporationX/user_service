@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -34,5 +35,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     void updateUserActive(long id, boolean active);
 
+    @Query(nativeQuery = true, value = """
+            SELECT EXISTS (
+                SELECT 1 FROM users
+                WHERE username = :username AND email = :email AND phone = :phone
+            )
+            """)
     boolean existsByUsernameAndEmailAndPhone(String username, String email, String phone);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = """
+            UPDATE users SET banned = true
+            WHERE id IN (:ids)
+            """)
+    void banUsersById(List<Long> ids);
 }

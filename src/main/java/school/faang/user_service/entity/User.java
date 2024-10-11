@@ -148,4 +148,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Promotion> promotions;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private TelegramContact telegramContact;
 }

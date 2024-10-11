@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.*;
 import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.TelegramContact;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -19,6 +20,7 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
+import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -48,6 +50,7 @@ public class UserService {
     private final PersonToUserMapper personToUserMapper;
     private final CountryService countryService;
     private final S3service s3service;
+    private final TelegramContactRepository telegramContactRepository;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -191,6 +194,17 @@ public class UserService {
         s3service.deleteFile(profilePic.getFileId());
         s3service.deleteFile(profilePic.getSmallFileId());
         userRepository.deleteUserProfilePicByUserId(userId);
+    }
+
+    @Transactional
+    public void updateTelegramUserId(String telegramUserName, String telegramUserId) {
+        TelegramContact telegramContact = telegramContactRepository.findByTelegramUserName(telegramUserName).orElseThrow(() ->
+                new EntityNotFoundException(String.format("Telegram user with username %s not found", telegramUserName)));
+
+        if (telegramContact.getTelegramUserId() == null) {
+            telegramContact.setTelegramUserId(telegramUserId);
+            telegramContactRepository.save(telegramContact);
+        }
     }
 
     private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {

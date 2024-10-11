@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -21,10 +25,9 @@ spring:
       port: 6379
       host: localhost
       channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+        mentorship-channel: mentorship_channel
+        follower-event-channel: follower_event
+        user-service: ban_user_channel
   cloud:
     openfeign:
       client:
@@ -65,3 +68,21 @@ profile-picture:
   small:
     path: image/default-small-profile-picture.svg
     size: 110
+
+event:
+  cron: "0 0 0 * * ?"
+  expiration: 1
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: normal
+
+---
+
+spring:
+  threads:
+    thread-pool-size: 5
+    queue-capacity: 300

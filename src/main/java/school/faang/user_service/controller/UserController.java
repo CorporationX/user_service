@@ -4,15 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.UserDto;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.service.UserLifeCycleService;
+import school.faang.user_service.service.UserProfilePicService;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;
@@ -26,6 +23,7 @@ public class UserController {
     private final UserContext userContext;
     private final UserService userService;
     private final UserLifeCycleService userLifeCycleService;
+    private final UserProfilePicService userProfilePicService;
 
     @PutMapping("/deactivate")
     public void deactivateUser() {
@@ -48,5 +46,10 @@ public class UserController {
     @PostMapping
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/{userId}/avatar")
+    public void uploadAvatar(@RequestParam("file") MultipartFile file) {
+        userProfilePicService.uploadAvatar(file);
     }
 }

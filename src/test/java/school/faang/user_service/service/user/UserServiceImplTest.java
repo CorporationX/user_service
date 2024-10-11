@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.CountryRepository;
@@ -82,7 +84,8 @@ class UserServiceImplTest {
                 1L,
                 "JaneSmith",
                 "janesmith@example.com",
-                "0987654321");
+                "0987654321",
+                PreferredContact.TELEGRAM);
 
         user = User.builder()
                 .id(1L)
@@ -94,6 +97,9 @@ class UserServiceImplTest {
                 .aboutMe("About Jane Smith")
                 .experience(5)
                 .banned(false)
+                .contactPreference(ContactPreference.builder()
+                        .preference(PreferredContact.TELEGRAM)
+                        .build())
                 .build();
 
         filters = List.of(userFilter);

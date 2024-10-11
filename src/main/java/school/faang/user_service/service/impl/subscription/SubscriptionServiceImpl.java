@@ -34,7 +34,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public void followUser(long followerId, long followeeId) {
         validator.isSubscriber(followerId, followeeId, subscriptionRepository);
         subscriptionRepository.followUser(followerId, followeeId);
-        sendEventToAnalyticsService(followerId, followeeId);
+
+        FollowerEventDto event = buildEvent(followerId, followeeId);
+        followerEventPublisher.publish(event);
+        log.info("Subscription event was sent", event);
     }
 
     @Transactional
@@ -76,13 +79,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public int getFollowingCount(long followerId) {
         validator.validateId(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
-    }
-
-    private void sendEventToAnalyticsService(long followerId, long followeeId) {
-        FollowerEventDto event = buildEvent(followerId, followeeId);
-        log.info("Sending event: {} to analytics-service", event);
-        followerEventPublisher.sendEvent(event);
-        log.info("Sent event: {} to analytics-service", event);
     }
 
     private static FollowerEventDto buildEvent(long followerId, long followeeId) {

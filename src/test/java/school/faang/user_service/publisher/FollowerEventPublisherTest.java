@@ -30,7 +30,7 @@ class FollowerEventPublisherTest {
         // given
         var followerEvent = FollowerEventDto.builder().build();
         // when
-        followerEventPublisher.sendEvent(followerEvent);
+        followerEventPublisher.publish(followerEvent);
         // then
         verify(redisTemplate).convertAndSend(channelTopic.getTopic(), followerEvent);
     }

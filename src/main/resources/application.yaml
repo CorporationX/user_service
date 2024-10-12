@@ -29,6 +29,8 @@ spring:
           name: event_start_channel
         ban-user-channel:
           name: user_ban
+        recommendation-request-channel:
+          name: recommendation_req_channel
 
 server:
   port: 8080

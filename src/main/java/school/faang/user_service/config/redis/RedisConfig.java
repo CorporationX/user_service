@@ -34,6 +34,8 @@ public class RedisConfig {
     private String followerEvent;
     @Value("${spring.data.redis.channels.event-start-channel.name}")
     private String eventStartTopic;
+    @Value("${spring.data.redis.channels.recommendation-request-channel.name}")
+    private String recommendationReqTopic;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -84,5 +86,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic eventStartTopic() {
         return new ChannelTopic(eventStartTopic);
+    }
+
+    @Bean
+    public ChannelTopic recommendationRequestTopic() {
+        return new ChannelTopic(recommendationReqTopic);
     }
 }

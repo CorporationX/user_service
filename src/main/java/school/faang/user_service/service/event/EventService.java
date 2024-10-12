@@ -10,5 +10,6 @@ public interface EventService {
     List<Event> getPastEvents();
 
     void deleteEventsByIds(List<Long> ids);
+
     EventDto getEvent(long id);
 }

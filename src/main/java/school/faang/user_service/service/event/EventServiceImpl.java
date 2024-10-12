@@ -25,6 +25,7 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findAllByEndDateBefore(LocalDateTime.now());
     }
 
+    @Override
     public EventDto getEvent(long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(()
                 -> new EntityNotFoundException("Event not found with id : %s".formatted(eventId)));
@@ -33,6 +34,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Async("taskExecutor")
+    @Override
     public void deleteEventsByIds(List<Long> ids) {
         eventRepository.deleteAllById(ids);
         log.info("Deleted {} past events with ids: {}", ids.size(), ids);

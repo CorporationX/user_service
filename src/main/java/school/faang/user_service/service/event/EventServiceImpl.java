@@ -2,8 +2,6 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
@@ -25,6 +23,8 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getPastEvents() {
         return eventRepository.findAllByEndDateBefore(LocalDateTime.now());
+    }
+
     public EventDto getEvent(long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(()
                 -> new EntityNotFoundException("Event not found with id : %s".formatted(eventId)));

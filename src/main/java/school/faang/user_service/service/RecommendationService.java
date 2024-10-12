@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -13,6 +14,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -32,6 +34,7 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationEventPublisher recommendationEventPublisher;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -47,6 +50,9 @@ public class RecommendationService {
         addSkillOffersAndGuarantee(recommendationDto);
         Recommendation recommendation = recommendationRepository.findById(recommendationDto.getId()).orElseThrow(() -> new NoSuchElementException(
                 String.format("There is no recommendation with id = %d", recommendationDto.getId())));
+
+        RecommendationEvent recommendationEvent = new RecommendationEvent(recommendationId, recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), LocalDateTime.now());
+        recommendationEventPublisher.publish(recommendationEvent);
         return recommendationMapper.toDto(recommendation);
     }
 

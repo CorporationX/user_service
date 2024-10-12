@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.config.redis.user.RedisProfileViewEventPublisher;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 import school.faang.user_service.entity.User;
@@ -21,7 +20,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static school.faang.user_service.util.users.UserTestUtil.buildUsers;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,9 +27,6 @@ class ProfileViewServiceTest {
     private static final long RECEIVER_ID = 1L;
     private static final long ACTOR_ID = 2L;
     private static final int NUMBER_OF_ACTORS = 3;
-
-    @Mock
-    private UserContext userContext;
 
     @Mock
     private RedisProfileViewEventPublisher redisProfileViewEventPublisher;
@@ -43,9 +38,7 @@ class ProfileViewServiceTest {
     @Test
     @DisplayName("Publish message by one actor id successful")
     void testAddToPublishOneActorId() {
-        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
-
-        profileViewService.addToPublish(ACTOR_ID);
+        profileViewService.addToPublish(RECEIVER_ID, ACTOR_ID);
         List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
@@ -60,9 +53,8 @@ class ProfileViewServiceTest {
     @DisplayName("Publish messages by list of actors successful")
     void testAddToPublishListOfActors() {
         List<User> actors = buildUsers(NUMBER_OF_ACTORS);
-        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
 
-        profileViewService.addToPublish(actors);
+        profileViewService.addToPublish(RECEIVER_ID, actors);
         List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
@@ -82,12 +74,11 @@ class ProfileViewServiceTest {
     void testPublishAllProfileViewEventsException() {
         int nunPublishedDtosSize = 2;
         List<User> actors = buildUsers(NUMBER_OF_ACTORS);
-        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
         doNothing()
                 .doThrow(new RedisConnectionFailureException(""))
                 .when(redisProfileViewEventPublisher).publish(any(ProfileViewEventDto.class));
 
-        profileViewService.addToPublish(actors);
+        profileViewService.addToPublish(RECEIVER_ID, actors);
         profileViewService.publishAllProfileViewEvents();
         List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
@@ -102,9 +93,8 @@ class ProfileViewServiceTest {
     @DisplayName("Save all user view events successful")
     void testPublishAllProfileViewEventsSuccessful() {
         List<User> actors = buildUsers(NUMBER_OF_ACTORS);
-        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
 
-        profileViewService.addToPublish(actors);
+        profileViewService.addToPublish(RECEIVER_ID, actors);
         profileViewService.publishAllProfileViewEvents();
         List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");

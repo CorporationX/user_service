@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
@@ -39,6 +40,7 @@ public class UserService {
     private final AvatarService avatarService;
     private final List<UserFilter> userFilters;
     private final ProfileViewService profileViewService;
+    private final UserContext userContext;
 
     @Transactional
     public User registerUser(User user) {
@@ -70,7 +72,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        profileViewService.addToPublish(userId);
+        profileViewService.addToPublish(userContext.getUserId(), userId);
         return user;
     }
 
@@ -128,7 +130,7 @@ public class UserService {
         List<Premium> premiums = premiumRepository.findAll();
         Stream<User> users = premiums.stream().map(Premium::getUser);
         List<User> filteredUsers = filterUsers(users, userFilterDto);
-        profileViewService.addToPublish(filteredUsers);
+        profileViewService.addToPublish(userContext.getUserId(), filteredUsers);
         return filteredUsers;
     }
 
@@ -145,14 +147,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> getUsers(List<Long> ids) {
         List<User> users = userRepository.findAllById(ids);
-        profileViewService.addToPublish(users);
+        profileViewService.addToPublish(userContext.getUserId(), users);
         return users;
     }
 
     @Transactional(readOnly = true)
     public User getUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        profileViewService.addToPublish(userId);
+        profileViewService.addToPublish(userContext.getUserId(), userId);
         return user;
     }
 }

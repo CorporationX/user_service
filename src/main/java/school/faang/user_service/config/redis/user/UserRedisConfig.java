@@ -1,6 +1,5 @@
 package school.faang.user_service.config.redis.user;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +13,14 @@ public class UserRedisConfig {
     private String profileViewEventTopic;
 
     @Bean
-    @Qualifier("profileViewEventTopic")
     public ChannelTopic profileViewEventTopic() {
         return new ChannelTopic(profileViewEventTopic);
     }
 
     @Bean
-    public ProfileViewEventPublisher profileViewEventPublisher(RedisTemplate<String, ProfileViewEventDto> redisTemplate,
-                                                               @Qualifier("profileViewEventTopic")
-                                                               ChannelTopic topic) {
-        return new RedisProfileViewEventPublisher(redisTemplate, topic);
+    public ProfileViewEventPublisher profileViewEventPublisher(RedisTemplate<String, ProfileViewEventDto>
+                                                                       profileViewEventDtoRedisTemplate,
+                                                               ChannelTopic profileViewEventTopic) {
+        return new RedisProfileViewEventPublisher(profileViewEventDtoRedisTemplate, profileViewEventTopic);
     }
 }

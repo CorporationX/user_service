@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
@@ -42,12 +43,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest extends AbstractUserServiceTest {
+    private static final long RECEIVER_ID = 1L;
+
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -62,6 +66,8 @@ class UserServiceTest extends AbstractUserServiceTest {
     private PremiumRepository premiumRepository;
     @Mock
     private ProfileViewService profileViewService;
+    @Mock
+    private UserContext userContext;
     @InjectMocks
     private UserService userService;
 
@@ -176,6 +182,7 @@ class UserServiceTest extends AbstractUserServiceTest {
         List<Premium> premiums = List.of(premiumToFind, premiumToNotFind);
 
         when(premiumRepository.findAll()).thenReturn(premiums);
+        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
 
         List<User> result = userService.getPremiumUsers(userFilterDto);
 
@@ -183,7 +190,7 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(USERNAME, result.get(0).getUsername());
         assertEquals(EMAIL, result.get(0).getEmail());
 
-        verify(profileViewService).addToPublish(anyList());
+        verify(profileViewService).addToPublish(anyLong(), anyList());
     }
 
 
@@ -195,6 +202,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         when(userRepository.findById(foundId)).thenReturn(Optional.ofNullable(user));
         when(userRepository.findById(notFoundId)).thenReturn(Optional.empty());
+        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
 
         User resultFound = userService.getUser(foundId);
         assertEquals(USERNAME, resultFound.getUsername());
@@ -202,7 +210,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertThrows(UserNotFoundException.class, () -> userService.getUser(notFoundId));
 
-        verify(profileViewService).addToPublish(foundId);
+        verify(profileViewService).addToPublish(RECEIVER_ID, foundId);
     }
 
     @Test
@@ -213,6 +221,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         when(userRepository.findAllById(idsFound)).thenReturn(users);
         when(userRepository.findAllById(idsNotFound)).thenReturn(Collections.emptyList());
+        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
 
         List<User> resultFound = userService.getUsers(idsFound);
         List<User> resultNotFound = userService.getUsers(idsNotFound);
@@ -223,7 +232,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertEquals(0, resultNotFound.size());
 
-        verify(profileViewService, times(2)).addToPublish(anyList());
+        verify(profileViewService, times(2)).addToPublish(anyLong(), anyList());
     }
 
     @Test
@@ -231,8 +240,9 @@ class UserServiceTest extends AbstractUserServiceTest {
     void testFindById() {
         User user = createUser(USERNAME, EMAIL);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userContext.getUserId()).thenReturn(RECEIVER_ID);
         userService.findById(1L);
-        verify(profileViewService).addToPublish(1L);
+        verify(profileViewService).addToPublish(RECEIVER_ID, 1L);
     }
 
     @Test

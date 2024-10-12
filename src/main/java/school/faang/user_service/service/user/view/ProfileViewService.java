@@ -2,8 +2,8 @@ package school.faang.user_service.service.user.view;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.config.redis.user.RedisProfileViewEventPublisher;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 import school.faang.user_service.entity.User;
@@ -16,17 +16,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service
 @RequiredArgsConstructor
 public class ProfileViewService {
-    private final UserContext userContext;
     private final RedisProfileViewEventPublisher redisProfileViewEventPublisher;
     private final List<ProfileViewEventDto> profileViewEventDtos = new CopyOnWriteArrayList<>();
 
-    public void addToPublish(long actorId) {
-        long receiverId = userContext.getUserId();
+    @Async("profileViewServicePool")
+    public void addToPublish(long receiverId, long actorId) {
         profileViewEventDtos.add(new ProfileViewEventDto(receiverId, actorId));
     }
 
-    public void addToPublish(List<User> actors) {
-        long receiverId = userContext.getUserId();
+    @Async("profileViewServicePool")
+    public void addToPublish(long receiverId, List<User> actors) {
         actors.forEach(actor ->
                 profileViewEventDtos.add(new ProfileViewEventDto(receiverId, actor.getId())));
     }

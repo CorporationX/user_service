@@ -36,13 +36,10 @@ public class SkillServiceImplTest {
     public void setUp() {
         user = new User();
         user.setId(1L);
-
         Skill skill1 = new Skill();
         skill1.setId(101L);
-
         Skill skill2 = new Skill();
         skill2.setId(102L);
-
         skills = Arrays.asList(skill1, skill2);
     }
 

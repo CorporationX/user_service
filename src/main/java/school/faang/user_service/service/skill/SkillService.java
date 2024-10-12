@@ -9,4 +9,6 @@ public interface SkillService {
     void assignSkillsToUser(User user, List<Skill> skills);
 
     void removeSkillsFromUser(User user, List<Skill> skills);
+
+    void updateSkills(User user, long goalId);
 }

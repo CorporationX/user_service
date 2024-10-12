@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -12,7 +13,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.event.GoalCompletedEvent;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
@@ -159,7 +159,7 @@ public class GoalService {
         goal.getUsers().parallelStream()
                 .forEach(user -> {
                     log.info("Sending notification to user - {}", user.getUsername());
-                    GoalCompletedEvent event = GoalCompletedEvent.builder()
+                    GoalCompletedEventDto event = GoalCompletedEventDto.builder()
                             .goalId(goal.getId())
                             .userId(user.getId())
                             .goalName(goal.getTitle())

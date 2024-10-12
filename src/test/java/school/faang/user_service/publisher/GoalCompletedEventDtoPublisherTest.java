@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.event.GoalCompletedEvent;
+import school.faang.user_service.dto.event.GoalCompletedEventDto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -33,7 +33,7 @@ class GoalCompletedEventPublisherTest {
     @Test
     @DisplayName("Should send message to redis")
     void whenGetMessageThenSendMessage() {
-        GoalCompletedEvent event = GoalCompletedEvent.builder().build();
+        GoalCompletedEventDto event = GoalCompletedEventDto.builder().build();
         when(channelTopic.getTopic()).thenReturn(TOPIC_NAME);
 
         goalCompletedEventPublisher.publish(event);

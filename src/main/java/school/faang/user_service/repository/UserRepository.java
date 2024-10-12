@@ -85,5 +85,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     @Query("SELECT id FROM User WHERE id IN :ids AND active = true")
-    List<Long> findActiveUserIdsByIds(@Param("ids") List<Long> ids);
+    List<Long> findActiveUserIds(@Param("ids") List<Long> ids);
 }

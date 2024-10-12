@@ -70,6 +70,7 @@ dependencies {
     implementation ("net.coobird:thumbnailator:0.4.1")
 
     implementation("org.apache.commons:commons-collections4:4.5.0-M2")
+    implementation("org.quartz-scheduler:quartz:2.3.0")
 
     /**
      * Test containers
@@ -172,16 +173,16 @@ tasks.jacocoTestCoverageVerification {
             exclude(jacocoExclude)
         }
     )
+}
 
-    tasks.check {
-        dependsOn(tasks.jacocoTestCoverageVerification)
-    }
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
 
-    tasks.build {
-        dependsOn(tasks.jacocoTestCoverageVerification)
-    }
+tasks.build {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
 
-    kotlin {
-        jvmToolchain(17)
-    }
+kotlin {
+    jvmToolchain(17)
 }

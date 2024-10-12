@@ -217,6 +217,17 @@ class UserServiceTest extends AbstractUserServiceTest {
     }
 
     @Test
+    void testBannedUser() {
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.bannedUser(userId);
+
+        assertTrue(user.isBanned());
+        verify(userRepository).save(user);
+    }
+
+    @Test
     void testGetOnlyActiveUsersFromList_success_notEmptyIds() {
         List<Long> ids = List.of(1L, 2L, 3L);
         List<Long> expectedActiveUserIds = Arrays.asList(1L, 2L);

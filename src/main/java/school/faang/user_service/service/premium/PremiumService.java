@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.payment.PaymentResponseDto;
+import school.faang.user_service.dto.premium.PremiumBoughtEventDto;
 import school.faang.user_service.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.premium.Premium;
@@ -26,6 +27,7 @@ public class PremiumService {
     private final PaymentService paymentService;
     private final PremiumValidationService premiumValidationService;
     private final UserRepository userRepository;
+    private final PremiumBoughtEventService premiumBoughtEventService;
 
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod period) {
@@ -41,7 +43,9 @@ public class PremiumService {
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(period.getDays()))
                 .build();
-        return premiumRepository.save(premium);
+        premiumRepository.save(premium);
+        premiumBoughtEventService.addToPublish(new PremiumBoughtEventDto(userId, period.getCost(), period.getDays()));
+        return premium;
     }
 
     @Transactional(readOnly = true)

@@ -1,0 +1,2 @@
+ALTER TABLE country
+    ADD COLUMN IF NOT EXISTS locale_code VARCHAR(8)

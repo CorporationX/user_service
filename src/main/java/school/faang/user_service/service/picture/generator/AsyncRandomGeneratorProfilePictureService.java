@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.dice.bear.DiceBearClient;
-import school.faang.user_service.config.ProfilePictureProperties;
+import school.faang.user_service.config.s3.ProfilePictureProperties;
 import school.faang.user_service.service.GeneratorPictureService;
 import school.faang.user_service.util.BinaryFileReader;
 

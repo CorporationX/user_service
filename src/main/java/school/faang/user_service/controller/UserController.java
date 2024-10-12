@@ -1,6 +1,7 @@
 package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +40,13 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    UserDto getUser(@PathVariable long userId) {
+    public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
+    }
+
+    @GetMapping("/{userId}/locale/contact-preference")
+    public UserDto getUserWithLocaleAndContactPreference(@PathVariable @Positive Long userId) {
+        return userService.getUserWithLocaleAndContactPreference(userId);
     }
 
     @PostMapping

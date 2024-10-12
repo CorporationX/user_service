@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.client.dice.bear.DiceBearClient;
-import school.faang.user_service.config.ProfilePictureProperties;
+import school.faang.user_service.config.s3.ProfilePictureProperties;
 import school.faang.user_service.util.BinaryFileReader;
 
 import java.util.List;

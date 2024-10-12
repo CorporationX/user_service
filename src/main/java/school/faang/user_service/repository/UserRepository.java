@@ -51,5 +51,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
 
     @Query("SELECT id FROM User WHERE id IN :ids AND active = true")
-    List<Long> findActiveUserIdsByIds(@Param("ids") List<Long> ids);
+    List<Long> findActiveUserIds(@Param("ids") List<Long> ids);
 }

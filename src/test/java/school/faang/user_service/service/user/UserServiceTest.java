@@ -219,16 +219,16 @@ class UserServiceTest extends AbstractUserServiceTest {
 
     @Test
     void testGetOnlyActiveUsersFromList_success_notEmptyIds() {
-        List<Long> ids = Arrays.asList(1L, 2L, 3L);
+        List<Long> ids = List.of(1L, 2L, 3L);
         List<Long> expectedActiveUserIds = Arrays.asList(1L, 2L);
 
-        when(userRepository.findActiveUserIdsByIds(ids)).thenReturn(expectedActiveUserIds);
+        when(userRepository.findActiveUserIds(ids)).thenReturn(expectedActiveUserIds);
 
         List<Long> activeUserIds = userService.getOnlyActiveUsersFromList(ids);
 
         assertNotNull(activeUserIds);
         assertEquals(expectedActiveUserIds, activeUserIds);
-        verify(userRepository, times(1)).findActiveUserIdsByIds(ids);
+        verify(userRepository).findActiveUserIds(ids);
     }
 
     @Test
@@ -238,8 +238,8 @@ class UserServiceTest extends AbstractUserServiceTest {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
                 () -> userService.getOnlyActiveUsersFromList(ids));
 
-        assertEquals("User ID list cannot be empty", thrown.getMessage());
-        verify(userRepository, never()).findActiveUserIdsByIds(any());
+        assertEquals("User ID list cannot be null or empty", thrown.getMessage());
+        verify(userRepository, never()).findActiveUserIds(any());
     }
 
     @Test

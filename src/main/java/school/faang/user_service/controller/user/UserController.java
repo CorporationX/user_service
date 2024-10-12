@@ -69,7 +69,6 @@ public class UserController {
 
     @PostMapping("/active")
     public List<Long> getOnlyActiveUsersFromList(@RequestBody List<Long> ids) {
-        log.info(ids.toString());
         return userService.getOnlyActiveUsersFromList(ids);
     }
 }

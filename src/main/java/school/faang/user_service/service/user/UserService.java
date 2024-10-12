@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -152,9 +154,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<Long> getOnlyActiveUsersFromList(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            throw new IllegalArgumentException("User ID list cannot be empty");
+        if (isEmpty(ids)) {
+            throw new IllegalArgumentException("User ID list cannot be null or empty");
         }
-        return userRepository.findActiveUserIdsByIds(ids);
+        return userRepository.findActiveUserIds(ids);
     }
 }

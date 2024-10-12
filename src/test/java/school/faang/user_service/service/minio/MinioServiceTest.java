@@ -2,14 +2,13 @@ package school.faang.user_service.service.minio;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.errors.MinioException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.exception.MinioUploadException;
+import school.faang.user_service.exception.MinioException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,9 +44,9 @@ public class MinioServiceTest {
     @Test
     public void testUploadFileFailure() throws Exception {
         when(minioClient.putObject(any(PutObjectArgs.class)))
-                .thenThrow(new RuntimeException(new MinioException("Failed to upload")));
+                .thenThrow(new RuntimeException(new io.minio.errors.MinioException("Failed to upload")));
 
-        assertThrows(MinioUploadException.class, () -> {
+        assertThrows(MinioException.class, () -> {
             minioService.uploadFile(fileName, data, contentType);
         });
     }

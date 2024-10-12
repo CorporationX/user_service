@@ -1,6 +1,6 @@
 package school.faang.user_service.config.redis;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -11,20 +11,14 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfiguration {
 
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
-
-    @Value("${spring.data.redis.channels.goal-completed-event-channel.name}")
-    private String goalCompletedEvent;
+    private final RedisProperties redisProperties;
 
     @Bean
     ChannelTopic goalCompletedEventTopic() {
-        return new ChannelTopic(goalCompletedEvent);
+        return new ChannelTopic(redisProperties.getChannels().getGoalCompletedEvent().getName());
     }
 
     @Bean
@@ -38,6 +32,10 @@ public class RedisConfiguration {
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
+                redisProperties.getHost(),
+                redisProperties.getPort());
+
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 }

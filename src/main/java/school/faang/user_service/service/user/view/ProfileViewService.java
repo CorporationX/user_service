@@ -36,20 +36,15 @@ public class ProfileViewService {
 
     public void publishAllProfileViewEvents() {
         List<ProfileViewEventDto> profileViewEventDtosCopy = new ArrayList<>();
-        List<ProfileViewEventDto> profileViewEventDtosPublished = new ArrayList<>();
         try {
             synchronized (profileViewEventDtos) {
                 log.info("Publish profile view events, size: {}", profileViewEventDtos.size());
                 profileViewEventDtosCopy = new ArrayList<>(profileViewEventDtos);
                 profileViewEventDtos.clear();
             }
-            profileViewEventDtosCopy.forEach(dto -> {
-                redisProfileViewEventPublisher.publish(dto);
-                profileViewEventDtosPublished.add(dto);
-            });
+            redisProfileViewEventPublisher.publish(profileViewEventDtosCopy);
         } catch (Exception e) {
             log.error("Profile view events publish failed:", e);
-            profileViewEventDtosCopy.removeAll(profileViewEventDtosPublished);
             synchronized (profileViewEventDtos) {
                 log.info("Save back to main profile view events copy remainder, size: {}",
                         profileViewEventDtosCopy.size());

@@ -10,6 +10,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 
+import java.util.List;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,9 +33,9 @@ class RedisProfileViewEventPublisherTest {
     @Test
     @DisplayName("Publish profile view event successful")
     void testPublishSuccessful() {
-        ProfileViewEventDto profileViewEventDto = new ProfileViewEventDto(RECEIVER_ID, ACTOR_ID);
+        List<ProfileViewEventDto> profileViewEventDtos = List.of(new ProfileViewEventDto(RECEIVER_ID, ACTOR_ID));
         when(channelTopic.getTopic()).thenReturn(TOPIC);
-        redisProfileViewEventPublisher.publish(profileViewEventDto);
-        verify(redisTemplate).convertAndSend(TOPIC, profileViewEventDto);
+        redisProfileViewEventPublisher.publish(profileViewEventDtos);
+        verify(redisTemplate).convertAndSend(TOPIC, profileViewEventDtos);
     }
 }

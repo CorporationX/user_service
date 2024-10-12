@@ -16,9 +16,8 @@ import school.faang.user_service.service.user.view.ProfileViewService;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static school.faang.user_service.util.users.UserTestUtil.buildUsers;
 
@@ -72,11 +71,9 @@ class ProfileViewServiceTest {
     @Test
     @DisplayName("Given an exception when publish list then catch and return copyList into main list")
     void testPublishAllProfileViewEventsException() {
-        int nunPublishedDtosSize = 2;
         List<User> actors = buildUsers(NUMBER_OF_ACTORS);
-        doNothing()
-                .doThrow(new RedisConnectionFailureException(""))
-                .when(redisProfileViewEventPublisher).publish(any(ProfileViewEventDto.class));
+        doThrow(new RedisConnectionFailureException(""))
+                .when(redisProfileViewEventPublisher).publish(anyList());
 
         profileViewService.addToPublish(RECEIVER_ID, actors);
         profileViewService.publishAllProfileViewEvents();
@@ -84,8 +81,8 @@ class ProfileViewServiceTest {
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
         assertThat(profileViewEventDtos).isNotEmpty();
-        assertThat(profileViewEventDtos.size()).isEqualTo(nunPublishedDtosSize);
-        verify(redisProfileViewEventPublisher, times(nunPublishedDtosSize)).publish(any(ProfileViewEventDto.class));
+        assertThat(profileViewEventDtos.size()).isEqualTo(actors.size());
+        verify(redisProfileViewEventPublisher).publish(anyList());
     }
 
     @SuppressWarnings("unchecked")
@@ -100,6 +97,6 @@ class ProfileViewServiceTest {
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
         assertThat(profileViewEventDtos).isEmpty();
-        verify(redisProfileViewEventPublisher, times(NUMBER_OF_ACTORS)).publish(any(ProfileViewEventDto.class));
+        verify(redisProfileViewEventPublisher).publish(anyList());
     }
 }

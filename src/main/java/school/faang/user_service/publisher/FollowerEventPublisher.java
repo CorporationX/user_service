@@ -26,11 +26,10 @@ public class FollowerEventPublisher implements MessagePublisher<FollowerEventDto
     public void publish(FollowerEventDto followerEventDto) {
         try {
             String messageJson = objectMapper.writeValueAsString(followerEventDto);
-            log.info(messageJson);
             redisTemplate.convertAndSend(topic, messageJson);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Can't parse message to json for topic %s".formatted(topic));
+            throw new RuntimeException("Can't parse object to json for topic %s".formatted(topic));
         }
     }
 }

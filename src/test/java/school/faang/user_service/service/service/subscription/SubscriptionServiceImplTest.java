@@ -16,6 +16,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.subscription.SubscriptionAlreadyExistsException;
 import school.faang.user_service.exception.subscription.SubscriptionNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.SubscriptionServiceImpl;
 import school.faang.user_service.service.subscription.SubscriptionValidator;
@@ -47,6 +48,9 @@ class SubscriptionServiceImplTest {
 
     @Mock
     private SubscriptionValidator validator;
+
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;

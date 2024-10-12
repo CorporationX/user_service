@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
@@ -37,7 +38,7 @@ class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
 
     private UserDto createTestUserDto(long id, String username, String email) {
-        return new UserDto(id, true, username, email);
+        return new UserDto(id, true, username, email, "123456789", PreferredContact.EMAIL);
     }
 
     private List<UserDto> createUserDtoList(UserDto... users) {

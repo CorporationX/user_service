@@ -62,8 +62,3 @@ redis:
     follower-event-channel: follower_event
     goal-completed-channel: goal_completed
     search-appearance-channel: search_appearance_channel
-    channels:
-      mentorship-channel:
-        name: mentorship_channel
-      follower-event-channel:
-        name: follower_event

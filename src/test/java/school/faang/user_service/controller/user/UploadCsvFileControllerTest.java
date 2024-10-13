@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.model.service.impl.UserServiceImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ public class UploadCsvFileControllerTest {
     private UserController userController;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @BeforeEach
     public void setUp() {
@@ -32,17 +32,17 @@ public class UploadCsvFileControllerTest {
     }
 
     @Test
-    public void testUploadCsvFile_Success() throws IOException {
+    public void testUploadCsvFile_Success() {
         MockMultipartFile file = new MockMultipartFile("file", "students.csv",
                 "text/csv", "name,email\nJohn Doe,johndoe@example.com".getBytes());
 
-        doNothing().when(userService).processCsvFile(any(InputStream.class));
+        doNothing().when(userServiceImpl).processCsvFile(any(InputStream.class));
 
         ResponseEntity<String> response = userController.uploadCsvFile(file);
 
         assertEquals(ResponseEntity.ok("The file has been successfully uploaded and processed"), response);
         ArgumentCaptor<InputStream> inputStreamCaptor = ArgumentCaptor.forClass(InputStream.class);
-        verify(userService).processCsvFile(inputStreamCaptor.capture());
+        verify(userServiceImpl).processCsvFile(inputStreamCaptor.capture());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class UploadCsvFileControllerTest {
         ResponseEntity<String> response = userController.uploadCsvFile(emptyFile);
 
         assertEquals(ResponseEntity.badRequest().body("The file cannot be empty"), response);
-        verify(userService, never()).processCsvFile(any(InputStream.class));
+        verify(userServiceImpl, never()).processCsvFile(any(InputStream.class));
     }
 
     @Test
@@ -66,6 +66,6 @@ public class UploadCsvFileControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Error reading the file", response.getBody());
-        verify(userService, never()).processCsvFile(any(InputStream.class));
+        verify(userServiceImpl, never()).processCsvFile(any(InputStream.class));
     }
 }

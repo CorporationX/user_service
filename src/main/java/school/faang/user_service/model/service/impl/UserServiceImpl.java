@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.model.service.impl;
 
 import com.json.student.Address;
 import jakarta.persistence.EntityNotFoundException;
@@ -8,7 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.user.*;
+import school.faang.user_service.dto.user.ContactInfoDto;
+import school.faang.user_service.dto.user.EducationDto;
+import school.faang.user_service.dto.user.PersonDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -24,26 +28,28 @@ import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.model.service.UserService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.minio.S3service;
+import school.faang.user_service.service.user.CountryService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Random;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
     private final static String PROMOTION_TARGET = "profile";
 
     private final UserRepository userRepository;
@@ -246,7 +252,7 @@ public class UserService {
     }
 
     private void deleteExpiredProfilePromotions() {
-        List<Promotion> expiredPromotions = promotionRepository.findAllExpiredPromotions(UserService.PROMOTION_TARGET);
+        List<Promotion> expiredPromotions = promotionRepository.findAllExpiredPromotions(UserServiceImpl.PROMOTION_TARGET);
         if (!expiredPromotions.isEmpty()) {
             promotionRepository.deleteAll(expiredPromotions);
         }

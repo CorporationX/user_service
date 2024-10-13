@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.model.service.impl.UserServiceImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final UserContext userContext;
 
     @Value("${services.s3.max-image-size-mb}")
@@ -32,18 +32,18 @@ public class UserController {
 
     @PutMapping("/deactivate")
     public UserDto deactivateUser(@RequestBody UserDto userDto) {
-        return userService.deactivateUser(userDto);
+        return userServiceImpl.deactivateUser(userDto);
     }
 
     @PostMapping(value = "/filtered")
     public List<UserDto> getFilteredUsers(@RequestBody UserFilterDto filter) {
         long userId = userContext.getUserId();
-        return userService.getFilteredUsers(filter, userId);
+        return userServiceImpl.getFilteredUsers(filter, userId);
     }
 
     @GetMapping(value = "/premium")
     public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto filter) {
-        return userService.getPremiumUsers(filter);
+        return userServiceImpl.getPremiumUsers(filter);
     }
 
     @GetMapping("/{userId}")
@@ -51,12 +51,12 @@ public class UserController {
         if (userId <= 0) {
             throw new IllegalArgumentException("Invalid user ID: " + userId);
         }
-        return userService.getUser(userId);
+        return userServiceImpl.getUser(userId);
     }
 
     @PostMapping()
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersByIds(ids);
+        return userServiceImpl.getUsersByIds(ids);
     }
 
     @PostMapping("/avatar")
@@ -74,13 +74,13 @@ public class UserController {
         }
 
         long userId = userContext.getUserId();
-        userService.saveAvatar(userId, file);
+        userServiceImpl.saveAvatar(userId, file);
     }
 
     @GetMapping(value = "/avatar", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> getAvatar() {
         long userId = userContext.getUserId();
-        byte[] imageBytes = userService.getAvatar(userId);
+        byte[] imageBytes = userServiceImpl.getAvatar(userId);
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
                 .body(imageBytes);
@@ -89,7 +89,7 @@ public class UserController {
     @DeleteMapping("/avatar")
     public void deleteAvatar() {
         long userId = userContext.getUserId();
-        userService.deleteAvatar(userId);
+        userServiceImpl.deleteAvatar(userId);
     }
 
     @PostMapping("/upload")
@@ -99,7 +99,7 @@ public class UserController {
         }
 
         try (InputStream inputStream = file.getInputStream()) {
-            userService.processCsvFile(inputStream);
+            userServiceImpl.processCsvFile(inputStream);
             return ResponseEntity.ok("The file has been successfully uploaded and processed");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading the file");

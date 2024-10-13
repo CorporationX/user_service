@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.CountryService;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.model.service.impl.UserServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 
-public class UserServiceProcessCsvFileTest {
+public class UserServiceImplProcessCsvFileTest {
     @Mock
     private UserRepository userRepository;
 
@@ -36,7 +36,7 @@ public class UserServiceProcessCsvFileTest {
     private PersonToUserMapper personToUserMapper;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @BeforeEach
     public void setUp() {
@@ -61,7 +61,7 @@ public class UserServiceProcessCsvFileTest {
         when(countryService.findOrCreateCountry("USA")).thenReturn(mockCountry);
         when(personToUserMapper.personToUser(any(PersonDto.class))).thenReturn(mockUser);
 
-        userService.processCsvFile(inputStream);
+        userServiceImpl.processCsvFile(inputStream);
 
         verify(userRepository, times(1)).save(mockUser);
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -75,7 +75,7 @@ public class UserServiceProcessCsvFileTest {
                 "John,Doe,2000,CS101,12345,johndoe@example.com";
 
         InputStream inputStream = new ByteArrayInputStream(csvData.getBytes());
-        userService.processCsvFile(inputStream);
+        userServiceImpl.processCsvFile(inputStream);
 
         verify(userRepository, never()).save(any(User.class));
     }

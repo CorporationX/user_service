@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
+import school.faang.user_service.dto.message.MentorshipRequestMessage;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
@@ -24,8 +26,18 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper menReqMapper;
     private final MentorshipRequestValidator menReqValidator;
     private final List<MentorshipRequestFilter> filtersRequests;
+    private final MentorshipRequestEventPublisher publisher;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto menReqDto) {
+
+        var message = MentorshipRequestMessage.builder()
+                .requesterId(menReqDto.getRequesterId())
+                .receiverId(menReqDto.getReceiverId())
+                .createdAt(menReqDto.getCreatedAt())
+                .build();
+
+        publisher.publish(message);
+
         menReqValidator.validateReceiverNoEqualsRequester(menReqDto);
         menReqValidator.validateAvailabilityUsersDB(menReqDto);
 

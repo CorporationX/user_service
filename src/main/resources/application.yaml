@@ -28,10 +28,12 @@ spring:
           name: follower_event
         goalCompletedEvent:
           name: goal_completed_event_channel
+        mentorship-request-topic: mentorship_request_topic
 
 servlet:
   multipart:
     max-file-size: 5242880
+
 
 server:
   port: 8080

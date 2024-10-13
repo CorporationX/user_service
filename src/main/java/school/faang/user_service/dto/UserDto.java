@@ -15,4 +15,7 @@ public class UserDto {
     private String username;
     @Email
     private String email;
+
+    private String avatar;
+    private String avatarSmall;
 }

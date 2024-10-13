@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.event.properties.EventProperties;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.filters.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -20,6 +21,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.event.filters.EventFilter;
 import school.faang.user_service.test_data.event.TestDataEvent;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,8 +43,9 @@ class EventServiceTest {
     private EventService eventService;
     private EventRepository eventRepository;
     private EventMapper eventMapper;
-    private EventServiceHelper eventValidator;
+    private EventServiceHelper eventServiceHelper;
     private UserRepository userRepository;
+    private EventProperties eventProperties;
     private TestDataEvent testDataEvent;
     private EventDto eventDto;
     private User user;
@@ -52,7 +55,8 @@ class EventServiceTest {
     void setUp() {
         eventRepository = Mockito.mock(EventRepository.class);
         eventMapper = Mockito.mock(EventMapper.class);
-        eventValidator = Mockito.mock(EventServiceHelper.class);
+        eventServiceHelper = Mockito.mock(EventServiceHelper.class);
+        eventProperties = Mockito.mock(EventProperties.class);
         userRepository = Mockito.mock(UserRepository.class);
         SkillRepository skillRepository = Mockito.mock(SkillRepository.class);
         SkillMapper skillMapper = Mockito.mock(SkillMapper.class);
@@ -61,7 +65,8 @@ class EventServiceTest {
         eventService = new EventService(
                 eventRepository,
                 eventMapper,
-                eventValidator,
+                eventServiceHelper,
+                eventProperties,
                 userRepository,
                 skillRepository,
                 skillMapper,
@@ -90,8 +95,8 @@ class EventServiceTest {
             assertNotNull(result);
             assertEquals(eventDto, result);
 
-            verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto);
-            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eq(eventDto), anySet());
+            verify(eventServiceHelper, atLeastOnce()).eventDatesValidation(eventDto);
+            verify(eventServiceHelper, atLeastOnce()).relatedSkillsValidation(eq(eventDto), anySet());
             verify(eventRepository, atLeastOnce()).save(event);
         }
 
@@ -132,7 +137,7 @@ class EventServiceTest {
         public void testDeleteEvent_Success() {
             eventService.deleteEvent(eventDto.getId());
 
-            verify(eventValidator, atLeastOnce()).eventExistByIdValidation(eventDto.getId());
+            verify(eventServiceHelper, atLeastOnce()).eventExistByIdValidation(eventDto.getId());
             verify(eventRepository, atLeastOnce()).deleteById(eventDto.getId());
         }
 
@@ -149,9 +154,9 @@ class EventServiceTest {
             assertNotNull(result);
             assertEquals(eventDto2, result);
 
-            verify(eventValidator, atLeastOnce()).eventDatesValidation(eventDto2);
-            verify(eventValidator, atLeastOnce()).relatedSkillsValidation(eq(eventDto2), anySet());
-            verify(eventValidator, atLeastOnce()).eventExistByIdValidation(eventDto2.getId());
+            verify(eventServiceHelper, atLeastOnce()).eventDatesValidation(eventDto2);
+            verify(eventServiceHelper, atLeastOnce()).relatedSkillsValidation(eq(eventDto2), anySet());
+            verify(eventServiceHelper, atLeastOnce()).eventExistByIdValidation(eventDto2.getId());
         }
 
         @Test
@@ -207,6 +212,19 @@ class EventServiceTest {
             assertEquals(eventDtoList, result);
 
             verify(eventRepository, atLeastOnce()).findParticipatedEventsByUserId(user.getId());
+        }
+
+        @Test
+        void testDeletePastEvents_Success() {
+            Event oldEvent = testDataEvent.getOldEvent();
+            List<Long> pastEventList = List.of(oldEvent.getId());
+
+            when(eventRepository.findEventIdsByEndDateBefore(any(LocalDateTime.class))).thenReturn(pastEventList);
+            when(eventProperties.getSublistSize()).thenReturn(1);
+
+            eventService.deletePastEvents();
+
+            verify(eventServiceHelper, atLeastOnce()).asyncDeletePastEvents(List.of(oldEvent.getId()));
         }
     }
 

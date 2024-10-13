@@ -40,7 +40,7 @@ public class ProfileViewService {
         while ((profileViewEventDto = profileViewEventDtos.poll()) != null) {
             profileViewEventDtosCopy.add(profileViewEventDto);
         }
-        log.info("Publish profile view events, size: {}", profileViewEventDtos.size());
+        log.info("Publish profile view events, size: {}", profileViewEventDtosCopy.size());
         try {
             redisProfileViewEventPublisher.publish(profileViewEventDtosCopy);
         } catch (Exception e) {

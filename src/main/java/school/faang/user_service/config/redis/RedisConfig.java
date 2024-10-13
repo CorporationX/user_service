@@ -17,7 +17,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanListener;
 
 @Configuration
-@Profile("!test")
 @RequiredArgsConstructor
 public class RedisConfig {
 

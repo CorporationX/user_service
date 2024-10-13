@@ -1,5 +1,6 @@
 DROP TABLE project_subscription;
 DROP TABLE contact;
+DROP TABLE contact_preferences;
 DROP TABLE skill_request;
 DROP TABLE recommendation_request;
 DROP TABLE skill_offer;
@@ -14,11 +15,15 @@ DROP TABLE user_goal;
 DROP TABLE goal_skill;
 DROP TABLE event_skill;
 DROP TABLE user_event;
+DROP TABLE user_premium;
 DROP TABLE rating;
 DROP TABLE event;
 DROP TABLE goal;
-DROP TABLE skill;
-DROP TABLE users;
-DROP TABLE country;
+DROP TABLE user_skill_guarantee;
+DROP TABLE skill CASCADE;
+DROP TABLE users CASCADE;
+DROP TABLE country CASCADE;
+DROP TABLE meet_participant;
+DROP TABLE meet;
 
 DELETE FROM databasechangelog;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.service.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalServiceImpl;
 
 import java.util.List;
 

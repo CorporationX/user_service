@@ -9,13 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class FollowerEventPublisher implements MessagePublisher{
     private final RedisTemplate<String, Object> redisTemplate;
-
-    @Qualifier("followingChannel")
-    private ChannelTopic followingTopic;
+    private final ChannelTopic followingTopic;
 
     @Autowired
     public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                  @Qualifier("followingChannel") ChannelTopic followingTopic
+                                  @Qualifier("follower-channel") ChannelTopic followingTopic
     ) {
         this.redisTemplate = redisTemplate;
         this.followingTopic = followingTopic;

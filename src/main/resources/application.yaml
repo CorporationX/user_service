@@ -25,6 +25,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        follower-channel:
+          name: follower_channel
 
 server:
   port: 8080
@@ -78,8 +80,3 @@ user:
         queue-capacity: 1000
         thread-name-prefix: "UserUpload-"
     batch-size: 200
-
-redis:
-  host:
-  port:
-  followingChannel: following_channel

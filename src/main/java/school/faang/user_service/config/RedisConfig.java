@@ -13,14 +13,14 @@ import org.springframework.data.redis.listener.ChannelTopic;
 @Configuration
 public class RedisConfig {
 
-    @Value("redis.host")
+    @Value("data.redis.host")
     private String host;
 
-    @Value("redis.port")
+    @Value("data.redis.port")
     private int port;
 
-    @Value("redis.followingChannel")
-    private String followingChannel;
+    @Value("data.redis.channels.follower-channel.name")
+    private String followerChannel;
 
     @Bean
     RedisTemplate<String, Object> redisTemplate() {
@@ -33,8 +33,8 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "following_channel")
-    public ChannelTopic followingChannel() {
-        return new ChannelTopic(followingChannel);
+    @Bean(name = "follower-channel")
+    public ChannelTopic followerChannel() {
+        return new ChannelTopic(followerChannel);
     }
 }

@@ -43,7 +43,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                         .findUserSkill(skillId, recommendation.receiverId()).isEmpty())
                 .forEach(skillId -> skillOfferRepository.create(skillId, recommendation.id()));
 
-        sendEventToNotificationService(recommendation);
+        sendEvent(recommendation);
 
         return recommendation;
     }
@@ -87,7 +87,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendations.map(recommendationMapper::toDto).toList();
     }
 
-    private void sendEventToNotificationService(RecommendationDto recommendation) {
+    private void sendEvent(RecommendationDto recommendation) {
         RecommendationReceivedEvent event = buildRecommendationReceivedEvent(recommendation);
         recommendationReceivedEventPublisher.publish(event);
     }

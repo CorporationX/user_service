@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -20,7 +19,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.model.service.impl.UserServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,7 +58,7 @@ public class UserControllerTest {
     private UserFilterDto userFilterDto;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Mock
     private UserContext userContext;
@@ -91,13 +90,13 @@ public class UserControllerTest {
     public void testGetUser_Success() throws Exception {
         long validId = 1L;
 
-        when(userService.getUser(validId)).thenReturn(userDto);
+        when(userServiceImpl.getUser(validId)).thenReturn(userDto);
 
         mockMvc.perform(get("/users/{userId}", validId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userDto)));
 
-        verify(userService).getUser(validId);
+        verify(userServiceImpl).getUser(validId);
     }
 
     @Test
@@ -105,7 +104,7 @@ public class UserControllerTest {
     public void testGetUser_NonExistingId() throws Exception {
         long invalidId = 100500L;
 
-        when(userService.getUser(invalidId)).thenAnswer(invocation -> {
+        when(userServiceImpl.getUser(invalidId)).thenAnswer(invocation -> {
             Long id = invocation.getArgument(0);
             throw new EntityNotFoundException("User not found with id: " + id);
         });
@@ -116,7 +115,7 @@ public class UserControllerTest {
                 .andExpect(result -> assertTrue(Objects.requireNonNull(result.getResolvedException())
                         .getMessage().contains("User not found with id: 100500")));
 
-        verify(userService).getUser(invalidId);
+        verify(userServiceImpl).getUser(invalidId);
     }
 
     @Test
@@ -125,7 +124,7 @@ public class UserControllerTest {
         List<UserDto> dtos = Arrays.asList(userDto, anotherUserDto);
         userIds = Arrays.asList(2L, 3L);
 
-        when(userService.getUsersByIds(userIds)).thenReturn(dtos);
+        when(userServiceImpl.getUsersByIds(userIds)).thenReturn(dtos);
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -134,7 +133,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(content().json(objectMapper.writeValueAsString(dtos)));
 
-        verify(userService).getUsersByIds(userIds);
+        verify(userServiceImpl).getUsersByIds(userIds);
     }
 
     @Test
@@ -142,7 +141,7 @@ public class UserControllerTest {
     void testGetUsersByIds_NotFound() throws Exception {
         userIds = List.of(100L, 200L, 300L);
 
-        when(userService.getUsersByIds(userIds)).thenReturn(Collections.emptyList());
+        when(userServiceImpl.getUsersByIds(userIds)).thenReturn(Collections.emptyList());
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +150,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
 
-        verify(userService).getUsersByIds(userIds);
+        verify(userServiceImpl).getUsersByIds(userIds);
     }
 
     @Test
@@ -161,7 +160,7 @@ public class UserControllerTest {
         String requestBody = objectMapper.writeValueAsString(userFilterDto);
 
         when(userContext.getUserId()).thenReturn(userId);
-        when(userService.getFilteredUsers(userFilterDto, userId)).thenReturn(List.of(userDto, anotherUserDto));
+        when(userServiceImpl.getFilteredUsers(userFilterDto, userId)).thenReturn(List.of(userDto, anotherUserDto));
 
         mockMvc.perform(post("/users/filtered")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +196,7 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("File size is too large!")));
 
-        verify(userService, never()).saveAvatar(anyLong(), any(MultipartFile.class));
+        verify(userServiceImpl, never()).saveAvatar(anyLong(), any(MultipartFile.class));
     }
 
     @Test
@@ -209,13 +208,13 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Invalid file type. Only images jpg are allowed!")));
 
-        verify(userService, never()).saveAvatar(anyLong(), any(MultipartFile.class));
+        verify(userServiceImpl, never()).saveAvatar(anyLong(), any(MultipartFile.class));
     }
 
     @Test
     public void testGetAvatar_Success() throws Exception {
         byte[] avatarBytes = new byte[1024];
-        when(userService.getAvatar(anyLong())).thenReturn(avatarBytes);
+        when(userServiceImpl.getAvatar(anyLong())).thenReturn(avatarBytes);
 
         mockMvc.perform(get("/users/avatar")
                         .header("x-user-id", 1L))
@@ -223,7 +222,7 @@ public class UserControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE))
                 .andExpect(content().bytes(avatarBytes));
 
-        verify(userService, times(1)).getAvatar(anyLong());
+        verify(userServiceImpl, times(1)).getAvatar(anyLong());
     }
 
 
@@ -233,6 +232,6 @@ public class UserControllerTest {
                         .header("x-user-id", 1L))
                 .andExpect(status().isOk());
 
-        verify(userService, times(1)).deleteAvatar(anyLong());
+        verify(userServiceImpl, times(1)).deleteAvatar(anyLong());
     }
 }

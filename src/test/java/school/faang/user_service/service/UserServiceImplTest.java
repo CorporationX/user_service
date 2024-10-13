@@ -39,7 +39,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.minio.S3service;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.model.service.impl.UserServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -70,7 +70,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -96,7 +96,7 @@ public class UserServiceTest {
     @Mock
     UserContext userContext;
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     private User user;
     private UserDto userDto;
@@ -138,7 +138,7 @@ public class UserServiceTest {
     public void testDeactivateUser_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> userService.deactivateUser(userDto));
+                () -> userServiceImpl.deactivateUser(userDto));
         assertEquals("Пользователь с ID 1 не найден", exception.getMessage());
         verify(userRepository, times(1)).findById(1L);
     }
@@ -147,7 +147,7 @@ public class UserServiceTest {
     public void testDeactivateUser_Success() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
-        UserDto result = userService.deactivateUser(userDto);
+        UserDto result = userServiceImpl.deactivateUser(userDto);
         assertNotNull(result);
         assertFalse(user.isActive());
         verify(mentorshipService, times(1)).stopMentorship(user);
@@ -160,7 +160,7 @@ public class UserServiceTest {
         user.setGoals(List.of(firstGoal, secondGoal));
         user.setOwnedEvents(List.of(firstEvent));
         user.setParticipatedEvents(List.of(secondEvent));
-        userService.stopUserActivities(user);
+        userServiceImpl.stopUserActivities(user);
         verify(eventRepository, times(1)).deleteAllById(any());
     }
 
@@ -170,7 +170,7 @@ public class UserServiceTest {
         goal.setId(1L);
         goal.setUsers(Collections.singletonList(user));
         user.setGoals(new ArrayList<>(Collections.singletonList(goal)));
-        userService.stopGoals(user);
+        userServiceImpl.stopGoals(user);
         verify(goalRepository, times(1)).deleteById(1L);
         assertTrue(user.getGoals().isEmpty());
     }
@@ -179,7 +179,7 @@ public class UserServiceTest {
     public void testStopGoals_OtherUsersInGoal() {
         firstGoal.getUsers().add(new User());
         user.setGoals(List.of(firstGoal));
-        userService.stopGoals(user);
+        userServiceImpl.stopGoals(user);
         verify(goalRepository, never()).deleteById(anyLong());
         assertTrue(user.getGoals().isEmpty());
     }
@@ -188,7 +188,7 @@ public class UserServiceTest {
     public void testStopEvents() {
         user.setOwnedEvents(List.of(firstEvent));
         user.setParticipatedEvents(List.of(secondEvent));
-        userService.stopEvents(user);
+        userServiceImpl.stopEvents(user);
         assertTrue(user.getOwnedEvents().isEmpty());
         assertTrue(user.getParticipatedEvents().isEmpty());
         verify(eventRepository, times(1)).deleteAllById(any());
@@ -202,7 +202,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findPremiumUsers()).thenReturn(Stream.of(user1, user2, user3));
 
         UserFilterDto filterDto = new UserFilterDto();
-        List<UserDto> users = userService.getPremiumUsers(filterDto);
+        List<UserDto> users = userServiceImpl.getPremiumUsers(filterDto);
 
         assertEquals(3, users.size());
     }
@@ -235,7 +235,7 @@ public class UserServiceTest {
         filterDto.setPhone("123123");
         filterDto.setCreatedAfter(LocalDateTime.now().minusMonths(1));
         filterDto.setCreatedBefore(LocalDateTime.now().plusMonths(1));
-        List<UserDto> users = userService.getPremiumUsers(filterDto);
+        List<UserDto> users = userServiceImpl.getPremiumUsers(filterDto);
 
         assertEquals(1, users.size());
     }
@@ -249,7 +249,7 @@ public class UserServiceTest {
         when(userMapper.toDto(user)).thenReturn(userDto);
         when(userContext.getUserId()).thenReturn(1L);
 
-        UserDto resultDto = userService.getUser(user.getId());
+        UserDto resultDto = userServiceImpl.getUser(user.getId());
 
         assertAll(
                 () -> assertNotNull(resultDto),
@@ -264,7 +264,7 @@ public class UserServiceTest {
     public void testGetUser_UserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> userService.getUser(42L));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.getUser(42L));
 
         verify(userRepository, times(1)).findById(anyLong());
         verifyNoInteractions(userMapper);
@@ -283,7 +283,7 @@ public class UserServiceTest {
         when(userRepository.findAllById(anyList())).thenReturn(users);
         when(userMapper.toListUserDto(users)).thenReturn(dtos);
 
-        List<UserDto> resultDtoList = userService.getUsersByIds(ids);
+        List<UserDto> resultDtoList = userServiceImpl.getUsersByIds(ids);
 
         assertAll(
                 () -> assertEquals(2, resultDtoList.size()),
@@ -296,7 +296,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Should return an empty list when ids list is empty")
     public void testGetUsersByIds_EmptyIdsList() {
-        List<UserDto> result = userService.getUsersByIds(Collections.emptyList());
+        List<UserDto> result = userServiceImpl.getUsersByIds(Collections.emptyList());
 
         assertAll(
                 () -> assertNotNull(result),
@@ -363,7 +363,7 @@ public class UserServiceTest {
         when(userRepository.findById(callingUser.getId())).thenReturn(Optional.of(callingUser));
         when(userRepository.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(filteredUsers);
 
-        List<UserDto> result = userService.getFilteredUsers(filterDto, callingUser.getId());
+        List<UserDto> result = userServiceImpl.getFilteredUsers(filterDto, callingUser.getId());
 
         verify(userMapper).toDto(callingUser);
         verify(userMapper).toDto(promoted1);
@@ -386,7 +386,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.getFilteredUsers(filterDto, 1L));
+        assertThrows(IllegalArgumentException.class, () -> userServiceImpl.getFilteredUsers(filterDto, 1L));
     }
 
     @Test
@@ -399,7 +399,7 @@ public class UserServiceTest {
         UserProfilePic newProfilePic = new UserProfilePic("new-large.jpg", "new-small.jpg");
         when(s3service.uploadFile(file, userId)).thenReturn(newProfilePic);
 
-        userService.saveAvatar(userId, file);
+        userServiceImpl.saveAvatar(userId, file);
 
         verify(s3service).deleteFile("existing-large.jpg");
         verify(s3service).deleteFile("existing-small.jpg");
@@ -417,7 +417,7 @@ public class UserServiceTest {
         UserProfilePic newProfilePic = new UserProfilePic("new-large.jpg", "new-small.jpg");
         when(s3service.uploadFile(file, userId)).thenReturn(newProfilePic);
 
-        userService.saveAvatar(userId, file);
+        userServiceImpl.saveAvatar(userId, file);
 
         verify(s3service, never()).deleteFile(anyString());
         verify(userRepository, never()).deleteUserProfilePicByUserId(anyLong());
@@ -435,7 +435,7 @@ public class UserServiceTest {
         InputStream avatarStream = new ByteArrayInputStream(avatarBytes);
         when(s3service.downloadFile("large.jpg")).thenReturn(avatarStream);
 
-        byte[] result = userService.getAvatar(userId);
+        byte[] result = userServiceImpl.getAvatar(userId);
 
         verify(s3service).downloadFile("large.jpg");
         Assertions.assertArrayEquals(avatarBytes, result);
@@ -446,7 +446,7 @@ public class UserServiceTest {
         long userId = 1L;
         when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(null);
 
-        assertThrows(EntityNotFoundException.class, () -> userService.getAvatar(userId));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.getAvatar(userId));
 
         verify(s3service, never()).downloadFile(anyString());
     }
@@ -457,7 +457,7 @@ public class UserServiceTest {
         UserProfilePic profilePic = new UserProfilePic("large.jpg", "small.jpg");
         when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(profilePic);
 
-        userService.deleteAvatar(userId);
+        userServiceImpl.deleteAvatar(userId);
 
         verify(s3service).deleteFile("large.jpg");
         verify(s3service).deleteFile("small.jpg");
@@ -469,7 +469,7 @@ public class UserServiceTest {
         long userId = 1L;
         when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(null);
 
-        assertThrows(EntityNotFoundException.class, () -> userService.deleteAvatar(userId));
+        assertThrows(EntityNotFoundException.class, () -> userServiceImpl.deleteAvatar(userId));
 
         verify(s3service, never()).deleteFile(anyString());
         verify(userRepository, never()).deleteUserProfilePicByUserId(anyLong());

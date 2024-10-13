@@ -56,7 +56,7 @@ class GoalInvitationServiceImplIT {
         goalInvitationRepository.deleteAll();
     }
 
-/*    @Test
+    /*@Test
     void getInvitations() {
         Country country = countryRepository.save(Country.builder().title("Country").build());
         User user1 = userRepository.save(User.builder()

@@ -69,4 +69,9 @@ public class SubscriptionService {
                 PageRequest.of(filters.getPage() - 1, filters.getPageSize()),
                 filteredUsers.size()).stream().toList();
     }
+
+    public List<Long> getFollowerIdsByFolloweeId(long followeeId) {
+        validator.validateFollowee(followeeId);
+        return subscriptionRepository.findFollowerIdsByFolloweeId(followeeId);
+    }
 }

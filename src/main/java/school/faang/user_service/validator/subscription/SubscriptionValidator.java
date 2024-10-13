@@ -15,4 +15,10 @@ public class SubscriptionValidator {
             throw new DataValidationException("Подписка уже существует");
         }
     }
+
+    public void validateFollowee(long followeeId) {
+        if (!repository.existsById(followeeId)) {
+            throw new DataValidationException("Followee with id " + followeeId + " doesn't exist");
+        }
+    }
 }

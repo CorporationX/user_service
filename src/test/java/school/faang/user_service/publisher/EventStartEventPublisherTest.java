@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import school.faang.user_service.entity.event.EventStartEvent;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -63,8 +64,10 @@ public class EventStartEventPublisherTest {
         List<Long> participantIds = Arrays.asList(1L, 2L, 3L);
         String topicName = "testTopic";
         when(topic.getTopic()).thenReturn(topicName);
-        eventStartEventPublisher.publishEventStart(eventId, participantIds);
-        verify(redisTemplate, never()).convertAndSend(topicName, new EventStartEvent(eventId, participantIds));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventStartEventPublisher.publishEventStart(eventId, participantIds);
+        });
     }
 
     @Test
@@ -73,8 +76,10 @@ public class EventStartEventPublisherTest {
         List<Long> participantIds = null;
         String topicName = "testTopic";
         when(topic.getTopic()).thenReturn(topicName);
-        eventStartEventPublisher.publishEventStart(eventId, participantIds);
-        verify(redisTemplate, never()).convertAndSend(topicName, new EventStartEvent(eventId, participantIds));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            eventStartEventPublisher.publishEventStart(eventId, participantIds);
+        });
     }
 
 

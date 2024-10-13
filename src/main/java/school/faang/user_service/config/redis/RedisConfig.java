@@ -1,4 +1,4 @@
-package school.faang.user_service.config.context;
+package school.faang.user_service.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,8 +7,6 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -20,8 +18,8 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${redis.channel.goal-completed}")
-    private String goalCompletedChannel;
+    @Value("${redis.channel.event-start}")
+    private String eventStartChannel;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -38,29 +36,13 @@ public class RedisConfig {
         return template;
     }
 
-//    @Bean
-//    public ChannelTopic goalCompletedChannel() {
-//        return new ChannelTopic(goalCompletedChannel);
-//    }
-
     @Bean
     public ChannelTopic eventStartTopic() {
-        return new ChannelTopic("eventStartTopic");
+        return new ChannelTopic(eventStartChannel);
     }
 
-    @Bean
-    public RedisMessageListenerContainer redisContainer(
-            GoalCompletedEventListener goalCompletedEventListener) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(goalCompletedListener(goalCompletedEventListener),
-                goalCompletedChannel());
-        return container;
+    public interface MessagePublisher {
+        void publish(String message);
     }
-
-    @Bean
-    public MessageListenerAdapter goalCompletedListener(GoalCompletedEventListener goalCompletedEventListener) {
-        return new MessageListenerAdapter(goalCompletedEventListener, "onMessage");
-    }
-
 }
+

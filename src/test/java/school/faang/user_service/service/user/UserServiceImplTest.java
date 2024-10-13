@@ -15,6 +15,7 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.publisher.ProfileViewEventPublisherImpl;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
@@ -70,6 +71,8 @@ class UserServiceImplTest {
     @Mock
     private CsvParser csvParser;
     @Mock
+    private ProfileViewEventPublisherImpl profileViewEventPublisher;
+    @Mock
     private UserContext userContext;
     private long id;
     private UserDto userDto;
@@ -99,8 +102,8 @@ class UserServiceImplTest {
                 .build();
 
         filters = List.of(userFilter);
-        userService = new UserServiceImpl(userRepository,countryRepository, filters, userMapper, goalService,
-                eventService, mentorshipService,csvParser,userContext);
+        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService,
+                eventService, mentorshipService, profileViewEventPublisher, csvParser, userContext);
     }
 
     @Test

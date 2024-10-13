@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.impl.event.EventServiceImpl;
 
 import static org.mockito.Mockito.verify;
 
@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 class SchedulerTest {
 
     @Mock
-    private EventService eventService;
+    private EventServiceImpl eventServiceImpl;
 
     @InjectMocks
     private Scheduler scheduler;
@@ -23,6 +23,6 @@ class SchedulerTest {
         // given & when
         scheduler.clearEvents();
         // then
-        verify(eventService).deletePassedEvents();
+        verify(eventServiceImpl).deletePassedEvents();
     }
 }

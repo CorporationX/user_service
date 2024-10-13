@@ -110,6 +110,9 @@ public class User {
     @ManyToMany(mappedBy = "users")
     private List<Skill> skills;
 
+    @Column(name = "banned")
+    private Boolean banned;
+
     @ManyToMany
     @JoinTable(
             name = "user_event",

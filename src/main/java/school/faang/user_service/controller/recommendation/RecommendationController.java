@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.service.recommendation.RecommendationService;
+import school.faang.user_service.service.RecommendationService;
 
 import java.util.List;
 

@@ -17,7 +17,8 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.impl.premium.PremiumServiceImpl;
+import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
@@ -38,7 +39,7 @@ class PremiumServiceImplTest {
     private PremiumRepository premiumRepository;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private PremiumValidator premiumValidator;

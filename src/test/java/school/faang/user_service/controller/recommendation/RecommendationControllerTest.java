@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.service.recommendation.RecommendationService;
+import school.faang.user_service.service.RecommendationService;
 
 import java.time.LocalDateTime;
 import java.util.List;

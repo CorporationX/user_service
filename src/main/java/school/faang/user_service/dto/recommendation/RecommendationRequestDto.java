@@ -12,8 +12,8 @@ import java.util.List;
 
 @Builder
 public record RecommendationRequestDto(
-        @NotNull
-                @Positive
+
+        @Positive
         Long id,
 
         @NotBlank

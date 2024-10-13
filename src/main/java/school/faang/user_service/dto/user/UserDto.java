@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,5 @@ public class UserDto {
     @Email(message = "Incorrect email format")
     private String email;
     private String phone;
+    private PreferredContact preference;
 }

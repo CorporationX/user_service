@@ -13,7 +13,7 @@ public enum PremiumPeriod {
     private final int days;
     private final long price;
 
-    public static PremiumPeriod fromDays(int days) {
+    public static PremiumPeriod getByDays(int days) {
         for (PremiumPeriod period : PremiumPeriod.values()) {
             if (period.days == days) {
                 return period;

@@ -16,7 +16,7 @@ class PromotionMapperTest {
 
     @Test
     @DisplayName("Should map Promotion to PromotionDto correctly")
-    void testToDto() {
+    void testToPromotionDto() {
         User user = new User();
         user.setId(1L);
 
@@ -28,7 +28,7 @@ class PromotionMapperTest {
                 .target(PromotionTarget.EVENTS.toString())
                 .build();
 
-        PromotionDto dto = promotionMapper.toDto(promotion);
+        PromotionDto dto = promotionMapper.toPromotionDto(promotion);
 
         assertNotNull(dto);
         assertEquals(5, dto.getPriority());

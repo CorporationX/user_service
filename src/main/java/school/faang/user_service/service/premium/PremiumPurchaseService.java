@@ -15,8 +15,11 @@ import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PremiumPurchaseService {
 
     private final PremiumRepository premiumRepository;
@@ -27,16 +30,26 @@ public class PremiumPurchaseService {
 
     @Transactional
     public PremiumDto buy(Long userId, PremiumPeriod premiumPeriod) {
+        log.info("Attempting to purchase premium for userId: {} with period: {}", userId, premiumPeriod);
+
         premiumValidator.validatePremiumAlreadyExistsByUserId(userId);
 
         User user = userService.getUserById(userId);
+        log.debug("User retrieved: {}", user);
+
         Premium premium = createPremium(user, premiumPeriod);
+        log.debug("Premium created: {}", premium);
+
         Long paymentNumber = premiumRepository.getPremiumPaymentNumber();
+        log.debug("Generated payment number: {}", paymentNumber);
 
         premiumRepository.save(premium);
-        paymentService.sendPayment(premiumPeriod.getPrice(), paymentNumber);
+        log.debug("Premium saved for userId: {} with paymentNumber: {}", userId, paymentNumber);
 
-        return premiumMapper.toDto(premium);
+        paymentService.sendPayment(premiumPeriod.getPrice(), paymentNumber);
+        log.info("Payment sent for userId: {} with amount: {}", userId, premiumPeriod.getPrice());
+
+        return premiumMapper.toPremiumDto(premium);
     }
 
     private Premium createPremium(User user, PremiumPeriod premiumPeriod) {

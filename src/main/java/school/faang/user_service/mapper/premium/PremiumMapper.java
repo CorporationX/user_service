@@ -10,7 +10,7 @@ import school.faang.user_service.entity.premium.Premium;
 public interface PremiumMapper {
 
     @Mapping(source = "user.id", target = "userId")
-    PremiumDto toDto(Premium entity);
+    PremiumDto toPremiumDto(Premium entity);
 
     @Mapping(target = "user", ignore = true)
     Premium toEntity(PremiumDto dto);

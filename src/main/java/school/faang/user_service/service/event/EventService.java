@@ -23,7 +23,6 @@ import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @Service
@@ -149,7 +148,7 @@ public class EventService {
     private List<Event> prioritizedEvents(List<Event> events) {
         return events.stream()
                 .sorted(Comparator.comparingInt(this::eventPriority).reversed())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Integer eventPriority(Event event) {

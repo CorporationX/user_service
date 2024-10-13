@@ -66,7 +66,7 @@ class PromotionPurchaseServiceTest {
         void whenBuyPromotionThenSuccess() {
             when(userService.getUserById(USER_ID)).thenReturn(user);
             when(promotionRepository.getPromotionPaymentNumber()).thenReturn(PAYMENT_NUMBER);
-            when(promotionMapper.toDto(any(Promotion.class))).thenReturn(promotionDto);
+            when(promotionMapper.toPromotionDto(any(Promotion.class))).thenReturn(promotionDto);
 
             PromotionDto result = promotionPurchaseService.buyPromotion(USER_ID, PROMOTION_TYPE, PROMOTION_TARGET);
 

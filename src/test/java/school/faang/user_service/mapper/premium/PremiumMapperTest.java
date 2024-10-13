@@ -17,7 +17,7 @@ class PremiumMapperTest {
 
     @Test
     @DisplayName("Should map Premium to PremiumDto correctly")
-    void testToDto() {
+    void testToPremiumDto() {
         User user = new User();
         user.setId(1L);
 
@@ -27,7 +27,7 @@ class PremiumMapperTest {
         premium.setEndDate(LocalDateTime.of(2024, 10, 1, 12, 0));
         premium.setUser(user);
 
-        PremiumDto dto = premiumMapper.toDto(premium);
+        PremiumDto dto = premiumMapper.toPremiumDto(premium);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getUserId());

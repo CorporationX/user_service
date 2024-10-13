@@ -66,7 +66,7 @@ class PremiumPurchaseServiceTest {
         void whenBuyPremiumThenSuccess() {
             when(userService.getUserById(USER_ID)).thenReturn(user);
             when(premiumRepository.getPremiumPaymentNumber()).thenReturn(PAYMENT_NUMBER);
-            when(premiumMapper.toDto(any(Premium.class))).thenReturn(premiumDto);
+            when(premiumMapper.toPremiumDto(any(Premium.class))).thenReturn(premiumDto);
 
             PremiumDto result = premiumPurchaseService.buy(USER_ID, PREMIUM_PERIOD);
 

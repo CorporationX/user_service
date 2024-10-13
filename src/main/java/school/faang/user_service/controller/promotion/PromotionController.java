@@ -17,7 +17,7 @@ public class PromotionController {
     private final PromotionPurchaseService promotionPurchaseService;
     private final UserContext userContext;
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public PromotionDto buyPromotion(@RequestParam PromotionType promotionType,
                                      @RequestParam PromotionTarget promotionTarget) {

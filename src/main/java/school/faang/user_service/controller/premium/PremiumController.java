@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.premium.BuyPremiumDto;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.dto.premium.PremiumPeriod;
 import school.faang.user_service.service.premium.PremiumPurchaseService;
@@ -18,11 +19,11 @@ public class PremiumController {
     private final PremiumPurchaseService premiumPurchaseService;
     private final UserContext userContext;
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public PremiumDto buyPremium(@RequestBody @NonNull @Positive Integer days) {
+    public PremiumDto buyPremium(@RequestBody @NonNull @Positive BuyPremiumDto buyPremiumDto) {
         Long userId = userContext.getUserId();
-        PremiumPeriod premiumPeriod = PremiumPeriod.fromDays(days);
+        PremiumPeriod premiumPeriod = PremiumPeriod.getByDays(buyPremiumDto.getDays());
 
         return premiumPurchaseService.buy(userId, premiumPeriod);
     }

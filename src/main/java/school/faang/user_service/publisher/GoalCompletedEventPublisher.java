@@ -1,22 +1,19 @@
 package school.faang.user_service.publisher;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.event.GoalCompletedEventDto;
 
 @Component
-public class GoalCompletedEventPublisher extends AbstractEventPublisher<GoalCompletedEventDto> {
+@RequiredArgsConstructor
+public class GoalCompletedEventPublisher {
 
-    private final ChannelTopic goalCompletedEventTopic;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ChannelTopic goalCompletedTopic;
 
-    public GoalCompletedEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                       ChannelTopic topic) {
-        super(redisTemplate);
-        this.goalCompletedEventTopic = topic;
-    }
-
-    public void sendEvent(GoalCompletedEventDto event) {
-        publish(goalCompletedEventTopic, event);
+    public void publish(GoalCompletedEventDto event) {
+        redisTemplate.convertAndSend(goalCompletedTopic.getTopic(), event);
     }
 }

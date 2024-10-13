@@ -57,7 +57,7 @@ public class GoalServiceImpl implements GoalService {
         goalRepository.save(goalMapper.toEntity(goalDto));
         if (goal.getStatus() == GoalStatus.COMPLETED) {
             assignGoalSkillsToUsers(goalId, skills);
-            sendEventToAnalyticsService(goalId);
+            sendEvent(goalId);
         }
         return goalMapper.toDto(goal);
     }
@@ -98,7 +98,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public void removeGoals(List<Goal> goals){
+    public void removeGoals(List<Goal> goals) {
         goalRepository.deleteAll(goals);
     }
 
@@ -110,8 +110,8 @@ public class GoalServiceImpl implements GoalService {
                 .build();
     }
 
-    private void sendEventToAnalyticsService(long goalId) {
+    private void sendEvent(long goalId) {
         GoalCompletedEventDto event = buildEvent(goalId);
-        goalCompletedEventPublisher.sendEvent(event);
+        goalCompletedEventPublisher.publish(event);
     }
 }

@@ -26,11 +26,11 @@ class GoalCompletedEventPublisherTest {
 
     @Test
     @DisplayName("Send Event Test")
-    void testSendEvent() {
+    void publish_isOk() {
         // given
         var goalCompletedEvent = GoalCompletedEventDto.builder().build();
         // when
-        goalCompletedEventPublisher.sendEvent(goalCompletedEvent);
+        goalCompletedEventPublisher.publish(goalCompletedEvent);
         // then
         verify(redisTemplate).convertAndSend(channelTopic.getTopic(), goalCompletedEvent);
     }

@@ -59,3 +59,11 @@ scheduler:
 
 executorConfig:
   thread-pool-size: 10
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      channels:
+        recommendation_channel:
+          name: recommendation_channel

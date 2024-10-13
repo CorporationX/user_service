@@ -45,10 +45,28 @@ class UserServiceImplTest {
 
         UserDto result = userService.getUser(id);
 
-        assertEquals(userEntity.getUsername(), result.username());
-        assertEquals(userEntity.getEmail(), result.email());
+        assertEquals(userEntity.getUsername(), result.getUsername());
+        assertEquals(userEntity.getEmail(), result.getEmail());
 
         verify(userRepository).findById(id);
+        verify(userMapper).toDto(userEntity);
+    }
+
+    @Test
+    void testGetUserWithLocaleAndContactPreference() {
+        long id = 1L;
+        User userEntity = new User();
+        userEntity.setId(id);
+        userEntity.setUsername("Name");
+        userEntity.setEmail("mail.ru");
+        when(userRepository.findByIdWithCountryAndContactPreference(id)).thenReturn(Optional.of(userEntity));
+
+        UserDto result = userService.getUserWithLocaleAndContactPreference(id);
+
+        assertEquals(userEntity.getUsername(), result.getUsername());
+        assertEquals(userEntity.getEmail(), result.getEmail());
+
+        verify(userRepository).findByIdWithCountryAndContactPreference(id);
         verify(userMapper).toDto(userEntity);
     }
 

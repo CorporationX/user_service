@@ -58,5 +58,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             LEFT JOIN FETCH u.contactPreference cp
             WHERE u.id = :id
             """)
-    Optional<User> findByIdForNotification(long id);
+    Optional<User> findByIdWithCountryAndContactPreference(long id);
 }

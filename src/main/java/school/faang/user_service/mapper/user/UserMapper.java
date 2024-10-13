@@ -25,7 +25,7 @@ public interface UserMapper {
 
     @Named("mapCountryToLocale")
     default Locale mapCountryToLocale(Country country) {
-        if (country == null || country.getTitle() == null) {
+        if (country == null || country.getLocaleCode() == null) {
             return null;
         }
         return Locale.forLanguageTag(country.getLocaleCode());

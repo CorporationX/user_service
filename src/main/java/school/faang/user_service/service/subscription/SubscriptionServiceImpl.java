@@ -1,12 +1,16 @@
 package school.faang.user_service.service.subscription;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.filters.UserFiltersApplier;
 
@@ -20,6 +24,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserFiltersApplier userFilterApplier;
     private final UserMapper userMapper;
     private final SubscriptionValidator validator;
+    private final ObjectMapper objectMapper;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Override
     @Transactional
@@ -28,6 +34,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validator.checkIfSubscriptionNotExists(followerId, followeeId);
         validator.validateUserIds(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+
+        publishFollowerEvent(followerId, followeeId);
     }
 
     @Override
@@ -63,5 +71,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public int getFollowingCounts(Long followerId) {
         validator.validateUserIds(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    private void publishFollowerEvent(Long followerId, Long followeeId) {
+        try {
+            FollowerEvent followerEvent = new FollowerEvent(followerId, followeeId);
+            String message = objectMapper.writeValueAsString(followerEvent);
+            followerEventPublisher.publish(message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

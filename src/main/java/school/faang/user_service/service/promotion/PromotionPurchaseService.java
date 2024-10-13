@@ -32,9 +32,8 @@ public class PromotionPurchaseService {
         Promotion promotion = createPromotion(user, promotionType, promotionTarget);
         Long paymentNumber = promotionRepository.getPromotionPaymentNumber();
 
-        paymentService.sendPayment(promotionType.getPrice(), paymentNumber);
-
         promotionRepository.save(promotion);
+        paymentService.sendPayment(promotionType.getPrice(), paymentNumber);
 
         return promotionMapper.toDto(promotion);
     }

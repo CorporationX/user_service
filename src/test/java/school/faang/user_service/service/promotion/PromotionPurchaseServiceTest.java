@@ -85,7 +85,7 @@ class PromotionPurchaseServiceTest {
             doThrow(new RuntimeException("Payment failure")).when(paymentService).sendPayment(any(), any());
 
             assertThrows(RuntimeException.class, () -> promotionPurchaseService.buyPromotion(USER_ID, PROMOTION_TYPE, PROMOTION_TARGET));
-            verify(promotionRepository, never()).save(any());
+            verify(promotionRepository).save(any());
         }
     }
 }

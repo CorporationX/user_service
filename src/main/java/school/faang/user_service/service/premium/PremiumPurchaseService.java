@@ -33,9 +33,8 @@ public class PremiumPurchaseService {
         Premium premium = createPremium(user, premiumPeriod);
         Long paymentNumber = premiumRepository.getPremiumPaymentNumber();
 
-        paymentService.sendPayment(premiumPeriod.getPrice(), paymentNumber);
-
         premiumRepository.save(premium);
+        paymentService.sendPayment(premiumPeriod.getPrice(), paymentNumber);
 
         return premiumMapper.toDto(premium);
     }

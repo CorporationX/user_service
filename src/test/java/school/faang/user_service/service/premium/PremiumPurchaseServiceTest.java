@@ -18,7 +18,6 @@ import school.faang.user_service.service.payment.PaymentService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.premium.PremiumValidator;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,7 +85,7 @@ class PremiumPurchaseServiceTest {
             doThrow(new RuntimeException("Payment failure")).when(paymentService).sendPayment(any(), any());
 
             assertThrows(RuntimeException.class, () -> premiumPurchaseService.buy(USER_ID, PREMIUM_PERIOD));
-            verify(premiumRepository, never()).save(any());
+            verify(premiumRepository).save(any());
         }
     }
 }

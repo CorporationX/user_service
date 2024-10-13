@@ -1,0 +1,67 @@
+package school.faang.user_service.service.impl;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.model.dto.GoalCompletedEvent;
+import school.faang.user_service.model.dto.GoalDto;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.GoalService;
+import school.faang.user_service.service.SkillService;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class GoalServiceImpl implements GoalService {
+    private final GoalRepository goalRepository;
+    private final SkillService skillService;
+    private final GoalMapper goalMapper;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
+
+    @Override
+    @Transactional
+    public GoalDto updateGoal(long goalId, GoalDto goalDto) {
+        Goal existingGoal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
+
+        Goal updatedGoal = validateAndSetGoalForUpdate(existingGoal, goalDto);
+        goalRepository.save(updatedGoal);
+        log.info("Goal with ID: {} successfully updated and saved.", goalId);
+
+        List<User> users = goalRepository.findUsersByGoalId(goalId);
+        skillService.addSkillToUsers(users, goalId);
+        log.info("Skills added to users for goal ID: {}", goalId);
+
+        users.forEach(user -> {
+            goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId));
+            log.info("GoalCompletedEvent published for user ID: {} and goal ID: {}", user.getId(), goalId);
+        });
+
+        return goalMapper.toGoalDto(updatedGoal);
+    }
+
+    private Goal validateAndSetGoalForUpdate(Goal existingGoal, GoalDto goalDto) {
+        Goal updatedGoal = goalMapper.toGoal(goalDto);
+
+        if (existingGoal.getStatus() == GoalStatus.COMPLETED) {
+            throw new DataValidationException("Cannot update because the goal is already in 'completed' status");
+        }
+
+        existingGoal.setStatus(updatedGoal.getStatus());
+        existingGoal.setTitle(updatedGoal.getTitle());
+        existingGoal.setSkillsToAchieve(updatedGoal.getSkillsToAchieve());
+        existingGoal.setDescription(updatedGoal.getDescription());
+
+        return existingGoal;
+    }
+}

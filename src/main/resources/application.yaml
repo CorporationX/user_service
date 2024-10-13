@@ -2,9 +2,6 @@ app:
   max-active-user-goals: 3
 
 spring:
-  mvc:
-    servlet:
-      path: /api/v1
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -54,3 +51,11 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+scheduler:
+  clear-events:
+    cron: "0 0 0 * * SUN"
+    batchSize: 10
+
+executorConfig:
+  thread-pool-size: 10

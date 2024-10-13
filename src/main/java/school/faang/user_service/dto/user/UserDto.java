@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
@@ -14,4 +15,5 @@ public class UserDto {
     private boolean active;
     private String email;
     private String username;
+    private PreferredContact preference;
 }

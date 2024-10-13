@@ -10,14 +10,15 @@ import school.faang.user_service.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProfileViewService {
     private final RedisProfileViewEventPublisher redisProfileViewEventPublisher;
-    private final List<ProfileViewEventDto> profileViewEventDtos = new CopyOnWriteArrayList<>();
+    private final Queue<ProfileViewEventDto> profileViewEventDtos = new ConcurrentLinkedDeque<>();
 
     @Async("profileViewServicePool")
     public void addToPublish(long receiverId, long actorId) {
@@ -26,8 +27,7 @@ public class ProfileViewService {
 
     @Async("profileViewServicePool")
     public void addToPublish(long receiverId, List<User> actors) {
-        actors.forEach(actor ->
-                profileViewEventDtos.add(new ProfileViewEventDto(receiverId, actor.getId())));
+        actors.forEach(actor -> profileViewEventDtos.add(new ProfileViewEventDto(receiverId, actor.getId())));
     }
 
     public boolean profileViewEventDtosIsEmpty() {

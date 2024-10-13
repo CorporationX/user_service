@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.view.ProfileViewService;
 
 import java.util.List;
+import java.util.Queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -38,11 +39,12 @@ class ProfileViewServiceTest {
     @DisplayName("Publish message by one actor id successful")
     void testAddToPublishOneActorId() {
         profileViewService.addToPublish(RECEIVER_ID, ACTOR_ID);
-        List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
+        Queue<ProfileViewEventDto> profileViewEventDtos = (Queue<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
         assertThat(profileViewEventDtos).isNotNull();
-        ProfileViewEventDto dto = profileViewEventDtos.get(0);
+        ProfileViewEventDto dto = profileViewEventDtos.peek();
+        assertThat(dto).isNotNull();
         assertThat(dto.getReceiverId()).isEqualTo(RECEIVER_ID);
         assertThat(dto.getActorId()).isEqualTo(ACTOR_ID);
     }
@@ -54,7 +56,7 @@ class ProfileViewServiceTest {
         List<User> actors = buildUsers(NUMBER_OF_ACTORS);
 
         profileViewService.addToPublish(RECEIVER_ID, actors);
-        List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
+        Queue<ProfileViewEventDto> profileViewEventDtos = (Queue<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
         assertThat(profileViewEventDtos).isNotEmpty();
@@ -77,7 +79,7 @@ class ProfileViewServiceTest {
 
         profileViewService.addToPublish(RECEIVER_ID, actors);
         profileViewService.publishAllProfileViewEvents();
-        List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
+        Queue<ProfileViewEventDto> profileViewEventDtos = (Queue<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
         assertThat(profileViewEventDtos).isNotEmpty();
@@ -93,7 +95,7 @@ class ProfileViewServiceTest {
 
         profileViewService.addToPublish(RECEIVER_ID, actors);
         profileViewService.publishAllProfileViewEvents();
-        List<ProfileViewEventDto> profileViewEventDtos = (List<ProfileViewEventDto>)
+        Queue<ProfileViewEventDto> profileViewEventDtos = (Queue<ProfileViewEventDto>)
                 ReflectionTestUtils.getField(profileViewService, "profileViewEventDtos");
 
         assertThat(profileViewEventDtos).isEmpty();

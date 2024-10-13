@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -12,10 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
+import school.faang.user_service.service.s3.S3CompatibleService;
+import school.faang.user_service.service.avatar_api.AvatarApiService;
 import school.faang.user_service.service.s3.S3ServiceImpl;
 
 import javax.imageio.ImageIO;
@@ -25,14 +30,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
+    private final AvatarApiService avatarApiService;
+    private final S3CompatibleService s3CompatibleService;
+
+    private final String DEFAULT_AVATAR_FILENAME = "default_profile";
     @Value("${services.s3.bucketName}")
     private String bucketName;
     private final S3ServiceImpl s3Service;
@@ -61,6 +73,69 @@ public class UserService {
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<User> users = userRepository.findAllById(ids);
         return userMapper.toDto(users);
+    }
+
+    public User registerNewUser(User newUser) {
+        validateUsername(newUser.getUsername());
+        validateEmail(newUser.getEmail());
+        validatePhone(newUser.getPhone());
+        validateCountry(newUser.getCountry().getId());
+
+        generateAndSaveDefaultAvatar(newUser);
+        User created = userRepository.save(newUser);
+        log.info("Successfully registered a new user (ID={})", created.getId());
+        return created;
+    }
+
+    private void generateAndSaveDefaultAvatar(User toCreate) {
+        byte[] defaultAvatarData = avatarApiService.generateDefaultAvatar(toCreate.getUsername());
+        String fileKey = String.format("%s/%s", UUID.randomUUID(), DEFAULT_AVATAR_FILENAME);
+        s3CompatibleService.uploadFile(defaultAvatarData, fileKey, "image/svg+xml");
+        setAvatarKeyForUser(toCreate, fileKey);
+    }
+
+    private void setAvatarKeyForUser(User toUpdate, String fileKey) {
+        UserProfilePic profilePic = new UserProfilePic();
+        profilePic.setFileId(fileKey);
+        profilePic.setSmallFileId(fileKey);
+        toUpdate.setUserProfilePic(profilePic);
+    }
+
+    private void validateUsername(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalStateException(String.format("Username %s is already in use", username));
+        }
+    }
+
+    private void validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalStateException(String.format("Email %s is already in use", email));
+        }
+    }
+
+    private void validatePhone(String phone) {
+        if (userRepository.existsByPhone(phone)) {
+            throw new IllegalStateException(String.format("Phone %s is already in use", phone));
+        }
+    }
+
+    private void validateCountry(Long countryId) {
+        if (!countryRepository.existsById(countryId)) {
+            throw new IllegalStateException(String.format("Country with ID %d does not exist", countryId));
+        }
+    }
+
+    public void banUser(Long userId) {
+        User user = getUserById(userId);
+        user.setBanned(true);
+        log.info("User with ID: " + userId + " banned.");
+        userRepository.save(user);
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new DataValidationException("User with ID: " + userId + " not found.")
+        );
     }
 
     @Transactional
@@ -101,8 +176,12 @@ public class UserService {
     @Transactional
     public void deleteProfileImage(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
+        if (user.getUserProfilePic().getFileId().contains(DEFAULT_AVATAR_FILENAME)) {
+            throw new RuntimeException("Can't delete default avatar!");
+        }
         String large = user.getUserProfilePic().getFileId();
         String compressed = user.getUserProfilePic().getSmallFileId();
+
 
         s3Service.deleteFile(large);
         s3Service.deleteFile(compressed);
@@ -149,7 +228,6 @@ public class UserService {
                 Scalr.OP_ANTIALIAS);
     }
 
-    //todo: yaml
     private void validateSizeImage(MultipartFile file) {
         int maxSizeFile = 5 * 1024 * 1024;
         if (file.getSize() > maxSizeFile) {

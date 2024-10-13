@@ -14,6 +14,7 @@ import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -46,6 +47,9 @@ public class RecommendationServiceImplTest {
 
     @Mock
     private RecommendationMapper recommendationMapper;
+
+    @Mock
+    private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @InjectMocks
     private RecommendationServiceImpl recommendationService;

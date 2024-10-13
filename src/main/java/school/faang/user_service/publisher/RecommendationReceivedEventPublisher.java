@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.follower.FollowerEventDto;
+import school.faang.user_service.event.RecommendationReceivedEvent;
 
 @Component
 @RequiredArgsConstructor
-public class FollowerEventPublisher {
+public class RecommendationReceivedEventPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic followerTopic;
+    private final ChannelTopic recommendationReceivedTopic;
 
-    public void sendEvent(FollowerEventDto event) {
-        redisTemplate.convertAndSend(followerTopic.getTopic(), event);
+    public void publish(RecommendationReceivedEvent event) {
+        redisTemplate.convertAndSend(recommendationReceivedTopic.getTopic(), event);
     }
 }

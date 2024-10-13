@@ -24,7 +24,8 @@ public class RecommendationServiceValidator {
                         recommendation.receiverId());
 
         if (existingRecommendation.isPresent()) {
-            if (ChronoUnit.DAYS.between(recommendation.createdAt(), existingRecommendation.get().getCreatedAt())
+            long between = ChronoUnit.DAYS.between(existingRecommendation.get().getCreatedAt(), recommendation.createdAt());
+            if (between
                     < SIX_MONTH_IN_DAYS) {
                 throw new DataValidationException("Need 180 days to pass before next recommendation");
             }

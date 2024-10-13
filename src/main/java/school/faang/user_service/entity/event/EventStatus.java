@@ -4,8 +4,8 @@ public enum EventStatus {
     PLANNED("Planned"),
     IN_PROGRESS("In Progress"),
     CANCELED("Canceled"),
-    COMPLETED("Completed"),
-    ;
+    COMPLETED("Completed");
+
     private final String status;
 
     EventStatus(String type) {

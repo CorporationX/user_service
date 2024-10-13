@@ -17,8 +17,8 @@ public interface PaymentServiceClient {
     @PostMapping("/api/payment")
     @Retryable(
             value = {FeignException.class},
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 5000)
+            maxAttemptsExpression = "${payment-service.retry.max-attempts}",
+            backoff = @Backoff(delayExpression = "${payment-service.retry.backoff-delay}")
     )
     ResponseEntity<PaymentResponse> sendPayment(@RequestBody PaymentRequest request);
 }

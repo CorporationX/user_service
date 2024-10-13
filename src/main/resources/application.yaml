@@ -46,6 +46,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  retry:
+    max-attempts: 5
+    backoff-delay: 5000
 
 services:
   s3:

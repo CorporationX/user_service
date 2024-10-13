@@ -4,7 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.stream.Stream;
 
-public interface DtoFilter<FilterDto, Entity> {
+public interface EntityFilter<FilterDto, Entity> {
     boolean isApplicable(FilterDto filters);
 
     Stream<Entity> apply(Stream<Entity> entities, FilterDto filters);

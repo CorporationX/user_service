@@ -54,6 +54,6 @@ payment-service:
 
 redis:
   channels:
-    mentorship-channel: mentorship_channel
-    follower-event-channel: follower_event
-    mentorship-accepted-channel: mentorship_accepted
+    mentorship: mentorship_channel
+    follower-event: follower_event_channel
+    mentorship-accepted: mentorship_accepted_channel

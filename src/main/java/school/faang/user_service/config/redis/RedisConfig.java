@@ -18,7 +18,7 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-    @Value("${redis.channels.mentorship-accepted-channel}")
+    @Value("${redis.channels.mentorship-accepted}")
     private String mentorshipAcceptedChannel;
 
     public interface MessagePublisher<T> {

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
@@ -33,4 +34,15 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Modifying
     @Query("update User u set u.goals = ?1 where u.id = ?2")
     int updateGoalsById(@NonNull Goal goals, @NonNull Long id);
+
+    @Modifying
+    @Query("UPDATE User u SET u.userProfilePic = ?2 WHERE u.id = ?1")
+    void saveUserProfilePic(Long userId, UserProfilePic userProfilePic);
+
+    @Query("SELECT u.userProfilePic FROM User u WHERE u.id = ?1")
+    UserProfilePic findUserProfilePicByUserId(Long userId);
+
+    @Modifying
+    @Query("UPDATE User u SET u.userProfilePic = null WHERE u.id = ?1")
+    void deleteUserProfilePicByUserId(Long userId);
 }

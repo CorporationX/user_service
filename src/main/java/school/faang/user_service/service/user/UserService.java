@@ -1,30 +1,35 @@
 package school.faang.user_service.service.user;
 
+import com.json.student.Address;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.user.*;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.minio.S3service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -40,6 +45,9 @@ public class UserService {
     private final EventRepository eventRepository;
     private final PromotionRepository promotionRepository;
     private final List<UserFilter> userFilters;
+    private final PersonToUserMapper personToUserMapper;
+    private final CountryService countryService;
+    private final S3service s3service;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -146,6 +154,45 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
+    public void saveAvatar(long userId, MultipartFile file) {
+        UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);
+        if (profilePic != null) {
+            s3service.deleteFile(profilePic.getFileId());
+            s3service.deleteFile(profilePic.getSmallFileId());
+            userRepository.deleteUserProfilePicByUserId(userId);
+        }
+
+        UserProfilePic userProfilePic = s3service.uploadFile(file, userId);
+        userRepository.saveUserProfilePic(userId, userProfilePic);
+    }
+
+    public byte[] getAvatar(long userId) {
+        UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);
+        if (profilePic == null) {
+            throw new EntityNotFoundException("User avatar not found");
+        }
+
+        String largeFileId = profilePic.getFileId();
+        try (InputStream inputStream = s3service.downloadFile(largeFileId)) {
+            return inputStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Error downloading file from S3", e);
+        }
+    }
+
+    @Transactional
+    public void deleteAvatar(long userId) {
+        UserProfilePic profilePic = userRepository.findUserProfilePicByUserId(userId);
+        if (profilePic == null) {
+            throw new EntityNotFoundException("User avatar not found");
+        }
+
+        s3service.deleteFile(profilePic.getFileId());
+        s3service.deleteFile(profilePic.getSmallFileId());
+        userRepository.deleteUserProfilePicByUserId(userId);
+    }
+
     private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
@@ -224,5 +271,90 @@ public class UserService {
         Promotion targetPromotion = getTargetPromotion(user);
 
         return targetPromotion != null ? -targetPromotion.getPriorityLevel() : 0;
+    }
+
+    @Transactional
+    public void processCsvFile(InputStream inputStream) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields.length < 21) continue;
+
+                Address address = new Address();
+                address.setStreet(fields[7].trim());
+                address.setCity(fields[8].trim());
+                address.setState(fields[9].trim());
+                address.setCountry(fields[10].trim());
+                address.setPostalCode(fields[11].trim());
+
+                ContactInfoDto contactInfoDto = new ContactInfoDto(fields[5].trim(), fields[6].trim(), address);
+
+                EducationDto educationDto = new EducationDto(
+                        fields[12].trim(),  // faculty
+                        Integer.parseInt(fields[13].trim()),
+                        fields[14].trim(),  // major
+                        Double.parseDouble(fields[15].trim())
+                );
+
+                PersonDto personDto = new PersonDto(
+                        fields[0].trim(),
+                        fields[1].trim(),
+                        contactInfoDto,
+                        educationDto,
+                        null,
+                        Integer.parseInt(fields[2].trim()),
+                        fields[3].trim(),
+                        fields[4].trim()
+                );
+
+                String countryName = contactInfoDto.address().getCountry();
+                Country country = countryService.findOrCreateCountry(countryName);
+
+                User user = personToUserMapper.personToUser(personDto);
+                user.setPassword(generatePassword());
+                user.setCountry(country);
+                user.setAboutMe(generateAboutMe(personDto));
+
+                userRepository.save(user);
+            }
+        } catch (IOException e) {
+            log.error("Ошибка при обработке CSV файла: {}", e.getMessage());
+        }
+    }
+
+    private String generateAboutMe(PersonDto personDto) {
+        StringBuilder aboutMe = new StringBuilder();
+
+        if (personDto.contactInfo() != null && personDto.contactInfo().address() != null) {
+            String state = personDto.contactInfo().address().getState();
+            if (state != null && !state.isEmpty()) {
+                aboutMe.append(state).append(", ");
+            }
+        }
+
+        if (personDto.education() != null) {
+            aboutMe.append(personDto.education().faculty()).append(", ")
+                    .append(personDto.education().yearOfStudy()).append(", ")
+                    .append(personDto.education().major()).append(", ");
+        }
+
+        if (personDto.employer() != null && !personDto.employer().isEmpty()) {
+            aboutMe.append(personDto.employer());
+        }
+
+        return aboutMe.toString().trim();
+    }
+
+    private String generatePassword() {
+        int length = 10;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        StringBuilder password = new StringBuilder(length);
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return password.toString();
     }
 }

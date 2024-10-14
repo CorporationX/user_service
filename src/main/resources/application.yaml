@@ -23,7 +23,7 @@ spring:
       channels:
         mentorship-channel:
           name: mentorship_channel
-        follower-event-channel:
+        follower-channel:
           name: follower_channel
       publisher:
         delay: 5000

@@ -13,10 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.controller.EventController;
-import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.model.dto.EventDto;
+import school.faang.user_service.model.filter_dto.EventFilterDto;
 import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.impl.EventServiceImpl;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class EventControllerTest {
     private EventFilterDto eventFilterDto;
 
     @Mock
-    private EventService eventService;
+    private EventServiceImpl eventService;
 
     @Mock
     private UserContext userContext;

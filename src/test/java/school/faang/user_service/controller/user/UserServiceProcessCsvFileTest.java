@@ -7,13 +7,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import school.faang.user_service.dto.user.PersonDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.PersonDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.CountryService;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.impl.CountryServiceImpl;
+import school.faang.user_service.service.impl.UserServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -30,13 +30,13 @@ public class UserServiceProcessCsvFileTest {
     private UserRepository userRepository;
 
     @Mock
-    private CountryService countryService;
+    private CountryServiceImpl countryService;
 
     @Mock
     private PersonToUserMapper personToUserMapper;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @BeforeEach
     public void setUp() {

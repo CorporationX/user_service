@@ -2,8 +2,9 @@ package school.faang.user_service.service.recommendation.filters;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.recomendation.RecommendationRequestFilterDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.filter.recommendation.RecommendationRequestMessageFilter;
+import school.faang.user_service.model.filter_dto.RecommendationRequestFilterDto;
+import school.faang.user_service.model.entity.RecommendationRequest;
 
 import java.util.List;
 import java.util.stream.Stream;

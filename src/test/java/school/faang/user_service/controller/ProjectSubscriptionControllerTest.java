@@ -8,9 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.dto.ProjectSubscriptionDto;
-import school.faang.user_service.service.ProjectSubscriptionService;
+import school.faang.user_service.model.dto.ProjectSubscriptionDto;
+import school.faang.user_service.service.impl.ProjectSubscriptionServiceImpl;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -23,7 +22,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 class ProjectSubscriptionControllerTest {
 
     @Mock
-    private ProjectSubscriptionService projectSubscriptionService;
+    private ProjectSubscriptionServiceImpl projectSubscriptionService;
 
     @InjectMocks
     private ProjectSubscriptionController projectSubscriptionController;

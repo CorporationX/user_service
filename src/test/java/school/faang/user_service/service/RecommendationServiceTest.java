@@ -7,18 +7,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.dto.RecommendationDto;
+import school.faang.user_service.model.dto.SkillOfferDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.UserSkillGuarantee;
+import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.repository.RecommendationRepository;
+import school.faang.user_service.repository.SkillOfferRepository;
+import school.faang.user_service.service.impl.RecommendationServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ class RecommendationServiceTest {
     private RecommendationMapper recommendationMapper;
 
     @InjectMocks
-    private RecommendationService recommendationService;
+    private RecommendationServiceImpl recommendationService;
 
     @Test
     void testCreate_WhenValidData_SkillOffersNotNull() {

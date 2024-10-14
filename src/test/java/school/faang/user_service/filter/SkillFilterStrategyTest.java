@@ -2,9 +2,9 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
 
 import java.util.List;
 

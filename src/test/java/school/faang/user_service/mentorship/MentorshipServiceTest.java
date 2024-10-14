@@ -13,14 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.repository.GoalRepository;
+import school.faang.user_service.repository.MentorshipRepository;
+import school.faang.user_service.service.impl.MentorshipServiceImpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,7 +29,7 @@ public class MentorshipServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @InjectMocks
-    private MentorshipService mentorshipService;
+    private MentorshipServiceImpl mentorshipService;
 
     private User mentor;
     private User mentee;

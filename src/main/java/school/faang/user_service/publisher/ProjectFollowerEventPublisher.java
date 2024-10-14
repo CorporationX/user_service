@@ -5,13 +5,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.model.dto.ProjectFollowerEvent;
+import school.faang.user_service.model.event.ProjectFollowerEvent;
 
 @Component
 public class ProjectFollowerEventPublisher extends RedisEventPublisher<ProjectFollowerEvent> {
     public ProjectFollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                          ObjectMapper objectMapper,
-                                         @Qualifier("projectFollowerEventTopic") ChannelTopic topic) {
+                                         @Qualifier("projectFollowerTopic") ChannelTopic topic) {
         super(redisTemplate, objectMapper, topic);
     }
 }

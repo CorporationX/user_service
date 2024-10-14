@@ -7,13 +7,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.model.dto.GoalInvitationDto;
+import school.faang.user_service.model.filter_dto.InvitationFilterDto;
+import school.faang.user_service.model.enums.RequestStatus;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.model.entity.GoalInvitation;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.filter.goal.GoalInvitationFilter;
 import school.faang.user_service.filter.goal.GoalInvitationInvitedIdFilter;
@@ -23,8 +23,9 @@ import school.faang.user_service.filter.goal.GoalInvitationInviterNameFilter;
 import school.faang.user_service.filter.goal.GoalInvitationRequestStatusFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.repository.GoalInvitationRepository;
+import school.faang.user_service.repository.GoalRepository;
+import school.faang.user_service.service.impl.GoalInvitationServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ class GoalInvitationServiceTest {
     private GoalInvitationMapper mapper;
 
     @InjectMocks
-    private GoalInvitationService goalInvitationService;
+    private GoalInvitationServiceImpl goalInvitationService;
 
     private GoalInvitationDto goalInvitationDto;
 

@@ -9,18 +9,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.dto.SkillCandidateDto;
+import school.faang.user_service.model.dto.SkillDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.repository.SkillOfferRepository;
+import school.faang.user_service.service.impl.SkillServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +66,7 @@ public class SkillServiceTest {
     private SkillMapper mapper;
 
     @InjectMocks
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
 
     @BeforeEach
     public void setUp() {

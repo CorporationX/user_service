@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.premium.PremiumPeriod;
-import school.faang.user_service.service.PremiumService;
+import school.faang.user_service.model.dto.PremiumDto;
+import school.faang.user_service.model.enums.PremiumPeriod;
+import school.faang.user_service.service.impl.PremiumService;
 
 @RestController
 @RequestMapping("/premium")

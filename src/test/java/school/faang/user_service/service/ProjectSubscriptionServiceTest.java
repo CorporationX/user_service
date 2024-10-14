@@ -7,13 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.ProjectServiceClient;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.ProjectDto;
-import school.faang.user_service.dto.ProjectSubscriptionDto;
-import school.faang.user_service.entity.ProjectSubscription;
+import school.faang.user_service.model.dto.ProjectDto;
+import school.faang.user_service.model.dto.ProjectSubscriptionDto;
+import school.faang.user_service.model.entity.ProjectSubscription;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.ProjectSubscriptionMapper;
 import school.faang.user_service.publisher.ProjectFollowerEventPublisher;
 import school.faang.user_service.repository.ProjectSubscriptionRepository;
+import school.faang.user_service.service.impl.ProjectSubscriptionServiceImpl;
 import school.faang.user_service.validator.ProjectSubscriptionValidator;
 
 import java.util.Optional;
@@ -42,7 +43,7 @@ class ProjectSubscriptionServiceTest {
     private ProjectFollowerEventPublisher projectFollowerEventPublisher;
 
     @InjectMocks
-    private ProjectSubscriptionService projectSubscriptionService;
+    private ProjectSubscriptionServiceImpl projectSubscriptionService;
 
     @Test
     void testSubscribeUserToProject_UserAlreadySubscribed_ThrowsException() {

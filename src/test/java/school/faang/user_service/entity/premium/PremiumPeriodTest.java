@@ -3,6 +3,7 @@ package school.faang.user_service.entity.premium;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.model.enums.PremiumPeriod;
 
 import java.util.Arrays;
 

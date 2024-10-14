@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.ProjectSubscriptionDto;
+import school.faang.user_service.model.dto.ProjectSubscriptionDto;
 import school.faang.user_service.service.ProjectSubscriptionService;
 
 @RestController

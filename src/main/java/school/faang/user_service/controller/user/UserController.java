@@ -8,7 +8,7 @@ import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
 public class UserController {

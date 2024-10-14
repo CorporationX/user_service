@@ -17,9 +17,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.recommendation.RecommendationRequestServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;

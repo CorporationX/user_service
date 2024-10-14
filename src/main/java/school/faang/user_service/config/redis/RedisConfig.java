@@ -28,14 +28,13 @@ public class RedisConfig {
         template.setValueSerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new StringRedisSerializer());
-//        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         template.afterPropertiesSet();
         return template;
     }
 
     @Bean
     public RecommendationRequestedEventPublisher recommendationRequestedPublisher(
-            RedisTemplate<String, RecommendationRequestEvent> redisTemplate, ChannelTopic recommendationRequestTopic) {
+            RedisTemplate<String, Object> redisTemplate, ChannelTopic recommendationRequestTopic) {
         return new RecommendationRequestedEventPublisher(redisTemplate, recommendationRequestTopic);
     }
 

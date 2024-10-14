@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.student.Person;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -14,9 +15,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.event.RecommendationEventDto;
 import school.faang.user_service.event.UserBanEvent;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.RecommendUserPublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.EventService;
@@ -26,6 +29,7 @@ import school.faang.user_service.service.GoalService;
 import school.faang.user_service.util.CsvParser;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,12 +84,13 @@ public class UserServiceImpl implements UserService {
             setStudentsCountry(student, user, countryList);
             userRepository.save(user);
             return user;
-        }).forEach(v -> {});
+        }).forEach(v -> {
+        });
     }
 
     private void setStudentsCountry(Person person, User user, List<Country> countryList) {
-        Optional<Country> country =  gerPersonsCountryFromDB(person, countryList);
-        country.ifPresentOrElse(user::setCountry,() -> {
+        Optional<Country> country = gerPersonsCountryFromDB(person, countryList);
+        country.ifPresentOrElse(user::setCountry, () -> {
             var saved = countryRepository.save(
                     Country.builder()
                             .title(person.getContactInfo().getAddress().getCountry())
@@ -96,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private Optional<Country> gerPersonsCountryFromDB(Person person, List<Country> countryList) {
-       return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
+        return countryList.stream().filter(country -> Objects.equals(person.getContactInfo().getAddress().getCountry(), country.getTitle())).findFirst();
     }
 
     @Override

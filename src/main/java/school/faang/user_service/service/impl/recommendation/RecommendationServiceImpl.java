@@ -5,11 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.event.RecommendationEventDto;
 import school.faang.user_service.event.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendUserPublisher;
 import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -17,6 +20,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.validator.recommendation.RecommendationServiceValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +32,8 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final RecommendationServiceValidator validator;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
+    private final UserContext userContext;
+    private final RecommendUserPublisher recommendUserPublisher;
 
     @Override
     @Transactional
@@ -44,7 +50,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .forEach(skillId -> skillOfferRepository.create(skillId, recommendation.id()));
 
         sendEvent(recommendation);
-
+        sendRecommendUserEvent(recommendation);
         return recommendation;
     }
 
@@ -85,6 +91,16 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .findAllByAuthorId(receiverId, Pageable.unpaged());
 
         return recommendations.map(recommendationMapper::toDto).toList();
+    }
+
+    private void sendRecommendUserEvent(RecommendationDto recommendationDto) {
+        RecommendationEventDto event = RecommendationEventDto
+                .builder()
+                .authorId(recommendationDto.authorId())
+                .receiverId(recommendationDto.receiverId())
+                .recommendedAt(LocalDateTime.now())
+                .build();
+        recommendUserPublisher.publish(event);
     }
 
     private void sendEvent(RecommendationDto recommendation) {

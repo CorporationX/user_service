@@ -37,6 +37,8 @@ public class RedisConfig {
     private String recommendationReceived;
     @Value("${spring.data.redis.channels.follow-project-channel.name}")
     private String followProjectTopic;
+    @Value("${spring.data.redis.channels.recommendation-channel.name}")
+    private String recommendation;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -91,5 +93,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic followProjectTopic() {
         return new ChannelTopic(followProjectTopic);
+    }
+
+    @Bean
+    public ChannelTopic recommendationTopic() {
+        return new ChannelTopic(recommendation);
     }
 }

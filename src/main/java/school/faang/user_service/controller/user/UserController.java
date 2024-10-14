@@ -33,7 +33,6 @@ public class UserController {
     public List<UserDto> getPremiumUsers(@ParameterObject @NotNull UserFilterDto filter) {
         return userService.getPremiumUsers(filter);
     }
-
     @PutMapping(value = "/{user_id}")
     public ResponseEntity<String> deactivateUserProfile(@PathVariable("user_id") @Positive long id) {
         userService.deactivateUserProfile(id);
@@ -52,7 +51,7 @@ public class UserController {
 
     @PostMapping("/csvfile")
     public ResponseEntity<String> addUsersFromFile(@RequestParam("file") MultipartFile file) throws IOException {
-      userService.addUsersFromFile(file.getInputStream());
-      return ResponseEntity.ok("sucessfuly uploaded");
+        userService.addUsersFromFile(file.getInputStream());
+        return ResponseEntity.ok("sucessfuly uploaded");
     }
 }

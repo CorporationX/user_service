@@ -27,7 +27,7 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @PostMapping
+    @PostMapping("/give")
     @ResponseStatus(HttpStatus.CREATED)
     public RecommendationDto giveRecommendation(@RequestBody @NotNull @Valid RecommendationDto recommendation) {
         return recommendationService.create(recommendation);

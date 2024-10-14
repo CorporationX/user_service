@@ -7,8 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,6 +19,7 @@ import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
@@ -24,13 +28,17 @@ import school.faang.user_service.service.impl.mentorship.MentorshipServiceImpl;
 import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.util.CsvParser;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -70,6 +78,12 @@ class UserServiceImplTest {
     @Mock
     private CsvParser csvParser;
 
+    @Mock
+    private UserContext userContext;
+
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
+
     private long id;
     private UserDto userDto;
     private UserFilterDto userFilterDto;
@@ -108,7 +122,16 @@ class UserServiceImplTest {
 
         filters = List.of(userFilter);
 
-        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService, eventServiceImpl, mentorshipService, csvParser);
+        userService = new UserServiceImpl(userRepository,
+                countryRepository,
+                filters,
+                userMapper,
+                goalService,
+                eventServiceImpl,
+                mentorshipService,
+                csvParser,
+                userContext,
+                profileViewEventPublisher);
     }
 
     @Test
@@ -236,6 +259,30 @@ class UserServiceImplTest {
 
         // Assert
         assertTrue(user.getBanned());
+    }
+
+    @Test
+    void getUserProfile() {
+        //given
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent(1L, 1L,
+                LocalDateTime.now());
+
+        when(userContext.getUserId()).thenReturn(id);
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+        //when
+        var result = userService.getUserProfile(id);
+
+        //then
+        assertEquals(userDto, result);
+        verify(userContext, times(1)).getUserId();
+        verify(userRepository, times(1)).
+                findById(id);
+        verify(profileViewEventPublisher, times(1))
+                .publish(Mockito.argThat(event ->
+                        event.senderId() == profileViewEvent.senderId() &&
+                                event.receiverId() == profileViewEvent.receiverId()
+                ));
     }
 
     private User buildUser() {

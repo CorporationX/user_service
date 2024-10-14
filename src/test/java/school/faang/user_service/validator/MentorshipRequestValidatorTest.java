@@ -32,6 +32,7 @@ public class MentorshipRequestValidatorTest {
     @InjectMocks
     private MentorshipRequestValidator mentorshipRequestValidator;
 
+    @Mock
     private MentorshipRequestDto mentorshipRequestDto;
 
     @BeforeEach

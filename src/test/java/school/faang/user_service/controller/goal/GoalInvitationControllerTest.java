@@ -17,6 +17,7 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.exception.GoalInvitationValidationException;
 import school.faang.user_service.service.GoalInvitationService;
 
+import java.util.Locale;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +37,7 @@ class GoalInvitationControllerTest {
 
     @BeforeEach
     void setUp() {
+        Locale.setDefault(new Locale("ru"));
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }

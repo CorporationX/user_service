@@ -60,3 +60,12 @@ scheduler:
 
 executorConfig:
   thread-pool-size: 10
+
+premium:
+  removal:
+    batch-size: 100
+    thread-pool:
+      core-pool-size: 8
+      max-pool-capacity: 16
+      queue-capacity: 32
+    interval: "@weekly"

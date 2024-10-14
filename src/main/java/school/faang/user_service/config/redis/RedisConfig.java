@@ -119,7 +119,8 @@ public class RedisConfig {
     }
 
     @Bean(value = "mentorshipEventChannel")
-    ChannelTopic mentorshipEventChannelTopic() {
-        return new ChannelTopic(redisChannelNames.getMentorshipEventChannel());
+    ChannelTopic mentorshipEventChannelTopic(
+            @Value("${spring.data.redis.channels.mentorship-channel.name}") String name) {
+        return new ChannelTopic(name);
     }
 }

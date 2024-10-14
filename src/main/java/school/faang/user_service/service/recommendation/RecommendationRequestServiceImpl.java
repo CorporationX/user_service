@@ -89,17 +89,17 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
                     }
                 });
 
-//        checkRequesterSkills(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getSkillId());
+        checkRequesterSkills(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getSkillId());
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
         recommendationRequest.setCreatedAt(LocalDateTime.now());
         recommendationRequest.setUpdatedAt(LocalDateTime.now());
 
-        publishRecommendationRequestEvent(recommendationRequestDto);
-
         RecommendationRequest savedRequest = recommendationRequestRepository.save(recommendationRequest);
-//
-//        saveSkills(recommendationRequestDto, savedRequest.getId());
+
+        saveSkills(recommendationRequestDto, savedRequest.getId());
+
+        publishRecommendationRequestEvent(recommendationRequestDto);
 
         return recommendationRequestMapper.toDto(savedRequest);
     }

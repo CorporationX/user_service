@@ -10,6 +10,12 @@ spring:
       ddl-auto: create-drop
   liquibase:
     enabled: false
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    pool-size: 3
+    consumer:
+      group-id: "group"
+      auto-offset-reset: earliest
 
 services:
   user-service:

@@ -133,7 +133,12 @@ jacoco {
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
+    exclude("**/school/faang/user_service/integration/**")
     finalizedBy(tasks.jacocoTestReport)
+}
+tasks.register<Test>("integrationTest") {
+    group = "verification"
+    include("**/school/faang/user_service/integration/**")
 }
 tasks.jacocoTestReport {
     reports {

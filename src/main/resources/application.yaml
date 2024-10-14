@@ -12,26 +12,28 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 100
+          batch_versioned_data: true
+        order_updates: true
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
   data:
     redis:
-      port: 6379
       host: localhost
-      channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+      port: 6379
+      channel-topics:
+        mentorship:
+          name: mentorship_topic
+        follower-event:
+          name: follower_event_topic
+        event-start:
+          name: event_start_topic
 
 server:
   port: 8080
-
-logging:
-  level:
-    root: info
 
 project-service:
   host: localhost
@@ -57,6 +59,9 @@ app:
   promotion:
     user_promotion_views_decrement_cron: '*/10 * * * * *'
     event__promotion_views_decrement_cron: '*/10 * * * * *'
+  premium:
+    cron:
+      premium_remove_scheduler: '0 0 0 ? * SUN *'
   retryable:
     payment_service:
       send_payment:
@@ -69,9 +74,22 @@ app:
       max_pool_size: 20
       queue_capacity: 1000
       thread_name_prefix: PromotionTaskService-Async-
+    premium-service-sync:
+      core_pool_size: 10
+      max_pool_size: 20
+      queue_capacity: 1000
+      thread_name_prefix: PremiumService-Async-
+  scheduler:
+    event:
+      start_event:
+        cron: "0 * * * * *" # every minute
 
 minio:
   endpoint: http://localhost:9000
   accessKey: user
   secretKey: password
   bucketName: corpbucket
+
+redis:
+  banner:
+    topic: "user_ban"

@@ -21,14 +21,14 @@ import static school.faang.user_service.service.premium.util.PremiumErrorMessage
 public class PremiumValidationService {
 
     public void validateUserForSubPeriod(long userId, User user) {
-        log.error("Verification of User with id: {} for buying premium subscription", userId);
+        log.info("Verification of User with id: {} for buying premium subscription", userId);
         getActivePremium(user).ifPresent(premium -> {
             throw new PremiumValidationFailureException(USER_ALREADY_HAS_PREMIUM, userId, premium.getEndDate());
         });
     }
 
     public void checkPaymentResponse(PaymentResponseDto paymentResponse, long userId, PremiumPeriod period) {
-        log.error("Check payment response: {}", paymentResponse);
+        log.info("Check payment response: {}", paymentResponse);
         if (paymentResponse.status() == FAILED) {
             throw new UnSuccessPaymentException(UNSUCCESSFUL_PREMIUM_PAYMENT, userId, period.getDays());
         }

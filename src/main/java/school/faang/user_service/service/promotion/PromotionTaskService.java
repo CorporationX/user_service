@@ -71,7 +71,7 @@ public class PromotionTaskService {
             userPromotionRepositoryBatch.updateUserPromotions(userPromotionViewsCopy);
         } catch (SQLException | UncategorizedSQLException e) {
             synchronized (userPromotionViews) {
-                log.error("SQL Exception when decrement user promotion views: {}", e.getMessage());
+                log.error("SQL Exception when decrement user promotion views:", e);
                 userPromotionViewsCopy.forEach((id, views) -> {
                     int primalViews = userPromotionViews.computeIfAbsent(id, k -> 0);
                     userPromotionViews.put(id, primalViews + views);
@@ -91,7 +91,7 @@ public class PromotionTaskService {
             eventPromotionRepositoryBatch.updateEventPromotions(eventPromotionViewsCopy);
         } catch (SQLException | UncategorizedSQLException e) {
             synchronized (eventPromotionViews) {
-                log.error("SQL Exception when decrement event promotion views: {}", e.getMessage());
+                log.error("SQL Exception when decrement event promotion views:", e);
                 eventPromotionViewsCopy.forEach((id, views) -> {
                     int primalViews = eventPromotionViews.computeIfAbsent(id, k -> 0);
                     eventPromotionViews.put(id, primalViews + views);

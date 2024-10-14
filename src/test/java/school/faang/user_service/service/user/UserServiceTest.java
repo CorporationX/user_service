@@ -214,4 +214,15 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertEquals(0, resultNotFound.size());
     }
+
+    @Test
+    void testBannedUser() {
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.bannedUser(userId);
+
+        assertTrue(user.isBanned());
+        verify(userRepository).save(user);
+    }
 }

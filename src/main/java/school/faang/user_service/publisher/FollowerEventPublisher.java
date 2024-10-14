@@ -1,35 +1,36 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.FollowerEventDto;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class FollowerEventPublisher implements MessagePublisher<FollowerEventDto> {
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, FollowerEventDto> redisTemplate;
+    private final ChannelTopic followerEventTopic;
 
-    @Setter
-    @Value("${spring.data.redis.channels.follower-event-channel.name}")
-    private String topic;
-
+    public FollowerEventPublisher(RedisTemplate<String, FollowerEventDto> redisTemplate,
+                                  @Qualifier("followerEventChannel") ChannelTopic followerEventTopic) {
+        this.redisTemplate = redisTemplate;
+        this.followerEventTopic = followerEventTopic;
+    }
 
     @Override
+    @Retryable(retryFor = RuntimeException.class,
+            backoff = @Backoff(delayExpression = "${spring.data.redis.publisher.delay}"))
     public void publish(FollowerEventDto followerEventDto) {
         try {
-            String messageJson = objectMapper.writeValueAsString(followerEventDto);
-            redisTemplate.convertAndSend(topic, messageJson);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Can't parse object to json for topic %s".formatted(topic));
+            redisTemplate.convertAndSend(followerEventTopic.getTopic(), followerEventDto);
+            log.debug("Published follower event: {}", followerEventDto);
+        } catch (Exception e) {
+            log.error("Failed to publish follower event: {}", followerEventDto, e);
+            throw new RuntimeException(e);
         }
     }
 }

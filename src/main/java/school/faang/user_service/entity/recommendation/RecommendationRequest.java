@@ -60,7 +60,7 @@ public class RecommendationRequest {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public void addSkillRequest(SkillRequest skillRequest) {
-        skills.add(skillRequest);
-    }
+public void addSkillRequest(SkillRequest skillRequest) {
+    skills.add(skillRequest);
+}
 }

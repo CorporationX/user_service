@@ -23,6 +23,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.PremiumRepository;
 import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.scheduler.PremiumRemoverTransactions;
+import school.faang.user_service.service.PremiumService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

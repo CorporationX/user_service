@@ -1,4 +1,4 @@
-package school.faang.user_service.service.impl;
+package school.faang.user_service.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.model.entity.UserProfilePic;

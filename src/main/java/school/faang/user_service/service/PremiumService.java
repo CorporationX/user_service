@@ -1,4 +1,4 @@
-package school.faang.user_service.service.impl;
+package school.faang.user_service.service;
 
 import school.faang.user_service.model.dto.PremiumDto;
 import school.faang.user_service.model.enums.PremiumPeriod;

@@ -28,6 +28,7 @@ import school.faang.user_service.repository.EventRepository;
 import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.service.CountryService;
 import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.S3service;
 import school.faang.user_service.service.UserService;
 
 import java.io.BufferedReader;

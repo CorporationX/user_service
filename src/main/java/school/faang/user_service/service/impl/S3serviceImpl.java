@@ -10,6 +10,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.model.entity.UserProfilePic;
+import school.faang.user_service.service.S3service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -13,6 +13,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
@@ -107,5 +108,18 @@ public class RedisConfig {
     public ChannelTopic goalCompletedTopic(
             @Value("${spring.data.redis.channels.goal-event-channel.name}") String topic) {
         return new ChannelTopic(topic);
+    }
+}
+    RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate() {
+        RedisTemplate<String, MentorshipAcceptedEventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, MentorshipAcceptedEventDto.class));
+        return template;
+    }
+
+    @Bean(value = "mentorshipEventChannel")
+    ChannelTopic mentorshipEventChannelTopic() {
+        return new ChannelTopic(redisChannelNames.getMentorshipEventChannel());
     }
 }

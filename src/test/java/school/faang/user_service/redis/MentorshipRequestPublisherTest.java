@@ -8,13 +8,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import school.faang.user_service.dto.MentorshipRequestEvent;
+import school.faang.user_service.publisher.MentorshipRequestPublisher;
 
 import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RedisMessageMentorshipRequestsPublisherTest {
+public class MentorshipRequestPublisherTest {
 
     private final String topicName = "topic";
 
@@ -25,7 +27,7 @@ public class RedisMessageMentorshipRequestsPublisherTest {
     private ChannelTopic channelTopic;
 
     @InjectMocks
-    private RedisMessageMentorshipRequestsPublisher publisher;
+    private MentorshipRequestPublisher publisher;
 
     private MentorshipRequestEvent event;
 

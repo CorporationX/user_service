@@ -2,6 +2,7 @@ package school.faang.user_service.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -14,7 +15,6 @@ import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-    private final RedisChannelNames redisChannelNames;
     private final ObjectMapper objectMapper;
 
     @Bean
@@ -32,7 +32,8 @@ public class RedisConfig {
     }
 
     @Bean(value = "mentorshipEventChannel")
-    ChannelTopic mentorshipEventChannelTopic() {
-        return new ChannelTopic(redisChannelNames.getMentorshipEventChannel());
+    ChannelTopic mentorshipEventChannelTopic(
+            @Value("${spring.data.redis.channels.mentorship-channel.name}") String name) {
+        return new ChannelTopic(name);
     }
 }

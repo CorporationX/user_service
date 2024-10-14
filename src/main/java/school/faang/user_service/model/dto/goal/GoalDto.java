@@ -15,7 +15,7 @@ import java.util.List;
 public record GoalDto(
         @NotBlank(message = "Title cannot be blank", groups = CreateGroup.class)
         @Size(max = 64, message = "Title cannot be longer than 64")
-        String tittle,
+        String title,
 
         @NotBlank(message = "Description cannot be blank", groups = CreateGroup.class)
         @Size(max = 4096, message = "Description cannot be longer than 64")

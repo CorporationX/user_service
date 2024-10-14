@@ -1,10 +1,12 @@
 package school.faang.user_service.service.impl.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.dto.goal.GoalFilterDto;
+import school.faang.user_service.model.dto.goal.GoalNotificationDto;
 import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
@@ -37,7 +39,7 @@ public class GoalServiceImpl implements GoalService {
     public GoalDto createGoal(long userId, GoalDto goalDto) {
         goalValidator.validateCreationGoal(userId, MAX_NUMBER_ACTIVE_GOALS);
 
-        Goal saveGoal = goalRepository.create(goalDto.tittle(),
+        Goal saveGoal = goalRepository.create(goalDto.title(),
                 goalDto.description(),
                 goalDto.parentId());
 
@@ -52,8 +54,7 @@ public class GoalServiceImpl implements GoalService {
         Goal goal = goalValidator.validateUpdate(goalId, goalDto);
 
         List<Skill> skills = skillService.getSkillsByTitle(goalDto.titleSkills());
-        assignNewSkillToGoal(goal, skills);
-        goalRepository.save(goalMapper.toEntity(goalDto));
+        assignNewSkillToGoal(goal, skills, goalDto.status());
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
             assignGoalSkillsToUsers(goalId, skills);
@@ -68,9 +69,9 @@ public class GoalServiceImpl implements GoalService {
                 .forEach(skill -> skillService.assignSkillToUser(skill.getId(), user.getId())));
     }
 
-    private void assignNewSkillToGoal(Goal goal, List<Skill> newSkills) {
-        skillService.deleteSkillFromGoal(goal.getId());
+    private void assignNewSkillToGoal(Goal goal, List<Skill> newSkills, GoalStatus status) {
         goal.setSkillsToAchieve(newSkills);
+        goal.setStatus(status);
     }
 
     @Override
@@ -100,6 +101,14 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public void removeGoals(List<Goal> goals){
         goalRepository.deleteAll(goals);
+    }
+
+    @Override
+    public GoalNotificationDto getGoal(long goalId) {
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() ->
+                new EntityNotFoundException("Goal with id %d doesn't exist".formatted(goalId)));
+
+        return goalMapper.toGoalNotificationDto(goal);
     }
 
     private void sendEvent(long goalId) {

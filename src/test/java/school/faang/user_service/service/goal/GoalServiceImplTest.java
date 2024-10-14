@@ -1,31 +1,36 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.filter.goal.GoalFilter;
+import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.dto.goal.GoalFilterDto;
+import school.faang.user_service.model.dto.goal.GoalNotificationDto;
 import school.faang.user_service.model.entity.Skill;
-import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.entity.goal.GoalStatus;
-import school.faang.user_service.filter.goal.GoalFilter;
-import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.impl.goal.GoalServiceImpl;
 import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.impl.goal.GoalServiceImpl;
 import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,7 +52,7 @@ public class GoalServiceImplTest {
     private List<GoalFilter> filters;
 
     @Spy
-    private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
+    private GoalMapperImpl goalMapper;
 
     // Test data
     private long userId;
@@ -56,8 +61,6 @@ public class GoalServiceImplTest {
     private GoalDto goalDto;
     private List<Skill> skills;
     private Goal goal;
-    private Goal updateGoal1;
-    private User user;
     private List<Goal> goals;
 
     @BeforeEach
@@ -75,11 +78,6 @@ public class GoalServiceImplTest {
                 .title("Skill2")
                 .build(), Skill.builder().title("Skill1").build());
         goal = new Goal();
-        updateGoal1 = Goal.builder()
-                .id(1L)
-                .build();
-        user = new User();
-        goals = List.of(new Goal());
     }
 
     @Test
@@ -88,14 +86,14 @@ public class GoalServiceImplTest {
                 .validateCreationGoal(userId, maxGoal);
 
         Goal saveGoal = new Goal();
-        Mockito.when(goalRepository.create(goalDto.tittle(),
+        Mockito.when(goalRepository.create(goalDto.title(),
                 goalDto.description(),
                 goalDto.parentId())).thenReturn(saveGoal);
 
         goalService.createGoal(userId, goalDto);
 
         Mockito.verify(goalRepository)
-                .create(goalDto.tittle(), goalDto.description(), goalDto.parentId());
+                .create(goalDto.title(), goalDto.description(), goalDto.parentId());
     }
 
     @Test
@@ -103,7 +101,7 @@ public class GoalServiceImplTest {
         Mockito.doNothing().when(goalValidator)
                 .validateCreationGoal(userId, maxGoal);
 
-        Mockito.when(goalRepository.create(goalDto.tittle(),
+        Mockito.when(goalRepository.create(goalDto.title(),
                 goalDto.description(),
                 goalDto.parentId())).thenReturn(goal);
 
@@ -119,7 +117,7 @@ public class GoalServiceImplTest {
         Mockito.doNothing().when(goalValidator)
                 .validateCreationGoal(userId, maxGoal);
 
-        Mockito.when(goalRepository.create(goalDto.tittle(),
+        Mockito.when(goalRepository.create(goalDto.title(),
                 goalDto.description(),
                 goalDto.parentId())).thenReturn(goal);
 
@@ -178,4 +176,22 @@ public class GoalServiceImplTest {
         goalService.removeGoals(goals);
         verify(goalRepository).deleteAll(goals);
     }
+
+    @Test
+    @DisplayName("Get Goal Success")
+    void testGetGoalShouldReturnGoal() {
+        var expected = GoalNotificationDto.builder().build();
+        doReturn(Optional.of(goal)).when(goalRepository).findById(anyLong());
+        var result = goalService.getGoal(goalId);
+        verify(goalRepository).findById(goalId);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    @DisplayName("Get Goal Throws Exception")
+    void testGetGoalThrowsException() {
+        doReturn(Optional.empty()).when(goalRepository).findById(anyLong());
+        assertThrows(EntityNotFoundException.class, () -> goalService.getGoal(goalId));
+    }
 }
+

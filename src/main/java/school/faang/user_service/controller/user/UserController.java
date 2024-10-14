@@ -55,4 +55,9 @@ public class UserController {
       userService.addUsersFromFile(file.getInputStream());
       return ResponseEntity.ok("sucessfuly uploaded");
     }
+
+    @GetMapping("/{user_id}/profile")
+    public UserDto getUserProfile(@PathVariable("user_id") @Positive(message = "Id can't be least 1") long userId) {
+        return userService.getUserProfile(userId);
+    }
 }

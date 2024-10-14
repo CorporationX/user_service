@@ -7,8 +7,11 @@ import school.faang.user_service.constant.ErrorMessages;
 import school.faang.user_service.constant.SubscriptionConst;
 import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.FollowerEvent;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.redis.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserFilter;
 
 import java.util.Comparator;
@@ -19,7 +22,9 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -28,6 +33,8 @@ public class SubscriptionService {
             throw new DataValidationException(ErrorMessages.ALREADY_SUBSCRIBE);
         }
         subscriptionRepository.followUser(followerId, followeeId);
+        User follower = userRepository.getReferenceById(followerId);
+        followerEventPublisher.publish(new FollowerEvent(followerId, followeeId, follower.getUsername()));
     }
 
     @Transactional

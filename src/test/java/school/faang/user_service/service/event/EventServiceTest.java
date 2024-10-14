@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -16,12 +17,14 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -29,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -40,7 +44,6 @@ class EventServiceTest {
     private static final long EVENT_ID_TWO = 2L;
     private static final long USER_ID_IS_ONE = 1L;
     private EventDto eventDto;
-    private User user;
     private Skill skill1;
     private Skill skill2;
     private List<Skill> skills;
@@ -67,6 +70,15 @@ class EventServiceTest {
     @Mock
     private EventParticipationService eventParticipationService;
 
+    @Mock
+    private PromotionManagementService promotionManagementService;
+
+    @Mock
+    private List<EventFilter> eventFilters;
+
+    @Mock
+    private EventFilter eventFilter;
+
     @Nested
     class PositiveTests {
 
@@ -90,9 +102,12 @@ class EventServiceTest {
             events.add(plannedEvent);
             events.add(canceledEvent);
 
+            Promotion promotion = mock(Promotion.class);
+
             user = User.builder()
                     .id(USER_ID_IS_ONE)
                     .ownedEvents(events)
+                    .promotions(List.of(promotion))
                     .build();
 
             eventDto = EventDto.builder()
@@ -292,41 +307,23 @@ class EventServiceTest {
         }
 
         @Test
-        void testGetEventsByFilterWhenFiltersAreNull() {
-            EventFilterDto filters = null;
+        @DisplayName("Successfully get filtered and prioritized events")
+        void whenGetEventsByFilterThenSuccess() {
+            EventFilterDto filterDto = new EventFilterDto();
+            List<Event> filteredEvents = List.of(event);
 
-            DataValidationException exception = assertThrows(DataValidationException.class,
-                    () -> eventService.getEventsByFilter(filters));
-            assertEquals("filters is null", exception.getMessage());
-        }
+            doNothing().when(promotionManagementService).removeExpiredPromotions();
+            when(eventFilters.stream()).thenReturn(Stream.of(eventFilter));
+            when(eventFilter.isApplicable(filterDto)).thenReturn(true);
+            when(eventFilter.toSpecification(filterDto)).thenReturn(mock(Specification.class));
+            when(eventRepository.findAll(any(Specification.class))).thenReturn(filteredEvents);
+            when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
 
-        @Test
-        void testGetEventsByFilter() {
-            EventFilterDto filters = mock(EventFilterDto.class);
-            List<Event> allEvents = Arrays.asList(mock(Event.class), mock(Event.class));
-            EventDto eventDto1 = mock(EventDto.class);
-            EventDto eventDto2 = mock(EventDto.class);
+            List<EventDto> result = eventService.getEventsByFilter(filterDto);
 
-            when(eventRepository.findAll()).thenReturn(allEvents);
-            when(eventMapper.toDto(allEvents.get(0))).thenReturn(eventDto1);
-            when(eventMapper.toDto(allEvents.get(1))).thenReturn(eventDto2);
-
-
-            EventFilter filter = mock(EventFilter.class);
-            when(filter.isApplicable(filters)).thenReturn(true);
-            when(filter.apply(any(), eq(filters))).thenReturn(allEvents.stream());
-
-            eventService = new EventService(eventMapper, eventRepository, eventParticipationService,
-                    Arrays.asList(filter), eventValidator, skillRepository, userRepository);
-
-            List<EventDto> result = eventService.getEventsByFilter(filters);
-
-            verify(eventRepository).findAll();
-            verify(filter).isApplicable(filters);
-            verify(filter).apply(any(), eq(filters));
-            verify(eventMapper).toDto(allEvents.get(0));
-            verify(eventMapper).toDto(allEvents.get(1));
-            assertEquals(Arrays.asList(eventDto1, eventDto2), result);
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            verify(eventMapper, times(1)).toDto(any(Event.class));
         }
     }
 }

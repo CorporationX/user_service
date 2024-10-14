@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -36,4 +38,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             LIMIT :limit
             """)
     List<Event> findAllSortedByPromotedEventsPerPage(@Param("offset") int offset, @Param("limit") int limit);
+
+    List<Event> findAllByStatusAndStartDateBetween(EventStatus eventStatus, LocalDateTime now, LocalDateTime toTime);
 }

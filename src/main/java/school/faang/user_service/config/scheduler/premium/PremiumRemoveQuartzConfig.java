@@ -5,12 +5,15 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import school.faang.user_service.service.premium.jobs.PremiumRemoveJob;
 
 @Configuration
 public class PremiumRemoveQuartzConfig {
+    @Value("${app.premium.cron.premium_remove_scheduler}")
+    private String expiredPremiumRemoveCron;
 
     @Bean
     public JobDetail premiumRemoveJobDetail() {
@@ -22,7 +25,7 @@ public class PremiumRemoveQuartzConfig {
 
     @Bean
     public Trigger premiumRemoveTrigger() {
-        CronScheduleBuilder croneScheduler = CronScheduleBuilder.cronSchedule("0 0 0 ? * SUN *");
+        CronScheduleBuilder croneScheduler = CronScheduleBuilder.cronSchedule(expiredPremiumRemoveCron);
         return TriggerBuilder.newTrigger()
                 .forJob(premiumRemoveJobDetail())
                 .withIdentity("premiumRemoveJobTrigger", "premium")

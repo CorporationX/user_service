@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.config.kafka.KafkaProperties;
 import school.faang.user_service.config.kafka.Topic;
-import school.faang.user_service.event.FollowerEvent;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.mapper.FollowerEventMapper;
 import school.faang.user_service.protobuf.generate.FollowerEventProto;
 

@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.kafka.KafkaProperties;
-import school.faang.user_service.event.FollowerEvent;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.mapper.FollowerEventMapper;
 import school.faang.user_service.protobuf.generate.FollowerEventProto;
 

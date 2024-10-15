@@ -2,9 +2,6 @@ app:
   max-active-user-goals: 3
 
 spring:
-  mvc:
-    servlet:
-      path: /api/v1
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -52,4 +49,24 @@ payment-service:
 
 redis:
   channels:
+    mentorship: mentorship_channel
+    project-follower: project_follower_channel
+    mentorship-accepted: mentorship_accepted_channel
     user-ban: user_ban_channel
+
+scheduler:
+  clear-events:
+    cron: "0 0 0 * * SUN"
+    batchSize: 10
+
+executorConfig:
+  thread-pool-size: 10
+
+premium:
+  removal:
+    batch-size: 100
+    thread-pool:
+      core-pool-size: 8
+      max-pool-capacity: 16
+      queue-capacity: 32
+    interval: "@weekly"

@@ -1,12 +1,10 @@
 package school.faang.user_service.mapper;
 
-import com.json.student.Person;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.model.dto.GoalInvitationDto;
+import school.faang.user_service.model.entity.GoalInvitation;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalInvitationMapper {

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.promotion.PromotionDto;
-import school.faang.user_service.entity.promotion.PromotionType;
+import school.faang.user_service.model.dto.PromotionDto;
+import school.faang.user_service.model.enums.PromotionType;
 import school.faang.user_service.service.PromotionService;
 
 @RestController

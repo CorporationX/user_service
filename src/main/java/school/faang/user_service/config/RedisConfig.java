@@ -1,6 +1,5 @@
 package school.faang.user_service.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +13,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanEventListener;
 
 @Configuration
-@Slf4j
 public class RedisConfig {
+
+    @Value("${redis.channels.project-follower}")
+    private String projectFollowerEventChannel;
 
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
+
+    public interface MessagePublisher<T> {
+        void publish(T redisEvent);
+    }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
@@ -27,6 +32,11 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
+    }
+
+    @Bean(name = "projectFollowerTopic")
+    public ChannelTopic projectFollowerChannelTopic() {
+        return new ChannelTopic(projectFollowerEventChannel);
     }
 
     @Bean

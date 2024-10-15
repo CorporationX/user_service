@@ -10,7 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import school.faang.user_service.config.context.UserHeaderFilter;
 import school.faang.user_service.controller.RecommendationController;
-import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.model.dto.RecommendationDto;
+import school.faang.user_service.service.impl.RecommendationServiceImpl;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class RecommendationControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private RecommendationService recommendationService;
+    private RecommendationServiceImpl recommendationService;
 
     @Test
     void giveRecommendation_ReturnsRecommendationDto_WhenContentIsValid() throws Exception {

@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.dto.event.follower.FollowerEventDto;
+import school.faang.user_service.model.event.follower.FollowerEventDto;
 
 import static org.mockito.Mockito.verify;
 
@@ -30,7 +30,7 @@ class FollowerEventPublisherTest {
         // given
         var followerEvent = FollowerEventDto.builder().build();
         // when
-        followerEventPublisher.sendEvent(followerEvent);
+        followerEventPublisher.publish(followerEvent);
         // then
         verify(redisTemplate).convertAndSend(channelTopic.getTopic(), followerEvent);
     }

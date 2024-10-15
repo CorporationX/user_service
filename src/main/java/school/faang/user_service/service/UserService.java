@@ -1,8 +1,8 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.User;
 
 import java.io.IOException;
 import java.io.InputStream;

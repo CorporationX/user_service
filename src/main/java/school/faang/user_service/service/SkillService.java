@@ -1,8 +1,8 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
+import school.faang.user_service.model.dto.skill.SkillCandidateDto;
+import school.faang.user_service.model.dto.skill.SkillDto;
+import school.faang.user_service.model.entity.Skill;
 
 import java.util.List;
 

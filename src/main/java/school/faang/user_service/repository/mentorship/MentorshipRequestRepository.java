@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 public interface MentorshipRequestRepository extends JpaRepository<MentorshipRequest, Long> {
 
-
     @Query(nativeQuery = true, value = """
             INSERT INTO mentorship_request (requester_id, receiver_id, description, status, created_at, updated_at)
             VALUES (?1, ?2, ?3, 0, NOW(), NOW())

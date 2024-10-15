@@ -27,9 +27,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     @Transactional
     @Override
     public void batchInsertUsers(List<User> users) {
-        String sql = "INSERT INTO users (username, password, email, phone, about_me, active, city, country_id) " +
-                "VALUES (:username, :password, :email, :phone, :aboutMe, :active, :city, :countryId) " +
-                "ON CONFLICT DO NOTHING RETURNING id";
+        String sql = """
+                INSERT INTO users (username, password, email, phone, about_me, active, city, country_id)
+                VALUES (:username, :password, :email, :phone, :aboutMe, :active, :city, :countryId)
+                ON CONFLICT DO NOTHING RETURNING id""";
 
         List<Long> savedUsersIds = new ArrayList<>();
         for (int i = 0; i < users.size(); i++) {

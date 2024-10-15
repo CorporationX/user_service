@@ -61,7 +61,8 @@ public class UserUploadServiceImpl implements UserUploadService {
     @Async("taskExecutor")
     @Override
     public void saveUsers(List<User> users) {
-        users.forEach(user -> user.setPassword(passwordCipher.encryptPassword(passwordGenerator.generatePassword(user.getUsername()))));
+        users.forEach(user -> user.setPassword(
+                passwordCipher.encryptPassword(passwordGenerator.generatePassword(user.getUsername()))));
         log.info("{} users to save", users.size());
         userRepository.batchInsertUsers(users);
     }

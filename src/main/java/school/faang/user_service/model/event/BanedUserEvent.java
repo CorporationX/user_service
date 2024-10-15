@@ -1,4 +1,4 @@
-package school.faang.user_service.event.redis;
+package school.faang.user_service.model.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

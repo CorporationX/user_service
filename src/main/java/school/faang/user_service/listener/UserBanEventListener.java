@@ -8,14 +8,12 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.event.application.UserIdsReceivedEvent;
-import school.faang.user_service.event.redis.BanedUserEvent;
+import school.faang.user_service.model.event.application.UserIdsReceivedEvent;
+import school.faang.user_service.model.event.BanedUserEvent;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Getter
 @Slf4j

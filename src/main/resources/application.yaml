@@ -76,3 +76,4 @@ redis:
     follower-event-channel: follower_event
     goal-completed-channel: goal_completed
     search-appearance-channel: search_appearance_channel
+    profile-view-channel: profile_view_channel

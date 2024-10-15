@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ContactInfoDto;
 import school.faang.user_service.dto.user.EducationDto;
 import school.faang.user_service.dto.user.PersonDto;
@@ -22,7 +23,9 @@ import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.model.dto.ProfileViewEvent;
 import school.faang.user_service.model.dto.SearchAppearanceEvent;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -62,7 +65,9 @@ public class UserServiceImpl implements UserService {
     private final PersonToUserMapper personToUserMapper;
     private final CountryService countryService;
     private final S3service s3service;
+    private final UserContext userContext;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
@@ -142,6 +147,7 @@ public class UserServiceImpl implements UserService {
 
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        profileViewEventPublisher.publish(new ProfileViewEvent(userId, userContext.getUserId(), LocalDateTime.now()));
 
         return userMapper.toDto(user);
     }

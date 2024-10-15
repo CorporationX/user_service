@@ -19,14 +19,7 @@ import school.faang.user_service.model.entity.UserProfilePic;
 import school.faang.user_service.model.entity.Event;
 import school.faang.user_service.model.entity.Goal;
 import school.faang.user_service.model.entity.Promotion;
-import school.faang.user_service.dto.user.*;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.TelegramContact;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.promotion.Promotion;
+import school.faang.user_service.model.entity.TelegramContact;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
@@ -220,6 +213,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteUserProfilePicByUserId(userId);
     }
 
+    @Override
     @Transactional
     public void updateTelegramUserId(String telegramUserName, String telegramUserId) {
         TelegramContact telegramContact = telegramContactRepository.findByTelegramUserName(telegramUserName).orElseThrow(() ->

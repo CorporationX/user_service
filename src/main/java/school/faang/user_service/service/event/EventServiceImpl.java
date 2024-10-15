@@ -1,16 +1,21 @@
 package school.faang.user_service.service.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.event.EventStartEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -23,20 +28,37 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
     private final SkillRepository skillRepository;
+    private final EventStartEventPublisher eventStartEventPublisher;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public EventDto create(EventDto eventDto) {
-        skillCheck(eventDto);
+//        skillCheck(eventDto);
         Event event = eventMapper.toEntity(eventDto);
         event.setOwner(userRepository.findById(eventDto.getOwnerId()).orElseThrow(() -> new DataValidationException("Пользователь не обнаружен")));
         event.setRelatedSkills(skillRepository.findAllById(eventDto.getRelatedSkillsIds()));
         eventRepository.save(event);
+
+        EventStartEvent eventStartEvent = new EventStartEvent();
+        eventStartEvent.setTitle(event.getTitle());
+        eventStartEvent.setStartDate(event.getStartDate());
+        eventStartEvent.setOwnerId(eventDto.getOwnerId());
+        eventStartEvent.setSubscriberId(eventDto.getOwnerId());
+
+        try {
+            String json = objectMapper.writeValueAsString(eventStartEvent);
+            eventStartEventPublisher.publish(json);
+            log.info("Сообщение {} успешно отправлено", json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return eventMapper.toDto(event);
     }
 

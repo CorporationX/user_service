@@ -14,6 +14,12 @@ public class RedisConfig {
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
 
+    @Value("${redis.channels.search-appearance-channel}")
+    private String searchAppearanceChannel;
+
+    @Value("${redis.channels.profile-view-channel}")
+    private String profileViewChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -30,5 +36,16 @@ public class RedisConfig {
     @Bean(name = "projectFollowerTopic")
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean
+    ChannelTopic searchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceChannel);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewChannel);
+
     }
 }

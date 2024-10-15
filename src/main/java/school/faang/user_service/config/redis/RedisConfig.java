@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -26,6 +27,10 @@ public class RedisConfig {
     @Bean
     public MessageListenerAdapter listenerAdapter(UserBanListener userBanListener) {
         return new MessageListenerAdapter(userBanListener);
+    }
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(redisProperties.getChannels().get("profile-view-channel"));
     }
 
     @Bean

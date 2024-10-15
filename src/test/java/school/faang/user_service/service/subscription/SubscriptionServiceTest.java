@@ -3,6 +3,7 @@ package school.faang.user_service.service.subscription;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
+import school.faang.user_service.publisher.FollowEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -38,6 +40,12 @@ public class SubscriptionServiceTest {
 
     @Mock
     private List<UserFilter> filters;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private FollowEventPublisher followEventPublisher;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -149,7 +157,9 @@ public class SubscriptionServiceTest {
         SubscriptionServiceImpl service = new SubscriptionServiceImpl(
                 subscriptionRepository,
                 userMapper,
-                Arrays.asList(filterMock)
+                Arrays.asList(filterMock),
+                objectMapper,
+                followEventPublisher
         );
 
         @SuppressWarnings("unchecked")

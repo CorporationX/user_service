@@ -1,7 +1,7 @@
 package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.util.TestDataFactory;
 
 import java.util.ArrayList;

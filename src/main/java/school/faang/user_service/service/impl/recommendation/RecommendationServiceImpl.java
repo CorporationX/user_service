@@ -5,12 +5,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.event.RecommendationEventDto;
 import school.faang.user_service.event.RecommendationReceivedEvent;
+
+import school.faang.user_service.model.dto.recommendation.RecommendationDto;
+import school.faang.user_service.model.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.model.entity.recommendation.Recommendation;
+import school.faang.user_service.model.event.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.publisher.RecommendUserPublisher;
 import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;

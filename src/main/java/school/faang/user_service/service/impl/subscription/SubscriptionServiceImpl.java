@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.event.follower.FollowerEventDto;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.event.follower.FollowerEventDto;
+import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.publisher.FollowerEventPublisher;
@@ -34,7 +34,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public void followUser(long followerId, long followeeId) {
         validator.isSubscriber(followerId, followeeId, subscriptionRepository);
         subscriptionRepository.followUser(followerId, followeeId);
-        sendEventToAnalyticsService(followerId, followeeId);
+
+        FollowerEventDto event = buildEvent(followerId, followeeId);
+        followerEventPublisher.publish(event);
+        log.info("Subscription event was sent", event);
     }
 
     @Transactional
@@ -76,13 +79,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public int getFollowingCount(long followerId) {
         validator.validateId(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
-    }
-
-    private void sendEventToAnalyticsService(long followerId, long followeeId) {
-        FollowerEventDto event = buildEvent(followerId, followeeId);
-        log.info("Sending event: {} to analytics-service", event);
-        followerEventPublisher.sendEvent(event);
-        log.info("Sent event: {} to analytics-service", event);
     }
 
     private static FollowerEventDto buildEvent(long followerId, long followeeId) {

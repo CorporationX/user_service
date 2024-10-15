@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.event.RecommendationReceivedEvent;
+import school.faang.user_service.model.event.RecommendationReceivedEvent;
 
 import static org.mockito.Mockito.verify;
 

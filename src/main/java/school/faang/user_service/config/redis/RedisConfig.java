@@ -45,6 +45,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.goal-completed-event-channel.name}")
     private String goalCompletedTopic;
 
+    @Value("${spring.data.redis.channels.mentorship-request-channel.name}")
+    private String mentorshipRequestTopic;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -103,5 +106,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic goalCompletedTopic() {
         return new ChannelTopic(goalCompletedTopic);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipRequestTopic() {
+        return new ChannelTopic(mentorshipRequestTopic);
     }
 }

@@ -2,18 +2,21 @@ package school.faang.user_service.service.impl.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.model.dto.Rejection;
 import school.faang.user_service.model.dto.RequestFilter;
 import school.faang.user_service.model.entity.MentorshipRequest;
+import school.faang.user_service.model.event.MentorshipRequestedEvent;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.util.predicate.NotApplicable;
 import school.faang.user_service.util.predicate.PredicateTrue;
-import school.faang.user_service.validator.MentorshipRequestValidator;
 import school.faang.user_service.validator.RequestFilterPredicate;
-import school.faang.user_service.validator.validatorResult.NotValidated;
-import school.faang.user_service.validator.validatorResult.Validated;
+import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,29 +24,37 @@ import java.util.function.Predicate;
 
 import static school.faang.user_service.model.entity.RequestStatus.ACCEPTED;
 import static school.faang.user_service.model.entity.RequestStatus.REJECTED;
+
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
-    private final MentorshipRequestRepository repository;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
     private final RequestFilterPredicate requestFilterPredicate;
-
-    public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
+    private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Override
-    public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        var response = mentorshipRequestValidator.validate(mentorshipRequestDto);
-        if (!(response instanceof Validated)) {
-            System.out.println(((NotValidated) response).getMessage());
-        } else {
-            repository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
-        }
+    @Transactional
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        mentorshipRequestValidator.validateMentorshipRequest(mentorshipRequestDto);
+        mentorshipRequestValidator.validateDateCreateRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(),
+                mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
 
+        var mentorshipRequestedEvent = MentorshipRequestedEvent.builder()
+                .userId(mentorshipRequest.getRequester().getId())
+                .receiverId(mentorshipRequest.getReceiver().getId())
+                .requestedAt(mentorshipRequest.getCreatedAt())
+                .build();
+
+        mentorshipRequestedEventPublisher.publish(mentorshipRequestedEvent);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     @Override
     public List<MentorshipRequest> getRequests(RequestFilter filter) {
-        return repository.findAll().stream().filter(mentReq -> {
+        return mentorshipRequestRepository.findAll().stream().filter(mentReq -> {
             return requestFilterPredicate.getRequestsFilterList().stream()
                     .map(predicate -> predicate.apply(mentReq, filter))
                     .filter(result -> !(result instanceof NotApplicable)) // Исключаем NotApplicable
@@ -61,27 +72,27 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     }
 
     @Override
-    public void acceptRequest(long id) throws Exception {
+    public void acceptRequest(long id) {
 
-        Optional<MentorshipRequest> requestOptional = repository.findById(id);
+        Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
         if (requestOptional.isPresent() && requestOptional.get().getStatus() != ACCEPTED) {
             var request = requestOptional.get();
             request.setStatus(ACCEPTED);
-            repository.save(request);
+            mentorshipRequestRepository.save(request);
         } else if (requestOptional.isPresent() && requestOptional.get().getStatus() == ACCEPTED) {
-            throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
+            throw new DataValidationException("Mentor request is already accepter");
         }
     }
 
     @Override
     public void rejectRequest(long id, Rejection rejection) {
-        Optional<MentorshipRequest> requestOptional = repository.findById(id);
+        Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
 
         if (requestOptional.isPresent()) {
             var request = requestOptional.get();
             request.setStatus(REJECTED);
             request.setRejectionReason(rejection.getReason());
-            repository.save(request);
+            mentorshipRequestRepository.save(request);
         }
 
     }

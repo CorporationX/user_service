@@ -13,7 +13,7 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
 
     @Query(nativeQuery = true, value = """
             INSERT INTO mentorship_request (requester_id, receiver_id, description, status, created_at, updated_at)
-            VALUES (:requesterId, :receiverId, :description, 0, NOW(), NOW())
+            VALUES (?1, ?2, ?3, 0, NOW(), NOW())
             RETURNING *
             """)
     MentorshipRequest create(long requesterId, long receiverId, String description);

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.LongStream;
 
 public class UserTestUtil {
-
     public static User buildUser(long id) {
         return User.builder()
                 .id(id)

@@ -6,20 +6,20 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.service.user.view.ProfileViewService;
+import school.faang.user_service.service.user.view.publisher.AOPRedisProfileViewEventPublisher;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class ProfileViewPublishJob implements Job {
-    private final ProfileViewService profileViewService;
+    private final AOPRedisProfileViewEventPublisher redisProfileViewEventPublisher;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-        if (!profileViewService.profileViewEventDtosIsEmpty()) {
+        if (!redisProfileViewEventPublisher.analyticEventsIsEmpty()) {
             log.info("Publish all profile view dtos execute");
-            profileViewService.publishAllProfileViewEvents();
+            redisProfileViewEventPublisher.publishAllEvents();
         }
     }
 }

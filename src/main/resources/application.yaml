@@ -83,11 +83,6 @@ app:
     event:
       start_event:
         cron: "0 * * * * *" # every minute
-    profile-view-service:
-      core_pool_size: 10
-      max_pool_size: 20
-      queue_capacity: 1000
-      thread_name_prefix: ProfileViewService-Async-
   user-redis-config:
     profile_view_event_topic: profileViewEvent
   quartz-config:

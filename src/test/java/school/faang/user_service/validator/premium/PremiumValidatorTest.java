@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.model.dto.premium.PaymentResponseDto;
-import school.faang.user_service.model.entity.premium.PaymentStatus;
+import school.faang.user_service.model.enums.premium.PaymentStatus;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import static org.junit.jupiter.api.Assertions.*;

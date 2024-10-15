@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import school.faang.user_service.model.entity.goal.GoalStatus;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.validator.groups.CreateGroup;
 import school.faang.user_service.validator.groups.UpdateGroup;
 

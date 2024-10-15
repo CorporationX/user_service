@@ -1,4 +1,4 @@
-package school.faang.user_service.model.entity.premium;
+package school.faang.user_service.model.enums.premium;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

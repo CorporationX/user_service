@@ -1,4 +1,4 @@
-package school.faang.user_service.model.entity.contact;
+package school.faang.user_service.model.enums.contact;
 
 public enum PreferredContact {
     EMAIL, PHONE, TELEGRAM;

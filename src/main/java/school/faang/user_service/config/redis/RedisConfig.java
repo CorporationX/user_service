@@ -1,5 +1,6 @@
 package school.faang.user_service.config.redis;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,12 +8,16 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
+import school.faang.user_service.dto.message.MentorshipRequestMessage;
 
 @Configuration
-public class redisConfig {
+@Slf4j
+public class RedisConfig {
 
-    @Value("${data.redis.channels.mentorship-request-topic}")
+    @Value("${spring.data.redis.channels.mentorship-request-topic}")
     private String topic;
 
     @Bean
@@ -29,7 +34,11 @@ public class redisConfig {
     public RedisTemplate<String, MentorshipRequestDto> redisTemplate() {
         final RedisTemplate<String, MentorshipRequestDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
-        template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
+        Jackson2JsonRedisSerializer<MentorshipRequestMessage> serializer =
+                new Jackson2JsonRedisSerializer<>(MentorshipRequestMessage.class);
+
+        template.setValueSerializer(serializer);
+        template.setKeySerializer(new StringRedisSerializer());
         return template;
     }
 }

@@ -24,7 +24,6 @@ class GoalCompletedEventPublisherTest {
     @InjectMocks
     private GoalCompletedEventPublisher goalCompletedEventPublisher;
 
-
     @Test
     @DisplayName("Send Event Test")
     void  publish_isOk() {

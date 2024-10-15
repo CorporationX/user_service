@@ -11,6 +11,15 @@ import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.entity.goal.GoalStatus;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.dto.goal.event.GoalCompletedEventDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.model.event.GoalCompletedEvent;
@@ -31,8 +40,8 @@ public class GoalService implements school.faang.user_service.service.GoalServic
     private final GoalValidator goalValidator;
     private final List<GoalFilter> filters;
     private final GoalMapper goalMapper;
-    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
     private final UserContext userContext;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     @Override
     public GoalDto createGoal(long userId, GoalDto goalDto) {
@@ -51,7 +60,6 @@ public class GoalService implements school.faang.user_service.service.GoalServic
     @Override
     public GoalDto updateGoal(long goalId, GoalDto goalDto) {
         Goal goal = goalValidator.validateUpdate(goalId, goalDto);
-
         List<Skill> skills = skillService.getSkillsByTitle(goalDto.titleSkills());
         assignNewSkillToGoal(goal, skills, goalDto.status());
 
@@ -98,7 +106,7 @@ public class GoalService implements school.faang.user_service.service.GoalServic
     }
 
     @Override
-    public void removeGoals(List<Goal> goals){
+    public void removeGoals(List<Goal> goals) {
         goalRepository.deleteAll(goals);
     }
 

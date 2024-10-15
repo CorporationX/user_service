@@ -11,19 +11,20 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
-import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.model.dto.EventDto;
+import school.faang.user_service.model.filter_dto.EventFilterDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.Event;
+import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.filter.event.EventMaxAttendeesFilter;
 import school.faang.user_service.filter.event.EventTitleFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.EventRepository;
+import school.faang.user_service.service.impl.EventServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class EventServiceTest {
     private ExecutorService executorService;
 
     @InjectMocks
-    private EventService eventService;
+    private EventServiceImpl eventService;
 
     private List<Event> events;
 
@@ -79,7 +80,7 @@ public class EventServiceTest {
         eventFilters = new ArrayList<>();
         eventFilters.add(eventTitleFilter);
         eventFilters.add(eventMaxAttendeesFilter);
-        eventService = new EventService(eventRepository, userRepository, promotionRepository, eventFilters, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, userRepository, promotionRepository, eventFilters, eventMapper);
         events = new ArrayList<>();
         eventService.setBatchSize(10);
     }

@@ -3,7 +3,7 @@ package school.faang.user_service.scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.EventService;
 
 @Component
 public class Scheduler {

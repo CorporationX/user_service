@@ -24,20 +24,28 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.promotion.Promotion;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.UserProfilePic;
+import school.faang.user_service.model.entity.Event;
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.filter.user.UserCreatedAfterFilter;
 import school.faang.user_service.filter.user.UserCreatedBeforeFilter;
-import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.minio.S3service;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.repository.EventRepository;
+import school.faang.user_service.repository.GoalRepository;
+import school.faang.user_service.service.impl.MentorshipServiceImpl;
+import school.faang.user_service.service.impl.S3serviceImpl;
+import school.faang.user_service.service.impl.UserServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -76,11 +84,11 @@ public class UserServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
-    private MentorshipService mentorshipService;
+    private MentorshipServiceImpl mentorshipService;
     @Mock
     PromotionRepository promotionRepository;
     @Mock
-    private S3service s3service;
+    private S3serviceImpl s3service;
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @Mock
@@ -89,7 +97,7 @@ public class UserServiceTest {
     private TelegramContactRepository telegramContactRepository;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     private User user;
     private UserDto userDto;

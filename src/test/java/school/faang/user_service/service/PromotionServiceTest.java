@@ -11,19 +11,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.premium.Currency;
-import school.faang.user_service.dto.premium.PaymentRequest;
-import school.faang.user_service.dto.premium.PaymentResponse;
-import school.faang.user_service.dto.premium.PaymentStatus;
-import school.faang.user_service.dto.promotion.PromotionDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.promotion.Promotion;
-import school.faang.user_service.entity.promotion.PromotionType;
+import school.faang.user_service.model.enums.Currency;
+import school.faang.user_service.model.dto.PaymentRequest;
+import school.faang.user_service.model.dto.PaymentResponse;
+import school.faang.user_service.model.enums.PaymentStatus;
+import school.faang.user_service.model.dto.PromotionDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.Promotion;
+import school.faang.user_service.model.enums.PromotionType;
 import school.faang.user_service.exception.ExistingPurchaseException;
 import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PromotionMapper;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.impl.PromotionServiceImpl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -63,7 +64,7 @@ public class PromotionServiceTest {
     private PromotionMapper promotionMapper;
 
     @InjectMocks
-    private PromotionService promotionService;
+    private PromotionServiceImpl promotionService;
 
     @BeforeEach
     void setUp() {

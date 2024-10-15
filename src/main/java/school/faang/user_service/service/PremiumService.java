@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.model.dto.PremiumDto;
+import school.faang.user_service.model.enums.PremiumPeriod;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

@@ -12,10 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.PremiumPeriod;
-import school.faang.user_service.service.PremiumService;
+import school.faang.user_service.model.dto.PremiumDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.PremiumPeriod;
+import school.faang.user_service.service.impl.PremiumServiceImpl;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +40,7 @@ public class PremiumControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private PremiumService premiumService;
+    private PremiumServiceImpl premiumService;
 
     @Mock
     private UserContext userContext;

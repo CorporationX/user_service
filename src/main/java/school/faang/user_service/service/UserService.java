@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.util.List;
 
 public interface UserService {
-    @Transactional
     List<UserDto> getPremiumUsers(UserFilterDto filterDto);
 
     UserDto deactivateUser(UserDto userDto);
@@ -25,17 +24,15 @@ public interface UserService {
 
     List<UserDto> getUsersByIds(List<Long> ids);
 
-    @Transactional
     List<UserDto> getFilteredUsers(UserFilterDto filterDto, Long callingUserId);
 
-    @Transactional
     void saveAvatar(long userId, MultipartFile file);
 
     byte[] getAvatar(long userId);
 
-    @Transactional
     void deleteAvatar(long userId);
 
-    @Transactional
     void processCsvFile(InputStream inputStream);
+
+    Long getMaxUserId();
 }

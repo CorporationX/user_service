@@ -461,5 +461,4 @@ public class UserServiceTest {
         verify(s3service, never()).deleteFile(anyString());
         verify(userRepository, never()).deleteUserProfilePicByUserId(anyLong());
     }
-
 }

@@ -14,4 +14,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
-      file: db/changelog/changeset/user_V008__user_update.sql
+      file: db/changelog/changeset/user_V008__user_promotion.sql
+  - include:
+      file: db/changelog/changeset/user_V009__user_update.sql

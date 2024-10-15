@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -10,7 +8,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -29,10 +27,6 @@ spring:
         goalCompletedEvent:
           name: goal_completed_event_channel
 
-servlet:
-  multipart:
-    max-file-size: 5242880
-
 server:
   port: 8080
 
@@ -47,6 +41,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  retry:
+    max-attempts: 5
+    backoff-delay: 5000
 
 services:
   s3:
@@ -65,3 +62,10 @@ services:
   postService:
     endpoint: http://localhost:8081
     requiredHeaders: x-user-id
+
+premium:
+  schedule: "0 0 0 * * *"
+  batch-size: 100
+
+thread-pool-config:
+  size: 5

@@ -1,9 +1,9 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.Rejection;
-import school.faang.user_service.dto.RequestFilter;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.Rejection;
+import school.faang.user_service.model.dto.RequestFilter;
+import school.faang.user_service.model.entity.MentorshipRequest;
 
 import java.util.List;
 

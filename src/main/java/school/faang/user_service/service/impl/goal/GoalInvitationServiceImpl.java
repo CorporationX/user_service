@@ -2,12 +2,12 @@ package school.faang.user_service.service.impl.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.model.dto.goal.GoalInvitationDto;
+import school.faang.user_service.model.dto.goal.InvitationFilterDto;
+import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.goal.Goal;
+import school.faang.user_service.model.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.goal.GoalInvitationValidationException;
 import school.faang.user_service.filter.goal.GoalInvitationFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;

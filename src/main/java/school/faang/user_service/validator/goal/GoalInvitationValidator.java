@@ -2,10 +2,10 @@ package school.faang.user_service.validator.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.goal.Goal;
+import school.faang.user_service.model.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.goal.GoalInvitationValidationException;
 import school.faang.user_service.repository.goal.GoalRepository;
 

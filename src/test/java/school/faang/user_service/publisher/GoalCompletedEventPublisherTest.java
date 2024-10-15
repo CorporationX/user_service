@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.dto.goal.event.GoalCompletedEventDto;
+import school.faang.user_service.model.event.GoalCompletedEvent;
 
 import static org.mockito.Mockito.verify;
 
@@ -26,12 +26,9 @@ class GoalCompletedEventPublisherTest {
 
     @Test
     @DisplayName("Send Event Test")
-    void publish_isOk() {
-        // given
-        var goalCompletedEvent = GoalCompletedEventDto.builder().build();
-        // when
+    void  publish_isOk() {
+        var goalCompletedEvent = GoalCompletedEvent.builder().build();
         goalCompletedEventPublisher.publish(goalCompletedEvent);
-        // then
         verify(redisTemplate).convertAndSend(channelTopic.getTopic(), goalCompletedEvent);
     }
 }

@@ -1,6 +1,6 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.model.dto.recommendation.RecommendationDto;
 
 import java.util.List;
 

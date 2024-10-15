@@ -1,8 +1,8 @@
 package school.faang.user_service.service;
 
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.mentorship.MentorshipDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.mentorship.MentorshipDto;
+import school.faang.user_service.model.entity.User;
 
 import java.util.List;
 

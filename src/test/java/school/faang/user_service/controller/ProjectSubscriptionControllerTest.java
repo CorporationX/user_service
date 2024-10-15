@@ -55,3 +55,7 @@ class ProjectSubscriptionControllerTest {
                 .andExpect(jsonPath("$.projectId").value(dto.getProjectId()));
     }
 }
+
+
+
+

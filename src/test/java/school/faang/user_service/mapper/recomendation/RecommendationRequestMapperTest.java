@@ -1,96 +1,116 @@
 package school.faang.user_service.mapper.recomendation;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
+import org.mapstruct.factory.Mappers;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.model.dto.RecommendationRequestDto;
+import school.faang.user_service.model.dto.RejectionDto;
+import school.faang.user_service.model.entity.RecommendationRequest;
+import school.faang.user_service.model.entity.SkillRequest;
+import school.faang.user_service.model.entity.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 class RecommendationRequestMapperTest {
-    private final RecommendationRequestDto recommendationRequestDto = createDto();
-    private final RecommendationRequest recommendationRequestEntity = createEntity(10L, 2L, 5L, RequestStatus.PENDING);
-    private final RecommendationRequestMapper recommendationRequestMapper = new RecommendationRequestMapperImpl();
 
+    private RecommendationRequestMapper recommendationRequestMapper;
 
-    @Test
-    public void testMapToEntity() {
-        RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.mapToEntity(recommendationRequestDto);
-        assertAll(
-                () -> assertEquals(recommendationRequestEntity.getCreatedAt(), recommendationRequestDto.getCreatedAt()),
-                () -> assertEquals(recommendationRequestEntity.getRequester().getId(), recommendationRequestDto.getRequesterId()),
-                () -> assertEquals(recommendationRequestEntity.getReceiver().getId(), recommendationRequestDto.getReceiverId()),
-                () -> assertEquals(recommendationRequestEntity.getStatus(), recommendationRequestDto.getStatus()),
-                () -> assertEquals(recommendationRequestEntity.getMessage(), recommendationRequestDto.getMessage()),
-                () -> assertEquals(recommendationRequestEntity.getId(), recommendationRequestDto.getId())
-        );
+    @BeforeEach
+    void setUp() {
+        recommendationRequestMapper = Mappers.getMapper(RecommendationRequestMapper.class);
     }
 
     @Test
-    public void testMapToDto() {
-        RecommendationRequestDto recommendationRequestDto = recommendationRequestMapper.mapToDto(recommendationRequestEntity);
-        assertAll(
-                () -> assertEquals(recommendationRequestDto.getMessage(), recommendationRequestEntity.getMessage()),
-                () -> assertEquals(recommendationRequestDto.getRequesterId(), recommendationRequestEntity.getRequester().getId()),
-                () -> assertEquals(recommendationRequestDto.getReceiverId(), recommendationRequestEntity.getReceiver().getId()),
-                () -> assertEquals(recommendationRequestDto.getStatus(), recommendationRequestEntity.getStatus()),
-                () -> assertEquals(recommendationRequestDto.getMessage(), recommendationRequestEntity.getMessage()),
-                () -> assertEquals(recommendationRequestDto.getSkillsIds().get(0), recommendationRequestEntity.getSkills().get(0).getId())
-        );
-    }
+    void testMapToDto_ShouldMapCorrectly() {
+        User requester = new User();
+        requester.setId(1L);
 
-    @Test
-    public void testMapRequestsListToDtoList() {
-        List<RecommendationRequest> recommendationRequests = List.of(createEntity(2L, 55L, 60L, RequestStatus.ACCEPTED),
-                createEntity(3L, 75L, 68L, RequestStatus.PENDING),
-                createEntity(33L, 16L, 71L, RequestStatus.REJECTED));
-        List<RecommendationRequestDto> recommendationRequestDtos = recommendationRequestMapper.mapToDto(recommendationRequests);
-        assertAll(
-                () -> assertEquals(recommendationRequestDtos.get(0).getId(), recommendationRequests.get(0).getId()),
-                () -> assertEquals(recommendationRequestDtos.get(1).getId(), recommendationRequests.get(1).getId()),
-                () -> assertEquals(recommendationRequestDtos.get(2).getId(), recommendationRequests.get(2).getId()),
-                () -> assertEquals(recommendationRequestDtos.get(0).getRequesterId(), recommendationRequests.get(0).getRequester().getId()),
-                () -> assertEquals(recommendationRequestDtos.get(1).getRequesterId(), recommendationRequests.get(1).getRequester().getId()),
-                () -> assertEquals(recommendationRequestDtos.get(2).getRequesterId(), recommendationRequests.get(2).getRequester().getId()),
-                () -> assertEquals(recommendationRequestDtos.get(0).getReceiverId(), recommendationRequests.get(0).getReceiver().getId()),
-                () -> assertEquals(recommendationRequestDtos.get(1).getReceiverId(), recommendationRequests.get(1).getReceiver().getId()),
-                () -> assertEquals(recommendationRequestDtos.get(2).getReceiverId(), recommendationRequests.get(2).getReceiver().getId()),
-                () -> assertEquals(recommendationRequestDtos.get(0).getStatus(), recommendationRequests.get(0).getStatus()),
-                () -> assertEquals(recommendationRequestDtos.get(1).getStatus(), recommendationRequests.get(1).getStatus()),
-                () -> assertEquals(recommendationRequestDtos.get(2).getStatus(), recommendationRequests.get(2).getStatus())
+        User receiver = new User();
+        receiver.setId(2L);
 
-        );
-    }
+        SkillRequest skillRequest1 = new SkillRequest();
+        skillRequest1.setId(10L);
 
-    private RecommendationRequestDto createDto() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setId(1L);
-        recommendationRequestDto.setRequesterId(2L);
-        recommendationRequestDto.setReceiverId(5L);
-        recommendationRequestDto.setCreatedAt(LocalDateTime.now());
-        recommendationRequestDto.setMessage("testMessage");
-        recommendationRequestDto.setStatus(RequestStatus.PENDING);
-        return recommendationRequestDto;
-    }
+        SkillRequest skillRequest2 = new SkillRequest();
+        skillRequest2.setId(20L);
 
-    private RecommendationRequest createEntity(long id, long requesterId, long receiverId, RequestStatus status) {
         RecommendationRequest recommendationRequest = new RecommendationRequest();
-        recommendationRequest.setId(id);
-        recommendationRequest.setCreatedAt(LocalDateTime.now());
-        recommendationRequest.setRequester(new User());
-        recommendationRequest.getRequester().setId(requesterId);
-        recommendationRequest.setReceiver(new User());
-        recommendationRequest.getReceiver().setId(receiverId);
-        recommendationRequest.setMessage("testMessage");
-        recommendationRequest.setStatus(status);
-        recommendationRequest.setSkills(List.of(new SkillRequest(), new SkillRequest()));
-        return recommendationRequest;
+        recommendationRequest.setRequester(requester);
+        recommendationRequest.setReceiver(receiver);
+        recommendationRequest.setSkills(List.of(skillRequest1, skillRequest2));
+
+        RecommendationRequestDto recommendationRequestDto = recommendationRequestMapper.mapToDto(recommendationRequest);
+
+        assertEquals(1L, recommendationRequestDto.getRequesterId());
+        assertEquals(2L, recommendationRequestDto.getReceiverId());
+        assertEquals(List.of(10L, 20L), recommendationRequestDto.getSkillsIds());
+    }
+
+    @Test
+    void testMapToEntity_ShouldMapCorrectly() {
+        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
+        recommendationRequestDto.setRequesterId(1L);
+        recommendationRequestDto.setReceiverId(2L);
+
+        RecommendationRequest recommendationRequest = recommendationRequestMapper.mapToEntity(recommendationRequestDto);
+
+        assertEquals(1L, recommendationRequest.getRequester().getId());
+        assertEquals(2L, recommendationRequest.getReceiver().getId());
+    }
+
+    @Test
+    void testMapToDtoList_ShouldMapCorrectly() {
+        User requester = new User();
+        requester.setId(1L);
+
+        User receiver = new User();
+        receiver.setId(2L);
+
+        SkillRequest skillRequest1 = new SkillRequest();
+        skillRequest1.setId(10L);
+
+        RecommendationRequest recommendationRequest = new RecommendationRequest();
+        recommendationRequest.setRequester(requester);
+        recommendationRequest.setReceiver(receiver);
+        recommendationRequest.setSkills(List.of(skillRequest1));
+
+        List<RecommendationRequestDto> result = recommendationRequestMapper.mapToDto(List.of(recommendationRequest));
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getRequesterId());
+        assertEquals(2L, result.get(0).getReceiverId());
+        assertEquals(List.of(10L), result.get(0).getSkillsIds());
+    }
+
+    @Test
+    void testMapToRejectionDto_ShouldMapCorrectly() {
+        RecommendationRequest recommendationRequest = new RecommendationRequest();
+        recommendationRequest.setRejectionReason("Not enough details");
+
+        RejectionDto rejectionDto = recommendationRequestMapper.mapToRejectionDto(recommendationRequest);
+
+        assertNotNull(rejectionDto);
+        assertEquals("Not enough details", rejectionDto.getRejectionReason());
+    }
+
+    @Test
+    void testMapSkillsReqsToSkillsReqsIds_ShouldMapCorrectly() {
+        SkillRequest skillRequest1 = new SkillRequest();
+        skillRequest1.setId(10L);
+
+        SkillRequest skillRequest2 = new SkillRequest();
+        skillRequest2.setId(20L);
+
+        List<SkillRequest> skillRequests = List.of(skillRequest1, skillRequest2);
+
+        List<Long> skillIds = RecommendationRequestMapper.mapSkillsReqsToSkillsReqsIds(skillRequests);
+
+        assertNotNull(skillIds);
+        assertEquals(2, skillIds.size());
+        assertEquals(List.of(10L, 20L), skillIds);
     }
 }

@@ -11,10 +11,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.promotion.PromotionDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.promotion.PromotionType;
-import school.faang.user_service.service.PromotionService;
+import school.faang.user_service.model.dto.PromotionDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.PromotionType;
+import school.faang.user_service.service.impl.PromotionServiceImpl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -34,7 +34,7 @@ public class PromotionControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private PromotionService promotionService;
+    private PromotionServiceImpl promotionService;
 
     @Mock
     private UserContext userContext;

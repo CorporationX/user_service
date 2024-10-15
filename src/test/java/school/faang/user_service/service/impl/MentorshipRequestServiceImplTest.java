@@ -19,23 +19,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestFilterDto;
-import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestFilter;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.RejectionDto;
+import school.faang.user_service.model.filter_dto.MentorshipRequestFilterDto;
+import school.faang.user_service.model.entity.MentorshipRequest;
+import school.faang.user_service.model.enums.RequestStatus;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestDescriptionFilter;
-import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestReceiverFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestStatusFilter;
-import school.faang.user_service.mapper.mentorshipRequest.MentorshipRequestMapper;
-import school.faang.user_service.model.dto.MentorshipAcceptedEvent;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.ArrayList;
@@ -150,7 +150,6 @@ public class MentorshipRequestServiceImplTest {
         assertTrue(result.isEmpty(), "Список должен быть пустым, если запросов нет");
     }
 
-
     @Test
     public void acceptRequestTest_Success() {
         requester.setMentors(new ArrayList<>());
@@ -195,7 +194,7 @@ public class MentorshipRequestServiceImplTest {
         when(mentorshipRequestRepository.findById(1L)).thenReturn(Optional.of(mentorshipRequest));
         when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(mentorshipRequestDto);
 
-        MentorshipRequestDto result = mentorshipRequestService.rejectRequest(1L, new RejectionDto("Not interested"));
+        MentorshipRequestDto result = mentorshipRequestService.rejectRequest(1L, new RejectionDto(1L, "Not interested"));
 
         assertEquals(RequestStatus.REJECTED, mentorshipRequest.getStatus());
         assertEquals("Not interested", mentorshipRequest.getRejectionReason());

@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.exception.EventPublishingException;
-import school.faang.user_service.model.dto.MentorshipAcceptedEvent;
+import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;

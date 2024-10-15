@@ -13,12 +13,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.util.ReflectionTestUtils;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.model.dto.SkillCandidateDto;
+import school.faang.user_service.model.dto.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.impl.SkillServiceImpl;
 import school.faang.user_service.validator.SkillValidator;
 
 import java.util.Collections;
@@ -50,7 +50,7 @@ public class SkillControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
 
     @InjectMocks
     private SkillController skillController;

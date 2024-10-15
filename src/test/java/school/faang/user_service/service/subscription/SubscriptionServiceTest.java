@@ -11,7 +11,7 @@ import school.faang.user_service.constant.TestConst;
 import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.publisher.redis.FollowerEventPublisher;
+import school.faang.user_service.redis.publisher.FollowEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserFilter;
@@ -43,7 +43,7 @@ public class SubscriptionServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private FollowerEventPublisher followerEventPublisher;
+    private FollowEventPublisher followEventPublisher;
 
     @InjectMocks
     private SubscriptionService subscriptionService;
@@ -180,7 +180,7 @@ public class SubscriptionServiceTest {
                 subscriptionRepository,
                 userRepository,
                 userFilters,
-                followerEventPublisher);
+                followEventPublisher);
 
         List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 

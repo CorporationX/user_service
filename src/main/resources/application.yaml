@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -26,6 +28,10 @@ spring:
           name: follower_event
         goalCompletedEvent:
           name: goal_completed_event_channel
+
+servlet:
+  multipart:
+    max-file-size: 5242880
 
 server:
   port: 8080

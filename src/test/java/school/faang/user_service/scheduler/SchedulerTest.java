@@ -7,10 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.testcontainers.shaded.org.apache.commons.lang.math.IntRange;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.service.event.EventService;
 
@@ -19,10 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,7 +35,7 @@ public class SchedulerTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(scheduler,"batchSize", 3);
+        ReflectionTestUtils.setField(scheduler, "batchSize", 3);
         IntStream.range(0, 6).forEach(i -> {
             Event event = Event.builder()
                     .id(i)
@@ -58,7 +53,7 @@ public class SchedulerTest {
         int batchSize = 3;
         int calls = (int) Math.ceil((double) events.size() / batchSize);
         scheduler.clearEvents();
-        verify(eventService,times(calls)).deleteEventsByIds(anyList());
+        verify(eventService, times(calls)).deleteEventsByIds(anyList());
 
     }
 
@@ -68,7 +63,7 @@ public class SchedulerTest {
         List<Event> emptyEvents = new ArrayList<>();
         when(eventService.getPastEvents()).thenReturn(emptyEvents);
         scheduler.clearEvents();
-        verify(eventService,times(0)).deleteEventsByIds(anyList());
+        verify(eventService, times(0)).deleteEventsByIds(anyList());
         verify(eventService).getPastEvents();
     }
 }

@@ -42,18 +42,6 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public void deleteFile(String key) {
-        log.debug("Starting file deletion from S3 with key: {}", key);
-        s3Client.deleteObject(bucketName, key);
-    }
-
-    @Override
-    public InputStream downloadFile(String key) {
-        log.debug("Starting file download from S3 with key: {}", key);
-        return s3Client.getObject(bucketName, key).getObjectContent();
-    }
-
-    @Override
     public void uploadFile(String key, byte[] file, String bucketName, long contentLength, MediaType contentType) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(contentLength);
@@ -66,5 +54,17 @@ public class S3ServiceImpl implements S3Service {
                 metadata
         );
         s3Client.putObject(request);
+    }
+
+    @Override
+    public void deleteFile(String key) {
+        log.debug("Starting file deletion from S3 with key: {}", key);
+        s3Client.deleteObject(bucketName, key);
+    }
+
+    @Override
+    public InputStream downloadFile(String key) {
+        log.debug("Starting file download from S3 with key: {}", key);
+        return s3Client.getObject(bucketName, key).getObjectContent();
     }
 }

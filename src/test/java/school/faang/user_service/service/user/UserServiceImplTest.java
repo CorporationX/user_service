@@ -9,17 +9,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.contact.ContactPreference;
-import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.contact.ContactPreference;
+import school.faang.user_service.model.entity.contact.PreferredContact;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
-import school.faang.user_service.service.impl.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalService;
 import school.faang.user_service.service.impl.mentorship.MentorshipServiceImpl;
 import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.util.CsvParser;
@@ -59,7 +59,7 @@ class UserServiceImplTest {
     private UserFilter userFilter;
 
     @Mock
-    private GoalServiceImpl goalService;
+    private GoalService goalService;
 
     @Mock
     private EventServiceImpl eventServiceImpl;
@@ -87,6 +87,12 @@ class UserServiceImplTest {
                 "0987654321",
                 PreferredContact.TELEGRAM);
 
+        ContactPreference contactPreference = ContactPreference.builder()
+                .id(1L)
+                .user(user)
+                .preference(PreferredContact.TELEGRAM)
+                .build();
+
         user = User.builder()
                 .id(1L)
                 .goals(List.of())
@@ -97,9 +103,7 @@ class UserServiceImplTest {
                 .aboutMe("About Jane Smith")
                 .experience(5)
                 .banned(false)
-                .contactPreference(ContactPreference.builder()
-                        .preference(PreferredContact.TELEGRAM)
-                        .build())
+                .contactPreference(contactPreference)
                 .build();
 
         filters = List.of(userFilter);

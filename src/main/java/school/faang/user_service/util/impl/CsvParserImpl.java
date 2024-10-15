@@ -4,7 +4,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.student.Person;
+import school.faang.user_service.model.dto.student.Person;
 import school.faang.user_service.util.CsvParser;
 
 import java.io.IOException;

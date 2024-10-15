@@ -1,10 +1,10 @@
 package school.faang.user_service.util;
 
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.contact.Contact;
 
 import java.util.List;
 

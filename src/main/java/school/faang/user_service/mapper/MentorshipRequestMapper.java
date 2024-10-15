@@ -3,8 +3,8 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.entity.MentorshipRequest;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {

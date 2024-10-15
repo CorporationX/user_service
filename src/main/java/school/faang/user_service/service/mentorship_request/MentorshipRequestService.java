@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.annotation.SendMentorshipRequestReceived;
 import school.faang.user_service.dto.mentorship_request.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
@@ -27,6 +28,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestParametersChecker checker;
     private final UserRepository userRepository;
 
+    @SendMentorshipRequestReceived
     @Transactional
     public MentorshipRequest requestMentorship(long requesterId, long receiverId, String description) {
         checker.checkRequestParams(requesterId, receiverId, description);

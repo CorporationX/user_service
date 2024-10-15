@@ -2,6 +2,8 @@ package school.faang.user_service.service.mentorshiprequest;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
@@ -21,6 +23,8 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@ToString
 public class MentorshipRequestService {
     private final MentorshipRequestRepository menReqRepository;
     private final MentorshipRequestMapper menReqMapper;
@@ -29,14 +33,6 @@ public class MentorshipRequestService {
     private final MentorshipRequestEventPublisher publisher;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto menReqDto) {
-
-        var message = MentorshipRequestMessage.builder()
-                .requesterId(menReqDto.getRequesterId())
-                .receiverId(menReqDto.getReceiverId())
-                .createdAt(menReqDto.getCreatedAt())
-                .build();
-
-        publisher.publish(message);
 
         menReqValidator.validateReceiverNoEqualsRequester(menReqDto);
         menReqValidator.validateAvailabilityUsersDB(menReqDto);
@@ -49,6 +45,15 @@ public class MentorshipRequestService {
         MentorshipRequest menReq = menReqRepository.create(menReqDto.getRequesterId(),
                 menReqDto.getReceiverId(),
                 menReqDto.getDescription());
+
+        var message = MentorshipRequestMessage.builder()
+                .requesterId(menReqDto.getRequesterId())
+                .receiverId(menReqDto.getReceiverId())
+                .createdAt(menReqDto.getCreatedAt())
+                .build();
+
+        publisher.publish(message);
+        log.info("message publish: {}", message.toString());
 
         return menReqMapper.toDto(menReq);
     }

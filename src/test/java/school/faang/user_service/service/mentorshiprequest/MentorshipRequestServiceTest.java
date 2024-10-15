@@ -17,6 +17,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
@@ -41,6 +42,8 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestValidator menReqValidator;
     @Mock
     private MentorshipRequestRepository menReqRepository;
+    @Mock
+    private MentorshipRequestEventPublisher publisher;
 
     private MentorshipRequestDto menReqDto = new MentorshipRequestDto();
     private MentorshipRequest menReqEntity = new MentorshipRequest();
@@ -64,7 +67,7 @@ class MentorshipRequestServiceTest {
             filterRequests = List.of(requestFilter);
 
             menReqService = new MentorshipRequestService(
-                    menReqRepository, menReqMapper, menReqValidator, filterRequests);
+                    menReqRepository, menReqMapper, menReqValidator, filterRequests, publisher);
 
             menReqDto = MentorshipRequestDto.builder()
                     .id(MENTORSHIP_REQUEST_ID)

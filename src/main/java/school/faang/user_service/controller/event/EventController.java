@@ -13,16 +13,14 @@ import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 
-@RestController()
-@RequestMapping("/api/v1")
+@Controller
 @RequiredArgsConstructor
 public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping("/event")
     public EventDto create(@RequestBody EventDto event) {
-//        validate(event);
+        validate(event);
         eventService.create(event);
         return event;
     }

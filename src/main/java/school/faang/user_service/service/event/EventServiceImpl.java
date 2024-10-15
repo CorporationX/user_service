@@ -28,37 +28,20 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
     private final SkillRepository skillRepository;
-    private final EventStartEventPublisher eventStartEventPublisher;
-    private final ObjectMapper objectMapper;
 
     @Transactional
     public EventDto create(EventDto eventDto) {
-//        skillCheck(eventDto);
+        skillCheck(eventDto);
         Event event = eventMapper.toEntity(eventDto);
         event.setOwner(userRepository.findById(eventDto.getOwnerId()).orElseThrow(() -> new DataValidationException("Пользователь не обнаружен")));
         event.setRelatedSkills(skillRepository.findAllById(eventDto.getRelatedSkillsIds()));
         eventRepository.save(event);
-
-        EventStartEvent eventStartEvent = new EventStartEvent();
-        eventStartEvent.setTitle(event.getTitle());
-        eventStartEvent.setStartDate(event.getStartDate());
-        eventStartEvent.setOwnerId(eventDto.getOwnerId());
-        eventStartEvent.setSubscriberId(eventDto.getOwnerId());
-
-        try {
-            String json = objectMapper.writeValueAsString(eventStartEvent);
-            eventStartEventPublisher.publish(json);
-            log.info("Сообщение {} успешно отправлено", json);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
         return eventMapper.toDto(event);
     }
 

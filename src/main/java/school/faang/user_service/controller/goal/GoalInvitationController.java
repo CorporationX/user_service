@@ -7,7 +7,7 @@ import school.faang.user_service.dto.GoalInvitationDto;
 import school.faang.user_service.dto.SuccessResponse;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.service.GoalInvitationService;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class GoalInvitationController {
     }
 
     @PostMapping("/getInvitations")
-    public List<GoalInvitation> getInvitations(@RequestBody InvitationFilterDto filterDTO) {
-        return goalInvitationService.getInvitations(filterDTO);
+    public List<GoalInvitation> getInvitations(@RequestBody GoalInvitationFilterDto filterDTO) {
+        return goalInvitationService.getInvitationsByFilter(filterDTO);
     }
 }
 

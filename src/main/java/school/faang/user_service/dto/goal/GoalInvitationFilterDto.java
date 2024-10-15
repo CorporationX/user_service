@@ -5,7 +5,7 @@ import school.faang.user_service.entity.RequestStatus;
 
 
 @Getter
-public class InvitationFilterDto {
+public class GoalInvitationFilterDto {
     private String inviterNamePattern;
 
     private String invitedNamePattern;

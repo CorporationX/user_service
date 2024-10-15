@@ -3,19 +3,22 @@ package school.faang.user_service.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoalInvitationDto;
+import school.faang.user_service.filter.GoalInvitationFilter;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
 public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalInvitationMapper goalInvitationMapper;
+    private final List<GoalInvitationFilter> goalnvitationFilterList;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDTO) {
         createInvitationValidation(invitationDTO);
@@ -43,19 +46,12 @@ public class GoalInvitationService {
         } else throw new IllegalArgumentException("Приглашение отклонено.");
     }
 
-    public List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
-        return goalInvitationRepository.findAll().stream()
-                .filter(invitation -> filter.getInviterNamePattern() == null ||
-                        invitation.getInviter().getUsername().contains(filter.getInviterNamePattern()))
-                .filter(invitation -> filter.getInvitedNamePattern() == null ||
-                        invitation.getInvited().getUsername().contains(filter.getInvitedNamePattern()))
-                .filter(invitation -> filter.getInviterId() == null ||
-                        invitation.getInviter().getId().equals(filter.getInviterId()))
-                .filter(invitation -> filter.getInvitedId() == null ||
-                        invitation.getInvited().getId().equals(filter.getInvitedId()))
-                .filter(invitation -> filter.getStatus() == null ||
-                        invitation.getStatus().equals(filter.getStatus()))
-                .collect(Collectors.toList());
+    public List<GoalInvitation> getInvitationsByFilter(GoalInvitationFilterDto goalInvitationFilterDto) {
+        Stream<GoalInvitation> allVacancy = goalInvitationRepository.findAll().stream();
+        List<GoalInvitation> invitationList = goalnvitationFilterList.stream().filter(filter -> filter.isApplicable(goalInvitationFilterDto))
+                .flatMap(filter -> filter.apply(allVacancy, goalInvitationFilterDto)).collect(Collectors.toList());
+        return invitationList;
+
     }
 
     public void createInvitationValidation(GoalInvitationDto invitationDTO) {

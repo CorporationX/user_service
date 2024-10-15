@@ -7,8 +7,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.application_event.UserIdsReceivedEvent;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.application.UserIdsReceivedEvent;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class UserBanService {
     private final UserRepository userRepository;
 
     @EventListener
-    public void processUserUpdates(UserIdsReceivedEvent event) {
+    public synchronized void processUserUpdates(UserIdsReceivedEvent event) {
         retryUpdateUsers(event.getUserIds());
     }
 

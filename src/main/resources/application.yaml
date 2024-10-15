@@ -52,4 +52,4 @@ payment-service:
 
 redis:
   channels:
-    user-ban: user_ban
+    user-ban: user_ban_channel

@@ -1,4 +1,4 @@
-package school.faang.user_service.application_event;
+package school.faang.user_service.event.application;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

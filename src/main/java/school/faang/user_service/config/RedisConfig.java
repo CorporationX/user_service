@@ -1,64 +1,51 @@
 package school.faang.user_service.config;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.redis.UserBanSubscriber;
+import school.faang.user_service.listener.UserBanEventListener;
 
 @Configuration
 @Slf4j
-@RequiredArgsConstructor
 public class RedisConfig {
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
+
     @Value("${redis.channels.user-ban}")
-    String bannedUserTopic;
-
-    private final UserBanSubscriber userBanSubscriber;
+    private String userBanEventChannel;
 
     @Bean
-    MessageListenerAdapter userBanMessageListener() {
-        return new MessageListenerAdapter(userBanSubscriber);
+    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(lettuceConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
     }
 
     @Bean
-    RedisMessageListenerContainer userBanRedisContainer() {
-        RedisMessageListenerContainer container
-                = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(userBanMessageListener(), bannedUserTopic());
+    public ChannelTopic userBanChannelTopic() {
+        return new ChannelTopic(userBanEventChannel);
+    }
+
+    @Bean
+    public MessageListenerAdapter userBanEventListenerAdapter(UserBanEventListener userBanEventListener) {
+        return new MessageListenerAdapter(userBanEventListener, "onMessage");
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer(
+            LettuceConnectionFactory lettuceConnectionFactory,
+            UserBanEventListener userBanEventListener) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(lettuceConnectionFactory);
+        container.addMessageListener(userBanEventListenerAdapter(userBanEventListener), userBanChannelTopic());
         return container;
-    }
-
-    @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        return new JedisConnectionFactory(config);
-    }
-
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
-
-    @Bean
-    public ChannelTopic bannedUserTopic() {
-        return new ChannelTopic(bannedUserTopic);
     }
 }

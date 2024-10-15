@@ -28,6 +28,7 @@ spring:
         mentorship-channel: mentorship_channel
         follower-event-channel: follower_event
         user-service: ban_user_channel
+        profile-view-channel: profile_view_channel
   cloud:
     openfeign:
       client:

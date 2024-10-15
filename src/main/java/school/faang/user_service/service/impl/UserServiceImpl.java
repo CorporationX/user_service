@@ -19,9 +19,11 @@ import school.faang.user_service.model.entity.UserProfilePic;
 import school.faang.user_service.model.entity.Event;
 import school.faang.user_service.model.entity.Goal;
 import school.faang.user_service.model.entity.Promotion;
+import school.faang.user_service.model.event.ProfileViewEvent;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.EventRepository;
@@ -35,12 +37,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.stream.Stream;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final static String PROMOTION_TARGET = "profile";
 
@@ -54,6 +61,7 @@ public class UserServiceImpl implements UserService {
     private final PersonToUserMapper personToUserMapper;
     private final CountryService countryService;
     private final S3service s3service;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Override
     @Transactional
@@ -374,5 +382,18 @@ public class UserServiceImpl implements UserService {
             password.append(chars.charAt(random.nextInt(chars.length())));
         }
         return password.toString();
+    }
+
+    @Override
+    public void publishProfileViewEvent(long viewerId, long profileOwnerId) {
+        if (viewerId != profileOwnerId) {
+            ProfileViewEvent event = new ProfileViewEvent(viewerId, profileOwnerId);
+            profileViewEventPublisher.publish(event);
+
+            log.info("Published ProfileViewEvent: viewerId={}, profileOwnerId={}", viewerId, profileOwnerId);
+        } else {
+            log.debug("Viewer ID is the same as Profile Owner ID. No event published. viewerId={}, profileOwnerId={}",
+                    viewerId, profileOwnerId);
+        }
     }
 }

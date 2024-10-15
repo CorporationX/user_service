@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.User;
@@ -10,7 +9,6 @@ import java.io.InputStream;
 import java.util.List;
 
 public interface UserService {
-    @Transactional
     List<UserDto> getPremiumUsers(UserFilterDto filterDto);
 
     UserDto deactivateUser(UserDto userDto);
@@ -25,17 +23,15 @@ public interface UserService {
 
     List<UserDto> getUsersByIds(List<Long> ids);
 
-    @Transactional
     List<UserDto> getFilteredUsers(UserFilterDto filterDto, Long callingUserId);
 
-    @Transactional
     void saveAvatar(long userId, MultipartFile file);
 
     byte[] getAvatar(long userId);
 
-    @Transactional
     void deleteAvatar(long userId);
 
-    @Transactional
     void processCsvFile(InputStream inputStream);
+
+    void publishProfileViewEvent(long viewerId, long profileOwnerId);
 }

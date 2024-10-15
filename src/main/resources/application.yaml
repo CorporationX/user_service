@@ -52,6 +52,7 @@ redis:
     mentorship: mentorship_channel
     project-follower: project_follower_channel
     mentorship-accepted: mentorship_accepted_channel
+    profile-view: profile_view_channel
 
 scheduler:
   clear-events:

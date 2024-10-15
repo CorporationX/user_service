@@ -46,10 +46,13 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
-        run: ./gradlew build testClasses -x test -x jacocoTestReport -x check --no-daemon
+        run: ./gradlew build testClasses -x test -x jacocoTestReport -x check -x integrationTest --no-daemon
 
       - name: Test with Gradle
         run: ./gradlew test -x testClasses --no-daemon --continue
+
+      - name: Integration tests with Gradle
+        run: ./gradlew integrationTest -x testClasses --no-daemon --continue
 
       - name: Archive test report
         if: always()

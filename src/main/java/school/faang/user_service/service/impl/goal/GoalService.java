@@ -13,10 +13,9 @@ import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.model.event.GoalCompletedEventDto;
+import school.faang.user_service.model.event.GoalCompletedEvent;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
@@ -25,7 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GoalServiceImpl implements GoalService {
+public class GoalService implements school.faang.user_service.service.GoalService {
     private final GoalRepository goalRepository;
     private final static int MAX_NUMBER_ACTIVE_GOALS = 3;
     private final SkillService skillService;
@@ -112,7 +111,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     private void sendEvent(long goalId) {
-        GoalCompletedEventDto event = GoalCompletedEventDto.builder()
+        GoalCompletedEvent event = GoalCompletedEvent.builder()
                 .goalId(goalId)
                 .userId(userContext.getUserId())
                 .completedAt(LocalDateTime.now())

@@ -20,7 +20,7 @@ import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.entity.goal.GoalStatus;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.SkillService;
-import school.faang.user_service.service.impl.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 public class GoalServiceImplTest {
 
     @InjectMocks
-    private GoalServiceImpl goalService;
+    private GoalService goalService;
 
     @Mock
     private GoalRepository goalRepository;

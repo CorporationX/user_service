@@ -19,7 +19,7 @@ import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
-import school.faang.user_service.service.impl.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalService;
 import school.faang.user_service.service.impl.mentorship.MentorshipServiceImpl;
 import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.util.CsvParser;
@@ -59,7 +59,7 @@ class UserServiceImplTest {
     private UserFilter userFilter;
 
     @Mock
-    private GoalServiceImpl goalService;
+    private GoalService goalService;
 
     @Mock
     private EventServiceImpl eventServiceImpl;

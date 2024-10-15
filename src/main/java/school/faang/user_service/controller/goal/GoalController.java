@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.dto.goal.GoalFilterDto;
 import school.faang.user_service.model.dto.goal.GoalNotificationDto;
-import school.faang.user_service.service.impl.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalService;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/api/v1/goals")
 @RequiredArgsConstructor
 public class GoalController {
-    private final GoalServiceImpl goalService;
+    private final GoalService goalService;
 
     @PostMapping("/userId/{userId}")
     public GoalDto createGoal(@PathVariable @Positive long userId, @RequestBody @Validated GoalDto goalDto) {

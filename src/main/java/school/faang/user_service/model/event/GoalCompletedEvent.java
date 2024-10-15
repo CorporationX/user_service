@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record GoalCompletedEventDto(
+public record GoalCompletedEvent(
         long userId,
         long goalId,
         LocalDateTime completedAt

@@ -2,8 +2,9 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.service.impl.PaginationServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PaginationServiceTest {
 
-    private PaginationService paginationService;
+    private PaginationServiceImpl paginationService;
 
     private static final String ITEM_1 = "item1";
     private static final String ITEM_2 = "item2";
@@ -23,7 +24,7 @@ class PaginationServiceTest {
 
     @BeforeEach
     void setUp() {
-        paginationService = new PaginationService();
+        paginationService = new PaginationServiceImpl();
     }
 
     private User createUser(long id, String username) {

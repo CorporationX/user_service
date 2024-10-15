@@ -5,13 +5,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.PreferredContact;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.impl.PaginationServiceImpl;
+import school.faang.user_service.service.impl.SubscriptionServiceImpl;
+import school.faang.user_service.service.impl.UserFilterService;
 import school.faang.user_service.validator.SubscriptionServiceValidator;
 
 import java.util.List;
@@ -35,7 +38,7 @@ class SubscriptionServiceTest {
     private SubscriptionServiceValidator subscriptionServiceValidator;
 
     @Mock
-    private PaginationService paginationService;
+    private PaginationServiceImpl paginationService;
 
     @Mock
     private UserFilterDto filter;
@@ -47,7 +50,7 @@ class SubscriptionServiceTest {
     private UserFilterService userFilterService;
 
     @InjectMocks
-    private SubscriptionService subscriptionService;
+    private SubscriptionServiceImpl subscriptionService;
 
     private static final long FOLLOWER_ID = 1L;
     private static final long FOLLOWEE_ID = 2L;

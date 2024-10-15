@@ -2,8 +2,8 @@ package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
+import school.faang.user_service.model.dto.SkillDto;
+import school.faang.user_service.model.entity.Skill;
 
 import java.util.Arrays;
 import java.util.List;

@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.UserProfilePic;
+import school.faang.user_service.model.entity.Goal;
 
 import java.util.List;
 import java.util.stream.Stream;

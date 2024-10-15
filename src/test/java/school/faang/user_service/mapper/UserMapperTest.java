@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.entity.User;
 
 import java.util.List;
 

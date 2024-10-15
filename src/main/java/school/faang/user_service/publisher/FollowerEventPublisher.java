@@ -13,7 +13,7 @@ public class FollowerEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic followerTopic;
 
-    public void sendEvent(FollowerEventDto event) {
+    public void publish(FollowerEventDto event) {
         redisTemplate.convertAndSend(followerTopic.getTopic(), event);
     }
 }

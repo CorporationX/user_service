@@ -10,6 +10,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SubscriptionRequirementsException;
+import school.faang.user_service.publis.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.SubscriptionService;
@@ -19,8 +20,10 @@ import school.faang.user_service.service.filters.UserFilter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -35,6 +38,8 @@ public class SubscriptionServiceTest {
     SubscriptionRepository subscriptionRepository;
     @Mock
     UserRepository userRepository;
+    @Mock
+    FollowerEventPublisher followerEventPublisher;
 
     @InjectMocks
     SubscriptionService subscriptionService;
@@ -53,9 +58,15 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testFollowUserSuccessful() {
+        User followerUser = User.builder()
+                .id(firstUserId)
+                .username("follower")
+                .build();
+
         when(userRepository.existsById(firstUserId)).thenReturn(true);
         when(userRepository.existsById(secondUserId)).thenReturn(true);
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(firstUserId, secondUserId)).thenReturn(false);
+        when(userRepository.findById(firstUserId)).thenReturn(Optional.of(followerUser));
 
         subscriptionService.followUser(firstUserId, secondUserId);
 

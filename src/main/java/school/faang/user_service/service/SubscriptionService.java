@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.dto.follower.FollowerEventDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SubscriptionRequirementsException;
 import school.faang.user_service.publis.publisher.FollowerEventPublisher;
@@ -32,8 +31,9 @@ public class SubscriptionService {
         validateFollowUnfollow(followerId, followeeId, true);
 
         subscriptionRepository.followUser(followerId, followeeId);
-        User user = userRepository.findById(followeeId).orElseThrow();
-        publishToRedisFollowing(user, followerId);
+        User follower = userRepository.findById(followerId).orElseThrow();
+
+        followerEventPublisher.publishFollower(follower, followeeId);
     }
 
     @Transactional
@@ -97,15 +97,5 @@ public class SubscriptionService {
         if (!userRepository.existsById(userId)) {
             throw new SubscriptionRequirementsException("User with the ID " + userId + " doesn't exits");
         }
-    }
-
-    private void publishToRedisFollowing(User user, long followerId) {
-        FollowerEventDto followerEventDto = FollowerEventDto.builder()
-                .username(user.getUsername())
-                .followerId(followerId)
-                .followeeId(user.getId())
-                .build();
-
-        followerEventPublisher.publishFollower(followerEventDto);
     }
 }

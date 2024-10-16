@@ -8,6 +8,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.redis.RedisProperties;
 import school.faang.user_service.dto.follower.FollowerEventDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.follower.FollowerEventMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -16,8 +18,10 @@ public class FollowerEventPublisher {
     private final RedisProperties redisProperties;
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
+    private final FollowerEventMapper followerEventMapper;
 
-    public void publishFollower(FollowerEventDto message) {
+    public void publishFollower(User follower, Long followeeId) {
+        FollowerEventDto message = followerEventMapper.toEventDto(follower, followeeId);
         String valueAsString;
         String followerEventChannel = redisProperties.getFollowerEventChannelName();
         try {

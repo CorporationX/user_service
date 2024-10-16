@@ -51,4 +51,4 @@ redis:
   channels:
     mentorship-channel: mentorship_channel
     follower-event-channel: follower_event
-    goal-completed-channel: goal_completed
+    goal-completed: goal_completed_channel

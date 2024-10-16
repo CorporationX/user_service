@@ -18,7 +18,7 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-    @Value("${redis.channels.goal-completed-channel}")
+    @Value("${redis.channels.goal-completed}")
     private String goalCompletedChannel;
 
     public interface MessagePublisher<T> {

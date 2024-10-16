@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -48,6 +49,15 @@ public class GoalServiceImpl implements GoalService {
         });
 
         return goalMapper.toGoalDto(updatedGoal);
+    }
+
+    @Override
+    public GoalDto getGoal(long goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
+
+        return goalMapper.toGoalDto(goal);
     }
 
     private Goal validateAndSetGoalForUpdate(Goal existingGoal, GoalDto goalDto) {

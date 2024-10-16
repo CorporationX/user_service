@@ -17,12 +17,12 @@ import school.faang.user_service.service.subscription.SubscriptionService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/subscriptions")
+@RequestMapping("/users/{followeeId}/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @PostMapping("/follower/{followerId}/followee/{followeeId}")
+    @PostMapping("/followers/{followerId}")
     public SuccessResponse followUser(@PathVariable Long followerId,
                                       @PathVariable Long followeeId) {
         subscriptionService.followUser(followerId, followeeId);

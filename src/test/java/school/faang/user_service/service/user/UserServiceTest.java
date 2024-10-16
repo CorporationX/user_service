@@ -3,18 +3,24 @@ package school.faang.user_service.service.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.UserFilter;
+import school.faang.user_service.filter.UsernameFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.publisher.EventPublisher;
+import school.faang.user_service.service.publisher.RedisTopics;
+import school.faang.user_service.service.publisher.event.SearchAppearanceEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +53,12 @@ public class UserServiceTest {
 
     @Mock
     private List<UserFilter> filters;
+
+    @Mock
+    private EventPublisher eventPublisher;
+
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -192,5 +204,34 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).findAllById(userIds);
         verify(userMapper, times(0)).toDto(any());
+    }
+
+    @Test
+    void getFilteredUsers_validRequest_returnsListOfUsers() {
+        UserFilter mockUsernameFilter = mock(UsernameFilter.class);
+        filters = new ArrayList<>(List.of(mockUsernameFilter));
+        UserFilter usernameFilter = new UsernameFilter();
+        filters.add(usernameFilter);
+        UserFilterDto userFilterDto = new UserFilterDto();
+        userFilterDto.setNamePattern("User1");
+        User user1 = new User();
+        user1.setUsername("User1");
+        UserDto userDto1 = new UserDto(1L, "User1", "email");
+
+        when(userRepository.findAll()).thenReturn(List.of(user1));
+        when(userMapper.toDto(user1)).thenReturn(userDto1);
+        when(userContext.getUserId()).thenReturn(3L);
+
+        List<UserDto> filteredUsers = userService.getFilteredUsers(userFilterDto);
+
+        assertEquals(1, filteredUsers.size());
+        ArgumentCaptor<SearchAppearanceEvent> eventCaptor = ArgumentCaptor.forClass(SearchAppearanceEvent.class);
+        verify(eventPublisher, times(1)).publishToTopic(eq(RedisTopics.SEARCH_APPEARANCE.getTopicName()), eventCaptor.capture());
+
+        for (SearchAppearanceEvent event : eventCaptor.getAllValues()) {
+            assertEquals(3L, event.getActorId());
+            assertNotNull(event.getReceivedAt());
+            assertEquals(1L, event.getReceiverId());
+        }
     }
 }

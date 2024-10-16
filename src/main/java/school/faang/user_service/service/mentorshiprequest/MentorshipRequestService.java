@@ -17,6 +17,7 @@ import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -42,20 +43,23 @@ public class MentorshipRequestService {
 
         menReqOptional.ifPresent(menReqValidator::validateDataCreateRequest);
 
-        MentorshipRequest menReq = menReqRepository.create(menReqDto.getRequesterId(),
+
+/*        MentorshipRequest menReq = menReqRepository.create(menReqDto.getRequesterId(),
                 menReqDto.getReceiverId(),
-                menReqDto.getDescription());
+                menReqDto.getDescription());*/
 
         var message = MentorshipRequestMessage.builder()
                 .requesterId(menReqDto.getRequesterId())
                 .receiverId(menReqDto.getReceiverId())
-                .createdAt(menReqDto.getCreatedAt())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         publisher.publish(message);
         log.info("message publish: {}", message.toString());
 
-        return menReqMapper.toDto(menReq);
+        MentorshipRequestDto dto = new MentorshipRequestDto();
+        return dto;
+//        return menReqMapper.toDto(menReq);
     }
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {

@@ -4,13 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
 @Setter
-public class MentorshipRequestMessage {
+public class MentorshipRequestMessage implements Serializable {
     private long requesterId;
     private long receiverId;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }

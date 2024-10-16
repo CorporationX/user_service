@@ -210,6 +210,11 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteUserProfilePicByUserId(userId);
     }
 
+    @Override
+    public Long getMaxUserId() {
+        return userRepository.findMaxUserId();
+    }
+
     private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service.subscription.filters;
+package school.faang.user_service.service.subscription.filters;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,18 +10,6 @@ import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
-import school.faang.user_service.service.subscription.filters.AboutMeFilter;
-import school.faang.user_service.service.subscription.filters.CityFilter;
-import school.faang.user_service.service.subscription.filters.ContactFilter;
-import school.faang.user_service.service.subscription.filters.CountryFilter;
-import school.faang.user_service.service.subscription.filters.EmailFilter;
-import school.faang.user_service.service.subscription.filters.ExperienceMaxFilter;
-import school.faang.user_service.service.subscription.filters.ExperienceMinFilter;
-import school.faang.user_service.service.subscription.filters.NameFilter;
-import school.faang.user_service.service.subscription.filters.PhoneFilter;
-import school.faang.user_service.service.subscription.filters.SkillFilter;
-import school.faang.user_service.service.subscription.filters.UserFilter;
-import school.faang.user_service.service.subscription.filters.UserFiltersApplier;
 
 import java.util.ArrayList;
 import java.util.List;

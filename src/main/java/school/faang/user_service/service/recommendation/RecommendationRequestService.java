@@ -1,6 +1,8 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendation;
 
 import school.faang.user_service.dto.*;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+
 import java.util.List;
 
 public interface RecommendationRequestService {

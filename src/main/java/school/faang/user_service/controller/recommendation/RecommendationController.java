@@ -1,9 +1,7 @@
 package school.faang.user_service.controller.recommendation;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.recommendation.RecommendationService;
 
@@ -11,27 +9,26 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Validated
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    public void giveRecommendation(@Valid RecommendationDto recommendation) {
+    public void giveRecommendation(RecommendationDto recommendation) {
         recommendationService.create(recommendation);
     }
 
-    public void updateRecommendation(@Valid RecommendationDto updated) {
+    public void updateRecommendation(RecommendationDto updated) {
         recommendationService.update(updated);
     }
 
-    public void deleteRecommendation(@Valid long id) {
+    public void deleteRecommendation(long id) {
         recommendationService.delete(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(@Valid long receiverId) {
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(@Valid long authorId) {
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         return recommendationService.getAllGivenRecommendations(authorId);
     }
 

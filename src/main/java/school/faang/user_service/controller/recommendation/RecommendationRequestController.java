@@ -1,11 +1,11 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.recommendation;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.service.RecommendationRequestService;
-import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.service.recommendation.RecommendationRequestService;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 

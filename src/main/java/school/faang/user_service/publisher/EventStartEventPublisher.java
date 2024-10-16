@@ -12,7 +12,8 @@ public class EventStartEventPublisher implements MessagePublisher<EventDto> {
     private final RedisTemplate<String, EventDto> redisTemplate;
     private final ChannelTopic eventTopic;
 
-    public EventStartEventPublisher(@Qualifier("eventTopic") ChannelTopic eventTopic, RedisTemplate<String, EventDto> redisTemplate) {
+    public EventStartEventPublisher(@Qualifier("eventTopic") ChannelTopic eventTopic,
+                                    RedisTemplate<String, EventDto> redisTemplate) {
         this.eventTopic = eventTopic;
         this.redisTemplate = redisTemplate;
     }

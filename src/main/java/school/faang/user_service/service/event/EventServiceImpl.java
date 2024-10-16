@@ -48,7 +48,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void startEvent(long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(()->
+        Event event = eventRepository.findById(eventId).orElseThrow(() ->
                 new EntityNotFoundException("Event not found with id : %s".formatted(eventId)));
         log.debug("Validating status for event with id {}", event.getId());
         validateEventStatus(event);
@@ -64,8 +64,8 @@ public class EventServiceImpl implements EventService {
                 .map(User::getId)
                 .toList();
 
-        EventDto publishEventDto = new EventDto
-                (userIds, event.getId(), event.getTitle(), event.getStartDate());
+        EventDto publishEventDto = new EventDto(
+                userIds, event.getId(), event.getTitle(), event.getStartDate());
         eventStartEventPublisher.publish(publishEventDto);
     }
 

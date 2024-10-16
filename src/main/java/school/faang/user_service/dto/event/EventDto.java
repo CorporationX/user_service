@@ -7,5 +7,5 @@ public record EventDto(
         List<Long> usersId,
         long eventId,
         String title,
-        LocalDateTime startDateTime)
-{}
+        LocalDateTime startDateTime) {
+}

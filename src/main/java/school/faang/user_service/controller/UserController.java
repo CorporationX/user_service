@@ -105,4 +105,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading the file");
         }
     }
+
+    @GetMapping("/maxId")
+    public Long getMaxUserId() {
+        return userService.getMaxUserId();
+    }
 }

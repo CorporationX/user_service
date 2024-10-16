@@ -15,5 +15,6 @@ public class UserDto {
     private boolean active;
     private String email;
     private String username;
+    private String phone;
     private PreferredContact preference;
 }

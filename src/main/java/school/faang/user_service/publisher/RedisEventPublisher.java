@@ -32,4 +32,3 @@ public abstract class RedisEventPublisher<T> implements MessagePublisher<T> {
         }
     }
 }
-

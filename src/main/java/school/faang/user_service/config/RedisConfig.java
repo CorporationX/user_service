@@ -14,6 +14,9 @@ public class RedisConfig {
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
 
+    @Value("${redis.channels.premium-bought}")
+    private String premiumBoughtEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -30,5 +33,10 @@ public class RedisConfig {
     @Bean(name = "projectFollowerTopic")
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean(name = "premiumBoughtTopic")
+    public ChannelTopic premiumBoughtChannelTopic() {
+        return new ChannelTopic(premiumBoughtEventChannel);
     }
 }

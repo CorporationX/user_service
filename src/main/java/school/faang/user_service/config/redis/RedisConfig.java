@@ -21,7 +21,7 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisTemplate<String, EventDto> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper oMapper) {
+    RedisTemplate<String, EventDto> redisEventTemplate(RedisConnectionFactory connectionFactory, ObjectMapper oMapper) {
         RedisTemplate<String, EventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());

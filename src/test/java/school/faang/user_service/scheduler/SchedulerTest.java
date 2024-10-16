@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = "scheduler.thread-count=10")
-@SpringBootTest
 class SchedulerTest {
 
     @Mock

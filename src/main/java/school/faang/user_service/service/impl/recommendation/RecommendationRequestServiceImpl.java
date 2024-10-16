@@ -2,11 +2,11 @@ package school.faang.user_service.service.impl.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.model.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.model.dto.recommendation.RejectionDto;
+import school.faang.user_service.model.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.model.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;

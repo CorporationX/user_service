@@ -1,9 +1,8 @@
 package school.faang.user_service.service;
 
-import org.springframework.scheduling.annotation.Async;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.model.dto.premium.PremiumDto;
+import school.faang.user_service.model.entity.Premium;
+import school.faang.user_service.model.enums.premium.PremiumPeriod;
 
 import java.util.List;
 

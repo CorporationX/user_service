@@ -1,4 +1,4 @@
-package school.faang.user_service.helper.mentorshiprequest;
+package school.faang.user_service.filter.mentorshiprequest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

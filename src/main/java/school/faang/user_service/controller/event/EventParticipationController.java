@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.EventParticipantsDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.EventParticipantsDto;
 import school.faang.user_service.service.event.EventParticipationService;
 import school.faang.user_service.service.event.EventServiceImpl;
 

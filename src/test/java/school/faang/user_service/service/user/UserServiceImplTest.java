@@ -62,8 +62,6 @@ public class UserServiceImplTest {
     @Mock
     private ImageProcessor imageProcessor;
 
-
-
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
@@ -201,7 +199,8 @@ public class UserServiceImplTest {
         String fileName = "fileName";
         String key = "key";
 
-        String result = (String) ReflectionTestUtils.invokeMethod(service, "uploadFile", userId, outputStream, fileName);
+        String result = (String) ReflectionTestUtils.invokeMethod
+                (service, "uploadFile", userId, outputStream, fileName);
 
         assertNotNull(result);
         verify(s3Service).uploadFile(eq(outputStream), anyString());

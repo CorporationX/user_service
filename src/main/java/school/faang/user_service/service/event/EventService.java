@@ -12,4 +12,6 @@ public interface EventService {
     void deleteEventsByIds(List<Long> ids);
 
     EventDto getEvent(long id);
+
+    void startEvent(EventDto eventDto);
 }

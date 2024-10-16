@@ -30,9 +30,7 @@ public class RedisConfig {
     }
 
     @Bean(value = "eventTopic")
-    public ChannelTopic eventTopic(
-            @Value("${spring.data.redis.channels.event-event-channel.name}") String topic
-    ) {
+    public ChannelTopic eventTopic(@Value("${spring.data.redis.channels.event-event-channel.name}") String topic) {
         return new ChannelTopic(topic);
     }
 }

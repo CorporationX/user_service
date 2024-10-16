@@ -22,12 +22,12 @@ public class RedisConfig {
 
     @Bean
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate(
-            RedisConnectionFactory connectionFactory
-            , ObjectMapper oMapper) {
+            RedisConnectionFactory connectionFactory,
+            ObjectMapper objMapper) {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(oMapper, GoalCompletedEventDto.class));
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objMapper, GoalCompletedEventDto.class));
         return template;
     }
 

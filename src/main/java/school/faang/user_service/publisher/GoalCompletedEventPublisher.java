@@ -12,8 +12,8 @@ public class GoalCompletedEventPublisher implements MessagePublisher<GoalComplet
     private final RedisTemplate<String, GoalCompletedEventDto> redisTemplate;
     private final ChannelTopic topic;
 
-    public GoalCompletedEventPublisher(RedisTemplate<String, GoalCompletedEventDto> redisTemplate
-            , @Qualifier("goalCompletedTopic") ChannelTopic topic) {
+    public GoalCompletedEventPublisher(RedisTemplate<String, GoalCompletedEventDto> redisTemplate,
+                                       @Qualifier("goalCompletedTopic") ChannelTopic topic) {
         this.redisTemplate = redisTemplate;
         this.topic = topic;
     }

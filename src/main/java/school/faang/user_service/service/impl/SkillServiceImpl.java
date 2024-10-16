@@ -4,20 +4,20 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.model.dto.SkillCandidateDto;
+import school.faang.user_service.model.dto.SkillDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.UserSkillGuarantee;
+import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.model.dto.SkillAcquiredEvent;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
 import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.repository.SkillOfferRepository;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
@@ -84,10 +84,11 @@ public class SkillServiceImpl implements SkillService {
             throw new SkillAssignmentException("Not enough skill offers to acquire this skill.");
         }
         log.info("Assigning skill ID {} to user ID {}", skillId, userId);
+
         skillRepository.assignSkillToUser(skillId, userId);
 
         skillAcquiredEventPublisher.publish(new SkillAcquiredEvent(userId, skillId));
-        log.info("Publishing skill acquired event for user ID {} and skill ID {}", userId, skillId);
+        log.info("Publishing SkillAcquiredEvent for user ID {} and skill ID {}", userId, skillId);
 
         setGuarantors(skillOffers);
 

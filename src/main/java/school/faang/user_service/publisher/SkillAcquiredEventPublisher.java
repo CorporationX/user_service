@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.model.dto.SkillAcquiredEvent;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
 
 @Component
 public class SkillAcquiredEventPublisher extends RedisEventPublisher<SkillAcquiredEvent> {

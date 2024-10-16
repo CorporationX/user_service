@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestFilterDto;
-import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.RejectionDto;
+import school.faang.user_service.model.filter_dto.MentorshipRequestFilterDto;
 import school.faang.user_service.service.MentorshipRequestService;
 
 import java.util.List;

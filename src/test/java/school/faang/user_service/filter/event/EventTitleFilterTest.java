@@ -8,8 +8,8 @@ import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.data.jpa.domain.Specification;
-import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.model.filter_dto.EventFilterDto;
+import school.faang.user_service.model.entity.Event;
 
 import java.util.List;
 import java.util.stream.Stream;

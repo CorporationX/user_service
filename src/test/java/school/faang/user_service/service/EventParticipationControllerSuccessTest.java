@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import school.faang.user_service.controller.event.EventParticipationController;
-import school.faang.user_service.service.event.EventParticipationService;
+import school.faang.user_service.controller.EventParticipationController;
+import school.faang.user_service.service.impl.EventParticipationServiceImpl;
 
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +22,7 @@ public class EventParticipationControllerSuccessTest {
     private EventParticipationController eventParticipationController;
 
     @Mock
-    private EventParticipationService eventParticipationService;
+    private EventParticipationServiceImpl eventParticipationService;
 
     @Test
     public void testGetParticipantsCountSuccess() {

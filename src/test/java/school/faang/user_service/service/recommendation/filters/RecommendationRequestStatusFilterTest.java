@@ -4,9 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.recomendation.RecommendationRequestFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.filter.recommendation.RecommendationRequestStatusFilter;
+import school.faang.user_service.model.filter_dto.RecommendationRequestFilterDto;
+import school.faang.user_service.model.enums.RequestStatus;
+import school.faang.user_service.model.entity.RecommendationRequest;
 
 import java.util.List;
 import java.util.stream.Stream;

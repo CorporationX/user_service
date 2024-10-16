@@ -2,11 +2,12 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import school.faang.user_service.dto.user.PersonDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.User;
+import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.model.dto.PersonDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.User;
 
-@Mapper(componentModel = "spring", uses = {ContactInfoMapper.class, AddressMapper.class, EducationMapper.class})
+@Mapper(componentModel = "spring", uses = {ContactInfoMapper.class, AddressMapper.class, EducationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PersonToUserMapper {
 
     @Mapping(target = "username", expression = "java(person.firstName() + \" \" + person.lastName())") // Изменено

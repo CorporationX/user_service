@@ -1,62 +1,20 @@
 package school.faang.user_service.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.validator.SubscriptionServiceValidator;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-public class SubscriptionService {
+public interface SubscriptionService {
+    void followUser(long followerId, long followeeId);
 
-    private final SubscriptionRepository subscriptionRepository;
-    private final UserMapper userMapper;
-    private final UserFilterService userFilterService;
-    private final PaginationService paginationService;
-    private final SubscriptionServiceValidator subscriptionServiceValidator;
+    void unfollowUser(long followerId, long followeeId);
 
-    public void followUser(long followerId, long followeeId) {
-        subscriptionServiceValidator.validateFollowIds(followerId, followeeId);
-        subscriptionServiceValidator.checkIfAlreadySubscribed(followerId, followeeId);
-        subscriptionRepository.followUser(followerId, followeeId);
-    }
+    List<UserDto> getFollowers(long followeeId, UserFilterDto filter);
 
-    public void unfollowUser(long followerId, long followeeId) {
-        subscriptionServiceValidator.validateFollowIds(followerId, followeeId);
-        subscriptionServiceValidator.checkIfAlreadySubscribed(followerId, followeeId);
-        subscriptionRepository.unfollowUser(followerId, followeeId);
-    }
+    long getFollowersCount(long followeeId);
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId)
-                .collect(Collectors.toList());
-        List<User> paginatedUsers = paginationService.applyPagination(followers, filter.getPage(), filter.getPageSize());
-        List<User> filteredUsers = userFilterService.filterUsers(paginatedUsers, filter);
+    List<UserDto> getFollowing(long followerId, UserFilterDto filter);
 
-        return userMapper.toListUserDto(filteredUsers);
-    }
-
-    public long getFollowersCount(long followeeId) {
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
-    }
-
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
-        List<User> following = subscriptionRepository.findByFollowerId(followerId)
-                .collect(Collectors.toList());
-        List<User> paginatedUsers = paginationService.applyPagination(following, filter.getPage(), filter.getPageSize());
-        List<User> filteredUsers = userFilterService.filterUsers(paginatedUsers, filter);
-
-        return userMapper.toListUserDto(filteredUsers);
-    }
-
-    public long getFollowingCount(long followerId) {
-        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
-    }
+    long getFollowingCount(long followerId);
 }

@@ -11,11 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.repository.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

@@ -9,20 +9,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.dto.SkillCandidateDto;
+import school.faang.user_service.model.dto.SkillDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.model.dto.SkillAcquiredEvent;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
 import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.repository.SkillOfferRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -220,6 +220,8 @@ public class SkillServiceImplTest {
         doNothing().when(skillRepository).assignSkillToUser(anyLong(), anyLong());
         when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of());
         when(mapper.toSkillDto(any(Skill.class))).thenReturn(skillDto);
+
+        doNothing().when(skillAcquiredEventPublisher).publish(any(SkillAcquiredEvent.class));
 
         SkillDto result = skillService.acquireSkillFromOffers(skillEntity.getId(), id);
 

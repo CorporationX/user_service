@@ -5,9 +5,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.user.PersonDto;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.PersonDto;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.entity.User;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {ContactInfoMapper.class, AddressMapper.class, EducationMapper.class})
 public interface UserMapper {
-    @Mapping(target = "preference", source = "contactPreference.preference")
+
+    @Mapping(source = "user.contactPreference.preference", target = "preference")
     UserDto toDto(User user);
     User toEntity(UserDto userDto);
     List<UserDto> toListUserDto(List<User> users);

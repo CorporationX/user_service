@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanEventListener;
 
@@ -17,6 +16,12 @@ public class RedisConfig {
 
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
+
+    @Value("${redis.channels.search-appearance-channel}")
+    private String searchAppearanceChannel;
+
+    @Value("${redis.channels.profile-view-channel}")
+    private String profileViewChannel;
 
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
@@ -37,6 +42,17 @@ public class RedisConfig {
     @Bean(name = "projectFollowerTopic")
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean
+    ChannelTopic searchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceChannel);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewChannel);
+
     }
 
     @Bean

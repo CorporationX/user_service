@@ -22,6 +22,7 @@ public interface UserMapper {
 
     List<SubscriptionUserDto> toSubscriptionUserDtoList(List<User> users);
 
+    @Mapping(source = "contactPreference.preference", target = "preferredContact")
     UserDto userToUserDto(User user);
 
     MentorshipUserDto toMentorshipUserDto(User user);

@@ -56,6 +56,9 @@ public class User {
     @Column(name = "phone", length = 32, unique = true)
     private String phone;
 
+    @Column(name = "telegram", length = 64, unique = true)
+    private String telegram;
+
     @Column(name = "password", length = 128, nullable = false)
     private String password;
 

@@ -198,7 +198,7 @@ public class UserServiceImplTest {
         ByteArrayOutputStream outputStream = mock(ByteArrayOutputStream.class);
         String fileName = "fileName";
 
-        String result = (String) ReflectionTestUtils.invokeMethod (
+        String result = (String) ReflectionTestUtils.invokeMethod(
                 service, "uploadFile", userId, outputStream, fileName);
 
         assertNotNull(result);

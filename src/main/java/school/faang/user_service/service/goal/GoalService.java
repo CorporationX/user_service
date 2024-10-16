@@ -158,7 +158,7 @@ public class GoalService {
     private void notifyUsersAboutCompletedGoal(Goal goal) {
         goal.getUsers().parallelStream()
                 .forEach(user -> {
-                    log.info("Sending notification to user - {}", user.getUsername());
+                    log.debug("Sending notification to user - {}", user.getUsername());
                     GoalCompletedEventDto event = GoalCompletedEventDto.builder()
                             .goalId(goal.getId())
                             .userId(user.getId())

@@ -7,8 +7,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import school.faang.user_service.dto.premium.PaymentRequest;
-import school.faang.user_service.dto.premium.PaymentResponse;
+import school.faang.user_service.model.dto.PaymentRequest;
+import school.faang.user_service.model.dto.PaymentResponse;
 
 @FeignClient(value = "payment-service", url = "${payment-service.host}:${payment-service.port}")
 public interface PaymentServiceClient {

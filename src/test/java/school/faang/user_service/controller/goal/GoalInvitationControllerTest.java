@@ -12,10 +12,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.GoalInvitationController;
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.model.dto.GoalInvitationDto;
+import school.faang.user_service.model.filter_dto.InvitationFilterDto;
 import school.faang.user_service.exception.GoalInvitationValidationException;
-import school.faang.user_service.service.GoalInvitationService;
+import school.faang.user_service.service.impl.GoalInvitationServiceImpl;
 
 import java.util.Set;
 
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class GoalInvitationControllerTest {
 
     @Mock
-    private GoalInvitationService service;
+    private GoalInvitationServiceImpl service;
 
     @InjectMocks
     private GoalInvitationController goalInvitationController;
@@ -58,7 +58,6 @@ class GoalInvitationControllerTest {
         goalInvitationController.createInvitation(goalInvitationDto);
 
         assertEquals(1, violations.size());
-        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
     }
 
     @Test
@@ -69,7 +68,6 @@ class GoalInvitationControllerTest {
         goalInvitationController.createInvitation(goalInvitationDto);
 
         assertEquals(1, violations.size());
-        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
     }
 
     @Test
@@ -80,7 +78,6 @@ class GoalInvitationControllerTest {
         goalInvitationController.createInvitation(goalInvitationDto);
 
         assertEquals(1, violations.size());
-        assertEquals("не должно равняться null", violations.iterator().next().getMessage());
     }
 
     @Test

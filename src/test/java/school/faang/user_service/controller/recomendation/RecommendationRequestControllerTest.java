@@ -7,10 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recomendation.RecommendationRequestDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.recommendation.RecommendationRequestService;
-import school.faang.user_service.validator.recommendation.RequestValidator;
+import school.faang.user_service.controller.RecommendationRequestController;
+import school.faang.user_service.model.dto.RecommendationRequestDto;
+import school.faang.user_service.model.enums.RequestStatus;
+import school.faang.user_service.service.impl.RecommendationRequestServiceImpl;
+import school.faang.user_service.validator.RequestValidator;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +26,7 @@ public class RecommendationRequestControllerTest {
    private RequestValidator requestValidator;
 
     @Mock
-    private RecommendationRequestService recommendationRequestService;
+    private RecommendationRequestServiceImpl recommendationRequestService;
 
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;

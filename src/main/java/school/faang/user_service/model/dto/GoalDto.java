@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.model.enums.GoalStatus;
 
 import java.util.List;
 

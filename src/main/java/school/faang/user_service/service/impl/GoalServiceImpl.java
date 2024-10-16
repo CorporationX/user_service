@@ -5,20 +5,20 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.model.dto.GoalCompletedEvent;
+import school.faang.user_service.model.event.GoalCompletedEvent;
 import school.faang.user_service.model.dto.GoalDto;
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
-import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +41,12 @@ public class GoalServiceImpl implements GoalService {
 
         List<User> users = goalRepository.findUsersByGoalId(goalId);
         skillService.addSkillToUsers(users, goalId);
-        log.info("Skills added to users for goal ID: {}", goalId);
+
+        String userIds = users.stream()
+                .map(user -> String.valueOf(user.getId()))
+                .collect(Collectors.joining(", "));
+
+        log.info("Skills added to users for goal ID: {}. User IDs: [{}]", goalId, userIds);
 
         users.forEach(user -> {
             goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId));
@@ -64,7 +69,7 @@ public class GoalServiceImpl implements GoalService {
         Goal updatedGoal = goalMapper.toGoal(goalDto);
 
         if (existingGoal.getStatus() == GoalStatus.COMPLETED) {
-            throw new DataValidationException("Cannot update because the goal is already in 'completed' status");
+            throw new DataValidationException("Cannot update because the goal is already in 'COMPLETED' status");
         }
 
         existingGoal.setStatus(updatedGoal.getStatus());

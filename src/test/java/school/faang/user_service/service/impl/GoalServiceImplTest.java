@@ -10,13 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.model.dto.GoalDto;
-import school.faang.user_service.model.dto.GoalCompletedEvent;
-import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.model.event.GoalCompletedEvent;
+
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.GoalStatus;
+import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
@@ -24,9 +25,15 @@ import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceImplTest {

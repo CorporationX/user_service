@@ -5,11 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.enums.PreferredContact;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.impl.SubscriptionServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +32,13 @@ class SubscriptionControllerTest {
     private static final String FOLLOWED_EMAIL = "followed@example.com";
 
     @Mock
-    private SubscriptionService subscriptionService;
+    private SubscriptionServiceImpl subscriptionService;
 
     @InjectMocks
     private SubscriptionController subscriptionController;
 
     private UserDto createTestUserDto(long id, String username, String email) {
-        return new UserDto(id, true, username, email, "123456789", PreferredContact.EMAIL);
+        return new UserDto(id, true, username, email, "79999999999", PreferredContact.EMAIL);
     }
 
     private List<UserDto> createUserDtoList(UserDto... users) {

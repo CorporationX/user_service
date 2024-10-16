@@ -30,4 +30,3 @@ public class GoalController {
         return goalService.updateGoal(goalId, goal);
     }
 }
-

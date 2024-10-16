@@ -9,23 +9,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.dto.SkillCandidateDto;
+import school.faang.user_service.model.dto.SkillDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.repository.SkillOfferRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -258,7 +257,7 @@ public class SkillServiceImplTest {
 
     @Test
     @DisplayName("Should add skills to all users based on the goalId")
-    public void testAddSkillToUsers() {
+    public void testAddSkillToUsers_Success() {
         long goalId = 1L;
 
         List<Skill> skillsForGoal = List.of(

@@ -18,6 +18,7 @@ import school.faang.user_service.listener.RedisBanMessageListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+
     private final RedisBanMessageListener banMessageListener;
     private final ObjectMapper objectMapper;
 
@@ -35,6 +36,9 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.event-start-channel.name}")
     private String eventStartTopic;
+
+    @Value("${spring.data.redis.channels.recommendation-request-channel.name}")
+    private String recommendationReqTopic;
 
     @Value("${spring.data.redis.channels.recommendation-received-channel.name}")
     private String recommendationReceived;
@@ -111,5 +115,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic skillAcquiredTopic() {
         return new ChannelTopic(skillAcquired);
+    }
+
+    @Bean
+    public ChannelTopic recommendationRequestTopic() {
+        return new ChannelTopic(recommendationReqTopic);
     }
 }

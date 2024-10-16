@@ -37,6 +37,8 @@ spring:
           name: goal_completed_event_channel
         skill-acquired-channel:
           name: skill_acquired_channel
+        recommendation-request-channel:
+          name: recommendation_req_channel
 
 server:
   port: 8080

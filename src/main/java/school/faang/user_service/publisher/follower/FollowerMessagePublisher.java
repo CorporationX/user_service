@@ -12,10 +12,10 @@ public class FollowerMessagePublisher extends AbstractMessagePublisher<FollowerE
 
     private final ChannelTopic followerTopic;
 
-    public FollowerMessagePublisher(RedisTemplate<String, Object> redisTemplate,
+    public FollowerMessagePublisher(RedisTemplate<String, FollowerEvent> followerEventRedisTemplate,
                                     ObjectMapper objectMapper,
                                     ChannelTopic followerTopic) {
-        super(redisTemplate, objectMapper);
+        super(followerEventRedisTemplate, objectMapper);
         this.followerTopic = followerTopic;
     }
 

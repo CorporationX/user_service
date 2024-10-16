@@ -153,13 +153,13 @@ public class UserServiceImplTest {
 
     @Test
     void downloadUserAvatarTest_Success() {
-        AvatarSize size = AvatarSize.SMALL;
         User user = createUser();
         UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setSmallFileId("smallFileId");
         user.setUserProfilePic(userProfilePic);
         byte[] avatarBytes = new byte[10];
         InputStream inputStream = new ByteArrayInputStream(avatarBytes);
+        AvatarSize size = AvatarSize.SMALL;
 
         when(repository.findById(user.getId())).thenReturn(java.util.Optional.of(user));
         when(s3Service.downloadFile("smallFileId")).thenReturn(inputStream);
@@ -197,7 +197,6 @@ public class UserServiceImplTest {
         Long userId = 1L;
         ByteArrayOutputStream outputStream = mock(ByteArrayOutputStream.class);
         String fileName = "fileName";
-        String key = "key";
 
         String result = (String) ReflectionTestUtils.invokeMethod
                 (service, "uploadFile", userId, outputStream, fileName);

@@ -16,7 +16,6 @@ import school.faang.user_service.service.s3.S3Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -41,10 +40,9 @@ public class AvatarService {
 
     public void createDefaultAvatarForUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
-                    String message = "User with id = " + userId + " has not in system";
-                    return new DataValidationException(message);
-                }
-        );
+            String message = "User with id = " + userId + " has not in system";
+            return new DataValidationException(message);
+        });
         if (user.getUserProfilePic() != null) {
             String message = "User with id = " + userId + " already has an avatar";
             throw new DataValidationException(message);
@@ -58,7 +56,7 @@ public class AvatarService {
     private List<String> getRandomBackGroundColorAvatar() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         StringBuilder backgroundColor = new StringBuilder();
-        for (int j = 0; j < 6; j ++) {
+        for (int j = 0; j < 6; j++) {
             backgroundColor.append(Integer.toHexString(random.nextInt(0, 15)).toLowerCase());
         }
         return new ArrayList<>(List.of(backgroundColor.toString()));
@@ -68,7 +66,7 @@ public class AvatarService {
     private void loadFileInStorage(byte[] file, User user, long contentLength, MediaType contentType) {
         long userId = user.getId();
         String key = prefixFileName + userId + "_" + System.currentTimeMillis();
-        s3Service.uploadFile(key, file, bucketName, contentLength,contentType);
+        s3Service.uploadFile(key, file, bucketName, contentLength, contentType);
         UserProfilePic userPic = new UserProfilePic();
         userPic.setFileId(key);
         userPic.setSmallFileId(key);

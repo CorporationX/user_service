@@ -64,6 +64,11 @@ avatar:
 image:
   format: jpeg
 
+events:
+  batch:
+    size: 3
+  cron: "0 0 0 * * *"
+
 user:
   password:
     length: 16

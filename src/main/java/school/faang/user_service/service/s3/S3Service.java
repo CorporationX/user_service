@@ -6,11 +6,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 public interface S3Service {
-    public void uploadFile(ByteArrayOutputStream outputStream, String key);
-
-    public void deleteFile(String key);
-
-    public InputStream downloadFile(String key);
+    void uploadFile(ByteArrayOutputStream outputStream, String key);
 
     void uploadFile(String key, byte[] file, String bucketName, long contentLength, MediaType contentType);
+
+    void deleteFile(String key);
+
+    InputStream downloadFile(String key);
 }

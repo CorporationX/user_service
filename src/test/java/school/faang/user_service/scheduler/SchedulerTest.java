@@ -20,7 +20,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(locations = "classpath:application.yaml")
+@TestPropertySource(properties = "scheduler.thread-count=10")
 @SpringBootTest
 class SchedulerTest {
 

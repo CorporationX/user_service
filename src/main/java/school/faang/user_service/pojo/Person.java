@@ -17,7 +17,7 @@ public class Person {
     private String lastName;
     private Integer yearOfBirth;
     private String group;
-    private String studentID;
+    private String studentId;
     @JsonUnwrapped
     private ContactInfo contactInfo;
     @JsonUnwrapped

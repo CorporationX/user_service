@@ -12,12 +12,9 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,10 +42,10 @@ public class EventServiceTest {
     @Test
     @DisplayName("Удаление событий по идентификаторам")
     public void testDeleteEventsByIds() {
-        doNothing().when(eventRepository).deleteAllById(List.of(1L,2L,3L));
+        doNothing().when(eventRepository).deleteAllById(List.of(1L, 2L, 3L));
 
-        eventService.deleteEventsByIds(List.of(1L,2L,3L));
+        eventService.deleteEventsByIds(List.of(1L, 2L, 3L));
 
-        verify(eventRepository).deleteAllById(List.of(1L,2L,3L));
+        verify(eventRepository).deleteAllById(List.of(1L, 2L, 3L));
     }
 }

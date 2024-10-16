@@ -57,7 +57,9 @@ public class UserUploadServiceTest {
     public void setUp() {
         multipartFile = new MockMultipartFile("file", "test.csv", "text/csv", "content".getBytes());
         countries = new ArrayList<>();
-        countries.addAll(List.of(Country.builder().id(1).title("USA").build(), Country.builder().id(2).title("France").build()));
+        countries.addAll(List.of(
+                Country.builder().id(1).title("USA").build(),
+                Country.builder().id(2).title("France").build()));
 
         country = Country.builder().title("Poland").build();
 

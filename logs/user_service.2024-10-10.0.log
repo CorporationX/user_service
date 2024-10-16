@@ -1,5 +1,5 @@
 20:25:41.397 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final
-20:25:41.409 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:25:41.409 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -85,10 +85,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:25:44.629 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:25:44.631 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 20:25:44.633 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-20:25:44.639 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:25:44.639 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:25:44.653 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:25:44.653 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -229,7 +229,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:25:44.697 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:25:44.697 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -312,10 +312,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:25:45.294 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:25:45.294 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown initiated...
 20:25:45.295 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown completed.
-20:25:45.297 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:25:45.297 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:25:45.298 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:25:45.298 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -456,7 +456,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:25:45.324 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:25:45.324 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -539,10 +539,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:25:45.813 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:25:45.813 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Shutdown initiated...
 20:25:45.822 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Shutdown completed.
-20:25:45.824 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:25:45.824 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:25:45.825 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:25:45.825 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -683,7 +683,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:25:45.846 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:25:45.846 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -766,10 +766,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:25:46.273 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:25:46.273 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Shutdown initiated...
 20:25:46.289 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Shutdown completed.
-20:25:46.291 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:25:46.291 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:25:46.292 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:25:46.292 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -910,7 +910,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:25:46.312 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:25:46.312 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -993,10 +993,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:25:46.725 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:25:46.725 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Shutdown initiated...
 20:25:46.728 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Shutdown completed.
-20:25:46.730 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:25:46.730 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:25:46.731 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:25:46.731 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -1137,7 +1137,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:25:46.751 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:25:46.751 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -1220,10 +1220,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:25:47.139 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:25:47.139 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Shutdown initiated...
 20:25:47.147 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Shutdown completed.
-20:25:47.149 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:25:47.149 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:25:47.150 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:25:47.150 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -1652,7 +1652,7 @@ java.sql.SQLException: null
 20:25:48.376 [Test worker] INFO  s.f.u.service.user.UserService - User banned: 1
 20:25:48.387 [Test worker] INFO  s.f.u.service.user.UserService - Find premium users by filter: UserFilterDto(username=jdoe, email=john.doe@email.com)
 20:27:21.586 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final
-20:27:21.605 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:27:21.605 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -1736,10 +1736,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:27:24.708 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:27:24.709 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 20:27:24.711 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-20:27:24.718 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:27:24.718 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:27:24.736 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:27:24.736 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -1880,7 +1880,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:27:24.772 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:27:24.772 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -1963,10 +1963,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:27:25.305 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:27:25.305 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown initiated...
 20:27:25.314 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown completed.
-20:27:25.316 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:27:25.316 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:27:25.317 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:27:25.317 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -2107,7 +2107,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:27:25.338 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:27:25.338 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -2190,10 +2190,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:27:25.787 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:27:25.788 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Shutdown initiated...
 20:27:25.803 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Shutdown completed.
-20:27:25.805 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:27:25.805 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:27:25.807 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:27:25.807 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -2334,7 +2334,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:27:25.827 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:27:25.827 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -2417,10 +2417,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:27:26.231 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:27:26.231 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Shutdown initiated...
 20:27:26.246 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Shutdown completed.
-20:27:26.251 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:27:26.251 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:27:26.252 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:27:26.252 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -2561,7 +2561,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:27:26.271 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:27:26.271 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -2644,10 +2644,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:27:26.641 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:27:26.641 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Shutdown initiated...
 20:27:26.642 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Shutdown completed.
-20:27:26.644 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:27:26.644 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:27:26.645 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:27:26.645 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -2788,7 +2788,7 @@ Caused by: org.springframework.beans.factory.NoUniqueBeanDefinitionException: No
 	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
 	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
 	... 111 common frames omitted
-20:27:26.661 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:27:26.661 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -2871,10 +2871,10 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 20:27:27.025 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 20:27:27.026 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Shutdown initiated...
 20:27:27.034 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Shutdown completed.
-20:27:27.036 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+20:27:27.036 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-20:27:27.037 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+20:27:27.037 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
 
 ***************************
 APPLICATION FAILED TO START
@@ -3303,7 +3303,7 @@ java.sql.SQLException: null
 20:27:28.187 [Test worker] INFO  s.f.u.service.user.UserService - User banned: 1
 20:27:28.195 [Test worker] INFO  s.f.u.service.user.UserService - Find premium users by filter: UserFilterDto(username=jdoe, email=john.doe@email.com)
 20:30:33.730 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final
-20:30:33.746 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+20:30:33.746 [Test worker] WARN  o.s.b.t.j.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer -
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 

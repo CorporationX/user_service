@@ -13,5 +13,5 @@ public interface EventService {
 
     EventDto getEvent(long id);
 
-    void startEvent(EventDto eventDto);
+    void startEvent(long eventId);
 }

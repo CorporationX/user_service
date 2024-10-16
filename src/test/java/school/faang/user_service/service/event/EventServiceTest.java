@@ -12,6 +12,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.publisher.EventStartEventPublisher;
+import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDateTime;
@@ -39,11 +40,15 @@ public class EventServiceTest {
     @Mock
     private EventStartEventPublisher eventStartEventPublisher;
 
+    @Mock
+    private EventParticipationRepository eventParticipationRepository;
+
     @InjectMocks
     private EventServiceImpl eventService;
 
     private Event event;
     private EventDto eventDto;
+    private LocalDateTime startTime = LocalDateTime.of(2220, 1, 1, 0, 0);
 
     @BeforeEach
     void setUp() {
@@ -79,12 +84,11 @@ public class EventServiceTest {
     @Test
     public void testGetEvent_Success() {
         List<Long> ids = List.of(1L);
-        LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
         Event event = new Event();
         event.setTitle("test");
-        event.setStartDate(date);
+        event.setStartDate(startTime);
         event.setId(1L);
-        EventDto eventDto = new EventDto(ids, 1L, "test", date);
+        EventDto eventDto = new EventDto(ids, 1L, "test", startTime);
 
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(eventMapper.toEventDto(event)).thenReturn(eventDto);
@@ -99,11 +103,10 @@ public class EventServiceTest {
     @Test
     void testStartEvent_EventIsInProgress() {
         event.setStatus(EventStatus.IN_PROGRESS);
-        when(eventMapper.toEvent(any())).thenReturn(event);
         when(eventRepository.findById(eventDto.eventId())).thenReturn(Optional.of(event));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            eventService.startEvent(eventDto);
+            eventService.startEvent(event.getId());
         });
 
         assertEquals("Event with id 100 can`t be started because it is IN_PROGRESS", exception.getMessage());
@@ -111,12 +114,11 @@ public class EventServiceTest {
 
     @Test
     void testStartEvent_WhenEventNotStartedYet() {
-        event.setStartDate(LocalDateTime.now().plusDays(1));
-        when(eventMapper.toEvent(any())).thenReturn(event);
-        when(eventRepository.findById(eventDto.eventId())).thenReturn(Optional.of(event));
+        event.setStartDate(startTime.minusYears(1000));
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            eventService.startEvent(eventDto);
+            eventService.startEvent(event.getId());
         });
 
         assertEquals("Event with id 100 is not started", exception.getMessage());
@@ -124,11 +126,10 @@ public class EventServiceTest {
 
     @Test
     void testStartEvent_Success() {
-        event.setStartDate(LocalDateTime.now().minusDays(1));
-        when(eventMapper.toEvent(any())).thenReturn(event);
-        when(eventRepository.findById(eventDto.eventId())).thenReturn(Optional.of(event));
+        event.setStartDate(startTime.plusDays(1));
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
 
-        eventService.startEvent(eventDto);
+        eventService.startEvent(event.getId());
 
         assertEquals(EventStatus.IN_PROGRESS, event.getStatus());
         verify(eventRepository, times(1)).save(event);

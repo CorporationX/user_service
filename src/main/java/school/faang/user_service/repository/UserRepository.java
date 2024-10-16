@@ -1,10 +1,12 @@
 package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -49,4 +51,36 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+
+    @Modifying
+    @Query(value = """
+    UPDATE users
+    SET profile_pic_file_id = (?2), profile_pic_small_file_id = (?3)
+    WHERE users.id = (?1);
+    """, nativeQuery = true)
+    void changeProfilePic(Long userId, String userProfilePicLarge, String userProfilePicSmall);
+
+    @Query(value = """
+    SELECT profile_pic_file_id
+    FROM users
+    WHERE users.id = (?1);
+    """, nativeQuery = true)
+    String findProfilePic(long userId);
+
+    @Query(value = """
+    SELECT profile_pic_small_file_id
+    FROM users
+    WHERE users.id = (?1);
+    """, nativeQuery = true)
+    String findSmallProfilePic(long userId);
+
+    @Modifying
+    @Query(value = """
+    UPDATE users
+    SET profile_pic_file_id = NULL, profile_pic_small_file_id = NULL
+    WHERE id = (?1);
+    """, nativeQuery = true)
+    void deleteProfilePic(Long userId);
+
+
 }

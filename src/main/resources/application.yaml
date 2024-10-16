@@ -41,6 +41,12 @@ payment-service:
   host: localhost
   port: 9080
 
+redis:
+  pubsub:
+    topics:
+      - search-appearance
+      - profile-view
+
 scheduler:
   cron: 0 0 0 * * *
   thread-count: 10

@@ -1,8 +1,8 @@
 package school.faang.user_service.model.dto.premium;
 
 import lombok.Builder;
-import school.faang.user_service.model.entity.premium.Currency;
-import school.faang.user_service.model.entity.premium.PaymentStatus;
+import school.faang.user_service.model.enums.premium.Currency;
+import school.faang.user_service.model.enums.premium.PaymentStatus;
 
 import java.math.BigDecimal;
 

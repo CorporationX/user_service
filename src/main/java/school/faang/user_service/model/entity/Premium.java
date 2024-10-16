@@ -1,11 +1,10 @@
-package school.faang.user_service.model.entity.premium;
+package school.faang.user_service.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.model.entity.User;
 
 import java.time.LocalDateTime;
 

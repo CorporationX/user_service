@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
-import school.faang.user_service.model.entity.goal.GoalStatus;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.repository.UserRepository;

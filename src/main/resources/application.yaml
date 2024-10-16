@@ -35,6 +35,8 @@ spring:
           name: project_subscription_event
         goal-completed-event-channel:
           name: goal_completed_event_channel
+        skill-acquired-channel:
+          name: skill_acquired_channel
 
 server:
   port: 8080

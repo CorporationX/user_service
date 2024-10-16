@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.model.event.FollowerEvent;
+import school.faang.user_service.event.SkillAcquiredEvent;
 
 @Component
 @RequiredArgsConstructor
-public class FollowerEventPublisher {
+public class SkillAcquiredEventPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic followerTopic;
+    private final ChannelTopic skillAcquiredTopic;
 
-    public void publish(FollowerEvent event) {
-        redisTemplate.convertAndSend(followerTopic.getTopic(), event);
+    public void publish(SkillAcquiredEvent event) {
+        redisTemplate.convertAndSend(skillAcquiredTopic.getTopic(), event);
     }
 }

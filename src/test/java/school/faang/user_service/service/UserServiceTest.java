@@ -1,21 +1,7 @@
 package school.faang.user_service.service;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,36 +13,57 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.data.jpa.domain.Specification;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.promotion.Promotion;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.dto.user.UserFilterDto;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.UserProfilePic;
+import school.faang.user_service.model.entity.Event;
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.filter.user.UserCreatedAfterFilter;
 import school.faang.user_service.filter.user.UserCreatedBeforeFilter;
-import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.EventRepository;
+import school.faang.user_service.repository.GoalRepository;
+import school.faang.user_service.service.impl.MentorshipServiceImpl;
+import school.faang.user_service.service.impl.S3serviceImpl;
+import school.faang.user_service.service.impl.UserServiceImpl;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.time.LocalDateTime;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -67,16 +74,18 @@ public class UserServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
-    private MentorshipService mentorshipService;
+    private MentorshipServiceImpl mentorshipService;
     @Mock
     PromotionRepository promotionRepository;
+    @Mock
+    private S3serviceImpl s3service;
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @Mock
     private List<UserFilter> userFilters;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     private User user;
     private UserDto userDto;
@@ -365,5 +374,91 @@ public class UserServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> userService.getFilteredUsers(filterDto, 1L));
+    }
+
+    @Test
+    void testSaveAvatar_whenUserProfilePicExists_shouldReplaceAvatar() {
+        long userId = 1L;
+        MultipartFile file = mock(MultipartFile.class);
+        UserProfilePic existingProfilePic = new UserProfilePic("existing-large.jpg", "existing-small.jpg");
+
+        when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(existingProfilePic);
+        UserProfilePic newProfilePic = new UserProfilePic("new-large.jpg", "new-small.jpg");
+        when(s3service.uploadFile(file, userId)).thenReturn(newProfilePic);
+
+        userService.saveAvatar(userId, file);
+
+        verify(s3service).deleteFile("existing-large.jpg");
+        verify(s3service).deleteFile("existing-small.jpg");
+        verify(userRepository).deleteUserProfilePicByUserId(userId);
+        verify(s3service).uploadFile(file, userId);
+        verify(userRepository).saveUserProfilePic(userId, newProfilePic);
+    }
+
+    @Test
+    void testSaveAvatar_whenUserProfilePicDoesNotExist_shouldUploadNewAvatar() {
+        long userId = 1L;
+        MultipartFile file = mock(MultipartFile.class);
+
+        when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(null);
+        UserProfilePic newProfilePic = new UserProfilePic("new-large.jpg", "new-small.jpg");
+        when(s3service.uploadFile(file, userId)).thenReturn(newProfilePic);
+
+        userService.saveAvatar(userId, file);
+
+        verify(s3service, never()).deleteFile(anyString());
+        verify(userRepository, never()).deleteUserProfilePicByUserId(anyLong());
+        verify(s3service).uploadFile(file, userId);
+        verify(userRepository).saveUserProfilePic(userId, newProfilePic);
+    }
+
+    @Test
+    void testGetAvatar_whenAvatarExists_shouldReturnAvatarBytes() throws Exception {
+        long userId = 1L;
+        UserProfilePic profilePic = new UserProfilePic("large.jpg", "small.jpg");
+        when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(profilePic);
+
+        byte[] avatarBytes = "avatar".getBytes();
+        InputStream avatarStream = new ByteArrayInputStream(avatarBytes);
+        when(s3service.downloadFile("large.jpg")).thenReturn(avatarStream);
+
+        byte[] result = userService.getAvatar(userId);
+
+        verify(s3service).downloadFile("large.jpg");
+        Assertions.assertArrayEquals(avatarBytes, result);
+    }
+
+    @Test
+    void testGetAvatar_whenAvatarDoesNotExist_shouldThrowException() {
+        long userId = 1L;
+        when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(null);
+
+        assertThrows(EntityNotFoundException.class, () -> userService.getAvatar(userId));
+
+        verify(s3service, never()).downloadFile(anyString());
+    }
+
+    @Test
+    void testDeleteAvatar_whenAvatarExists_shouldDeleteAvatar() {
+        long userId = 1L;
+        UserProfilePic profilePic = new UserProfilePic("large.jpg", "small.jpg");
+        when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(profilePic);
+
+        userService.deleteAvatar(userId);
+
+        verify(s3service).deleteFile("large.jpg");
+        verify(s3service).deleteFile("small.jpg");
+        verify(userRepository).deleteUserProfilePicByUserId(userId);
+    }
+
+    @Test
+    void testDeleteAvatar_whenAvatarDoesNotExist_shouldThrowException() {
+        long userId = 1L;
+        when(userRepository.findUserProfilePicByUserId(userId)).thenReturn(null);
+
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteAvatar(userId));
+
+        verify(s3service, never()).deleteFile(anyString());
+        verify(userRepository, never()).deleteUserProfilePicByUserId(anyLong());
     }
 }

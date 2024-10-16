@@ -1,15 +1,14 @@
 package school.faang.user_service.service;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.service.event.EventParticipationService;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.repository.EventParticipationRepository;
+import school.faang.user_service.service.impl.EventParticipationServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +23,7 @@ public class EventParticipationServiceTest {
     private EventParticipationRepository eventParticipationRepository;
 
     @InjectMocks
-    private EventParticipationService eventParticipationService;
+    private EventParticipationServiceImpl eventParticipationService;
 
     private User registeredUser;
     private User unRegisteredUser;

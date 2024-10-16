@@ -30,7 +30,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
-    implementation ("org.springframework.retry:spring-retry")
+    implementation("org.springframework.retry:spring-retry")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     implementation("io.swagger:swagger-annotations:1.6.14")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -68,7 +68,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
-    implementation ("net.coobird:thumbnailator:0.4.1")
+    implementation("net.coobird:thumbnailator:0.4.1")
 
     /**
      * Test containers
@@ -84,6 +84,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.github.hakky54:logcaptor:2.9.3")
     implementation(kotlin("stdlib-jdk8"))
 }
 

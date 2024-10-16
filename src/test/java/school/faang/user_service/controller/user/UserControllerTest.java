@@ -9,36 +9,48 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.controller.UserController;
+import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.service.impl.UserServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
-
 import java.util.List;
 import java.util.Objects;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
+
+    private static final long MAX_IMAGE_SIZE_MB = 5;
+
     private ObjectMapper objectMapper;
     private MockMvc mockMvc;
     private UserDto userDto;
@@ -47,13 +59,14 @@ public class UserControllerTest {
     private UserFilterDto userFilterDto;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private UserContext userContext;
 
     @InjectMocks
     private UserController userController;
+
 
     @BeforeEach
     public void setUp() {
@@ -65,6 +78,8 @@ public class UserControllerTest {
         userFilterDto = new UserFilterDto();
 
         objectMapper = new ObjectMapper();
+
+        userController.setMaxImageSizeMb(5);
 
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalRestExceptionHandler())
@@ -168,6 +183,56 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Invalid Input Format"))
                 .andExpect(jsonPath("$.message")
-                        .value(org.hamcrest.Matchers.containsString("JSON parse error")));
+                        .value(containsString("JSON parse error")));
+    }
+
+    @Test
+    void testSaveAvatar_FileTooLarge() throws Exception {
+        long maxSizeBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "avatar.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[(int) (maxSizeBytes + 1)]);
+
+        mockMvc.perform(multipart("/users/avatar")
+                        .file(file))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("File size is too large!")));
+
+        verify(userService, never()).saveAvatar(anyLong(), any(MultipartFile.class));
+    }
+
+    @Test
+    void testSaveAvatar_InvalidFileType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, new byte[1024]);
+
+        mockMvc.perform(multipart("/users/avatar")
+                        .file(file))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid file type. Only images jpg are allowed!")));
+
+        verify(userService, never()).saveAvatar(anyLong(), any(MultipartFile.class));
+    }
+
+    @Test
+    public void testGetAvatar_Success() throws Exception {
+        byte[] avatarBytes = new byte[1024];
+        when(userService.getAvatar(anyLong())).thenReturn(avatarBytes);
+
+        mockMvc.perform(get("/users/avatar")
+                        .header("x-user-id", 1L))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE))
+                .andExpect(content().bytes(avatarBytes));
+
+        verify(userService, times(1)).getAvatar(anyLong());
+    }
+
+
+    @Test
+    void testDeleteAvatar_Success() throws Exception {
+        mockMvc.perform(delete("/users/avatar")
+                        .header("x-user-id", 1L))
+                .andExpect(status().isOk());
+
+        verify(userService, times(1)).deleteAvatar(anyLong());
     }
 }

@@ -13,22 +13,25 @@ import org.springframework.data.redis.listener.ChannelTopic;
 @Configuration
 public class RedisConfig {
 
-    @Value("data.redis.host")
+    @Value("${spring.data.redis.host}")
     private String host;
 
-    @Value("data.redis.port")
+    @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("data.redis.channels.follower-channel.name")
+    @Value("${spring.data.redis.channels.follower-channel.name}")
     private String followerChannel;
 
     @Bean
-    RedisTemplate<String, Object> redisTemplate() {
+    public RedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        RedisConnectionFactory factory = new JedisConnectionFactory(config);
+        return new JedisConnectionFactory(config);
+    }
 
+    @Bean
+    RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
+        template.setConnectionFactory(jedisConnectionFactory());
 
         return template;
     }

@@ -11,8 +11,8 @@ import java.util.Random;
 public class PasswordGenerator {
 
     private final Random random;
-    private static final String SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" +
-            "0123456789!@#$%^&*()-_+=<>?/{}[]|\\:;\"',.";
+    private static final String SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            + "0123456789!@#$%^&*()-_+=<>?/{}[]|\\:;\"',.";
 
     @Value("${user.password.length}")
     private int passwordLength;

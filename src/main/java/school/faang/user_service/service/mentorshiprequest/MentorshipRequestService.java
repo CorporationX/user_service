@@ -43,10 +43,9 @@ public class MentorshipRequestService {
 
         menReqOptional.ifPresent(menReqValidator::validateDataCreateRequest);
 
-
-/*        MentorshipRequest menReq = menReqRepository.create(menReqDto.getRequesterId(),
+        MentorshipRequest menReq = menReqRepository.create(menReqDto.getRequesterId(),
                 menReqDto.getReceiverId(),
-                menReqDto.getDescription());*/
+                menReqDto.getDescription());
 
         var message = MentorshipRequestMessage.builder()
                 .requesterId(menReqDto.getRequesterId())
@@ -57,9 +56,7 @@ public class MentorshipRequestService {
         publisher.publish(message);
         log.info("message publish: {}", message.toString());
 
-        MentorshipRequestDto dto = new MentorshipRequestDto();
-        return dto;
-//        return menReqMapper.toDto(menReq);
+        return menReqMapper.toDto(menReq);
     }
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {

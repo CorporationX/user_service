@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ProfileViewEventDto {
     private final long receiverId;
+    private final String receiverName;
     private final long actorId;
+    private final String actorName;
     private LocalDateTime receivedAt = LocalDateTime.now();
 }

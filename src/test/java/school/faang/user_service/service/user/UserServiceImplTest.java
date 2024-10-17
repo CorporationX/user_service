@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -61,6 +63,7 @@ public class UserServiceImplTest {
 
     @Mock
     private ImageProcessor imageProcessor;
+
 
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
@@ -222,6 +225,26 @@ public class UserServiceImplTest {
         when(repository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(EntityNotFoundException.class, () -> service.deleteUserAvatar(user.getId()));
+    }
+
+    @Test
+    @DisplayName("Try to ban not founded user")
+    public void testBanUserWithNotFoundedId() {
+        when(repository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.banUserById(1L));
+    }
+
+    @Test
+    @DisplayName("Successfully ban user by id")
+    public void testBanUserSuccess() {
+        User user = createUser();
+        when(repository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        service.banUserById(1L);
+
+        verify(repository).save(user);
+        assertTrue(user.isBanned());
     }
 
     private User createUser() {

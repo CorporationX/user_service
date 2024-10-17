@@ -174,4 +174,12 @@ public class UserServiceImpl implements UserService {
                     throw new EntitySaveException("Users were not saved", e);
                 });
     }
+
+    @Override
+    public void banUserById(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
+        user.setBanned(true);
+        userRepository.save(user);
+    }
 }

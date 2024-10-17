@@ -33,7 +33,10 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         eventParticipationRepository.register(eventId, userId);
 
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new DataValidationException("Event not found"));
+        pushMessage(event, userId);
+    }
 
+    private void pushMessage(Event event, long userId) {
         EventStartEvent eventStartEvent = new EventStartEvent();
         eventStartEvent.setTitle(event.getTitle());
         eventStartEvent.setStartDate(event.getStartDate());

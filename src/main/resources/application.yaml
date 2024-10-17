@@ -39,6 +39,8 @@ spring:
           name: recommendation_req_channel
         mentorship-request-channel:
           name: mentorship-request-channel
+        fund-raised-channel:
+          name: fund-raised-channel
 
 server:
   port: 8080
@@ -66,7 +68,7 @@ payment-service:
 springdoc:
   swagger-ui:
     enabled: true
-    url: openapi.yml
+    url: OpenAPI.yml
 
 premium:
   scheduled:

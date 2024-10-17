@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
-import school.faang.user_service.service.user.view.publisher.AOPRedisProfileViewEventPublisher;
+import school.faang.user_service.service.user.view.publisher.AspectRedisProfileViewEventPublisher;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ProfileViewPublishJobTest {
     @Mock
-    private AOPRedisProfileViewEventPublisher redisProfileViewEventPublisher;
+    private AspectRedisProfileViewEventPublisher redisProfileViewEventPublisher;
 
     @InjectMocks
     private ProfileViewPublishJob profileViewPublishJob;

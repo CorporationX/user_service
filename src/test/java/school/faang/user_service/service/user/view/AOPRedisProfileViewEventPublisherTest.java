@@ -12,7 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 import school.faang.user_service.exception.annotation.InvalidReturnTypeException;
-import school.faang.user_service.service.user.view.publisher.AOPRedisProfileViewEventPublisher;
+import school.faang.user_service.service.user.view.publisher.AspectRedisProfileViewEventPublisher;
 
 import java.util.List;
 import java.util.Queue;
@@ -39,7 +39,7 @@ class AOPRedisProfileViewEventPublisherTest {
     private UserContext userContext;
 
     @InjectMocks
-    private AOPRedisProfileViewEventPublisher redisProfileViewEventPublisher;
+    private AspectRedisProfileViewEventPublisher redisProfileViewEventPublisher;
 
     @SuppressWarnings("unchecked")
     @Test

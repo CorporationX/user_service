@@ -6,14 +6,14 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.service.user.view.publisher.AOPRedisProfileViewEventPublisher;
+import school.faang.user_service.service.user.view.publisher.AspectRedisProfileViewEventPublisher;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class ProfileViewPublishJob implements Job {
-    private final AOPRedisProfileViewEventPublisher redisProfileViewEventPublisher;
+    private final AspectRedisProfileViewEventPublisher redisProfileViewEventPublisher;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {

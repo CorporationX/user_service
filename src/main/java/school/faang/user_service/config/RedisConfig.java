@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanEventListener;
 
@@ -23,6 +22,9 @@ public class RedisConfig {
 
     @Value("${redis.channels.user-follower}")
     private String userFollowerEventChannel;
+
+    @Value("${redis.channels.goal-completed}")
+    private String goalCompletedEventChannel;
 
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
@@ -50,6 +52,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic userFollowerChannelTopic() {
         return new ChannelTopic(userFollowerEventChannel);
+    }
+
+    @Bean(name = "goalCompletedTopic")
+    public ChannelTopic goalCompletedChannelTopic() {
+        return new ChannelTopic(goalCompletedEventChannel);
     }
 
     @Bean

@@ -54,6 +54,7 @@ redis:
     mentorship-accepted: mentorship_accepted_channel
     user-ban: user_ban_channel
     user-follower: user_follower_channel
+    goal-completed: goal_completed_channel
 
 scheduler:
   clear-events:

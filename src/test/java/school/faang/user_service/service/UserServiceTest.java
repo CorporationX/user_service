@@ -357,9 +357,9 @@ public class UserServiceTest {
 
         List<UserDto> result = userService.getFilteredUsers(filterDto, callingUser.getId());
 
-        verify(userMapper).toDto(callingUser);
-        verify(userMapper).toDto(promoted1);
-        verify(userMapper).toDto(promoted2);
+        verify(userMapper, times(1)).toDto(callingUser);
+        verify(userMapper, times(2)).toDto(promoted1);
+        verify(userMapper, times(2)).toDto(promoted2);
 
         assertAll(
                 () -> assertNotNull(result),

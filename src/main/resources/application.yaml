@@ -25,6 +25,8 @@ spring:
           name: mentorship_channel
         follower-channel:
           name: follower_channel
+        profile-view-channel:
+          name: profile_view_channel
       publisher:
         delay: 5000
 

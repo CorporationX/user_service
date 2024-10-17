@@ -14,6 +14,7 @@ import school.faang.user_service.dto.event.FollowerEventDto;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Configuration
 @RequiredArgsConstructor
@@ -39,6 +40,15 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisTemplate<String, ProfileViewEvent> profileViewRedisTemplate() {
+        RedisTemplate<String, ProfileViewEvent> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, ProfileViewEvent.class));
+        return template;
+    }
+
+    @Bean
     public MessageListenerAdapter messageListenerAdapter(RedisMessageSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber);
     }
@@ -52,6 +62,12 @@ public class RedisConfig {
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
         return new ChannelTopic(name);
+    }
+
+    @Bean(value = "profileViewChannel")
+    public ChannelTopic profileViewChannelTopic(
+            @Value("${spring.data.redis.channels.profile-view-channel.name}") String profileViewChannelName) {
+        return new ChannelTopic(profileViewChannelName);
     }
 
     @Bean

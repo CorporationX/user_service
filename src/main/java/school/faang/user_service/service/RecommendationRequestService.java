@@ -1,9 +1,9 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.model.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.model.dto.recommendation.RejectionDto;
+import school.faang.user_service.model.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.model.entity.recommendation.RecommendationRequest;
 
 import java.util.List;
 

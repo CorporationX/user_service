@@ -2,9 +2,9 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.model.dto.goal.GoalFilterDto;
+import school.faang.user_service.model.entity.goal.Goal;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 
 import java.util.stream.Stream;

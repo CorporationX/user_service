@@ -2,10 +2,12 @@ package school.faang.user_service.service.impl.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.Rejection;
-import school.faang.user_service.dto.RequestFilter;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.Rejection;
+import school.faang.user_service.model.dto.RequestFilter;
+import school.faang.user_service.model.entity.MentorshipRequest;
+import school.faang.user_service.model.event.MentorshipAcceptedEvent;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.util.predicate.NotApplicable;
@@ -19,14 +21,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
-import static school.faang.user_service.entity.RequestStatus.REJECTED;
+import static school.faang.user_service.model.entity.RequestStatus.ACCEPTED;
+import static school.faang.user_service.model.entity.RequestStatus.REJECTED;
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository repository;
     private final RequestFilterPredicate requestFilterPredicate;
+    private final MentorshipAcceptedEventPublisher mentorshipPublisher;
 
     public static final String MENTOR_IS_ALREADY_ACCEPTED = "mentor request is already accepter";
 
@@ -62,12 +65,13 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public void acceptRequest(long id) throws Exception {
-
         Optional<MentorshipRequest> requestOptional = repository.findById(id);
         if (requestOptional.isPresent() && requestOptional.get().getStatus() != ACCEPTED) {
             var request = requestOptional.get();
             request.setStatus(ACCEPTED);
             repository.save(request);
+            mentorshipPublisher.publish(new MentorshipAcceptedEvent(request.getRequester().getId(),
+                    request.getReceiver().getId(), request.getId()));
         } else if (requestOptional.isPresent() && requestOptional.get().getStatus() == ACCEPTED) {
             throw new Exception(MENTOR_IS_ALREADY_ACCEPTED);
         }

@@ -18,6 +18,7 @@ import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+
     private final ObjectMapper objectMapper;
 
     @Value("${redis.topic.user-ban}")
@@ -35,8 +36,6 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, FollowerEventDto.class));
         return template;
-    public ChannelTopic channelTopic() {
-        return new ChannelTopic(userBanTopicName);
     }
 
     @Bean
@@ -44,15 +43,22 @@ public class RedisConfig {
         return new MessageListenerAdapter(subscriber);
     }
 
+    @Bean
+    public ChannelTopic userBanChannel() {
+        return new ChannelTopic(userBanTopicName);
+    }
+
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
         return new ChannelTopic(name);
+    }
+
     @Bean
     public RedisMessageListenerContainer container(MessageListenerAdapter messageListenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, channelTopic());
+        container.addMessageListener(messageListenerAdapter, userBanChannel());
         return container;
     }
 }

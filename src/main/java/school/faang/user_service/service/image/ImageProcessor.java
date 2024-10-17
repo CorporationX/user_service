@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.exception.DataValidationException;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
@@ -31,10 +31,10 @@ public class ImageProcessor {
         return bufferedImage;
     }
 
-    public ByteArrayOutputStream getImageOS(Image image) {
-        try (ByteArrayOutputStream bigImageOS = new ByteArrayOutputStream()) {
-            ImageIO.write((RenderedImage) image, formatName, bigImageOS);
-            return bigImageOS;
+    public ByteArrayOutputStream getImageOs(Image image) {
+        try (ByteArrayOutputStream bigImageOs = new ByteArrayOutputStream()) {
+            ImageIO.write((RenderedImage) image, formatName, bigImageOs);
+            return bigImageOs;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

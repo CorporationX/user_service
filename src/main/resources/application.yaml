@@ -23,8 +23,10 @@ spring:
       channels:
         mentorship-channel:
           name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+        follower-channel:
+          name: follower_channel
+      publisher:
+        delay: 5000
 
 server:
   port: 8080
@@ -61,6 +63,11 @@ avatar:
 
 image:
   format: jpeg
+
+events:
+  batch:
+    size: 3
+  cron: "0 0 0 * * *"
 
 user:
   password:

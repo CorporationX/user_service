@@ -19,6 +19,7 @@ public interface UserService {
     Resource downloadUserAvatar(long userId, AvatarSize size);
 
     void deleteUserAvatar(long userId);
+
     UserDto register(UserDtoForRegistration userDto);
 
     void uploadUsers(MultipartFile file);

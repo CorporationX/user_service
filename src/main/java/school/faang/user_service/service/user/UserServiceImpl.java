@@ -79,8 +79,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
         BufferedImagesHolder scaledImage = imageProcessor.scaleImage(uploadedImage);
-        String fileId = uploadFile(userId, imageProcessor.getImageOS(scaledImage.getBigPic()), BIG_AVATAR_PICTURE_NAME);
-        String smallFieldId = uploadFile(userId, imageProcessor.getImageOS(scaledImage.getSmallPic()), SMALL_AVATAR_PICTURE_NAME);
+        String fileId = uploadFile(userId, imageProcessor.getImageOs(scaledImage.getBigPic()), BIG_AVATAR_PICTURE_NAME);
+        String smallFieldId = uploadFile(
+                userId, imageProcessor.getImageOs(scaledImage.getSmallPic()), SMALL_AVATAR_PICTURE_NAME);
         if (user.getUserProfilePic() != null) {
             log.info("Deleting old user avatar for user ID: {}", userId);
             deleteUserAvatar(userId);

@@ -82,18 +82,18 @@ public class CsvLoaderTest {
 
         List<User> users = futureUsers.join();
 
+        assertEquals(user.getUsername(), john.getFirstName() + " " + john.getLastName());
         assertEquals(2, users.size());
         assertEquals("John Doe", users.get(0).getUsername());
         assertEquals("Jane Doe", users.get(1).getUsername());
 
         verify(multipartFile).getInputStream();
         verify(objectReader).readValues(inputStream);
-        assertEquals(user.getUsername(), john.getFirstName() + " " + john.getLastName());
     }
 
     @Test
     @DisplayName("Fail to parse CSV with IOException")
-    public void testParseCsvToUsersWithIOException() throws Exception {
+    void testParseCsvToUsersWithIoException() throws Exception {
         when(multipartFile.getInputStream()).thenThrow(new IOException("File not found"));
 
         assertThrows(FileUploadedException.class, () -> csvLoader.parseCsvToUsers(multipartFile).join());

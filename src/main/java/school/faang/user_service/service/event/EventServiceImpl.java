@@ -1,16 +1,21 @@
 package school.faang.user_service.service.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.event.EventStartEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;

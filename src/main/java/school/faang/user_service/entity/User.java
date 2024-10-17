@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
@@ -49,7 +51,7 @@ public class User {
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 
@@ -140,9 +142,9 @@ public class User {
     })
     private UserProfilePic userProfilePic;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private ContactPreference contactPreference;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Premium premium;
 }

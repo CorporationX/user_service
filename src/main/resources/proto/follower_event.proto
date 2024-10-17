@@ -5,6 +5,7 @@ import "google/protobuf/timestamp.proto";
 option java_outer_classname = "school.faang.user_service.protobuf.generate.FollowerEventProto";
 
 message FollowerEvent {
-  int64 user_id = 1;
-  google.protobuf.Timestamp event_time = 2;
+  int64 followerId = 1;
+  int64 followeeId = 2;
+  google.protobuf.Timestamp event_time = 3;
 }

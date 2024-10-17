@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.s3;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

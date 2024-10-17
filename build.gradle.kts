@@ -180,7 +180,7 @@ protobuf {
 sourceSets {
     main {
         proto {
-            srcDir("src/main/java/school/faang/user_service/protobuf/proto")
+            srcDir("src/main/resources/proto")
         }
     }
 }

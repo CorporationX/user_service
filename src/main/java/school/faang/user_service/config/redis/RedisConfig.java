@@ -32,6 +32,7 @@ public class RedisConfig {
     }
 
     @Bean
+    RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate(ObjectMapper objectMapper) {
     RedisTemplate<String, EventDto> redisEventTemplate() {
         RedisTemplate<String, EventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());

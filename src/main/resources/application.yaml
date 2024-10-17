@@ -77,6 +77,10 @@ events:
     size: 3
   cron: "0 0 0 * * *"
 
+mentorship:
+  request:
+    time-constraint: 3
+
 user:
   password:
     length: 16

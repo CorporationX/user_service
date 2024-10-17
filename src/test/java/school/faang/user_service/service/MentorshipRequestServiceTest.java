@@ -32,6 +32,7 @@ import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipReques
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.service.impl.MentorshipRequestServiceImpl;
@@ -55,9 +56,12 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    @Mock
+    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     private MentorshipRequestDto mentorshipRequestDto;
     private MentorshipRequest mentorshipRequest;
+    private MentorshipRequest savedMentorshipRequest;
     private User requester;
     private User receiver;
     private List<MentorshipRequest> requests;
@@ -84,12 +88,20 @@ public class MentorshipRequestServiceTest {
         mentorshipRequest.setDescription("Need mentorship on Java.");
 
         requests = List.of(mentorshipRequest);
+
+        savedMentorshipRequest = new MentorshipRequest();
+        savedMentorshipRequest.setId(100L);
+        savedMentorshipRequest.setRequester(requester);
+        savedMentorshipRequest.setReceiver(receiver);
+        savedMentorshipRequest.setStatus(RequestStatus.PENDING);
+        savedMentorshipRequest.setDescription("Need mentorship on Java.");
     }
 
     @Test
     public void requestMentorshipTest_Success() {
         when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
         when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(mentorshipRequestDto);
+        when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(savedMentorshipRequest);
 
         MentorshipRequestDto result = mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         assertNotNull(result);
@@ -130,7 +142,7 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequestFilter> mentorshipRequestFilterList = List.of(new MentorshipRequestDescriptionFilter(),
                 new MentorshipRequestRequesterFilter(), new MentorshipRequestReceiverFilter(), new MentorshipRequestStatusFilter());
         mentorshipRequestService = new MentorshipRequestServiceImpl(mentorshipRequestValidator, mentorshipRequestRepository,
-                userRepository, mentorshipRequestMapper, mentorshipRequestFilterList);
+                userRepository, mentorshipRequestMapper, mentorshipRequestFilterList, mentorshipOfferedEventPublisher);
         filters = MentorshipRequestFilterDto.builder().descriptionPattern("Need mentorship on Java.").build();
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);
         when(mentorshipRequestMapper.toDto(requests.get(0))).thenReturn(mentorshipRequestDto);

@@ -11,7 +11,7 @@ import school.faang.user_service.model.event.ProjectFollowerEvent;
 public class ProjectFollowerEventPublisher extends RedisEventPublisher<ProjectFollowerEvent> {
     public ProjectFollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                          ObjectMapper objectMapper,
-                                         @Qualifier("projectFollowerTopic") ChannelTopic topic) {
+                                         @Qualifier("projectFollowerChannelTopic") ChannelTopic topic) {
         super(redisTemplate, objectMapper, topic);
     }
 }

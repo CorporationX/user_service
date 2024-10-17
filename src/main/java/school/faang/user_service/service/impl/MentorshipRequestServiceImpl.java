@@ -1,17 +1,20 @@
 package school.faang.user_service.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestFilter;
 import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.model.dto.RejectionDto;
+import school.faang.user_service.model.event.MentorshipOfferedEvent;
 import school.faang.user_service.model.filter_dto.MentorshipRequestFilterDto;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.enums.RequestStatus;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
@@ -29,8 +32,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Override
+    @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.descriptionValidation(mentorshipRequestDto);
         mentorshipRequestValidator.requesterReceiverValidation(mentorshipRequestDto);
@@ -39,8 +44,14 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
-        mentorshipRequestRepository.save(mentorshipRequest);
+        MentorshipRequest savedRequest = mentorshipRequestRepository.save(mentorshipRequest);
         log.info("Получен запрос на менторство от пользователя с ID: {}", mentorshipRequestDto.getRequesterId());
+        MentorshipOfferedEvent mentorshipOfferedEvent = new MentorshipOfferedEvent(
+                mentorshipRequestDto.getRequesterId(),
+                savedRequest.getId(),
+                mentorshipRequestDto.getReceiverId());
+        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEvent);
+        log.info("MentorshipOfferedEvent отправлен в redis {}", mentorshipOfferedEvent);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

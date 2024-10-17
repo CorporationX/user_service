@@ -21,6 +21,9 @@ public class RedisConfig {
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
 
+    @Value("${redis.channels.mentorship-offered}")
+    private String mentorshipOfferedEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -34,7 +37,7 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "projectFollowerTopic")
+    @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
     }
@@ -42,6 +45,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic userBanChannelTopic() {
         return new ChannelTopic(userBanEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipOfferedChannelTopic() {
+        return new ChannelTopic(mentorshipOfferedEventChannel);
     }
 
     @Bean

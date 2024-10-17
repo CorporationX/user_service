@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V009__add_locale_code_column.sql
   - include:
       file: db/changelog/changeset/user_V010__create_index.sql
+  - include:
+      file: db/changelog/changeset/user_V011__add_telegram_id_column.sql

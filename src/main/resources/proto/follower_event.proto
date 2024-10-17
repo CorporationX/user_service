@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-option java_outer_classname = "school.faang.user_service.protobuf.generate.FollowerEventProto";
+option java_outer_classname = "FollowerEventProto";
 
 message FollowerEvent {
   int64 followerId = 1;

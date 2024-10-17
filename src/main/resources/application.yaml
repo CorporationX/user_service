@@ -22,13 +22,15 @@ spring:
 
   data:
     redis:
-      port: 6379
       host: localhost
-      channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+      port: 6379
+      channel-topics:
+        mentorship:
+          name: mentorship_topic
+        follower-event:
+          name: follower_event_topic
+        event-start:
+          name: event_start_topic
 
 server:
   port: 8080
@@ -77,11 +79,10 @@ app:
       max_pool_size: 20
       queue_capacity: 1000
       thread_name_prefix: PremiumService-Async-
-    premium-bought-event:
-      core_pool_size: 10
-      max_pool_size: 20
-      queue_capacity: 1000
-      thread_name_prefix: PremiumBoughtEventService-Async-
+  scheduler:
+    event:
+      start_event:
+        cron: "0 * * * * *" # every minute
   premium-redis-config:
     premium_bought_event_topic: premiumBoughtEvent
   quartz-config:

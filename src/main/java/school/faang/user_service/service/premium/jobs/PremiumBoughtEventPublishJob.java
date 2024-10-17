@@ -6,20 +6,20 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.service.premium.PremiumBoughtEventService;
+import school.faang.user_service.service.premium.AspectRedisPremiumBoughtEventPublisher;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class PremiumBoughtEventPublishJob implements Job {
-    private final PremiumBoughtEventService premiumBoughtEventService;
+    private final AspectRedisPremiumBoughtEventPublisher redisPremiumBoughtEventPublisher;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-        if (!premiumBoughtEventService.premiumBoughtEventDtosIsEmpty()) {
+        if (!redisPremiumBoughtEventPublisher.analyticEventsIsEmpty()) {
             log.info("Publish all premium bought event job execute");
-            premiumBoughtEventService.publishAllPremiumBoughtEvents();
+            redisPremiumBoughtEventPublisher.publishAllEvents();
         }
     }
 }

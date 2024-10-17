@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.stream.LongStream;
 
 public class UserTestUtil {
+    public static User getUser(long id) {
+        return User.builder()
+                .id(id)
+                .build();
+    }
+
     public static User getUser(long id, String username, String email) {
         return User.builder()
                 .id(id)

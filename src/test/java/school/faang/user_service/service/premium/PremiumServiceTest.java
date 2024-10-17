@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.payment.PaymentResponseDto;
-import school.faang.user_service.dto.premium.PremiumBoughtEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.payment.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
@@ -51,9 +50,6 @@ class PremiumServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private PremiumBoughtEventService premiumBoughtEventService;
-
     @InjectMocks
     private PremiumService premiumService;
 
@@ -79,7 +75,6 @@ class PremiumServiceTest {
         verify(premiumValidationService).validateUserForSubPeriod(USER_ID, user);
         verify(premiumValidationService)
                 .checkPaymentResponse(any(PaymentResponseDto.class), any(Long.class), any(PremiumPeriod.class));
-        verify(premiumBoughtEventService).addToPublish(any(PremiumBoughtEventDto.class));
     }
 
     @Test

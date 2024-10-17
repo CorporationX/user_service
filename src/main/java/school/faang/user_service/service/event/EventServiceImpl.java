@@ -11,13 +11,19 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.event.exceptions.InsufficientSkillsException;
+import school.faang.user_service.redis.event.EventStartEvent;
+import school.faang.user_service.redis.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static school.faang.user_service.entity.event.EventStatus.IN_PROGRESS;
+import static school.faang.user_service.entity.event.EventStatus.PLANNED;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -26,6 +32,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final List<EventFilter> eventFilters;
+    private final EventStartEventPublisher eventStartEventPublisher;
 
     @Override
     @Transactional
@@ -120,6 +127,19 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Override
+    @Transactional
+    public void startEventsFromPeriod(LocalDateTime from, LocalDateTime to) {
+        List<Event> events = eventRepository.findAllByStatusAndStartDateBetween(PLANNED, from, to);
+
+        events.stream()
+                .map(this::mapToEventStartEvent)
+                .forEach(eventStartEventPublisher::publish);
+
+        events.forEach(event -> event.setStatus(IN_PROGRESS));
+        eventRepository.saveAll(events);
+    }
+
     private void validateUserSkills(Event event) {
         log.info("Проверка навыков пользователя с ID: {}", event.getOwner().getId());
         User user = loadUserById(event.getOwner().getId());
@@ -138,5 +158,18 @@ public class EventServiceImpl implements EventService {
             log.error("Пользователь с ID {} не найден", id);
             return new EntityNotFoundException("Пользователь с ID " + id + " не найден.");
         });
+    }
+
+    private EventStartEvent mapToEventStartEvent(Event event) {
+        EventStartEvent eventStartEvent = new EventStartEvent();
+
+        eventStartEvent.setId(event.getId());
+        eventStartEvent.setTitle(event.getTitle());
+        List<Long> attendeeIds = event.getAttendees().stream()
+                .map(User::getId)
+                .toList();
+        eventStartEvent.setAttendeeIds(attendeeIds);
+
+        return eventStartEvent;
     }
 }

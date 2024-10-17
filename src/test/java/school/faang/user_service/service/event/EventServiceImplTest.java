@@ -10,19 +10,25 @@ import school.faang.user_service.dto.event.EventFilters;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.redis.event.EventStartEvent;
+import school.faang.user_service.redis.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 import school.faang.user_service.service.event.filters.EventLocationFilter;
 import school.faang.user_service.service.event.filters.EventTitleFilter;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,6 +40,8 @@ public class EventServiceImplTest {
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private EventStartEventPublisher eventStartEventPublisher;
     @InjectMocks
     private EventServiceImpl eventServiceImpl;
 
@@ -132,7 +140,7 @@ public class EventServiceImplTest {
         List<EventFilter> realFilters = Arrays.asList(locationFilter, titleFilter);
 
         eventServiceImpl = new EventServiceImpl(
-                eventRepository, userRepository, realFilters);
+                eventRepository, userRepository, realFilters, eventStartEventPublisher);
 
         EventFilters filters = new EventFilters();
         filters.setTitle("Java");
@@ -178,4 +186,23 @@ public class EventServiceImplTest {
         verify(eventRepository, times(1)).deleteById(1L);
     }
 
+    @Test
+    public void testStartEventsFromPeriod_Success() {
+        LocalDateTime from = LocalDateTime.now();
+        LocalDateTime to = from.plusMinutes(1);
+        event.setAttendees(List.of(
+                User.builder().id(1L).build(),
+                User.builder().id(2L).build()));
+        otherEvent.setAttendees(List.of(
+                User.builder().id(1L).build()));
+
+        when(eventRepository.findAllByStatusAndStartDateBetween(any(EventStatus.class), eq(from), eq(to)))
+                .thenReturn(Arrays.asList(event, otherEvent));
+        doNothing().when(eventStartEventPublisher).publish(any(EventStartEvent.class));
+        when(eventRepository.saveAll(anyList())).thenReturn(Arrays.asList(event, otherEvent));
+
+        eventServiceImpl.startEventsFromPeriod(from, to);
+
+        verify(eventStartEventPublisher, times(2)).publish(any(EventStartEvent.class));
+    }
 }

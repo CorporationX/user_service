@@ -16,11 +16,4 @@ public class PremiumBoughtEventPublisherRedisConfig {
     public ChannelTopic premiumBoughtEventTopic() {
         return new ChannelTopic(premiumBoughtEvent);
     }
-
-    @Bean
-    public PremiumBoughtEventPublisher premiumBoughtEventPublisher(
-            RedisTemplate<String, PremiumBoughtEventDto> premiumBoughtEventDtoRedisTemplate,
-            ChannelTopic premiumBoughtEventTopic) {
-        return new RedisPremiumBoughtEventPublisher(premiumBoughtEventDtoRedisTemplate, premiumBoughtEventTopic);
-    }
 }

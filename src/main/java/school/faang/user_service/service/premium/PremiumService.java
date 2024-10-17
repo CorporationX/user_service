@@ -3,10 +3,10 @@ package school.faang.user_service.service.premium;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.payment.PaymentResponseDto;
-import school.faang.user_service.dto.premium.PremiumBoughtEventDto;
-import school.faang.user_service.entity.User;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.annotation.analytic.send.user.SendPremiumBoughtAnalyticEvent;
+import school.faang.user_service.dto.payment.PaymentResponseDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.premium.PremiumNotFoundException;
@@ -27,8 +27,8 @@ public class PremiumService {
     private final PaymentService paymentService;
     private final PremiumValidationService premiumValidationService;
     private final UserRepository userRepository;
-    private final PremiumBoughtEventService premiumBoughtEventService;
 
+    @SendPremiumBoughtAnalyticEvent
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod period) {
         log.info("User with id: {} buy a premium {} days subscription", userId, period.getDays());
@@ -43,9 +43,7 @@ public class PremiumService {
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(period.getDays()))
                 .build();
-        premiumRepository.save(premium);
-        premiumBoughtEventService.addToPublish(new PremiumBoughtEventDto(userId, period.getCost(), period.getDays()));
-        return premium;
+        return premiumRepository.save(premium);
     }
 
     @Transactional(readOnly = true)

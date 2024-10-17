@@ -2,10 +2,10 @@ package school.faang.user_service.service.impl.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.Rejection;
-import school.faang.user_service.dto.RequestFilter;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.Rejection;
+import school.faang.user_service.model.dto.RequestFilter;
+import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -21,9 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
-import static school.faang.user_service.entity.RequestStatus.REJECTED;
-
+import static school.faang.user_service.model.entity.RequestStatus.ACCEPTED;
+import static school.faang.user_service.model.entity.RequestStatus.REJECTED;
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
@@ -42,6 +41,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         } else {
             repository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
         }
+
     }
 
     @Override

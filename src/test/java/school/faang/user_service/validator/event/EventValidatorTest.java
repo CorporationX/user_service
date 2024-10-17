@@ -1,6 +1,5 @@
 package school.faang.user_service.validator.event;
 
-import com.amazonaws.services.s3.model.Owner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,10 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.event.EventDto;
+import school.faang.user_service.model.dto.skill.SkillDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

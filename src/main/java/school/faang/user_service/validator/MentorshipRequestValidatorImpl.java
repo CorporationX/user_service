@@ -2,7 +2,7 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.predicate.NotApplicable;
 import school.faang.user_service.util.predicate.PredicateFalse;

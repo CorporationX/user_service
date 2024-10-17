@@ -7,16 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.model.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.model.dto.recommendation.RejectionDto;
+import school.faang.user_service.model.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.model.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
+import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.impl.recommendation.RecommendationRequestServiceImpl;
@@ -49,6 +50,9 @@ public class RecommendationRequestServiceImplTest {
     @Mock
     private List<RecommendationRequestFilter> recommendationsFilters;
 
+    @Mock
+    private RecommendationRequestedEventPublisher recommendationReqPublisher;
+
     @InjectMocks
     private RecommendationRequestServiceImpl requestService;
 
@@ -64,7 +68,7 @@ public class RecommendationRequestServiceImplTest {
                 .id(1L)
                 .skillsId(List.of(1L, 2L))
                 .requesterId(1L)
-                .receiverId(1L)
+                .receiverId(2L)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -72,8 +76,8 @@ public class RecommendationRequestServiceImplTest {
         recommendationRequest = RecommendationRequest.builder()
                 .id(1L)
                 .skills(List.of(new SkillRequest()))
-                .requester(new User())
-                .receiver(new User())
+                .requester(User.builder().id(1L).build())
+                .receiver(User.builder().id(2L).build())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .status(RequestStatus.ACCEPTED)

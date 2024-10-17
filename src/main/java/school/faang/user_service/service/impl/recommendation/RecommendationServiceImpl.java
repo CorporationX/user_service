@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.dto.recommendation.RecommendationDto;
+import school.faang.user_service.model.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.model.entity.recommendation.Recommendation;
+import school.faang.user_service.model.event.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -25,6 +27,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final SkillRepository skillRepository;
     private final RecommendationServiceValidator validator;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @Override
     @Transactional
@@ -39,6 +42,8 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .filter(skillId -> skillRepository
                         .findUserSkill(skillId, recommendation.receiverId()).isEmpty())
                 .forEach(skillId -> skillOfferRepository.create(skillId, recommendation.id()));
+
+        sendEvent(recommendation);
 
         return recommendation;
     }
@@ -80,5 +85,18 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .findAllByAuthorId(receiverId, Pageable.unpaged());
 
         return recommendations.map(recommendationMapper::toDto).toList();
+    }
+
+    private void sendEvent(RecommendationDto recommendation) {
+        RecommendationReceivedEvent event = buildRecommendationReceivedEvent(recommendation);
+        recommendationReceivedEventPublisher.publish(event);
+    }
+
+    private RecommendationReceivedEvent buildRecommendationReceivedEvent(RecommendationDto recommendation) {
+        return RecommendationReceivedEvent.builder()
+                .authorId(recommendation.authorId())
+                .receiverId(recommendation.receiverId())
+                .recommendationId(recommendation.id())
+                .build();
     }
 }

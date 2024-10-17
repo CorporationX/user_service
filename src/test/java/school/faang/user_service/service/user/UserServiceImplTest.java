@@ -9,11 +9,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.contact.ContactPreference;
+import school.faang.user_service.model.enums.contact.PreferredContact;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
@@ -28,7 +30,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -82,7 +87,14 @@ class UserServiceImplTest {
                 1L,
                 "JaneSmith",
                 "janesmith@example.com",
-                "0987654321");
+                "0987654321",
+                PreferredContact.TELEGRAM);
+
+        ContactPreference contactPreference = ContactPreference.builder()
+                .id(1L)
+                .user(user)
+                .preference(PreferredContact.TELEGRAM)
+                .build();
 
         user = User.builder()
                 .id(1L)
@@ -94,6 +106,7 @@ class UserServiceImplTest {
                 .aboutMe("About Jane Smith")
                 .experience(5)
                 .banned(false)
+                .contactPreference(contactPreference)
                 .build();
 
         filters = List.of(userFilter);

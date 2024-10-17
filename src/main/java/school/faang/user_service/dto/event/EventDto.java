@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record EventDto(
-        List<Long> usersId,
+        List<Long> userIds,
         long eventId,
         String title,
         LocalDateTime startDateTime) {

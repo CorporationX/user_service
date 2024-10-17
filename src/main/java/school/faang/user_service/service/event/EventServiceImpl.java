@@ -48,8 +48,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void startEvent(long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() ->
-                new EntityNotFoundException("Event not found with id : %s".formatted(eventId)));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id : %s".formatted(eventId)));
         log.debug("Validating status for event with id {}", event.getId());
         validateEventStatus(event);
         log.debug("Validating start date for event with id {}", event.getId());

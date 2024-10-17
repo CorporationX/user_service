@@ -1,4 +1,4 @@
-package school.faang.user_service.model.entity.event;
+package school.faang.user_service.model.enums.event;
 
 public enum EventType {
     WEBINAR("Webinar"),

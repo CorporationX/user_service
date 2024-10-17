@@ -2,7 +2,7 @@ package school.faang.user_service.model.dto.goal;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.model.entity.goal.GoalStatus;
+import school.faang.user_service.model.enums.GoalStatus;
 
 @Data
 @NoArgsConstructor

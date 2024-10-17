@@ -12,10 +12,11 @@ import school.faang.user_service.model.dto.goal.GoalNotificationDto;
 import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
-import school.faang.user_service.model.entity.goal.GoalStatus;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.model.event.GoalCompletedEvent;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
@@ -24,7 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GoalService implements school.faang.user_service.service.GoalService {
+public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
     private final static int MAX_NUMBER_ACTIVE_GOALS = 3;
     private final SkillService skillService;

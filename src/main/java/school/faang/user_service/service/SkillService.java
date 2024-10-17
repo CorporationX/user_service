@@ -7,14 +7,14 @@ import school.faang.user_service.model.entity.Skill;
 import java.util.List;
 
 public interface SkillService {
-    public SkillDto create(SkillDto skillDto);
+
+    SkillDto create(SkillDto skillDto);
 
     List<SkillDto> getUserSkills(Long userId);
 
     List<SkillCandidateDto> getOfferedSkills(long userId);
 
     SkillDto acquireSkillFromOffers(long skillId, long userId);
-
 
     List<Skill> getSkillsByTitle(List<String> skillsTitle);
 

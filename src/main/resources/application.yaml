@@ -33,6 +33,10 @@ spring:
           name: project_subscription_event
         goal-completed-event-channel:
           name: goal_completed_event_channel
+        skill-acquired-channel:
+          name: skill_acquired_channel
+        recommendation-request-channel:
+          name: recommendation_req_channel
         mentorship-request-channel:
           name: mentorship-request-channel
 

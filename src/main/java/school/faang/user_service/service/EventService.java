@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
-import school.faang.user_service.model.event.EventDto;
-import school.faang.user_service.model.event.EventFilterDto;
+import school.faang.user_service.model.dto.event.EventDto;
+import school.faang.user_service.model.dto.event.EventFilterDto;
 import school.faang.user_service.model.entity.event.Event;
 
 import java.util.List;

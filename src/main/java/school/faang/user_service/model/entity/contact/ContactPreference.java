@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor

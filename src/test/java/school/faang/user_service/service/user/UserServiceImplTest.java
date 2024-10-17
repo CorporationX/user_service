@@ -9,17 +9,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.model.dto.user.UserDto;
 import school.faang.user_service.model.dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.contact.ContactPreference;
-import school.faang.user_service.model.entity.contact.PreferredContact;
-import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.model.enums.contact.PreferredContact;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
-import school.faang.user_service.service.impl.goal.GoalService;
+import school.faang.user_service.service.impl.goal.GoalServiceImpl;
 import school.faang.user_service.service.impl.mentorship.MentorshipServiceImpl;
 import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.util.CsvParser;
@@ -30,7 +30,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -59,7 +62,7 @@ class UserServiceImplTest {
     private UserFilter userFilter;
 
     @Mock
-    private GoalService goalService;
+    private GoalServiceImpl goalService;
 
     @Mock
     private EventServiceImpl eventServiceImpl;

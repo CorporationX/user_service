@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.event.EventStatus;
+import school.faang.user_service.model.enums.event.EventType;
 
 import java.time.LocalDateTime;
 import java.util.List;

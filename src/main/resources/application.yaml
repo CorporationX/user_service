@@ -29,6 +29,7 @@ spring:
         delay: 5000
 
 
+
 server:
   port: 8080
 
@@ -69,6 +70,10 @@ events:
   batch:
     size: 3
   cron: "0 0 0 * * *"
+
+mentorship:
+  request:
+    time-constraint: 3
 
 user:
   password:

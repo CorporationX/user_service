@@ -1,7 +1,6 @@
 package school.faang.user_service.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +12,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 
 @Configuration
-@RequiredArgsConstructor
 public class RedisConfig {
-    private final ObjectMapper objectMapper;
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
@@ -23,7 +20,7 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate() {
+    RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate(ObjectMapper objectMapper) {
         RedisTemplate<String, MentorshipAcceptedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());

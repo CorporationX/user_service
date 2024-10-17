@@ -3,6 +3,7 @@ package school.faang.user_service.service.mentorship;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.mentorship.request.MentorshipRequestCreationDto;
@@ -28,14 +29,15 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
-    private static final int REQUEST_TIME_CONSTRAINT = 3;
-
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final UserContext userContext;
     private final MentorshipRequestMapper requestMapper;
     private final MentorshipAcceptedEventPublisher acceptedEventPublisher;
     private final List<RequestFilter> filters;
+
+    @Value("${mentorship.request.time-constraint}")
+    private int minTimeRequestConstraint;
 
     @Override
     public MentorshipRequestDto requestMentorship(MentorshipRequestCreationDto creationRequest) {
@@ -132,11 +134,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                                 .formatted(creationRequest.receiverId(), creationRequest.requesterId()));
             }
             LocalDateTime requestDate = latestRequest.get().getCreatedAt();
-            if (LocalDateTime.now().minusMonths(REQUEST_TIME_CONSTRAINT).isBefore(requestDate)) {
+            if (LocalDateTime.now().minusMonths(minTimeRequestConstraint).isBefore(requestDate)) {
                 throw new DataValidationException(
                         "Can't send request often than one in %d months, requester id: %d, receiver id: %d"
                                 .formatted(
-                                        REQUEST_TIME_CONSTRAINT,
+                                        minTimeRequestConstraint,
                                         creationRequest.requesterId(),
                                         creationRequest.receiverId()));
             }

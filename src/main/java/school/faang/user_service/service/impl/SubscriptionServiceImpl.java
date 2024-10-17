@@ -1,11 +1,14 @@
 package school.faang.user_service.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.model.event.UserFollowerEvent;
 import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.UserFollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.PaginationService;
 import school.faang.user_service.service.SubscriptionService;
@@ -23,14 +26,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserFilterService userFilterService;
     private final PaginationService paginationService;
     private final SubscriptionServiceValidator subscriptionServiceValidator;
+    private final UserFollowerEventPublisher userFollowerEventPublisher;
 
+    @Transactional
     @Override
     public void followUser(long followerId, long followeeId) {
         subscriptionServiceValidator.validateFollowIds(followerId, followeeId);
         subscriptionServiceValidator.checkIfAlreadySubscribed(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        userFollowerEventPublisher.publish(new UserFollowerEvent(followerId, followeeId));
     }
 
+    @Transactional
     @Override
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionServiceValidator.validateFollowIds(followerId, followeeId);

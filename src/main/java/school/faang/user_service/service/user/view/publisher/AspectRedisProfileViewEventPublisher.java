@@ -21,7 +21,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @Component
 @RequiredArgsConstructor
-public class AOPRedisProfileViewEventPublisher extends AbstractEventAggregator<ProfileViewEventDto> {
+public class AspectRedisProfileViewEventPublisher extends AbstractEventAggregator<ProfileViewEventDto> {
     private static final String EVENT_TYPE_NAME = "Profile view";
 
     private final RedisTemplate<String, ProfileViewEventDto> profileViewEventDtoRedisTemplate;

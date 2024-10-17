@@ -11,6 +11,7 @@ import java.util.Locale;
 public class UserDto {
     private Long id;
     private String username;
+    private Long telegramId;
     private String email;
     private String phone;
     private Locale locale;

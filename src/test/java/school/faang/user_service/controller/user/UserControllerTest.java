@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -234,5 +235,17 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService, times(1)).deleteAvatar(anyLong());
+    }
+
+    @Test
+    public void testUpdateTelegramUserId_Success() {
+        String telegramUserName = "testTelegramUserName";
+        String telegramUserId = "123456789";
+
+        doNothing().when(userService).updateTelegramUserId(telegramUserName, telegramUserId);
+
+        userController.updateTelegramUserId(telegramUserName, telegramUserId);
+
+        verify(userService, times(1)).updateTelegramUserId(telegramUserName, telegramUserId);
     }
 }

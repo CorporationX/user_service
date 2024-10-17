@@ -114,7 +114,8 @@ class SubscriptionServiceTest {
     void testGetFollowers_Success() {
         User user = createTestUser(FOLLOWEE_ID, USERNAME, EMAIL);
         List<User> users = List.of(user);
-        List<UserDto> userDtos = List.of(new UserDto(FOLLOWEE_ID, true, EMAIL, USERNAME, PHONE, PreferredContact.EMAIL));
+        List<UserDto> userDtos = List.of(new UserDto
+                (FOLLOWEE_ID, true, EMAIL, "@User", USERNAME, "123456789", PreferredContact.EMAIL));
 
         when(subscriptionRepository.findByFolloweeId(FOLLOWEE_ID)).thenReturn(users.stream());
         when(paginationService.applyPagination(users, filter.getPage(), filter.getPageSize())).thenReturn(users);
@@ -143,8 +144,8 @@ class SubscriptionServiceTest {
     void testGetFollowing_Success() {
         User user = createTestUser(FOLLOWEE_ID, FOLLOWED_USERNAME, FOLLOWED_EMAIL);
         List<User> users = List.of(user);
-        List<UserDto> userDtos = List.of(new UserDto(FOLLOWEE_ID, true, FOLLOWED_EMAIL, FOLLOWED_USERNAME,
-                PHONE, PreferredContact.EMAIL));
+        List<UserDto> userDtos = List.of(new UserDto
+                (FOLLOWEE_ID, true, FOLLOWED_EMAIL, "@User", FOLLOWED_USERNAME, "123456789", PreferredContact.EMAIL));
 
         when(subscriptionRepository.findByFollowerId(FOLLOWER_ID)).thenReturn(users.stream());
         when(paginationService.applyPagination(users, filter.getPage(), filter.getPageSize())).thenReturn(users);

@@ -41,6 +41,8 @@ spring:
           name: recommendation_req_channel
         mentorship-accepted-event-channel:
           name: mentorship_accepted_event_channel
+        premium-bought-channel:
+          name: premium_bought_channel
 
 server:
   port: 8080

@@ -17,18 +17,18 @@ class AbstractEventAggregatorTest {
     private static final String EVENT = "event";
     private static final Queue<String> EVENTS = new ConcurrentLinkedDeque<>(List.of("event1", "event2", "event3"));
 
-    private final AbstractEventAggregator<String> abstractEventAggregator =
-            new AbstractEventAggregatorImpl();
-    private final AbstractEventAggregator<String> abstractEventAggregatorException =
-            new AbstractEventAggregatorImplThrowException();
+    private final AbstractEventAggregator<String> abstractAnalyticEventAggregator =
+            new AbstractAnalyticEventAggregatorImpl();
+    private final AbstractEventAggregator<String> abstractAnalyticEventAggregatorException =
+            new AbstractAnalyticEventAggregatorImplThrowException();
 
     @SuppressWarnings("unchecked")
     @Test
     @DisplayName("Add event to queue successful")
     void testAddToQueueSuccessful() {
-        abstractEventAggregator.addToQueue(EVENT);
+        abstractAnalyticEventAggregator.addToQueue(EVENT);
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
         assertThat(analyticEvents).isNotEmpty();
     }
 
@@ -36,26 +36,26 @@ class AbstractEventAggregatorTest {
     @Test
     @DisplayName("Add event to queue successful")
     void testAddToQueueListSuccessful() {
-        abstractEventAggregator.addToQueue(List.of(EVENT, EVENT));
+        abstractAnalyticEventAggregator.addToQueue(List.of(EVENT, EVENT));
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
         assertThat(analyticEvents).isNotEmpty();
     }
 
     @Test
     @DisplayName("Analytic events list is empty successful")
     void testAnalyticEventsIsEmptySuccessful() {
-        assertThat(abstractEventAggregator.analyticEventsIsEmpty()).isTrue();
+        assertThat(abstractAnalyticEventAggregator.analyticEventsIsEmpty()).isTrue();
     }
 
     @SuppressWarnings("unchecked")
     @Test
     @DisplayName("Given non empty events list when publish throw exception then save back events")
     void testPublishAllAnalyticEventsException() {
-        ReflectionTestUtils.setField(abstractEventAggregator, "events", EVENTS);
-        abstractEventAggregatorException.publishAllEvents();
+        ReflectionTestUtils.setField(abstractAnalyticEventAggregator, "events", EVENTS);
+        abstractAnalyticEventAggregatorException.publishAllEvents();
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
         assertThat(analyticEvents).isNotEmpty();
     }
 
@@ -63,14 +63,14 @@ class AbstractEventAggregatorTest {
     @Test
     @DisplayName("Publish all analytic events successful")
     void testPublishAllAnalyticEventsSuccessful() {
-        ReflectionTestUtils.setField(abstractEventAggregator, "events", EVENTS);
-        abstractEventAggregator.publishAllEvents();
+        ReflectionTestUtils.setField(abstractAnalyticEventAggregator, "events", EVENTS);
+        abstractAnalyticEventAggregator.publishAllEvents();
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
         assertThat(analyticEvents).isEmpty();
     }
 
-    static class AbstractEventAggregatorImpl extends AbstractEventAggregator<String> {
+    static class AbstractAnalyticEventAggregatorImpl extends AbstractEventAggregator<String> {
         @Override
         protected void publishEvents(List<String> eventsCopy) {
             System.out.println("Publish: " + eventsCopy);
@@ -82,7 +82,7 @@ class AbstractEventAggregatorTest {
         }
     }
 
-    static class AbstractEventAggregatorImplThrowException extends AbstractEventAggregator<String> {
+    static class AbstractAnalyticEventAggregatorImplThrowException extends AbstractEventAggregator<String> {
         @Override
         protected void publishEvents(List<String> eventsCopy) {
             throw new RuntimeException("TEST EXCEPTION");

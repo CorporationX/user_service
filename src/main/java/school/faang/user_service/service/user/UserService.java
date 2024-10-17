@@ -4,20 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.entity.AvatarStyle;
+import school.faang.user_service.annotation.analytic.send.user.SendUserViewAnalyticEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.exception.UserAlreadyExistsException;
 import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.exception.UserAlreadyExistsException;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
@@ -37,7 +38,7 @@ public class UserService {
     private final MentorshipService mentorshipService;
     private final AvatarService avatarService;
     private final List<UserFilter> userFilters;
-    
+
     @Transactional
     public User registerUser(User user) {
         validateUsernameAndEmail(user);
@@ -47,7 +48,6 @@ public class UserService {
 
         return userRepository.save(user);
     }
-    
 
     @Transactional
     public void deactivateUser(Long userId) {
@@ -65,6 +65,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @SendUserViewAnalyticEvent
     @Transactional(readOnly = true)
     public User findById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -107,6 +108,7 @@ public class UserService {
         });
 
     }
+
     private void validateUsernameAndEmail(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException("User with this email already exists");
@@ -117,8 +119,9 @@ public class UserService {
         }
     }
 
+    @SendUserViewAnalyticEvent
     @Transactional(readOnly = true)
-    public List<User> getPremiumUsers (UserFilterDto userFilterDto) {
+    public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
         log.info("Find premium users by filter: {}", userFilterDto.toString());
         List<Premium> premiums = premiumRepository.findAll();
         Stream<User> users = premiums.stream().map(Premium::getUser);
@@ -135,11 +138,13 @@ public class UserService {
                 .toList();
     }
 
+    @SendUserViewAnalyticEvent
     @Transactional(readOnly = true)
     public List<User> getUsers(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
 
+    @SendUserViewAnalyticEvent
     @Transactional(readOnly = true)
     public User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

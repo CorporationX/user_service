@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.premium.PremiumBoughtEventDto;
+import school.faang.user_service.dto.user.ProfileViewEventDto;
 
 @Configuration
 public class RedisConfig {
@@ -27,8 +28,14 @@ public class RedisConfig {
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory connectionFactory,
-                                                       ObjectMapper objectMapper) {
-        return buildRedisTemplate(connectionFactory, Object.class, objectMapper);
+                                                       ObjectMapper javaTimeModuleObjectMapper) {
+        return buildRedisTemplate(connectionFactory, Object.class, javaTimeModuleObjectMapper);
+    }
+
+    @Bean
+    public RedisTemplate<String, ProfileViewEventDto> profileViewEventDtoRedisTemplate(
+            JedisConnectionFactory connectionFactory, ObjectMapper javaTimeModuleObjectMapper) {
+        return buildRedisTemplate(connectionFactory, ProfileViewEventDto.class, javaTimeModuleObjectMapper);
     }
 
     @Bean
@@ -37,10 +44,10 @@ public class RedisConfig {
         return buildRedisTemplate(connectionFactory, PremiumBoughtEventDto.class, objectMapper);
     }
 
-    private <T> RedisTemplate<String, T> buildRedisTemplate(JedisConnectionFactory connectionFactory, Class<T> clazz,
-                                                            ObjectMapper objectMapper) {
+    private <T> RedisTemplate<String, T> buildRedisTemplate(JedisConnectionFactory jedisConnectionFactory,
+                                                            Class<T> clazz, ObjectMapper objectMapper) {
         RedisTemplate<String, T> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+        template.setConnectionFactory(jedisConnectionFactory);
 
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         Jackson2JsonRedisSerializer<T> serializer = new Jackson2JsonRedisSerializer<>(objectMapper, clazz);

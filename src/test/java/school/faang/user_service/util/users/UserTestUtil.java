@@ -7,6 +7,18 @@ import java.util.List;
 import java.util.stream.LongStream;
 
 public class UserTestUtil {
+    public static User buildUser(long id) {
+        return User.builder()
+                .id(id)
+                .build();
+    }
+
+    public static List<User> buildUsers(int number) {
+        return LongStream.rangeClosed(1, number)
+                .mapToObj(UserTestUtil::buildUser)
+                .toList();
+    }
+
     public static User getUser(long id) {
         return User.builder()
                 .id(id)

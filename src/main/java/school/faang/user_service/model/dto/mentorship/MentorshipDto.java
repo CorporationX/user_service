@@ -24,4 +24,5 @@ public record MentorshipDto(
 
         @NotBlank(message = "About Me must not be null or empty", groups = {CreateGroup.class, UpdateGroup.class})
         String aboutMe
-) {}
+) {
+}

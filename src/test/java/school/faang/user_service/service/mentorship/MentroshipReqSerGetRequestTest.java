@@ -10,6 +10,7 @@ import school.faang.user_service.model.dto.RequestFilter;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.mapper.RequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.service.impl.mentorship.MentorshipRequestServiceImpl;
@@ -33,6 +34,9 @@ public class MentroshipReqSerGetRequestTest {
     @Mock
     MentorshipRequestRepository repository;
 
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipPublisher;
+
     private RequestFilterPredicate predicates;
 
     MentorshipRequestService service;
@@ -40,7 +44,8 @@ public class MentroshipReqSerGetRequestTest {
     @BeforeEach
     public void setup() {
         predicates = new PredicatesImpl();
-        service = new MentorshipRequestServiceImpl(mentorshipRequestValidator, repository, predicates);
+        service = new MentorshipRequestServiceImpl(mentorshipRequestValidator, repository,
+                predicates, mentorshipPublisher);
     }
 
     @Test
@@ -90,8 +95,9 @@ public class MentroshipReqSerGetRequestTest {
         System.out.println(result);
 
         // Assert
-        assertThat(result).isEqualTo( List.of(m1));
+        assertThat(result).isEqualTo(List.of(m1));
     }
+
     @Test
     public void shouldReturnList_WhenAllFilterMatch() {
         // Arrange
@@ -115,7 +121,7 @@ public class MentroshipReqSerGetRequestTest {
         System.out.println(result);
 
         // Assert
-        assertThat(result).isEqualTo( List.of(m1,m2));
+        assertThat(result).isEqualTo(List.of(m1, m2));
     }
 
 

@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.dto.premium.PremiumBoughtEventDto;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 
 @Configuration
@@ -35,6 +36,12 @@ public class RedisConfig {
     public RedisTemplate<String, ProfileViewEventDto> profileViewEventDtoRedisTemplate(
             JedisConnectionFactory connectionFactory, ObjectMapper javaTimeModuleObjectMapper) {
         return buildRedisTemplate(connectionFactory, ProfileViewEventDto.class, javaTimeModuleObjectMapper);
+    }
+
+    @Bean
+    public RedisTemplate<String, PremiumBoughtEventDto> premiumBoughtEventDtoRedisTemplate(
+            JedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+        return buildRedisTemplate(connectionFactory, PremiumBoughtEventDto.class, objectMapper);
     }
 
     private <T> RedisTemplate<String, T> buildRedisTemplate(JedisConnectionFactory jedisConnectionFactory,

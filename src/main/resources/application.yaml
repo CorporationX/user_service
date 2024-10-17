@@ -1,3 +1,6 @@
+app:
+  max-active-user-goals: 3
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -20,11 +23,14 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+
+services:
+  s3:
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    max-image-size-mb: 5
 
 server:
   port: 8080
@@ -40,3 +46,27 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+redis:
+  channels:
+    mentorship: mentorship_channel
+    project-follower: project_follower_channel
+    mentorship-accepted: mentorship_accepted_channel
+    user-ban: user_ban_channel
+
+scheduler:
+  clear-events:
+    cron: "0 0 0 * * SUN"
+    batchSize: 10
+
+executorConfig:
+  thread-pool-size: 10
+
+premium:
+  removal:
+    batch-size: 100
+    thread-pool:
+      core-pool-size: 8
+      max-pool-capacity: 16
+      queue-capacity: 32
+    interval: "@weekly"

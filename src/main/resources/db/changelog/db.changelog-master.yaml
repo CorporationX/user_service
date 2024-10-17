@@ -13,3 +13,11 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/user_V008__BJS2-27196_insert_goals.sql
+  - include:
+      file: db/changelog/changeset/user_V009__BJS2-27201_insert_premium_users.sql
+  - include:
+      file: db/changelog/changeset/user_V010_BJS2-27199.sql
+  - include:
+      file: db/changelog/changeset/user_V011_BJS2-27267_add_version_banned_columns.sql

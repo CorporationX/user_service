@@ -1,41 +1,61 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1/subscribe")
 @RequiredArgsConstructor
 public class SubscriptionController {
-  private final SubscriptionService subscriptionService;
 
-  public void followUser(long followerId, long followeeId) throws DataValidationException {
-    subscriptionService.followUser(followerId, followeeId);
-  }
+    private final SubscriptionService subscriptionService;
 
-  public void unfollowUser(long followerId, long followeeId) throws DataValidationException {
-    subscriptionService.unfollowUser(followerId, followeeId);
-  }
+    @PostMapping("/follow")
+    public void followUser(@RequestParam(name = "followerId") Long followerId,
+                           @RequestParam(name = "followeeId") Long followeeId) {
 
-  public List<UserDto> getFollowers(long followeeId) {
-    return subscriptionService.getFollowers(followeeId);
-  }
+        if (followerId == null || followeeId == null) {
+            throw new DataValidationException("followerId and followeeId cannot be null");
+        }
+        subscriptionService.followUser(followerId, followeeId);
+    }
 
-  public int getFollowersCount(long followerId) {
-    return subscriptionService.getFollowersCount(followerId);
-  }
+    @PostMapping("/unfollow")
+    public void unfollowUser(@RequestParam(name = "followerId") long followerId,
+                             @RequestParam(name = "followeeId") long followeeId) {
+        subscriptionService.unfollowUser(followerId, followeeId);
+    }
 
-  public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
-    return subscriptionService.getFollowing(followeeId, filter);
-  }
+    @GetMapping("/followers")
+    public List<UserDto> getFollowers(@RequestParam(name = "followeeId") long followeeId,
+                                      @RequestBody UserFilterDto filter) {
+        return subscriptionService.getFollowers(followeeId, filter);
+    }
 
-  public int getFollowingCount(long followerId) {
-    return subscriptionService.getFollowingCount(followerId);
-  }
+    @GetMapping("/followers/count")
+    public long getFollowersCount(@RequestParam(name = "followeeId") long followeeId) {
+        return subscriptionService.getFollowersCount(followeeId);
+    }
+
+    @GetMapping("/following")
+    public List<UserDto> getFollowing(@RequestParam(name = "followerId") long followerId,
+                                      @RequestBody UserFilterDto filter) {
+        return subscriptionService.getFollowing(followerId, filter);
+    }
+
+    @GetMapping("/following/count")
+    public long getFollowingCount(@RequestParam(name = "followerId") long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
+    }
 }

@@ -11,6 +11,7 @@ import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.enums.PreferredContact;
 import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.publisher.UserFollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.impl.PaginationServiceImpl;
 import school.faang.user_service.service.impl.SubscriptionServiceImpl;
@@ -48,6 +49,9 @@ class SubscriptionServiceTest {
 
     @Mock
     private UserFilterService userFilterService;
+
+    @Mock
+    private UserFollowerEventPublisher userFollowerEventPublisher;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;

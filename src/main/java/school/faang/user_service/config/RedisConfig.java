@@ -21,6 +21,9 @@ public class RedisConfig {
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
 
+    @Value("${redis.channels.user-follower}")
+    private String userFollowerEventChannel;
+
     @Value("${redis.channels.mentorship-offered}")
     private String mentorshipOfferedEventChannel;
 
@@ -45,6 +48,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic userBanChannelTopic() {
         return new ChannelTopic(userBanEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic userFollowerChannelTopic() {
+        return new ChannelTopic(userFollowerEventChannel);
     }
 
     @Bean

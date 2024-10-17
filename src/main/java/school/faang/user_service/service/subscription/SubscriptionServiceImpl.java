@@ -3,13 +3,16 @@ package school.faang.user_service.service.subscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.filters.UserFiltersApplier;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -20,6 +23,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserFiltersApplier userFilterApplier;
     private final UserMapper userMapper;
     private final SubscriptionValidator validator;
+    private final FollowerEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -28,6 +32,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validator.checkIfSubscriptionNotExists(followerId, followeeId);
         validator.validateUserIds(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        FollowerEventDto followerEvent = FollowerEventDto.builder()
+                .followerId(followerId)
+                .followeeId(followeeId)
+                .timestamp(LocalDateTime.now())
+                .build();
+        eventPublisher.publish(followerEvent);
     }
 
     @Override

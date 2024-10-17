@@ -23,12 +23,14 @@ spring:
       channels:
         mentorship-channel:
           name: mentorship_channel
-        follower-event-channel:
+        follower-channel:
           name: follower_channel
         goal-event-channel:
           name: goal_channel
         event-event-channel:
           name: event_channel
+      publisher:
+        delay: 5000
 
 server:
   port: 8080

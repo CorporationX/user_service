@@ -4,6 +4,6 @@ import java.time.LocalDateTime;
 
 public record GoalCompletedEventDto(
         long userId,
-        long eventId,
+        long goalId,
         LocalDateTime timestamp) {
 }

@@ -33,7 +33,7 @@ public class RedisConfig {
 
     @Bean(value = "goalCompletedTopic")
     public ChannelTopic goalCompletedTopic(
-            @Value("${spring.data.redis.channels.goal-event-channel.name") String topic) {
+            @Value("${spring.data.redis.channels.goal-event-channel.name}") String topic) {
         return new ChannelTopic(topic);
     }
 }

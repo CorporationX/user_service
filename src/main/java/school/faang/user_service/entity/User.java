@@ -9,10 +9,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.entity.recommendation.Recommendation;
@@ -146,4 +147,8 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Promotion> promotions;
+
+    @Column(name = "notify_preference", length = 20)
+    private PreferredContact notifyPreference;
+
 }

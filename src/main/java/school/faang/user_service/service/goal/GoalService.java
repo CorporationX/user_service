@@ -3,7 +3,9 @@ package school.faang.user_service.service.goal;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -13,6 +15,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserService;
@@ -22,6 +25,7 @@ import school.faang.user_service.validator.skill.SkillValidator;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GoalService {
@@ -34,6 +38,7 @@ public class GoalService {
     private final SkillValidator skillValidator;
     private final UserService userService;
     private final GoalInvitationService goalInvitationService;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
@@ -110,6 +115,9 @@ public class GoalService {
 
         goalRepository.save(existingGoal);
 
+        if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
+            notifyUsersAboutCompletedGoal(existingGoal);
+        }
         return existingGoal;
     }
 
@@ -145,6 +153,20 @@ public class GoalService {
                 });
 
         user.getGoals().clear();
+    }
+
+    private void notifyUsersAboutCompletedGoal(Goal goal) {
+        goal.getUsers().parallelStream()
+                .forEach(user -> {
+                    log.debug("Sending notification to user - {}", user.getUsername());
+                    GoalCompletedEventDto event = GoalCompletedEventDto.builder()
+                            .goalId(goal.getId())
+                            .userId(user.getId())
+                            .goalName(goal.getTitle())
+                            .build();
+
+                    goalCompletedEventPublisher.publish(event);
+                });
     }
 }
 

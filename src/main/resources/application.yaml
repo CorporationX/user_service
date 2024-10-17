@@ -28,6 +28,17 @@ spring:
         mentorship-channel: mentorship_channel
         follower-event-channel: follower_channel
         user-service: ban_user_channel
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    pool-size: 3
+    consumer:
+      group-id: "group"
+      auto-offset-reset: earliest
+    topics:
+      follower:
+        name: follower_topic
+        num-partitions: 3
+        replication-factor: 1
   cloud:
     openfeign:
       client:

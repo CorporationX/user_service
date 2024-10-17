@@ -11,7 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import school.faang.user_service.config.redis.RedisProperties;
-import school.faang.user_service.event.FollowerEvent;
+import school.faang.user_service.dto.FollowerEvent;
 
 import java.util.Map;
 

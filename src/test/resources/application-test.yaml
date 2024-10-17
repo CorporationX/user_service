@@ -13,6 +13,12 @@ spring:
   data:
     redis:
       port: -1
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    pool-size: 3
+    consumer:
+      group-id: "group"
+      auto-offset-reset: earliest
 
 services:
   user-service:

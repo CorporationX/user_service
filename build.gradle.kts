@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("com.google.protobuf") version "0.9.4"
     kotlin("jvm")
 }
 
@@ -44,6 +45,7 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     implementation("redis.clients:jedis:4.3.2")
     runtimeOnly("org.postgresql:postgresql")
+    implementation("org.springframework.kafka:spring-kafka")
 
     /**
      * Amazon S3
@@ -69,7 +71,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-
+    implementation("com.google.protobuf:protobuf-java:4.28.2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
     implementation ("net.coobird:thumbnailator:0.4.1")
 
@@ -164,4 +166,25 @@ tasks.jacocoTestCoverageVerification {
 }
 kotlin {
     jvmToolchain(17)
+}
+
+/**
+ * Protobuf setting
+ */
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.28.2"
+    }
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir("src/main/resources/proto")
+        }
+    }
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }

@@ -3,13 +3,14 @@ package school.faang.user_service.service.subscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.event.FollowerEvent;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.publisher.FollowerEventPublisher;
+import school.faang.user_service.publisher.SubscriptionPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
@@ -24,6 +25,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final FollowerEventPublisher followerEventPublisher;
+    private final SubscriptionPublisher subscriptionPublisher;
     private final SubscriptionValidator validator;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
@@ -34,6 +36,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validator.validateUserIds(followerId, followeeId);
         boolean exists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
         validator.validateFollowSubscription(exists, followerId, followeeId);
+
+        FollowerEvent followerEvent = FollowerEvent.builder()
+                .followeeId(followeeId)
+                .eventTime(LocalDateTime.now())
+                .build();
+        subscriptionPublisher.publish(followerEvent);
+
         subscriptionRepository.followUser(followerId, followeeId);
         followerEventPublisher.publish(new FollowerEvent(followerId, followeeId, LocalDateTime.now()));
     }

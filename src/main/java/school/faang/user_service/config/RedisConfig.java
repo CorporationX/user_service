@@ -24,6 +24,9 @@ public class RedisConfig {
     @Value("${redis.channels.user-follower}")
     private String userFollowerEventChannel;
 
+    @Value("${redis.channels.mentorship-offered}")
+    private String mentorshipOfferedEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -50,6 +53,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic userFollowerChannelTopic() {
         return new ChannelTopic(userFollowerEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipOfferedChannelTopic() {
+        return new ChannelTopic(mentorshipOfferedEventChannel);
     }
 
     @Bean

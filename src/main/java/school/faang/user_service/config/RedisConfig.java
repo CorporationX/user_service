@@ -26,6 +26,9 @@ public class RedisConfig {
     @Value("${redis.channels.goal-completed}")
     private String goalCompletedEventChannel;
 
+    @Value("${redis.channels.mentorship-accepted}")
+    private String mentorshipAcceptedEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -57,6 +60,11 @@ public class RedisConfig {
     @Bean(name = "goalCompletedTopic")
     public ChannelTopic goalCompletedChannelTopic() {
         return new ChannelTopic(goalCompletedEventChannel);
+    }
+
+    @Bean(name = "mentorshipAcceptedTopic")
+    public ChannelTopic mentorshipAcceptedChannelTopic() {
+        return new ChannelTopic(mentorshipAcceptedEventChannel);
     }
 
     @Bean

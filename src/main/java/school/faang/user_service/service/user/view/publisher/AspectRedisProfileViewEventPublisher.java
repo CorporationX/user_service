@@ -23,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AspectRedisProfileViewEventPublisher extends AbstractEventAggregator<ProfileViewEventDto> {
     private static final String EVENT_TYPE_NAME = "Profile view";
-
     private final RedisTemplate<String, ProfileViewEventDto> profileViewEventDtoRedisTemplate;
     private final ChannelTopic profileViewEventTopic;
     private final UserContext userContext;
@@ -34,10 +33,12 @@ public class AspectRedisProfileViewEventPublisher extends AbstractEventAggregato
     )
     @SuppressWarnings("unchecked")
     public void addToPublish(Object returnValue) {
-        if (returnValue instanceof User) {
+        if (returnValue instanceof User user) {
             long receiverId = userContext.getUserId();
-            long actorId = ((User) returnValue).getId();
-            addToQueue(new ProfileViewEventDto(receiverId, actorId));
+            String receiverName = userContext.getUserName();
+
+            addToQueue(new ProfileViewEventDto(receiverId, receiverName, user.getId(), user.getUsername()));
+
         } else if (returnValue instanceof List<?> users && !users.isEmpty() && users.get(0) instanceof User) {
             addToQueue(buildProfileViewEvents((List<User>) users));
         } else {
@@ -58,8 +59,11 @@ public class AspectRedisProfileViewEventPublisher extends AbstractEventAggregato
 
     private List<ProfileViewEventDto> buildProfileViewEvents(List<User> users) {
         long receiverId = userContext.getUserId();
+        String receiverName = userContext.getUserName();
+
         return users.stream()
-                .map(user -> new ProfileViewEventDto(receiverId, user.getId()))
+                .filter(user -> user.getId() != receiverId)
+                .map(user -> new ProfileViewEventDto(receiverId, receiverName, user.getId(), user.getUsername()))
                 .toList();
     }
 }

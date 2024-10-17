@@ -18,8 +18,13 @@ public class UserHeaderFilter implements Filter {
             throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
         String userId = req.getHeader("x-user-id");
+        String userName = req.getHeader("x-user-name");
+
         if (userId != null) {
             userContext.setUserId(Long.parseLong(userId));
+        }
+        if (userName != null) {
+            userContext.setUserName(userName);
         }
         try {
             chain.doFilter(request, response);

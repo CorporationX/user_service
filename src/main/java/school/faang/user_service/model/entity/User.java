@@ -150,4 +150,7 @@ public class User {
 
     @Column(name = "banned", nullable = false)
     private boolean banned;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private TelegramContact telegramContact;
 }

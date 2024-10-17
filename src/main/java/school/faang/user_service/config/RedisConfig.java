@@ -20,6 +20,9 @@ public class RedisConfig {
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
 
+    @Value("${redis.channels.user-follower}")
+    private String userFollowerEventChannel;
+
     @Value("${redis.channels.goal-completed}")
     private String goalCompletedEventChannel;
 
@@ -36,7 +39,7 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "projectFollowerTopic")
+    @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
     }
@@ -44,6 +47,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic userBanChannelTopic() {
         return new ChannelTopic(userBanEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic userFollowerChannelTopic() {
+        return new ChannelTopic(userFollowerEventChannel);
     }
 
     @Bean(name = "goalCompletedTopic")

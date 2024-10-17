@@ -2,6 +2,9 @@ app:
   max-active-user-goals: 3
 
 spring:
+  mvc:
+    servlet:
+      path: /
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -50,9 +53,12 @@ payment-service:
 redis:
   channels:
     mentorship: mentorship_channel
-    project-follower: project_follower_channel
-    mentorship-accepted: mentorship_accepted_channel
+    follower-event: follower_event_channel
+    goal-completed: goal_completed
+    search-appearance: search_appearance_channel
+    profile-view: profile_view_channel
     user-ban: user_ban_channel
+    mentorship-accepted: mentorship_accepted_channel
 
 scheduler:
   clear-events:

@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
@@ -26,7 +27,7 @@ public class EventController {
     }
 
     @GetMapping
-    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
+    public List<EventDto> getEventsByFilter(@RequestBody @Valid EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 

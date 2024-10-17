@@ -10,11 +10,10 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
-
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
@@ -23,10 +22,12 @@ spring:
       port: 6379
       host: localhost
       channels:
-        mentorship-channel:
+        mentorshipChannel:
           name: mentorship_channel
-        follower-event-channel:
-          name: follower_channel
+        followerEventChannel:
+          name: follower_event
+        goalCompletedEvent:
+          name: goal_completed_event_channel
 
 servlet:
   multipart:
@@ -46,6 +47,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  retry:
+    max-attempts: 5
+    backoff-delay: 5000
 
 services:
   s3:
@@ -64,3 +68,10 @@ services:
   postService:
     endpoint: http://localhost:8081
     requiredHeaders: x-user-id
+
+premium:
+  schedule: "0 0 0 * * *"
+  batch-size: 100
+
+thread-pool-config:
+  size: 5

@@ -3,24 +3,26 @@ package school.faang.user_service.service.event;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.validator.event.EventValidator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Data
 @Service
@@ -34,6 +36,7 @@ public class EventService {
     private final EventValidator eventValidator;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final PromotionManagementService promotionManagementService;
 
     private Event getEventOrThrow(long eventId) {
         return eventRepository.findById(eventId)
@@ -77,14 +80,15 @@ public class EventService {
         user.getOwnedEvents().removeAll(removedEvents);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
-        if (filters == null) {
-            throw new DataValidationException("filters is null");
-        }
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+        promotionManagementService.removeExpiredPromotions();
 
-        return eventFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .flatMap(filter -> filter.apply(eventRepository.findAll().stream(), filters))
+        List<Event> filteredEvents = filteredEvents(filter);
+        List<Event> prioritizedEvents = prioritizedEvents(filteredEvents);
+
+        markAsShownEvents(prioritizedEvents);
+
+        return prioritizedEvents.stream()
                 .map(eventMapper::toDto)
                 .toList();
     }
@@ -130,5 +134,46 @@ public class EventService {
         return events.stream()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    private List<Event> filteredEvents(EventFilterDto filterDto) {
+        return eventFilters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .map(filter -> filter.toSpecification(filterDto))
+                .reduce(Specification::and)
+                .map(eventRepository::findAll)
+                .orElseGet(Collections::emptyList);
+    }
+
+    private List<Event> prioritizedEvents(List<Event> events) {
+        return events.stream()
+                .sorted(Comparator.comparingInt(this::eventPriority).reversed())
+                .toList();
+    }
+
+    private Integer eventPriority(Event event) {
+        if (event.getOwner() != null && event.getOwner().getPromotions() != null) {
+            return event.getOwner().getPromotions().stream()
+                    .filter(promotion -> PromotionTarget.EVENTS.name().equals(promotion.getTarget()))
+                    .findFirst()
+                    .map(Promotion::getPriority)
+                    .orElse(0);
+        } else {
+            return 0;
+        }
+    }
+
+    private void markAsShownEvents(List<Event> events) {
+        List<Long> promotionIds = events.stream()
+                .map(Event::getOwner)
+                .map(User::getPromotions)
+                .filter(promotions -> !promotions.isEmpty())
+                .flatMap(promotions -> promotions.stream().filter(
+                        promotion -> PromotionTarget.EVENTS.name().equals(promotion.getTarget()))
+                )
+                .map(Promotion::getId)
+                .toList();
+
+        promotionManagementService.markAsShowPromotions(promotionIds);
     }
 }

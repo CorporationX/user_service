@@ -2,31 +2,39 @@ package school.faang.user_service.service.user;
 
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.exception.remote.AmazonS3CustomException;
 import school.faang.user_service.exception.remote.ImageGeneratorException;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.image.RemoteImageService;
+import school.faang.user_service.service.promotion.PromotionManagementService;
 import school.faang.user_service.service.s3.S3Service;
 import school.faang.user_service.util.file.CsvUtil;
 import school.faang.user_service.validator.user.UserValidator;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,6 +48,8 @@ public class UserService {
     private final S3Service s3Service;
     private final CsvUtil csvUtil;
     private final CountryService countryService;
+    private final List<UserFilter> userFilters;
+    private final PromotionManagementService promotionManagementService;
 
     @Transactional
     public User getUserById(Long userId) {
@@ -103,6 +113,56 @@ public class UserService {
 
         log.info("registerUser() - end : user = {}", user);
         return userMapper.toDto(user);
+    }
+
+    @Transactional
+    public List<UserDto> users(UserFilterDto filterDto) {
+        promotionManagementService.removeExpiredPromotions();
+
+        List<User> filteredUsers = filteredUsers(filterDto);
+        List<User> prioritizedUsers = prioritizedUsers(filteredUsers);
+
+        markAsShownUsers(prioritizedUsers);
+
+        return prioritizedUsers.stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    private List<User> filteredUsers(UserFilterDto filterDto) {
+        return userFilters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .map(filter -> filter.toSpecification(filterDto))
+                .reduce(Specification::and)
+                .map(userRepository::findAll)
+                .orElseGet(Collections::emptyList);
+    }
+
+    private List<User> prioritizedUsers(List<User> users) {
+        return users.stream()
+                .sorted(Comparator.comparingInt(this::userPriority).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private Integer userPriority(User user) {
+        return user.getPromotions().stream()
+                .filter(promotion -> PromotionTarget.PROFILE.name().equals(promotion.getTarget()))
+                .findFirst()
+                .map(Promotion::getPriority)
+                .orElse(0);
+    }
+
+    private void markAsShownUsers(List<User> users) {
+        List<Long> promotionIds = users.stream()
+                .map(User::getPromotions)
+                .filter(promotions -> !promotions.isEmpty())
+                .flatMap(promotions -> promotions.stream().filter(
+                        promotion -> PromotionTarget.PROFILE.name().equals(promotion.getTarget()))
+                )
+                .map(Promotion::getId)
+                .toList();
+
+        promotionManagementService.markAsShowPromotions(promotionIds);
     }
 
     private void setUserDefaultAvatar(User user) {

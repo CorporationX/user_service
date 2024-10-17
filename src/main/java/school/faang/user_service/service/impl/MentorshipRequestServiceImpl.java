@@ -1,5 +1,6 @@
 package school.faang.user_service.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         mentorshipRequestValidator.lastRequestDateValidation(mentorshipRequestDto);
 
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
+        User requester = userRepository.findById(mentorshipRequestDto.getRequesterId()).orElseThrow(() ->
+                new EntityNotFoundException(String.format("User with id = %d not found", mentorshipRequestDto.getRequesterId())));
+        User receiver = userRepository.findById(mentorshipRequestDto.getReceiverId()).orElseThrow(() ->
+                new EntityNotFoundException(String.format("User with id = %d not found", mentorshipRequestDto.getReceiverId())));
+        mentorshipRequest.setRequester(requester);
+        mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         MentorshipRequest savedRequest = mentorshipRequestRepository.save(mentorshipRequest);
         log.info("Получен запрос на менторство от пользователя с ID: {}", mentorshipRequestDto.getRequesterId());
@@ -51,7 +58,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                 savedRequest.getId(),
                 mentorshipRequestDto.getReceiverId());
         mentorshipOfferedEventPublisher.publish(mentorshipOfferedEvent);
-        log.info("MentorshipOfferedEvent отправлен в redis {}", mentorshipOfferedEvent);
+        log.info("MentorshipOfferedEvent sent to redis {}", mentorshipOfferedEvent);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

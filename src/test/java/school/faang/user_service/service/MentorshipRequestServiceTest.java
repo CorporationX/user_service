@@ -102,6 +102,8 @@ public class MentorshipRequestServiceTest {
         when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
         when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(mentorshipRequestDto);
         when(mentorshipRequestRepository.save(mentorshipRequest)).thenReturn(savedMentorshipRequest);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(requester));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(receiver));
 
         MentorshipRequestDto result = mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         assertNotNull(result);

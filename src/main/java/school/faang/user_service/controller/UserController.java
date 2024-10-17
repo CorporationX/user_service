@@ -114,6 +114,11 @@ public class UserController {
         }
     }
 
+    @GetMapping("/maxId")
+    public Long getMaxUserId() {
+        return userService.getMaxUserId();
+    }
+
     @PutMapping("/updateTelegramUserId")
     public void updateTelegramUserId(
             @RequestParam String telegramUserName,

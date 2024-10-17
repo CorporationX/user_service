@@ -20,4 +20,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V010_BJS2-27199.sql
   - include:
-      file: db/changelog/changeset/user_V011_create_telegram_contact.sql
+      file: db/changelog/changeset/user_V011_BJS2-27267_add_version_banned_columns.sql
+  - include:
+      file: db/changelog/changeset/user_V012_create_telegram_contact.sql

@@ -140,6 +140,13 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Promotion> promotions;
 
+    @Version
+    @Column(name = "version")
+    private Integer version;
+
+    @Column(name = "banned", nullable = false)
+    private boolean banned;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private TelegramContact telegramContact;
 }

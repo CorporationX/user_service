@@ -214,6 +214,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long getMaxUserId() {
+        return userRepository.findMaxUserId();
+    }
+
+    @Override
     @Transactional
     public void updateTelegramUserId(String telegramUserName, String telegramUserId) {
         TelegramContact telegramContact = telegramContactRepository.findByTelegramUserName(telegramUserName).orElseThrow(() ->

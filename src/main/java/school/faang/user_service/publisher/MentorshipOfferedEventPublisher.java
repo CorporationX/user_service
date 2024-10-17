@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.model.event.MentorshipOfferedEvent;
 
 @Component
-public class MentorshipOfferedEventPublisher extends RedisEventPublisher<MentorshipOfferedEvent> {
+public class MentorshipOfferedEventPublisher extends AbstractEventPublisher<MentorshipOfferedEvent> {
     public MentorshipOfferedEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                            ObjectMapper objectMapper,
                                            @Qualifier("mentorshipOfferedChannelTopic") ChannelTopic topic) {

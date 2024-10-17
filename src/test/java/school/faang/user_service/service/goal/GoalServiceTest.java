@@ -16,6 +16,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.publisher.goal.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
@@ -59,6 +60,9 @@ public class GoalServiceTest {
 
     @Mock
     private GoalInvitationService goalInvitationService;
+
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     private GoalDto goalDto;
     private Goal goal;
@@ -145,6 +149,7 @@ public class GoalServiceTest {
         @DisplayName("Does not throw exception when goal is not completed during update")
         void whenGoalIsNotCompletedThenDoNotThrowExceptionOnUpdate() {
             goal.setStatus(GoalStatus.ACTIVE);
+            goalDto.setStatus(GoalStatus.ACTIVE);
 
             when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.of(goal));
             when(goalMapper.toGoalDto(goal)).thenReturn(goalDto);
@@ -154,6 +159,26 @@ public class GoalServiceTest {
             assertNotNull(result);
             verify(goalValidator).validateGoalStatusNotCompleted(goal);
             verify(goalMapper).toGoalDto(goal);
+        }
+
+        @Test
+        @DisplayName("Should notify user when goalDto status is Completed")
+        void whenGoalDtoIsCompletedThenDoNotThrowExceptionAndNotifyUsers() {
+            goal.setStatus(GoalStatus.ACTIVE);
+            goal.setId(GOAL_ID);
+            goal.setTitle(NEW_GOAL_TITLE);
+            goal.setUsers(List.of(User.builder().id(USER_ID_ONE).build()));
+            goalDto.setStatus(GoalStatus.COMPLETED);
+
+            when(goalRepository.findById(GOAL_ID)).thenReturn(Optional.of(goal));
+            when(goalMapper.toGoalDto(goal)).thenReturn(goalDto);
+
+            GoalDto result = goalService.updateGoal(GOAL_ID, goalDto);
+
+            assertNotNull(result);
+            verify(goalValidator).validateGoalStatusNotCompleted(goal);
+            verify(goalMapper).toGoalDto(goal);
+            verify(goalCompletedEventPublisher).publish(any());
         }
     }
 

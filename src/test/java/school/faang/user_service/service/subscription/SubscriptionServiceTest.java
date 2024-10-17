@@ -110,7 +110,8 @@ class SubscriptionServiceTest {
                 userFilters,
                 userValidator,
                 subscriptionValidator,
-                followerMessagePublisher);
+                followerMessagePublisher
+        );
     }
 
     @Nested

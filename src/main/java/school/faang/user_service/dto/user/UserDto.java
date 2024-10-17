@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @Builder
@@ -18,4 +19,5 @@ public class UserDto {
     private Long countryId;
     private String city;
     private String userProfilePicId;
+    private PreferredContact notifyPreference;
 }

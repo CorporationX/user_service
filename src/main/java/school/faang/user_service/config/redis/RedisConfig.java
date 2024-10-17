@@ -33,14 +33,11 @@ public class RedisConfig {
         return template;
     }
 
-    RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate(
-            RedisConnectionFactory connectionFactory,
-            ObjectMapper objMapper) {
+    RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+        template.setConnectionFactory(jedisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, FollowerEventDto.class));
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objMapper, GoalCompletedEventDto.class));
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, GoalCompletedEventDto.class));
         return template;
     }
 

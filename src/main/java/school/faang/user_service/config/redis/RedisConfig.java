@@ -11,8 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
+import school.faang.user_service.dto.event.GoalCompletedEventDto;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,6 +28,11 @@ public class RedisConfig {
     RedisTemplate<String, FollowerEventDto> followerEventredisTemplate() {
         RedisTemplate<String, FollowerEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, FollowerEventDto.class));
+        return template;
+    }
+
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate(
             RedisConnectionFactory connectionFactory,
             ObjectMapper objMapper) {
@@ -39,10 +44,13 @@ public class RedisConfig {
         return template;
     }
 
+
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
         return new ChannelTopic(name);
+    }
+
     @Bean(value = "goalCompletedTopic")
     public ChannelTopic goalCompletedTopic(
             @Value("${spring.data.redis.channels.goal-event-channel.name}") String topic) {

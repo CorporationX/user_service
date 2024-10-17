@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.PaymentDto;
+import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.FileOperationException;
 import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.image.AvatarSize;
@@ -29,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +54,7 @@ public class UserServiceImpl implements UserService {
     private final S3Service s3Service;
     private final UserUploadService userUploadService;
     private final CsvLoader csvLoader;
+    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
     @Override
     public UserDto getUser(long userId) {
@@ -173,5 +178,21 @@ public class UserServiceImpl implements UserService {
                 .exceptionally(e -> {
                     throw new EntitySaveException("Users were not saved", e);
                 });
+    }
+
+    @Override
+    public void buyPremium(PaymentDto paymentDto) {
+        /**
+         * Метод-пустышка, нужен для задачи сбора аналитики по покупки премиум доступа
+         * реализация самой покупки - отсутствует
+         */
+
+        PremiumBoughtEvent premiumBoughtEvent = new PremiumBoughtEvent(
+                paymentDto.userId(),
+                paymentDto.amount(),
+                paymentDto.duration(),
+                LocalDateTime.now()
+        );
+        premiumBoughtEventPublisher.publish(premiumBoughtEvent);
     }
 }

@@ -9,11 +9,14 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.dto.PaymentDto;
+import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
@@ -55,6 +58,9 @@ public class UserServiceImplTest {
 
     @Mock
     private UserRepository repository;
+
+    @Mock
+    private PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
     @Mock
     private S3Service s3Service;
@@ -222,6 +228,13 @@ public class UserServiceImplTest {
         when(repository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(EntityNotFoundException.class, () -> service.deleteUserAvatar(user.getId()));
+    }
+
+    @Test
+    public void testBuyPremium() {
+        // Act and Assert
+        service.buyPremium(new PaymentDto(1, 1.0, 1));
+        verify(premiumBoughtEventPublisher, times(1)).publish(any(PremiumBoughtEvent.class));
     }
 
     private User createUser() {

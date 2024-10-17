@@ -1,6 +1,9 @@
 package school.faang.user_service.service.user;
 
 import org.springframework.core.io.Resource;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import school.faang.user_service.dto.PaymentDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,4 +26,6 @@ public interface UserService {
     UserDto register(UserDtoForRegistration userDto);
 
     void uploadUsers(MultipartFile file);
+
+    void buyPremium(PaymentDto paymentDto);
 }

@@ -19,10 +19,12 @@ import school.faang.user_service.model.entity.UserProfilePic;
 import school.faang.user_service.model.entity.Event;
 import school.faang.user_service.model.entity.Goal;
 import school.faang.user_service.model.entity.Promotion;
+import school.faang.user_service.model.entity.TelegramContact;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.PromotionRepository;
+import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.EventRepository;
 import school.faang.user_service.repository.GoalRepository;
@@ -54,6 +56,7 @@ public class UserServiceImpl implements UserService {
     private final PersonToUserMapper personToUserMapper;
     private final CountryService countryService;
     private final S3service s3service;
+    private final TelegramContactRepository telegramContactRepository;
 
     @Override
     @Transactional
@@ -213,6 +216,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long getMaxUserId() {
         return userRepository.findMaxUserId();
+    }
+
+    @Override
+    @Transactional
+    public void updateTelegramUserId(String telegramUserName, String telegramUserId) {
+        TelegramContact telegramContact = telegramContactRepository.findByTelegramUserName(telegramUserName).orElseThrow(() ->
+                new EntityNotFoundException(String.format("Telegram user with username %s not found", telegramUserName)));
+
+        if (telegramContact.getTelegramUserId() == null) {
+            telegramContact.setTelegramUserId(telegramUserId);
+            telegramContactRepository.save(telegramContact);
+        }
     }
 
     private List<User> getFilteredUsersFromRepository(UserFilterDto filterDto) {

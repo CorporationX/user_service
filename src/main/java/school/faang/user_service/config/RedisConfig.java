@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanEventListener;
 
@@ -20,6 +19,12 @@ public class RedisConfig {
 
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
+
+    @Value("${redis.channels.user-follower}")
+    private String userFollowerEventChannel;
+
+    @Value("${redis.channels.goal-completed}")
+    private String goalCompletedEventChannel;
 
     @Value("${redis.channels.mentorship-accepted}")
     private String mentorshipAcceptedEventChannel;
@@ -37,7 +42,7 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "projectFollowerTopic")
+    @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
     }
@@ -45,6 +50,16 @@ public class RedisConfig {
     @Bean
     public ChannelTopic userBanChannelTopic() {
         return new ChannelTopic(userBanEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic userFollowerChannelTopic() {
+        return new ChannelTopic(userFollowerEventChannel);
+    }
+
+    @Bean(name = "goalCompletedTopic")
+    public ChannelTopic goalCompletedChannelTopic() {
+        return new ChannelTopic(goalCompletedEventChannel);
     }
 
     @Bean(name = "mentorshipAcceptedTopic")

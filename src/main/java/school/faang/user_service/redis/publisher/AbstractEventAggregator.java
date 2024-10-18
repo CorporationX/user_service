@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractEventAggregator<T> {
-    private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
     private final Topic topic;
     private final Queue<T> events = new ConcurrentLinkedDeque<>();
 
@@ -43,7 +43,8 @@ public abstract class AbstractEventAggregator<T> {
             redisTemplate.convertAndSend(topic.getTopic(), jsonEvent);
         } catch (Exception e) {
             log.error("{} events publish failed:", getEventTypeName(), e);
-            log.info("Save back to main {} events copy remainder, size: {}", getEventTypeName(), analyticEventsCopy.size());
+            log.warn("Save back to main {} events copy remainder, size: {}",
+                    getEventTypeName(), analyticEventsCopy.size());
             events.addAll(analyticEventsCopy);
         }
     }

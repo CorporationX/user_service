@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.Topic;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.premium.PremiumBoughtEventDto;
 import school.faang.user_service.entity.premium.Premium;
@@ -24,11 +25,10 @@ public class AspectRedisPremiumBoughtEventPublisher extends AbstractEventAggrega
     private static final String EVENT_TYPE_NAME = "Premium bought";
 
     public AspectRedisPremiumBoughtEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                                  Topic premiumBoughtEventTopic,
-                                                  ObjectMapper javaTimeModuleObjectMapper) {
-        super(javaTimeModuleObjectMapper, redisTemplate, premiumBoughtEventTopic);
+                                                  ObjectMapper javaTimeModuleObjectMapper,
+                                                  Topic premiumBoughtEventTopic) {
+        super(redisTemplate, javaTimeModuleObjectMapper, premiumBoughtEventTopic);
     }
-
 
     @AfterReturning(
             pointcut = "(@annotation(school.faang.user_service.annotation.analytic.send.user.SendPremiumBoughtAnalyticEvent))",

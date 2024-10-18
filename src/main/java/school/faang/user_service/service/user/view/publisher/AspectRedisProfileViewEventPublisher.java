@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.Topic;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
@@ -25,10 +26,10 @@ public class AspectRedisProfileViewEventPublisher extends AbstractEventAggregato
     private final UserContext userContext;
 
     public AspectRedisProfileViewEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                                Topic profileViewEventTopic,
                                                 ObjectMapper javaTimeModuleObjectMapper,
+                                                Topic profileViewEventTopic,
                                                 UserContext userContext) {
-        super(javaTimeModuleObjectMapper, redisTemplate, profileViewEventTopic);
+        super(redisTemplate, javaTimeModuleObjectMapper, profileViewEventTopic);
         this.userContext = userContext;
     }
 

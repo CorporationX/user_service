@@ -98,7 +98,7 @@ class AbstractEventAggregatorTest {
         public AbstractAnalyticEventAggregatorImpl(ObjectMapper objectMapper,
                                                    RedisTemplate<String, Object> redisTemplate,
                                                    Topic topic) {
-            super(objectMapper, redisTemplate, topic);
+            super(redisTemplate, objectMapper, topic);
         }
 
         @Override

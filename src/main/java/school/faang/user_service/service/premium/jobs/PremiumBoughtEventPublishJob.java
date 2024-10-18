@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.service.premium.AspectRedisPremiumBoughtEventPublisher;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
 @DisallowConcurrentExecution
+@RequiredArgsConstructor
+@Component
 public class PremiumBoughtEventPublishJob implements Job {
     private final AspectRedisPremiumBoughtEventPublisher redisPremiumBoughtEventPublisher;
 

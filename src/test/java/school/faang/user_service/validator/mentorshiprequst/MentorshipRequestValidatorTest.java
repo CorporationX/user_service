@@ -1,4 +1,4 @@
-package school.faang.user_service.helper.mentorshiprequst;
+package school.faang.user_service.validator.mentorshiprequst;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,6 @@ import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

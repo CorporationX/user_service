@@ -54,6 +54,10 @@ scheduler:
   event-start:
     cron: "0 * * * * ?" # every minute
 
+service:
+  goal:
+    max-active-goals: 3
+
 
 logging:
   level:

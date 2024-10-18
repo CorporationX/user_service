@@ -1,23 +1,27 @@
 package school.faang.user_service.service.goal;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.dto.goal.GoalFilterDto;
 import school.faang.user_service.model.dto.goal.GoalNotificationDto;
 import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.enums.GoalStatus;
+import school.faang.user_service.model.event.GoalCompletedEvent;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.impl.goal.GoalServiceImpl;
@@ -29,9 +33,13 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceImplTest {
@@ -54,6 +62,12 @@ public class GoalServiceImplTest {
     @Spy
     private GoalMapperImpl goalMapper;
 
+    @Mock
+    private UserContext userContext;
+
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
+
     // Test data
     private long userId;
     private int maxGoal;
@@ -63,6 +77,7 @@ public class GoalServiceImplTest {
     private Goal goal;
     private List<Goal> goals;
 
+
     @BeforeEach
     void setUp() {
         userId = 1;
@@ -71,74 +86,94 @@ public class GoalServiceImplTest {
         goalDto = new GoalDto("goal title",
                 "goal description",
                 null,
-                List.of("Skill1"),
+                List.of(1L, 2L),
                 GoalStatus.ACTIVE);
         skills = List.of(Skill.builder()
                 .id(1L)
                 .title("Skill2")
-                .build(), Skill.builder().title("Skill1").build());
+                .build(), Skill.builder().id(2L).title("Skill1").build());
         goal = new Goal();
     }
 
     @Test
     void createGoalIsCalledWithCorrectParameters() {
-        Mockito.doNothing().when(goalValidator)
-                .validateCreationGoal(userId, maxGoal);
-
+        //given
         Goal saveGoal = new Goal();
-        Mockito.when(goalRepository.create(goalDto.title(),
+        saveGoal.setTitle("goal title");
+        saveGoal.setDescription("goal description");
+        saveGoal.setParent(null);
+        saveGoal.setSkillsToAchieve(skills);
+        saveGoal.setStatus(GoalStatus.ACTIVE);
+
+        when(skillService.getSkillsByIds(anyList()))
+                .thenReturn(skills);
+
+        when(goalRepository.create(goalDto.title(),
                 goalDto.description(),
                 goalDto.parentId())).thenReturn(saveGoal);
+        //when
+        var result = goalService.createGoal(userId, goalDto);
 
-        goalService.createGoal(userId, goalDto);
-
-        Mockito.verify(goalRepository)
+        //then
+        Assertions.assertEquals(result, goalDto);
+        verify(goalRepository, times(1)).save(any(Goal.class));
+        verify(skillService, times(1))
+                .getSkillsByIds(anyList());
+        verify(goalRepository)
                 .create(goalDto.title(), goalDto.description(), goalDto.parentId());
     }
 
     @Test
-    void createGoalGetSkillByTitlesCalled() {
-        Mockito.doNothing().when(goalValidator)
-                .validateCreationGoal(userId, maxGoal);
-
-        Mockito.when(goalRepository.create(goalDto.title(),
-                goalDto.description(),
-                goalDto.parentId())).thenReturn(goal);
-
-        Mockito.when(skillService.getSkillsByTitle(goalDto.titleSkills())).thenReturn(skills);
-
-        goalService.createGoal(userId, goalDto);
-
-        Mockito.verify(skillService).getSkillsByTitle(goalDto.titleSkills());
-    }
-
-    @Test
-    void createGoalSaveGoalCalled() {
-        Mockito.doNothing().when(goalValidator)
-                .validateCreationGoal(userId, maxGoal);
-
-        Mockito.when(goalRepository.create(goalDto.title(),
-                goalDto.description(),
-                goalDto.parentId())).thenReturn(goal);
-
-        Mockito.when(skillService.getSkillsByTitle(goalDto.titleSkills())).thenReturn(skills);
-
-        goalService.createGoal(userId, goalDto);
-
-        goal.setSkillsToAchieve(skills);
-        Mockito.verify(goalRepository).save(goal);
-    }
-
-    @Test
-    void updateGoalAssignNewSkillToGoal() {
+    void updateGoalIsCalledWithCorrectParametersIsStatusActive() {
         goal.setId(1L);
-        goal.setSkillsToAchieve(List.of(Skill.builder().title("skill2").build()));
-        Mockito.when(goalValidator.validateUpdate(goalId, goalDto)).thenReturn(goal);
+        goal.setTitle("goal title");
+        goal.setDescription("goal description");
+        goal.setParent(null);
+        goal.setSkillsToAchieve(skills);
+        goal.setStatus(GoalStatus.ACTIVE);
+        when(goalValidator.validateUpdate(goalId)).thenReturn(goal);
+        when(skillService.getSkillsByIds(anyList())).thenReturn(skills);
 
-        Mockito.when(skillService.getSkillsByTitle(goalDto.titleSkills())).thenReturn(skills);
-        goalService.updateGoal(goalId, goalDto);
+        var result = goalService.updateGoal(goalId, goalDto);
 
-        assertEquals(goal.getSkillsToAchieve(), skills);
+        Assertions.assertEquals(goalDto, result);
+        verify(goalValidator, times(1)).validateUpdate(anyLong());
+        verify(skillService, times(1)).getSkillsByIds(anyList());
+        verify(goalRepository, times(1)).deleteSkillsByGoalId(anyLong());
+        verify(goalRepository, times(1)).save(any(Goal.class));
+    }
+
+    @Test
+    void updateGoalIsCalledWithCorrectParametersIsStatusCompleted() {
+        User user = new User();
+        user.setId(1L);
+        goalDto = new GoalDto("goal title",
+                "goal description",
+                null,
+                List.of(1L, 2L),
+                GoalStatus.COMPLETED);
+        goal.setId(1L);
+        goal.setTitle("goal title");
+        goal.setDescription("goal description");
+        goal.setParent(null);
+        goal.setSkillsToAchieve(skills);
+        goal.setStatus(GoalStatus.COMPLETED);
+        when(userContext.getUserId()).thenReturn(1L);
+        when(goalValidator.validateUpdate(anyLong())).thenReturn(goal);
+        when(skillService.getSkillsByIds(anyList())).thenReturn(skills);
+        when(goalRepository.findUsersByGoalId(anyLong())).thenReturn(List.of(user));
+
+        var result = goalService.updateGoal(goalId, goalDto);
+
+        Assertions.assertEquals(goalDto, result);
+        verify(goalValidator, times(1)).validateUpdate(anyLong());
+        verify(skillService, times(1)).getSkillsByIds(anyList());
+        verify(goalRepository, times(1)).deleteSkillsByGoalId(anyLong());
+        verify(goalRepository, times(1)).save(any(Goal.class));
+        verify(goalRepository, times(1)).findUsersByGoalId(anyLong());
+        verify(skillService, times(2)).assignSkillToUser(anyLong(), anyLong());
+        verify(goalCompletedEventPublisher, times(1))
+                .publish(any(GoalCompletedEvent.class));
     }
 
     @Test
@@ -149,26 +184,31 @@ public class GoalServiceImplTest {
 
     @Test
     void findSubtasksByGoalId() {
+        goal.setSkillsToAchieve(skills);
         goal.setTitle("title");
+
         GoalFilterDto filterDto = new GoalFilterDto();
         filterDto.setTitle("title");
 
-        Mockito.when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal));
+        when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal));
         List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filterDto);
 
         assertEquals(goalMapper.toDto(List.of(goal)), result);
+        verify(goalRepository, times(1)).findByParent(anyLong());
     }
 
     @Test
     void getGoalsByUser() {
         goal.setTitle("title");
+        goal.setSkillsToAchieve(skills);
         GoalFilterDto filterDto = new GoalFilterDto();
         filterDto.setTitle("title");
 
-        Mockito.when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal));
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal));
         List<GoalDto> result = goalService.getGoalsByUser(userId, filterDto);
 
         assertEquals(goalMapper.toDto(List.of(goal)), result);
+        verify(goalRepository, times(1)).findGoalsByUserId(anyLong());
     }
 
     @Test

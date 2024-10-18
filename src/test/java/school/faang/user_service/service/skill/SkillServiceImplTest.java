@@ -9,24 +9,31 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.skill.SkillCandidateMapperImpl;
+import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.model.dto.skill.SkillCandidateDto;
 import school.faang.user_service.model.dto.skill.SkillDto;
 import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.skill.SkillCandidateMapperImpl;
-import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.impl.skill.SkillServiceImpl;
 import school.faang.user_service.validator.skill.SkillValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SkillServiceImplTest {
@@ -128,11 +135,28 @@ class SkillServiceImplTest {
     // Merged test methods from SkillServiceTest
 
     @Test
-    void getSkillsByTitle() {
-        doNothing().when(skillServiceValidator).validateSkill(titleSkills, skillRepository);
-        when(skillRepository.findByTitleIn(titleSkills)).thenReturn(skills);
-        var result = skillService.getSkillsByTitle(titleSkills);
-        assertEquals(result, skills);
+    void getSkillsByIdsThenNotEmptyList() {
+        Skill expectedSkill = new Skill();
+        skill.setId(1L);
+        List<Skill> skillsList = List.of(expectedSkill);
+        when(skillRepository.findAllById(anyList()))
+                .thenReturn(skillsList);
+
+        var result = skillService.getSkillsByIds(List.of(1L));
+
+        assertEquals(skillsList, result);
+        verify(skillRepository, times(1)).findAllById(anyList());
+    }
+
+    @Test
+    void getSkillsByIdsThenException() {
+        List<Skill> skillsList = new ArrayList<>();
+        when(skillRepository.findAllById(anyList()))
+                .thenReturn(skillsList);
+
+        assertThrows(DataValidationException.class, () ->
+                skillService.getSkillsByIds(List.of(1L)));
+        verify(skillRepository, times(1)).findAllById(anyList());
     }
 
     @Test

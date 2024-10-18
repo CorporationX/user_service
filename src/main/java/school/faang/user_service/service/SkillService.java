@@ -16,7 +16,7 @@ public interface SkillService {
 
     SkillDto acquireSkillFromOffers(long skillId, long userId);
 
-    List<Skill> getSkillsByTitle(List<String> skillsTitle);
+    List<Skill> getSkillsByIds(List<Long> skillIds);
 
     void assignSkillToUser(long skillId, long userId);
 

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@NotNull
+@NotNull(message = "Filters can't be null!")
 public class RecommendationRequestFilterDto {
     private Long requesterId;
     private Long receiverId;

@@ -53,6 +53,8 @@ redis:
     project-follower: project_follower_channel
     mentorship-accepted: mentorship_accepted_channel
     user-ban: user_ban_channel
+    user-follower: user_follower_channel
+    goal-completed: goal_completed_channel
     skill-acquired: skill_acquired_channel
 
 scheduler:

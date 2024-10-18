@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.model.dto.RecommendationDto;
 
 import java.util.List;

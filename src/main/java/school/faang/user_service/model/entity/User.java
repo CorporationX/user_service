@@ -102,7 +102,7 @@ public class User {
     @OneToMany(mappedBy = "mentor")
     private List<Goal> setGoals;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")
@@ -150,4 +150,7 @@ public class User {
 
     @Column(name = "banned", nullable = false)
     private boolean banned;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private TelegramContact telegramContact;
 }

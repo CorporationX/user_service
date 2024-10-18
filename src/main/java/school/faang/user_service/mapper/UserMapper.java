@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {ContactInfoMapper.class, AddressMapper.class, EducationMapper.class})
 public interface UserMapper {
-
-    @Mapping(source = "user.contactPreference.preference", target = "preference")
+    @Mapping(source = "contactPreference.preference", target = "preference")
+    @Mapping(source = "user.telegramContact.telegramUserId", target = "telegramUserId")
     UserDto toDto(User user);
     User toEntity(UserDto userDto);
     List<UserDto> toListUserDto(List<User> users);

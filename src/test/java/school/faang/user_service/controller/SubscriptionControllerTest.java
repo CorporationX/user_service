@@ -38,8 +38,8 @@ class SubscriptionControllerTest {
     @InjectMocks
     private SubscriptionController subscriptionController;
 
-    private UserDto createTestUserDto(long id, String username, String email, String phone) {
-        return new UserDto(id, true, username, email, phone, PreferredContact.EMAIL);
+    private UserDto createTestUserDto(long id, String username, String email) {
+        return new UserDto(id, true, email, "@User", username, "79999999999", PreferredContact.EMAIL);
     }
 
     private List<UserDto> createUserDtoList(UserDto... users) {
@@ -69,7 +69,7 @@ class SubscriptionControllerTest {
     void testGetFollowers_Success() {
         UserFilterDto filter = new UserFilterDto();
         List<UserDto> followers = createUserDtoList(
-                createTestUserDto(2L, TEST_EMAIL, TEST_USERNAME, TEST_PHONE)
+                createTestUserDto(2L, TEST_USERNAME, TEST_EMAIL)
         );
 
         when(subscriptionService.getFollowers(FOLLOWER_ID, filter)).thenReturn(followers);
@@ -94,7 +94,7 @@ class SubscriptionControllerTest {
     void testGetFollowing_Success() {
         UserFilterDto filter = new UserFilterDto();
         List<UserDto> following = createUserDtoList(
-                createTestUserDto(2L, FOLLOWED_EMAIL, FOLLOWED_USERNAME, TEST_PHONE)
+                createTestUserDto(2L, FOLLOWED_USERNAME, FOLLOWED_EMAIL)
         );
 
         when(subscriptionService.getFollowing(FOLLOWER_ID, filter)).thenReturn(following);

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +16,9 @@ public class UserDto {
     private String username;
     @Email
     private String email;
-
+    // Здесь не все поля у сущности юзер
+    private String phone;
     private String avatar;
     private String avatarSmall;
+    private PreferredContact preference;
 }

@@ -7,6 +7,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SubscriptionRequirementsException;
+import school.faang.user_service.publis.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.filters.UserFilter;
@@ -21,6 +22,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters = new ArrayList<>();
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -29,6 +31,9 @@ public class SubscriptionService {
         validateFollowUnfollow(followerId, followeeId, true);
 
         subscriptionRepository.followUser(followerId, followeeId);
+        User follower = userRepository.findById(followerId).orElseThrow();
+
+        followerEventPublisher.publishFollower(follower, followeeId);
     }
 
     @Transactional

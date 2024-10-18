@@ -48,6 +48,8 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.follow-project-channel.name}")
     private String followProjectTopic;
+    @Value("${spring.data.redis.channels.recommendation-channel.name}")
+    private String recommendation;
 
     @Value("${spring.data.redis.channels.premium-bought-channel.name}")
     private String premiumBoughtTopic;
@@ -114,6 +116,10 @@ public class RedisConfig {
     }
 
     @Bean
+
+    public ChannelTopic recommendationTopic() {
+        return new ChannelTopic(recommendation);
+
     public ChannelTopic goalCompletedTopic() {
         return new ChannelTopic(goalCompletedTopic);
     }

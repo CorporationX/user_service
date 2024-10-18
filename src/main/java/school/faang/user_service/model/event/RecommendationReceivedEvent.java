@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RecommendationReceivedEvent {
     private Long authorId;
-    private Long recommendedUserId;
+    private Long receiverUserId;
     private Long recommendationId;
 }

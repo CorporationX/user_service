@@ -48,9 +48,6 @@ public class MentorshipRequestValidator {
                 log.info("Пользователь id{} отправлял запрос на менторство менее 3 месяцев назад", mentorshipRequestDto.getReceiverId());
                 throw new DataValidationException("Пользователь id" + mentorshipRequestDto.getRequesterId() + " отправлял запрос на менторство менее 3 месяцев назад");
             }
-        } else {
-            log.info("Последний запрос не найден, валидация пройдена. Пользователь, который запрашивает менторство {}. " +
-                    "Пользователь, у которого запрашивают менторство {}", mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
         }
     }
 

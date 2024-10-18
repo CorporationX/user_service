@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.model.event.SkillAcquiredEvent;
 
 @Component
-public class SkillAcquiredEventPublisher extends RedisEventPublisher<SkillAcquiredEvent> {
+public class SkillAcquiredEventPublisher extends AbstractEventPublisher<SkillAcquiredEvent> {
     public SkillAcquiredEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                             ObjectMapper objectMapper,
                                             @Qualifier("skillAcquiredTopic") ChannelTopic topic) {

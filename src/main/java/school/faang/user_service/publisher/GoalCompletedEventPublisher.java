@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.model.event.GoalCompletedEvent;
 
 @Component
-public class GoalCompletedEventPublisher extends RedisEventPublisher<GoalCompletedEvent> {
+public class GoalCompletedEventPublisher extends AbstractEventPublisher<GoalCompletedEvent> {
     public GoalCompletedEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                        ObjectMapper objectMapper,
                                        @Qualifier("goalCompletedTopic") ChannelTopic topic) {

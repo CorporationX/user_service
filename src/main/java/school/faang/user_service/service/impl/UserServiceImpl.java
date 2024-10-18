@@ -8,10 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.model.dto.ContactInfoDto;
 import school.faang.user_service.model.dto.EducationDto;
 import school.faang.user_service.model.dto.PersonDto;
 import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.event.ProfileViewEvent;
+import school.faang.user_service.model.event.SearchAppearanceEvent;
 import school.faang.user_service.model.filter_dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
 import school.faang.user_service.model.entity.User;
@@ -23,6 +26,8 @@ import school.faang.user_service.model.entity.TelegramContact;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -37,6 +42,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -57,6 +63,9 @@ public class UserServiceImpl implements UserService {
     private final CountryService countryService;
     private final S3service s3service;
     private final TelegramContactRepository telegramContactRepository;
+    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
+    private final UserContext userContext;
 
     @Override
     @Transactional
@@ -142,7 +151,7 @@ public class UserServiceImpl implements UserService {
 
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-
+        profileViewEventPublisher.publish(new ProfileViewEvent(userId, userContext.getUserId(), LocalDateTime.now()));
         return userMapper.toDto(user);
     }
 
@@ -162,6 +171,12 @@ public class UserServiceImpl implements UserService {
 
         List<User> filteredUsers = getFilteredUsersFromRepository(filterDto);
         List<User> priorityFilteredUsers = getPriorityFilteredUsers(filteredUsers, callingUser);
+
+        if (!filteredUsers.isEmpty()) {
+            filteredUsers.stream()
+                    .map(user -> new SearchAppearanceEvent(user.getId(), callingUserId, LocalDateTime.now()))
+                    .forEach(searchAppearanceEventPublisher::publish);
+        }
 
         decrementRemainingShows(priorityFilteredUsers);
         deleteExpiredProfilePromotions();

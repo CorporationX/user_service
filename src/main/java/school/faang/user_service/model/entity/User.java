@@ -138,7 +138,7 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ContactPreference contactPreference;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Premium premium;
 
     @OneToMany(mappedBy = "user")

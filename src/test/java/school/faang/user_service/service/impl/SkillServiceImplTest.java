@@ -17,6 +17,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.model.entity.SkillOffer;
@@ -65,6 +67,9 @@ public class SkillServiceImplTest {
 
     @Mock
     private SkillMapper mapper;
+
+    @Mock
+    SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @InjectMocks
     private SkillServiceImpl skillService;
@@ -218,6 +223,8 @@ public class SkillServiceImplTest {
         when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of());
         when(mapper.toSkillDto(any(Skill.class))).thenReturn(skillDto);
 
+        doNothing().when(skillAcquiredEventPublisher).publish(any(SkillAcquiredEvent.class));
+
         SkillDto result = skillService.acquireSkillFromOffers(skillEntity.getId(), id);
 
         assertAll(
@@ -226,6 +233,8 @@ public class SkillServiceImplTest {
         );
 
         verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
+        verify(skillAcquiredEventPublisher, times(1)).
+                publish(new SkillAcquiredEvent(id, skillEntity.getId()));
     }
 
     @Test

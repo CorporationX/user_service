@@ -29,6 +29,9 @@ public class RedisConfig {
     @Value("${redis.channels.mentorship-accepted}")
     private String mentorshipAcceptedEventChannel;
 
+    @Value("${redis.channels.skill-acquired}")
+    private String skillAcquiredEventChannel;
+
     @Value("${redis.channels.mentorship-offered}")
     private String mentorshipOfferedEventChannel;
 
@@ -68,6 +71,11 @@ public class RedisConfig {
     @Bean(name = "mentorshipAcceptedTopic")
     public ChannelTopic mentorshipAcceptedChannelTopic() {
         return new ChannelTopic(mentorshipAcceptedEventChannel);
+    }
+
+    @Bean(name = "skillAcquiredTopic")
+    public ChannelTopic skillAcquiredChannelTopic() {
+        return new ChannelTopic(skillAcquiredEventChannel);
     }
 
     @Bean

@@ -1,6 +1,10 @@
-package school.faang.user_service.service.publisher;
+package school.faang.user_service.redis.publisher;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.Topic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +12,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractEventAggregator<T> {
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+    private final Topic topic;
     private final Queue<T> events = new ConcurrentLinkedDeque<>();
 
     protected void addToQueue(T event) {
@@ -31,15 +39,15 @@ public abstract class AbstractEventAggregator<T> {
         }
         log.info("Publish {} events, size: {}", getEventTypeName(), analyticEventsCopy.size());
         try {
-            publishEvents(analyticEventsCopy);
+            String jsonEvent = objectMapper.writeValueAsString(analyticEventsCopy);
+            redisTemplate.convertAndSend(topic.getTopic(), jsonEvent);
         } catch (Exception e) {
             log.error("{} events publish failed:", getEventTypeName(), e);
-            log.info("Save back to main {} events copy remainder, size: {}", getEventTypeName(), analyticEventsCopy.size());
+            log.warn("Save back to main {} events copy remainder, size: {}",
+                    getEventTypeName(), analyticEventsCopy.size());
             events.addAll(analyticEventsCopy);
         }
     }
-
-    protected abstract void publishEvents(List<T> eventsCopy);
 
     protected abstract String getEventTypeName();
 }

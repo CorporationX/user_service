@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.enums.GoalStatus;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -22,6 +21,8 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalValidatorTest {
@@ -52,43 +53,40 @@ public class GoalValidatorTest {
     }
 
     @Test
+    @DisplayName("Проверка не существующего пользователя")
     public void givenNotValidWhenValidateUserIdThenException() {
-        Mockito.when(userRepository.findById(userId))
+        when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> goalValidator.validateUserId(userId));
     }
 
     @Test
+    @DisplayName("Проверка на существующего пользователя")
     public void givenValidWhenValidateUserIdThenNotException() {
         User user = new User();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         assertDoesNotThrow(() -> goalValidator.validateUserId(userId));
     }
 
     @Test
+    @DisplayName("Проверка на максимальное количество активных целей у пользователя")
     public void givenNotValidWhenValidateCreationGoalThenException() {
-        Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(3);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+        when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(3);
 
         assertThrows(DataValidationException.class, () ->
-                goalValidator.validateCreationGoal(userId, maxGoal));
-    }
-
-    @Test
-    public void givenValidWhenValidateCreationGoalThenNotException() {
-        Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(2);
-
-        assertDoesNotThrow(() -> goalValidator.validateCreationGoal(userId, maxGoal));
+                goalValidator.validateCreationGoal(userId));
     }
 
     @Test
     @DisplayName("Проверка на не существующий цели в БД")
     public void givenNotValidGoalIdWhenValidateUpdateThenException() {
-        Mockito.when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
+        when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () ->
-                goalValidator.validateUpdate(goalId, goalDto));
+                goalValidator.validateUpdate(goalId));
     }
 
     @Test
@@ -96,22 +94,10 @@ public class GoalValidatorTest {
     public void givenStatusCompletedWhenValidateUpdateThenException() {
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);
-        Mockito.when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
+        when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
 
         assertThrows(DataValidationException.class, () ->
-                goalValidator.validateUpdate(userId, goalDto));
-    }
-
-    @Test
-    @DisplayName("Проверка на пустой лист навыков")
-    public void givenEmptyListSkillsWhenValidateUpdateThenException() {
-        Goal goal = new Goal();
-        goal.setStatus(GoalStatus.ACTIVE);
-
-        Mockito.when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
-
-        assertThrows(DataValidationException.class, () ->
-                goalValidator.validateUpdate(goalId, goalDto));
+                goalValidator.validateUpdate(userId));
     }
 
     @Test
@@ -120,6 +106,4 @@ public class GoalValidatorTest {
         assertThrows(ResourceNotFoundException.class, () ->
                 goalValidator.validateGoalId(goalId));
     }
-
-
 }

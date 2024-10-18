@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.event.SkillAcquiredEvent;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.model.dto.skill.SkillCandidateDto;
@@ -83,9 +84,17 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public List<Skill> getSkillsByTitle(List<String> skillsTitle) {
-        skillValidator.validateSkill(skillsTitle, skillRepository);
-        return skillRepository.findByTitleIn(skillsTitle);
+    public List<Skill> getSkillsByIds(List<Long> skillIds) {
+        return skillRepository.findAllById(skillIds).stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        result -> {
+                            if (result.isEmpty()) {
+                                throw new DataValidationException("Skills don't exist");
+                            }
+                            return result;
+                        }
+                ));
     }
 
     @Override

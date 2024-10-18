@@ -1,6 +1,7 @@
 package school.faang.user_service.service.impl.goal;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
@@ -27,7 +28,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
-    private final static int MAX_NUMBER_ACTIVE_GOALS = 3;
     private final SkillService skillService;
     private final GoalValidator goalValidator;
     private final List<GoalFilter> filters;
@@ -36,24 +36,26 @@ public class GoalServiceImpl implements GoalService {
     private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     @Override
+    @Transactional
     public GoalDto createGoal(long userId, GoalDto goalDto) {
-        goalValidator.validateCreationGoal(userId, MAX_NUMBER_ACTIVE_GOALS);
+        goalValidator.validateCreationGoal(userId);
+
+        List<Skill> skills = skillService.getSkillsByIds(goalDto.skillIds());
 
         Goal saveGoal = goalRepository.create(goalDto.title(),
                 goalDto.description(),
                 goalDto.parentId());
-
-        List<Skill> skills = skillService.getSkillsByTitle(goalDto.titleSkills());
         saveGoal.setSkillsToAchieve(skills);
         goalRepository.save(saveGoal);
         return goalMapper.toDto(saveGoal);
     }
 
     @Override
+    @Transactional
     public GoalDto updateGoal(long goalId, GoalDto goalDto) {
-        Goal goal = goalValidator.validateUpdate(goalId, goalDto);
-        List<Skill> skills = skillService.getSkillsByTitle(goalDto.titleSkills());
-        assignNewSkillToGoal(goal, skills, goalDto.status());
+        Goal goal = goalValidator.validateUpdate(goalId);
+        List<Skill> skills = skillService.getSkillsByIds(goalDto.skillIds());
+        assignNewSkillToGoal(goal, skills, goalDto);
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
             assignGoalSkillsToUsers(goalId, skills);
@@ -68,9 +70,11 @@ public class GoalServiceImpl implements GoalService {
                 .forEach(skill -> skillService.assignSkillToUser(skill.getId(), user.getId())));
     }
 
-    private void assignNewSkillToGoal(Goal goal, List<Skill> newSkills, GoalStatus status) {
+    private void assignNewSkillToGoal(Goal goal, List<Skill> newSkills, GoalDto goalDto) {
+        goalRepository.deleteSkillsByGoalId(goal.getId());
         goal.setSkillsToAchieve(newSkills);
-        goal.setStatus(status);
+        goal.setStatus(goalDto.status());
+        goalRepository.save(goal);
     }
 
     @Override
@@ -98,6 +102,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    @Transactional
     public void removeGoals(List<Goal> goals) {
         goalRepository.deleteAll(goals);
     }

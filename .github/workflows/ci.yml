@@ -43,16 +43,34 @@ jobs:
       - name: Checkstyle verification
         run: ./gradlew checkstyleMain checkstyleTest --no-daemon --continue
 
-      - name: Archive test report
+      - name: Preview test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: pavi2410/html-preview-action@v4
         with:
-          name: test_report
-          path: build/reports/tests/test
+          html-file: build/reports/tests/test/index.html
 
-      - name: Archive checkstyle report
+      - name: Preview checkstyle main classes report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: pavi2410/html-preview-action@v4
         with:
-          name: checkstyle_report
-          path: build/reports/checkstyle
+          html-file: build/reports/checkstyle/main.html
+
+      - name: Preview checkstyle test classes report
+        if: always()
+        uses: pavi2410/html-preview-action@v4
+        with:
+          html-file: build/reports/checkstyle/test.html
+
+#      - name: Archive test report
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test_report
+#          path: build/reports/tests/test
+#
+#      - name: Archive checkstyle report
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: checkstyle_report
+#          path: build/reports/checkstyle

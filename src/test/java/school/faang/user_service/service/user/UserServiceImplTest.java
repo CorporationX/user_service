@@ -10,11 +10,14 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
@@ -67,6 +70,12 @@ public class UserServiceImplTest {
 
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
+
+    @Mock
+    private MessagePublisher<ProfileViewEvent> profileViewEventPublisher;
+
+    @Mock
+    private UserContext userContext;
 
     @Test
     public void getUser_Success() {
@@ -166,6 +175,7 @@ public class UserServiceImplTest {
 
         when(repository.findById(user.getId())).thenReturn(java.util.Optional.of(user));
         when(s3Service.downloadFile("smallFileId")).thenReturn(inputStream);
+        when(userContext.getUserId()).thenReturn(1L);
 
         Resource result = service.downloadUserAvatar(user.getId(), size);
 
@@ -176,6 +186,9 @@ public class UserServiceImplTest {
             throw new RuntimeException(e);
         }
         verify(s3Service).downloadFile("smallFileId");
+        verify(userContext).getUserId();
+        verify(profileViewEventPublisher).publish(any(ProfileViewEvent.class));
+
     }
 
     @Test

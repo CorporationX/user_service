@@ -6,13 +6,31 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.listener.UserBanEventListener;
 
 @Configuration
 public class RedisConfig {
 
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
+
+    @Value("${redis.channels.user-ban}")
+    private String userBanEventChannel;
+
+    @Value("${redis.channels.user-follower}")
+    private String userFollowerEventChannel;
+
+    @Value("${redis.channels.goal-completed}")
+    private String goalCompletedEventChannel;
+
+    @Value("${redis.channels.mentorship-accepted}")
+    private String mentorshipAcceptedEventChannel;
+
+    @Value("${redis.channels.skill-acquired}")
+    private String skillAcquiredEventChannel;
 
     @Value("${redis.channels.profile-view}")
     private String profileViewEventChannel;
@@ -30,9 +48,49 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "projectFollowerTopic")
+    @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic userBanChannelTopic() {
+        return new ChannelTopic(userBanEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic userFollowerChannelTopic() {
+        return new ChannelTopic(userFollowerEventChannel);
+    }
+
+    @Bean(name = "goalCompletedTopic")
+    public ChannelTopic goalCompletedChannelTopic() {
+        return new ChannelTopic(goalCompletedEventChannel);
+    }
+
+    @Bean(name = "mentorshipAcceptedTopic")
+    public ChannelTopic mentorshipAcceptedChannelTopic() {
+        return new ChannelTopic(mentorshipAcceptedEventChannel);
+    }
+
+    @Bean(name = "skillAcquiredTopic")
+    public ChannelTopic skillAcquiredChannelTopic() {
+        return new ChannelTopic(skillAcquiredEventChannel);
+    }
+
+    @Bean
+    public MessageListenerAdapter userBanEventListenerAdapter(UserBanEventListener userBanEventListener) {
+        return new MessageListenerAdapter(userBanEventListener, "onMessage");
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer(
+            LettuceConnectionFactory lettuceConnectionFactory,
+            UserBanEventListener userBanEventListener) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(lettuceConnectionFactory);
+        container.addMessageListener(userBanEventListenerAdapter(userBanEventListener), userBanChannelTopic());
+        return container;
     }
 
     @Bean(name = "profileViewTopic")

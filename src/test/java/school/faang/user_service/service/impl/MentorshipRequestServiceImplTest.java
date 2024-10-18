@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,15 +26,16 @@ import school.faang.user_service.model.filter_dto.MentorshipRequestFilterDto;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.enums.RequestStatus;
 import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestReceiverFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.MentorshipRequestRepository;
-import school.faang.user_service.service.impl.MentorshipRequestServiceImpl;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipRequestServiceTest {
+public class MentorshipRequestServiceImplTest {
     @InjectMocks
     private MentorshipRequestServiceImpl mentorshipRequestService;
     @Mock
@@ -55,6 +56,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     private MentorshipRequestDto mentorshipRequestDto;
     private MentorshipRequest mentorshipRequest;
@@ -78,6 +81,7 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestDto.setDescription("Need mentorship on Java.");
 
         mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setId(1L);
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
@@ -130,7 +134,7 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequestFilter> mentorshipRequestFilterList = List.of(new MentorshipRequestDescriptionFilter(),
                 new MentorshipRequestRequesterFilter(), new MentorshipRequestReceiverFilter(), new MentorshipRequestStatusFilter());
         mentorshipRequestService = new MentorshipRequestServiceImpl(mentorshipRequestValidator, mentorshipRequestRepository,
-                userRepository, mentorshipRequestMapper, mentorshipRequestFilterList);
+                userRepository, mentorshipRequestMapper, mentorshipRequestFilterList, mentorshipAcceptedEventPublisher);
         filters = MentorshipRequestFilterDto.builder().descriptionPattern("Need mentorship on Java.").build();
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);
         when(mentorshipRequestMapper.toDto(requests.get(0))).thenReturn(mentorshipRequestDto);
@@ -146,7 +150,6 @@ public class MentorshipRequestServiceTest {
         assertTrue(result.isEmpty(), "Список должен быть пустым, если запросов нет");
     }
 
-
     @Test
     public void acceptRequestTest_Success() {
         requester.setMentors(new ArrayList<>());
@@ -160,6 +163,12 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.acceptRequest(1L);
         assertEquals(1, requester.getMentors().size());
         assertTrue(requester.getMentors().contains(receiver));
+
+        verify(mentorshipAcceptedEventPublisher, times(1)).publish(new MentorshipAcceptedEvent(
+                mentorshipRequest.getId(),
+                mentorshipRequestDto.getRequesterId(),
+                mentorshipRequestDto.getReceiverId()
+        ));
     }
 
     @Test

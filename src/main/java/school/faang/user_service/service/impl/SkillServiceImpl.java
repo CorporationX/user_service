@@ -2,15 +2,19 @@ package school.faang.user_service.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.model.dto.SkillCandidateDto;
 import school.faang.user_service.model.dto.SkillDto;
 import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.UserSkillGuarantee;
 import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SkillServiceImpl implements SkillService {
     private static final int MIN_SKILL_OFFERS = 3;
 
@@ -31,6 +36,7 @@ public class SkillServiceImpl implements SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
     private final SkillMapper mapper;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @Override
     @Transactional
@@ -78,8 +84,13 @@ public class SkillServiceImpl implements SkillService {
         if (skillOffers.size() < MIN_SKILL_OFFERS) {
             throw new SkillAssignmentException("Not enough skill offers to acquire this skill.");
         }
+        log.info("Assigning skill ID {} to user ID {}", skillId, userId);
 
         skillRepository.assignSkillToUser(skillId, userId);
+
+        skillAcquiredEventPublisher.publish(new SkillAcquiredEvent(userId, skillId));
+        log.info("Publishing SkillAcquiredEvent for user ID {} and skill ID {}", userId, skillId);
+
         setGuarantors(skillOffers);
 
         Skill assignedSkill = skillRepository.findUserSkill(skillId, userId)
@@ -96,5 +107,11 @@ public class SkillServiceImpl implements SkillService {
                         .build())
                 .distinct()
                 .toList());
+    }
+
+    @Override
+    @Transactional
+    public void addSkillToUsers(List<User> users, Long goalId) {
+        users.forEach(user -> user.getSkills().addAll(skillRepository.findSkillsByGoalId(goalId)));
     }
 }

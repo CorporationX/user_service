@@ -5,12 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.enums.PreferredContact;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.publisher.UserFollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.impl.PaginationServiceImpl;
 import school.faang.user_service.service.impl.SubscriptionServiceImpl;
@@ -49,6 +50,9 @@ class SubscriptionServiceTest {
     @Mock
     private UserFilterService userFilterService;
 
+    @Mock
+    private UserFollowerEventPublisher userFollowerEventPublisher;
+
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
 
@@ -56,6 +60,7 @@ class SubscriptionServiceTest {
     private static final long FOLLOWEE_ID = 2L;
     private static final String USERNAME = "testuser";
     private static final String EMAIL = "test@example.com";
+    private static final String PHONE = "79998887766";
     private static final String FOLLOWED_USERNAME = "followedUser";
     private static final String FOLLOWED_EMAIL = "followed@example.com";
 
@@ -109,7 +114,8 @@ class SubscriptionServiceTest {
     void testGetFollowers_Success() {
         User user = createTestUser(FOLLOWEE_ID, USERNAME, EMAIL);
         List<User> users = List.of(user);
-        List<UserDto> userDtos = List.of(new UserDto(FOLLOWEE_ID, true, EMAIL, USERNAME, PreferredContact.EMAIL));
+        List<UserDto> userDtos = List.of(new UserDto
+                (FOLLOWEE_ID, true, EMAIL, "@User", USERNAME, "123456789", PreferredContact.EMAIL));
 
         when(subscriptionRepository.findByFolloweeId(FOLLOWEE_ID)).thenReturn(users.stream());
         when(paginationService.applyPagination(users, filter.getPage(), filter.getPageSize())).thenReturn(users);
@@ -138,7 +144,8 @@ class SubscriptionServiceTest {
     void testGetFollowing_Success() {
         User user = createTestUser(FOLLOWEE_ID, FOLLOWED_USERNAME, FOLLOWED_EMAIL);
         List<User> users = List.of(user);
-        List<UserDto> userDtos = List.of(new UserDto(FOLLOWEE_ID, true, FOLLOWED_EMAIL, FOLLOWED_USERNAME, PreferredContact.EMAIL));
+        List<UserDto> userDtos = List.of(new UserDto
+                (FOLLOWEE_ID, true, FOLLOWED_EMAIL, "@User", FOLLOWED_USERNAME, "123456789", PreferredContact.EMAIL));
 
         when(subscriptionRepository.findByFollowerId(FOLLOWER_ID)).thenReturn(users.stream());
         when(paginationService.applyPagination(users, filter.getPage(), filter.getPageSize())).thenReturn(users);

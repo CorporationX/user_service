@@ -33,5 +33,9 @@ public interface UserService {
 
     void processCsvFile(InputStream inputStream);
 
+    Long getMaxUserId();
+
+    void updateTelegramUserId(String telegramUserName, String telegramUserId);
+
     void publishProfileViewEvent(long viewerId, long profileOwnerId);
 }

@@ -56,7 +56,6 @@ public class PremiumServiceTest {
     private PaymentResponse unsuccessfulPaymentResponse;
     private Premium premium;
     private PremiumDto premiumDto;
-    List<Long> premiumIds;
 
     @Mock
     private PremiumRepository premiumRepository;

@@ -26,7 +26,7 @@ public class SwaggerConfig {
                                 .url("https://some-url.com"))
                         .termsOfService("Terms of service"))
                 .addServersItem(new Server()
-                        .url("http://localhost:8080/api/v1")
+                        .url("http://localhost:8080")
                         .description("Local Environment"));
     }
 }

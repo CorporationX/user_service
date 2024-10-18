@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestFilter;
+import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.model.dto.RejectionDto;
 import school.faang.user_service.model.event.MentorshipOfferedEvent;
@@ -16,6 +17,7 @@ import school.faang.user_service.model.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
@@ -33,6 +35,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedPublisher;
     private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Override
@@ -88,6 +91,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         if (requestMentee.getMentors().stream().noneMatch(mentor -> mentor.equals(requestMentor))) {
             requestMentee.getMentors().add(requestMentor);
             log.info("Запрос на менторство id{} принят", id);
+            mentorshipAcceptedPublisher.publish(new MentorshipAcceptedEvent(
+                    id, requestMentee.getId(), requestMentor.getId()));
+            log.info("Публикация события MentorshipAcceptedEvent для запроса id{} между mentee id{} и mentor id{}",
+                    id, requestMentee.getId(), requestMentor.getId());
         } else {
             log.info("Пользователь id{} уже является ментором отправителя id{}", requestMentor.getId(), requestMentee.getId());
             throw new DataValidationException("Пользователь id" + requestMentor.getId() + " уже является ментором отправителя id" + requestMentee.getId());

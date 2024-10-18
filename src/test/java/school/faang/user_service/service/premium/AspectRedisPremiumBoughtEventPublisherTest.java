@@ -23,7 +23,7 @@ import static school.faang.user_service.util.premium.PremiumFabric.getPremium;
 import static school.faang.user_service.util.users.UserTestUtil.getUser;
 
 @ExtendWith(MockitoExtension.class)
-class AOPRedisPremiumBoughtEventPublisherTest {
+class AspectRedisPremiumBoughtEventPublisherTest {
     private static final long USER_ID = 1L;
     private static final long PREMIUM_ID = 1L;
     private static final LocalDateTime START_DATE = LocalDateTime.of(2000, 1, 1, 1, 1);

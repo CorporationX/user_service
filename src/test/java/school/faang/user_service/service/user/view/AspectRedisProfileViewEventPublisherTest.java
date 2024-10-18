@@ -24,7 +24,7 @@ import static school.faang.user_service.util.users.UserTestUtil.buildUser;
 import static school.faang.user_service.util.users.UserTestUtil.buildUsers;
 
 @ExtendWith(MockitoExtension.class)
-class AOPRedisProfileViewEventPublisherTest {
+class AspectRedisProfileViewEventPublisherTest {
     private static final long RECEIVER_ID = 1L;
     private static final long ACTOR_ID = 2L;
     private static final int NUMBER_OF_ACTORS = 3;

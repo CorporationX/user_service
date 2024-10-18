@@ -14,6 +14,8 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.exception.EventPublishingException;
 import school.faang.user_service.model.event.GoalCompletedEvent;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,7 +43,7 @@ public class GoalCompletedEventPublisherTest {
 
     @BeforeEach
     public void setUp() {
-        testEvent = new GoalCompletedEvent(1L, 2L);
+        testEvent = new GoalCompletedEvent(1L, 2L, LocalDateTime.now());
     }
 
     @Test

@@ -17,6 +17,7 @@ import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +50,7 @@ public class GoalServiceImpl implements GoalService {
         log.info("Skills added to users for goal ID: {}. User IDs: [{}]", goalId, userIds);
 
         users.forEach(user -> {
-            goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId));
+            goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId, LocalDateTime.now()));
             log.info("GoalCompletedEvent published for user ID: {} and goal ID: {}", user.getId(), goalId);
         });
 

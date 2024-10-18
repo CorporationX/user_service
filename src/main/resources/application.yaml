@@ -25,6 +25,9 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+      topics:
+        - search-appearance
+        - profile-view
 
 server:
   port: 8080
@@ -40,12 +43,6 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
-
-redis:
-  pubsub:
-    topics:
-      - search-appearance
-      - profile-view
 
 scheduler:
   cron: 0 0 0 * * *

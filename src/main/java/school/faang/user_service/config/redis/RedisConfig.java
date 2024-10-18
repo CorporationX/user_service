@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "redis.pubsub")
+@ConfigurationProperties(prefix = "spring.data.redis")
 public class RedisConfig {
 
     private List<String> topics;

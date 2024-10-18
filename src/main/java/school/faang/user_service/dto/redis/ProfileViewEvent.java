@@ -1,4 +1,4 @@
-package school.faang.user_service.service.publisher.event;
+package school.faang.user_service.dto.redis;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ProfileViewEvent extends AnalyticsEvent {
-    public ProfileViewEvent(Long id, long receiverId, long actorId, LocalDateTime receivedAt) {
-        super(id, receiverId, actorId, receivedAt);
+    public ProfileViewEvent(long receiverId, long actorId, LocalDateTime receivedAt) {
+        super(receiverId, actorId, receivedAt);
     }
 }

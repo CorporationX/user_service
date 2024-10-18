@@ -12,10 +12,10 @@ import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.publisher.EventPublisher;
-import school.faang.user_service.service.publisher.event.ProfileViewEvent;
-import school.faang.user_service.service.publisher.RedisTopics;
-import school.faang.user_service.service.publisher.event.SearchAppearanceEvent;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.dto.redis.ProfileViewEvent;
+import school.faang.user_service.publisher.RedisTopics;
+import school.faang.user_service.dto.redis.SearchAppearanceEvent;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = userRepository.findById(userId).map(userMapper::toDto)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         ProfileViewEvent profileViewEvent = new ProfileViewEvent(
-                null,
                 userDto.getId(),
                 userContext.getUserId(),
                 LocalDateTime.now()
@@ -72,7 +71,6 @@ public class UserServiceImpl implements UserService {
                         .allMatch(filter -> filter.apply(userDto, userFilterDto)))
                 .peek(userDto -> {
                     SearchAppearanceEvent searchAppearanceEvent = new SearchAppearanceEvent(
-                            null,
                             userDto.getId(),
                             userContext.getUserId(),
                             LocalDateTime.now()

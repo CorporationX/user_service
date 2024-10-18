@@ -1,4 +1,4 @@
-package school.faang.user_service.service.publisher.event;
+package school.faang.user_service.dto.redis;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class AnalyticsEvent {
-    private Long id;
     private long receiverId;
     private long actorId;
     private LocalDateTime receivedAt;

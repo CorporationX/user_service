@@ -1,4 +1,4 @@
-package school.faang.user_service.service.publisher;
+package school.faang.user_service.publisher;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

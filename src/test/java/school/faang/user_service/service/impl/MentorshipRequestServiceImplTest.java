@@ -150,7 +150,6 @@ public class MentorshipRequestServiceImplTest {
                 new MentorshipRequestRequesterFilter(), new MentorshipRequestReceiverFilter(), new MentorshipRequestStatusFilter());
         mentorshipRequestService = new MentorshipRequestServiceImpl(mentorshipRequestValidator, mentorshipRequestRepository,
                 userRepository, mentorshipRequestMapper, mentorshipRequestFilterList, mentorshipAcceptedEventPublisher, mentorshipOfferedEventPublisher);
-                userRepository, mentorshipRequestMapper, mentorshipRequestFilterList, mentorshipOfferedEventPublisher);
         filters = MentorshipRequestFilterDto.builder().descriptionPattern("Need mentorship on Java.").build();
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);
         when(mentorshipRequestMapper.toDto(requests.get(0))).thenReturn(mentorshipRequestDto);

@@ -2,6 +2,7 @@ package school.faang.user_service.exception.handler;
 
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 
@@ -88,6 +90,22 @@ public class GlobalRestExceptionHandler {
     public ErrorResponse handleFeignException(FeignException ex) {
         log.error("Feign Exception", ex);
         return new ErrorResponse("Feign Exception", ex.getMessage());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleResponseStatusException(ResponseStatusException ex) {
+        log.error("Bad Request", ex);
+        return new ErrorResponse("Bad Request", ex.getReason());
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConstraintViolation(ConstraintViolationException ex) {
+        String message = ex.getConstraintViolations().iterator().next().getMessage();
+        log.error("Validation Error", ex);
+        return new ErrorResponse("Validation Error", message);
     }
 
     @ExceptionHandler(RuntimeException.class)

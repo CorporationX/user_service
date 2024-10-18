@@ -32,6 +32,9 @@ public class RedisConfig {
     @Value("${redis.channels.skill-acquired}")
     private String skillAcquiredEventChannel;
 
+    @Value("${redis.channels.profile-view}")
+    private String profileViewEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -88,5 +91,10 @@ public class RedisConfig {
         container.setConnectionFactory(lettuceConnectionFactory);
         container.addMessageListener(userBanEventListenerAdapter(userBanEventListener), userBanChannelTopic());
         return container;
+    }
+
+    @Bean(name = "profileViewTopic")
+    public ChannelTopic profileViewChannelTopic() {
+        return new ChannelTopic(profileViewEventChannel);
     }
 }

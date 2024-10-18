@@ -12,7 +12,7 @@ import school.faang.user_service.dto.message.MentorshipRequestMessage;
 @AllArgsConstructor
 @Slf4j
 @ToString
-public class MentorshipRequestEventPublisher implements MessagePublisher {
+public class MentorshipRequestEventPublisher implements MessagePublisher<MentorshipRequestMessage> {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic mentorshipRequestTopic;

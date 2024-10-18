@@ -6,12 +6,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.model.event.ProjectFollowerEvent;
+import school.faang.user_service.model.event.UserFollowerEvent;
 
 @Component
-public class ProjectFollowerEventPublisher extends AbstractEventPublisher<ProjectFollowerEvent> {
-    public ProjectFollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                         ObjectMapper objectMapper,
-                                         @Qualifier("projectFollowerChannelTopic") ChannelTopic topic) {
+public class UserFollowerEventPublisher extends AbstractEventPublisher<UserFollowerEvent> {
+    public UserFollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                      ObjectMapper objectMapper,
+                                      @Qualifier("userFollowerChannelTopic") ChannelTopic topic) {
         super(redisTemplate, objectMapper, topic);
     }
 }

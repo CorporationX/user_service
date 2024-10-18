@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.model.dto.SkillCandidateDto;
 import school.faang.user_service.model.dto.SkillDto;
 import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.UserSkillGuarantee;
 import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
@@ -96,5 +97,11 @@ public class SkillServiceImpl implements SkillService {
                         .build())
                 .distinct()
                 .toList());
+    }
+
+    @Override
+    @Transactional
+    public void addSkillToUsers(List<User> users, Long goalId) {
+        users.forEach(user -> user.getSkills().addAll(skillRepository.findSkillsByGoalId(goalId)));
     }
 }

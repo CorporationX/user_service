@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.entity.TelegramContact;
 import school.faang.user_service.model.filter_dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
 import school.faang.user_service.model.entity.User;
@@ -33,6 +34,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
+import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.EventRepository;
 import school.faang.user_service.repository.GoalRepository;
@@ -86,6 +88,8 @@ public class UserServiceTest {
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @Mock
     private List<UserFilter> userFilters;
+    @Mock
+    private TelegramContactRepository telegramContactRepository;
     @Mock
     private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
     @Mock
@@ -365,9 +369,9 @@ public class UserServiceTest {
 
         List<UserDto> result = userService.getFilteredUsers(filterDto, callingUser.getId());
 
-        verify(userMapper).toDto(callingUser);
-        verify(userMapper).toDto(promoted1);
-        verify(userMapper).toDto(promoted2);
+        verify(userMapper, times(1)).toDto(callingUser);
+        verify(userMapper, times(2)).toDto(promoted1);
+        verify(userMapper, times(2)).toDto(promoted2);
         verify(searchAppearanceEventPublisher, times(3)).publish(any());
 
         assertAll(
@@ -473,5 +477,56 @@ public class UserServiceTest {
 
         verify(s3service, never()).deleteFile(anyString());
         verify(userRepository, never()).deleteUserProfilePicByUserId(anyLong());
+    }
+
+    @Test
+    public void testUpdateTelegramUserId_Success() {
+        String telegramUserName = "testTelegramUserName";
+        String telegramUserId = "123456789";
+
+        TelegramContact telegramContact = new TelegramContact();
+        telegramContact.setTelegramUserName(telegramUserName);
+        telegramContact.setTelegramUserId(null); // Предположим, что поле ещё не заполнено
+
+        when(telegramContactRepository.findByTelegramUserName(telegramUserName)).thenReturn(Optional.of(telegramContact));
+
+        userService.updateTelegramUserId(telegramUserName, telegramUserId);
+
+        verify(telegramContactRepository, times(1)).save(telegramContact);
+        verify(telegramContactRepository).save(telegramContact);
+        verify(telegramContactRepository, times(1)).findByTelegramUserName(telegramUserName);
+    }
+
+    @Test
+    public void testUpdateTelegramUserId_UserNotFound() {
+        String telegramUserName = "nonExistingTelegramUserName";
+        String telegramUserId = "123456789";
+
+        when(telegramContactRepository.findByTelegramUserName(telegramUserName)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            userService.updateTelegramUserId(telegramUserName, telegramUserId);
+        });
+
+        verify(telegramContactRepository, times(1)).findByTelegramUserName(telegramUserName);
+        verify(telegramContactRepository, never()).save(any(TelegramContact.class));
+    }
+
+    @Test
+    public void testUpdateTelegramUserId_IdAlreadyExists() {
+        String telegramUserName = "testTelegramUserName";
+        String existingTelegramUserId = "123456789";
+        String newTelegramUserId = "987654321";
+
+        TelegramContact telegramContact = new TelegramContact();
+        telegramContact.setTelegramUserName(telegramUserName);
+        telegramContact.setTelegramUserId(existingTelegramUserId);
+
+        when(telegramContactRepository.findByTelegramUserName(telegramUserName)).thenReturn(Optional.of(telegramContact));
+
+        userService.updateTelegramUserId(telegramUserName, newTelegramUserId);
+
+        verify(telegramContactRepository, never()).save(telegramContact);
+        verify(telegramContactRepository, times(1)).findByTelegramUserName(telegramUserName);
     }
 }

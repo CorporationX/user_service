@@ -55,6 +55,8 @@ redis:
     search-appearance-channel: search_appearance_channel
     profile-view-channel: profile_view_channel
     user-ban: user_ban_channel
+    user-follower: user_follower_channel
+    goal-completed: goal_completed_channel
 
 scheduler:
   clear-events:

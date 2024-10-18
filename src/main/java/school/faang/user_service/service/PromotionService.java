@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
 import school.faang.user_service.model.dto.PromotionDto;
 import school.faang.user_service.model.enums.PromotionType;
 

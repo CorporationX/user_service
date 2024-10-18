@@ -28,6 +28,7 @@ class SubscriptionControllerTest {
     private static final long EXPECTED_COUNT = 5L;
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PHONE = "123456789";
     private static final String FOLLOWED_USERNAME = "followedUser";
     private static final String FOLLOWED_EMAIL = "followed@example.com";
 
@@ -38,7 +39,7 @@ class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
 
     private UserDto createTestUserDto(long id, String username, String email) {
-        return new UserDto(id, true, username, email, PreferredContact.EMAIL);
+        return new UserDto(id, true, email, "@User", username, "79999999999", PreferredContact.EMAIL);
     }
 
     private List<UserDto> createUserDtoList(UserDto... users) {
@@ -68,7 +69,7 @@ class SubscriptionControllerTest {
     void testGetFollowers_Success() {
         UserFilterDto filter = new UserFilterDto();
         List<UserDto> followers = createUserDtoList(
-                createTestUserDto(2L, TEST_EMAIL, TEST_USERNAME)
+                createTestUserDto(2L, TEST_USERNAME, TEST_EMAIL)
         );
 
         when(subscriptionService.getFollowers(FOLLOWER_ID, filter)).thenReturn(followers);
@@ -93,7 +94,7 @@ class SubscriptionControllerTest {
     void testGetFollowing_Success() {
         UserFilterDto filter = new UserFilterDto();
         List<UserDto> following = createUserDtoList(
-                createTestUserDto(2L, FOLLOWED_EMAIL, FOLLOWED_USERNAME)
+                createTestUserDto(2L, FOLLOWED_USERNAME, FOLLOWED_EMAIL)
         );
 
         when(subscriptionService.getFollowing(FOLLOWER_ID, filter)).thenReturn(following);

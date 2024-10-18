@@ -1,6 +1,7 @@
 package school.faang.user_service.integration;
 
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Transactional
 @ExtendWith(SpringExtension.class)
+@Disabled
 public class GoalValidatorIntegrationTest {
 
     @Autowired

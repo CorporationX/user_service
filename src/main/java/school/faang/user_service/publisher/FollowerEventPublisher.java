@@ -7,12 +7,13 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FollowerEventPublisher implements MessagePublisher{
-    private final RedisTemplate<String, Object> redisTemplate;
+public class FollowerEventPublisher implements MessagePublisher {
+    private final RedisTemplate<String, String> redisTemplate;
     private final ChannelTopic followingTopic;
 
     @Autowired
-    public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
+    public FollowerEventPublisher(@Qualifier("followerEventPublisherRedisTemplate")
+                                      RedisTemplate<String, String> redisTemplate,
                                   @Qualifier("follower-channel") ChannelTopic followingTopic
     ) {
         this.redisTemplate = redisTemplate;

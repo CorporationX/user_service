@@ -1,4 +1,4 @@
-package school.faang.user_service.service.publisher;
+package school.faang.user_service.dto.redis;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class SearchAppearanceEvent {
-    private Long id;
     private long receiverId;
     private long actorId;
     private LocalDateTime receivedAt;

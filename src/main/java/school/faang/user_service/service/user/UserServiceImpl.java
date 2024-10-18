@@ -13,9 +13,9 @@ import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.publisher.EventPublisher;
-import school.faang.user_service.service.publisher.RedisTopics;
-import school.faang.user_service.service.publisher.SearchAppearanceEvent;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.publisher.RedisTopics;
+import school.faang.user_service.dto.redis.SearchAppearanceEvent;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -64,7 +64,6 @@ public class UserServiceImpl implements UserService {
                         .allMatch(filter -> filter.apply(userDto, userFilterDto)))
                 .peek(userDto -> {
                     SearchAppearanceEvent searchAppearanceEvent = new SearchAppearanceEvent(
-                            null,
                             userDto.getId(),
                             userContext.getUserId(),
                             LocalDateTime.now()

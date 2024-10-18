@@ -28,6 +28,7 @@ class SubscriptionControllerTest {
     private static final long EXPECTED_COUNT = 5L;
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PHONE = "123456789";
     private static final String FOLLOWED_USERNAME = "followedUser";
     private static final String FOLLOWED_EMAIL = "followed@example.com";
 

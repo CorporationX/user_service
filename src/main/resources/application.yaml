@@ -55,6 +55,7 @@ redis:
     user-ban: user_ban_channel
     user-follower: user_follower_channel
     goal-completed: goal_completed_channel
+    skill-acquired: skill_acquired_channel
 
 scheduler:
   clear-events:

@@ -13,15 +13,15 @@ import school.faang.user_service.redis.publisher.AbstractEventAggregator;
 import java.util.List;
 
 @Component
-public class ProfileViewEventPublisherRedis extends AbstractEventAggregator<ProfileViewEventDto>
+public class ProfileViewEventPublisherToRedis extends AbstractEventAggregator<ProfileViewEventDto>
         implements EventPublisher {
     private static final String EVENT_TYPE_NAME = "Profile view";
     private final UserContext userContext;
 
-    public ProfileViewEventPublisherRedis(RedisTemplate<String, Object> redisTemplate,
-                                                ObjectMapper javaTimeModuleObjectMapper,
-                                                Topic profileViewEventTopic,
-                                                UserContext userContext) {
+    public ProfileViewEventPublisherToRedis(RedisTemplate<String, Object> redisTemplate,
+                                            ObjectMapper javaTimeModuleObjectMapper,
+                                            Topic profileViewEventTopic,
+                                            UserContext userContext) {
         super(redisTemplate, javaTimeModuleObjectMapper, profileViewEventTopic);
         this.userContext = userContext;
     }

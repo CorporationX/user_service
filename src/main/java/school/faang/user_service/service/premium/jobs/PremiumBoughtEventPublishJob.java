@@ -6,14 +6,14 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.aspect.redis.PremiumBoughtEventPublisherRedis;
+import school.faang.user_service.aspect.redis.PremiumBoughtEventPublisherToRedis;
 
 @Slf4j
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
 @Component
 public class PremiumBoughtEventPublishJob implements Job {
-    private final PremiumBoughtEventPublisherRedis premiumBoughtEventPublisherRedis;
+    private final PremiumBoughtEventPublisherToRedis premiumBoughtEventPublisherRedis;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {

@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
-import school.faang.user_service.aspect.redis.PremiumBoughtEventPublisherRedis;
+import school.faang.user_service.aspect.redis.PremiumBoughtEventPublisherToRedis;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PremiumBoughtEventPublishJobTest {
     @Mock
-    private PremiumBoughtEventPublisherRedis premiumBoughtEventPublisherRedis;
+    private PremiumBoughtEventPublisherToRedis premiumBoughtEventPublisherRedis;
 
     @InjectMocks
     private PremiumBoughtEventPublishJob premiumBoughtEventPublishJob;

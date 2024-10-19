@@ -28,7 +28,7 @@ public class PremiumService {
     private final PremiumValidationService premiumValidationService;
     private final UserRepository userRepository;
 
-    @PublishEvent(returnType = Premium.class)
+    @PublishEvent(returnedType = Premium.class)
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod period) {
         log.info("User with id: {} buy a premium {} days subscription", userId, period.getDays());

@@ -67,7 +67,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @PublishEvent(returnType = User.class)
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public User findById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -121,7 +121,7 @@ public class UserService {
         }
     }
 
-    @PublishEvent(returnType = User.class)
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
         log.info("Find premium users by filter: {}", userFilterDto.toString());
@@ -140,13 +140,13 @@ public class UserService {
                 .toList();
     }
 
-    @PublishEvent(returnType = User.class)
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public List<User> getUsers(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
 
-    @PublishEvent(returnType = User.class)
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

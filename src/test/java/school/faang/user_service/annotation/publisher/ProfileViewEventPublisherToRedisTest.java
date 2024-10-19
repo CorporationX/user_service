@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import school.faang.user_service.aspect.redis.ProfileViewEventPublisherRedis;
+import school.faang.user_service.aspect.redis.ProfileViewEventPublisherToRedis;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 
@@ -19,7 +19,7 @@ import static school.faang.user_service.util.users.UserTestUtil.buildUser;
 import static school.faang.user_service.util.users.UserTestUtil.buildUsers;
 
 @ExtendWith(MockitoExtension.class)
-class ProfileViewEventPublisherRedisTest {
+class ProfileViewEventPublisherToRedisTest {
     private static final long RECEIVER_ID = 1L;
     private static final String RECEIVER_NAME = "Name";
     private static final long ACTOR_ID = 2L;
@@ -29,15 +29,15 @@ class ProfileViewEventPublisherRedisTest {
     private UserContext userContext;
 
     @InjectMocks
-    private ProfileViewEventPublisherRedis profileViewEventPublisherRedis;
+    private ProfileViewEventPublisherToRedis profileViewEventPublisherToRedis;
 
     @SuppressWarnings("unchecked")
     @Test
     @DisplayName("Given not User and List<User> return value and do nothing")
     void testAddToPublishNotInstanceDoNothing() {
-        profileViewEventPublisherRedis.publish(new Object());
+        profileViewEventPublisherToRedis.publish(new Object());
         Queue<ProfileViewEventDto> analyticEvents =
-                (Queue<ProfileViewEventDto>) ReflectionTestUtils.getField(profileViewEventPublisherRedis, "events");
+                (Queue<ProfileViewEventDto>) ReflectionTestUtils.getField(profileViewEventPublisherToRedis, "events");
 
         assertThat(analyticEvents).isEmpty();
     }
@@ -49,9 +49,9 @@ class ProfileViewEventPublisherRedisTest {
         when(userContext.getUserId()).thenReturn(RECEIVER_ID);
         when(userContext.getUserName()).thenReturn(RECEIVER_NAME);
 
-        profileViewEventPublisherRedis.publish(buildUser(ACTOR_ID));
+        profileViewEventPublisherToRedis.publish(buildUser(ACTOR_ID));
         Queue<ProfileViewEventDto> analyticEvents =
-                (Queue<ProfileViewEventDto>) ReflectionTestUtils.getField(profileViewEventPublisherRedis, "events");
+                (Queue<ProfileViewEventDto>) ReflectionTestUtils.getField(profileViewEventPublisherToRedis, "events");
 
         assertThat(analyticEvents).isNotEmpty();
     }
@@ -63,9 +63,9 @@ class ProfileViewEventPublisherRedisTest {
         when(userContext.getUserId()).thenReturn(RECEIVER_ID);
         when(userContext.getUserName()).thenReturn(RECEIVER_NAME);
 
-        profileViewEventPublisherRedis.publish(buildUsers(NUMBER_OF_ACTORS));
+        profileViewEventPublisherToRedis.publish(buildUsers(NUMBER_OF_ACTORS));
         Queue<ProfileViewEventDto> analyticEvents =
-                (Queue<ProfileViewEventDto>) ReflectionTestUtils.getField(profileViewEventPublisherRedis, "events");
+                (Queue<ProfileViewEventDto>) ReflectionTestUtils.getField(profileViewEventPublisherToRedis, "events");
 
         assertThat(analyticEvents).isNotEmpty();
     }

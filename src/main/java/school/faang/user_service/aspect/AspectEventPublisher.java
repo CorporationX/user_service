@@ -17,17 +17,17 @@ import java.util.List;
 public class AspectEventPublisher {
     private final List<EventPublisher> publishers;
 
-    @AfterReturning(pointcut = "@annotation(publishEvent)", returning = "returnValue")
-    public void execute(PublishEvent publishEvent, Object returnValue) {
-        EventPublisher publisher = definePublisher(publishEvent.returnType());
-        publisher.publish(returnValue);
+    @AfterReturning(pointcut = "@annotation(publishEvent)", returning = "returnedValue")
+    public void execute(PublishEvent publishEvent, Object returnedValue) {
+        EventPublisher publisher = definePublisher(publishEvent.returnedType());
+        publisher.publish(returnedValue);
     }
 
-    private EventPublisher definePublisher(Class<?> returnType) {
+    private EventPublisher definePublisher(Class<?> returnedType) {
         return publishers.stream()
-                .filter(publisher -> publisher.getInstance().equals(returnType))
+                .filter(publisher -> publisher.getInstance().equals(returnedType))
                 .findFirst()
                 .orElseThrow(() -> new InvalidReturnTypeException("No implementation of the publisher for class: " +
-                        returnType.getName()));
+                        returnedType.getName()));
     }
 }

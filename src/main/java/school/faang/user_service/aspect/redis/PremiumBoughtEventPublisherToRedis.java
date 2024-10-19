@@ -13,13 +13,13 @@ import school.faang.user_service.redis.publisher.AbstractEventAggregator;
 import java.time.temporal.ChronoUnit;
 
 @Component
-public class PremiumBoughtEventPublisherRedis extends AbstractEventAggregator<PremiumBoughtEventDto>
+public class PremiumBoughtEventPublisherToRedis extends AbstractEventAggregator<PremiumBoughtEventDto>
         implements EventPublisher {
     private static final String EVENT_TYPE_NAME = "Premium bought";
 
-    public PremiumBoughtEventPublisherRedis(RedisTemplate<String, Object> redisTemplate,
-                                            ObjectMapper javaTimeModuleObjectMapper,
-                                            Topic premiumBoughtEventTopic) {
+    public PremiumBoughtEventPublisherToRedis(RedisTemplate<String, Object> redisTemplate,
+                                              ObjectMapper javaTimeModuleObjectMapper,
+                                              Topic premiumBoughtEventTopic) {
         super(redisTemplate, javaTimeModuleObjectMapper, premiumBoughtEventTopic);
     }
 

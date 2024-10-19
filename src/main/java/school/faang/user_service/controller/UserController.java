@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.model.dto.UserDto;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.io.IOException;

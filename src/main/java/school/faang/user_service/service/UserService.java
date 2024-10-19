@@ -3,7 +3,7 @@ package school.faang.user_service.service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.User;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 
 import java.io.InputStream;
 import java.util.List;

@@ -21,6 +21,7 @@ import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.filter.event.EventMaxAttendeesFilter;
 import school.faang.user_service.filter.event.EventTitleFilter;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.EventRepository;
@@ -70,6 +71,9 @@ public class EventServiceTest {
     @Mock
     private ExecutorService executorService;
 
+    @Mock
+    private EventStartEventPublisher eventPublisher;
+
     @InjectMocks
     private EventServiceImpl eventService;
 
@@ -80,7 +84,7 @@ public class EventServiceTest {
         eventFilters = new ArrayList<>();
         eventFilters.add(eventTitleFilter);
         eventFilters.add(eventMaxAttendeesFilter);
-        eventService = new EventServiceImpl(eventRepository, userRepository, promotionRepository, eventFilters, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, userRepository, promotionRepository, eventFilters, eventMapper,eventPublisher);
         events = new ArrayList<>();
         eventService.setBatchSize(10);
     }

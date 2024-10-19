@@ -25,4 +25,9 @@ public class EventController {
         long userId = userContext.getUserId();
         return eventService.getFilteredEvents(filter, userId);
     }
+
+    @PostMapping()
+    public EventDto createEvent(@RequestBody EventDto eventDto) {
+        return eventService.createEvent(eventDto);
+    }
 }

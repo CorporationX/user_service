@@ -12,7 +12,7 @@ import school.faang.user_service.model.dto.ContactInfoDto;
 import school.faang.user_service.model.dto.EducationDto;
 import school.faang.user_service.model.dto.PersonDto;
 import school.faang.user_service.model.dto.UserDto;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.UserProfilePic;

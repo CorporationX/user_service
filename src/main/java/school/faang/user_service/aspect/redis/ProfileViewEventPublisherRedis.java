@@ -55,6 +55,7 @@ public class ProfileViewEventPublisherRedis extends AbstractEventAggregator<Prof
         String receiverName = userContext.getUserName();
 
         return users.stream()
+                .filter(user -> user.getId() != receiverId)
                 .map(user -> new ProfileViewEventDto(receiverId, receiverName, user.getId(), user.getUsername()))
                 .toList();
     }

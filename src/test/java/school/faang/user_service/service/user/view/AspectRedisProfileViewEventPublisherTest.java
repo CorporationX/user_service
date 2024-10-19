@@ -26,6 +26,7 @@ import static school.faang.user_service.util.users.UserTestUtil.buildUsers;
 @ExtendWith(MockitoExtension.class)
 class AspectRedisProfileViewEventPublisherTest {
     private static final long RECEIVER_ID = 1L;
+    private static final String RECEIVER_NAME = "Name";
     private static final long ACTOR_ID = 2L;
     private static final int NUMBER_OF_ACTORS = 3;
 
@@ -57,6 +58,7 @@ class AspectRedisProfileViewEventPublisherTest {
     @DisplayName("Given instanceof User returnValue and add tu queue")
     void testAddToPublishAddOneEventToQueue() {
         when(userContext.getUserId()).thenReturn(RECEIVER_ID);
+        when(userContext.getUserName()).thenReturn(RECEIVER_NAME);
 
         redisProfileViewEventPublisher.addToPublish(buildUser(ACTOR_ID));
         Queue<ProfileViewEventDto> analyticEvents =
@@ -82,6 +84,7 @@ class AspectRedisProfileViewEventPublisherTest {
     @DisplayName("Given instanceof List<User> returnValue and add to queue")
     void testAddToPublishAddListOfEventToQueue() {
         when(userContext.getUserId()).thenReturn(RECEIVER_ID);
+        when(userContext.getUserName()).thenReturn(RECEIVER_NAME);
 
         redisProfileViewEventPublisher.addToPublish(buildUsers(NUMBER_OF_ACTORS));
         Queue<ProfileViewEventDto> analyticEvents =

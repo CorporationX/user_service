@@ -20,7 +20,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.publisher.RedisTopics;
-import school.faang.user_service.dto.redis.SearchAppearanceEvent;
+import school.faang.user_service.dto.analyticsevent.SearchAppearanceEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;

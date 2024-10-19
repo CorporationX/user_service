@@ -2,6 +2,7 @@ package school.faang.user_service.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "spring.data.redis")
+@Setter
 public class RedisConfig {
 
     private List<String> topics;
@@ -37,12 +39,5 @@ public class RedisConfig {
         template.setConnectionFactory(connectionFactory);
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
         return template;
-    }
-
-    public void setTopics(List<String> topics) {
-        this.topics = topics;
-        for (String topic : topics) {
-            topicMap.put(topic, new ChannelTopic(topic));
-        }
     }
 }

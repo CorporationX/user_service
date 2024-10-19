@@ -11,12 +11,14 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import school.faang.user_service.publis.listener.UserBanListener;
+import school.faang.user_service.redis.listener.AuthorBanListener;
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
     private final RedisProperties redisProperties;
     private final UserBanListener userBanListener;
+    private final AuthorBanListener authorBanListener;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -29,6 +31,7 @@ public class RedisConfig {
         redisContainer.setConnectionFactory(redisConnectionFactory());
 
         redisContainer.addMessageListener(userBanListenerAdapter(), userBanTopic());
+        redisContainer.addMessageListener(authorBanListenerAdapter(), userBanTopic());
 
         return redisContainer;
     }
@@ -36,6 +39,11 @@ public class RedisConfig {
     @Bean
     public MessageListener userBanListenerAdapter() {
         return new MessageListenerAdapter(userBanListener);
+    }
+
+    @Bean
+    public MessageListener authorBanListenerAdapter() {
+        return new MessageListenerAdapter(authorBanListener);
     }
 
     @Bean

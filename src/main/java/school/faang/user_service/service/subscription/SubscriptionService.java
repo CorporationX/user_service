@@ -71,7 +71,12 @@ public class SubscriptionService {
     }
 
     public List<Long> getFollowerIdsByFolloweeId(long followeeId) {
-        validator.validateFollowee(followeeId);
+        validator.validateUser(followeeId);
         return subscriptionRepository.findFollowerIdsByFolloweeId(followeeId);
+    }
+
+    public List<Long> getFolloweeIdsByFollowerId(long followerId) {
+        validator.validateUser(followerId);
+        return subscriptionRepository.findFolloweeIdsByFollowerId(followerId);
     }
 }

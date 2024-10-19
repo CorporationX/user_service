@@ -48,4 +48,10 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
                         WHERE followee_id = :followeeId
             """)
     List<Long> findFollowerIdsByFolloweeId(long followeeId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT followee_id FROM subscription
+                        WHERE follower_id = :followerId
+            """)
+    List<Long> findFolloweeIdsByFollowerId(long followerId);
 }

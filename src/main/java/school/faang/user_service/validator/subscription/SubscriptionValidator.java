@@ -16,7 +16,7 @@ public class SubscriptionValidator {
         }
     }
 
-    public void validateFollowee(long followeeId) {
+    public void validateUser(long followeeId) {
         if (!repository.existsById(followeeId)) {
             throw new DataValidationException("Followee with id " + followeeId + " doesn't exist");
         }

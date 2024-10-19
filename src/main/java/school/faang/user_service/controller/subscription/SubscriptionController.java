@@ -56,4 +56,10 @@ public class SubscriptionController {
             @PathVariable @Min(value = 1L, message = "Followee id cannot be less than 1") long followeeId) {
         return subscriptionService.getFollowerIdsByFolloweeId(followeeId);
     }
+
+    @GetMapping("/{followerId}/followeeeids")
+    public List<Long> getFolloweeIdsByFollowerId(
+            @PathVariable @Min(value = 1L, message = "Follower id cannot be less than 1") long followerId) {
+        return subscriptionService.getFolloweeIdsByFollowerId(followerId);
+    }
 }

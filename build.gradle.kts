@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation ("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -56,7 +56,7 @@ dependencies {
     /**
      * AOP
      */
-    implementation ("org.aspectj:aspectjweaver:1.9.19")
+    implementation("org.aspectj:aspectjweaver:1.9.19")
 
     /**
      * Utils & Logging

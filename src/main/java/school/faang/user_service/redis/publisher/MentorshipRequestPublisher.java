@@ -12,7 +12,6 @@ import school.faang.user_service.entity.MentorshipRequest;
 @Aspect
 @Component
 public class MentorshipRequestPublisher extends AbstractEventPublisher<MentorshipRequestedEventDto> {
-
     public MentorshipRequestPublisher(RedisTemplate<String, Object> redisTemplate,
                                       Topic mentorshipRequestReceivedTopicName,
                                       ObjectMapper objectMapper) {

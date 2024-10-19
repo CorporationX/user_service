@@ -1,4 +1,4 @@
-package school.faang.user_service.annotation.analytic.send.user;
+package school.faang.user_service.annotation.publisher;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface SendUserViewAnalyticEvent {
+public @interface PublishEvent {
+    Class<?> returnType();
 }

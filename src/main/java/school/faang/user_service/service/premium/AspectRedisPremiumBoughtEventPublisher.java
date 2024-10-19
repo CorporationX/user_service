@@ -31,7 +31,7 @@ public class AspectRedisPremiumBoughtEventPublisher extends AbstractEventAggrega
     }
 
     @AfterReturning(
-            pointcut = "(@annotation(school.faang.user_service.annotation.analytic.send.user.SendPremiumBoughtAnalyticEvent))",
+            pointcut = "(@annotation(school.faang.user_service.annotation.analytic.send.user.SendPremiumBoughtEvent))",
             returning = "returnValue"
     )
     public void addToPublish(Object returnValue) {
@@ -42,7 +42,7 @@ public class AspectRedisPremiumBoughtEventPublisher extends AbstractEventAggrega
 
             addToQueue(new PremiumBoughtEventDto(userId, cost, days));
         } else {
-            throw new InvalidReturnTypeException("Method annotated with @SendPremiumBoughtAnalyticEvent must return Premium");
+            throw new InvalidReturnTypeException("Method annotated with @SendPremiumBoughtEvent must return Premium");
         }
     }
 

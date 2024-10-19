@@ -12,6 +12,7 @@ import school.faang.user_service.model.dto.Rejection;
 import school.faang.user_service.model.dto.RequestFilter;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.impl.mentorship.MentorshipRequestServiceImpl;
@@ -33,7 +34,6 @@ import static org.mockito.Mockito.when;
 public class MentorshipRequestServiceImplTest {
     @Mock
     MentorshipRequestRepository repository;
-
 
     @Mock
     private MentorshipAcceptedEventPublisher mentorshipPublisher;
@@ -70,7 +70,7 @@ public class MentorshipRequestServiceImplTest {
 
         request.setStatus(RequestStatus.ACCEPTED);
         // Assert
-        verify(repository, times(1)).save(request);
+        verify(repository, times(2)).save(request);
     }
 
 

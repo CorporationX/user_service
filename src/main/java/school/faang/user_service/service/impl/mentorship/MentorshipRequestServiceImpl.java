@@ -33,6 +33,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipAcceptedEventPublisher mentorshipPublisher;
+    private final RequestFilterPredicate requestFilterPredicate;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
@@ -79,7 +80,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         if (requestOptional.isPresent() && requestOptional.get().getStatus() != ACCEPTED) {
             var request = requestOptional.get();
             request.setStatus(ACCEPTED);
-            repository.save(request);
+            mentorshipRequestRepository.save(request);
             mentorshipPublisher.publish(new MentorshipAcceptedEvent(request.getRequester().getId(),
                     request.getReceiver().getId(), request.getId()));
             mentorshipRequestRepository.save(request);

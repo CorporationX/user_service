@@ -9,6 +9,8 @@ import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.model.dto.Rejection;
 import school.faang.user_service.model.dto.RequestFilter;
 import school.faang.user_service.model.entity.MentorshipRequest;
+import school.faang.user_service.model.event.MentorshipAcceptedEvent;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.model.event.MentorshipRequestedEvent;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -30,7 +32,7 @@ import static school.faang.user_service.model.entity.RequestStatus.REJECTED;
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final RequestFilterPredicate requestFilterPredicate;
+    private final MentorshipAcceptedEventPublisher mentorshipPublisher;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
@@ -73,11 +75,13 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public void acceptRequest(long id) {
-
         Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
         if (requestOptional.isPresent() && requestOptional.get().getStatus() != ACCEPTED) {
             var request = requestOptional.get();
             request.setStatus(ACCEPTED);
+            repository.save(request);
+            mentorshipPublisher.publish(new MentorshipAcceptedEvent(request.getRequester().getId(),
+                    request.getReceiver().getId(), request.getId()));
             mentorshipRequestRepository.save(request);
         } else if (requestOptional.isPresent() && requestOptional.get().getStatus() == ACCEPTED) {
             throw new DataValidationException("Mentor request is already accepter");

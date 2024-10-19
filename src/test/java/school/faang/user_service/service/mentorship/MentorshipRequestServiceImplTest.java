@@ -12,6 +12,7 @@ import school.faang.user_service.model.dto.Rejection;
 import school.faang.user_service.model.dto.RequestFilter;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.impl.mentorship.MentorshipRequestServiceImpl;
 
@@ -34,6 +35,9 @@ public class MentorshipRequestServiceImplTest {
     MentorshipRequestRepository repository;
 
 
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipPublisher;
+
     @InjectMocks
     MentorshipRequestServiceImpl service;
 
@@ -55,6 +59,8 @@ public class MentorshipRequestServiceImplTest {
     void acceptRequest_ShouldUpdateStatus_WhenRequestIsNotAccepted() {
         MentorshipRequest request = new MentorshipRequest();
         request.setId(1L);
+        request.setRequester(User.builder().id(1L).build());
+        request.setReceiver(User.builder().id(2L).build());
         request.setStatus(RequestStatus.PENDING);
         // Arrange
         when(repository.findById(1L)).thenReturn(Optional.of(request));

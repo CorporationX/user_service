@@ -37,6 +37,10 @@ spring:
           name: skill_acquired_channel
         recommendation-request-channel:
           name: recommendation_req_channel
+        mentorship-accepted-event-channel:
+          name: mentorship_accepted_event_channel
+        premium-bought-channel:
+          name: premium_bought_channel
         mentorship-request-channel:
           name: mentorship-request-channel
 

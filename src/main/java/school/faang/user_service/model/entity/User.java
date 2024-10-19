@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,11 +13,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"skills"})
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "users")
 public class User {
@@ -26,9 +28,11 @@ public class User {
     private Long id;
 
     @Column(name = "username", length = 64, nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private String username;
 
     @Column(name = "email", length = 64, nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private String email;
 
     @Column(name = "phone", length = 32, unique = true)
@@ -98,7 +102,7 @@ public class User {
     @OneToMany(mappedBy = "mentor")
     private List<Goal> setGoals;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")
@@ -134,7 +138,7 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ContactPreference contactPreference;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Premium premium;
 
     @OneToMany(mappedBy = "user")
@@ -146,4 +150,7 @@ public class User {
 
     @Column(name = "banned", nullable = false)
     private boolean banned;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private TelegramContact telegramContact;
 }

@@ -6,15 +6,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.config.RedisConfig.MessagePublisher;
+import school.faang.user_service.config.RedisConfig;
 import school.faang.user_service.exception.EventPublishingException;
 
 @Slf4j
 @RequiredArgsConstructor
-public abstract class RedisEventPublisher<T> implements MessagePublisher<T> {
+public abstract class AbstractEventPublisher<T> implements RedisConfig.MessagePublisher<T> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
+    protected final ObjectMapper objectMapper;
     private final ChannelTopic channelTopic;
 
     public void publish(T redisEvent) {

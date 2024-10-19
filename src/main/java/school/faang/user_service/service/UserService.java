@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.User;
@@ -35,4 +34,6 @@ public interface UserService {
     void processCsvFile(InputStream inputStream);
 
     Long getMaxUserId();
+
+    void updateTelegramUserId(String telegramUserName, String telegramUserId);
 }

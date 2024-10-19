@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.impl;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +16,16 @@ import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.model.entity.SkillOffer;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.SkillOfferRepository;
-import school.faang.user_service.service.impl.SkillServiceImpl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +46,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SkillServiceTest {
+public class SkillServiceImplTest {
     private final Long id = 1L;
     private SkillDto skillDto;
     private SkillDto anotherSkillDto;
@@ -64,6 +67,9 @@ public class SkillServiceTest {
 
     @Mock
     private SkillMapper mapper;
+
+    @Mock
+    SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @InjectMocks
     private SkillServiceImpl skillService;
@@ -217,6 +223,8 @@ public class SkillServiceTest {
         when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(List.of());
         when(mapper.toSkillDto(any(Skill.class))).thenReturn(skillDto);
 
+        doNothing().when(skillAcquiredEventPublisher).publish(any(SkillAcquiredEvent.class));
+
         SkillDto result = skillService.acquireSkillFromOffers(skillEntity.getId(), id);
 
         assertAll(
@@ -225,6 +233,8 @@ public class SkillServiceTest {
         );
 
         verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
+        verify(skillAcquiredEventPublisher, times(1)).
+                publish(new SkillAcquiredEvent(id, skillEntity.getId()));
     }
 
     @Test
@@ -252,5 +262,40 @@ public class SkillServiceTest {
         assertEquals("Not enough skill offers to acquire this skill.", exception.getMessage());
 
         verify(skillRepository, never()).assignSkillToUser(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("Should add skills to all users based on the goalId")
+    public void testAddSkillToUsers_Success() {
+        long goalId = 1L;
+
+        List<Skill> skillsForGoal = List.of(
+                Skill.builder().title("Java").build(),
+                Skill.builder().title("Spring").build()
+        );
+
+        User user1 = User.builder()
+                .id(1L)
+                .skills(new ArrayList<>())
+                .build();
+
+        User user2 = User.builder()
+                .id(2L)
+                .skills(new ArrayList<>())
+                .build();
+
+        List<User> users = List.of(user1, user2);
+
+        when(skillRepository.findSkillsByGoalId(anyLong())).thenAnswer(invocation -> {
+            Long id = invocation.getArgument(0);
+            return skillsForGoal;
+        });
+
+        skillService.addSkillToUsers(users, goalId);
+
+        assertTrue(user1.getSkills().containsAll(skillsForGoal));
+        assertTrue(user2.getSkills().containsAll(skillsForGoal));
+
+        verify(skillRepository, times(2)).findSkillsByGoalId(goalId);
     }
 }

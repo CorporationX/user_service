@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
 import school.faang.user_service.model.dto.EventDto;
 import school.faang.user_service.model.filter_dto.EventFilterDto;
 

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.entity.TelegramContact;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.UserProfilePic;
@@ -225,7 +225,7 @@ public class UserServiceTest {
 
         UserFilterDto filterDto = new UserFilterDto();
         filterDto.setNamePattern("user");
-        filterDto.setPhone("123123");
+        filterDto.setPhonePattern("123123");
         filterDto.setCreatedAfter(LocalDateTime.now().minusMonths(1));
         filterDto.setCreatedBefore(LocalDateTime.now().plusMonths(1));
         List<UserDto> users = userService.getPremiumUsers(filterDto);

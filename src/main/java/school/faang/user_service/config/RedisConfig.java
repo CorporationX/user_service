@@ -32,6 +32,9 @@ public class RedisConfig {
     @Value("${redis.channels.skill-acquired}")
     private String skillAcquiredEventChannel;
 
+    @Value("${redis.channels.event-start}")
+    private String eventStartEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -73,6 +76,11 @@ public class RedisConfig {
     @Bean(name = "skillAcquiredTopic")
     public ChannelTopic skillAcquiredChannelTopic() {
         return new ChannelTopic(skillAcquiredEventChannel);
+    }
+
+    @Bean(name = "eventStartTopic")
+    public ChannelTopic eventStartChannelTopic() {
+        return new ChannelTopic(eventStartEventChannel);
     }
 
     @Bean

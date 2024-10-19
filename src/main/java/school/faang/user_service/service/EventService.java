@@ -11,4 +11,6 @@ public interface EventService {
     void clearPastEvents();
 
     void setBatchSize(int batchSize);
+
+    EventDto createEvent(EventDto eventDto);
 }

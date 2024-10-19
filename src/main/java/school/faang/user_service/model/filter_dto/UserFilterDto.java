@@ -1,7 +1,10 @@
 package school.faang.user_service.model.filter_dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +17,9 @@ public class UserFilterDto {
     private String cityPattern;
     private String phonePattern;
     private String skillPattern;
+    private LocalDateTime createdAfter;
+    private LocalDateTime createdBefore;
+    private Integer experience;
     private int experienceMin;
     private int experienceMax;
     private int page;

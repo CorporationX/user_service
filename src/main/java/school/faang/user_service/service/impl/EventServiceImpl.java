@@ -8,11 +8,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.model.dto.EventDto;
+import school.faang.user_service.model.event.EventStartEvent;
 import school.faang.user_service.model.filter_dto.EventFilterDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.Event;
 import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.EventRepository;
@@ -38,6 +40,7 @@ public class EventServiceImpl implements EventService {
     private final PromotionRepository promotionRepository;
     private final List<EventFilter> eventFilters;
     private final EventMapper mapper;
+    private final EventStartEventPublisher eventPublisher;
 
     @Value("${scheduler.clear-events.batchSize}")
     @Setter
@@ -59,6 +62,21 @@ public class EventServiceImpl implements EventService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+    @Override
+    public EventDto createEvent(EventDto eventDto) {
+//        Event event = mapper.toEntity(eventDto);
+//        Event savedEvent = eventRepository.save(event);
+//        EventStartEvent eventStartEvent = new EventStartEvent(savedEvent.getId(), savedEvent.getAttendees().stream()
+//                .map(User::getId)
+//                .toList());
+        // TODO resolve task https://faang-school.atlassian.net/browse/BJS2-40398
+        EventStartEvent eventStartEvent = new EventStartEvent(1L, List.of(1L));
+        eventPublisher.publish(eventStartEvent);
+//        return mapper.toDto(savedEvent);
+        return null;
+    }
+
 
     private List<Event> getFilteredEventsFromRepository(EventFilterDto filterDto) {
         return eventFilters.stream()

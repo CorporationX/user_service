@@ -19,7 +19,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.controller.UserController;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.exception.handler.GlobalRestExceptionHandler;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.service.impl.UserServiceImpl;
 
 import java.util.Arrays;

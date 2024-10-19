@@ -21,7 +21,7 @@ public class DonateServiceImpl implements DonateService {
     @Override
     public void donate() {
         var fundRaisedEvent = FundRaisedEvent.builder()
-                .projectId(1)
+                .userId(1)
                 .projectId(2)
                 .amount(BigDecimal.valueOf(243543634.50))
                 .donatedAt(LocalDateTime.now())

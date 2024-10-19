@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.annotation.analytic.send.user.SendUserViewAnalyticEvent;
+import school.faang.user_service.annotation.publisher.PublishEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
@@ -67,7 +67,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @SendUserViewAnalyticEvent
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public User findById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -121,7 +121,7 @@ public class UserService {
         }
     }
 
-    @SendUserViewAnalyticEvent
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
         log.info("Find premium users by filter: {}", userFilterDto.toString());
@@ -140,13 +140,13 @@ public class UserService {
                 .toList();
     }
 
-    @SendUserViewAnalyticEvent
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public List<User> getUsers(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
 
-    @SendUserViewAnalyticEvent
+    @PublishEvent(returnedType = User.class)
     @Transactional(readOnly = true)
     public User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

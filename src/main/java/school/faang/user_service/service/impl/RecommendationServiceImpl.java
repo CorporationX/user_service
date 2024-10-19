@@ -1,6 +1,7 @@
 package school.faang.user_service.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import school.faang.user_service.model.entity.UserSkillGuarantee;
 import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.model.event.SkillOfferedEvent;
+import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.RecommendationRepository;
@@ -25,6 +28,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RecommendationServiceImpl implements RecommendationService {
     private static final int NUMBER_OF_MONTHS_AFTER_PREVIOUS_RECOMMENDATION = 6;
 
@@ -33,6 +37,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
+    private final SkillOfferedEventPublisher skillOfferedEventPublisher;
 
     @Override
     @Transactional
@@ -47,6 +52,9 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         recommendationDto.setId(recommendationId);
         addSkillOffersAndGuarantee(recommendationDto);
+
+        publishSkillOfferedEvent(recommendationDto);
+
         Recommendation recommendation = recommendationRepository.findById(recommendationDto.getId()).orElseThrow(() -> new NoSuchElementException(
                 String.format("There is no recommendation with id = %d", recommendationDto.getId())));
         return recommendationMapper.toDto(recommendation);
@@ -69,6 +77,9 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         skillOfferRepository.deleteAllByRecommendationId(recommendationDto.getId());
         addSkillOffersAndGuarantee(recommendationDto);
+
+        publishSkillOfferedEvent(recommendationDto);
+
         Recommendation updatedRecommendation = recommendationRepository.findById(recommendationDto.getId()).orElseThrow(() -> new NoSuchElementException(
                 String.format("There is no recommendation with id = %d", recommendationDto.getId())));
         return recommendationMapper.toDto(updatedRecommendation);
@@ -157,6 +168,23 @@ public class RecommendationServiceImpl implements RecommendationService {
         int crossedSkillAmount = skillRepository.countExisting(skillIdList);
         if (crossedSkillAmount < skillIdList.size()) {
             throw new DataValidationException("Not all skills exist in the system");
+        }
+    }
+
+    private void publishSkillOfferedEvent(RecommendationDto recommendationDto) {
+        List<SkillOfferDto> skillOfferDtoList = recommendationDto.getSkillOffers();
+        if (skillOfferDtoList == null || skillOfferDtoList.isEmpty()) {
+            return;
+        }
+
+        log.info("Starting to publish {} skill offers for recommendation ID: {}",
+                skillOfferDtoList.size(), recommendationDto.getId());
+
+        for (SkillOfferDto skillOfferDto : skillOfferDtoList) {
+            skillOfferedEventPublisher.publish(new SkillOfferedEvent(
+                    skillOfferDto.getAuthorId(), skillOfferDto.getReceiverId(),  skillOfferDto.getSkillId()));
+            log.info("Published SkillOfferedEvent - Author ID: {}, Receiver ID: {}, Skill ID: {}",
+                    skillOfferDto.getAuthorId(), skillOfferDto.getReceiverId(), skillOfferDto.getSkillId());
         }
     }
 }

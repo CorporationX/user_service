@@ -1,9 +1,10 @@
-package school.faang.user_service.annotation.publisher;
+package school.faang.user_service.aspect.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.Topic;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.aspect.EventPublisher;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 import school.faang.user_service.entity.User;
@@ -30,18 +31,13 @@ public class ProfileViewEventPublisherRedis extends AbstractEventAggregator<Prof
     public void publish(Object eventObject) {
         if (eventObject instanceof User user) {
             long receiverId = userContext.getUserId();
-            long actorId = user.getId();
-            addToQueue(new ProfileViewEventDto(receiverId, actorId));
+            String receiverName = userContext.getUserName();
+
+            addToQueue(new ProfileViewEventDto(receiverId, receiverName, user.getId(), user.getUsername()));
+
         } else if (eventObject instanceof List<?> users) {
             addToQueue(buildProfileViewEvents((List<User>) users));
         }
-    }
-
-    private List<ProfileViewEventDto> buildProfileViewEvents(List<User> users) {
-        long receiverId = userContext.getUserId();
-        return users.stream()
-                .map(user -> new ProfileViewEventDto(receiverId, user.getId()))
-                .toList();
     }
 
     @Override
@@ -52,5 +48,14 @@ public class ProfileViewEventPublisherRedis extends AbstractEventAggregator<Prof
     @Override
     public Class<?> getInstance() {
         return User.class;
+    }
+
+    private List<ProfileViewEventDto> buildProfileViewEvents(List<User> users) {
+        long receiverId = userContext.getUserId();
+        String receiverName = userContext.getUserName();
+
+        return users.stream()
+                .map(user -> new ProfileViewEventDto(receiverId, receiverName, user.getId(), user.getUsername()))
+                .toList();
     }
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.annotation.analytic.send.user.SendPremiumBoughtEvent;
 import school.faang.user_service.annotation.publisher.PublishEvent;
 import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.entity.User;
@@ -29,7 +28,6 @@ public class PremiumService {
     private final PremiumValidationService premiumValidationService;
     private final UserRepository userRepository;
 
-//    @SendPremiumBoughtEvent
     @PublishEvent(returnType = Premium.class)
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod period) {

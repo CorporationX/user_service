@@ -1,4 +1,4 @@
-package school.faang.user_service.annotation.publisher;
+package school.faang.user_service.aspect;
 
 public interface EventPublisher {
     Class<?> getInstance();

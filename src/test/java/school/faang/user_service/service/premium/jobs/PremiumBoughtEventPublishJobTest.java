@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
-import school.faang.user_service.service.premium.AspectRedisPremiumBoughtEventPublisher;
+import school.faang.user_service.aspect.redis.PremiumBoughtEventPublisherRedis;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PremiumBoughtEventPublishJobTest {
     @Mock
-    private AspectRedisPremiumBoughtEventPublisher redisPremiumBoughtEventPublisher;
+    private PremiumBoughtEventPublisherRedis premiumBoughtEventPublisherRedis;
 
     @InjectMocks
     private PremiumBoughtEventPublishJob premiumBoughtEventPublishJob;
@@ -24,18 +24,18 @@ class PremiumBoughtEventPublishJobTest {
     @Test
     @DisplayName("Given true when check profile views then not execute publishAllPremiumBoughtEvents")
     void testExecuteListIsEmptyTrue() {
-        when(redisPremiumBoughtEventPublisher.analyticEventsIsEmpty()).thenReturn(true);
+        when(premiumBoughtEventPublisherRedis.analyticEventsIsEmpty()).thenReturn(true);
         premiumBoughtEventPublishJob.execute(mock(JobExecutionContext.class));
 
-        verify(redisPremiumBoughtEventPublisher, never()).publishAllEvents();
+        verify(premiumBoughtEventPublisherRedis, never()).publishAllEvents();
     }
 
     @Test
     @DisplayName("Given false when check profile views then execute publishAllPremiumBoughtEvents")
     void testExecuteListIsEmptyFalse() {
-        when(redisPremiumBoughtEventPublisher.analyticEventsIsEmpty()).thenReturn(false);
+        when(premiumBoughtEventPublisherRedis.analyticEventsIsEmpty()).thenReturn(false);
         premiumBoughtEventPublishJob.execute(mock(JobExecutionContext.class));
 
-        verify(redisPremiumBoughtEventPublisher).publishAllEvents();
+        verify(premiumBoughtEventPublisherRedis).publishAllEvents();
     }
 }

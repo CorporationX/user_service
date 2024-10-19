@@ -6,7 +6,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.annotation.publisher.PremiumBoughtEventPublisherRedis;
+import school.faang.user_service.aspect.redis.PremiumBoughtEventPublisherRedis;
 
 @Slf4j
 @DisallowConcurrentExecution

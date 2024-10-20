@@ -24,21 +24,42 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
     private String host;
+
     @Value("${spring.data.redis.port}")
     private int port;
 
     @Value("${spring.data.redis.channels.ban-user-channel.name}")
     private String banUserTopic;
+
     @Value("${spring.data.redis.channels.follower-event-channel.name}")
     private String followerEvent;
+
     @Value("${spring.data.redis.channels.event-start-channel.name}")
     private String eventStartTopic;
+
+    @Value("${spring.data.redis.channels.mentorship-accepted-event-channel.name}")
+    private String mentorshipAcceptedEventTopic;
+
+    @Value("${spring.data.redis.channels.recommendation-request-channel.name}")
+    private String recommendationReqTopic;
+
     @Value("${spring.data.redis.channels.recommendation-received-channel.name}")
     private String recommendationReceived;
+
     @Value("${spring.data.redis.channels.follow-project-channel.name}")
     private String followProjectTopic;
+
     @Value("${spring.data.redis.channels.search-appearance-channel.name}")
     private String searchAppearanceTopic;
+
+    @Value("${spring.data.redis.channels.premium-bought-channel.name}")
+    private String premiumBoughtTopic;
+
+    @Value("${spring.data.redis.channels.goal-completed-event-channel.name}")
+    private String goalCompletedTopic;
+
+    @Value("${spring.data.redis.channels.skill-acquired-channel.name}")
+    private String skillAcquired;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -98,5 +119,30 @@ public class RedisConfig {
     @Bean
     public ChannelTopic searchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
+    }
+
+    @Bean
+    public ChannelTopic goalCompletedTopic() {
+        return new ChannelTopic(goalCompletedTopic);
+    }
+
+    @Bean
+    public ChannelTopic skillAcquiredTopic() {
+        return new ChannelTopic(skillAcquired);
+    }
+
+    @Bean
+    public ChannelTopic recommendationRequestTopic() {
+        return new ChannelTopic(recommendationReqTopic);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipAcceptedEventTopic() {
+        return new ChannelTopic(mentorshipAcceptedEventTopic);
+    }
+
+    @Bean
+    public ChannelTopic premiumBoughtTopic() {
+        return new ChannelTopic(premiumBoughtTopic);
     }
 }

@@ -10,11 +10,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.EmptyResultDataAccessException;
-import school.faang.user_service.dto.*;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.entity.MentorshipRequest;
+import school.faang.user_service.model.entity.RequestStatus;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.mapper.RequestMapper;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.Rejection;
+import school.faang.user_service.model.dto.RequestFilter;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.impl.mentorship.MentorshipRequestServiceImpl;
 import school.faang.user_service.util.predicate.PredicateResult;
@@ -47,6 +50,9 @@ public class MentorshipRequestServiceImplTest {
 
     @Spy
     private RequestFilterPredicate predicates;
+
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipPublisher;
 
     @InjectMocks
     MentorshipRequestServiceImpl service;
@@ -119,6 +125,8 @@ public class MentorshipRequestServiceImplTest {
     void acceptRequest_ShouldUpdateStatus_WhenRequestIsNotAccepted() throws Exception {
         MentorshipRequest request = new MentorshipRequest();
         request.setId(1L);
+        request.setRequester(User.builder().id(1L).build());
+        request.setReceiver(User.builder().id(2L).build());
         request.setStatus(RequestStatus.PENDING);
         // Arrange
         when(repository.findById(1L)).thenReturn(Optional.of(request));

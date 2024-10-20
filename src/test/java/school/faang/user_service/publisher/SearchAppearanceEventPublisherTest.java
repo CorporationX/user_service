@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.event.SearchAppearanceEvent;
+import school.faang.user_service.model.event.SearchAppearanceEvent;
 
 import static org.mockito.Mockito.verify;
 

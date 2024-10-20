@@ -5,10 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.student.Address;
-import school.faang.user_service.dto.student.ContactInfo;
-import school.faang.user_service.dto.student.Education;
-import school.faang.user_service.dto.student.Person;
+import school.faang.user_service.model.dto.student.Address;
+import school.faang.user_service.model.dto.student.ContactInfo;
+import school.faang.user_service.model.dto.student.Education;
+import school.faang.user_service.model.dto.student.Person;
 import school.faang.user_service.util.impl.CsvParserImpl;
 
 import java.io.ByteArrayInputStream;

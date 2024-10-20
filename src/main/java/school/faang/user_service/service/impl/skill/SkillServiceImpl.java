@@ -3,13 +3,15 @@ package school.faang.user_service.service.impl.skill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.model.dto.skill.SkillCandidateDto;
+import school.faang.user_service.model.dto.skill.SkillDto;
+import school.faang.user_service.model.entity.Skill;
+import school.faang.user_service.model.entity.UserSkillGuarantee;
+import school.faang.user_service.model.entity.recommendation.SkillOffer;
+import school.faang.user_service.model.event.SkillAcquiredEvent;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -30,6 +32,7 @@ public class SkillServiceImpl implements SkillService {
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
     private final SkillValidator skillValidator;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @Override
     @Transactional
@@ -63,6 +66,7 @@ public class SkillServiceImpl implements SkillService {
         skillValidator.validateSkillByMinSkillOffers(allSkillOffers.size(), skillId, userId);
         skillRepository.assignSkillToUser(skillId, userId);
         addUserSkillGuarantee(allSkillOffers);
+        sendEvent(skillId, userId);
         return skillMapper.toDto(allSkillOffers.get(0).getSkill());
     }
 
@@ -92,5 +96,17 @@ public class SkillServiceImpl implements SkillService {
     @Override
     public void deleteSkillFromGoal(long goalId) {
         skillRepository.deleteAll(skillRepository.findSkillsByGoalId(goalId));
+    }
+
+    private void sendEvent(long skillId, long userId) {
+        SkillAcquiredEvent event = buildSkillAcquiredEvent(skillId, userId);
+        skillAcquiredEventPublisher.publish(event);
+    }
+
+    private SkillAcquiredEvent buildSkillAcquiredEvent(long skillId, long userId) {
+        return SkillAcquiredEvent.builder()
+                .skillId(skillId)
+                .userId(userId)
+                .build();
     }
 }

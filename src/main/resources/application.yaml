@@ -35,6 +35,16 @@ spring:
           name: project_subscription_event
         search-appearance-channel:
           name: search_appearance_event
+        goal-completed-event-channel:
+          name: goal_completed_event_channel
+        skill-acquired-channel:
+          name: skill_acquired_channel
+        recommendation-request-channel:
+          name: recommendation_req_channel
+        mentorship-accepted-event-channel:
+          name: mentorship_accepted_event_channel
+        premium-bought-channel:
+          name: premium_bought_channel
 
 server:
   port: 8080

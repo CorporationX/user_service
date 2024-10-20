@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.model.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.model.dto.recommendation.RejectionDto;
+import school.faang.user_service.model.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;

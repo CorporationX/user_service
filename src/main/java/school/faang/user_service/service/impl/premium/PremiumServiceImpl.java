@@ -7,13 +7,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.premium.PaymentRequestDto;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Currency;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.model.dto.premium.PaymentRequestDto;
+import school.faang.user_service.model.dto.premium.PremiumDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.premium.Currency;
+import school.faang.user_service.model.entity.Premium;
+import school.faang.user_service.model.enums.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
+import school.faang.user_service.model.event.PremiumBoughtEvent;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PremiumService;
 import school.faang.user_service.service.UserService;
@@ -31,6 +33,7 @@ public class PremiumServiceImpl implements PremiumService {
     private final UserService userService;
     private final PremiumValidator premiumValidator;
     private final PremiumMapper premiumMapper;
+    private final PremiumBoughtEventPublisher premiumBoughtPublisher;
 
     @Value("${premium.batch-size}")
     private int batchSize;
@@ -44,6 +47,9 @@ public class PremiumServiceImpl implements PremiumService {
         var paymentResponseDto = paymentServiceClient.sendPayment(paymentRequestDto);
         premiumValidator.verifyPayment(paymentResponseDto);
         var premium = buildPremium(period, user);
+        PremiumBoughtEvent event = buildPaymentEvent(userId, period);
+        premiumBoughtPublisher.publish(event);
+
         return premiumMapper.toDto(premiumRepository.save(premium));
     }
 
@@ -75,6 +81,16 @@ public class PremiumServiceImpl implements PremiumService {
                 .user(user)
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(period.getDays()))
+                .build();
+    }
+
+
+    private static PremiumBoughtEvent buildPaymentEvent(long userId, PremiumPeriod period) {
+        return PremiumBoughtEvent.builder()
+                .userId(userId)
+                .sum(period.getPrice())
+                .duration(period.getDays())
+                .observeTime(LocalDateTime.now())
                 .build();
     }
 }

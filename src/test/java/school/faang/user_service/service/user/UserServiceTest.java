@@ -2,14 +2,16 @@ package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.AvatarStyle;
 import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -20,8 +22,8 @@ import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserEmailFilter;
@@ -34,11 +36,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,7 +58,7 @@ class UserServiceTest extends AbstractUserServiceTest {
     private MentorshipService mentorshipService;
     @Mock
     private AvatarService avatarService;
-    @Mock  
+    @Mock
     private PremiumRepository premiumRepository;
     @InjectMocks
     private UserService userService;
@@ -131,7 +134,7 @@ class UserServiceTest extends AbstractUserServiceTest {
 
         assertThrows(UserDeactivatedException.class, () -> userService.deactivateUser(userId));
     }
-  
+
     @Test
     public void testRegisterUser() {
         User user = new User();
@@ -179,7 +182,6 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(EMAIL, result.get(0).getEmail());
     }
 
-
     @Test
     void testGetUser() {
         long foundId = 1L;
@@ -213,6 +215,39 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertEquals(EMAIL, resultFound.get(0).getEmail());
 
         assertEquals(0, resultNotFound.size());
+    }
+
+    @Test
+    void testGetOnlyActiveUsersFromList_success_notEmptyIds() {
+        List<Long> ids = List.of(1L, 2L, 3L);
+        List<Long> expectedActiveUserIds = Arrays.asList(1L, 2L);
+
+        when(userRepository.findActiveUserIds(ids)).thenReturn(expectedActiveUserIds);
+
+        List<Long> activeUserIds = userService.getOnlyActiveUsersFromList(ids);
+
+        assertNotNull(activeUserIds);
+        assertEquals(expectedActiveUserIds, activeUserIds);
+        verify(userRepository).findActiveUserIds(ids);
+    }
+
+    @Test
+    public void testGetOnlyActiveUsersFromList_failed_EmptyIds() {
+        List<Long> ids = Collections.emptyList();
+
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+                () -> userService.getOnlyActiveUsersFromList(ids));
+
+        assertEquals("User ID list cannot be null or empty", thrown.getMessage());
+        verify(userRepository, never()).findActiveUserIds(any());
+    }
+
+    @Test
+    @DisplayName("Find by id successful")
+    void testFindById() {
+        User user = createUser(USERNAME, EMAIL);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.findById(1L);
     }
 
     @Test

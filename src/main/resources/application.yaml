@@ -83,6 +83,11 @@ app:
     event:
       start_event:
         cron: "0 * * * * *" # every minute
+  user-redis-config:
+    profile_view_event_topic: profileViewEvent
+  quartz-config:
+    profile-view-publish:
+      trigger_interval_sec: 10
 
 minio:
   endpoint: http://localhost:9000

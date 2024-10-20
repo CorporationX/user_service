@@ -29,6 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation ("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -52,6 +53,11 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
+
+    /**
+     * AOP
+     */
+    implementation ("org.aspectj:aspectjweaver:1.9.19")
 
     /**
      * Utils & Logging
@@ -134,7 +140,12 @@ jacoco {
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
+    exclude("**/school/faang/user_service/integration/**")
     finalizedBy(tasks.jacocoTestReport)
+}
+tasks.register<Test>("integrationTest") {
+    group = "verification"
+    include("**/school/faang/user_service/integration/**")
 }
 tasks.jacocoTestReport {
     reports {

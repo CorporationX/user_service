@@ -27,6 +27,9 @@ spring:
           name: follower_event
         eventStart-event-channel:
           name: eventStart_event
+      topics:
+        - search-appearance
+        - profile-view
 
 server:
   port: 8080

@@ -9,6 +9,8 @@ public enum RedisTopics {
     SEARCH_APPEARANCE("search-appearance"),
     PROFILE_VIEW("profile-view"),
     EVENTS_VIEW("eventStart-event");
+    PROFILE_VIEW("profile-view"),
+    GOAL_COMPLETED("goal-completed");
 
     private final String topicName;
 }

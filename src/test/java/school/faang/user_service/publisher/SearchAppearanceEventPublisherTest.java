@@ -1,5 +1,6 @@
 package school.faang.user_service.publisher;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,29 +8,29 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import school.faang.user_service.model.event.SkillAcquiredEvent;
+import school.faang.user_service.model.event.SearchAppearanceEvent;
 
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class SkillAcquiredEventPublisherTest {
-
+public class SearchAppearanceEventPublisherTest {
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
 
     @Mock
-    private ChannelTopic skillAcquiredTopic;
+    private ChannelTopic searchAppearanceTopic;
 
     @InjectMocks
-    private SkillAcquiredEventPublisher skillAcquiredEventPublisher;
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
 
     @Test
-    void publish_isOk() {
+    @DisplayName("Search Appearance Event Test")
+    void testSendEvent() {
         // given
-        var skillAcquiredEvent = SkillAcquiredEvent.builder().build();
+        SearchAppearanceEvent event = SearchAppearanceEvent.builder().build();
         // when
-        skillAcquiredEventPublisher.publish(skillAcquiredEvent);
+        searchAppearanceEventPublisher.publish(event);
         // then
-        verify(redisTemplate).convertAndSend(skillAcquiredTopic.getTopic(), skillAcquiredEvent);
+        verify(redisTemplate).convertAndSend(searchAppearanceTopic.getTopic(), event);
     }
 }

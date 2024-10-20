@@ -1,4 +1,4 @@
-package school.faang.user_service.event;
+package school.faang.user_service.model.event;
 
 import lombok.Builder;
 

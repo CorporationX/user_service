@@ -49,6 +49,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.follow-project-channel.name}")
     private String followProjectTopic;
 
+    @Value("${spring.data.redis.channels.search-appearance-channel.name}")
+    private String searchAppearanceTopic;
+
     @Value("${spring.data.redis.channels.premium-bought-channel.name}")
     private String premiumBoughtTopic;
 
@@ -111,6 +114,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic followProjectTopic() {
         return new ChannelTopic(followProjectTopic);
+    }
+
+    @Bean
+    public ChannelTopic searchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceTopic);
     }
 
     @Bean

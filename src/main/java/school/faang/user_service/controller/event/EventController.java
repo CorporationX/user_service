@@ -19,7 +19,7 @@ public class EventController {
 
     private final EventService eventService;
 
-    public EventDto create(@RequestBody EventDto event) {
+    public EventDto create(EventDto event) {
         validate(event);
         eventService.create(event);
         return event;

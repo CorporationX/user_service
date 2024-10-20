@@ -2,6 +2,8 @@ package school.faang.user_service.service.event;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,8 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         }
         eventParticipationRepository.register(eventId, userId);
 
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new DataValidationException("Event not found"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Event with %s id not found", eventId)));
         pushMessage(event, userId);
     }
 

@@ -161,7 +161,7 @@ public class UserService {
         log.info("Processed and saved user: {}", user.getEmail());
     }
 
-    public List<Long> findAllActiveUserIds() {
-        return userRepository.findAllActiveUserIds();
+    public List<Long> findAllUserIds() {
+        return userRepository.findAllUserIds();
     }
 }

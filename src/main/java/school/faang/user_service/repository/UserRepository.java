@@ -31,6 +31,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByPhone(String phone);
 
-    @Query("SELECT u.id FROM User u WHERE u.active = true")
-    List<Long> findAllActiveUserIds();
+    @Query("SELECT u.id FROM User u")
+    List<Long> findAllUserIds();
 }

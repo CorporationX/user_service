@@ -81,7 +81,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<Long> findAllActiveUserIds() {
-        return userService.findAllActiveUserIds();
+    public List<Long> findAllUserIds() {
+        return userService.findAllUserIds();
     }
 }

@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V008__user_promotion.sql
   - include:
       file: db/changelog/changeset/user_V009__user_update.sql
+  - include:
+      file: db/changelog/changeset/user_V010__add_banned_to_users.sql

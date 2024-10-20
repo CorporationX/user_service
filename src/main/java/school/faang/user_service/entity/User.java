@@ -151,4 +151,6 @@ public class User {
     @Column(name = "notify_preference", length = 20)
     private PreferredContact notifyPreference;
 
+    @Column(name = "banned", nullable = false)
+    private boolean banned;
 }

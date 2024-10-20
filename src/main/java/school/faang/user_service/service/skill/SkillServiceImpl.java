@@ -27,4 +27,11 @@ public class SkillServiceImpl implements SkillService {
                     .ifPresent(skillRepository::delete);
         }
     }
+
+    public void updateSkills(User user, long goalId) {
+        List<Skill> oldSkills = user.getSkills();
+        List<Skill> newSkills = skillRepository.findSkillsByGoalId(goalId);
+        removeSkillsFromUser(user, oldSkills);
+        assignSkillsToUser(user, newSkills);
+    }
 }

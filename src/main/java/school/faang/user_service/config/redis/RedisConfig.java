@@ -2,6 +2,7 @@ package school.faang.user_service.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +23,6 @@ import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
 public class RedisConfig {
     private final ObjectMapper objectMapper;
 
-    @Value("${redis.topic.user-ban}")
-    private String userBanTopicName;
-
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         return new JedisConnectionFactory();
@@ -36,10 +34,11 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer container(MessageListenerAdapter messageListenerAdapter) {
+    public RedisMessageListenerContainer container(MessageListenerAdapter messageListenerAdapter,
+                                                   @Qualifier("userBanChannel") ChannelTopic userBanChannel) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, userBanChannel());
+        container.addMessageListener(messageListenerAdapter, userBanChannel);
         return container;
     }
 
@@ -61,11 +60,13 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
-    public ChannelTopic userBanChannel() {
+    @Bean(value = "userBanChannel")
+    public ChannelTopic userBanChannel(
+            @Value("${spring.data.redis.channels.user-ban-channel.name}") String userBanTopicName) {
         return new ChannelTopic(userBanTopicName);
     }
 
+    @Bean
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());

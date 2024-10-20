@@ -12,11 +12,18 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
     private final ObjectMapper objectMapper;
+
+    @Value("${redis.topic.user-ban}")
+    private String userBanTopicName;
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
@@ -41,6 +48,15 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean
+    public RedisTemplate<String, ProfileViewEvent> profileViewRedisTemplate() {
+        RedisTemplate<String, ProfileViewEvent> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, ProfileViewEvent.class));
+        return template;
+    }
+
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
@@ -50,5 +66,16 @@ public class RedisConfig {
     @Bean(value = "eventTopic")
     public ChannelTopic eventTopic(@Value("${spring.data.redis.channels.event-event-channel.name}") String topic) {
         return new ChannelTopic(topic);
+    }
+
+    @Bean(value = "profileViewChannel")
+    public ChannelTopic profileViewChannelTopic(
+            @Value("${spring.data.redis.channels.profile-view-channel.name}") String profileViewChannelName) {
+        return new ChannelTopic(profileViewChannelName);
+    }
+
+    @Bean
+    public ChannelTopic userBanChannel() {
+        return new ChannelTopic(userBanTopicName);
     }
 }

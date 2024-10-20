@@ -1,0 +1,847 @@
+openapi: 3.0.3
+info:
+  title: User Service Rest API
+  description: User Service REST API Docs
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер разработки
+paths:
+  #  User Controller paths
+  /api/v1/users/premium:
+    get:
+      tags:
+        - User
+      summary: Получение списка премиум пользователей
+      description: Возвращает список премиум пользователей с применением фильтров
+      parameters:
+        - name: filter
+          in: query
+          description: Фильтры для поиска премиум пользователей
+          schema:
+            $ref: "#/components/schemas/UserFilterDto"
+      responses:
+        200:
+          description: Успешное получение премиум пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+        400:
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/users/{user_id}:
+    put:
+      tags:
+        - User
+      summary: Деактивация пользователя
+      description: Деактивация пользователя по его ID
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Пользователь деактивирован успешно
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                           "message": "User deactivated successfully"
+                }
+        404:
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      tags:
+        - User
+      summary: Получение пользователя
+      description: Получение пользователя по его ID
+      parameters:
+        - name: user_id
+          in: path
+          description: ID пользователя
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Успешное получение пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        404:
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/users:
+    get:
+      tags:
+        - User
+      summary: Получение пользователей
+      description: Получение списка пользователей по их ID
+      parameters:
+        - name: user_id
+          in: query
+          description: ID Пользователя(-ей)
+          required: true
+          schema:
+            type: array
+            items:
+                type: integer
+                format: int64
+      responses:
+        200:
+          description: Успешное получение списка пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+#EventController paths
+  /api/v1/events:
+    post:
+      tags:
+        - Event
+      summary: "POST api/v1/events"
+      operationId: "create"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventDto"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EventDto"
+    get:
+      tags:
+        - Event
+      summary: "GET api/v1/events"
+      operationId: "getEventsByFilter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventFilterDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EventDto"
+    put:
+      tags:
+        - Event
+      summary: "PUT api/v1/events"
+      operationId: "updateEvent"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EventDto"
+  /api/v1/events/{id}:
+    get:
+      tags:
+        - Event
+      summary: "GET api/v1/events/{id}"
+      operationId: "getEvent"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EventDto"
+    delete:
+      tags:
+        - Event
+      summary: "DELETE api/v1/events/{id}"
+      operationId: "deleteEvent"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+  /api/v1/events/{user_id}/owned_events:
+    get:
+      tags:
+        - Event
+      summary: "GET api/v1/events/{user_id}/owned_events"
+      operationId: "getOwnedEvents"
+      parameters:
+        - name: "user_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Event"
+  /api/v1/events/{user_id}/participated_events:
+    get:
+      tags:
+        - Event
+      summary: "GET api/v1/events/{user_id}/participated_events"
+      operationId: "getParticipatedEvents"
+      parameters:
+        - name: "user_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Event"
+
+components:
+  schemas:
+    UserFilterDto:
+      type: object
+      properties:
+        namePattern:
+          type: string
+          description: Фильтр по имени пользователя
+          example: Jessica
+        aboutPattern:
+          type: string
+          description: Фильтр по описанию пользователя
+          example: Увлекаюсь...
+        contactPattern:
+          type: string
+          description: Фильтр по контакту
+          example: Контакт
+        countryPattern:
+          type: string
+          description: Фильтр по стране
+          example: Россия
+        cityPattern:
+          type: string
+          description: Фильтр по городу
+          example: Москва
+        phonePatter:
+          type: string
+          description: Фильтр по телефону
+          example: 71234567893
+        skillPattern:
+          type: string
+          description: Фильтр по навыку
+          example: Java
+        experienceMin:
+          type: integer
+          format: int32
+          description: Фильтр по минимальному опыту
+          example: 1
+        experienceMax:
+          type: integer
+          format: int32
+          description: Фильтр по максимальному опыту
+          example: 5
+
+    UserDto:
+      type: object
+      title: userDto
+      properties:
+        id:
+          title: id
+          type: integer
+          example: 1
+          description: ID пользователя
+        username:
+          type: string
+          title: username
+          example: "Somebody"
+          description: Имя пользователя
+          nullable: false
+        email:
+          type: string
+          title: email
+          example: "sombody@mail.ru"
+          description: Email пользователя
+          nullable: false
+        phone:
+          type: string
+          title: phone
+          description: Телефон пользователя
+          example: 1234567894
+
+    ErrorResponse:
+      type: object
+      title: ErrorResponse
+      properties:
+        code:
+          type: integer
+          title: code
+          format: int32
+          description: Код ответа
+          example: 400
+        message:
+          type: string
+          description: Сообщение ошибки
+          example: "Error..."
+
+    SkillDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+    EventDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        startDate:
+          type: "string"
+          format: "date-time"
+        endDate:
+          type: "string"
+          format: "date-time"
+        ownerId:
+          type: "integer"
+          format: "int64"
+        description:
+          type: "string"
+        relatedSkills:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/SkillDto"
+        location:
+          type: "string"
+        maxAttendees:
+          type: "integer"
+          format: "int32"
+    EventFilterDto:
+      type: "object"
+      properties:
+        titleFilter:
+          type: "string"
+        ownerIdFilter:
+          type: "integer"
+          format: "int64"
+        startDateFilter:
+          type: "string"
+          format: "date-time"
+    Country:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        residents:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+    MentorshipRequest:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        description:
+          type: "string"
+        requester:
+          $ref: "#/components/schemas/User"
+        receiver:
+          $ref: "#/components/schemas/User"
+        status:
+          type: "string"
+          enum:
+            - "PENDING"
+            - "ACCEPTED"
+            - "REJECTED"
+        rejectionReason:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    UserSkillGuarantee:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        user:
+          $ref: "#/components/schemas/User"
+        skill:
+          $ref: "#/components/schemas/Skill"
+        guarantor:
+          $ref: "#/components/schemas/User"
+    Skill:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        users:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        guarantees:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/UserSkillGuarantee"
+        events:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Event"
+        goals:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Goal"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    Goal:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        parent:
+          $ref: "#/components/schemas/Goal"
+        title:
+          type: "string"
+        description:
+          type: "string"
+        status:
+          type: "string"
+          enum:
+            - "ACTIVE"
+            - "COMPLETED"
+        deadline:
+          type: "string"
+          format: "date-time"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+        mentor:
+          $ref: "#/components/schemas/User"
+        invitations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GoalInvitation"
+        users:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        skillsToAchieve:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Skill"
+    GoalInvitation:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        goal:
+          $ref: "#/components/schemas/Goal"
+        inviter:
+          $ref: "#/components/schemas/User"
+        invited:
+          $ref: "#/components/schemas/User"
+        status:
+          type: "string"
+          enum:
+            - "PENDING"
+            - "ACCEPTED"
+            - "REJECTED"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    SkillOffer:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        skill:
+          $ref: "#/components/schemas/Skill"
+        recommendation:
+          $ref: "#/components/schemas/Recommendation"
+    SkillRequest:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        request:
+          $ref: "#/components/schemas/RecommendationRequest"
+        skill:
+          $ref: "#/components/schemas/Skill"
+    RecommendationRequest:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        requester:
+          $ref: "#/components/schemas/User"
+        receiver:
+          $ref: "#/components/schemas/User"
+        message:
+          type: "string"
+        status:
+          type: "string"
+          enum:
+            - "PENDING"
+            - "ACCEPTED"
+            - "REJECTED"
+        rejectionReason:
+          type: "string"
+        recommendation:
+          $ref: "#/components/schemas/Recommendation"
+        skills:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/SkillRequest"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    Recommendation:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        content:
+          type: "string"
+        author:
+          $ref: "#/components/schemas/User"
+        receiver:
+          $ref: "#/components/schemas/User"
+        skillOffers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/SkillOffer"
+        request:
+          $ref: "#/components/schemas/RecommendationRequest"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    Contact:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        user:
+          $ref: "#/components/schemas/User"
+        contact:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "GITHUB"
+            - "TELEGRAM"
+            - "VK"
+            - "FACEBOOK"
+            - "INSTAGRAM"
+            - "WHATSAPP"
+            - "CUSTOM"
+    Rating:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        comment:
+          type: "string"
+        rate:
+          type: "integer"
+          format: "int32"
+        event:
+          $ref: "#/components/schemas/Event"
+        user:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+    UserProfilePic:
+      type: "object"
+      properties:
+        fileId:
+          type: "string"
+        smallFileId:
+          type: "string"
+    ContactPreference:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        user:
+          $ref: "#/components/schemas/User"
+        preference:
+          type: "string"
+          enum:
+            - "EMAIL"
+            - "PHONE"
+            - "TELEGRAM"
+    Premium:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        user:
+          $ref: "#/components/schemas/User"
+        startDate:
+          type: "string"
+          format: "date-time"
+        endDate:
+          type: "string"
+          format: "date-time"
+    User:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        username:
+          type: "string"
+        email:
+          type: "string"
+        phone:
+          type: "string"
+        password:
+          type: "string"
+        active:
+          type: "boolean"
+        aboutMe:
+          type: "string"
+        country:
+          $ref: "#/components/schemas/Country"
+        city:
+          type: "string"
+        experience:
+          type: "integer"
+          format: "int32"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+        followers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        followees:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        ownedEvents:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Event"
+        mentees:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        mentors:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        receivedMentorshipRequests:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/MentorshipRequest"
+        sentMentorshipRequests:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/MentorshipRequest"
+        sentGoalInvitations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GoalInvitation"
+        receivedGoalInvitations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GoalInvitation"
+        setGoals:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Goal"
+        goals:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Goal"
+        skills:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Skill"
+        banned:
+          type: "boolean"
+        participatedEvents:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Event"
+        recommendationsGiven:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Recommendation"
+        recommendationsReceived:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Recommendation"
+        contacts:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Contact"
+        ratings:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Rating"
+        userProfilePic:
+          $ref: "#/components/schemas/UserProfilePic"
+        contactPreference:
+          $ref: "#/components/schemas/ContactPreference"
+        premium:
+          $ref: "#/components/schemas/Premium"
+    Event:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        description:
+          type: "string"
+        startDate:
+          type: "string"
+          format: "date-time"
+        endDate:
+          type: "string"
+          format: "date-time"
+        location:
+          type: "string"
+        maxAttendees:
+          type: "integer"
+          format: "int32"
+        attendees:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+        ratings:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Rating"
+        owner:
+          $ref: "#/components/schemas/User"
+        relatedSkills:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Skill"
+        type:
+          type: "string"
+          enum:
+            - "WEBINAR"
+            - "POLL"
+            - "MEETING"
+            - "GIVEAWAY"
+            - "PRESENTATION"
+        status:
+          type: "string"
+          enum:
+            - "PLANNED"
+            - "IN_PROGRESS"
+            - "CANCELED"
+            - "COMPLETED"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"

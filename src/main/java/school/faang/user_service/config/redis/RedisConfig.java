@@ -5,18 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.FollowerEventDto;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
-import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Configuration
 @RequiredArgsConstructor
@@ -50,11 +46,6 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter messageListenerAdapter(RedisMessageSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber);
-    }
-
-    @Bean
     public ChannelTopic userBanChannel() {
         return new ChannelTopic(userBanTopicName);
     }
@@ -78,14 +69,6 @@ public class RedisConfig {
     public ChannelTopic profileViewChannelTopic(
             @Value("${spring.data.redis.channels.profile-view-channel.name}") String profileViewChannelName) {
         return new ChannelTopic(profileViewChannelName);
-    }
-
-    @Bean
-    public RedisMessageListenerContainer container(MessageListenerAdapter messageListenerAdapter) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, userBanChannel());
-        return container;
     }
 
     @Bean(value = "goalCompletedTopic")

@@ -1,19 +1,23 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestEvent;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RecommendationRequestException;
 import school.faang.user_service.filter.ReceiverIdFilter;
 import school.faang.user_service.filter.RequesterIdFilter;
 import school.faang.user_service.filter.StatusFilter;
+import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.publisher.RedisTopics;
 import school.faang.user_service.repository.RequestFilter;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
@@ -25,11 +29,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RecommendationRequestServiceImpl implements RecommendationRequestService{
+public class RecommendationRequestServiceImpl implements RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserRepository userRepository;
+    private final EventPublisher eventPublisher;
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
@@ -93,6 +98,8 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
         saveSkills(recommendationRequestDto, savedRequest.getId());
 
+        publishRecommendationRequestEvent(recommendationRequestDto);
+
         return recommendationRequestMapper.toDto(savedRequest);
     }
 
@@ -123,5 +130,14 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
             filters.add(new StatusFilter(filter.getStatus()));
         }
         return filters;
+    }
+
+    public void publishRecommendationRequestEvent(RecommendationRequestDto recommendationRequestDto) {
+        RecommendationRequestEvent event = new RecommendationRequestEvent();
+        event.setId(recommendationRequestDto.getId());
+        event.setRequesterId(recommendationRequestDto.getRequesterId());
+        event.setReceiverId(recommendationRequestDto.getReceiverId());
+
+        eventPublisher.publishToTopic(RedisTopics.RECOMMENDATION_REQUEST_CHANNEL.getTopicName(), event);
     }
 }

@@ -1,13 +1,11 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.user;
 
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 public class UserFilterDto {
-    @Size(max = 255)
     private String namePattern;
     private String aboutPattern;
     private String emailPattern;

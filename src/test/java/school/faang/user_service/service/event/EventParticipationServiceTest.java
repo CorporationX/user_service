@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,14 +9,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,15 +40,28 @@ public class EventParticipationServiceTest {
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private EventStartEventPublisher eventStartEventPublisher;
+
+    @Mock
+    private EventRepository eventRepository;
+
     private static long eventId;
     private static long userId;
     private static User registeredUser = new User();
+    static Event event = new Event();
 
     @BeforeAll
     static void setup() {
         eventId = 1L;
         userId = 1L;
         registeredUser.setId(1L);
+        User user = new User();
+        user.setId(1L);
+        event.setOwner(user);
     }
 
     @Test
@@ -59,6 +77,7 @@ public class EventParticipationServiceTest {
     void registerParticipant_newParticipant_repositoryCalled() {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(Collections.emptyList());
+        when(eventRepository.findById(userId)).thenReturn(Optional.of(event));
         eventParticipationService.registerParticipant(eventId, userId);
         verify(eventParticipationRepository, times(1)).register(eventId, userId);
     }

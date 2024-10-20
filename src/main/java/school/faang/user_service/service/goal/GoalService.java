@@ -13,9 +13,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.event.goal.GoalSetEvent;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.publisher.goal.GoalCompletedEventPublisher;
+import school.faang.user_service.publisher.goal.GoalSetEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserService;
@@ -39,6 +41,7 @@ public class GoalService {
     private final UserService userService;
     private final GoalInvitationService goalInvitationService;
     private final GoalCompletedEventPublisher goalCompletedEventPublisher;
+    private final GoalSetEventPublisher goalSetEventPublisher;
 
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
@@ -90,7 +93,7 @@ public class GoalService {
         setSkillsToGoal(goalDto.getSkillIds(), goal);
 
         goalRepository.save(goal);
-
+        notifyAboutGoalSet(goal.getId(), user.getId());
         return goal;
     }
 
@@ -168,6 +171,14 @@ public class GoalService {
                     goalCompletedEventPublisher.publish(event);
                 });
     }
+
+    private void notifyAboutGoalSet(Long goalId, Long userId) {
+        log.debug("Sending notification about goal set with userId - {0}, and goalId - {1}", userId, goalId);
+        GoalSetEvent event = GoalSetEvent.builder()
+                .goalId(goalId)
+                .userId(userId)
+                .build();
+
+        goalSetEventPublisher.publish(event);
+    }
 }
-
-

@@ -72,6 +72,7 @@ class RecommendationRequestServiceTest {
         when(skillRequestRepository.findAllById(any())).thenReturn(skillRequests);
         when(recommendationRequestMapper.mapToEntity(requestDto)).thenReturn(recommendationRequestEntity);
         when(recommendationRequestMapper.mapToDto(recommendationRequestEntity)).thenReturn(requestDto);
+        when(recommendationRequestRepository.save(recommendationRequestEntity)).thenReturn(recommendationRequestEntity);
 
         RecommendationRequestDto result = recommendationRequestService.create(requestDto);
 

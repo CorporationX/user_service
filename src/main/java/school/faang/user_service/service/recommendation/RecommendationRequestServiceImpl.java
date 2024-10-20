@@ -16,6 +16,7 @@ import school.faang.user_service.filter.RequesterIdFilter;
 import school.faang.user_service.filter.StatusFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
+import school.faang.user_service.publisher.RedisTopics;
 import school.faang.user_service.repository.RequestFilter;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -141,7 +142,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
         try {
             String json = objectMapper.writeValueAsString(event);
-            recommendationRequestedEventPublisher.publish(json);
+            recommendationRequestedEventPublisher.publish(RedisTopics.RECOMMENDATION_REQUEST_CHANNEL.getTopicName(), json);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

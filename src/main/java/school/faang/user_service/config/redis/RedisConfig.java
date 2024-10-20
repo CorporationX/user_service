@@ -1,23 +1,34 @@
 package school.faang.user_service.config.redis;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
+@RequiredArgsConstructor
+@Setter
+@ConfigurationProperties(prefix = "spring.data.redis")
 public class RedisConfig {
 
-    @Value("${spring.data.redis.channels.recommendation-request-channel.name}")
-    private String recommendationRequestTopic;
+    private List<String> topics;
+    private final Map<String, ChannelTopic> topicMap = new HashMap<>();
 
     @Bean
-    public ChannelTopic recommendationRequestTopic() {
-        return new ChannelTopic(recommendationRequestTopic);
+    public Map<String, ChannelTopic> channelTopics() {
+        for (String topic : topics) {
+            topicMap.put(topic, new ChannelTopic(topic));
+        }
+        return topicMap;
     }
 
     @Bean
@@ -30,12 +41,6 @@ public class RedisConfig {
         template.setHashValueSerializer(new StringRedisSerializer());
         template.afterPropertiesSet();
         return template;
-    }
-
-    @Bean
-    public RecommendationRequestedEventPublisher recommendationRequestedPublisher(
-            RedisTemplate<String, Object> redisTemplate, ChannelTopic recommendationRequestTopic) {
-        return new RecommendationRequestedEventPublisher(redisTemplate, recommendationRequestTopic);
     }
 
 }

@@ -27,6 +27,8 @@ spring:
           name: follower_event
         recommendation-request-channel:
           name: recommendation_request_channel
+      topics:
+        - recommendation_request_channel
 
 server:
   port: 8080

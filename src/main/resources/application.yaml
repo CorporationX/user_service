@@ -56,6 +56,7 @@ redis:
     user-follower: user_follower_channel
     goal-completed: goal_completed_channel
     skill-acquired: skill_acquired_channel
+    recommendation-requested: recommendation_requested_channel
 
 scheduler:
   clear-events:

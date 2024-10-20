@@ -16,4 +16,5 @@ public class UserResponseDto {
     private String phone;
     private boolean active;
     private String aboutMe;
+    private String preference;
 }

@@ -8,6 +8,7 @@ import school.faang.user_service.constant.SubscriptionConst;
 import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.redis.publisher.subscribe.PublishSubscribeUserEvent;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserFilter;
 
@@ -22,6 +23,7 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
 
     @Transactional
+    @PublishSubscribeUserEvent
     public void followUser(long followerId, long followeeId) {
         checkNotToFollowOrUnfollowToSelf(followerId, followeeId);
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {

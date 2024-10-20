@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Configuration
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "spring.data.redis")
 @Setter
+@Configuration
 public class RedisConfig {
 
     private List<String> topics;

@@ -23,9 +23,9 @@ spring:
       topics:
         - search-appearance
         - profile-view
-        - mentorship_channel
-        - follower_event
-        - goal_completed
+        - mentorship-channel
+        - follower-event
+        - goal-completed
 server:
   port: 8080
 

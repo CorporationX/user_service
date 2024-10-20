@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.model.enums.PremiumPeriod;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -17,10 +17,10 @@ public class PremiumBoughtEventDto {
     private Long userId;
 
     @NotNull(message = "amount cannot be null")
-    private BigDecimal amount;
+    private int amount;
 
     @NotNull(message = "subscriptionDuration cannot be null")
-    private Integer subscriptionDuration;
+    private PremiumPeriod subscriptionDuration;
 
-    private LocalDateTime purchaseDateTime;
+    private LocalDateTime receivedAt;
 }

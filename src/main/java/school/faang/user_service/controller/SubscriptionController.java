@@ -1,8 +1,6 @@
 package school.faang.user_service.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,13 +12,7 @@ import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.filter_dto.UserFilterDto;
 import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.service.SubscriptionService;
-import school.faang.user_service.model.dto.PremiumBoughtEventDto;
-import school.faang.user_service.service.SubscriptionService;
-import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
-import school.faang.user_service.model.dto.PremiumBoughtEventDto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -67,17 +59,5 @@ public class SubscriptionController {
     @GetMapping("/following/count")
     public long getFollowingCount(@RequestParam(name = "followerId") long followerId) {
         return subscriptionService.getFollowingCount(followerId);
-    }
-
-    @PostMapping("/buy-premium")
-    public ResponseEntity<?> buyPremium(@Valid @RequestBody PremiumBoughtEventDto request) {
-        Long userId = request.getUserId();
-        BigDecimal amount = request.getAmount();
-        Integer subscriptionDuration = request.getSubscriptionDuration();
-
-        PremiumBoughtEventDto event = new PremiumBoughtEventDto(userId, amount, subscriptionDuration, LocalDateTime.now());
-        eventPublisher.publish(event);
-
-        return ResponseEntity.ok().build();
     }
 }

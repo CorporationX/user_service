@@ -9,8 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.core.RedisTemplate;
 import school.faang.user_service.model.dto.PremiumBoughtEventDto;
+import school.faang.user_service.model.enums.PremiumPeriod;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,9 +40,9 @@ public class PremiumBoughtEventPublisherTest {
     void testPublish() throws Exception {
         PremiumBoughtEventDto event = new PremiumBoughtEventDto();
         event.setUserId(123L);
-        event.setAmount(BigDecimal.valueOf(99.99));
-        event.setSubscriptionDuration(30);
-        event.setPurchaseDateTime(LocalDateTime.now());
+        event.setAmount(99);
+        event.setSubscriptionDuration(PremiumPeriod.ONE_MONTH);
+        event.setReceivedAt(LocalDateTime.now());
 
         publisher.publish(event);
 

@@ -15,6 +15,7 @@ import school.faang.user_service.filter.ReceiverIdFilter;
 import school.faang.user_service.filter.RequesterIdFilter;
 import school.faang.user_service.filter.StatusFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.publisher.RedisTopics;
 import school.faang.user_service.repository.RequestFilter;
@@ -36,7 +37,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
-    private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
+    private final EventPublisher eventPublisher;
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
@@ -140,11 +141,6 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         event.setRequesterId(recommendationRequestDto.getRequesterId());
         event.setReceiverId(recommendationRequestDto.getReceiverId());
 
-        try {
-            String json = objectMapper.writeValueAsString(event);
-            recommendationRequestedEventPublisher.publish(RedisTopics.RECOMMENDATION_REQUEST_CHANNEL.getTopicName(), json);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        eventPublisher.publishToTopic(RedisTopics.RECOMMENDATION_REQUEST_CHANNEL.getTopicName(), event);
     }
 }

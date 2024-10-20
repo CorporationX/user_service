@@ -6,8 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RedisTopics {
-    RECOMMENDATION_REQUEST_CHANNEL("recommendation_request_channel");
+    SEARCH_APPEARANCE("search-appearance"),
+    PROFILE_VIEW("profile-view"),
+    RECOMMENDATION_REQUEST_CHANNEL("recommendation-request-channel");
+
 
     private final String topicName;
-
 }

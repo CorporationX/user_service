@@ -34,7 +34,7 @@ spring:
         follow-project-channel:
           name: project_subscription_event
         search-appearance-channel:
-          name: search-appearance-channel
+          name: search_appearance_event
 
 server:
   port: 8080

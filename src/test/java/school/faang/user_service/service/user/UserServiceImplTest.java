@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -9,11 +10,14 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
@@ -33,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -62,8 +67,15 @@ public class UserServiceImplTest {
     @Mock
     private ImageProcessor imageProcessor;
 
+
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
+
+    @Mock
+    private MessagePublisher<ProfileViewEvent> profileViewEventPublisher;
+
+    @Mock
+    private UserContext userContext;
 
     @Test
     public void getUser_Success() {
@@ -163,6 +175,7 @@ public class UserServiceImplTest {
 
         when(repository.findById(user.getId())).thenReturn(java.util.Optional.of(user));
         when(s3Service.downloadFile("smallFileId")).thenReturn(inputStream);
+        when(userContext.getUserId()).thenReturn(1L);
 
         Resource result = service.downloadUserAvatar(user.getId(), size);
 
@@ -173,6 +186,9 @@ public class UserServiceImplTest {
             throw new RuntimeException(e);
         }
         verify(s3Service).downloadFile("smallFileId");
+        verify(userContext).getUserId();
+        verify(profileViewEventPublisher).publish(any(ProfileViewEvent.class));
+
     }
 
     @Test
@@ -222,6 +238,26 @@ public class UserServiceImplTest {
         when(repository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(EntityNotFoundException.class, () -> service.deleteUserAvatar(user.getId()));
+    }
+
+    @Test
+    @DisplayName("Try to ban not founded user")
+    public void testBanUserWithNotFoundedId() {
+        when(repository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.banUserById(1L));
+    }
+
+    @Test
+    @DisplayName("Successfully ban user by id")
+    public void testBanUserSuccess() {
+        User user = createUser();
+        when(repository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        service.banUserById(1L);
+
+        verify(repository).save(user);
+        assertTrue(user.isBanned());
     }
 
     private User createUser() {

@@ -27,6 +27,8 @@ spring:
           name: follower_channel
         goal-event-channel:
           name: goal_channel
+        profile-view-channel:
+          name: profile_view_channel
       publisher:
         delay: 5000
 
@@ -82,3 +84,7 @@ user:
         queue-capacity: 1000
         thread-name-prefix: "UserUpload-"
     batch-size: 200
+
+redis:
+  topic:
+    user-ban: user_ban

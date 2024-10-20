@@ -2,7 +2,6 @@ package school.faang.user_service.redis.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.Topic;
@@ -18,7 +17,7 @@ public class FollowEventPublisher extends AbstractEventPublisher<FollowerEvent> 
         super(redisTemplate, objectMapper);
     }
 
-    @Bean
+    @Override
     public Topic getTopic() {
         return new ChannelTopic(userFollowTopicName);
     }

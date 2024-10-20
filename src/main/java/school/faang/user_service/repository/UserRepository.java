@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -50,4 +51,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE id IN (:ids)
             """)
     void banUsersById(List<Long> ids);
+
+    @Query("""
+            SELECT u, c.localeCode, cp.preference FROM User u
+            LEFT JOIN FETCH u.country c
+            LEFT JOIN FETCH u.contactPreference cp
+            WHERE u.id = :id
+            """)
+    Optional<User> findByIdWithCountryAndContactPreference(long id);
 }

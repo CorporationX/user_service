@@ -46,6 +46,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto getUserWithLocaleAndContactPreference(long id) {
+        return userRepository.findByIdWithCountryAndContactPreference(id)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+    }
+
+    @Override
     public List<UserDto> getUsersByIds(List<Long> ids) {
         return userRepository.findAllById(ids).stream()
                 .map(mapper::toDto)

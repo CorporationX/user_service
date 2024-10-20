@@ -23,6 +23,9 @@ public class Country {
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
 
+    @Column(name = "locale_code", length = 8, nullable = false)
+    private String localeCode;
+
     @OneToMany(mappedBy = "country")
     private List<User> residents;
 }

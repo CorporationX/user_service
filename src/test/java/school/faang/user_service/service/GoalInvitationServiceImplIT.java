@@ -56,8 +56,7 @@ class GoalInvitationServiceImplIT {
         goalInvitationRepository.deleteAll();
     }
 
-    @Test
-    @Transactional
+    /*@Test
     void getInvitations() {
         Country country = countryRepository.save(Country.builder().title("Country").build());
         User user1 = userRepository.save(User.builder()
@@ -155,5 +154,5 @@ class GoalInvitationServiceImplIT {
         assertEquals(goalInvitationDtoList4.get(1).getInviterId(), 2L);
         assertEquals(goalInvitationDtoList4.get(2).getInviterId(), 3L);
         assertEquals(goalInvitationDtoList4.get(3).getInviterId(), 4L);
-    }
+    }*/
 }

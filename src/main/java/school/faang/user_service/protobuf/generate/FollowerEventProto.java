@@ -30,23 +30,29 @@ public final class FollowerEventProto {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int64 user_id = 1;</code>
-     * @return The userId.
+     * <code>int64 followerId = 1;</code>
+     * @return The followerId.
      */
-    long getUserId();
+    long getFollowerId();
 
     /**
-     * <code>.google.protobuf.Timestamp event_time = 2;</code>
+     * <code>int64 followeeId = 2;</code>
+     * @return The followeeId.
+     */
+    long getFolloweeId();
+
+    /**
+     * <code>.google.protobuf.Timestamp event_time = 3;</code>
      * @return Whether the eventTime field is set.
      */
     boolean hasEventTime();
     /**
-     * <code>.google.protobuf.Timestamp event_time = 2;</code>
+     * <code>.google.protobuf.Timestamp event_time = 3;</code>
      * @return The eventTime.
      */
     com.google.protobuf.Timestamp getEventTime();
     /**
-     * <code>.google.protobuf.Timestamp event_time = 2;</code>
+     * <code>.google.protobuf.Timestamp event_time = 3;</code>
      */
     com.google.protobuf.TimestampOrBuilder getEventTimeOrBuilder();
   }
@@ -88,21 +94,32 @@ public final class FollowerEventProto {
     }
 
     private int bitField0_;
-    public static final int USER_ID_FIELD_NUMBER = 1;
-    private long userId_ = 0L;
+    public static final int FOLLOWERID_FIELD_NUMBER = 1;
+    private long followerId_ = 0L;
     /**
-     * <code>int64 user_id = 1;</code>
-     * @return The userId.
+     * <code>int64 followerId = 1;</code>
+     * @return The followerId.
      */
     @java.lang.Override
-    public long getUserId() {
-      return userId_;
+    public long getFollowerId() {
+      return followerId_;
     }
 
-    public static final int EVENT_TIME_FIELD_NUMBER = 2;
+    public static final int FOLLOWEEID_FIELD_NUMBER = 2;
+    private long followeeId_ = 0L;
+    /**
+     * <code>int64 followeeId = 2;</code>
+     * @return The followeeId.
+     */
+    @java.lang.Override
+    public long getFolloweeId() {
+      return followeeId_;
+    }
+
+    public static final int EVENT_TIME_FIELD_NUMBER = 3;
     private com.google.protobuf.Timestamp eventTime_;
     /**
-     * <code>.google.protobuf.Timestamp event_time = 2;</code>
+     * <code>.google.protobuf.Timestamp event_time = 3;</code>
      * @return Whether the eventTime field is set.
      */
     @java.lang.Override
@@ -110,7 +127,7 @@ public final class FollowerEventProto {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.google.protobuf.Timestamp event_time = 2;</code>
+     * <code>.google.protobuf.Timestamp event_time = 3;</code>
      * @return The eventTime.
      */
     @java.lang.Override
@@ -118,7 +135,7 @@ public final class FollowerEventProto {
       return eventTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : eventTime_;
     }
     /**
-     * <code>.google.protobuf.Timestamp event_time = 2;</code>
+     * <code>.google.protobuf.Timestamp event_time = 3;</code>
      */
     @java.lang.Override
     public com.google.protobuf.TimestampOrBuilder getEventTimeOrBuilder() {
@@ -139,11 +156,14 @@ public final class FollowerEventProto {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (userId_ != 0L) {
-        output.writeInt64(1, userId_);
+      if (followerId_ != 0L) {
+        output.writeInt64(1, followerId_);
+      }
+      if (followeeId_ != 0L) {
+        output.writeInt64(2, followeeId_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeMessage(2, getEventTime());
+        output.writeMessage(3, getEventTime());
       }
       getUnknownFields().writeTo(output);
     }
@@ -154,13 +174,17 @@ public final class FollowerEventProto {
       if (size != -1) return size;
 
       size = 0;
-      if (userId_ != 0L) {
+      if (followerId_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, userId_);
+          .computeInt64Size(1, followerId_);
+      }
+      if (followeeId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, followeeId_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getEventTime());
+          .computeMessageSize(3, getEventTime());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -177,8 +201,10 @@ public final class FollowerEventProto {
       }
       FollowerEventProto.FollowerEvent other = (FollowerEventProto.FollowerEvent) obj;
 
-      if (getUserId()
-          != other.getUserId()) return false;
+      if (getFollowerId()
+          != other.getFollowerId()) return false;
+      if (getFolloweeId()
+          != other.getFolloweeId()) return false;
       if (hasEventTime() != other.hasEventTime()) return false;
       if (hasEventTime()) {
         if (!getEventTime()
@@ -195,9 +221,12 @@ public final class FollowerEventProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + USER_ID_FIELD_NUMBER;
+      hash = (37 * hash) + FOLLOWERID_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getUserId());
+          getFollowerId());
+      hash = (37 * hash) + FOLLOWEEID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getFolloweeId());
       if (hasEventTime()) {
         hash = (37 * hash) + EVENT_TIME_FIELD_NUMBER;
         hash = (53 * hash) + getEventTime().hashCode();
@@ -339,7 +368,8 @@ public final class FollowerEventProto {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        userId_ = 0L;
+        followerId_ = 0L;
+        followeeId_ = 0L;
         eventTime_ = null;
         if (eventTimeBuilder_ != null) {
           eventTimeBuilder_.dispose();
@@ -379,10 +409,13 @@ public final class FollowerEventProto {
       private void buildPartial0(FollowerEventProto.FollowerEvent result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.userId_ = userId_;
+          result.followerId_ = followerId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.followeeId_ = followeeId_;
         }
         int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000002) != 0)) {
+        if (((from_bitField0_ & 0x00000004) != 0)) {
           result.eventTime_ = eventTimeBuilder_ == null
               ? eventTime_
               : eventTimeBuilder_.build();
@@ -403,8 +436,11 @@ public final class FollowerEventProto {
 
       public Builder mergeFrom(FollowerEventProto.FollowerEvent other) {
         if (other == FollowerEventProto.FollowerEvent.getDefaultInstance()) return this;
-        if (other.getUserId() != 0L) {
-          setUserId(other.getUserId());
+        if (other.getFollowerId() != 0L) {
+          setFollowerId(other.getFollowerId());
+        }
+        if (other.getFolloweeId() != 0L) {
+          setFolloweeId(other.getFolloweeId());
         }
         if (other.hasEventTime()) {
           mergeEventTime(other.getEventTime());
@@ -436,17 +472,22 @@ public final class FollowerEventProto {
                 done = true;
                 break;
               case 8: {
-                userId_ = input.readInt64();
+                followerId_ = input.readInt64();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 8
-              case 18: {
+              case 16: {
+                followeeId_ = input.readInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 26: {
                 input.readMessage(
                     getEventTimeFieldBuilder().getBuilder(),
                     extensionRegistry);
-                bitField0_ |= 0x00000002;
+                bitField0_ |= 0x00000004;
                 break;
-              } // case 18
+              } // case 26
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -464,34 +505,66 @@ public final class FollowerEventProto {
       }
       private int bitField0_;
 
-      private long userId_ ;
+      private long followerId_ ;
       /**
-       * <code>int64 user_id = 1;</code>
-       * @return The userId.
+       * <code>int64 followerId = 1;</code>
+       * @return The followerId.
        */
       @java.lang.Override
-      public long getUserId() {
-        return userId_;
+      public long getFollowerId() {
+        return followerId_;
       }
       /**
-       * <code>int64 user_id = 1;</code>
-       * @param value The userId to set.
+       * <code>int64 followerId = 1;</code>
+       * @param value The followerId to set.
        * @return This builder for chaining.
        */
-      public Builder setUserId(long value) {
+      public Builder setFollowerId(long value) {
 
-        userId_ = value;
+        followerId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>int64 user_id = 1;</code>
+       * <code>int64 followerId = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearUserId() {
+      public Builder clearFollowerId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        userId_ = 0L;
+        followerId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long followeeId_ ;
+      /**
+       * <code>int64 followeeId = 2;</code>
+       * @return The followeeId.
+       */
+      @java.lang.Override
+      public long getFolloweeId() {
+        return followeeId_;
+      }
+      /**
+       * <code>int64 followeeId = 2;</code>
+       * @param value The followeeId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFolloweeId(long value) {
+
+        followeeId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 followeeId = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFolloweeId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        followeeId_ = 0L;
         onChanged();
         return this;
       }
@@ -500,14 +573,14 @@ public final class FollowerEventProto {
       private com.google.protobuf.SingleFieldBuilder<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> eventTimeBuilder_;
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        * @return Whether the eventTime field is set.
        */
       public boolean hasEventTime() {
-        return ((bitField0_ & 0x00000002) != 0);
+        return ((bitField0_ & 0x00000004) != 0);
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        * @return The eventTime.
        */
       public com.google.protobuf.Timestamp getEventTime() {
@@ -518,7 +591,7 @@ public final class FollowerEventProto {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       public Builder setEventTime(com.google.protobuf.Timestamp value) {
         if (eventTimeBuilder_ == null) {
@@ -529,12 +602,12 @@ public final class FollowerEventProto {
         } else {
           eventTimeBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       public Builder setEventTime(
           com.google.protobuf.Timestamp.Builder builderForValue) {
@@ -543,16 +616,16 @@ public final class FollowerEventProto {
         } else {
           eventTimeBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       public Builder mergeEventTime(com.google.protobuf.Timestamp value) {
         if (eventTimeBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) != 0) &&
+          if (((bitField0_ & 0x00000004) != 0) &&
             eventTime_ != null &&
             eventTime_ != com.google.protobuf.Timestamp.getDefaultInstance()) {
             getEventTimeBuilder().mergeFrom(value);
@@ -563,16 +636,16 @@ public final class FollowerEventProto {
           eventTimeBuilder_.mergeFrom(value);
         }
         if (eventTime_ != null) {
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000004;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       public Builder clearEventTime() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         eventTime_ = null;
         if (eventTimeBuilder_ != null) {
           eventTimeBuilder_.dispose();
@@ -582,15 +655,15 @@ public final class FollowerEventProto {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       public com.google.protobuf.Timestamp.Builder getEventTimeBuilder() {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         onChanged();
         return getEventTimeFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       public com.google.protobuf.TimestampOrBuilder getEventTimeOrBuilder() {
         if (eventTimeBuilder_ != null) {
@@ -601,7 +674,7 @@ public final class FollowerEventProto {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp event_time = 2;</code>
+       * <code>.google.protobuf.Timestamp event_time = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
@@ -683,10 +756,10 @@ public final class FollowerEventProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\024follower_event.proto\032\037google/protobuf/" +
-      "timestamp.proto\"P\n\rFollowerEvent\022\017\n\007user" +
-      "_id\030\001 \001(\003\022.\n\nevent_time\030\002 \001(\0132\032.google.p" +
-      "rotobuf.TimestampB\024B\022FollowerEventProtob" +
-      "\006proto3"
+      "timestamp.proto\"g\n\rFollowerEvent\022\022\n\nfoll" +
+      "owerId\030\001 \001(\003\022\022\n\nfolloweeId\030\002 \001(\003\022.\n\neven" +
+      "t_time\030\003 \001(\0132\032.google.protobuf.Timestamp" +
+      "B\024B\022FollowerEventProtob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -698,7 +771,7 @@ public final class FollowerEventProto {
     internal_static_FollowerEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_FollowerEvent_descriptor,
-        new java.lang.String[] { "UserId", "EventTime", });
+        new java.lang.String[] { "FollowerId", "FolloweeId", "EventTime", });
     descriptor.resolveAllFeaturesImmutable();
     com.google.protobuf.TimestampProto.getDescriptor();
   }

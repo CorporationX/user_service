@@ -8,5 +8,7 @@ public interface UserService {
 
     UserDto getUser(long id);
 
+    UserDto getUserWithLocaleAndContactPreference(long id);
+
     List<UserDto> getUsersByIds(List<Long> ids);
 }

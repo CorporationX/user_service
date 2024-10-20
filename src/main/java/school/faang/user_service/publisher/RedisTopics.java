@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RedisTopics {
     SEARCH_APPEARANCE("search-appearance"),
-    PROFILE_VIEW("profile-view");
+    PROFILE_VIEW("profile-view"),
+    EVENTS_VIEW("eventStart-event");
 
     private final String topicName;
 }

@@ -2,18 +2,25 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
 
-@Controller
+@RestController("/api/v1")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class EventParticipationController {
 
     private final EventParticipationService eventParticipationService;
 
-    public void registerParticipant(long eventId, long userId) {
+    @PostMapping("/event")
+    public void registerParticipant(@RequestParam long eventId,
+                                    @RequestParam long userId) {
         eventParticipationService.registerParticipant(eventId, userId);
     }
 

@@ -1,18 +1,16 @@
 package school.faang.user_service.service.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.event.EventStartEvent;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.publisher.EventStartEventPublisher;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.publisher.RedisTopics;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -24,8 +22,7 @@ public class EventParticipationServiceImpl implements EventParticipationService 
     private final EventParticipationRepository eventParticipationRepository;
     private final EventRepository eventRepository;
     private final UserMapper userMapper;
-    private final ObjectMapper objectMapper;
-    private final EventStartEventPublisher eventStartEventPublisher;
+    private final EventPublisher eventPublisher;
 
     @Transactional
     public void registerParticipant(long eventId, long userId) {
@@ -46,12 +43,8 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         eventStartEvent.setOwnerId(event.getOwner().getId());
         eventStartEvent.setSubscriberId(userId);
 
-        try {
-            String json = objectMapper.writeValueAsString(eventStartEvent);
-            eventStartEventPublisher.publish(json);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        eventPublisher.publishToTopic(RedisTopics.EVENTS_VIEW.getTopicName(), eventStartEvent);
+
     }
 
     @Transactional

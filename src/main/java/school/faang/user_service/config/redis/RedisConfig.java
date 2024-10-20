@@ -2,8 +2,11 @@ package school.faang.user_service.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -37,15 +40,4 @@ public class RedisConfig {
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
         return template;
     }
-
-    @Bean
-    public ChannelTopic eventStartTopic() {
-        return new ChannelTopic(eventChannelName);
-    }
-
-    @Bean
-    public EventStartEventPublisher eventStartEventPublisher(RedisTemplate<String, Object> redisTemplate, ChannelTopic eventStartTopic) {
-        return new EventStartEventPublisher(redisTemplate, eventStartTopic);
-    }
-
 }

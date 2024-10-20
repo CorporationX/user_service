@@ -41,6 +41,8 @@ spring:
           name: mentorship_accepted_event_channel
         premium-bought-channel:
           name: premium_bought_channel
+        skill-offered-channel:
+          name: skill_offered_channel
         mentorship-request-channel:
           name: mentorship-request-channel
 

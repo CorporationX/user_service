@@ -30,8 +30,8 @@ public class MentorshipRequestController {
     private final RejectionMapper rejectionMapper;
 
     @PostMapping
-    public void requestMentorship(@RequestBody @NotNull @Validated(CreateGroup.class) MentorshipRequestDto mentorshipRequestDto) {
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+    public MentorshipRequestDto requestMentorship(@RequestBody @NotNull @Validated(CreateGroup.class) MentorshipRequestDto mentorshipRequestDto) {
+       return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
     @GetMapping

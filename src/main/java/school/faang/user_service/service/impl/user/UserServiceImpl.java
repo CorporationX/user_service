@@ -24,7 +24,7 @@ import school.faang.user_service.model.dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.event.Event;
-import school.faang.user_service.model.entity.event.EventStatus;
+import school.faang.user_service.model.enums.event.EventStatus;
 import school.faang.user_service.model.entity.goal.Goal;
 
 import school.faang.user_service.filter.user.UserFilter;

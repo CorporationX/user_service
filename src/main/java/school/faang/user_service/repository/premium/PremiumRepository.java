@@ -2,7 +2,7 @@ package school.faang.user_service.repository.premium;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import school.faang.user_service.model.entity.premium.Premium;
+import school.faang.user_service.model.entity.Premium;
 
 import java.time.LocalDateTime;
 import java.util.List;

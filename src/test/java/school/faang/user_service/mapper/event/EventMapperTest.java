@@ -6,7 +6,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.model.event.EventDto;
+import school.faang.user_service.model.dto.event.EventDto;
 import school.faang.user_service.model.dto.skill.SkillDto;
 import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.User;

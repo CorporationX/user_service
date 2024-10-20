@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.model.event.follower.FollowerEventDto;
+import school.faang.user_service.model.event.FollowerEvent;
 import school.faang.user_service.model.dto.user.UserDto;
 import school.faang.user_service.model.dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.User;
@@ -35,7 +35,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validator.isSubscriber(followerId, followeeId, subscriptionRepository);
         subscriptionRepository.followUser(followerId, followeeId);
 
-        FollowerEventDto event = buildEvent(followerId, followeeId);
+        FollowerEvent event = buildEvent(followerId, followeeId);
         followerEventPublisher.publish(event);
         log.info("Subscription event was sent", event);
     }
@@ -81,8 +81,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
-    private static FollowerEventDto buildEvent(long followerId, long followeeId) {
-        return FollowerEventDto.builder()
+    private static FollowerEvent buildEvent(long followerId, long followeeId) {
+        return FollowerEvent.builder()
                 .followeeId(followeeId)
                 .followerId(followerId)
                 .subscribedAt(LocalDateTime.now())

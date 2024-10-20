@@ -163,7 +163,7 @@ public class RedisConfig {
     @Bean
     public ChannelTopic eventStarter() {
         return new ChannelTopic(eventStarter);
-
+    }
     @Bean
     public ChannelTopic skillOfferedTopic() {
         return new ChannelTopic(skillOffered);

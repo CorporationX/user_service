@@ -11,9 +11,7 @@ import school.faang.user_service.constant.TestConst;
 import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.redis.publisher.FollowEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserFilter;
 import school.faang.user_service.util.users.UserTestUtil;
 
@@ -39,12 +37,6 @@ public class SubscriptionServiceTest {
     @Mock
     private UserFilter userFilter;
 
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private FollowEventPublisher followEventPublisher;
-
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -69,9 +61,7 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testFollowUser_successSubscribe() {
-        User follower = users.get(0);
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
-        when(userRepository.getReferenceById(followerId)).thenReturn(follower);
         subscriptionService.followUser(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
@@ -178,9 +168,7 @@ public class SubscriptionServiceTest {
         userFilters = List.of(userFilter);
         subscriptionService = new SubscriptionService(
                 subscriptionRepository,
-                userRepository,
-                userFilters,
-                followEventPublisher);
+                userFilters);
 
         List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 

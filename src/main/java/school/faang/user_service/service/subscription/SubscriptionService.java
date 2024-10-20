@@ -7,11 +7,9 @@ import school.faang.user_service.constant.ErrorMessages;
 import school.faang.user_service.constant.SubscriptionConst;
 import school.faang.user_service.dto.user.UserExtendedFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.redis.event.FollowerEvent;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.redis.publisher.FollowEventPublisher;
+import school.faang.user_service.redis.publisher.subscribe.PublishSubscribeUserEvent;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserFilter;
 
 import java.util.Comparator;
@@ -22,19 +20,16 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
-    private final FollowEventPublisher followEventPublisher;
 
     @Transactional
+    @PublishSubscribeUserEvent
     public void followUser(long followerId, long followeeId) {
         checkNotToFollowOrUnfollowToSelf(followerId, followeeId);
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException(ErrorMessages.ALREADY_SUBSCRIBE);
         }
         subscriptionRepository.followUser(followerId, followeeId);
-        User follower = userRepository.getReferenceById(followerId);
-        followEventPublisher.publish(new FollowerEvent(followerId, followeeId, follower.getUsername()));
     }
 
     @Transactional

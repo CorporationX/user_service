@@ -1,6 +1,5 @@
 package school.faang.user_service.service.recommendation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
     private final EventPublisher eventPublisher;
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejectionDto) {

@@ -13,4 +13,5 @@ public enum RedisTopics {
     RECOMMENDATION_REQUEST_CHANNEL("recommendation-request-channel");
 
     private final String topicName;
+
 }

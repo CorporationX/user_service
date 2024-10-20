@@ -160,4 +160,8 @@ public class UserService {
         userRepository.save(user);
         log.info("Processed and saved user: {}", user.getEmail());
     }
+
+    public List<Long> findAllActiveUserIds() {
+        return userRepository.findAllActiveUserIds();
+    }
 }

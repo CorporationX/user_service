@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import school.faang.user_service.validator.file.FileValidator;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,5 +78,10 @@ public class UserController {
         fileValidator.validateFile(file);
         userService.processCSVAsync(file.getInputStream());
         return ResponseEntity.ok("The file has been uploaded successfully and will be processed!");
+    }
+
+    @GetMapping
+    public List<Long> findAllActiveUserIds() {
+        return userService.findAllActiveUserIds();
     }
 }

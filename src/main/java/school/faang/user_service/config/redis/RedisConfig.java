@@ -12,9 +12,6 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Configuration
@@ -72,10 +69,5 @@ public class RedisConfig {
     public ChannelTopic profileViewChannelTopic(
             @Value("${spring.data.redis.channels.profile-view-channel.name}") String profileViewChannelName) {
         return new ChannelTopic(profileViewChannelName);
-    }
-
-    @Bean
-    public ChannelTopic userBanChannel() {
-        return new ChannelTopic(userBanTopicName);
     }
 }

@@ -11,15 +11,12 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.FollowerEventDto;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
+import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-
     private final ObjectMapper objectMapper;
 
     @Value("${redis.topic.user-ban}")
@@ -49,14 +46,18 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter messageListenerAdapter(RedisMessageSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber);
-    }
-
-    @Bean
     public ChannelTopic userBanChannel() {
         return new ChannelTopic(userBanTopicName);
     }
+
+    RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
+        RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, GoalCompletedEventDto.class));
+        return template;
+    }
+
 
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
@@ -70,11 +71,9 @@ public class RedisConfig {
         return new ChannelTopic(profileViewChannelName);
     }
 
-    @Bean
-    public RedisMessageListenerContainer container(MessageListenerAdapter messageListenerAdapter) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, userBanChannel());
-        return container;
+    @Bean(value = "goalCompletedTopic")
+    public ChannelTopic goalCompletedTopic(
+            @Value("${spring.data.redis.channels.goal-event-channel.name}") String topic) {
+        return new ChannelTopic(topic);
     }
 }

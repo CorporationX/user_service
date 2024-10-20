@@ -129,6 +129,16 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
+    public void banUser(Long userId) {
+        User user = getUserById(userId);
+
+        if (!user.isBanned()) {
+            user.setBanned(true);
+            userRepository.save(user);
+        }
+    }
+
     private List<User> filteredUsers(UserFilterDto filterDto) {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))

@@ -30,6 +30,8 @@ spring:
         goalCompletedEvent:
           name: goal_completed_event_channel
         mentorshipRequest: mentorship_request_topic
+        projectChannel:
+          name: project_channel
 
 servlet:
   multipart:

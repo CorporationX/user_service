@@ -154,6 +154,7 @@ public class RedisConfig {
     public ChannelTopic premiumBoughtTopic() {
         return new ChannelTopic(premiumBoughtTopic);
     }
+    @Bean
     public ChannelTopic eventStarter() {
         return new ChannelTopic(eventStarter);
     }

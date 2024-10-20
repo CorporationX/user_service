@@ -11,9 +11,9 @@ import school.faang.user_service.event.ProfileViewEventDto;
 @RequiredArgsConstructor
 public class ProfileViewEventPublisherImpl implements ProfileViewEventPublisher{
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic topic;
+    private final ChannelTopic profileViewTopic;
     @Override
     public void publish(ProfileViewEventDto profileEvent) {
-        redisTemplate.convertAndSend(topic.getTopic(), profileEvent);
+        redisTemplate.convertAndSend(profileViewTopic.getTopic(), profileEvent);
     }
 }

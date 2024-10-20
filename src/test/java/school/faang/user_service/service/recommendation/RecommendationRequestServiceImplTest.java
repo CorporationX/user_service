@@ -15,7 +15,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RecommendationRequestException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -46,7 +46,7 @@ public class RecommendationRequestServiceImplTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
+    private EventPublisher eventPublisher;
 
     @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
@@ -109,8 +109,6 @@ public class RecommendationRequestServiceImplTest {
         when(recommendationRequestRepository.save(any(RecommendationRequest.class)))
                 .thenReturn(recommendationRequest);
         when(recommendationRequestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
-
-
 
         RecommendationRequestDto result = recommendationRequestService.create(recommendationRequestDto);
 

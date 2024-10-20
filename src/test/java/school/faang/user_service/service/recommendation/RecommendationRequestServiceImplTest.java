@@ -1,33 +1,41 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
+import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestEvent;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RecommendationRequestException;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceImplTest {
+    @InjectMocks
+    private RecommendationRequestServiceImpl recommendationRequestService;
+
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
 
@@ -35,18 +43,23 @@ public class RecommendationRequestServiceImplTest {
     private SkillRequestRepository skillRequestRepository;
 
     @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private EventPublisher eventPublisher;
+
+    @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
 
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
-    private RecommendationRequestServiceImpl recommendationRequestService;
-
     private RecommendationRequest recommendationRequest;
     private RecommendationRequestDto recommendationRequestDto;
     private RejectionDto rejectionDto;
 
+
+    RecommendationRequestEvent recommendationRequestEvent = new RecommendationRequestEvent();
     @BeforeEach
     public void setUp() {
         recommendationRequest = new RecommendationRequest();
@@ -64,6 +77,10 @@ public class RecommendationRequestServiceImplTest {
         recommendationRequestDto.setReceiverId(2L);
         List<Long> skillIds = List.of(3L);
         recommendationRequestDto.setSkillId(skillIds);
+
+        recommendationRequestEvent.setId(1L);
+        recommendationRequestEvent.setRequesterId(1L);
+        recommendationRequestEvent.setReceiverId(2L);
     }
 
     @Test
@@ -82,7 +99,7 @@ public class RecommendationRequestServiceImplTest {
     }
 
     @Test
-    public void testCreate_Success() {
+    public void testCreate_Success() throws JsonProcessingException {
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.existsById(2L)).thenReturn(true);
         when(recommendationRequestRepository.findLatestPendingRequest(1L, 2L))

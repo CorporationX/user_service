@@ -18,7 +18,6 @@ import school.faang.user_service.listener.RedisBanMessageListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-
     private final RedisBanMessageListener banMessageListener;
     private final ObjectMapper objectMapper;
 
@@ -60,6 +59,9 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.skill-offered-channel.name}")
     private String skillOffered;
+
+    @Value("${spring.data.redis.channels.mentorship-request-channel.name}")
+    private String mentorshipRequestTopic;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -144,5 +146,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic skillOfferedTopic() {
         return new ChannelTopic(skillOffered);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipRequestTopic() {
+        return new ChannelTopic(mentorshipRequestTopic);
     }
 }

@@ -21,8 +21,6 @@ spring:
       port: 6379
       host: localhost
       channels:
-        mentorship-channel:
-          name: mentorship_channel
         follower-event-channel:
           name: follower_event_channel
         event-start-channel:
@@ -45,6 +43,8 @@ spring:
           name: premium_bought_channel
         skill-offered-channel:
           name: skill_offered_channel
+        mentorship-request-channel:
+          name: mentorship-request-channel
 
 server:
   port: 8080

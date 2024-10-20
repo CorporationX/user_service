@@ -8,9 +8,10 @@ import lombok.Getter;
 public enum RedisTopics {
     SEARCH_APPEARANCE("search-appearance"),
     PROFILE_VIEW("profile-view"),
-    EVENTS_VIEW("eventStart-event"),
+    EVENTS_START("eventStart-event"),
     GOAL_COMPLETED("goal-completed"),
-    RECOMMENDATION_REQUEST_CHANNEL("recommendation-request-channel");
+    RECOMMENDATION_REQUEST_CHANNEL("recommendation-request-channel"),
+    FOLLOW_EVENT("follower-event");
 
     private final String topicName;
 

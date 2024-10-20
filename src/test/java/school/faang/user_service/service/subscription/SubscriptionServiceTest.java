@@ -12,6 +12,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
@@ -22,10 +23,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class SubscriptionServiceTest {
@@ -41,6 +39,9 @@ public class SubscriptionServiceTest {
 
     @Mock
     private List<UserFilter> filters;
+
+    @Mock
+    private EventPublisher eventPublisher;;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -152,7 +153,8 @@ public class SubscriptionServiceTest {
         SubscriptionServiceImpl service = new SubscriptionServiceImpl(
                 subscriptionRepository,
                 userMapper,
-                Arrays.asList(filterMock)
+                Arrays.asList(filterMock),
+                eventPublisher
         );
 
         @SuppressWarnings("unchecked")

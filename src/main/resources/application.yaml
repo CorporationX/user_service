@@ -24,7 +24,7 @@ spring:
         - search-appearance
         - profile-view
         - eventStart-event
-        - follower_event
+        - follower-event
         - mentorship_channel
         - goal-completed
         - recommendation-request-channel

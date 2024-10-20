@@ -1,24 +1,18 @@
 package school.faang.user_service.service.subscription;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
-import school.faang.user_service.publisher.FollowEventPublisher;
-import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
@@ -29,10 +23,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class SubscriptionServiceTest {
@@ -50,10 +41,7 @@ public class SubscriptionServiceTest {
     private List<UserFilter> filters;
 
     @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
-    private FollowEventPublisher followEventPublisher;
+    private EventPublisher eventPublisher;;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -166,8 +154,7 @@ public class SubscriptionServiceTest {
                 subscriptionRepository,
                 userMapper,
                 Arrays.asList(filterMock),
-                objectMapper,
-                followEventPublisher
+                eventPublisher
         );
 
         @SuppressWarnings("unchecked")

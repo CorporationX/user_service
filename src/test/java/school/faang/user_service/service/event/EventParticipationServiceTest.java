@@ -14,10 +14,12 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +43,7 @@ public class EventParticipationServiceTest {
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Mock
-    private ObjectMapper objectMapper;
+    private EventPublisher eventPublisher;
 
     @Mock
     private EventStartEventPublisher eventStartEventPublisher;
@@ -62,6 +64,8 @@ public class EventParticipationServiceTest {
         User user = new User();
         user.setId(1L);
         event.setOwner(user);
+        event.setTitle("title");
+        event.setStartDate(LocalDateTime.now());
     }
 
     @Test

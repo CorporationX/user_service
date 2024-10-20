@@ -43,7 +43,7 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         eventStartEvent.setOwnerId(event.getOwner().getId());
         eventStartEvent.setSubscriberId(userId);
 
-        eventPublisher.publishToTopic(RedisTopics.EVENTS_VIEW.getTopicName(), eventStartEvent);
+        eventPublisher.publishToTopic(RedisTopics.EVENTS_START.getTopicName(), eventStartEvent);
 
     }
 

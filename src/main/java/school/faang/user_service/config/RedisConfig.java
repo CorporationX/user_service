@@ -17,6 +17,12 @@ public class RedisConfig {
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
 
+    @Value("${redis.channels.search-appearance-channel}")
+    private String searchAppearanceChannel;
+
+    @Value("${redis.channels.profile-view-channel}")
+    private String profileViewChannel;
+
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
 
@@ -51,6 +57,17 @@ public class RedisConfig {
     @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean
+    ChannelTopic searchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceChannel);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewChannel);
+
     }
 
     @Bean

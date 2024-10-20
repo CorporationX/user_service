@@ -15,4 +15,7 @@ public class RedisProperties {
 
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
     private String userBanChannelName;
+
+    @Value("${spring.data.redis.channels.follower_event_channel.name}")
+    private String followerEventChannelName;
 }

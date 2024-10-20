@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -267,6 +266,38 @@ class UserServiceTest {
                         .save(user);
                 verify(userMapper)
                         .toDto(user);
+            }
+        }
+
+        @Nested
+        class BanUser {
+
+            @Test
+            @DisplayName("Should successfully ban a non-banned user")
+            void whenBanNonBannedUserThenBanSuccess() {
+                user = mock(User.class);
+
+                when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+                when(user.isBanned()).thenReturn(false);
+
+                userService.banUser(USER_ID);
+
+                verify(user).setBanned(true);
+                verify(userRepository).save(user);
+            }
+
+            @Test
+            @DisplayName("Should do nothing when banning an already banned user")
+            void whenBanAlreadyBannedUserThenDoNothing() {
+                user = mock(User.class);
+
+                when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+                when(user.isBanned()).thenReturn(true);
+
+                userService.banUser(USER_ID);
+
+                verify(user, never()).setBanned(true);
+                verify(userRepository, never()).save(user);
             }
         }
     }

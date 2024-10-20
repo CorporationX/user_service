@@ -2,8 +2,8 @@ package school.faang.user_service.validator.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.dto.recommendation.RecommendationDto;
+import school.faang.user_service.model.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -24,7 +24,8 @@ public class RecommendationServiceValidator {
                         recommendation.receiverId());
 
         if (existingRecommendation.isPresent()) {
-            if (ChronoUnit.DAYS.between(recommendation.createdAt(), existingRecommendation.get().getCreatedAt())
+            long between = ChronoUnit.DAYS.between(existingRecommendation.get().getCreatedAt(), recommendation.createdAt());
+            if (between
                     < SIX_MONTH_IN_DAYS) {
                 throw new DataValidationException("Need 180 days to pass before next recommendation");
             }

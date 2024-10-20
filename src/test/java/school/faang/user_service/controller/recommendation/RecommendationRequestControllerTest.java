@@ -11,11 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.recommendation.RecommendationRequestService;
+import school.faang.user_service.model.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.model.dto.recommendation.RejectionDto;
+import school.faang.user_service.model.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.Set;
 

@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
-import school.faang.user_service.service.goal.GoalInvitationService;
+import school.faang.user_service.model.dto.goal.GoalInvitationDto;
+import school.faang.user_service.model.dto.goal.InvitationFilterDto;
+import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.validator.groups.CreateGroup;
 
 import java.util.List;

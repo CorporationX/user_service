@@ -10,17 +10,20 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.model.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.model.entity.contact.ContactPreference;
+import school.faang.user_service.model.enums.contact.PreferredContact;
 import school.faang.user_service.publisher.ProfileViewEventPublisherImpl;
+import school.faang.user_service.model.dto.user.UserDto;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.impl.event.EventServiceImpl;
+import school.faang.user_service.service.impl.goal.GoalServiceImpl;
+import school.faang.user_service.service.impl.mentorship.MentorshipServiceImpl;
+import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.util.CsvParser;
 
 import java.util.List;
@@ -32,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -60,13 +64,13 @@ class UserServiceImplTest {
     private UserFilter userFilter;
 
     @Mock
-    private GoalService goalService;
+    private GoalServiceImpl goalService;
 
     @Mock
-    private EventService eventService;
+    private EventServiceImpl eventService;
 
     @Mock
-    private MentorshipService mentorshipService;
+    private MentorshipServiceImpl mentorshipService;
 
     @Mock
     private CsvParser csvParser;
@@ -88,7 +92,14 @@ class UserServiceImplTest {
                 1L,
                 "JaneSmith",
                 "janesmith@example.com",
-                "0987654321");
+                "0987654321",
+                PreferredContact.TELEGRAM);
+
+        ContactPreference contactPreference = ContactPreference.builder()
+                .id(1L)
+                .user(user)
+                .preference(PreferredContact.TELEGRAM)
+                .build();
 
         user = User.builder()
                 .id(1L)
@@ -99,11 +110,15 @@ class UserServiceImplTest {
                 .phone("0987654321")
                 .aboutMe("About Jane Smith")
                 .experience(5)
+                .banned(false)
+                .contactPreference(contactPreference)
                 .build();
 
         filters = List.of(userFilter);
         userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService,
                 eventService, mentorshipService, profileViewEventPublisher, csvParser, userContext);
+
+        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService, eventService, mentorshipService,profileViewEventPublisher, csvParser,userContext);
     }
 
     @Test
@@ -219,6 +234,18 @@ class UserServiceImplTest {
         verify(userRepository).findAllById(List.of(1L, 2L));
         verify(userMapper).toDto(user);
         assertThat(result).isNotNull().hasSize(2).isEqualTo(List.of(userDto, userDto2));
+    }
+
+    @Test
+    void banUserById() {
+        // Arrange
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
+
+        // Act
+        userService.banUserById(1L);
+
+        // Assert
+        assertTrue(user.getBanned());
     }
 
     private User buildUser() {

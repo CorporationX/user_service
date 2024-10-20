@@ -2,6 +2,7 @@ package school.faang.user_service.entity.premium;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import school.faang.user_service.model.enums.premium.PremiumPeriod;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

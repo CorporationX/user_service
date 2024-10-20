@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.model.dto.event.EventDto;
+import school.faang.user_service.model.dto.event.EventFilterDto;
+import school.faang.user_service.service.impl.event.EventServiceImpl;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
@@ -25,7 +25,7 @@ class EventControllerTest {
     private EventController eventController;
 
     @Mock
-    private EventService eventService;
+    private EventServiceImpl eventServiceImpl;
 
     @Mock
     private EventValidator eventValidator;
@@ -42,27 +42,27 @@ class EventControllerTest {
     @Test
     void create_shouldReturnEventDto() {
         // Arrange
-        when(eventService.create(eventDto)).thenReturn(eventDto);
+        when(eventServiceImpl.create(eventDto)).thenReturn(eventDto);
 
         // Act
         EventDto result = eventController.create(eventDto);
 
         // Assert
-        verify(eventService, times(1)).create(eventDto);
+        verify(eventServiceImpl, times(1)).create(eventDto);
         assertEquals(eventDto, result);
     }
 
     @Test
     void getEventsByFilter_shouldReturnFilteredEvents() {
         // Arrange
-        when(eventService.getEventsByFilter(eq(eventFilterDto))).thenReturn(eventDtoList);
+        when(eventServiceImpl.getEventsByFilter(eq(eventFilterDto))).thenReturn(eventDtoList);
 
         // Act
         List<EventDto> result = eventController.getEventsByFilter(eventFilterDto);
 
         // Assert
         assertEquals(eventDtoList, result);
-        verify(eventService).getEventsByFilter(eq(eventFilterDto));
+        verify(eventServiceImpl).getEventsByFilter(eq(eventFilterDto));
     }
 
     @Test
@@ -74,33 +74,33 @@ class EventControllerTest {
         eventController.deleteEvent(eventId);
 
         // Assert
-        verify(eventService).deleteEvent(eventId);
+        verify(eventServiceImpl).deleteEvent(eventId);
     }
 
     @Test
     void updateEvent_shouldCallServiceUpdateEvent() {
         // Act
-        eventService.updateEvent(eventDto);
+        eventServiceImpl.updateEvent(eventDto);
 
         // Assert
-        verify(eventService).updateEvent(eventDto);
+        verify(eventServiceImpl).updateEvent(eventDto);
     }
 
     @Test
     void getOwnedEvents_shouldCallServiceUpdateEvent() {
         // Act
-        eventService.getOwnedEvents(1L);
+        eventServiceImpl.getOwnedEvents(1L);
 
         // Assert
-        verify(eventService).getOwnedEvents(1L);
+        verify(eventServiceImpl).getOwnedEvents(1L);
     }
 
     @Test
     void getParticipatedEvents_shouldCallServiceGetParticipatedEvents() {
         // Act
-        eventService.getParticipatedEvents(1L);
+        eventServiceImpl.getParticipatedEvents(1L);
 
         // Assert
-        verify(eventService).getParticipatedEvents(1L);
+        verify(eventServiceImpl).getParticipatedEvents(1L);
     }
 }

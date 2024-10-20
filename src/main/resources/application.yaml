@@ -26,7 +26,25 @@ spring:
         mentorship-channel:
           name: mentorship_channel
         follower-event-channel:
-          name: follower_event
+          name: follower_event_channel
+        event-start-channel:
+          name: event_start_channel
+        recommendation-received-channel:
+          name: recommendation_received_channel
+        ban-user-channel:
+          name: user_ban
+        follow-project-channel:
+          name: project_subscription_event
+        goal-completed-event-channel:
+          name: goal_completed_event_channel
+        skill-acquired-channel:
+          name: skill_acquired_channel
+        recommendation-request-channel:
+          name: recommendation_req_channel
+        mentorship-accepted-event-channel:
+          name: mentorship_accepted_event_channel
+        premium-bought-channel:
+          name: premium_bought_channel
 
 server:
   port: 8080
@@ -35,6 +53,9 @@ scheduler:
   clear-events-cron: "@weekly"
   event-batch-size: 100
   thread-pool-size: 4
+  event-start:
+    cron: "0 * * * * ?" # every minute
+
 
 logging:
   level:

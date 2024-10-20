@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.premium.PremiumPeriod;
-import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.model.dto.premium.PremiumDto;
+import school.faang.user_service.model.enums.premium.PremiumPeriod;
+import school.faang.user_service.service.PremiumService;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;

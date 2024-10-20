@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.service.subscription.SubscriptionService;
+import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.model.dto.user.UserFilterDto;
+import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
 
 import java.util.List;

@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
-import school.faang.user_service.service.goal.GoalInvitationService;
+import school.faang.user_service.model.dto.goal.GoalInvitationDto;
+import school.faang.user_service.model.dto.goal.InvitationFilterDto;
+import school.faang.user_service.service.GoalInvitationService;
 
 import static org.mockito.Mockito.verify;
 

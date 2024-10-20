@@ -8,16 +8,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.premium.PaymentResponseDto;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Currency;
-import school.faang.user_service.entity.premium.PaymentStatus;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.model.dto.premium.PaymentResponseDto;
+import school.faang.user_service.model.dto.premium.PremiumDto;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.enums.premium.Currency;
+import school.faang.user_service.model.enums.premium.PaymentStatus;
+import school.faang.user_service.model.entity.Premium;
+import school.faang.user_service.model.enums.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.impl.premium.PremiumServiceImpl;
+import school.faang.user_service.service.impl.user.UserServiceImpl;
 import school.faang.user_service.validator.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
@@ -38,13 +40,16 @@ class PremiumServiceImplTest {
     private PremiumRepository premiumRepository;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private PremiumValidator premiumValidator;
 
     @Mock
     private PremiumMapper premiumMapper;
+
+    @Mock
+    private PremiumBoughtEventPublisher premiumBoughtPublisher;
 
     @InjectMocks
     private PremiumServiceImpl premiumService;

@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V008__addcolumn_name.sql
   - include:
       file: db/changelog/changeset/user_V008__add_names.sql
+  - include:
+      file: db/changelog/changeset/user_V009__addcolumn_banned.sql

@@ -58,6 +58,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.skill-acquired-channel.name}")
     private String skillAcquired;
 
+    @Value("${spring.data.redis.channels.skill-offered-channel.name}")
+    private String skillOffered;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -136,5 +139,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic premiumBoughtTopic() {
         return new ChannelTopic(premiumBoughtTopic);
+    }
+
+    @Bean
+    public ChannelTopic skillOfferedTopic() {
+        return new ChannelTopic(skillOffered);
     }
 }

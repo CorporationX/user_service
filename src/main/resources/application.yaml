@@ -21,10 +21,16 @@ spring:
       port: 6379
       host: localhost
       channels:
-        mentorship-channel:
+        mentorshipChannel:
           name: mentorship_channel
-        follower-event-channel:
+        followerEventChannel:
           name: follower_event
+        profileViewChannel:
+          name: profile_view_channel
+
+servlet:
+  multipart:
+    max-file-size: 5242880
 
 server:
   port: 8080

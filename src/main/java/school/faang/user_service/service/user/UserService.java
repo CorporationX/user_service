@@ -10,6 +10,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.profile.NewProfileViewEventDto;
 import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -23,6 +25,7 @@ import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.pojo.student.Person;
+import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.image.RemoteImageService;
@@ -50,6 +53,8 @@ public class UserService {
     private final CountryService countryService;
     private final List<UserFilter> userFilters;
     private final PromotionManagementService promotionManagementService;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
+    private final UserContext userContext;
 
     @Transactional
     public User getUserById(Long userId) {
@@ -60,7 +65,19 @@ public class UserService {
     public UserDto getUser(long userId) {
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
+        return userMapper.toDto(existedUser);
+    }
+    // Не знаю как сделать так чтобы установить какой из методов будет дергать система из разных сервисов
+    // А какой будет для чисто юзеров и как это лучше сделать, пока сделал так, работает но костыли...
 
+    public UserDto getUserOnce(long userId) {
+        User existedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
+        NewProfileViewEventDto profileView = NewProfileViewEventDto.builder()
+                .userViewedId(userContext.getUserId())
+                .profileViewedId(userId)
+                .build();
+        profileViewEventPublisher.publish(profileView);
         return userMapper.toDto(existedUser);
     }
 

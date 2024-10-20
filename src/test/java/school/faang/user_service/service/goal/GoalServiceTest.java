@@ -17,6 +17,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.publisher.goal.GoalCompletedEventPublisher;
+import school.faang.user_service.publisher.goal.GoalSetEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
@@ -63,6 +64,9 @@ public class GoalServiceTest {
 
     @Mock
     private GoalCompletedEventPublisher goalCompletedEventPublisher;
+
+    @Mock
+    private GoalSetEventPublisher goalSetEventPublisher;
 
     private GoalDto goalDto;
     private Goal goal;
@@ -123,6 +127,7 @@ public class GoalServiceTest {
             assertNotNull(result);
             verify(goalValidator).validateUserGoalLimit(USER_ID_ONE);
             verify(goalMapper).toGoalDto(goal);
+            verify(goalSetEventPublisher).publish(any());
         }
     }
 

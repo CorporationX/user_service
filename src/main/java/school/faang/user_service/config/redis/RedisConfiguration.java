@@ -33,6 +33,11 @@ public class RedisConfiguration {
     }
 
     @Bean
+    public ChannelTopic goalSetTopic() {
+        return new ChannelTopic(redisProperties.getChannels().getGoalSetChannel().getName());
+    }
+
+    @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());

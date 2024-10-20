@@ -20,11 +20,12 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        mentorship-channel: mentorship_channel
-        follower-channel: follower_event
-        goal-completed-channel: goal_completed
-
+      topics:
+        - search-appearance
+        - profile-view
+        - mentorship_channel
+        - follower_event
+        - goal_completed
 server:
   port: 8080
 

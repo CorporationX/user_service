@@ -1,19 +1,21 @@
 package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/api/v1/goal")
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService goalService;
 
-    public GoalDto createGoal(Long userId, GoalDto goalDto) {
+    @PostMapping("/{userId}")
+    public GoalDto createGoal(@PathVariable Long userId,@RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 

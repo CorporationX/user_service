@@ -2,6 +2,7 @@ package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
@@ -11,6 +12,7 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.KafkaPublisherService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
@@ -27,6 +29,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalValidator goalValidator;
     private final List<GoalFilter> goalFilters;
     private final SkillRepository skillRepository;
+    private final KafkaPublisherService kafkaPublisherService;
 
     @Override
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
@@ -40,6 +43,8 @@ public class GoalServiceImpl implements GoalService {
 
         goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, createdGoal.getId()));
         goalRepository.addGoalToUser(userId, createdGoal.getId());
+
+        sendAndCollectionEvent(goalDto);
 
         return goalMapper.toDto(createdGoal);
     }
@@ -88,6 +93,13 @@ public class GoalServiceImpl implements GoalService {
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(filters, goals));
         return goals.map(goalMapper::toDto).toList();
+    }
+
+    private void sendAndCollectionEvent(GoalDto goalDto) {
+        GoalCompletedEvent event = new GoalCompletedEvent();
+        event.setGoalId(goalDto.getId());
+        event.setUserId(goalDto.getParentId());
+        kafkaPublisherService.sendMessage(event);
     }
 
     private void validateGoalsPerUser(Long userId) throws DataValidationException {

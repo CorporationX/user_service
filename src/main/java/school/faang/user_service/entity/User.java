@@ -37,9 +37,6 @@ public class User {
     @Column(name = "username", length = 64, nullable = false, unique = true)
     private String username;
 
-    @NotBlank(message = "Email не может быть пустым")
-    @Email(message = "Неверный формат email")
-    @Size(max = 64, message = "Email не должен превышать 64 символа")
     @Column(name = "email", length = 64, nullable = false, unique = true)
     private String email;
 

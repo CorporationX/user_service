@@ -1,5 +1,6 @@
 package school.faang.user_service.dto;
 
+import jakarta.validation.constraints.NotNull;
 import school.faang.user_service.entity.RequestStatus;
 
-public record RequestFilterDto(RequestStatus status, String messagePattern) {}
+public record RequestFilterDto(@NotNull(message = "Status cannot be empty") RequestStatus status, String messagePattern) {}

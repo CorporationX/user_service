@@ -3,6 +3,7 @@ package school.faang.user_service.controller.goal;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,6 +20,7 @@ import school.faang.user_service.service.goal.GoalService;
 
 @RestController
 @RequestMapping("/goal")
+@Validated
 public class GoalController {
 
     @Autowired

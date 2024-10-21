@@ -23,7 +23,8 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping
-    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestCreationDto mentorshipRequestCreationDto) {
+    public MentorshipRequestDto requestMentorship(
+            @RequestBody MentorshipRequestCreationDto mentorshipRequestCreationDto) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestCreationDto);
     }
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.filter_dto.UserFilterDto;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
+    private final PremiumBoughtEventPublisher eventPublisher;
 
     @PostMapping("/follow")
     public void followUser(@RequestParam(name = "followerId") Long followerId,

@@ -23,6 +23,9 @@ public class RedisConfig {
     @Value("${redis.channels.profile-view-channel}")
     private String profileViewChannel;
 
+    @Value("${redis.channels.premium-bought}")
+    private String premiumBoughtEventChannel;
+
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
 
@@ -54,6 +57,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean(name = "premiumBoughtTopic")
+    public ChannelTopic premiumBoughtChannelTopic() {
+        return new ChannelTopic(premiumBoughtEventChannel);
     }
 
     @Bean

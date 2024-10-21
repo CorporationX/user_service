@@ -1,10 +1,12 @@
 package school.faang.user_service.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,12 +52,16 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.premium-bought-channel.name}")
     private String premiumBoughtTopic;
+    @Value("${spring.data.redis.channels.event-starter}")
+    private String eventStarter;
 
     @Value("${spring.data.redis.channels.goal-completed-event-channel.name}")
     private String goalCompletedTopic;
 
     @Value("${spring.data.redis.channels.skill-acquired-channel.name}")
     private String skillAcquired;
+    @Value("${spring.data.redis.channels.profile}")
+    private String profileView;
 
     @Value("${spring.data.redis.channels.skill-offered-channel.name}")
     private String skillOffered;
@@ -64,26 +70,33 @@ public class RedisConfig {
     private String mentorshipRequestTopic;
 
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
+    public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
                 new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(mapper, Object.class);
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(serializer);
+        redisTemplate.setValueSerializer(serializer);
+
         return redisTemplate;
     }
 
     @Bean
     public RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory());
+        container.setConnectionFactory(redisConnectionFactory());
         container.addMessageListener(banUserMessageListenerAdapter(), banUserChannelTopic());
         return container;
     }
@@ -117,6 +130,10 @@ public class RedisConfig {
     public ChannelTopic followProjectTopic() {
         return new ChannelTopic(followProjectTopic);
     }
+    @Bean
+    public ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileView);
+    }
 
     @Bean
     public ChannelTopic goalCompletedTopic() {
@@ -144,6 +161,10 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic eventStarter() {
+        return new ChannelTopic(eventStarter);
+    }
+    @Bean
     public ChannelTopic skillOfferedTopic() {
         return new ChannelTopic(skillOffered);
     }
@@ -151,5 +172,6 @@ public class RedisConfig {
     @Bean
     public ChannelTopic mentorshipRequestTopic() {
         return new ChannelTopic(mentorshipRequestTopic);
+
     }
 }

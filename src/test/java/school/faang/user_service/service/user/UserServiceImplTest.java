@@ -9,13 +9,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.mapper.user.UserMapperImpl;
-import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.model.dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.User;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.model.entity.contact.ContactPreference;
 import school.faang.user_service.model.enums.contact.PreferredContact;
+import school.faang.user_service.publisher.ProfileViewEventPublisherImpl;
+import school.faang.user_service.model.dto.user.UserDto;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
@@ -65,14 +67,17 @@ class UserServiceImplTest {
     private GoalServiceImpl goalService;
 
     @Mock
-    private EventServiceImpl eventServiceImpl;
+    private EventServiceImpl eventService;
 
     @Mock
     private MentorshipServiceImpl mentorshipService;
 
     @Mock
     private CsvParser csvParser;
-
+    @Mock
+    private ProfileViewEventPublisherImpl profileViewEventPublisher;
+    @Mock
+    private UserContext userContext;
     private long id;
     private UserDto userDto;
     private UserFilterDto userFilterDto;
@@ -110,8 +115,10 @@ class UserServiceImplTest {
                 .build();
 
         filters = List.of(userFilter);
+        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService,
+                eventService, mentorshipService, profileViewEventPublisher, csvParser, userContext);
 
-        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService, eventServiceImpl, mentorshipService, csvParser);
+        userService = new UserServiceImpl(userRepository, countryRepository, filters, userMapper, goalService, eventService, mentorshipService,profileViewEventPublisher, csvParser,userContext);
     }
 
     @Test
@@ -169,7 +176,7 @@ class UserServiceImplTest {
 
         verify(userRepository).findById(id);
         verify(goalService).removeGoals(List.of());
-        verify(eventServiceImpl).deleteEvents(List.of());
+        verify(eventService).deleteEvents(List.of());
         verify(mentorshipService).deleteMentorFromMentees(anyLong(), any());
         verify(userRepository).save(any());
     }

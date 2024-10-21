@@ -27,6 +27,8 @@ spring:
           name: follower_channel
         goal-event-channel:
           name: goal_channel
+        event-event-channel:
+          name: event_channel
         profile-view-channel:
           name: profile_view_channel
         user-ban-channel:

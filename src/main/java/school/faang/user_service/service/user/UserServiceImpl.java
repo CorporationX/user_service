@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.FileOperationException;
 import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.avatar.AvatarService;
@@ -40,7 +42,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
     public static final String BIG_AVATAR_PICTURE_NAME = "bigPicture";
@@ -54,7 +55,24 @@ public class UserServiceImpl implements UserService {
     private final S3Service s3Service;
     private final UserUploadService userUploadService;
     private final CsvLoader csvLoader;
-    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
+
+    private final MessagePublisher<PremiumBoughtEvent> premiumBoughtEventPublisher;
+
+    public UserServiceImpl(UserRepository userRepository, AvatarService avatarService,
+                           UserMapper userMapper, ImageProcessor imageProcessor,
+                           S3Service s3Service, UserUploadService userUploadService, CsvLoader csvLoader,
+                           @Qualifier("premiumBoughtEventPublisher")
+                           MessagePublisher<PremiumBoughtEvent> premiumBoughtEventPublisher
+    ) {
+        this.userRepository = userRepository;
+        this.avatarService = avatarService;
+        this.userMapper = userMapper;
+        this.imageProcessor = imageProcessor;
+        this.s3Service = s3Service;
+        this.userUploadService = userUploadService;
+        this.csvLoader = csvLoader;
+        this.premiumBoughtEventPublisher = premiumBoughtEventPublisher;
+    }
 
     @Override
     public UserDto getUser(long userId) {

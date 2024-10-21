@@ -10,6 +10,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import school.faang.user_service.dto.projectfollower.ProjectFollowerEvent;
 import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -23,6 +25,7 @@ import school.faang.user_service.exception.remote.ImageGeneratorException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.pojo.student.Person;
+import school.faang.user_service.publisher.follower.ProjectFollowerEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.image.RemoteImageService;
@@ -50,6 +53,8 @@ public class UserService {
     private final CountryService countryService;
     private final List<UserFilter> userFilters;
     private final PromotionManagementService promotionManagementService;
+    private final ProjectFollowerEventPublisher projectFollowerEventPublisher;
+
 
     @Transactional
     public User getUserById(Long userId) {
@@ -202,5 +207,15 @@ public class UserService {
             log.error(e.getMessage());
             throw new ImageGeneratorException(e.getMessage());
         }
+    }
+
+    public void subscribeToProject(Long followerId, Long projectId, Long creatorId) {
+        ProjectFollowerEvent event = ProjectFollowerEvent.builder()
+                .followerId(followerId)
+                .projectId(projectId)
+                .creatorId(creatorId)
+                .build();
+
+        projectFollowerEventPublisher.publish(event);
     }
 }

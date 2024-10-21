@@ -14,7 +14,6 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.user.UserSkillGuaranteeService;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.service.SkillOfferService;
 
 import java.util.ArrayList;
 import java.util.List;

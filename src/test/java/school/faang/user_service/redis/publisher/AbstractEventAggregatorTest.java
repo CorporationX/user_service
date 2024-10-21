@@ -1,9 +1,16 @@
-package school.faang.user_service.service.publisher;
+package school.faang.user_service.redis.publisher;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.Topic;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -15,12 +22,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class AbstractEventAggregatorTest {
     private static final String EVENT = "event";
+    private static final String EVENTS_NAME = "events name";
+    private static final String EVENTS_FIELD_NAME = "events";
     private static final Queue<String> EVENTS = new ConcurrentLinkedDeque<>(List.of("event1", "event2", "event3"));
 
-    private final AbstractEventAggregator<String> abstractAnalyticEventAggregator =
-            new AbstractAnalyticEventAggregatorImpl();
-    private final AbstractEventAggregator<String> abstractAnalyticEventAggregatorException =
-            new AbstractAnalyticEventAggregatorImplThrowException();
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Spy
+    private Topic topic = new ChannelTopic("topic");
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @InjectMocks
+    private AbstractAnalyticEventAggregatorImpl abstractAnalyticEventAggregator;
 
     @SuppressWarnings("unchecked")
     @Test
@@ -28,7 +44,8 @@ class AbstractEventAggregatorTest {
     void testAddToQueueSuccessful() {
         abstractAnalyticEventAggregator.addToQueue(EVENT);
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, EVENTS_FIELD_NAME);
+
         assertThat(analyticEvents).isNotEmpty();
     }
 
@@ -38,7 +55,8 @@ class AbstractEventAggregatorTest {
     void testAddToQueueListSuccessful() {
         abstractAnalyticEventAggregator.addToQueue(List.of(EVENT, EVENT));
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, EVENTS_FIELD_NAME);
+
         assertThat(analyticEvents).isNotEmpty();
     }
 
@@ -52,10 +70,14 @@ class AbstractEventAggregatorTest {
     @Test
     @DisplayName("Given non empty events list when publish throw exception then save back events")
     void testPublishAllAnalyticEventsException() {
-        ReflectionTestUtils.setField(abstractAnalyticEventAggregator, "events", EVENTS);
+        AbstractEventAggregator<String> abstractAnalyticEventAggregatorException =
+                new AbstractAnalyticEventAggregatorImpl(objectMapper, redisTemplate, topic);
+        ReflectionTestUtils.setField(abstractAnalyticEventAggregator, EVENTS_FIELD_NAME, EVENTS);
+
         abstractAnalyticEventAggregatorException.publishAllEvents();
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, EVENTS_FIELD_NAME);
+
         assertThat(analyticEvents).isNotEmpty();
     }
 
@@ -63,34 +85,25 @@ class AbstractEventAggregatorTest {
     @Test
     @DisplayName("Publish all analytic events successful")
     void testPublishAllAnalyticEventsSuccessful() {
-        ReflectionTestUtils.setField(abstractAnalyticEventAggregator, "events", EVENTS);
+        ReflectionTestUtils.setField(abstractAnalyticEventAggregator, EVENTS_FIELD_NAME, EVENTS);
+
         abstractAnalyticEventAggregator.publishAllEvents();
         Queue<String> analyticEvents =
-                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, "events");
+                (Queue<String>) ReflectionTestUtils.getField(abstractAnalyticEventAggregator, EVENTS_FIELD_NAME);
+
         assertThat(analyticEvents).isEmpty();
     }
 
     static class AbstractAnalyticEventAggregatorImpl extends AbstractEventAggregator<String> {
-        @Override
-        protected void publishEvents(List<String> eventsCopy) {
-            System.out.println("Publish: " + eventsCopy);
+        public AbstractAnalyticEventAggregatorImpl(ObjectMapper objectMapper,
+                                                   RedisTemplate<String, Object> redisTemplate,
+                                                   Topic topic) {
+            super(redisTemplate, objectMapper, topic);
         }
 
         @Override
         protected String getEventTypeName() {
-            return "events name";
-        }
-    }
-
-    static class AbstractAnalyticEventAggregatorImplThrowException extends AbstractEventAggregator<String> {
-        @Override
-        protected void publishEvents(List<String> eventsCopy) {
-            throw new RuntimeException("TEST EXCEPTION");
-        }
-
-        @Override
-        protected String getEventTypeName() {
-            return "events name";
+            return EVENTS_NAME;
         }
     }
 }

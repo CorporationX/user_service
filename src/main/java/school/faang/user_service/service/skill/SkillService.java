@@ -20,7 +20,6 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.UserSkillGuaranteeService;
 import school.faang.user_service.validator.skill.SkillOfferValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
-import school.faang.user_service.service.SkillOfferService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +59,9 @@ public class SkillService {
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = getSkill(skillId);
         User user = userService.getUserById(userId);
-//        skillValidator.checkUserSkill(skillId, userId);
+        skillValidator.checkUserSkill(skillId, userId);
         List<SkillOffer> offers = skillOfferService.findAllOffersOfSkill(skill, user);
-//        skillOfferValidator.validateOffers(offers, skill, user);
+        skillOfferValidator.validateOffers(offers, skill, user);
         skillRepository.assignSkillToUser(skillId, userId);
 
         var message = SkillAcquiredEventMessage.builder()

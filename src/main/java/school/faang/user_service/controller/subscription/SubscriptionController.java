@@ -1,14 +1,18 @@
 package school.faang.user_service.controller.subscription;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.follow.ProjectFollowerEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.EventPublisher;
+import school.faang.user_service.publisher.RedisTopics;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.List;
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
+    private final EventPublisher eventPublisher;
 
     @PostMapping("/follow/{followerId}/{followeeId}")
     public void followUser(@PathVariable long followerId,
@@ -46,6 +51,11 @@ public class SubscriptionController {
 
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filterDto) {
         return subscriptionService.getFollowing(followeeId, filterDto);
+    }
+
+    @PostMapping("follow/project")
+    public void projectFollowerEvent(@RequestBody ProjectFollowerEvent projectFollowerEvent){
+        eventPublisher.publishToTopic(RedisTopics.PROJECT_FOLLOWER_CHANNEL.getTopicName(), projectFollowerEvent);
     }
 
     public int getFollowingCount(long followerId) {

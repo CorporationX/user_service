@@ -27,7 +27,7 @@ spring:
         - follower-event
         - mentorship_channel
         - goal-completed
-        - recommendation-request-channel
+        - project-follower-chanel
 
 server:
   port: 8080

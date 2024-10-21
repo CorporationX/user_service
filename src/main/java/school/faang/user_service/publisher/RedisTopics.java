@@ -11,7 +11,8 @@ public enum RedisTopics {
     EVENTS_START("eventStart-event"),
     GOAL_COMPLETED("goal-completed"),
     RECOMMENDATION_REQUEST_CHANNEL("recommendation-request-channel"),
-    FOLLOW_EVENT("follower-event");
+    FOLLOW_EVENT("follower-event"),
+    PROJECT_FOLLOWER_CHANNEL("project-follower-chanel");
 
     private final String topicName;
 

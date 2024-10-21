@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.model.event.SearchAppearanceEvent;
 
 @Component
-public class SearchAppearanceEventPublisher extends RedisEventPublisher<SearchAppearanceEvent> {
+public class SearchAppearanceEventPublisher extends AbstractEventPublisher<SearchAppearanceEvent> {
     public SearchAppearanceEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
                                           @Qualifier("searchAppearanceTopic") ChannelTopic channelTopic) {
         super(redisTemplate, objectMapper, channelTopic);

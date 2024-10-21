@@ -1,5 +1,7 @@
 package school.faang.user_service.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,12 +9,14 @@ import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipReques
 import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.model.dto.RejectionDto;
+import school.faang.user_service.model.event.MentorshipOfferedEvent;
 import school.faang.user_service.model.filter_dto.MentorshipRequestFilterDto;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.enums.RequestStatus;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.MentorshipRequestRepository;
@@ -32,8 +36,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedPublisher;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Override
+    @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.descriptionValidation(mentorshipRequestDto);
         mentorshipRequestValidator.requesterReceiverValidation(mentorshipRequestDto);
@@ -41,9 +47,21 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         mentorshipRequestValidator.lastRequestDateValidation(mentorshipRequestDto);
 
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
+        User requester = userRepository.findById(mentorshipRequestDto.getRequesterId()).orElseThrow(() ->
+                new EntityNotFoundException(String.format("User with id = %d not found", mentorshipRequestDto.getRequesterId())));
+        User receiver = userRepository.findById(mentorshipRequestDto.getReceiverId()).orElseThrow(() ->
+                new EntityNotFoundException(String.format("User with id = %d not found", mentorshipRequestDto.getReceiverId())));
+        mentorshipRequest.setRequester(requester);
+        mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
-        mentorshipRequestRepository.save(mentorshipRequest);
+        MentorshipRequest savedRequest = mentorshipRequestRepository.save(mentorshipRequest);
         log.info("Получен запрос на менторство от пользователя с ID: {}", mentorshipRequestDto.getRequesterId());
+        MentorshipOfferedEvent mentorshipOfferedEvent = new MentorshipOfferedEvent(
+                mentorshipRequestDto.getRequesterId(),
+                savedRequest.getId(),
+                mentorshipRequestDto.getReceiverId());
+        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEvent);
+        log.info("MentorshipOfferedEvent sent to redis {}", mentorshipOfferedEvent);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 

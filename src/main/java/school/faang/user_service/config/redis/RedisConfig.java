@@ -26,9 +26,11 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory connectionFactory,
-                                                       ObjectMapper javaTimeModuleObjectMapper) {
-        return buildRedisTemplate(connectionFactory, Object.class, javaTimeModuleObjectMapper);
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setDefaultSerializer(new StringRedisSerializer());
+        return template;
     }
 
     @Bean

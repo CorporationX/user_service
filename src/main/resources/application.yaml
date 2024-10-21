@@ -26,7 +26,7 @@ spring:
       port: 6379
       channel-topics:
         mentorship:
-          name: mentorship_topic
+          request_accepted: mentorship_request_accepted_topic
         follower-event:
           name: follower_event_topic
         event-start:

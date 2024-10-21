@@ -2,9 +2,11 @@ package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.mentorship.request.MentorshipRequestCreationDto;
 import school.faang.user_service.dto.mentorship.request.MentorshipRequestDto;
@@ -36,18 +38,19 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipAcceptedEventPublisher acceptedEventPublisher;
     private final List<RequestFilter> filters;
 
+    @Setter
     @Value("${mentorship.request.time-constraint}")
     private int minTimeRequestConstraint;
 
     @Override
+    @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestCreationDto creationRequest) {
         validateRequesterId(creationRequest.requesterId());
         validateRequestCreation(creationRequest);
-        MentorshipRequest request = mentorshipRequestRepository.create(
-                creationRequest.requesterId(),
-                creationRequest.receiverId(),
-                creationRequest.description());
-        log.info("Created mentorship request requseter id: %d, receiver id: %d"
+        MentorshipRequest request = requestMapper.toMentorshipRequest(creationRequest);
+        request.setStatus(RequestStatus.PENDING);
+        mentorshipRequestRepository.save(request);
+        log.info("Created mentorship request requester id: %d, receiver id: %d"
                 .formatted(creationRequest.requesterId(), creationRequest.receiverId()));
         return requestMapper.toMentorshipRequestDto(request);
     }
@@ -109,10 +112,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     }
 
     private void validateRequesterId(Long requesterId) {
-        if (requesterId != userContext.getUserId()) {
+        Long currentUserId = userContext.getUserId();
+        if (!Objects.equals(requesterId, currentUserId)) {
             throw new DataValidationException(
                     "Requester id %d doesn't match current user id: %d"
-                            .formatted(requesterId, userContext.getUserId()));
+                            .formatted(requesterId, currentUserId));
         }
     }
 
@@ -121,20 +125,20 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             throw new DataValidationException("User can't send mentorship request to himself, user id: %d"
                     .formatted(creationRequest.requesterId()));
         }
+        validateUserId(creationRequest.requesterId());
         validateUserId(creationRequest.receiverId());
-        validateUserId(creationRequest.receiverId());
+        if (mentorshipRequestRepository.existAcceptedRequest(
+                creationRequest.requesterId(), creationRequest.receiverId())) {
+            throw new DataValidationException(
+                    "User with id %d already accepted mentorship request from user with id %d"
+                            .formatted(creationRequest.receiverId(), creationRequest.requesterId()));
+        }
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository.findLatestRequest(
                 creationRequest.requesterId(),
                 creationRequest.receiverId());
         if (latestRequest.isPresent()) {
-            if (mentorshipRequestRepository.existAcceptedRequest(
-                    creationRequest.requesterId(), creationRequest.receiverId())) {
-                throw new DataValidationException(
-                        "User with id %d already accepted mentorship request from user with id %d"
-                                .formatted(creationRequest.receiverId(), creationRequest.requesterId()));
-            }
             LocalDateTime requestDate = latestRequest.get().getCreatedAt();
-            if (LocalDateTime.now().minusMonths(minTimeRequestConstraint).isBefore(requestDate)) {
+            if (requestDate.isAfter(LocalDateTime.now().minusMonths(minTimeRequestConstraint))) {
                 throw new DataValidationException(
                         "Can't send request often than one in %d months, requester id: %d, receiver id: %d"
                                 .formatted(

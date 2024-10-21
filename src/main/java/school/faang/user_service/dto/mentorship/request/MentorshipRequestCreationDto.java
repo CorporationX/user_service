@@ -3,7 +3,9 @@ package school.faang.user_service.dto.mentorship.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 
+@Builder
 public record MentorshipRequestCreationDto(
 
         @NotBlank(message = "Description with reason for request is required")

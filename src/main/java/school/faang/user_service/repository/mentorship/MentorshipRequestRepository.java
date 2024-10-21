@@ -25,9 +25,9 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
     Optional<MentorshipRequest> findLatestRequest(long requesterId, long receiverId);
 
     @Query(nativeQuery = true, value = """
-           SELECT EXISTS(SELECT 1 FROM mentorship_request 
-           WHERE requester_id = :requesterId 
-           AND receiver_id = :receiverId AND status = 1) 
-           """)
+            SELECT EXISTS(SELECT 1 FROM mentorship_request
+            WHERE requester_id = :requesterId
+            AND receiver_id = :receiverId AND status = 1)
+            """)
     boolean existAcceptedRequest(long requesterId, long receiverId);
 }

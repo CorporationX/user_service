@@ -72,6 +72,7 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean
     RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate() {
         RedisTemplate<String, MentorshipAcceptedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());

@@ -31,6 +31,8 @@ spring:
           name: event_channel
         profile-view-channel:
           name: profile_view_channel
+        user-ban-channel:
+          name: user_ban_channel
       publisher:
         delay: 5000
 
@@ -86,7 +88,3 @@ user:
         queue-capacity: 1000
         thread-name-prefix: "UserUpload-"
     batch-size: 200
-
-redis:
-  topic:
-    user-ban: user_ban

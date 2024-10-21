@@ -28,7 +28,7 @@ spring:
         mentorship-channel: mentorship_channel
         follower-event-channel: follower_event
         user-service: ban_user_channel
-        profile-view-channel: profile-view-event
+        profile-view-channel: profile_view_event
   kafka:
     bootstrap-servers: "localhost:9092"
     pool-size: 3

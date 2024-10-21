@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
+import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Configuration
@@ -57,10 +58,20 @@ public class RedisConfig {
     }
 
     @Bean
+    RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate() {
+        RedisTemplate<String, MentorshipAcceptedEventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, MentorshipAcceptedEventDto.class));
+        return template;
+    }
+
+    @Bean
     public ChannelTopic userBanChannel() {
         return new ChannelTopic(userBanTopicName);
     }
 
+    @Bean
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
@@ -68,7 +79,6 @@ public class RedisConfig {
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, GoalCompletedEventDto.class));
         return template;
     }
-
 
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
@@ -91,5 +101,11 @@ public class RedisConfig {
     public ChannelTopic goalCompletedTopic(
             @Value("${spring.data.redis.channels.goal-event-channel.name}") String topic) {
         return new ChannelTopic(topic);
+    }
+
+    @Bean(value = "mentorshipEventChannel")
+    ChannelTopic mentorshipEventChannelTopic(
+            @Value("${spring.data.redis.channels.mentorship-channel.name}") String name) {
+        return new ChannelTopic(name);
     }
 }

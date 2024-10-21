@@ -59,6 +59,7 @@ redis:
     mentorship-offered: mentorship_offered_channel
     goal-completed: goal_completed_channel
     skill-acquired: skill_acquired_channel
+    recommendation-received: recommendation_received_channel
 
 scheduler:
   clear-events:

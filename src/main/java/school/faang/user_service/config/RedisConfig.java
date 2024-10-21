@@ -41,6 +41,9 @@ public class RedisConfig {
     @Value("${redis.channels.mentorship-offered}")
     private String mentorshipOfferedEventChannel;
 
+    @Value("${redis.channels.recommendation-received}")
+    private String recommendationReceivedEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -98,6 +101,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic mentorshipOfferedChannelTopic() {
         return new ChannelTopic(mentorshipOfferedEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic recommendationReceivedChannelTopic() {
+        return new ChannelTopic(recommendationReceivedEventChannel);
     }
 
     @Bean

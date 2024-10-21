@@ -157,6 +157,8 @@ public class User {
     private UserProfilePic userProfilePic;
 
     @OneToOne(mappedBy = "user")
+    @JoinColumn(
+            name = "prefernce")
     private ContactPreference contactPreference;
 
     @OneToOne(mappedBy = "user")

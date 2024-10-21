@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -29,6 +27,7 @@ spring:
           name: follower_channel
         goalCompletedEvent:
           name: goal_completed_event_channel
+        skillAcquiredChannel: skill_acquired_channel
 
 servlet:
   multipart:
@@ -69,7 +68,6 @@ services:
   postService:
     endpoint: http://localhost:8081
     requiredHeaders: x-user-id
-
 
 premium:
   schedule: "0 0 0 * * *"

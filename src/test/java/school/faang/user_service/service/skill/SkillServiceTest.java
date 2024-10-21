@@ -15,6 +15,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.UserSkillGuaranteeService;
@@ -55,6 +56,8 @@ class SkillServiceTest {
     private SkillValidator skillValidator;
     @Mock
     private SkillOfferValidator skillOfferValidator;
+    @Mock
+    private SkillAcquiredEventPublisher publisher;
 
     private static final long ANY_ID = 123L;
     private static final String SKILL_TITLE = "squating";

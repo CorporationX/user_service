@@ -57,6 +57,7 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean
     RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate() {
         RedisTemplate<String, MentorshipAcceptedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
@@ -70,6 +71,7 @@ public class RedisConfig {
         return new ChannelTopic(userBanTopicName);
     }
 
+    @Bean
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());

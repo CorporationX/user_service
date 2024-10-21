@@ -86,7 +86,6 @@ public class RedisConfig {
         return template;
     }
 
-
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {

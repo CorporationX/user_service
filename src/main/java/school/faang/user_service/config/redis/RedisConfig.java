@@ -61,6 +61,7 @@ public class RedisConfig {
         return new ChannelTopic(userBanTopicName);
     }
 
+    @Bean
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());

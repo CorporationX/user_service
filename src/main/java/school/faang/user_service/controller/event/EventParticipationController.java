@@ -12,7 +12,7 @@ import school.faang.user_service.dto.EventParticipantsDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.event.EventParticipationService;
-import school.faang.user_service.service.event.EventServiceImpl;
+import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class EventParticipationController {
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
     private final EventParticipationService eventParticipationService;
 
     @GetMapping("/{eventId}")

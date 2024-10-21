@@ -33,6 +33,8 @@ spring:
           name: profile_view_channel
         user-ban-channel:
           name: user_ban_channel
+        profile-pic-channel:
+          name: profile_pic_channel
       publisher:
         delay: 5000
 

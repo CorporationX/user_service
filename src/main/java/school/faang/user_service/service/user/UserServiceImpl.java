@@ -6,6 +6,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.ProfilePicEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
@@ -19,6 +20,7 @@ import school.faang.user_service.exception.FileOperationException;
 import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.MessagePublisher;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.image.AvatarSize;
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
     private final CsvLoader csvLoader;
     private final MessagePublisher<ProfileViewEvent> profileViewEventPublisher;
     private final UserContext userContext;
+    private final ProfilePicEventPublisher profilePicEventPublisher;
 
     @Override
     public UserDto getUser(long userId) {
@@ -98,6 +101,11 @@ public class UserServiceImpl implements UserService {
                 .build());
         User updateUser = userRepository.save(user);
         log.info("User avatar uploaded successfully for user ID: {}", userId);
+        ProfilePicEventDto profilePicEventDto = ProfilePicEventDto.builder()
+                .userId(userId)
+                .timestamp(LocalDateTime.now())
+                .build();
+        profilePicEventPublisher.publish(profilePicEventDto);
         return userMapper.userToUserDto(updateUser);
     }
 

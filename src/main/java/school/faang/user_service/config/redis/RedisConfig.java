@@ -16,6 +16,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
+import school.faang.user_service.dto.event.ProfilePicEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
 
@@ -86,6 +87,15 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean
+    RedisTemplate<String, ProfilePicEventDto> redisProfilePicTemplate() {
+        RedisTemplate<String, ProfilePicEventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, ProfilePicEventDto.class));
+        return template;
+    }
+
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
@@ -106,6 +116,12 @@ public class RedisConfig {
     @Bean(value = "goalCompletedTopic")
     public ChannelTopic goalCompletedTopic(
             @Value("${spring.data.redis.channels.goal-event-channel.name}") String topic) {
+        return new ChannelTopic(topic);
+    }
+
+    @Bean(value = "profilePicTopic")
+    public ChannelTopic profilePicTopic(
+            @Value("${spring.data.redis.channels.profile-pic-channel.name}") String topic) {
         return new ChannelTopic(topic);
     }
 }

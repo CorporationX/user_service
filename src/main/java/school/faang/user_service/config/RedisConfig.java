@@ -17,6 +17,12 @@ public class RedisConfig {
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
 
+    @Value("${redis.channels.search-appearance-channel}")
+    private String searchAppearanceChannel;
+
+    @Value("${redis.channels.profile-view-channel}")
+    private String profileViewChannel;
+
     @Value("${redis.channels.premium-bought}")
     private String premiumBoughtEventChannel;
 
@@ -56,6 +62,17 @@ public class RedisConfig {
     @Bean(name = "premiumBoughtTopic")
     public ChannelTopic premiumBoughtChannelTopic() {
         return new ChannelTopic(premiumBoughtEventChannel);
+    }
+
+    @Bean
+    ChannelTopic searchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceChannel);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewChannel);
+
     }
 
     @Bean

@@ -29,7 +29,7 @@ spring:
           name: follower_event
         goalCompletedEvent:
           name: goal_completed_event_channel
-        mentorship-request-topic: mentorship_request_topic
+        mentorshipRequest: mentorship_request_topic
 
 servlet:
   multipart:

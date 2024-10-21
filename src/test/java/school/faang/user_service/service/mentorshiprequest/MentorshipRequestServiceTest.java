@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
+import school.faang.user_service.dto.message.MentorshipRequestMessage;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -21,6 +22,7 @@ import school.faang.user_service.publisher.MentorshipRequestEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,6 +98,7 @@ class MentorshipRequestServiceTest {
         @Test
         @DisplayName("Успешное создание запроса если запрос не был создан ранее")
         void whenCreateThenSaveRequest() {
+
             when(menReqRepository.findLatestRequest(menReqDto.getRequesterId(), menReqDto.getReceiverId()))
                     .thenReturn(Optional.of(menReqEntity));
             when(menReqRepository.create(menReqDto.getRequesterId(),
@@ -121,6 +124,7 @@ class MentorshipRequestServiceTest {
             verify(menReqRepository).create(menReqDto.getRequesterId(),
                     menReqDto.getReceiverId(), menReqDto.getDescription());
             verify(menReqRepository).findLatestRequest(menReqDto.getRequesterId(), menReqDto.getReceiverId());
+            verify(publisher).publish(any(MentorshipRequestMessage.class));
             verify(menReqMapper).toDto(menReqEntity);
         }
 

@@ -1,7 +1,7 @@
 package school.faang.user_service.entity.contact;
 
 public enum PreferredContact {
-    EMAIL, PHONE, TELEGRAM;
+    EMAIL, SMS, TELEGRAM;
 
     public static PreferredContact fromString(String preference) {
         for (PreferredContact contact : PreferredContact.values()) {

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_outer_classname = "ProfilePicEventProto";
+
+import "google/protobuf/timestamp.proto";
+
+message ProfilePicEvent {
+  int64 userId = 1;
+  string profilePic = 2;
+  google.protobuf.Timestamp eventTime = 3;
+}

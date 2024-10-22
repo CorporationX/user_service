@@ -54,7 +54,7 @@ public class UserController {
         return userService.getUsersByIds(ids);
     }
 
-    @PostMapping("/{userId}/avatar")
+    @PostMapping("/avatar")
     public void uploadAvatar(@RequestParam("file") MultipartFile file) {
         userProfilePicService.uploadAvatar(file);
     }

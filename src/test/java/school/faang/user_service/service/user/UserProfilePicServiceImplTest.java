@@ -12,11 +12,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.ProfilePicEvent;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfilePicServiceImplTest {
@@ -26,6 +31,9 @@ class UserProfilePicServiceImplTest {
 
     @Mock
     private UserContext userContext;
+
+    @Mock
+    private ProfilePicEventPublisher profilePicEventPublisher;
 
     @InjectMocks
     private UserProfilePicServiceImpl userProfilePicService;
@@ -43,6 +51,7 @@ class UserProfilePicServiceImplTest {
 
         ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
         verify(amazonS3, times(1)).putObject(captor.capture());
+        verify(profilePicEventPublisher).publish(any(ProfilePicEvent.class));
 
         PutObjectRequest request = captor.getValue();
         assertEquals(bucketName, request.getBucketName());

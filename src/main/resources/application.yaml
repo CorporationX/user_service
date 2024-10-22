@@ -39,6 +39,10 @@ spring:
         name: follower_topic
         num-partitions: 3
         replication-factor: 1
+      profile_pic:
+        name: profile_pic_topic
+        num-partitions: 3
+        replication-factor: 1
   cloud:
     openfeign:
       client:

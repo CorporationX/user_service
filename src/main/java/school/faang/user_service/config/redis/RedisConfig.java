@@ -38,6 +38,13 @@ public class RedisConfig {
         return new ChannelTopic(name);
     }
 
+    @Bean(name = "premiumChannel")
+    public ChannelTopic premiumChannelTopic(
+        @Value("${spring.data.redis.channels.premium-channel.name}") String topicName
+    ) {
+        return new ChannelTopic(topicName);
+    }
+
     @Bean
     public RedisTemplate<String, PremiumBoughtEvent> PremiumBoughtEventRedisTemplate() {
         RedisTemplate<String, PremiumBoughtEvent> redisTemplate = new RedisTemplate<>();

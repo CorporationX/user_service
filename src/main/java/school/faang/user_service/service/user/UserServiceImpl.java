@@ -42,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
     public static final String BIG_AVATAR_PICTURE_NAME = "bigPicture";
@@ -56,23 +57,9 @@ public class UserServiceImpl implements UserService {
     private final UserUploadService userUploadService;
     private final CsvLoader csvLoader;
 
+    @Qualifier("premiumBoughtEventPublisher")
     private final MessagePublisher<PremiumBoughtEvent> premiumBoughtEventPublisher;
 
-    public UserServiceImpl(UserRepository userRepository, AvatarService avatarService,
-                           UserMapper userMapper, ImageProcessor imageProcessor,
-                           S3Service s3Service, UserUploadService userUploadService, CsvLoader csvLoader,
-                           @Qualifier("premiumBoughtEventPublisher")
-                           MessagePublisher<PremiumBoughtEvent> premiumBoughtEventPublisher
-    ) {
-        this.userRepository = userRepository;
-        this.avatarService = avatarService;
-        this.userMapper = userMapper;
-        this.imageProcessor = imageProcessor;
-        this.s3Service = s3Service;
-        this.userUploadService = userUploadService;
-        this.csvLoader = csvLoader;
-        this.premiumBoughtEventPublisher = premiumBoughtEventPublisher;
-    }
 
     @Override
     public UserDto getUser(long userId) {

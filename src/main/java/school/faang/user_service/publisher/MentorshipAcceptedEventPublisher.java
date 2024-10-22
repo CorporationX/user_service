@@ -1,5 +1,6 @@
 package school.faang.user_service.publisher;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,15 +12,12 @@ import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MentorshipAcceptedEventPublisher implements MessagePublisher<MentorshipAcceptedEventDto> {
     private final RedisTemplate<String, MentorshipAcceptedEventDto> redisTemplate;
-    private final ChannelTopic mentorshipEventTopic;
 
-    public MentorshipAcceptedEventPublisher(RedisTemplate<String, MentorshipAcceptedEventDto> redisTemplate,
-                                            @Qualifier("mentorshipEventChannel") ChannelTopic mentorshipEventTopic) {
-        this.redisTemplate = redisTemplate;
-        this.mentorshipEventTopic = mentorshipEventTopic;
-    }
+    @Qualifier("mentorshipEventChannel")
+    private final ChannelTopic mentorshipEventTopic;
 
     @Override
     @Retryable(retryFor = RuntimeException.class,

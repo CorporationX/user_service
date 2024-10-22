@@ -77,6 +77,10 @@ events:
     size: 3
   cron: "0 0 0 * * *"
 
+mentorship:
+  request:
+    time-constraint: 3
+
 user:
   password:
     length: 16
@@ -88,3 +92,7 @@ user:
         queue-capacity: 1000
         thread-name-prefix: "UserUpload-"
     batch-size: 200
+
+redis:
+  topic:
+    user-ban: user_ban

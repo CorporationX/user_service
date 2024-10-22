@@ -23,7 +23,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    ChannelTopic goalCompletedEventTopic() {
+    public ChannelTopic goalCompletedEventTopic() {
         return new ChannelTopic(redisProperties.getChannels().getGoalCompletedEvent().getName());
     }
 
@@ -33,7 +33,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    ChannelTopic mentorshipRequestTopic() {
+    public ChannelTopic mentorshipRequestTopic() {
         return new ChannelTopic(redisProperties.getChannels().getSkillAcquiredChannel().getName());
     }
 

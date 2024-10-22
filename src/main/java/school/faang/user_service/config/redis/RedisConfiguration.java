@@ -23,13 +23,18 @@ public class RedisConfiguration {
     }
 
     @Bean
-    ChannelTopic goalCompletedEventTopic() {
+    public ChannelTopic goalCompletedEventTopic() {
         return new ChannelTopic(redisProperties.getChannels().getGoalCompletedEvent().getName());
     }
 
     @Bean
     public ChannelTopic followerTopic() {
         return new ChannelTopic(redisProperties.getChannels().getFollowerEventChannel().getName());
+    }
+
+    @Bean
+    public ChannelTopic mentorshipStartEventTopic() {
+        return new ChannelTopic(redisProperties.getChannels().getMentorshipStartEvent().getName());
     }
 
     @Bean

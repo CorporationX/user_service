@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.event.MentorshipStartEvent;
 import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
@@ -17,6 +18,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorshiprequest.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorshipStart.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorshiprequst.MentorshipRequestValidator;
 
@@ -41,6 +43,8 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestValidator menReqValidator;
     @Mock
     private MentorshipRequestRepository menReqRepository;
+    @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     private MentorshipRequestDto menReqDto = new MentorshipRequestDto();
     private MentorshipRequest menReqEntity = new MentorshipRequest();
@@ -64,7 +68,7 @@ class MentorshipRequestServiceTest {
             filterRequests = List.of(requestFilter);
 
             menReqService = new MentorshipRequestService(
-                    menReqRepository, menReqMapper, menReqValidator, filterRequests);
+                    menReqRepository, menReqMapper, menReqValidator, filterRequests, mentorshipStartEventPublisher);
 
             menReqDto = MentorshipRequestDto.builder()
                     .id(MENTORSHIP_REQUEST_ID)
@@ -118,6 +122,7 @@ class MentorshipRequestServiceTest {
             verify(menReqRepository).create(menReqDto.getRequesterId(),
                     menReqDto.getReceiverId(), menReqDto.getDescription());
             verify(menReqRepository).findLatestRequest(menReqDto.getRequesterId(), menReqDto.getReceiverId());
+            verify(mentorshipStartEventPublisher).publish(any(MentorshipStartEvent.class));
             verify(menReqMapper).toDto(menReqEntity);
         }
 

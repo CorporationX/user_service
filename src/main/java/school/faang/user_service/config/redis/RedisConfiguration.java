@@ -18,11 +18,6 @@ public class RedisConfiguration {
     private final RedisProperties redisProperties;
 
     @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory();
-    }
-
-    @Bean
     ChannelTopic goalCompletedEventTopic() {
         return new ChannelTopic(redisProperties.getChannels().getGoalCompletedEvent().getName());
     }
@@ -33,6 +28,11 @@ public class RedisConfiguration {
     }
 
     @Bean
+    ChannelTopic mentorshipRequestTopic() {
+        return new ChannelTopic(redisProperties.getChannels().getMentorshipRequest().getName());
+    }
+
+    @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
@@ -40,5 +40,10 @@ public class RedisConfiguration {
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return template;
+    }
+
+    @Bean
+    JedisConnectionFactory jedisConnectionFactory() {
+        return new JedisConnectionFactory();
     }
 }

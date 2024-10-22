@@ -13,6 +13,8 @@ import school.faang.user_service.model.entity.UserSkillGuarantee;
 import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.model.event.RecommendationReceivedEvent;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.RecommendationRepository;
@@ -33,6 +35,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @Override
     @Transactional
@@ -49,6 +52,10 @@ public class RecommendationServiceImpl implements RecommendationService {
         addSkillOffersAndGuarantee(recommendationDto);
         Recommendation recommendation = recommendationRepository.findById(recommendationDto.getId()).orElseThrow(() -> new NoSuchElementException(
                 String.format("There is no recommendation with id = %d", recommendationDto.getId())));
+        recommendationReceivedEventPublisher.publish(new RecommendationReceivedEvent(
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendation.getId()));
         return recommendationMapper.toDto(recommendation);
     }
 

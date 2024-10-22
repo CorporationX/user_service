@@ -13,6 +13,7 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.follower.FollowerMessagePublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
 import school.faang.user_service.validator.user.UserValidator;
@@ -45,6 +46,9 @@ class SubscriptionServiceTest {
 
     @Mock
     private UserFilter userFilter;
+
+    @Mock
+    private FollowerMessagePublisher followerMessagePublisher;
 
     private User user;
     private List<User> users;
@@ -105,7 +109,9 @@ class SubscriptionServiceTest {
                 userMapper,
                 userFilters,
                 userValidator,
-                subscriptionValidator);
+                subscriptionValidator,
+                followerMessagePublisher
+        );
     }
 
     @Nested
@@ -128,6 +134,8 @@ class SubscriptionServiceTest {
                 assertThrows(ValidationException.class,
                         () -> subscriptionService.followUser(USER_ID_IS_ONE, USER_ID_IS_ONE),
                         exceptionMsg);
+
+                verify(followerMessagePublisher, never()).publish(any());
             }
 
             @Test
@@ -145,6 +153,8 @@ class SubscriptionServiceTest {
                 assertThrows(ValidationException.class,
                         () -> subscriptionService.followUser(USER_ID_IS_ONE, USER_ID_IS_TWO),
                         exceptionMsg);
+
+                verify(followerMessagePublisher, never()).publish(any());
             }
         }
 
@@ -204,6 +214,8 @@ class SubscriptionServiceTest {
                     "Already subscribed");
             verify(subscriptionRepository)
                     .followUser(USER_ID_IS_ONE, USER_ID_IS_TWO);
+
+            verify(followerMessagePublisher).publish(any());
         }
 
         @Test

@@ -1,10 +1,11 @@
-package school.faang.user_service.publisher;
+package school.faang.user_service.publisher.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
+import school.faang.user_service.publisher.MessagePublisher;
 
 @Component
 @RequiredArgsConstructor

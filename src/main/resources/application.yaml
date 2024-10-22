@@ -26,7 +26,7 @@ spring:
         mentorshipChannel:
           name: mentorship_channel
         followerEventChannel:
-          name: follower_event
+          name: follower_channel
         goalCompletedEvent:
           name: goal_completed_event_channel
         mentorshipRequest: mentorship_request_topic
@@ -71,6 +71,7 @@ services:
   postService:
     endpoint: http://localhost:8081
     requiredHeaders: x-user-id
+
 
 premium:
   schedule: "0 0 0 * * *"

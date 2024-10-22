@@ -16,7 +16,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+import school.faang.user_service.publisher.goal.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;

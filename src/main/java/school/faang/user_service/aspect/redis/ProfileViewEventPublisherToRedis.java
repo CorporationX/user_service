@@ -9,6 +9,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ProfileViewEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.redis.publisher.AbstractEventAggregator;
+import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
 
@@ -17,13 +18,16 @@ public class ProfileViewEventPublisherToRedis extends AbstractEventAggregator<Pr
         implements EventPublisher {
     private static final String EVENT_TYPE_NAME = "Profile view";
     private final UserContext userContext;
+    private final UserRepository userRepository;
 
     public ProfileViewEventPublisherToRedis(RedisTemplate<String, Object> redisTemplate,
                                             ObjectMapper javaTimeModuleObjectMapper,
                                             Topic profileViewEventTopic,
-                                            UserContext userContext) {
+                                            UserContext userContext,
+                                            UserRepository userRepository) {
         super(redisTemplate, javaTimeModuleObjectMapper, profileViewEventTopic);
         this.userContext = userContext;
+        this.userRepository = userRepository;
     }
 
     @SuppressWarnings("unchecked")
@@ -31,7 +35,7 @@ public class ProfileViewEventPublisherToRedis extends AbstractEventAggregator<Pr
     public void publish(Object eventObject) {
         if (eventObject instanceof User user) {
             long receiverId = userContext.getUserId();
-            String receiverName = userContext.getUserName();
+            String receiverName = userRepository.findById(userContext.getUserId()).orElseThrow().getUsername();
 
             addToQueue(new ProfileViewEventDto(receiverId, receiverName, user.getId(), user.getUsername()));
 
@@ -52,7 +56,7 @@ public class ProfileViewEventPublisherToRedis extends AbstractEventAggregator<Pr
 
     private List<ProfileViewEventDto> buildProfileViewEvents(List<User> users) {
         long receiverId = userContext.getUserId();
-        String receiverName = userContext.getUserName();
+        String receiverName = userRepository.findById(userContext.getUserId()).orElseThrow().getUsername();
 
         return users.stream()
                 .filter(user -> user.getId() != receiverId)

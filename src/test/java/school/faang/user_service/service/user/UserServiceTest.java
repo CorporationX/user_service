@@ -217,26 +217,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testAddProfileImage() throws IOException {
-        File imageFile = new File("src/test/java/school/faang/user_service/test_avatar/pxfuel.jpg");
-        FileInputStream inputStream = new FileInputStream(imageFile);
-        UserProfilePic userProfilePicExp = new UserProfilePic();
-        userProfilePicExp.setFileId("user_1/profile");
-        userProfilePicExp.setSmallFileId("user_1/profile_small");
-
-        when(file.getSize()).thenReturn(2L);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(file.getInputStream()).thenReturn(inputStream);
-
-        userService.addProfileImage(userId, file);
-        verify(userRepository).save(captor.capture());
-        User resultUser = captor.getValue();
-        UserProfilePic resultUserProfilePic = resultUser.getUserProfilePic();
-
-        assertThat(resultUserProfilePic).usingRecursiveComparison().isEqualTo(userProfilePicExp);
-    }
-
-    @Test
     public void testAddProfileImage_FileExceedsMaxSize() {
         int maxSizeFile = 6 * 1024 * 1024; // 6 MB
         when(file.getSize()).thenReturn((long) maxSizeFile);

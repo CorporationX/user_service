@@ -19,6 +19,10 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+servlet:
+  multipart:
+    max-file-size: 5MB
+
   data:
     redis:
       port: 6379

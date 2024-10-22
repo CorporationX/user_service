@@ -74,6 +74,9 @@ public class User {
     @Column(name = "banned")
     private boolean banned;
 
+    @Column(name = "telegram_id", unique = true)
+    private Long telegramId;
+
     @ManyToMany
     @JoinTable(name = "subscription",
             joinColumns = @JoinColumn(name = "followee_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))

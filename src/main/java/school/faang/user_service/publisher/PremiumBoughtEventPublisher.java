@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.model.dto.PremiumBoughtEventDto;
 
 @Component
-public class PremiumBoughtEventPublisher extends RedisEventPublisher<PremiumBoughtEventDto> {
+public class PremiumBoughtEventPublisher extends AbstractEventPublisher<PremiumBoughtEventDto> {
 
     public PremiumBoughtEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                        ObjectMapper objectMapper,

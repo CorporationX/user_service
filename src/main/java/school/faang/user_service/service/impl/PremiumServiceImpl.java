@@ -58,7 +58,8 @@ public class PremiumServiceImpl implements PremiumService {
             throw new ExistingPurchaseException("User already has an active premium subscription");
         }
 
-        PremiumBoughtEventDto event = new PremiumBoughtEventDto(userId, premiumPeriod.getPrice(), premiumPeriod, LocalDateTime.now());
+        PremiumBoughtEventDto event = new PremiumBoughtEventDto(userId, premiumPeriod.getPrice(),
+                premiumPeriod, LocalDateTime.now());
         premiumBoughtEventPublisher.publish(event);
         payPremium(premiumPeriod, user);
 

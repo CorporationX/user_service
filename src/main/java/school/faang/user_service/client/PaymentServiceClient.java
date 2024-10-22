@@ -13,7 +13,7 @@ import school.faang.user_service.model.dto.PaymentResponse;
 @FeignClient(value = "payment-service", url = "${payment-service.host}:${payment-service.port}")
 public interface PaymentServiceClient {
 
-    @PostMapping("/api/payment")
+    @PostMapping("/api/v1/payment")
     @Retryable(
             value = {FeignException.class},
             maxAttempts = 5,

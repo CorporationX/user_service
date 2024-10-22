@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.PaymentServiceClient;
+import school.faang.user_service.model.dto.PremiumBoughtEventDto;
 import school.faang.user_service.model.enums.Currency;
 import school.faang.user_service.model.dto.PaymentRequest;
 import school.faang.user_service.model.dto.PaymentResponse;
@@ -19,6 +20,7 @@ import school.faang.user_service.model.enums.PremiumPeriod;
 import school.faang.user_service.exception.ExistingPurchaseException;
 import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.PremiumRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +46,7 @@ public class PremiumServiceImpl implements PremiumService {
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumMapper premiumMapper;
     private final PremiumRemoverTransactions premiumRemoverTransactions;
+    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
     @Override
     @Transactional
@@ -55,6 +58,9 @@ public class PremiumServiceImpl implements PremiumService {
             throw new ExistingPurchaseException("User already has an active premium subscription");
         }
 
+        PremiumBoughtEventDto event = new PremiumBoughtEventDto(userId, premiumPeriod.getPrice(),
+                premiumPeriod, LocalDateTime.now());
+        premiumBoughtEventPublisher.publish(event);
         payPremium(premiumPeriod, user);
 
         Premium savedPremium = savePremium(premiumPeriod, user);

@@ -60,6 +60,7 @@ redis:
     goal-completed: goal_completed_channel
     skill-acquired: skill_acquired_channel
     recommendation-received: recommendation_received_channel
+    premium-bought: premium_bought_channel
 
 scheduler:
   clear-events:

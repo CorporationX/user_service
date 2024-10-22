@@ -13,6 +13,13 @@ public class UserTestUtil {
                 .build();
     }
 
+    public static User buildUser(long id, String username) {
+        return User.builder()
+                .id(id)
+                .username(username)
+                .build();
+    }
+
     public static List<User> buildUsers(int number) {
         return LongStream.rangeClosed(1, number)
                 .mapToObj(UserTestUtil::buildUser)

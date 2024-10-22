@@ -82,6 +82,10 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation(kotlin("stdlib-jdk8"))
+    /**
+     * Scale avatar
+     */
+    implementation("org.imgscalr:imgscalr-lib:4.2")
 }
 
 jsonSchema2Pojo {

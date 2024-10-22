@@ -4,11 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
@@ -23,14 +25,29 @@ import school.faang.user_service.service.filters.UserCityPattern;
 import school.faang.user_service.service.filters.UserFilter;
 import school.faang.user_service.service.filters.UserSkillPattern;
 import school.faang.user_service.service.s3.S3CompatibleService;
+import school.faang.user_service.service.s3.S3ServiceImpl;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,10 +66,20 @@ public class UserServiceTest {
     private S3CompatibleService s3CompatibleService;
 
     @Mock
+    private S3ServiceImpl s3Service;
+
+    @Mock
     private List<UserFilter> userFilter = new ArrayList<>();
 
     @Mock
     private UserMapper mapper;
+
+    @Mock
+    private MultipartFile file;
+
+    @Captor
+    ArgumentCaptor<User> captor;
+
 
     @InjectMocks
     private UserService userService;
@@ -63,12 +90,14 @@ public class UserServiceTest {
     private List<Long> idsList = new ArrayList<>();
     private List<User> userList = new ArrayList<>();
     private List<UserDto> userDtoList = new ArrayList<>();
+    private UserProfilePic userProfilePic = new UserProfilePic();
+
 
     @BeforeEach
     public void setUp() {
         user = new User();
         user.setId(userId);
-        ReflectionTestUtils.setField(userService, "DEFAULT_AVATAR_FILENAME", "default_avatar");
+        byte[] content = "test image content".getBytes();
     }
 
     @Test
@@ -185,5 +214,65 @@ public class UserServiceTest {
         assertThat(expectedUser).usingRecursiveComparison()
                 .ignoringFields("userProfilePic")
                 .isEqualTo(actual);
+    }
+
+    @Test
+    public void testAddProfileImage_FileExceedsMaxSize() {
+        int maxSizeFile = 6 * 1024 * 1024; // 6 MB
+        when(file.getSize()).thenReturn((long) maxSizeFile);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.addProfileImage(userId, file));
+        assertEquals("File exceeds the maximum size of 5 MB", exception.getMessage());
+        verify(userRepository, never()).findById(userId);
+        verify(s3Service, never()).uploadFile(any(byte[].class), anyString(), anyLong(), anyString());
+    }
+
+    @Test
+    public void testGetBigImageFromProfile() throws IOException {
+        userProfilePic.setFileId("largeImage.jpg");
+        user.setUserProfilePic(userProfilePic);
+        byte[] imageBytes = "test image content".getBytes();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(s3Service.downloadFile("largeImage.jpg")).thenReturn(imageBytes);
+        byte[] result = userService.getBigImageFromProfile(userId).getContentAsByteArray();
+        assertEquals(new String(imageBytes), new String(result));
+        verify(userRepository, times(1)).findById(userId);
+        verify(s3Service, times(1)).downloadFile("largeImage.jpg");
+    }
+
+    @Test
+    public void testGetSmallImageFromProfile() throws IOException {
+        userProfilePic.setSmallFileId("smallImage.jpg");
+        user.setUserProfilePic(userProfilePic);
+        byte[] imageBytes = "test image content".getBytes();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(s3Service.downloadFile("smallImage.jpg")).thenReturn(imageBytes);
+        byte[] result = userService.getSmallImageFromProfile(userId).getContentAsByteArray();
+        assertEquals(new String(imageBytes), new String(result));
+        verify(userRepository, times(1)).findById(userId);
+        verify(s3Service, times(1)).downloadFile("smallImage.jpg");
+    }
+
+    @Test
+    public void testDeleteProfileImage() {
+        userProfilePic.setFileId("largeImage.jpg");
+        userProfilePic.setSmallFileId("smallImage.jpg");
+        user.setUserProfilePic(userProfilePic);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        userService.deleteProfileImage(userId);
+        verify(s3Service, times(1)).deleteFile("largeImage.jpg");
+        verify(s3Service, times(1)).deleteFile("smallImage.jpg");
+        verify(userRepository, times(1)).save(user);
+        assertNull(user.getUserProfilePic());
+    }
+
+    @Test
+    public void testDeleteProfileImage_UserProfileNotFound() {
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> userService.deleteProfileImage(userId));
+
+        verify(s3Service, never()).deleteFile(anyString());
+        verify(userRepository, never()).save(any(User.class));
     }
 }

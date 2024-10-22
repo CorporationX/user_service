@@ -19,6 +19,10 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+
   data:
     redis:
       port: 6379
@@ -56,6 +60,12 @@ payment-service:
 
 schedule:
   clean_past_events:
-      clean_interval: "0 0 6 * * 1"
-      threads_num: 4
-      sublist_size: 10
+    clean_interval: "0 0 6 * * 1"
+    threads_num: 4
+    sublist_size: 10
+
+image-limitations:
+  picture-allowed-types: image/jpeg, image/png
+  max-pixel-size:
+    large-image: 1080
+    small-image: 170

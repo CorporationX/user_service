@@ -32,15 +32,6 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisTemplate<String, EventDto> redisEventTemplate() {
-        RedisTemplate<String, EventDto> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory());
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, EventDto.class));
-        return template;
-    }
-
-    @Bean
     public MessageListenerAdapter messageListenerAdapter(RedisMessageSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber);
     }
@@ -52,6 +43,15 @@ public class RedisConfig {
         container.setConnectionFactory(jedisConnectionFactory());
         container.addMessageListener(messageListenerAdapter, userBanChannel);
         return container;
+    }
+
+    @Bean
+    RedisTemplate<String, EventDto> redisEventTemplate() {
+        RedisTemplate<String, EventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, EventDto.class));
+        return template;
     }
 
     @Bean
@@ -73,6 +73,15 @@ public class RedisConfig {
     }
 
     @Bean
+    RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
+        RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, GoalCompletedEventDto.class));
+        return template;
+    }
+
+    @Bean
     RedisTemplate<String, MentorshipAcceptedEventDto> mentorshipAcceptedEventredisTemplate() {
         RedisTemplate<String, MentorshipAcceptedEventDto> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
@@ -87,24 +96,15 @@ public class RedisConfig {
         return new ChannelTopic(userBanTopicName);
     }
 
-    @Bean
-    RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
-        RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory());
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, GoalCompletedEventDto.class));
-        return template;
+    @Bean(value = "eventTopic")
+    public ChannelTopic eventTopic(@Value("${spring.data.redis.channels.event-event-channel.name}") String topic) {
+        return new ChannelTopic(topic);
     }
 
     @Bean(value = "followerEventChannel")
     ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
         return new ChannelTopic(name);
-    }
-
-    @Bean(value = "eventTopic")
-    public ChannelTopic eventTopic(@Value("${spring.data.redis.channels.event-event-channel.name}") String topic) {
-        return new ChannelTopic(topic);
     }
 
     @Bean(value = "profileViewChannel")

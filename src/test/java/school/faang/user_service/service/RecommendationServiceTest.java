@@ -16,6 +16,7 @@ import school.faang.user_service.model.entity.UserSkillGuarantee;
 import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.model.event.SkillOfferedEvent;
 import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
@@ -62,6 +63,9 @@ class RecommendationServiceTest {
 
     @Mock
     private RecommendationMapper recommendationMapper;
+
+    @Mock
+    private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @Mock
     private SkillOfferedEventPublisher skillOfferedEventPublisher;

@@ -19,6 +19,7 @@ public interface UserService {
     User findUserById(long userId);
 
     UserDto getUser(long userId);
+    UserDto getUserProfile(long userId);
 
     List<UserDto> getUsersByIds(List<Long> userIds);
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface MentorshipRequestService {
 
-    void requestMentorship(MentorshipRequestDto mentorshipRequestDto);
+    MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto);
 
     List<MentorshipRequest> getRequests(RequestFilter filter);
 

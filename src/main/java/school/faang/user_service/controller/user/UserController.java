@@ -44,6 +44,10 @@ public class UserController {
     public UserDto getUser(@PathVariable("user_id") @Positive(message = "Id can't be least 1") long userId) {
         return userService.getUser(userId);
     }
+    @GetMapping("/{user_id}/profile")
+    public UserDto getUserProfile(@PathVariable("user_id") @Positive(message = "Id can't be least 1") long userId) {
+        return userService.getUserProfile(userId);
+    }
 
     @GetMapping
     public List<UserDto> getUsersByIds(@RequestParam("user_id") @NotNull @NotEmpty List<Long> userIds) {

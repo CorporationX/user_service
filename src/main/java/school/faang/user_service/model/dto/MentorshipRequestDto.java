@@ -1,5 +1,7 @@
 package school.faang.user_service.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,13 +33,14 @@ public class MentorshipRequestDto {
     @Size(max = 4096)
     private String description;
 
-    @NotNull(message = "Request status must not be null", groups = {CreateGroup.class, UpdateGroup.class})
     private RequestStatus status;
 
-    @NotBlank(message = "Rejection reason must not be null or empty", groups = {CreateGroup.class, UpdateGroup.class})
     @Size(max = 4096)
     private String rejectionReason;
 
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime createdAt;
+
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime updatedAt;
 }

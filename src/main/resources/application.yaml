@@ -21,6 +21,10 @@ spring:
       port: 6379
       host: localhost
       channels:
+        event-starter: event_starter_channel
+        profile: profile_channel
+        mentorship-channel:
+          name: mentorship_channel
         follower-event-channel:
           name: follower_event_channel
         event-start-channel:
@@ -37,6 +41,16 @@ spring:
           name: skill_acquired_channel
         recommendation-request-channel:
           name: recommendation_req_channel
+        mentorship-accepted-event-channel:
+          name: mentorship_accepted_event_channel
+        premium-bought-channel:
+          name: premium_bought_channel
+        skill-offered-channel:
+          name: skill_offered_channel
+        mentorship-request-channel:
+          name: mentorship-request-channel
+        fund-raised-channel:
+          name: fund-raised-channel
         mentorship-start-channel:
           name: mentorship_start_channel
 
@@ -66,7 +80,7 @@ payment-service:
 springdoc:
   swagger-ui:
     enabled: true
-    url: openapi.yml
+    url: OpenAPI.yml
 
 premium:
   scheduled:

@@ -1,6 +1,6 @@
 package school.faang.user_service.filter.event;
 
-import school.faang.user_service.model.event.EventFilterDto;
+import school.faang.user_service.model.dto.event.EventFilterDto;
 import school.faang.user_service.model.entity.event.Event;
 
 import java.util.stream.Stream;

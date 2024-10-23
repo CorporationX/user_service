@@ -10,6 +10,8 @@ import school.faang.user_service.model.entity.recommendation.RecommendationReque
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
+import school.faang.user_service.model.event.RecommendationRequestedEvent;
+import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.RecommendationRequestService;
@@ -26,6 +28,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final List<RecommendationRequestFilter> recommendationsFilters;
+    private final RecommendationRequestedEventPublisher recommendationReqPublisher;
 
     @Override
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
@@ -33,8 +36,15 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
         RecommendationRequest recommendationRequest = requestMapper.toEntity(recommendationRequestDto);
         RecommendationRequest savedRecommendationRequest = recommendationRequestRepository.save(recommendationRequest);
-
         saveSkillRequestsByNewRecommendation(recommendationRequestDto, savedRecommendationRequest);
+
+        recommendationReqPublisher.publish(
+                new RecommendationRequestedEvent(
+                        savedRecommendationRequest.getRequester().getId(),
+                        savedRecommendationRequest.getReceiver().getId(),
+                        savedRecommendationRequest.getId()
+                )
+        );
 
         return requestMapper.toDto(savedRecommendationRequest);
     }

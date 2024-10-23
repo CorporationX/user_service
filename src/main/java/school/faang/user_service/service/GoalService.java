@@ -8,6 +8,7 @@ import school.faang.user_service.model.entity.goal.Goal;
 import java.util.List;
 
 public interface GoalService {
+
     GoalDto createGoal(long userId, GoalDto goalDto);
 
     GoalDto updateGoal(long goalId, GoalDto goalDto);

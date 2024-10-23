@@ -11,11 +11,12 @@ import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.model.dto.premium.PaymentResponseDto;
 import school.faang.user_service.model.dto.premium.PremiumDto;
 import school.faang.user_service.model.entity.User;
-import school.faang.user_service.model.entity.premium.Currency;
-import school.faang.user_service.model.entity.premium.PaymentStatus;
-import school.faang.user_service.model.entity.premium.Premium;
-import school.faang.user_service.model.entity.premium.PremiumPeriod;
+import school.faang.user_service.model.enums.premium.Currency;
+import school.faang.user_service.model.enums.premium.PaymentStatus;
+import school.faang.user_service.model.entity.Premium;
+import school.faang.user_service.model.enums.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.impl.premium.PremiumServiceImpl;
 import school.faang.user_service.service.impl.user.UserServiceImpl;
@@ -46,6 +47,9 @@ class PremiumServiceImplTest {
 
     @Mock
     private PremiumMapper premiumMapper;
+
+    @Mock
+    private PremiumBoughtEventPublisher premiumBoughtPublisher;
 
     @InjectMocks
     private PremiumServiceImpl premiumService;

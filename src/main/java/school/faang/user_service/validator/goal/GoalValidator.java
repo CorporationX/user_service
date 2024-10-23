@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.model.dto.goal.GoalDto;
 import school.faang.user_service.model.entity.goal.Goal;
-import school.faang.user_service.model.entity.goal.GoalStatus;
+import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.repository.UserRepository;

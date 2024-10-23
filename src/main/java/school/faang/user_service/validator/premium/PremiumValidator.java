@@ -3,7 +3,7 @@ package school.faang.user_service.validator.premium;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.model.dto.premium.PaymentResponseDto;
-import school.faang.user_service.model.entity.premium.PaymentStatus;
+import school.faang.user_service.model.enums.premium.PaymentStatus;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 @Component

@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import school.faang.user_service.model.event.EventDto;
+import school.faang.user_service.model.dto.event.EventDto;
 import school.faang.user_service.model.dto.skill.SkillDto;
 import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.User;

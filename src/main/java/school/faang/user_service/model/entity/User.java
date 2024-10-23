@@ -13,7 +13,6 @@ import school.faang.user_service.model.entity.event.Event;
 import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.entity.goal.GoalInvitation;
 import school.faang.user_service.model.entity.event.Rating;
-import school.faang.user_service.model.entity.premium.Premium;
 import school.faang.user_service.model.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;

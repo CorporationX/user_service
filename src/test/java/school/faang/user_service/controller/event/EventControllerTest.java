@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.model.event.EventDto;
-import school.faang.user_service.model.event.EventFilterDto;
+import school.faang.user_service.model.dto.event.EventDto;
+import school.faang.user_service.model.dto.event.EventFilterDto;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
 import school.faang.user_service.validator.event.EventValidator;
 

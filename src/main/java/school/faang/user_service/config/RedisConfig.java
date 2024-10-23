@@ -44,6 +44,9 @@ public class RedisConfig {
     @Value("${redis.channels.recommendation-received}")
     private String recommendationReceivedEventChannel;
 
+    @Value("${redis.channels.profile-view}")
+    private String profileViewEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -106,6 +109,11 @@ public class RedisConfig {
     @Bean
     public ChannelTopic recommendationReceivedChannelTopic() {
         return new ChannelTopic(recommendationReceivedEventChannel);
+    }
+
+    @Bean(name = "profileViewTopic")
+    public ChannelTopic profileViewChannelTopic() {
+        return new ChannelTopic(profileViewEventChannel);
     }
 
     @Bean

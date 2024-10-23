@@ -36,4 +36,6 @@ public interface UserService {
     Long getMaxUserId();
 
     void updateTelegramUserId(String telegramUserName, String telegramUserId);
+
+    void publishProfileViewEvent(long viewerId, long profileOwnerId);
 }

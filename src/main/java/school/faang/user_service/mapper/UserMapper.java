@@ -12,8 +12,10 @@ import java.util.List;
 public interface UserMapper {
     @Mapping(source = "userProfilePic.fileId", target = "avatar")
     @Mapping(source = "userProfilePic.smallFileId", target = "avatarSmall")
+    @Mapping(target = "preference", source = "contactPreference.preference")
     UserDto toDto(User user);
 
+    @Mapping(target = "contactPreference.preference", source = "preference")
     User toEntity(UserDto userDto);
 
     @Mapping(source = "countryId", target = "country.id")

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
@@ -61,6 +62,9 @@ class UserServiceTest {
 
     @Mock
     private S3Service s3Service;
+
+    @Mock
+    private UserContext userContext;
 
     private User user;
     private User secondUser;
@@ -152,6 +156,7 @@ class UserServiceTest {
             assertNotNull(resultUserDto);
             verify(userRepository).findById(REQUESTER_ID);
             verify(userMapper).toDto(requester);
+            verify(userContext).getUserId();
         }
 
         @Test

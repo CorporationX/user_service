@@ -68,8 +68,8 @@ public class UserService {
         if(userContext.getUserId() > 0){
             User user = getUserById(userContext.getUserId());
             NewProfileViewEventDto profileView = NewProfileViewEventDto.builder()
-                    .userViewedId(userContext.getUserId())
-                    .userViewedName(user.getUsername())
+                    .viewerId(userContext.getUserId())
+                    .viewerUserName(user.getUsername())
                     .viewedProfileId(userId)
                     .build();
             profileViewEventPublisher.publish(profileView);

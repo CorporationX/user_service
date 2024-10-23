@@ -156,6 +156,7 @@ class UserServiceTest {
             assertNotNull(resultUserDto);
             verify(userRepository).findById(REQUESTER_ID);
             verify(userMapper).toDto(requester);
+            verify(userContext).getUserId();
         }
 
         @Test

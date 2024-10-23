@@ -47,6 +47,9 @@ public class RedisConfig {
     @Value("${redis.channels.profile-view}")
     private String profileViewEventChannel;
 
+    @Value("${redis.channels.skill-offered}")
+    private String skillOfferedEventChannel;
+
     public interface MessagePublisher<T> {
         void publish(T redisEvent);
     }
@@ -114,6 +117,11 @@ public class RedisConfig {
     @Bean(name = "profileViewTopic")
     public ChannelTopic profileViewChannelTopic() {
         return new ChannelTopic(profileViewEventChannel);
+    }
+
+    @Bean(name = "skillOfferedTopic")
+    public ChannelTopic skillOfferedChannelTopic() {
+        return new ChannelTopic(skillOfferedEventChannel);
     }
 
     @Bean

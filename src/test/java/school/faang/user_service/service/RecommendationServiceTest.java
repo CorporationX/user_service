@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,6 +17,8 @@ import school.faang.user_service.model.entity.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
+import school.faang.user_service.model.event.SkillOfferedEvent;
+import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.RecommendationRepository;
@@ -63,6 +66,9 @@ class RecommendationServiceTest {
 
     @Mock
     private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
+
+    @Mock
+    private SkillOfferedEventPublisher skillOfferedEventPublisher;
 
     @InjectMocks
     private RecommendationServiceImpl recommendationService;
@@ -126,6 +132,13 @@ class RecommendationServiceTest {
         verify(skillRepository, times(1)).save(any());
         assertNotNull(result);
         assertEquals("Test content", result.getContent());
+
+        ArgumentCaptor<SkillOfferedEvent> captor = ArgumentCaptor.forClass(SkillOfferedEvent.class);
+        verify(skillOfferedEventPublisher, times(1)).publish(captor.capture());
+        SkillOfferedEvent capturedEvent = captor.getValue();
+        assertEquals(skillId, capturedEvent.getSkillId());
+        assertEquals(authorId, capturedEvent.getSenderId());
+        assertEquals(receiverId, capturedEvent.getReceiverId());
     }
 
     @Test
@@ -265,6 +278,13 @@ class RecommendationServiceTest {
         verify(userRepository, times(1)).findById(receiverId);
         verify(userRepository, times(1)).findById(authorId);
         verify(skillRepository, times(1)).save(any());
+
+        ArgumentCaptor<SkillOfferedEvent> captor = ArgumentCaptor.forClass(SkillOfferedEvent.class);
+        verify(skillOfferedEventPublisher, times(1)).publish(captor.capture());
+        SkillOfferedEvent capturedEvent = captor.getValue();
+        assertEquals(skillId, capturedEvent.getSkillId());
+        assertEquals(authorId, capturedEvent.getSenderId());
+        assertEquals(receiverId, capturedEvent.getReceiverId());
     }
 
     @Test

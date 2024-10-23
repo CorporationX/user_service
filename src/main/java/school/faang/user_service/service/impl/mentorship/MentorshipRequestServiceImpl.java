@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.model.dto.MentorshipRequestDto;
 import school.faang.user_service.model.dto.Rejection;
 import school.faang.user_service.model.dto.RequestFilter;
@@ -13,6 +14,8 @@ import school.faang.user_service.model.event.MentorshipAcceptedEvent;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.model.event.MentorshipRequestedEvent;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
+import school.faang.user_service.model.event.MentorshipStartEvent;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.util.predicate.NotApplicable;
@@ -36,6 +39,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final RequestFilterPredicate requestFilterPredicate;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @Override
     @Transactional
@@ -56,6 +60,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MentorshipRequest> getRequests(RequestFilter filter) {
         return mentorshipRequestRepository.findAll().stream().filter(mentReq -> {
             return requestFilterPredicate.getRequestsFilterList().stream()
@@ -70,11 +75,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                     })
                     .reduce(Predicate::and) // Combine all predicates using AND
                     .orElse(req -> false).test(mentReq);
-
         }).toList();
     }
 
     @Override
+    @Transactional
     public void acceptRequest(long id) {
         Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
         if (requestOptional.isPresent() && requestOptional.get().getStatus() != ACCEPTED) {
@@ -83,6 +88,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             mentorshipRequestRepository.save(request);
             mentorshipPublisher.publish(new MentorshipAcceptedEvent(request.getRequester().getId(),
                     request.getReceiver().getId(), request.getId()));
+            sendMentorshipStartEvent(request);
             mentorshipRequestRepository.save(request);
         } else if (requestOptional.isPresent() && requestOptional.get().getStatus() == ACCEPTED) {
             throw new DataValidationException("Mentor request is already accepter");
@@ -90,16 +96,26 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     }
 
     @Override
+    @Transactional
     public void rejectRequest(long id, Rejection rejection) {
         Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
-
         if (requestOptional.isPresent()) {
             var request = requestOptional.get();
             request.setStatus(REJECTED);
             request.setRejectionReason(rejection.getReason());
             mentorshipRequestRepository.save(request);
         }
-
     }
 
+    private MentorshipStartEvent buildMentorshipStartEvent(MentorshipRequest request) {
+        return MentorshipStartEvent.builder()
+                .mentorId(request.getRequester().getId())
+                .menteeId(request.getReceiver().getId())
+                .build();
+    }
+
+    private void sendMentorshipStartEvent(MentorshipRequest request) {
+        MentorshipStartEvent event = buildMentorshipStartEvent(request);
+        mentorshipStartEventPublisher.publish(event);
+    }
 }

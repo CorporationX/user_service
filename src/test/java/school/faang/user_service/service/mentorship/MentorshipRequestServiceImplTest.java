@@ -14,6 +14,11 @@ import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.entity.RequestStatus;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.mapper.RequestMapper;
+import school.faang.user_service.model.dto.MentorshipRequestDto;
+import school.faang.user_service.model.dto.Rejection;
+import school.faang.user_service.model.dto.RequestFilter;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.impl.mentorship.MentorshipRequestServiceImpl;
 
@@ -37,6 +42,9 @@ public class MentorshipRequestServiceImplTest {
 
     @Mock
     private MentorshipAcceptedEventPublisher mentorshipPublisher;
+
+    @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @InjectMocks
     MentorshipRequestServiceImpl service;
@@ -104,13 +112,13 @@ public class MentorshipRequestServiceImplTest {
         when(repository.findById(1L)).thenThrow(new EmptyResultDataAccessException(1));
 
         // Act & Assert
-        assertThrows(EmptyResultDataAccessException.class, () -> service.rejectRequest(1L,any()));
+        assertThrows(EmptyResultDataAccessException.class, () -> service.rejectRequest(1L, any()));
 
-        verify(repository,  never()).save(any());
+        verify(repository, never()).save(any());
     }
 
     @Test
-    void rejectRequest_ShouldCall_updateMentorshipRequestStatusByRequesterId(){
+    void rejectRequest_ShouldCall_updateMentorshipRequestStatusByRequesterId() {
         MentorshipRequest request = new MentorshipRequest();
         request.setId(1L);
         request.setRejectionReason("reason");
@@ -118,7 +126,7 @@ public class MentorshipRequestServiceImplTest {
         when(repository.findById(1L)).thenReturn(Optional.of(request));
         Rejection rejectionDto = Rejection.builder().reason("reason").build();
 
-        service.rejectRequest(request.getId(),rejectionDto);
+        service.rejectRequest(request.getId(), rejectionDto);
 
 
         verify(repository).save(request);

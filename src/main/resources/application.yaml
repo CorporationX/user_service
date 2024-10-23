@@ -51,6 +51,8 @@ spring:
           name: mentorship-request-channel
         fund-raised-channel:
           name: fund-raised-channel
+        mentorship-start-channel:
+          name: mentorship_start_channel
 
 server:
   port: 8080

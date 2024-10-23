@@ -1,7 +1,6 @@
 package school.faang.user_service.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +11,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.redis.event.FollowerEvent;
 import school.faang.user_service.repository.UserRepository;
@@ -38,10 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SubscriptionControllerTest {
+public class SubscriptionControllerTest extends TestContainersConfig {
     private static final String REDIS_TOPIC = "follower_event_topic";
 
     @Autowired
@@ -66,23 +58,6 @@ public class SubscriptionControllerTest {
     private User followee;
     private FollowerEvent followerEvent;
     private CountDownLatch latch;
-
-    @Container
-    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:13"));
-
-    @Container
-    private static final RedisContainer redis = new RedisContainer(
-            DockerImageName.parse("redis:latest"));
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.data.redis.host", redis::getHost);
-        registry.add("spring.data.redis.port", redis::getFirstMappedPort);
-    }
 
     @BeforeEach
     public void setup() {

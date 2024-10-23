@@ -1,9 +1,7 @@
 package school.faang.user_service.redis.publisher.subscribe;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
@@ -20,17 +18,9 @@ public class SubscribeUserEventAspect {
     @Autowired
     private UserRepository userRepository;
 
-    @Pointcut("@annotation(PublishSubscribeUserEvent)")
-    public void publishEventPointcut() {
-    }
-
-    @Around("publishEventPointcut() && args(followerId, followeeId)")
-    public Object publishEvent(ProceedingJoinPoint joinPoint, long followerId, long followeeId) throws Throwable {
-        Object result = joinPoint.proceed();
-
+    @AfterReturning(pointcut = "@annotation(publishSubscribeUserEvent) && args(followerId, followeeId)")
+    public void afterMethodWithEvent(long followerId, long followeeId, PublishSubscribeUserEvent publishSubscribeUserEvent) {
         User follower = userRepository.getReferenceById(followerId);
         followEventPublisher.publish(new FollowerEvent(followerId, followeeId, follower.getUsername()));
-
-        return result;
     }
 }

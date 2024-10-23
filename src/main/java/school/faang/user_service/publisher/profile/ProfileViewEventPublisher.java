@@ -14,11 +14,11 @@ import school.faang.user_service.publisher.MessagePublisher;
 public class ProfileViewEventPublisher implements MessagePublisher<NewProfileViewEventDto> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic profileViewTopic;
+    private final ChannelTopic profileViewChannel;
 
     @Override
     public void publish(NewProfileViewEventDto profileView) {
-        redisTemplate.convertAndSend(profileViewTopic.getTopic(), profileView);
-        log.debug("Profile view event sent {}, in topic - {}", profileView, profileViewTopic.getTopic());
+        redisTemplate.convertAndSend(profileViewChannel.getTopic(), profileView);
+        log.debug("Profile view event sent {}, in topic - {}", profileView, profileViewChannel.getTopic());
     }
 }

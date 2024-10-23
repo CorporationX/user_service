@@ -29,14 +29,14 @@ spring:
           name: follower_channel
         goalCompletedEvent:
           name: goal_completed_event_channel
-        mentorshipRequest: mentorship_request_topic
+        mentorshipRequest:
+          name: mentorship_request_topic
         profileViewChannel:
           name: profile_view_channel
 
 servlet:
   multipart:
     max-file-size: 5242880
-
 
 server:
   port: 8080

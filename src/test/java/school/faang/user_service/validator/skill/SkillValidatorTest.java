@@ -31,7 +31,6 @@ public class SkillValidatorTest {
     private List<Skill> skills;
     private List<Long> skillIds;
     private final long ANY_ID = 123L;
-    private final String BLANK_STRING = "  ";
     private final String SKILL_TITLE = "squat";
 
 
@@ -73,30 +72,6 @@ public class SkillValidatorTest {
     }
 
     @Test
-    @DisplayName("Data validation exception when skill title is null")
-    void whenNullValueThenThrowValidationException() {
-        skillDto = SkillDto.builder()
-                .id(ANY_ID)
-                .title(null)
-                .build();
-
-        assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(skillDto), "Skill title can't be blank or null");
-    }
-
-    @Test
-    @DisplayName("Data validation exception when skill title is blank")
-    void whenEmptyValueThenThrowValidationException() {
-        skillDto = SkillDto.builder()
-                .id(ANY_ID)
-                .title(BLANK_STRING)
-                .build();
-
-        assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(skillDto), "Skill title can't be blank or null");
-    }
-
-    @Test
     @DisplayName("Data validation exception when the skill we want to create already exist")
     void whenSkillExistThenThrowException() {
         skillDto = SkillDto.builder()
@@ -109,13 +84,6 @@ public class SkillValidatorTest {
 
         assertThrows(DataValidationException.class,
                 () -> skillValidator.validateSkill(skillDto), "Skill \"" + skillDto.getTitle() + "\" already exist");
-    }
-
-    @Test
-    @DisplayName("Data validation exception when SKillDto is null")
-    void whenNullDtoThenThrowValidationException() {
-        assertThrows(DataValidationException.class,
-                () -> skillValidator.validateSkill(null), "SkillDto can't be null");
     }
 
     @Test

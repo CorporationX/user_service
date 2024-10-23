@@ -151,7 +151,6 @@ public class RecommendationRequestServiceTest {
 
             recommendationRequestService.create(rqd);
 
-            verify(recommendationRequestValidator).validateRecommendationRequestMessageNotNull(rqd);
             verify(skillService).getAllSkills(rqd.getSkillIds());
             verify(skillValidator).validateSkillsExist(rqd.getSkillIds(), skills);
         }
@@ -207,14 +206,6 @@ public class RecommendationRequestServiceTest {
                     recommendationRequestService.getRequest(rqd.getId()));
             assertThrows(DataValidationException.class, () ->
                     recommendationRequestService.rejectRequest(rqd.getId(), rejection));
-        }
-
-        @Test
-        @DisplayName("When filterDto is null throw exception")
-        public void whenFilterDtoIsNullThenThrowException() {
-            filters = null;
-            assertThrows(DataValidationException.class, () ->
-                    recommendationRequestService.getRequests(filters));
         }
     }
 }

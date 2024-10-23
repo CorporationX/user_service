@@ -3,8 +3,8 @@ package school.faang.user_service.service.recommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRejectionDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
@@ -39,7 +39,6 @@ public class RecommendationRequestService {
     private final List<RequestFilter> requestFilters;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        recommendationRequestValidator.validateRecommendationRequestMessageNotNull(recommendationRequestDto);
         Optional<RecommendationRequest> lastRequest = getLastPendingRequest(recommendationRequestDto);
         lastRequest.ifPresent(recommendationRequestValidator::validatePreviousRequest);
         User requester = userService.getUserById(recommendationRequestDto.getRequesterId());
@@ -59,10 +58,6 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filters) {
-        if (filters == null) {
-            log.error("Filters cannot be null or empty!");
-            throw new DataValidationException("RequestFilterDto can't be null!");
-        }
         Stream<RecommendationRequest> requests = recommendationRequestRepository.findAll().stream();
         return requestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))

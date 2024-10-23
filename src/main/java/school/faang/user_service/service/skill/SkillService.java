@@ -2,8 +2,10 @@ package school.faang.user_service.service.skill;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.message.SkillAcquiredEventMessage;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -26,6 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillOfferService skillOfferService;
@@ -94,11 +97,7 @@ public class SkillService {
         return skillRepository.findByIdIn(ids);
     }
 
-    public void saveSkill(Skill skill) {
-        if (skill == null) {
-            throw new DataValidationException("Skill cannot be null");
-        }
-
+    public void saveSkill(@Valid Skill skill) {
         skillRepository.save(skill);
     }
 

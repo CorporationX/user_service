@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -8,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -27,6 +29,7 @@ spring:
           name: follower_channel
         goalCompletedEvent:
           name: goal_completed_event_channel
+        mentorshipRequest: mentorship_request_topic
         skillAcquiredChannel:
           name: skill_acquired_channel
 

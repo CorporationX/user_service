@@ -3,7 +3,6 @@ package school.faang.user_service.validator.recommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
@@ -17,13 +16,6 @@ import java.time.temporal.ChronoUnit;
 public class RecommendationRequestValidator {
 
     private static final int MONTHS_BEFORE_NEXT_REQUEST = 6;
-
-    public void validateRecommendationRequestMessageNotNull(RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
-            log.error("Error! Invalid request message!");
-            throw new DataValidationException("Recommendation request message text can't be null or empty!");
-        }
-    }
 
     public void validateRequestStatus(RecommendationRequest request) {
         if (request.getStatus() != RequestStatus.PENDING) {

@@ -1,6 +1,5 @@
 package school.faang.user_service.service.recommendation;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(getRecommendation(recommendationId));
     }
 
-    public RecommendationDto update(long id, @Valid RecommendationDto recommendation) {
+    public RecommendationDto update(long id, RecommendationDto recommendation) {
         recommendationDtoValidator.validateRecommendation(recommendation);
         List<Skill> skills = getSkills(recommendation);
 

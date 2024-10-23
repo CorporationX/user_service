@@ -1,15 +1,14 @@
 package school.faang.user_service.controller.skill;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
@@ -17,10 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/skills")
+@Validated
 public class SkillController {
     private final SkillService skillService;
 
-    public SkillDto create(SkillDto skill) {
+    public SkillDto create(@Valid SkillDto skill) {
         return skillService.create(skill);
     }
 

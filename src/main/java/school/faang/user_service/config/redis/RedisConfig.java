@@ -1,15 +1,11 @@
 package school.faang.user_service.config.redis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.dto.user.ProfileViewEventDto;
 
 @Configuration
 public class RedisConfig {
@@ -26,33 +22,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setDefaultSerializer(new StringRedisSerializer());
-
-        return template;
-    }
-
-    @Bean
-    public RedisTemplate<String, ProfileViewEventDto> profileViewEventDtoRedisTemplate(
-            JedisConnectionFactory connectionFactory, ObjectMapper javaTimeModuleObjectMapper) {
-        return buildRedisTemplate(connectionFactory, ProfileViewEventDto.class, javaTimeModuleObjectMapper);
-    }
-
-    private <T> RedisTemplate<String, T> buildRedisTemplate(JedisConnectionFactory jedisConnectionFactory,
-                                                            Class<T> clazz, ObjectMapper objectMapper) {
-        RedisTemplate<String, T> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory);
-
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        Jackson2JsonRedisSerializer<T> serializer = new Jackson2JsonRedisSerializer<>(objectMapper, clazz);
-
-        template.setKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(serializer);
-        template.setHashKeySerializer(stringRedisSerializer);
-        template.setHashValueSerializer(serializer);
-
-        return template;
+    public StringRedisSerializer stringRedisSerializer() {
+        return new StringRedisSerializer();
     }
 }

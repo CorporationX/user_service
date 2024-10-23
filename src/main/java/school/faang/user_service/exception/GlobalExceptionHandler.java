@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        log.error("MethodArgumentNotValidException occurred: {}", ex.getMessage());
+        log.error("MethodArgumentNotValidException occurred: {}", ex.getMessage(), ex);
         return ex.getBindingResult()
                 .getAllErrors()
                 .stream()

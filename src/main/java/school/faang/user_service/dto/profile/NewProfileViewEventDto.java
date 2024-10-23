@@ -13,5 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NewProfileViewEventDto {
     private Long userViewedId;
-    private Long profileViewedId;
+    private String userViewedName;
+    private Long viewedProfileId;
 }

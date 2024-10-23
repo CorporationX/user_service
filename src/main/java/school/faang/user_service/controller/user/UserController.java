@@ -31,11 +31,6 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @GetMapping("/v2/{userId}")
-    public UserDto getUserOnce(@PathVariable long userId){
-        return userService.getUserOnce(userId);
-    }
-
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);

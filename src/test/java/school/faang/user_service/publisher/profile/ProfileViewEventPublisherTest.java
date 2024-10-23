@@ -17,10 +17,13 @@ import static org.mockito.Mockito.when;
 public class ProfileViewEventPublisherTest {
 
     private static final String PROFILE_VIEW_EVENT_TOPIC = "profile_view_channel";
+
     @InjectMocks
     private ProfileViewEventPublisher profileViewEventPublisher;
+
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
+
     @Mock
     private ChannelTopic channelTopic;
 

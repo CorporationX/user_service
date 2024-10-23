@@ -65,19 +65,15 @@ public class UserService {
     public UserDto getUser(long userId) {
         User existedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
-        return userMapper.toDto(existedUser);
-    }
-    // Не знаю как сделать так чтобы установить какой из методов будет дергать система из разных сервисов
-    // А какой будет для чисто юзеров и как это лучше сделать, пока сделал так, работает но костыли...
-
-    public UserDto getUserOnce(long userId) {
-        User existedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException("User with id " + userId + " does not exist"));
-        NewProfileViewEventDto profileView = NewProfileViewEventDto.builder()
-                .userViewedId(userContext.getUserId())
-                .profileViewedId(userId)
-                .build();
-        profileViewEventPublisher.publish(profileView);
+        if(userContext.getUserId() > 0){
+            User user = getUserById(userContext.getUserId());
+            NewProfileViewEventDto profileView = NewProfileViewEventDto.builder()
+                    .userViewedId(userContext.getUserId())
+                    .userViewedName(user.getUsername())
+                    .viewedProfileId(userId)
+                    .build();
+            profileViewEventPublisher.publish(profileView);
+        }
         return userMapper.toDto(existedUser);
     }
 

@@ -103,10 +103,10 @@ public class RedisConfig {
     }
 
     @Bean
-
     public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendation);
-
+    }
+    @Bean
     public ChannelTopic goalCompletedTopic() {
         return new ChannelTopic(goalCompletedTopic);
     }

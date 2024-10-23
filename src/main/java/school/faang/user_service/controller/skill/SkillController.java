@@ -16,7 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/skill")
+@RequestMapping("/v1/skills")
 public class SkillController {
     private final SkillService skillService;
 

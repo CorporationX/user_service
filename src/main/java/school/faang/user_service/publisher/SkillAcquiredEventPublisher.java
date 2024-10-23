@@ -12,7 +12,6 @@ import school.faang.user_service.dto.message.SkillAcquiredEventMessage;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ToString
 public class SkillAcquiredEventPublisher implements MessagePublisher<SkillAcquiredEventMessage> {
 
     private final RedisTemplate<String, Object> redisTemplate;

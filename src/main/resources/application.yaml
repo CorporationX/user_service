@@ -27,7 +27,8 @@ spring:
           name: follower_channel
         goalCompletedEvent:
           name: goal_completed_event_channel
-        skillAcquiredChannel: skill_acquired_channel
+        skillAcquiredChannel:
+          name: skill_acquired_channel
 
 servlet:
   multipart:

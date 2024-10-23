@@ -33,7 +33,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public ChannelTopic mentorshipRequestTopic() {
+    public ChannelTopic skillAcquiredTopic() {
         return new ChannelTopic(redisProperties.getChannels().getSkillAcquiredChannel().getName());
     }
 

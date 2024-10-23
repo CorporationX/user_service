@@ -64,12 +64,7 @@ public class SkillService {
         skillOfferValidator.validateOffers(offers, skill, user);
         skillRepository.assignSkillToUser(skillId, userId);
 
-        var message = SkillAcquiredEventMessage.builder()
-                .skillId(skill.getId())
-                .receiverId(userId)
-                .skillTitle(skill.getTitle())
-                .build();
-
+        SkillAcquiredEventMessage message = createMessage(skill, userId);
         publisher.publish(message);
 
 
@@ -109,5 +104,13 @@ public class SkillService {
 
     public List<Skill> getAllSkills(List<Long> skillIds) {
         return skillRepository.findAllById(skillIds);
+    }
+
+    private SkillAcquiredEventMessage createMessage(Skill skill, long userId) {
+        return SkillAcquiredEventMessage.builder()
+                .skillId(skill.getId())
+                .receiverId(userId)
+                .skillTitle(skill.getTitle())
+                .build();
     }
 }

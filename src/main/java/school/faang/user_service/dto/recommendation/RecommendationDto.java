@@ -16,7 +16,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@NotNull(message = "Recommendation dto can't be null!")
 public class RecommendationDto {
     private Long id;
     @NotNull(message = "Mustn't be null!")

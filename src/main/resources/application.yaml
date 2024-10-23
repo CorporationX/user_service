@@ -31,6 +31,8 @@ spring:
           name: event_start_channel
         recommendation-received-channel:
           name: recommendation_received_channel
+        nice-guy-achievement-channel:
+          name: recommendation_received_channel
         ban-user-channel:
           name: user_ban
         follow-project-channel:

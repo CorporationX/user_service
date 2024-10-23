@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -8,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -24,13 +26,17 @@ spring:
         mentorshipChannel:
           name: mentorship_channel
         followerEventChannel:
-          name: follower_event
+          name: follower_channel
+        goalCompletedEvent:
+          name: goal_completed_event_channel
+        mentorshipRequest: mentorship_request_topic
         profileViewChannel:
           name: profile_view_channel
 
 servlet:
   multipart:
     max-file-size: 5242880
+
 
 server:
   port: 8080
@@ -67,6 +73,7 @@ services:
   postService:
     endpoint: http://localhost:8081
     requiredHeaders: x-user-id
+
 
 premium:
   schedule: "0 0 0 * * *"

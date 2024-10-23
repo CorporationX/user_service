@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProfileViewEvent {
+public class SearchAppearanceEvent {
     private Long receiverId;
     private Long actorId;
     private LocalDateTime receivedAt;

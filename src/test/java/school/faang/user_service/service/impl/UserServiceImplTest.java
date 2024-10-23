@@ -15,6 +15,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.event.ProfileViewEvent;
@@ -32,6 +33,7 @@ import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -87,7 +89,11 @@ public class UserServiceImplTest {
     @Mock
     private TelegramContactRepository telegramContactRepository;
     @Mock
-    ProfileViewEventPublisher profileViewEventPublisher;
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -240,9 +246,11 @@ public class UserServiceImplTest {
     @DisplayName("Should return a certain user when user exists by id")
     public void testGetUser_Success() {
         userDto.setActive(true);
+        userContext.setUserId(1L);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
+        when(userContext.getUserId()).thenReturn(1L);
 
         UserDto resultDto = userService.getUser(user.getId());
 
@@ -252,6 +260,7 @@ public class UserServiceImplTest {
                 () -> assertTrue(resultDto.isActive())
         );
         verify(userRepository, times(1)).findById(anyLong());
+        verify(profileViewEventPublisher, times(1)).publish(any());
     }
 
     @Test
@@ -363,6 +372,7 @@ public class UserServiceImplTest {
         verify(userMapper, times(1)).toDto(callingUser);
         verify(userMapper, times(2)).toDto(promoted1);
         verify(userMapper, times(2)).toDto(promoted2);
+        verify(searchAppearanceEventPublisher, times(3)).publish(any());
 
         assertAll(
                 () -> assertNotNull(result),

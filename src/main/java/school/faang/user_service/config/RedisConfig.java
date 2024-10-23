@@ -17,6 +17,12 @@ public class RedisConfig {
     @Value("${redis.channels.project-follower}")
     private String projectFollowerEventChannel;
 
+    @Value("${redis.channels.search-appearance-channel}")
+    private String searchAppearanceChannel;
+
+    @Value("${redis.channels.profile-view-channel}")
+    private String profileViewChannel;
+
     @Value("${redis.channels.user-ban}")
     private String userBanEventChannel;
 
@@ -31,6 +37,12 @@ public class RedisConfig {
 
     @Value("${redis.channels.skill-acquired}")
     private String skillAcquiredEventChannel;
+
+    @Value("${redis.channels.mentorship-offered}")
+    private String mentorshipOfferedEventChannel;
+
+    @Value("${redis.channels.recommendation-received}")
+    private String recommendationReceivedEventChannel;
 
     @Value("${redis.channels.profile-view}")
     private String profileViewEventChannel;
@@ -51,6 +63,17 @@ public class RedisConfig {
     @Bean
     public ChannelTopic projectFollowerChannelTopic() {
         return new ChannelTopic(projectFollowerEventChannel);
+    }
+
+    @Bean
+    ChannelTopic searchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceChannel);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic() {
+        return new ChannelTopic(profileViewChannel);
+
     }
 
     @Bean
@@ -79,6 +102,21 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic mentorshipOfferedChannelTopic() {
+        return new ChannelTopic(mentorshipOfferedEventChannel);
+    }
+
+    @Bean
+    public ChannelTopic recommendationReceivedChannelTopic() {
+        return new ChannelTopic(recommendationReceivedEventChannel);
+    }
+
+    @Bean(name = "profileViewTopic")
+    public ChannelTopic profileViewChannelTopic() {
+        return new ChannelTopic(profileViewEventChannel);
+    }
+
+    @Bean
     public MessageListenerAdapter userBanEventListenerAdapter(UserBanEventListener userBanEventListener) {
         return new MessageListenerAdapter(userBanEventListener, "onMessage");
     }
@@ -91,10 +129,5 @@ public class RedisConfig {
         container.setConnectionFactory(lettuceConnectionFactory);
         container.addMessageListener(userBanEventListenerAdapter(userBanEventListener), userBanChannelTopic());
         return container;
-    }
-
-    @Bean(name = "profileViewTopic")
-    public ChannelTopic profileViewChannelTopic() {
-        return new ChannelTopic(profileViewEventChannel);
     }
 }

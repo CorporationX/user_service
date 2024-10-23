@@ -5,12 +5,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.model.event.ProfileViewEvent;
+import school.faang.user_service.model.event.SearchAppearanceEvent;
 
 @Component
-public class ProfileViewEventPublisher extends AbstractEventPublisher<ProfileViewEvent>{
-    public ProfileViewEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
-                                     @Qualifier("profileViewTopic") ChannelTopic channelTopic) {
+public class SearchAppearanceEventPublisher extends AbstractEventPublisher<SearchAppearanceEvent> {
+    public SearchAppearanceEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
+                                          @Qualifier("searchAppearanceTopic") ChannelTopic channelTopic) {
         super(redisTemplate, objectMapper, channelTopic);
     }
 }

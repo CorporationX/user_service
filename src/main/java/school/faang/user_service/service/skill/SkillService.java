@@ -1,10 +1,12 @@
 package school.faang.user_service.service.skill;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import school.faang.user_service.dto.message.SkillAcquiredEventMessage;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -14,12 +16,12 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.UserSkillGuaranteeService;
 import school.faang.user_service.validator.skill.SkillOfferValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
-import school.faang.user_service.service.SkillOfferService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class SkillService {
     private final SkillCandidateMapper skillCandidateMapper;
     private final SkillValidator skillValidator;
     private final SkillOfferValidator skillOfferValidator;
+    private final SkillAcquiredEventPublisher publisher;
 
     public SkillDto create(SkillDto skill) {
         skillValidator.validateSkill(skill);
@@ -55,6 +58,7 @@ public class SkillService {
                 .orElseThrow(() -> new EntityNotFoundException("Skill with id " + skillId + " doesn't exist"));
     }
 
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = getSkill(skillId);
         User user = userService.getUserById(userId);
@@ -62,6 +66,11 @@ public class SkillService {
         List<SkillOffer> offers = skillOfferService.findAllOffersOfSkill(skill, user);
         skillOfferValidator.validateOffers(offers, skill, user);
         skillRepository.assignSkillToUser(skillId, userId);
+
+        SkillAcquiredEventMessage message = createMessage(skill, userId);
+        publisher.publish(message);
+
+
         List<UserSkillGuarantee> guaranteeList = new ArrayList<>();
         for (SkillOffer offer : offers) {
             UserSkillGuarantee guarantee = new UserSkillGuarantee();
@@ -94,5 +103,13 @@ public class SkillService {
 
     public List<Skill> getAllSkills(List<Long> skillIds) {
         return skillRepository.findAllById(skillIds);
+    }
+
+    private SkillAcquiredEventMessage createMessage(Skill skill, long userId) {
+        return SkillAcquiredEventMessage.builder()
+                .skillId(skill.getId())
+                .receiverId(userId)
+                .skillTitle(skill.getTitle())
+                .build();
     }
 }

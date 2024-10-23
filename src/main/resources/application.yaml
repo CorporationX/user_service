@@ -30,11 +30,12 @@ spring:
         goalCompletedEvent:
           name: goal_completed_event_channel
         mentorshipRequest: mentorship_request_topic
+        skillAcquiredChannel:
+          name: skill_acquired_channel
 
 servlet:
   multipart:
     max-file-size: 5242880
-
 
 server:
   port: 8080
@@ -71,7 +72,6 @@ services:
   postService:
     endpoint: http://localhost:8081
     requiredHeaders: x-user-id
-
 
 premium:
   schedule: "0 0 0 * * *"

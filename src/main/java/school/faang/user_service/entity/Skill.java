@@ -1,7 +1,6 @@
 package school.faang.user_service.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "skill")
-@NotNull(message = "Skill cannot be null!")
 public class Skill {
 
     @Id

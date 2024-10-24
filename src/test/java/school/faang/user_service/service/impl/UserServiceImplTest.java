@@ -246,11 +246,9 @@ public class UserServiceImplTest {
     @DisplayName("Should return a certain user when user exists by id")
     public void testGetUser_Success() {
         userDto.setActive(true);
-        userContext.setUserId(1L);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
-        when(userContext.getUserId()).thenReturn(1L);
 
         UserDto resultDto = userService.getUser(user.getId());
 
@@ -260,7 +258,6 @@ public class UserServiceImplTest {
                 () -> assertTrue(resultDto.isActive())
         );
         verify(userRepository, times(1)).findById(anyLong());
-        verify(profileViewEventPublisher, times(1)).publish(any());
     }
 
     @Test

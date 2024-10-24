@@ -156,7 +156,6 @@ public class UserServiceImpl implements UserService {
 
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        profileViewEventPublisher.publish(new ProfileViewEvent(userId, userContext.getUserId(), LocalDateTime.now()));
         return userMapper.toDto(user);
     }
 

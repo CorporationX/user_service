@@ -1,14 +1,17 @@
 package school.faang.user_service.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.model.dto.RecommendationRequestDto;
+import school.faang.user_service.model.event.RecommendationRequestedEvent;
 import school.faang.user_service.model.filter_dto.RecommendationRequestFilterDto;
 import school.faang.user_service.model.dto.RejectionDto;
 import school.faang.user_service.model.enums.RequestStatus;
 import school.faang.user_service.model.entity.RecommendationRequest;
 import school.faang.user_service.model.entity.SkillRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.RecommendationRequestRepository;
 import school.faang.user_service.repository.SkillRequestRepository;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
@@ -27,7 +30,9 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestValidator recommendationRequestValidator;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
+    private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
 
+    @Transactional
     @Override
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         recommendationRequestValidator.isUsersInDb(recommendationRequestDto);
@@ -39,8 +44,12 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         recommendationRequestEntity.setSkills(skillRequests);
         skillRequests.forEach(skillRequest ->
                 skillRequestRepository.create((int) skillRequest.getId(), (int) skillRequest.getSkill().getId()));
-        recommendationRequestRepository.save(recommendationRequestEntity);
-        return recommendationRequestMapper.mapToDto(recommendationRequestEntity);
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.save(recommendationRequestEntity);
+        recommendationRequestedEventPublisher.publish(new RecommendationRequestedEvent(
+                recommendationRequestDto.getRequesterId(),
+                recommendationRequestDto.getReceiverId(),
+                recommendationRequest.getId()));
+        return recommendationRequestMapper.mapToDto(recommendationRequest);
     }
 
     @Override

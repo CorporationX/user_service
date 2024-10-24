@@ -13,6 +13,7 @@ import school.faang.user_service.model.entity.Skill;
 import school.faang.user_service.model.entity.SkillRequest;
 import school.faang.user_service.model.enums.RequestStatus;
 import school.faang.user_service.model.filter_dto.RecommendationRequestFilterDto;
+import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.RecommendationRequestRepository;
 import school.faang.user_service.repository.SkillRequestRepository;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
@@ -49,6 +50,9 @@ class RecommendationRequestServiceTest {
     @Mock
     private List<RecommendationRequestFilter> recommendationRequestFilters;
 
+    @Mock
+    private RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
+
     @InjectMocks
     private RecommendationRequestServiceImpl recommendationRequestService;
 
@@ -68,6 +72,7 @@ class RecommendationRequestServiceTest {
         when(skillRequestRepository.findAllById(any())).thenReturn(skillRequests);
         when(recommendationRequestMapper.mapToEntity(requestDto)).thenReturn(recommendationRequestEntity);
         when(recommendationRequestMapper.mapToDto(recommendationRequestEntity)).thenReturn(requestDto);
+        when(recommendationRequestRepository.save(recommendationRequestEntity)).thenReturn(recommendationRequestEntity);
 
         RecommendationRequestDto result = recommendationRequestService.create(requestDto);
 

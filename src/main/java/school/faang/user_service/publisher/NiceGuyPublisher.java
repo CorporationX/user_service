@@ -8,7 +8,7 @@ import school.faang.user_service.model.event.NiceGuyEvent;
 
 @Component
 @RequiredArgsConstructor
-public class NiceGuyPublisherEvent {
+public class NiceGuyPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic niceGuyAchievementTopic;
 

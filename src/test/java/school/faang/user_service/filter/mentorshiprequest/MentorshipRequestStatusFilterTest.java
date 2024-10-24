@@ -1,4 +1,4 @@
-package school.faang.user_service.helper.mentorshiprequest;
+package school.faang.user_service.filter.mentorshiprequest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,47 +8,42 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorshiprequest.MentorshipRecipientRequestFilter;
+import school.faang.user_service.entity.RequestStatus;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class MentorshipRecipientRequestFilterTest {
+class MentorshipRequestStatusFilterTest {
 
     @InjectMocks
-    private MentorshipRecipientRequestFilter filterByRecipientRequest;
+    private MentorshipRequestStatusFilter filterByRequestStatus;
 
     private static final RequestFilterDto requestFilterDto = new RequestFilterDto();
-    private static final User requester = new User();
-    private static final long REQUESTER_ID = 1L;
-    private static final long STREAM_COUNT = 1L;
+    private static final RequestStatus STATUS = RequestStatus.ACCEPTED;
 
     @Test
     @DisplayName("Возвращаем положительный результат")
     void whenValidateIsApplicableThenReturnNotNull() {
-        requestFilterDto.setRequesterId(REQUESTER_ID);
+        requestFilterDto.setStatus(STATUS);
 
-        assertTrue(filterByRecipientRequest.isApplicable(requestFilterDto));
+        assertTrue(filterByRequestStatus.isApplicable(requestFilterDto));
     }
 
     @Test
     void whenFilterThenReturn() {
-        requester.setId(REQUESTER_ID);
-
         MentorshipRequest firstMenReq = new MentorshipRequest();
-        firstMenReq.setRequester(requester);
+        firstMenReq.setStatus(STATUS);
 
         Stream<MentorshipRequest> menReqs = Stream.of(firstMenReq);
 
-        requestFilterDto.setRequesterId(REQUESTER_ID);
+        requestFilterDto.setStatus(STATUS);
 
-        Stream<MentorshipRequest> menReqsNew = filterByRecipientRequest.apply(menReqs, requestFilterDto);
+        Stream<MentorshipRequest> menReqsNew = filterByRequestStatus.apply(menReqs, requestFilterDto);
 
         assertNotNull(menReqsNew);
-        assertEquals(menReqsNew.count(), STREAM_COUNT);
+        assertEquals(menReqsNew.count(), 1L);
     }
 
     @Nested
@@ -56,9 +51,9 @@ class MentorshipRecipientRequestFilterTest {
         @Test
         @DisplayName("Ничего не возвращаем ")
         void whenValidateIsApplicableThenBrake() {
-            requestFilterDto.setRequesterId(null);
+            requestFilterDto.setStatus(null);
 
-            assertFalse(filterByRecipientRequest.isApplicable(requestFilterDto));
+            assertFalse(filterByRequestStatus.isApplicable(requestFilterDto));
         }
     }
 }

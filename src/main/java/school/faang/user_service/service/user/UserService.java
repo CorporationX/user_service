@@ -5,6 +5,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.service.image.AvatarSize;
+import school.faang.user_service.dto.PaymentDto;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -23,6 +24,8 @@ public interface UserService {
     UserDto register(UserDtoForRegistration userDto);
 
     void uploadUsers(MultipartFile file);
+
+    void buyPremium(PaymentDto paymentDto);
 
     void banUserById(long userId);
 }

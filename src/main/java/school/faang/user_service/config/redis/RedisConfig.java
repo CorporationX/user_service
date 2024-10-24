@@ -15,6 +15,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.FollowerEventDto;
+import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
@@ -102,9 +103,25 @@ public class RedisConfig {
     }
 
     @Bean(value = "followerEventChannel")
-    ChannelTopic followerEventChannelTopic(
+    public ChannelTopic followerEventChannelTopic(
             @Value("${spring.data.redis.channels.follower-channel.name}") String name) {
         return new ChannelTopic(name);
+    }
+
+    @Bean(name = "premiumChannel")
+    public ChannelTopic premiumChannelTopic(
+        @Value("${spring.data.redis.channels.premium-channel.name}") String topicName
+    ) {
+        return new ChannelTopic(topicName);
+    }
+
+    @Bean
+    public RedisTemplate<String, PremiumBoughtEvent> PremiumBoughtEventRedisTemplate() {
+        RedisTemplate<String, PremiumBoughtEvent> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, PremiumBoughtEvent.class));
+        return redisTemplate;
     }
 
     @Bean(value = "profileViewChannel")

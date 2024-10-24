@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.PaymentDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import school.faang.user_service.service.image.AvatarSize;
@@ -83,5 +85,14 @@ public class UserController {
     SuccessResponse uploadUser(@RequestParam("file") @ValidFile MultipartFile file) {
         userService.uploadUsers(file);
         return new SuccessResponse("The file is uploaded. Processing...");
+    }
+
+    @PostMapping("/users/premium")
+    public void buyPremium(@RequestBody PaymentDto paymentDto) {
+        /**
+         * Метод-пустышка, нужен для задачи сбора аналитики по покупки премиум доступа
+         * реализация самой покупки - отсутствует
+         */
+        userService.buyPremium(paymentDto);
     }
 }

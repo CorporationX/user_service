@@ -2,9 +2,12 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.PaymentDto;
+import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
@@ -18,6 +21,8 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.FileOperationException;
 import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.MessagePublisher;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.avatar.AvatarService;
@@ -56,6 +61,10 @@ public class UserServiceImpl implements UserService {
     private final CsvLoader csvLoader;
     private final MessagePublisher<ProfileViewEvent> profileViewEventPublisher;
     private final UserContext userContext;
+
+    @Qualifier("premiumBoughtEventPublisher")
+    private final MessagePublisher<PremiumBoughtEvent> premiumBoughtEventPublisher;
+
 
     @Override
     public UserDto getUser(long userId) {
@@ -187,6 +196,22 @@ public class UserServiceImpl implements UserService {
                 .exceptionally(e -> {
                     throw new EntitySaveException("Users were not saved", e);
                 });
+    }
+
+    @Override
+    public void buyPremium(PaymentDto paymentDto) {
+        /**
+         * Метод-пустышка, нужен для задачи сбора аналитики по покупки премиум доступа
+         * реализация самой покупки - отсутствует
+         */
+
+        PremiumBoughtEvent premiumBoughtEvent = new PremiumBoughtEvent(
+                paymentDto.userId(),
+                paymentDto.amount(),
+                paymentDto.duration(),
+                LocalDateTime.now()
+        );
+        premiumBoughtEventPublisher.publish(premiumBoughtEvent);
     }
 
     @Override

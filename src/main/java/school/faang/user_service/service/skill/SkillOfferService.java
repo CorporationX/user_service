@@ -1,7 +1,5 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -11,7 +9,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.UserSkillGuaranteeService;
 

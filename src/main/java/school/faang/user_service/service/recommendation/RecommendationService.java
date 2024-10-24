@@ -10,9 +10,9 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.service.skill.SkillOfferService;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.recommendation.RecommendationDtoValidator;
-import school.faang.user_service.service.SkillOfferService;
 
 import java.util.List;
 

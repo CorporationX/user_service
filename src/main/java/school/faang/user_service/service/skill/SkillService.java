@@ -19,7 +19,6 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.UserSkillGuaranteeService;
 import school.faang.user_service.validator.skill.SkillOfferValidator;
 import school.faang.user_service.validator.skill.SkillValidator;
-import school.faang.user_service.service.SkillOfferService;
 
 import java.util.ArrayList;
 import java.util.List;

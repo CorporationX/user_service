@@ -1,7 +1,7 @@
 package school.faang.user_service.publis.aspect;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,18 +17,13 @@ public class FollowerEventAspect {
     @Autowired
     private FollowerEventPublisher followerEventPublisher;
 
-    @Around("@annotation(PublisherFollowerEvent)")
-    public Object publisherFollowerEvent(ProceedingJoinPoint joinPoint) throws Throwable {
+    @AfterReturning(pointcut = "@annotation(PublisherFollowerEvent)")
+    public void publisherFollowerEvent(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         long followerId = (Long) args[0];
         long followeeId = (Long) args[1];
 
-        Object result = joinPoint.proceed();
-
         User follower = userRepository.findById(followerId).orElseThrow();
         followerEventPublisher.publishFollower(follower, followeeId);
-
-        return result;
     }
-
 }

@@ -30,8 +30,8 @@ spring:
       channels:
         mentorship-channel:
           name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
+        follower_event_channel:
+          name: follower_event_channel
         user_ban_channel:
           name: user_ban
 

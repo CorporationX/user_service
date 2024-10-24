@@ -93,9 +93,6 @@ public class RecommendationServiceImpl implements RecommendationService {
     private void sendEvent(RecommendationDto recommendation) {
         RecommendationReceivedEvent event = buildRecommendationReceivedEvent(recommendation);
         recommendationReceivedEventPublisher.publish(event);
-        NiceGuyEvent niceGuyEvent = buildNiceGuyAchievementEvent(event);
-        niceGuyPublisherEvent.publish(niceGuyEvent);
-
     }
     private NiceGuyEvent buildNiceGuyAchievementEvent(RecommendationReceivedEvent recommendationReceivedEvent) {
         return NiceGuyEvent.builder()

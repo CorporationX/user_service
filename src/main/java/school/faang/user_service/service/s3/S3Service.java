@@ -75,6 +75,10 @@ public class S3Service {
         s3Client.deleteObject(bucketDefaultAvatarsName, key);
     }
 
+    public String getFullAvatarLinkByFileName(String fileName) {
+        return s3Client.getUrl(bucketDefaultAvatarsName, fileName).toString();
+    }
+
     private void putObjectInS3(String bucketName, String key, InputStream inputStream, ObjectMetadata objectMetadata) {
         log.info("Trying to save data in s3. BucketName = {}, key = {}", bucketName, key);
 

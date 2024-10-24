@@ -18,7 +18,7 @@ public class RedisConfiguration {
     private final RedisProperties redisProperties;
 
     @Bean
-    ChannelTopic goalCompletedEventTopic() {
+    public ChannelTopic goalCompletedEventTopic() {
         return new ChannelTopic(redisProperties.getChannels().getGoalCompletedEvent().getName());
     }
 
@@ -30,6 +30,11 @@ public class RedisConfiguration {
     @Bean
     ChannelTopic mentorshipRequestTopic() {
         return new ChannelTopic(redisProperties.getChannels().getMentorshipRequest().getName());
+    }
+
+    @Bean
+    public ChannelTopic profilePicTopic() {
+        return new ChannelTopic(redisProperties.getChannels().getProfilePicEventChannel().getName());
     }
 
     @Bean

@@ -18,6 +18,7 @@ import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
+import school.faang.user_service.dto.event.RecommendationReceivedEvent;
 import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
 
 @Configuration
@@ -90,6 +91,15 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean
+    public RedisTemplate<String, RecommendationReceivedEvent> recommendationReceivedEventRedisTemplate() {
+        RedisTemplate<String, RecommendationReceivedEvent> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, RecommendationReceivedEvent.class));
+        return template;
+    }
+
     @Bean(value = "userBanChannel")
     public ChannelTopic userBanChannel(
             @Value("${spring.data.redis.channels.user-ban-channel.name}") String userBanTopicName) {
@@ -122,6 +132,12 @@ public class RedisConfig {
     @Bean(value = "mentorshipEventChannel")
     ChannelTopic mentorshipEventChannelTopic(
             @Value("${spring.data.redis.channels.mentorship-channel.name}") String name) {
+        return new ChannelTopic(name);
+    }
+
+    @Bean(value = "recommendationReceivedTopic")
+    ChannelTopic recommendationReceivedTopic(
+            @Value("${spring.data.redis.channels.recommendation-channel.name}") String name) {
         return new ChannelTopic(name);
     }
 }

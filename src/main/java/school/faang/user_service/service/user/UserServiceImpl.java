@@ -8,6 +8,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.PaymentDto;
 import school.faang.user_service.dto.event.PremiumBoughtEvent;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserDtoForRegistration;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import school.faang.user_service.exception.user.EntitySaveException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.image.AvatarSize;
@@ -56,6 +59,8 @@ public class UserServiceImpl implements UserService {
     private final S3Service s3Service;
     private final UserUploadService userUploadService;
     private final CsvLoader csvLoader;
+    private final MessagePublisher<ProfileViewEvent> profileViewEventPublisher;
+    private final UserContext userContext;
 
     @Qualifier("premiumBoughtEventPublisher")
     private final MessagePublisher<PremiumBoughtEvent> premiumBoughtEventPublisher;
@@ -118,6 +123,14 @@ public class UserServiceImpl implements UserService {
             byte[] avatarBytes = userAvatarIS.readAllBytes();
             Resource avatarResource = new ByteArrayResource(avatarBytes);
             log.info("User avatar downloaded successfully for user ID: {}, size: {}", userId, size);
+
+            ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
+                    .userId(userId)
+                    .guestId(userContext.getUserId())
+                    .viewDateTime(LocalDateTime.now())
+                    .build();
+            profileViewEventPublisher.publish(profileViewEvent);
+
             return avatarResource;
         } catch (IOException e) {
             throw new FileOperationException("Failed to download user avatar for user ID: %s, size: %s"
@@ -199,5 +212,13 @@ public class UserServiceImpl implements UserService {
                 LocalDateTime.now()
         );
         premiumBoughtEventPublisher.publish(premiumBoughtEvent);
+    }
+
+    @Override
+    public void banUserById(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id %s not found".formatted(userId)));
+        user.setBanned(true);
+        userRepository.save(user);
     }
 }

@@ -62,6 +62,9 @@ public class User {
     @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Column(name = "banned")
+    private boolean banned;
+
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
 
@@ -154,6 +157,7 @@ public class User {
     private UserProfilePic userProfilePic;
 
     @OneToOne(mappedBy = "user")
+    @JoinColumn(name = "prefernce")
     private ContactPreference contactPreference;
 
     @OneToOne(mappedBy = "user")

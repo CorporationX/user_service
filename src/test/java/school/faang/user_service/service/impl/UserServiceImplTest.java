@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.event.ProfileViewEvent;
 import school.faang.user_service.model.entity.TelegramContact;
 import school.faang.user_service.model.filter_dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
@@ -38,9 +39,6 @@ import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.EventRepository;
 import school.faang.user_service.repository.GoalRepository;
-import school.faang.user_service.service.impl.MentorshipServiceImpl;
-import school.faang.user_service.service.impl.S3serviceImpl;
-import school.faang.user_service.service.impl.UserServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -71,7 +69,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -106,6 +104,8 @@ public class UserServiceTest {
     private Goal secondGoal;
     private Event firstEvent;
     private Event secondEvent;
+    long viewerId;
+    long profileOwnerId;
 
     @BeforeEach
     void setUp() {
@@ -246,11 +246,9 @@ public class UserServiceTest {
     @DisplayName("Should return a certain user when user exists by id")
     public void testGetUser_Success() {
         userDto.setActive(true);
-        userContext.setUserId(1L);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
-        when(userContext.getUserId()).thenReturn(1L);
 
         UserDto resultDto = userService.getUser(user.getId());
 
@@ -260,7 +258,6 @@ public class UserServiceTest {
                 () -> assertTrue(resultDto.isActive())
         );
         verify(userRepository, times(1)).findById(anyLong());
-        verify(profileViewEventPublisher, times(1)).publish(any());
     }
 
     @Test
@@ -528,5 +525,26 @@ public class UserServiceTest {
 
         verify(telegramContactRepository, never()).save(telegramContact);
         verify(telegramContactRepository, times(1)).findByTelegramUserName(telegramUserName);
+    }
+    @Test
+    @DisplayName("Should publish ProfileViewEvent when viewer id is different from profile owner id")
+    public void testPublishProfileViewEvent_Success() {
+        viewerId = 1L;
+        profileOwnerId = 2L;
+
+        userService.publishProfileViewEvent(viewerId, profileOwnerId);
+
+        verify(profileViewEventPublisher, times(1)).publish(any(ProfileViewEvent.class));
+    }
+
+    @Test
+    @DisplayName("Should not publish ProfileViewEvent when viewer id is same as profile owner id")
+    public void testPublishProfileViewEvent_SameViewerAndProfileOwnerIds() {
+        long viewerId = 1L;
+        long profileOwnerId = 1L;
+
+        userService.publishProfileViewEvent(viewerId, profileOwnerId);
+
+        verify(profileViewEventPublisher, never()).publish(any(ProfileViewEvent.class));
     }
 }

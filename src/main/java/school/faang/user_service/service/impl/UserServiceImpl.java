@@ -42,13 +42,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
 import java.time.LocalDateTime;
-import java.util.*;
 import java.util.stream.Stream;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final static String PROMOTION_TARGET = "profile";
 
@@ -151,7 +156,6 @@ public class UserServiceImpl implements UserService {
 
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        profileViewEventPublisher.publish(new ProfileViewEvent(userId, userContext.getUserId(), LocalDateTime.now()));
         return userMapper.toDto(user);
     }
 
@@ -409,5 +413,18 @@ public class UserServiceImpl implements UserService {
             password.append(chars.charAt(random.nextInt(chars.length())));
         }
         return password.toString();
+    }
+
+    @Override
+    public void publishProfileViewEvent(long viewerId, long profileOwnerId) {
+        if (viewerId != profileOwnerId) {
+            ProfileViewEvent event = new ProfileViewEvent(profileOwnerId, viewerId, LocalDateTime.now());
+            profileViewEventPublisher.publish(event);
+
+            log.info("Published ProfileViewEvent: viewerId={}, profileOwnerId={}", viewerId, profileOwnerId);
+        } else {
+            log.debug("Viewer ID is the same as Profile Owner ID. No event published. viewerId={}, profileOwnerId={}",
+                    viewerId, profileOwnerId);
+        }
     }
 }

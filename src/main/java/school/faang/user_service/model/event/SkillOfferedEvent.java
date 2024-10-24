@@ -5,14 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProfileViewEvent {
+public class SkillOfferedEvent {
+    private Long senderId;
     private Long receiverId;
-    private Long actorId;
-    private LocalDateTime receivedAt;
+    private Long skillId;
 }

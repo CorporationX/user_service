@@ -248,4 +248,19 @@ public class UserControllerTest {
 
         verify(userService, times(1)).updateTelegramUserId(telegramUserName, telegramUserId);
     }
+
+    @Test
+    @DisplayName("Should return user profile when valid user id and header provided")
+    public void getUserProfile_Success() throws Exception {
+        userDto.setUsername("Test User");
+
+        when(userContext.getUserId()).thenReturn(108L);
+        when(userService.getUser(2L)).thenReturn(userDto);
+
+        mockMvc.perform(get("/users/2/profile")
+                        .header("x-user-id", "108"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2L))
+                .andExpect(jsonPath("$.username").value("Test User"));
+    }
 }

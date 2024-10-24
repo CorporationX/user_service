@@ -8,8 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.model.dto.recommendation.RecommendationDto;
 import school.faang.user_service.model.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.model.entity.recommendation.Recommendation;
+import school.faang.user_service.model.event.NiceGuyEvent;
 import school.faang.user_service.model.event.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.NiceGuyPublisher;
+import school.faang.user_service.publisher.NiceGuyPublisher;
 import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -28,6 +31,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final RecommendationServiceValidator validator;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
+    private final NiceGuyPublisher niceGuyPublisher;
 
     @Override
     @Transactional
@@ -91,7 +95,13 @@ public class RecommendationServiceImpl implements RecommendationService {
         RecommendationReceivedEvent event = buildRecommendationReceivedEvent(recommendation);
         recommendationReceivedEventPublisher.publish(event);
     }
-
+    private NiceGuyEvent buildNiceGuyAchievementEvent(RecommendationReceivedEvent recommendationReceivedEvent) {
+        return NiceGuyEvent.builder()
+                .receiverId(recommendationReceivedEvent.receiverId())
+                .authorId(recommendationReceivedEvent.authorId())
+                .text("Вы получили достижение 'Просто душка'!")
+                .build();
+    }
     private RecommendationReceivedEvent buildRecommendationReceivedEvent(RecommendationDto recommendation) {
         return RecommendationReceivedEvent.builder()
                 .authorId(recommendation.authorId())

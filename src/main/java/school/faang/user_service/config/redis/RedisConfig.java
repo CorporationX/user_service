@@ -45,6 +45,8 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.recommendation-received-channel.name}")
     private String recommendationReceived;
+    @Value("${spring.data.redis.channels.nice-guy-achievement-channel.name}")
+    private String niceGuyAchievementReceived;
 
     @Value("${spring.data.redis.channels.follow-project-channel.name}")
     private String followProjectTopic;
@@ -96,6 +98,7 @@ public class RedisConfig {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
         container.addMessageListener(banUserMessageListenerAdapter(), banUserChannelTopic());
+
         return container;
     }
 
@@ -108,6 +111,8 @@ public class RedisConfig {
     public ChannelTopic banUserChannelTopic() {
         return new ChannelTopic(banUserTopic);
     }
+    @Bean
+    public ChannelTopic niceGuyAchievementTopic() { return new ChannelTopic(niceGuyAchievementReceived);}
 
     @Bean
     public ChannelTopic followerTopic() {

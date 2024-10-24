@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
+    @Mapping(source = "contactPreference.preference", target = "preference")
     UserResponseDto toDto(User entity);
 
     List<UserResponseDto> toDtos(List<User> entities);

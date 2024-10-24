@@ -61,7 +61,6 @@ public class SubscriptionServiceTest {
 
     @Test
     public void testFollowUser_successSubscribe() {
-
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
         subscriptionService.followUser(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
@@ -167,7 +166,9 @@ public class SubscriptionServiceTest {
         when(userFilter.getPredicate(filterDto)).thenReturn(user -> user.getEmail().contains(email));
 
         userFilters = List.of(userFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters);
+        subscriptionService = new SubscriptionService(
+                subscriptionRepository,
+                userFilters);
 
         List<User> result = subscriptionService.getFollowers(followeeId, filterDto);
 

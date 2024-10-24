@@ -22,8 +22,7 @@ public class AuthorBanListener implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             AuthorBanDto dto = mapper.readValue(message.getBody(), AuthorBanDto.class);
-            Long idToBan = dto.userId();
-            userService.banUser(idToBan);
+            userService.banUser(dto.userId());
         } catch(IOException e) {
             log.error("Faced an issue when deserializing to AuthorBanDto");
             throw new IllegalStateException("Faced an issue when deserializing to AuthorBanDto");

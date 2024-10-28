@@ -102,4 +102,8 @@ public class UserService {
                 .filter(goal -> goal.getUsers().size() == ONE_USER)
                 .toList();
     }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream().map(mapper::toDto).toList();
+    }
 }

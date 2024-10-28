@@ -55,4 +55,9 @@ public class UserController {
     public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         return service.getPremiumUsers(userFilterDto);
     }
+
+    @GetMapping()
+    public List<UserDto> getAllUsers(){
+        return service.getAllUsers();
+    }
 }

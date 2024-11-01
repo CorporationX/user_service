@@ -1,28 +1,39 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.service.SkillService;
 
+import java.util.List;
+
+@Validated
 @Component
 public class SkillController {
-    private SkillService skillService;
+    private final SkillService skillService;
 
     @Autowired
     public SkillController(SkillService skillService) {
         this.skillService = skillService;
     }
 
-    public SkillDto create(SkillDto skillDto) {
-
+    public SkillDto create(@Valid SkillDto skillDto) {
+        return skillService.create(skillDto);
     }
 
-    public void validateSkill(SkillDto skillDto) {
-        if (skillDto.getTitle() == null) {
+    public List<SkillDto> getUserSkills(@Positive @NotNull
+                                        Long userId) {
+        return skillService.getUserSkills(userId);
+    }
 
-        } else {
-
-        }
+    public List<SkillCandidateDto> getOfferedSkills(@Positive
+                                                    @NotNull
+                                                    Long userId) {
+          return skillService.getOfferedSkills(userId);
     }
 }

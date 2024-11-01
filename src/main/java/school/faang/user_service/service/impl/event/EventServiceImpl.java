@@ -15,7 +15,7 @@ import school.faang.user_service.model.event.EventStartEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
-import school.faang.user_service.publisher.EventStartEventPublisher;
+import school.faang.user_service.producer.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.EventService;
 import school.faang.user_service.validator.event.EventValidator;

@@ -14,7 +14,7 @@ import school.faang.user_service.model.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.recommendation.Recommendation;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
-import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
+import school.faang.user_service.producer.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;

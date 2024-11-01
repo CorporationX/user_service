@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.model.dto.ProjectDto;
 import school.faang.user_service.model.event.ProjectFollowerEvent;
-import school.faang.user_service.publisher.ProjectSubscriptionPublisher;
+import school.faang.user_service.producer.ProjectSubscriptionPublisher;
 import school.faang.user_service.repository.ProjectSubscriptionRepository;
 import school.faang.user_service.service.impl.project.subscription.ProjectSubscriptionServiceImpl;
 import school.faang.user_service.validator.project.subscription.ProjectSubscriptionValidator;

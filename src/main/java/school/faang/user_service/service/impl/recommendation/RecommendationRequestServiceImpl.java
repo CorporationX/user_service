@@ -11,7 +11,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.model.event.RecommendationRequestedEvent;
-import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
+import school.faang.user_service.producer.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.RecommendationRequestService;

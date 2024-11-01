@@ -16,7 +16,7 @@ import school.faang.user_service.model.enums.premium.PaymentStatus;
 import school.faang.user_service.model.entity.Premium;
 import school.faang.user_service.model.enums.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
-import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
+import school.faang.user_service.producer.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.impl.premium.PremiumServiceImpl;
 import school.faang.user_service.service.impl.user.UserServiceImpl;

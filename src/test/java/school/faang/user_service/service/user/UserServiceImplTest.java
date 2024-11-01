@@ -12,17 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapperImpl;
-import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.producer.SearchAppearanceEventPublisher;
 import school.faang.user_service.model.dto.user.UserDto;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.model.dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.User;
-import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.model.entity.contact.ContactPreference;
 import school.faang.user_service.model.enums.contact.PreferredContact;
-import school.faang.user_service.publisher.ProfileViewEventPublisherImpl;
-import school.faang.user_service.model.dto.user.UserDto;
+import school.faang.user_service.producer.ProfileViewEventPublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;
@@ -87,7 +83,7 @@ class UserServiceImplTest {
     private UserContext userContext;
 
     @Mock
-    private ProfileViewEventPublisherImpl profileViewEventPublisher;
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     private long id;
     private UserDto userDto;

@@ -13,7 +13,7 @@ import school.faang.user_service.model.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.publisher.FollowerEventPublisher;
+import school.faang.user_service.producer.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.impl.subscription.SubscriptionServiceImpl;
 import school.faang.user_service.util.TestDataFactory;

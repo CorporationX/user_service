@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.model.dto.ProjectDto;
 import school.faang.user_service.model.event.ProjectFollowerEvent;
-import school.faang.user_service.publisher.ProjectSubscriptionPublisher;
+import school.faang.user_service.producer.ProjectSubscriptionPublisher;
 import school.faang.user_service.repository.ProjectSubscriptionRepository;
 import school.faang.user_service.service.ProjectSubscriptionService;
 import school.faang.user_service.validator.project.subscription.ProjectSubscriptionValidator;

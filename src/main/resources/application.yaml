@@ -13,6 +13,43 @@ spring:
       hibernate:
         format_sql: true
 
+  kafka:
+    host: localhost
+    port: 9092
+    channels:
+      event-starter: event_starter_channel
+      profile: profile_channel
+      follower-event-channel:
+        name: follower_event_channel
+      event-start-channel:
+        name: event_start_channel
+      recommendation-received-channel:
+        name: recommendation_received_channel
+      ban-user-channel:
+        name: user_ban
+      follow-project-channel:
+        name: project_subscription_event
+      search-appearance-channel:
+        name: search_appearance_event
+      goal-completed-event-channel:
+        name: goal_completed_event_channel
+      skill-acquired-channel:
+        name: skill_acquired_channel
+      recommendation-request-channel:
+        name: recommendation_req_channel
+      mentorship-accepted-event-channel:
+        name: mentorship_accepted_event_channel
+      premium-bought-channel:
+        name: premium_bought_channel
+      skill-offered-channel:
+        name: skill_offered_channel
+      mentorship-request-channel:
+        name: mentorship-request-channel
+      fund-raised-channel:
+        name: fund-raised-channel
+      mentorship-start-channel:
+        name: mentorship_start_channel
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
@@ -20,41 +57,6 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        event-starter: event_starter_channel
-        profile: profile_channel
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event_channel
-        event-start-channel:
-          name: event_start_channel
-        recommendation-received-channel:
-          name: recommendation_received_channel
-        ban-user-channel:
-          name: user_ban
-        follow-project-channel:
-          name: project_subscription_event
-        search-appearance-channel:
-          name: search_appearance_event
-        goal-completed-event-channel:
-          name: goal_completed_event_channel
-        skill-acquired-channel:
-          name: skill_acquired_channel
-        recommendation-request-channel:
-          name: recommendation_req_channel
-        mentorship-accepted-event-channel:
-          name: mentorship_accepted_event_channel
-        premium-bought-channel:
-          name: premium_bought_channel
-        skill-offered-channel:
-          name: skill_offered_channel
-        mentorship-request-channel:
-          name: mentorship-request-channel
-        fund-raised-channel:
-          name: fund-raised-channel
-        mentorship-start-channel:
-          name: mentorship_start_channel
 
 server:
   port: 8080

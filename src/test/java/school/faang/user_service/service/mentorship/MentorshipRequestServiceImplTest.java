@@ -13,12 +13,8 @@ import school.faang.user_service.model.dto.RequestFilter;
 import school.faang.user_service.model.entity.MentorshipRequest;
 import school.faang.user_service.model.entity.RequestStatus;
 import school.faang.user_service.model.entity.User;
-import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
-import school.faang.user_service.mapper.RequestMapper;
-import school.faang.user_service.model.dto.MentorshipRequestDto;
-import school.faang.user_service.model.dto.Rejection;
-import school.faang.user_service.model.dto.RequestFilter;
-import school.faang.user_service.publisher.MentorshipStartEventPublisher;
+import school.faang.user_service.producer.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.producer.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.impl.mentorship.MentorshipRequestServiceImpl;
 

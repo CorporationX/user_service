@@ -3,7 +3,7 @@ package school.faang.user_service.service.impl.donate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.model.event.FundRaisedEvent;
-import school.faang.user_service.publisher.FundRaisedEventPublisher;
+import school.faang.user_service.producer.FundRaisedEventPublisher;
 import school.faang.user_service.service.DonateService;
 
 import java.math.BigDecimal;

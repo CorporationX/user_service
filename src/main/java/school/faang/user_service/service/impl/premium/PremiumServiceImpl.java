@@ -15,7 +15,7 @@ import school.faang.user_service.model.entity.Premium;
 import school.faang.user_service.model.enums.premium.PremiumPeriod;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.model.event.PremiumBoughtEvent;
-import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
+import school.faang.user_service.producer.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PremiumService;
 import school.faang.user_service.service.UserService;

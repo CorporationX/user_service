@@ -14,7 +14,7 @@ import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.goal.Goal;
 import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.model.event.GoalCompletedEvent;
-import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+import school.faang.user_service.producer.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;

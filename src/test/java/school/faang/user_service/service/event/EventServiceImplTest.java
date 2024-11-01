@@ -18,7 +18,7 @@ import school.faang.user_service.model.event.EventStartEvent;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
-import school.faang.user_service.publisher.EventStartEventPublisher;
+import school.faang.user_service.producer.EventStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.impl.event.EventServiceImpl;

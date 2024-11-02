@@ -13,12 +13,7 @@ public interface UserMapper {
 
     UserDto toDto(User user);
 
-    default List<UserDto> toListDto(List<User> users) {
-        return users.stream().map(this::toDto).toList();
-    }
+    List<UserDto> toListDto(List<User> users);
 
-    default List<User> toListUser(List<UserDto> users) {
-        return users.stream().map(this::toUser).toList();
-    }
-
+    List<User> toListUser(List<UserDto> users);
 }

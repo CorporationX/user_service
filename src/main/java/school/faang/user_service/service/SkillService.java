@@ -10,6 +10,8 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class SkillService {
@@ -37,8 +39,11 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills(Long userId) {
-        skillRepository.findSkillsOfferedToUser(userId);
-
+        List<Skill> allOfferedSkills = skillRepository.findSkillsOfferedToUser(userId);
+        Map<Skill, Long> map2 = allOfferedSkills.stream()
+                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
+        List<SkillCandidateDto> listFinal = skillMapper.toCandidateDto(map2);
+        return listFinal;
     }
 }
 

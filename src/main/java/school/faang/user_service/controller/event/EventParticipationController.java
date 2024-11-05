@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.event;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Tag(name = "Event-Participation-Controller")
 @Slf4j
 public class EventParticipationController {
     private final EventParticipationService service;

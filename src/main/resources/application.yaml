@@ -41,5 +41,5 @@ payment-service:
   host: localhost
   port: 9080
 
-  skill:
-    minOffersRequired: 3
+skill:
+  minOffersRequired: 3

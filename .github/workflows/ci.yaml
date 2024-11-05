@@ -5,7 +5,7 @@ on:
     branches:
       - feature/pipeline-BC-*
   push:
-     branches:
+    branches:
       - feature/pipeline-BC-*
 jobs:
   test:
@@ -28,7 +28,7 @@ jobs:
       - name: Run tests
         run: |
           ./gradlew test --no-daemon
-        continue-on-error: ${{ github.event.pull_request.head.ref == 'feature/pipeline-test-BC-tasknumber' }}
+        continue-on-error: ${{ github.event.pull_request.head.ref == 'feature/pipeline-test-BC-BJS2-40777' }}
 
   # Optional step: Notifies if any tests failed
   notifications:

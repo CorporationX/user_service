@@ -1,0 +1,3 @@
+application:
+  constants:
+    max-active-goals-count: 3

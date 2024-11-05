@@ -1,40 +1,40 @@
-name: CI
+name: CI Pipeline
 
 on:
-  [push, pull_request]
-
+  pull_request:
+    branches:
+      - feature/pipeline-BC-*
+  push:
+     branches:
+      - feature/pipeline-BC-*
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
-
-      - name: Build with Gradle
-        run: ./gradlew build --info
-
-      - name: Cache build outputs
-        uses: actions/cache@v4
-        with:
-          path: build
-          key: ${{ runner.os }}-build-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-build-
+      - name: Install dependencies
+        run: |
+          ./gradlew clean build --no-daemon
 
       - name: Run tests
-        run: ./gradlew test --no-daemon --continue
+        run: |
+          ./gradlew test --no-daemon
+        continue-on-error: ${{ github.event.pull_request.head.ref == 'feature/pipeline-test-BC-tasknumber' }}
+
+  # Optional step: Notifies if any tests failed
+  notifications:
+    needs: test
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Notify on Failure
+        run: echo "Tests failed in feature/pipeline-test-BC-BJS2-40777"

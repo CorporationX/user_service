@@ -1,6 +1,9 @@
 name: CI Pipeline
+# on:
+#  [ push, pull_request ]
 
 on:
+  [ push, pull_request ]
   pull_request:
     branches:
       - feature/pipeline-BC-*

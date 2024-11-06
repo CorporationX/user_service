@@ -11,6 +11,6 @@ public class failTest {
 
     @Test
     public void failTest() {
-        assertEquals(10, 5 + 4);
+        assertEquals(10, 4 + 5);
     }
 }

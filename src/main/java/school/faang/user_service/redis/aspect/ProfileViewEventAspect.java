@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.redis.event.ProfileViewEvent;
@@ -16,6 +17,7 @@ public class ProfileViewEventAspect {
     private final ProfileViewEventPublisher publisher;
     private final UserContext userContext;
 
+    @Async
     @AfterReturning(pointcut = "@annotation(PublishProfileViewEvent)")
     public void publishProfileViewEvent(JoinPoint joinPoint) {
         long requesterId = userContext.getUserId();

@@ -65,6 +65,13 @@ public class UserService {
     }
 
     @PublishProfileViewEvent
+    @Transactional(readOnly = true)
+    public UserDto getUserProfile(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalArgumentException("User does not exist"));
+        return userMapper.toDto(user);
+    }
+
     public UserDto getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("User does not exist"));

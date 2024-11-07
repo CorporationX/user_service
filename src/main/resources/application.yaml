@@ -41,5 +41,8 @@ payment-service:
   host: localhost
   port: 9080
 
+  application:
+    constants:
+      max-active-goals-count: 3
   skill:
     minOffersRequired: 3

@@ -17,7 +17,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)
-    Stream<Goal> findGoalsByUserId(long userId);
+    Stream<Goal> getGoalsByUserIdId(long userId);
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)

@@ -2,11 +2,8 @@ name: CI Pipline Cyclop stream7
 on:
   pull_request:
     branches: [ "Cyclop-master-stream7" ]
-
-
 jobs:
   test:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read

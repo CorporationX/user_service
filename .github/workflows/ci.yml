@@ -1,9 +1,7 @@
-name: CI
+name: CI Pipline Cyclop stream7
 on:
-  push:
-    branches: [ "feature/pipline-BC-BJS2-40717" ]
   pull_request:
-    branches: [ "feature/pipline-BC-BJS2-40717" ]
+    branches: [ "Cyclop-master-stream7" ]
 
 
 jobs:

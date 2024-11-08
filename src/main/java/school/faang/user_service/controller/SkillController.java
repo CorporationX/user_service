@@ -36,4 +36,11 @@ public class SkillController {
                                                     Long userId) {
           return skillService.getOfferedSkills(userId);
     }
+
+    public SkillDto acquireSkillFromOffers(long skillId,
+                                           @Positive
+                                           @NotNull
+                                           Long userId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
+    }
 }

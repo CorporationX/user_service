@@ -1,8 +1,7 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
@@ -22,67 +21,88 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class SkillService {
     private static final long MIN_SKILL_OFFERS = 3;
-    private final SkillRepository skillRepository;
+    private final SkillRepository skillRepo;
     private final SkillMapper skillMapper;
-    private final SkillOfferRepository skillOfferRepository;
-    private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserRepository userRepository;
-    private List<UserSkillGuarantee> list3;
+    private final SkillOfferRepository skillOfferRepo;
+    private final UserSkillGuaranteeRepository userSkillGuaranteeRepo;
+    private final UserRepository userRepo;
 
     public SkillDto create(SkillDto skillDto) {
-        if (skillRepository.existsByTitle(skillDto.title())) {
+        if (skillRepo.existsByTitle(skillDto.title())) {
             throw new DataValidationException();
         }
-            Skill skillEntity = skillMapper.toEntity(skillDto);
-            skillEntity = skillRepository.save(skillEntity);
-            return skillMapper.toDto(skillEntity);
+        Skill skill = skillMapper.toEntity(skillDto);
+        skill = skillRepo.save(skill);
+        return skillMapper.toDto(skill);
     }
 
     public List<SkillDto> getUserSkills(Long userId) {
-        List<Skill> allSkills = skillRepository.findAllByUserId(userId);
+        List<Skill> allSkills = skillRepo.findAllByUserId(userId);
         return allSkills.stream().map(skillMapper::toDto).toList();
     }
 
     public List<SkillCandidateDto> getOfferedSkills(Long userId) {
-        List<Skill> allOfferedSkills = skillRepository.findSkillsOfferedToUser(userId);
-        Map<Skill, Long> map2 = allOfferedSkills.stream()
-                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
-        List<SkillCandidateDto> listFinal = map2.entrySet().stream()
-                .map(entryPair -> new SkillCandidateDto(skillMapper.toDto(entryPair.getKey()),
-                        entryPair.getValue()))
+        List<Skill> allOfferedSkills = skillRepo.findSkillsOfferedToUser(userId);
+        Map<Skill, Long> sortedMap = allOfferedSkills.stream()
+                .collect(Collectors.groupingBy(skill -> skill,
+                        Collectors.counting()));
+        List<SkillCandidateDto> sortedOfferedSkills = sortedMap.entrySet().stream()
+                .map(entryPair -> SkillCandidateDto.builder()
+                        .skillDto(skillMapper.toDto(entryPair.getKey()))
+                        .offersAmount(entryPair.getValue())
+                        .build())
                 .toList();
-        return listFinal;
+        return sortedOfferedSkills;
     }
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        Optional<Skill> requiredSkill = skillRepository.findUserSkill(skillId, userId);
+        Optional<Skill> requiredSkill = skillRepo.findUserSkill(skillId, userId);
         if (requiredSkill.isEmpty()) {
-            List<SkillOffer> allOffers =
-                    skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-            long count = allOffers.size();
-            if (count >= MIN_SKILL_OFFERS) {
-                skillRepository.assignSkillToUser(skillId, userId);
-                Skill skill1 = skillRepository.findById(skillId).orElseThrow(() ->
-                        new RuntimeException("Скилл не найден"));
-                User user4 = userRepository.findById(userId).orElseThrow(() ->
-                        new RuntimeException("Пользователь не найден"));
-                for (SkillOffer skillOffer : allOffers) {
-                    UserSkillGuarantee obj = UserSkillGuarantee.builder()
-                            .user(user4)
-                            .skill(skill1)
-                            .guarantor(skillOffer.getRecommendation().getAuthor())
-                            .build();
-                    userSkillGuaranteeRepository.save(obj);
-                    skill1.addGuarantee(obj);
-                }
-                skillRepository.save(skill1);
-                return skillMapper.toDto(skill1);
-            }
+            assignSkillIfCountValid(skillId, userId);
+            createAndAddGuarantee(skillId, userId);
+            Skill skill = skillRepo.findById(skillId).orElseThrow(() ->
+                    new EntityNotFoundException("Skill not found"));
+            skillRepo.save(skill);
+            return skillMapper.toDto(skill);
+        } else {
+            throw new IllegalArgumentException("Skill with " + skillId
+                    + " id is already exists");
+        }
+    }
+
+    private void assignSkillIfCountValid(Long skillId, Long userId) {
+        List<SkillOffer> allSkillOffers =
+                skillOfferRepo.findAllOffersOfSkill(skillId, userId);
+        long count = allSkillOffers.size();
+        if (count >= MIN_SKILL_OFFERS) {
+            skillRepo.assignSkillToUser(skillId, userId);
+        } else {
+            throw new RuntimeException("Not enough offers of skill to assign to user");
+        }
+    }
+
+    private void createAndAddGuarantee(Long skillId, Long userId) {
+        List<SkillOffer> allSkillOffers =
+                skillOfferRepo.findAllOffersOfSkill(skillId, userId);
+        Skill skill = skillRepo.findById(skillId).orElseThrow(() ->
+                new EntityNotFoundException("Skill not found"));
+        User user = userRepo.findById(userId).orElseThrow(() ->
+                new EntityNotFoundException("User not found"));
+        for (SkillOffer skillOffer : allSkillOffers) {
+            UserSkillGuarantee newGuarantee = UserSkillGuarantee.builder()
+                    .user(user)
+                    .skill(skill)
+                    .guarantor(skillOffer.getRecommendation().getAuthor())
+                    .build();
+            userSkillGuaranteeRepo.save(newGuarantee);
+            skill.addGuarantee(newGuarantee);
         }
     }
 }
+
 

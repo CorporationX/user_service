@@ -34,7 +34,8 @@ public class SkillService {
 
     public SkillDto create(SkillDto skillDto) {
         if (skillRepo.existsByTitle(skillDto.title())) {
-            throw new DataValidationException();
+            throw new DataValidationException("Couldn't create a skill:"
+                    + " skill already exists");
         }
         Skill skill = skillMapper.toEntity(skillDto);
         skill = skillRepo.save(skill);
@@ -51,7 +52,8 @@ public class SkillService {
         Map<Skill, Long> sortedMap = allOfferedSkills.stream()
                 .collect(Collectors.groupingBy(skill -> skill,
                         Collectors.counting()));
-        List<SkillCandidateDto> sortedOfferedSkills = sortedMap.entrySet().stream()
+        List<SkillCandidateDto> sortedOfferedSkills = sortedMap.entrySet()
+                .stream()
                 .map(entryPair -> SkillCandidateDto.builder()
                         .skillDto(skillMapper.toDto(entryPair.getKey()))
                         .offersAmount(entryPair.getValue())
@@ -61,8 +63,8 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        Optional<Skill> requiredSkill = skillRepo.findUserSkill(skillId, userId);
-        if (requiredSkill.isEmpty()) {
+        Optional<Skill> offeredSkill = skillRepo.findUserSkill(skillId, userId);
+        if (offeredSkill.isEmpty()) {
             assignSkillIfCountValid(skillId, userId);
             createAndAddGuarantee(skillId, userId);
             Skill skill = skillRepo.findById(skillId).orElseThrow(() ->
@@ -70,7 +72,7 @@ public class SkillService {
             skillRepo.save(skill);
             return skillMapper.toDto(skill);
         } else {
-            throw new IllegalArgumentException("Skill with " + skillId
+            throw new DataValidationException("Skill with " + skillId
                     + " id is already exists");
         }
     }
@@ -82,7 +84,8 @@ public class SkillService {
         if (count >= MIN_SKILL_OFFERS) {
             skillRepo.assignSkillToUser(skillId, userId);
         } else {
-            throw new RuntimeException("Not enough offers of skill to assign to user");
+            throw new RuntimeException("Not enough offers of skill" +
+                    " to assign to user");
         }
     }
 

@@ -7,5 +7,6 @@ import lombok.Builder;
 public record SkillDto(
         Long id,
         @NotBlank(message = "title не может быть пустым или null")
-        String title) {
+        String title
+) {
 }

@@ -18,6 +18,7 @@ import school.faang.user_service.dto.event.FollowerEventDto;
 import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
+import school.faang.user_service.dto.event.ProfilePicEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.event.RecommendationReceivedEvent;
 import school.faang.user_service.service.user.redis.RedisMessageSubscriber;
@@ -74,6 +75,12 @@ public class RedisConfig {
         return template;
     }
 
+    @Bean(value = "userBanChannel")
+    public ChannelTopic userBanChannel(
+            @Value("${spring.data.redis.channels.user-ban-channel.name}") String userBanTopicName) {
+        return new ChannelTopic(userBanTopicName);
+    }
+
     @Bean
     RedisTemplate<String, GoalCompletedEventDto> redisGoalTemplate() {
         RedisTemplate<String, GoalCompletedEventDto> template = new RedisTemplate<>();
@@ -101,15 +108,18 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(value = "userBanChannel")
-    public ChannelTopic userBanChannel(
-            @Value("${spring.data.redis.channels.user-ban-channel.name}") String userBanTopicName) {
-        return new ChannelTopic(userBanTopicName);
-    }
-
     @Bean(value = "eventTopic")
     public ChannelTopic eventTopic(@Value("${spring.data.redis.channels.event-event-channel.name}") String topic) {
         return new ChannelTopic(topic);
+    }
+
+    @Bean
+    RedisTemplate<String, ProfilePicEventDto> redisProfilePicTemplate() {
+        RedisTemplate<String, ProfilePicEventDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, ProfilePicEventDto.class));
+        return template;
     }
 
     @Bean(value = "followerEventChannel")
@@ -155,6 +165,12 @@ public class RedisConfig {
     @Bean(value = "recommendationReceivedTopic")
     public ChannelTopic recommendationReceivedTopic(
             @Value("${spring.data.redis.channels.recommendation-channel.name}") String topic) {
+        return new ChannelTopic(topic);
+    }
+
+    @Bean(value = "profilePicTopic")
+    public ChannelTopic profilePicTopic(
+            @Value("${spring.data.redis.channels.profile-pic-channel.name}") String topic) {
         return new ChannelTopic(topic);
     }
 }

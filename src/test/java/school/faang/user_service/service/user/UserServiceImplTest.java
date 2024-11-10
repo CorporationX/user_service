@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.PaymentDto;
 import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.ProfilePicEventDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
@@ -24,6 +25,8 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.publisher.AbstractEventPublisher;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.image.AvatarSize;
 import school.faang.user_service.service.image.BufferedImagesHolder;
@@ -62,6 +65,7 @@ public class UserServiceImplTest {
     private BufferedImagesHolder bufferedImagesHolder;
     private BufferedImage bufferedImage;
 
+    @InjectMocks
     private UserServiceImpl service;
 
     @Mock
@@ -84,21 +88,25 @@ public class UserServiceImplTest {
     private ProfileViewEventPublisher profileViewEventPublisher;
 
     @Mock
+    private AbstractEventPublisher<ProfilePicEventDto> profilePicEventPublisher;
+
+    @Mock
     private UserContext userContext;
 
     @BeforeEach
     public void setup() {
         service = new UserServiceImpl(
-            repository,
-            null,
-            mapper,
-            imageProcessor,
-            s3Service,
-            null,
-            null,
-            profileViewEventPublisher,
-            userContext,
-            premiumBoughtEventPublisher
+                repository,
+                null,
+                mapper,
+                imageProcessor,
+                s3Service,
+                null,
+                null,
+                profileViewEventPublisher,
+                userContext,
+                premiumBoughtEventPublisher,
+                profilePicEventPublisher
         );
     }
 

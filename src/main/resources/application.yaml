@@ -37,6 +37,8 @@ spring:
           name: user_ban_channel
         recommendation-channel:
           name: recommendation_channel
+        profile-pic-channel:
+          name: profile_pic_channel
       publisher:
         delay: 5000
 

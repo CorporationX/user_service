@@ -2,15 +2,18 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.exceptions.ResourceNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SkillService {
     private static final long MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepo;
@@ -31,6 +35,21 @@ public class SkillService {
     private final SkillOfferRepository skillOfferRepo;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepo;
     private final UserRepository userRepo;
+
+    public Skill getSkillById(Long id) {
+        return skillRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Skill", "id", id));
+    }
+
+    public List<Skill> getSkillsFrom(List<SkillOfferDto> skillOffers) {
+        return skillOffers.stream()
+                .map(skillOfferDto -> getSkillById(skillOfferDto.skillId()))
+                .toList();
+    }
+
+    public List<Skill> getAllSkillsByIds(List<Long> skillIds) {
+        return skillRepo.findAllById(skillIds);
+    }
 
     public SkillDto create(SkillDto skillDto) {
         if (skillRepo.existsByTitle(skillDto.title())) {
@@ -107,5 +126,3 @@ public class SkillService {
         }
     }
 }
-
-

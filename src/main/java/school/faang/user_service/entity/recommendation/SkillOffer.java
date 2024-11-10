@@ -17,7 +17,7 @@ public class SkillOffer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "skill_id", nullable = false)
@@ -26,4 +26,9 @@ public class SkillOffer {
     @ManyToOne
     @JoinColumn(name = "recommendation_id", nullable = false)
     private Recommendation recommendation;
+
+    public SkillOffer(Skill skill, Recommendation recommendation) {
+        this.skill = skill;
+        this.recommendation = recommendation;
+    }
 }

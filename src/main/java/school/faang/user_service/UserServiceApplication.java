@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Bean;
                 version = "1.0.0")
 )
 public class UserServiceApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApplication.class, args);
     }

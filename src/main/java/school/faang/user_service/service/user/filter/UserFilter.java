@@ -12,4 +12,8 @@ public interface UserFilter {
     boolean isApplicable(UserFilterDto filter);
 
     Stream<User> apply(Stream<User> users, UserFilterDto filter);
+
+
+
+
 }

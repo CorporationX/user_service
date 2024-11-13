@@ -1,6 +1,7 @@
 package school.faang.user_service.dto.user;
 
 import lombok.Data;
+import school.faang.user_service.entity.premium.Premium;
 
 @Data
 public class UserFilterDto {
@@ -16,4 +17,6 @@ public class UserFilterDto {
     private int experienceMax;
     private int page;
     private int pageSize;
+    private Long id;
+    private Premium premium;
 }

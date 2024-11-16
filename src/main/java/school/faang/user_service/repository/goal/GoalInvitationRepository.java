@@ -6,4 +6,5 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 
 @Repository
 public interface GoalInvitationRepository extends JpaRepository<GoalInvitation, Long> {
+
 }

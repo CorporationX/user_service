@@ -1,12 +1,12 @@
 package school.faang.user_service.controller.subscription;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -14,7 +14,7 @@ import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
@@ -53,6 +53,11 @@ public class SubscriptionController {
     @GetMapping("/followings/count/{followeeId}")
     public int getFollowingCount(@PathVariable long followeeId) {
         return subscriptionService.getFollowingCount(followeeId);
+    }
+
+    @GetMapping("/{followeeId}/followers/{followerId}")
+    public boolean checkFollowerOfFollowee(@PathVariable long followeeId, @PathVariable long followerId) {
+        return subscriptionService.checkFollowerOfFollowee(followeeId, followerId);
     }
 
     private void isFollowerFolloweeIdsEqual(long followerId, long followeeId, String message) {

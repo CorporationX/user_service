@@ -82,4 +82,8 @@ public class SubscriptionService {
         log.info("Getting followings count for user with id: {}", followeeId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followeeId);
     }
+
+    public boolean checkFollowerOfFollowee(long followeeId, long followerId) {
+        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+    }
 }

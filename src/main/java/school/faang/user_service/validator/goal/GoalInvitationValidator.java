@@ -6,7 +6,7 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.goal.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;

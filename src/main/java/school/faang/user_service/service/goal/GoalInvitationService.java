@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,6 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.goal.EntityNotFound;
 import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -53,7 +53,7 @@ public class GoalInvitationService {
                     GoalInvitationDto dto = goalInvitationMapper.toDto(goalInvitationRepository.save(invitation));
                     log.info("User {} accepted invitation with id: {}", invitation.getInvited().getUsername(), id);
                     return dto;
-                }).orElseThrow(() -> new EntityNotFound("Invitation not found for id: " + id));
+                }).orElseThrow(() -> new EntityNotFoundException("Invitation not found for id: " + id));
     }
 
     @Transactional
@@ -68,7 +68,7 @@ public class GoalInvitationService {
                     GoalInvitationDto dto = goalInvitationMapper.toDto(goalInvitationRepository.save(invitation));
                     log.info("Rejected invitation with id: {}", id);
                     return dto;
-                }).orElseThrow(() -> new EntityNotFound("Invitation not found for id: " + id));
+                }).orElseThrow(() -> new EntityNotFoundException("Invitation not found for id: " + id));
     }
 
     public List<GoalInvitationDto> getInvitations(GoalInvitationFilterDto filterDto) {

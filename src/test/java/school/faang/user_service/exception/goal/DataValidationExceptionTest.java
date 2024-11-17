@@ -2,6 +2,7 @@ package school.faang.user_service.exception.goal;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import school.faang.user_service.exception.DataValidationException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

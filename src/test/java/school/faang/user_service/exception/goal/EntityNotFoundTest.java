@@ -1,5 +1,6 @@
 package school.faang.user_service.exception.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ class EntityNotFoundTest {
     @DisplayName("Test Exception Message")
     void testExceptionMessage() {
         String message = "exception message";
-        EntityNotFound entityNotFound = new EntityNotFound(message);
+        EntityNotFoundException entityNotFound = new EntityNotFoundException(message);
 
         assertEquals(message, entityNotFound.getMessage());
     }

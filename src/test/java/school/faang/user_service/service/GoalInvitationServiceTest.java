@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.goal.EntityNotFound;
 import school.faang.user_service.filter.Filter;
 import school.faang.user_service.filter.goal.InvitedIdFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
@@ -127,7 +127,7 @@ class GoalInvitationServiceTest {
         long invalidId = 99L;
         when(goalInvitationRepository.getById(invalidId)).thenReturn(Optional.empty());
 
-        EntityNotFound exception = assertThrows(EntityNotFound.class, () ->
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
                 goalInvitationService.rejectGoalInvitation(invalidId));
 
         verify(goalInvitationRepository, times(1)).getById(invalidId);

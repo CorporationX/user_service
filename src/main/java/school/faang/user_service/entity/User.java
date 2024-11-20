@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -102,7 +103,7 @@ public class User {
     private List<GoalInvitation> receivedGoalInvitations;
 
     @OneToMany(mappedBy = "mentor")
-    private List<Goal> setGoals;
+    private List<Goal> settingGoals;
 
     @ManyToMany(mappedBy = "users")
     private List<Goal> goals;
@@ -124,6 +125,7 @@ public class User {
     @OneToMany(mappedBy = "receiver")
     private List<Recommendation> recommendationsReceived;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<Contact> contacts;
 
@@ -143,10 +145,6 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Premium premium;
 
-
-    public void removeParticipatedEvent(Event event){
-        participatedEvents.remove(event);
-    }
 
     public void removeOwnedEvent(Event event){
         ownedEvents.remove(event);
@@ -182,5 +180,31 @@ public class User {
 
     public boolean hasMaxNumOfGoals(int maxNumOfGoals) {
         return goals.size() > maxNumOfGoals;
+    }
+
+
+    public void removeParticipatedEvent(Event event) {
+        if (event != null && participatedEvents != null) {
+            participatedEvents.remove(event);
+        }
+    }
+
+    public void removeAllGoals() {
+        settingGoals.clear();
+        goals.clear();
+    }
+
+    public void removeAllParticipatedEvents(){
+        participatedEvents.clear();
+    }
+
+    public void removeAllOwnedEvents() {
+        ownedEvents.clear();
+    }
+
+    public void removeMentor(User mentor) {
+        if (mentor != null && mentors != null) {
+            mentors.remove(mentor);
+        }
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,12 @@ class UserTest {
     @Mock
     private Event mockEvent;
 
+    @Mock
+    private User mockMentor;
+
+    @Mock
+    private Goal mockGoal;
+
     private User user;
 
     @BeforeEach
@@ -23,10 +30,13 @@ class UserTest {
         user = new User();
         user.setParticipatedEvents(new ArrayList<>());
         user.setOwnedEvents(new ArrayList<>());
+        user.setSettingGoals(new ArrayList<>());
+        user.setGoals(new ArrayList<>());
+        user.setMentors(new ArrayList<>());
     }
 
     @Test
-    void testRemoveParticipatedEvent() {
+    void testRemoveParticipatedEventWithUserHasEvent() {
         user.getParticipatedEvents().add(mockEvent);
         assertTrue(user.getParticipatedEvents().contains(mockEvent));
 
@@ -53,5 +63,30 @@ class UserTest {
         String logString = user.toLogString();
         assertEquals("User testUser with id 1", logString);
     }
+
+    @Test
+    void testRemoveAllGoals() {
+        user.getSettingGoals().add(mockGoal);
+        user.getGoals().add(mockGoal);
+
+        assertTrue(user.getSettingGoals().contains(mockGoal));
+        assertTrue(user.getGoals().contains(mockGoal));
+
+        user.removeAllGoals();
+
+        assertTrue(user.getSettingGoals().isEmpty());
+        assertTrue(user.getGoals().isEmpty());
+    }
+
+    @Test
+    void testRemoveMentor() {
+        user.getMentors().add(mockMentor);
+        assertTrue(user.getMentors().contains(mockMentor));
+
+        user.removeMentor(mockMentor);
+
+        assertFalse(user.getMentors().contains(mockMentor));
+    }
+
 }
 

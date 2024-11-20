@@ -27,7 +27,7 @@ public class Goal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="parent_goal_id")
+    @JoinColumn(name = "parent_goal_id")
     private Goal parent;
 
     @Column(name = "title", length = 64, nullable = false, unique = true)
@@ -85,5 +85,18 @@ public class Goal {
     public void updateSkills(List<Skill> newSkills) {
         skillsToAchieve.clear();
         skillsToAchieve.addAll(newSkills);
+    }
+
+    public boolean isEmptyExecutingUsers() {
+        if(users == null){
+            return true;
+        }
+        return users.isEmpty();
+    }
+
+    public void removeExecutingUser(User user) {
+        if (user != null) {
+            users.remove(user);
+        }
     }
 }

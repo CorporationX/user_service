@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.Skill;
@@ -49,6 +50,7 @@ public class Event {
     @OneToMany(mappedBy = "event")
     private List<Rating> ratings;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
@@ -99,5 +101,12 @@ public class Event {
 
     public String toLogString(){
         return String.format("Event(id=%d, title=%s, owner=%s)", id, title, owner.getId());
+    }
+
+    public void removeAttendeeFromEvent(User user) {
+        if (user == null) {
+            return;
+        }
+        attendees.remove(user);
     }
 }

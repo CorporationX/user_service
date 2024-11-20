@@ -16,6 +16,7 @@ public class GlobalExceptionHandler {
     public static final String DATA_VALIDATION_ERROR = "DataValidationException occurred: {}";
     public static final String ILLEGAL_ARGUMENT = "IllegalArgumentException occurred: {}";
     public static final String UNEXPECTED_ERROR = "An unexpected error occurred: {}";
+    public static final String PAYMENT_ERROR = "PaymentException occurred: {}";
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
@@ -47,6 +48,17 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException ex) {
+        log.error(PAYMENT_ERROR, ex.getMessage(), ex);
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.PAYMENT_REQUIRED.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.PAYMENT_REQUIRED);
     }
 
     @ExceptionHandler(Exception.class)

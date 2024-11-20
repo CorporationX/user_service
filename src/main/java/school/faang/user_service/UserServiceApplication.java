@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableRetry
 @SpringBootApplication
@@ -19,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
                 title = "User Service",
                 version = "1.0.0")
 )
-@EnableScheduling
 public class UserServiceApplication {
 
     public static void main(String[] args) {

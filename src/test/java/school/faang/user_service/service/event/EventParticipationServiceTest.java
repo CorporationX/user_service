@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.subscribe.UserDTO;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.ParticipantRegistrationException;
+import school.faang.user_service.exception.ParticipantRegistrationException;
 import school.faang.user_service.mapper.UserDTOMapperImpl;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 

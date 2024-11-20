@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.subscribe.UserDTO;
 import school.faang.user_service.dto.subscribe.UserFilterDTO;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.InvalidUserIdException;
-import school.faang.user_service.exceptions.SubscriptionNotFoundException;
-import school.faang.user_service.exceptions.UnfollowException;
+import school.faang.user_service.exception.InvalidUserIdException;
+import school.faang.user_service.exception.SubscriptionNotFoundException;
+import school.faang.user_service.exception.UnfollowException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;

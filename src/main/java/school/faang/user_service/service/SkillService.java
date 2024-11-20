@@ -9,8 +9,8 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.exceptions.SkillAlreadyAcquiredException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.SkillAlreadyAcquiredException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -34,7 +34,7 @@ public class SkillService {
     private int minOffersRequired;
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        validateSkillAndUserId(skillId,userId);
+        validateSkillAndUserId(skillId, userId);
 
         log.info("Attempting to acquire skill with ID {} for user ID {} ", skillId, userId);
         skillRepository.findUserSkill(skillId, userId)
@@ -72,7 +72,7 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        log.info("Retrieving offered skill for user ID {}",userId);
+        log.info("Retrieving offered skill for user ID {}", userId);
         List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
         Map<Skill, Long> skillCountMap = offeredSkills.stream()
                 .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
@@ -82,7 +82,7 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        log.info("Retrieving skills for user ID {}",userId);
+        log.info("Retrieving skills for user ID {}", userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skills.stream()
                 .map(skillMapper::toDto)
@@ -90,9 +90,9 @@ public class SkillService {
     }
 
     public SkillDto create(SkillDto skillDto) {
-        log.info("Creating skill with title '{}'",skillDto.getTitle());
+        log.info("Creating skill with title '{}'", skillDto.getTitle());
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            log.warn("Skill with title '{}' already exists",skillDto.getTitle());
+            log.warn("Skill with title '{}' already exists", skillDto.getTitle());
             throw new DataValidationException("Skill with this title already exists");
         }
 
@@ -107,10 +107,16 @@ public class SkillService {
                 .map(skillMapper::toDto)
                 .collect(Collectors.toList());
     }
-    private void validateSkillAndUserId(Long skillId,Long userId){
+
+    private void validateSkillAndUserId(Long skillId, Long userId) {
         if (skillId == null || userId == null) {
             log.warn("Skill ID or User ID is null. Validation failed.");
             throw new DataValidationException("Skill ID and User ID cannot be null.");
         }
+    }
+
+    public Skill findById(Long id) {
+        return skillRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Skill not found."));
     }
 }

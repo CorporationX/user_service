@@ -1,4 +1,4 @@
-package school.faang.user_service.exceptions;
+package school.faang.user_service.exception;
 
 public class InvalidUserIdException extends RuntimeException {
     public InvalidUserIdException(String message) {

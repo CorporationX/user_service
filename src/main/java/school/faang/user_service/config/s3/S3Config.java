@@ -1,4 +1,4 @@
-package school.faang.user_service.config.minio;
+package school.faang.user_service.config.s3;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -10,14 +10,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MinioConfig {
-    @Value("${minio.endpoint}")
+public class S3Config {
+    @Value("${services.s3.endpoint}")
     private String endpoint;
-    @Value("${minio.username}")
+    @Value("${services.s3.username}")
     String accessKey;
-    @Value("${minio.password}")
+    @Value("${services.s3.password}")
     String secretKey;
-    @Value("${minio.region}")
+    @Value("${services.s3.region}")
     String region;
 
     @Bean

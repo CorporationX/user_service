@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 
-import school.faang.user_service.dto.SkillCandidateDto;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapperImpl;

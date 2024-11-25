@@ -13,9 +13,12 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.user.UpdateUsersRankDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +38,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserContext userContext;
     private final AvatarService avatarService;
+    private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserMapper userMapper;
 
     public Optional<User> findById(long userId) {
@@ -98,6 +102,13 @@ public class UserService {
         return randomAvatarUrl;
     }
 
+    public UserSkillGuarantee addGuaranty(long userId, SkillOffer skillOffer) {
+        UserSkillGuarantee guarantee = UserSkillGuarantee.builder().user(
+                        userRepository.findById(userId).get()
+                ).guarantor(skillOffer.getRecommendation().getAuthor())
+                .build();
+        return userSkillGuaranteeRepository.save(guarantee);
+
     public UserDto getUserDtoById(long userId) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("user not found!"));
@@ -112,3 +123,4 @@ public class UserService {
                 .toList();
     }
 }
+

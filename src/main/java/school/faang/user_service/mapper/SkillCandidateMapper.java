@@ -2,8 +2,8 @@ package school.faang.user_service.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.SkillCandidateDto;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
 import java.util.ArrayList;

@@ -2,8 +2,9 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
-    username: user
-    password: password
+    username: postgres
+    password: nastena123
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -102,3 +103,12 @@ user:
 redis:
   topic:
     user-ban: user_ban
+
+unique:
+  numbers:
+    seq:
+      name: unique_numbers_seq
+
+hash:
+  batch:
+    size: 10

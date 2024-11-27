@@ -26,12 +26,11 @@ spring:
         follower-event-channel:
           name: follower_event
 
+  profiles:
+    active: local
+
 server:
   port: 8080
-
-logging:
-  level:
-    root: info
 
 project-service:
   host: localhost

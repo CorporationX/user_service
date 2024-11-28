@@ -16,6 +16,7 @@ import school.faang.user_service.dto.promotion.PromotionTarget;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
+import school.faang.user_service.dto.user.feed.UserNewsFeedDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -226,5 +227,9 @@ public class UserService {
                 .build();
 
         projectFollowerEventPublisher.publish(event);
+    }
+
+    public List<UserNewsFeedDto> getAllUsers() {
+        return userMapper.toUserNewsFeedDtos(userRepository.findAll());
     }
 }

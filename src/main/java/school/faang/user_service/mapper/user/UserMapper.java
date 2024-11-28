@@ -2,9 +2,11 @@ package school.faang.user_service.mapper.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
+import school.faang.user_service.dto.user.feed.UserNewsFeedDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.pojo.student.Person;
 
@@ -71,5 +73,21 @@ public interface UserMapper {
         }
 
         return sb.toString();
+    }
+
+    @Mapping(source = "id", target = "userId")
+    @Mapping(source = "followees", target = "folowees", qualifiedByName = "mapFolloweesToIds")
+    UserNewsFeedDto toNewsFeedDto(User user);
+
+    List<UserNewsFeedDto> toUserNewsFeedDtos(List<User> users);
+
+    @Named("mapFolloweesToIds")
+    default List<Long> mapFolloweesToIds(List<User> followees) {
+        if (followees == null) {
+            return List.of();
+        }
+        return followees.stream()
+                .map(User::getId)
+                .toList();
     }
 }

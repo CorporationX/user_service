@@ -89,6 +89,7 @@ jsonSchema2Pojo {
     setSource(files("src/main/resources/json"))
     targetDirectory = file("${project.buildDir}/generated-sources/js2p")
     targetPackage = "com.json.student"
+    useLongIntegers = true
     setSourceType("jsonschema")
 }
 

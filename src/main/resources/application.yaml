@@ -20,6 +20,8 @@ spring:
     redis:
       port: 6379
       host: localhost
+      usersBanTopic: user_ban
+
       channels:
         mentorship-channel:
           name: mentorship_channel

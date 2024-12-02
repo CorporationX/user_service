@@ -3,6 +3,7 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.ErrorMessage;
@@ -76,5 +77,15 @@ public class UserService {
         return userIds.stream()
                 .filter(id -> !existingUserIds.contains(id))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void banUsers(List<Long> idForBanUsers) {
+        List<User> usersToBan = userRepository.findAllById(idForBanUsers);
+        usersToBan.forEach(user -> {
+            user.setBanned(true);
+            userRepository.save(user);
+        });
+        log.info("All found users were banned");
     }
 }

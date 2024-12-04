@@ -28,6 +28,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        fund-raised-channel:
+          name: fund-raised-topic
 
 server:
   port: 8080

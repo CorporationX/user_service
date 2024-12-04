@@ -8,5 +8,4 @@ public record SkillDto(
         Long id,
         @NotBlank String title
 ) {
-
 }

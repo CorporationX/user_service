@@ -133,6 +133,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void handleUserBanMessage(Long authorId) {
+        User user = findUserById(authorId);
+        user.setBanned(true);
+        log.info("User {} is banned", authorId);
+        userRepository.save(user);
+    }
+
     private User findUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ErrorMessage.USER_NOT_FOUND, userId)));

@@ -23,6 +23,6 @@ public class Country {
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
 
-    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "country")
     private List<User> residents;
 }

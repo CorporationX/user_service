@@ -272,8 +272,8 @@ class UserServiceTest {
                 .telegramChatId(90218421908421L)
                 .build();
 
-        UserDto firstUserDto = new UserDto(firstUserId, "firstUser", "first@email.com", 1242142141241L);
-        UserDto secondUserDto = new UserDto(secondUserId, "secondUser", "second@email.com", 90218421908421L);
+        UserDto firstUserDto = new UserDto(firstUserId, "firstUser", "first@email.com", 1242142141241L, false);
+        UserDto secondUserDto = new UserDto(secondUserId, "secondUser", "second@email.com", 90218421908421L, false);
 
         Stream<User> users = Stream.of(firstUser, secondUser);
         List<UserDto> expectedUsersDto = List.of(firstUserDto, secondUserDto);
@@ -317,8 +317,8 @@ class UserServiceTest {
                 .telegramChatId(893248953L)
                 .build();
 
-        UserDto firstUserDto = new UserDto(firstUserId, "firstUser", "first@email.com", 90182590L);
-        UserDto secondUserDto = new UserDto(secondUserId, "secondUser", "second@email.com", 893248953L);
+        UserDto firstUserDto = new UserDto(firstUserId, "firstUser", "first@email.com", 90182590L, false);
+        UserDto secondUserDto = new UserDto(secondUserId, "secondUser", "second@email.com", 893248953L, false);
 
         List<UserDto> expectedUsersDto = List.of(firstUserDto, secondUserDto);
         List<User> usersList = List.of(firstUser, secondUser);
@@ -369,7 +369,7 @@ class UserServiceTest {
         userService.banUser(user.getId());
 
         verify(userRepository, times(1)).save(userCaptor.capture());
-        assertEquals(true, userCaptor.getValue().getBanned());
+        assertTrue(userCaptor.getValue().isBanned());
     }
 
     @Test
@@ -418,5 +418,6 @@ class UserServiceTest {
                 "text/plain", "Some content".getBytes());
         assertThrows(IllegalArgumentException.class, () -> userService.parsePersonDataIntoUserDto(invalidTypeFile));
     }
+
 
 }

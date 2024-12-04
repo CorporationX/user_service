@@ -139,8 +139,8 @@ public class SubscriptionServiceTest {
                 .emailPattern("first")
                 .build();
 
-        firstUserDto = new UserDto(followerId, "firstUser", "first@email.com", 98125891L);
-        secondUserDto = new UserDto(followeeId, "secondUser", "second@email.com", 3454353L);
+        firstUserDto = new UserDto(followerId, "firstUser", "first@email.com", 98125891L, false);
+        secondUserDto = new UserDto(followeeId, "secondUser", "second@email.com", 3454353L, false);
         expectedUsers = new ArrayList<>(List.of(firstUserDto, secondUserDto));
 
         when(userService.existsById(userId)).thenReturn(isExists);
@@ -210,8 +210,8 @@ public class SubscriptionServiceTest {
                 .emailPattern("first")
                 .build();
 
-        firstUserDto = new UserDto(followerId, "firstUser", "first@email.com", 9821491L);
-        secondUserDto = new UserDto(followeeId, "secondUser", "second@email.com", 894189742L);
+        firstUserDto = new UserDto(followerId, "firstUser", "first@email.com", 9821491L, false);
+        secondUserDto = new UserDto(followeeId, "secondUser", "second@email.com", 894189742L, false);
         expectedUsers = new ArrayList<>(List.of(firstUserDto, secondUserDto));
 
         when(userService.existsById(userId)).thenReturn(isExists);

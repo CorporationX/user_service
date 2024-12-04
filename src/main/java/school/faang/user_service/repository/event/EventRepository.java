@@ -29,4 +29,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             WHERE e.endDate < CURRENT_TIMESTAMP
             """)
     List<Long> findPastEventIds();
+
+    @Query(nativeQuery = true, value = """
+            SELECT e.* 
+            FROM event e
+            WHERE e.status < 1 
+                AND e.start_date BETWEEN (CURRENT_TIMESTAMP) AND (CURRENT_TIMESTAMP + INTERVAL '1 day')
+            """)
+    List<Event> findNearbyUnstartedEvents();
 }

@@ -2,9 +2,12 @@ package school.faang.user_service.mapper.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.pojo.user.Person;
 
 import java.util.List;
@@ -13,6 +16,7 @@ import java.util.stream.Stream;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
+    @Mapping(source = "contactPreference.preference", target = "preference", qualifiedByName = "preferenceToInt")
     UserDto toDto(User user);
 
     @Mapping(target = "username", expression = "java(person.getFirstName() + \" \" + person.getLastName())")
@@ -43,5 +47,16 @@ public interface UserMapper {
         }
 
         return aboutMe.toString().trim();
+    }
+
+    default List<Long> usersToIds(List<UserDto> users) {
+        return users.stream()
+                .map(UserDto::getId)
+                .toList();
+    }
+
+    @Named("preferenceToInt")
+    default int preferenceToInt(PreferredContact preference) {
+        return preference != null ? preference.ordinal() : -1;
     }
 }

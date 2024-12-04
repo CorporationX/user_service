@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -14,6 +15,7 @@ public class EventParticipationService {
     private final EventParticipationRepository repository;
     private final UserMapper userMapper;
 
+    @Transactional
     public void registerParticipant(long eventId, long userId) {
         if (checkRegistration(eventId, userId)) {
             throw new IllegalStateException("User is already registered to event");

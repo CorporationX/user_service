@@ -34,6 +34,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        user-ban: user_ban
+        event-start: event_start
   servlet:
     multipart:
       max-file-size: 5MB
@@ -42,6 +44,10 @@ clear-events:
   batch-size: 100
   scheduler:
     cron: "0 0 0 * * ?"
+
+check-start-event:
+  scheduler:
+    cron: "0 * * * * ?"
 
 dicebear:
   base-url: https://api.dicebear.com

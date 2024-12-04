@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.subscribe.UserDTO;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.ParticipantRegistrationException;
-import school.faang.user_service.mapper.UserDTOMapper;
+import school.faang.user_service.exception.ParticipantRegistrationException;
+import school.faang.user_service.mapper.user.UserDTOMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;

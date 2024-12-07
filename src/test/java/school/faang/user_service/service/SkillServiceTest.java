@@ -1,6 +1,8 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -129,5 +131,41 @@ public class SkillServiceTest {
         verify(skillRepository).countExisting(ids);
 
         verifyNoMoreInteractions(skillRepository);
+    }
+
+    @Nested
+    class GetSkillsByIdIn {
+
+        List<Long> ids;
+        List<Skill> skills;
+
+        @BeforeEach
+        void setUp() {
+            ids = List.of(1L, 2L);
+            Skill firstSkill = Skill.builder()
+                    .id(1L)
+                    .build();
+            Skill secondSkill = Skill.builder()
+                    .id(2L)
+                    .build();
+            skills = List.of(firstSkill, secondSkill);
+        }
+
+        @Test
+        void testGetSkillsByIdIn_SkillExist() {
+            when(skillRepository.findByIdIn(ids)).thenReturn(skills);
+
+            List<Skill> returnedSkills = skillService.getSkillsByIdIn(ids);
+
+            assertEquals(skills, returnedSkills);
+        }
+
+        @Test
+        void testGetSkillsByIdIn_SkillNotExist() {
+            ids = List.of(1L, 2L, 3L, 4L);
+            when(skillRepository.findByIdIn(ids)).thenReturn(skills);
+
+            assertThrows(EntityNotFoundException.class, () -> skillService.getSkillsByIdIn(ids));
+        }
     }
 }

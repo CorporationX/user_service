@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -12,8 +13,10 @@ import school.faang.user_service.repository.skill.SkillRepository;
 import school.faang.user_service.repository.skill.SkillRequestRepository;
 import school.faang.user_service.validator.SkillValidator;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -83,5 +86,23 @@ public class SkillService {
 
     public int countExisting(List<Long> ids){
         return skillRepository.countExisting(ids);
+    }
+
+    public List<Skill> getSkillsByIdIn(Collection<Long> ids) {
+        List<Skill> skills = skillRepository.findByIdIn(ids);
+        Set<Long> existingSkillIds = skills.stream()
+                .map(Skill::getId)
+                .collect(Collectors.toSet());
+
+        String notValidSkillIds = ids.stream()
+                .filter(id -> !existingSkillIds.contains(id))
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+
+        if (!notValidSkillIds.isEmpty()) {
+            throw new EntityNotFoundException("Skills with this ids don't exist: " + notValidSkillIds);
+        }
+
+        return skills;
     }
 }

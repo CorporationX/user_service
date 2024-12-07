@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.Skill;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,4 +49,6 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             WHERE gs.goal_id = ?1)
             """)
     List<Skill> findSkillsByGoalId(long goalId);
+
+    List<Skill> findByIdIn(Collection<Long> ids);
 }

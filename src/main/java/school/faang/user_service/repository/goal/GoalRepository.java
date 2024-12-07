@@ -49,4 +49,8 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    boolean existsGoalByTitle(String title);
+
+    boolean existsGoalByDescription(String description);
 }

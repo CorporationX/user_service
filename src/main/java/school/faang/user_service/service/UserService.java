@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.internal.Function;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -235,12 +236,16 @@ public class UserService {
 
 
     private Stream<User> applyFilters(Stream<User> users, UserFilterDto filterDto) {
-        for (Filter<User, UserFilterDto> filter : userFilters) {
-            if (filter.isApplicable(filterDto)) {
-                users = filter.apply(users, filterDto);
-            }
-        }
-        return users;
+        Stream<Function<Stream<User>, Stream<User>>> filterFunctions = userFilters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .map(filter -> userStream -> filter.apply(userStream, filterDto));
+
+        return filterFunctions.reduce(
+                users,
+                (currentStream, filterFunction)
+                        -> filterFunction.apply(currentStream),
+                (stream1, stream2) -> stream1
+        );
     }
 
     private void removeOwnedEvents(User user) {

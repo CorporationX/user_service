@@ -18,6 +18,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Data
 @Builder
@@ -146,7 +147,7 @@ public class User {
     private Premium premium;
     @Column(name = "banned")
     private boolean banned;
-
     @Column(name = "messages")
     private long messages;
+
 }

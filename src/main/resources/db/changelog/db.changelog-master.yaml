@@ -20,10 +20,10 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V009_create_table_user_google_info.sql
   - include:
-      file: db/changelog/changeset/user_V009__user_premium_rename_column_is_active.sql
-  - include:
       file: db/changelog/changeset/user_V010__update_user_add_banned_column.sql
   - include:
       file: db/changelog/changeset/user_V011__update_user_bug_fix.sql
   - include:
       file: db/changelog/changeset/user_V012__update_user_add_column_messages.sql
+  - include:
+      file: db/changelog/changeset/user_V013__update_user_add_column_locale.sql

@@ -23,7 +23,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
-  
+
     @Value("${spring.data.redis.topic.search-appearance}")
     private String searchAppearanceTopicName;
 
@@ -48,7 +48,13 @@ public class RedisConfig {
         log.info("Создание ChannelTopic для канала: {}", redisProperties.getUnfollowChannel());
         return new ChannelTopic(redisProperties.getUnfollowChannel());
     }
-  
+
+    @Bean
+    public ChannelTopic projectFollowerChannel() {
+        log.info("Создание ChannelTopic для канала: {}", redisProperties.getProjectFollowerChannel());
+        return new ChannelTopic(redisProperties.getProjectFollowerChannel());
+    }
+
     @Bean
     public ChannelTopic createAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopicName);

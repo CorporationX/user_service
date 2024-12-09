@@ -6,7 +6,8 @@ spring:
       channel:
         follower: follower_channel
         unfollow: unfollow_channel
-       topic:
+        follower-project: follower_project_channel
+      topic:
         search-appearance: search_appearance_topic
 
   datasource:

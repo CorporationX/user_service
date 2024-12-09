@@ -5,6 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.ProjectSubscription;
 
+import java.util.Optional;
+
 @Repository
 public interface ProjectSubscriptionRepository extends CrudRepository<ProjectSubscription, Long> {
     @Query(nativeQuery = true,
@@ -14,4 +16,9 @@ public interface ProjectSubscriptionRepository extends CrudRepository<ProjectSub
     @Query(nativeQuery = true,
             value = "insert into project_subscription  (follower_id, project_id) values (:followerId, :projectId)")
     void followProject(long followerId, long projectId);
+
+    boolean existsByFollowerIdAndProjectId(Long followerId, Long projectId);
+
+    Optional<ProjectSubscription> findByFollowerIdAndProjectId(Long followerId, Long projectId);
+
 }

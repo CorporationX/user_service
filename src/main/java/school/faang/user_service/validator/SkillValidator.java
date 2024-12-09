@@ -19,12 +19,6 @@ public class SkillValidator {
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
 
-    public void validateSkill(SkillDto skillDto) {
-        if (Strings.isBlank(skillDto.getTitle())) {
-            throw new DataValidationException("Скилл должен иметь название и имя скилла не может быть пустым");
-        }
-    }
-
     public void validateExistTitle(String title) {
         if (skillRepository.existsByTitle(title)) {
             throw new DataValidationException(title);

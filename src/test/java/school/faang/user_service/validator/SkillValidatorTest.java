@@ -13,6 +13,7 @@ import school.faang.user_service.repository.SkillOfferRepository;
 
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -28,22 +29,6 @@ public class SkillValidatorTest {
     private SkillOfferRepository skillOfferRepository;
 
     @Test
-    void testValidateSkillWithNullTitle() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setTitle(null);
-
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skillDto));
-    }
-
-    @Test
-    void testValidateSkillWithEmptyTitle() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setTitle("");
-
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skillDto));
-    }
-
-    @Test
     void testValidateExistTitle() {
         String title = "title";
 
@@ -51,6 +36,17 @@ public class SkillValidatorTest {
 
         assertThrows(DataValidationException.class, () -> skillValidator.validateExistTitle(title));
     }
+
+    @Test
+    void testValidateNotExistTitle() {
+        String title = "title";
+
+        when(skillRepository.existsByTitle(title)).thenReturn(false);
+
+        assertDoesNotThrow(() -> skillValidator.validateExistTitle(title));
+    }
+
+
 
     @Test
     void testValidateSkillOfferCount() {

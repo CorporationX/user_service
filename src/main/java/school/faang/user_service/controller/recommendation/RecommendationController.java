@@ -3,6 +3,7 @@ package school.faang.user_service.controller.recommendation;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,28 +13,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.recommendation.RecommendationService;
-import school.faang.user_service.validator.recommendation.ControllerRecommendationValidator;
 
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class RecommendationController {
     private final RecommendationService recommendationService;
-    private final ControllerRecommendationValidator recommendationValidator;
 
     @PutMapping("/update")
     public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updateRecommendationDto) {
         log.info("A request has been received to update the recommendation {}", updateRecommendationDto);
-        recommendationValidator.validateContentRecommendation(updateRecommendationDto.getContent());
         return recommendationService.updateRecommendation(updateRecommendationDto);
     }
 
     @PostMapping("/create")
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
         log.info("A request has been received for a recommendation {}", recommendationDto);
-        recommendationValidator.validateContentRecommendation(recommendationDto.getContent());
         return recommendationService.giveRecommendation(recommendationDto);
     }
 

@@ -35,32 +35,6 @@ public class SkillControllerTest {
     }
 
     @Test
-    void testCreateWithNullTitle() {
-        skillDto.setTitle(null);
-        doThrow(DataValidationException.class).when(skillValidator).validateSkill(skillDto);
-
-        assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-    }
-
-    @Test
-    void testCreateWithEmptyTitle() {
-        skillDto.setTitle("");
-        doThrow(DataValidationException.class).when(skillValidator).validateSkill(skillDto);
-
-        assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-    }
-
-    @Test
-    void testCrateWithCorrectTitle() {
-        skillDto.setTitle("title");
-        doNothing().when(skillValidator).validateSkill(skillDto);
-
-        skillController.create(skillDto);
-
-        verify(skillService, times(1)).create(skillDto);
-    }
-
-    @Test
     void testGetUserSkills() {
         skillService.getUserSkills(USER_Id);
 

@@ -1,16 +1,16 @@
 package school.faang.user_service.service.subscription;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.redis.publisher.UserFollowerEventPublisher;
 import school.faang.user_service.redis.event.UserFollowerEvent;
+import school.faang.user_service.redis.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
@@ -30,18 +30,18 @@ public class SubscriptionService {
     private final SubscriptionValidator subscriptionValidator;
     private final UserValidator userValidator;
     private final UserService userService;
-    private final UserFollowerEventPublisher followerEventPublisher;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
         userValidator.validateUserExistence(userService.existsById(followerId));
         userValidator.validateUserExistence(userService.existsById(followeeId));
-
         subscriptionValidator.isFollowingExistsValidate(followerId, followeeId);
 
         subscriptionRepository.followUser(followerId, followeeId);
-        log.info("User with id: {} follow user with id: {}", followerId, followeeId);
         followerEventPublisher.publish(new UserFollowerEvent(followerId, followeeId));
+
+        log.info("User with id: {} follow user with id: {}", followerId, followeeId);
     }
 
     @Transactional

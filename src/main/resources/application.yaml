@@ -34,6 +34,7 @@ spring:
         profile-view: profile_view_channel
         mentorship:
           accepted: mentorship_accepted_channel
+        user-ban: user_ban
   servlet:
     multipart:
       max-file-size: 5MB

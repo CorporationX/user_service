@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import school.faang.user_service.exceptions.SubscriptionNotFoundException;
 import school.faang.user_service.publisher.UnfollowEventPublisher;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.SubscriptionService;
 
 import java.util.Arrays;
 import java.util.List;

@@ -20,9 +20,9 @@ public class ProjectSubscriptionService {
 
     private final ProjectSubscriptionRepository projectSubscriptionRepository;
     private final UserRepository userRepository;
-    private final ProjectRepository projectRepository;  // Репозиторий для работы с проектами
+    private final ProjectRepository projectRepository;
     private final ProjectFollowerEventPublisher projectFollowerEventPublisher;
-    private final ProjectUnfollowEventPublisher projectUnfollowEventPublisher;  // Предположительно для отписки
+    private final ProjectUnfollowEventPublisher projectUnfollowEventPublisher;
 
     public void subscribeToProject(Long userId, Long projectId) {
         if (projectSubscriptionRepository.existsByFollowerIdAndProjectId(userId, projectId)) {
@@ -47,20 +47,21 @@ public class ProjectSubscriptionService {
     }
 
     public void unsubscribeFromProject(Long userId, Long projectId) {
+        User follower = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + userId + " не найден"));
+
         ProjectSubscription subscription = projectSubscriptionRepository.findByFollowerIdAndProjectId(userId, projectId)
             .orElseThrow(() -> new IllegalArgumentException("Подписка не найдена"));
 
         projectSubscriptionRepository.delete(subscription);
         log.info("Пользователь с ID {} отписался от проекта с ID {}", userId, projectId);
 
-        User follower = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " + userId + " не найден"));
-
         Long creatorId = getCreatorId(projectId);
 
         ProjectFollowerEventDto event = new ProjectFollowerEventDto(follower.getId(), projectId, creatorId);
         projectUnfollowEventPublisher.publishUnfollow(event);
     }
+
 
     private Long getCreatorId(Long projectId) {
         Project project = projectRepository.findById(projectId)

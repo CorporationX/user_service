@@ -10,7 +10,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserSubResponseDto;
 import school.faang.user_service.dto.user.MenteeResponseDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;

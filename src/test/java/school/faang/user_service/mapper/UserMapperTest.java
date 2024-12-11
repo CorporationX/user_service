@@ -2,12 +2,12 @@ package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserSubResponseDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserMapperTest {
-    private UserMapper userMapper = new UserMapperImpl();
+    private final UserMapper userMapper = new UserMapperImpl();
 
     @Test
     public void testToDto() {

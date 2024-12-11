@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

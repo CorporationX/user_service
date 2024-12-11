@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.user.User;
 
 import java.util.ArrayList;
 

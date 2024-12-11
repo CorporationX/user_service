@@ -13,7 +13,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalResponseDto;
 import school.faang.user_service.dto.goal.UpdateGoalDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exceptions.DataValidationException;
@@ -77,7 +77,7 @@ public class GoalService {
 
     public List<Goal> mapListIdsToGoals(List<Long> goalsIds) {
         return goalsIds.stream()
-                .map(id -> getGoalById(id))
+                .map(this::getGoalById)
                 .toList();
     }
 

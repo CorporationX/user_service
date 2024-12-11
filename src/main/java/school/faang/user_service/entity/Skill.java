@@ -21,6 +21,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.user.User;
+import school.faang.user_service.entity.user.UserSkillGuarantee;
 
 import java.time.LocalDateTime;
 import java.util.List;

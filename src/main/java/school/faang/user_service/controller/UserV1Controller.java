@@ -25,6 +25,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.UserSubResponseDto;
 import school.faang.user_service.dto.user.DeactivatedUserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserForNotificationDto;
 import school.faang.user_service.service.user.UserDeactivationService;
 import school.faang.user_service.service.user.UserService;
@@ -32,7 +33,7 @@ import school.faang.user_service.service.user.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Validated
 public class UserV1Controller {
@@ -40,6 +41,11 @@ public class UserV1Controller {
     private final UserService userService;
 
     @GetMapping("/{userId}")
+    public UserDto getUserById(@PathVariable long userId) {
+        return userService.findUserById(userId);
+    }
+
+    @GetMapping("/subscription/{userId}")
     public UserSubResponseDto getUser(@Positive @PathVariable long userId) {
         return userService.getUserDtoById(userId);
     }

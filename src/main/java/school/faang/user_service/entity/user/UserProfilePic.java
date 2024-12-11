@@ -1,4 +1,4 @@
-package school.faang.user_service.entity;
+package school.faang.user_service.entity.user;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

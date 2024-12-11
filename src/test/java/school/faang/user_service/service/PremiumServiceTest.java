@@ -10,7 +10,7 @@ import school.faang.user_service.client.payment.PaymentServiceClient;
 import school.faang.user_service.dto.premium.PaymentRequestDto;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.PremiumPeriod;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.exceptions.PaymentException;

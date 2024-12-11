@@ -1,4 +1,4 @@
-package school.faang.user_service.entity;
+package school.faang.user_service.entity.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.Skill;
 
 @Data
 @Builder

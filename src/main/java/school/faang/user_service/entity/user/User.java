@@ -1,6 +1,25 @@
-package school.faang.user_service.entity;
+package school.faang.user_service.entity.user;
 
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,15 +27,16 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.entity.recommendation.Language;
-import school.faang.user_service.entity.recommendation.LanguageConverter;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
@@ -147,9 +167,9 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Premium premium;
 
-    @Convert(converter = LanguageConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "locale", nullable = false)
-    private Language locale;
+    private Language language;
 
     public void removeOwnedEvent(Event event){
         ownedEvents.remove(event);

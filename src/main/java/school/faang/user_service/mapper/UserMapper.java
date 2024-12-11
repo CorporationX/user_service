@@ -4,13 +4,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.ParticipantDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.UserSubResponseDto;
 import school.faang.user_service.dto.user.DeactivatedUserDto;
 import school.faang.user_service.dto.user.MenteeResponseDto;
 import school.faang.user_service.dto.user.UserForNotificationDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 
@@ -49,9 +50,10 @@ public interface UserMapper {
     @Mapping(target = "participatedEvents", ignore = true)
     @Mapping(target = "country", ignore = true)
     User deactivatedUserDtoToEntity(DeactivatedUserDto deactivatedUserDto);
-    UserDto toDto(User user);
 
+    UserDto toUserDto(User user);
 
+    @Mapping(target = "preference", source = "contactPreference.preference")
     UserForNotificationDto toUserForNotificationDto(User user);
 
     @Named("mapGoalsToListId")
@@ -65,7 +67,8 @@ public interface UserMapper {
     }
     User toEntity(UserDto userDto);
 
-    List<UserDto> toDtos(List<User> users);
+    List<ParticipantDto> toDtos(List<User> users);
+
     @Named("mapSkillsToListId")
     default List<Long> mapSkillsToListId(List<Skill> skills) {
         if (skills == null) {

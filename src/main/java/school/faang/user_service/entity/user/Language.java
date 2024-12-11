@@ -1,4 +1,4 @@
-package school.faang.user_service.entity.recommendation;
+package school.faang.user_service.entity.user;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

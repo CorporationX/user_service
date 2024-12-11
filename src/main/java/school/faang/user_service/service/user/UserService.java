@@ -9,9 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.UserSubResponseDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserForNotificationDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.user.User;
+import school.faang.user_service.entity.user.UserProfilePic;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
@@ -46,6 +47,11 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с id:%d не найден".formatted(id)));
+    }
+
+    public UserDto findUserById(Long id) {
+        User user = getUserById(id);
+        return userMapper.toUserDto(user);
     }
 
     public List<User> getAllUsersByIds(List<Long> ids) {
@@ -148,6 +154,9 @@ public class UserService {
         String contentType = file.getContentType();
         double fileSize = bytesToMegabytes(file.getSize());
 
+        if (contentType == null) {
+            throw new DataValidationException("Content type is required");
+        }
         if (!contentType.contains("image")) {
             throw new DataValidationException("The file is not image");
         }

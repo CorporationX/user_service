@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
       file: db/changelog/changeset/user_V009_user_add_column_locale.sql
+  - include:
+      file: db/changelog/changeset/user_V010_user_alter_column_locale.sql

@@ -14,12 +14,12 @@ public class ProjectSubscriptionController {
     @PostMapping("/{projectId}/subscribe")
     public String subscribeToProject(@RequestParam Long userId, @PathVariable Long projectId) {
         projectSubscriptionService.subscribeToProject(userId, projectId);
-        return "Вы успешно подписались на проект.";
+        return "You have successfully subscribed from the project.";
     }
 
     @DeleteMapping("/{projectId}/unsubscribe")
     public String unsubscribeFromProject(@RequestParam Long userId, @PathVariable Long projectId) {
         projectSubscriptionService.unsubscribeFromProject(userId, projectId);
-        return "Вы успешно отписались от проекта.";
+        return "You have successfully unsubscribed from the project.";
     }
 }

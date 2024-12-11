@@ -26,6 +26,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<String> handleDataAccessException(DataAccessException ex) {
         log.error("Ошибка доступа к базе данных: ", ex);

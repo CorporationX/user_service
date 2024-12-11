@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationReceivedEvent;
+import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.dto.recommendation.RequestRecommendationDto;
 import school.faang.user_service.dto.recommendation.ResponseRecommendationDto;
 import school.faang.user_service.entity.Skill;
@@ -18,11 +19,13 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.recommendation.ErrorMessage;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.publisher.recommendation.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.validator.recommendation.RecommendationValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -36,6 +39,8 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
     private final RecommendationValidator recommendationValidator;
     private final RecommendationReceivedEventPublisher publisher;
+    private RecommendationEventPublisher recommendationEventPublisher;
+
 
     @Transactional
     public ResponseRecommendationDto create(RequestRecommendationDto requestRecommendationDto) {
@@ -189,5 +194,12 @@ public class RecommendationService {
     private void createRecommendationPublisher(long authorId, long receiverId, long recommendationId) {
         RecommendationReceivedEvent event = new RecommendationReceivedEvent(authorId, receiverId, recommendationId);
         publisher.publish(event);
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        RecommendationEvent recommendationEvent = new RecommendationEvent(recommendationId, authorId, receiverId, timestamp);
+
+        recommendationEventPublisher.publish(recommendationEvent);
+        log.info("Both RecommendationReceivedEvent and RecommendationEvent published for recommendationId={}", recommendationId);
+
     }
 }

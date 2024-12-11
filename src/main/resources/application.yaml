@@ -31,7 +31,10 @@ spring:
         event-start-reminder-event-channel: event-start-reminder-event-channel
         search-appearance-channel: search-appearance-topic
         recommendation-received-channel: recommendation-received
+        recommendation-event-channel: recommendation-event
+
         profile-pic-channel: profile-pic-channel
+
 
 
 server:

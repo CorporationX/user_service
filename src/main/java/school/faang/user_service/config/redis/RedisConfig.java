@@ -1,13 +1,13 @@
 package school.faang.user_service.config.redis;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -16,13 +16,17 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-
 @RequiredArgsConstructor
 @Configuration
 @Slf4j
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
+
+    @Value("${spring.data.redis.channel.search-appearance.name}")
+    private String searchAppearanceTopicName;
+
+    private static final String CREATE_CHANNEL_LOG_MESSAGE = "Создание ChannelTopic для канала: {}";
 
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
@@ -34,26 +38,26 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic topicEventParticipation() {
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getTopicEventParticipation());
+        return new ChannelTopic(redisProperties.getTopicEventParticipation());
+    }
+
+    @Bean
     public ChannelTopic followerChannel() {
-        log.info("Создание ChannelTopic для канала: {}", redisProperties.getFollowerChannel());
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getFollowerChannel());
         return new ChannelTopic(redisProperties.getFollowerChannel());
     }
 
     @Bean
     public ChannelTopic unfollowerChannel() {
-        log.info("Создание ChannelTopic для канала: {}", redisProperties.getUnfollowChannel());
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getUnfollowChannel());
         return new ChannelTopic(redisProperties.getUnfollowChannel());
     }
 
     @Bean
-    public ChannelTopic projectFollowerChannel() {
-        log.info("Создание ChannelTopic для канала: {}", redisProperties.getProjectFollowerChannel());
-        return new ChannelTopic(redisProperties.getProjectFollowerChannel());
-    }
-
-    @Bean
     public ChannelTopic createAppearanceTopic() {
-        return new ChannelTopic(redisProperties.getSearchAppearanceChannel());
+        return new ChannelTopic(searchAppearanceTopicName);
     }
 
     @Bean

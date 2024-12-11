@@ -6,8 +6,14 @@ spring:
       channel:
         follower: follower_channel
         unfollow: unfollow_channel
-        follower-project: follower_project_channel
-        search-appearance: search_appearance_topic
+        mentorship-channel:
+          name: mentorship_channel
+        follower-event-channel:
+          name: follower_event
+        event-participation:
+          name: event_participation_channel
+        search-appearance:
+          name: search_appearance_topic
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -25,6 +31,9 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8080
 
 logging:
   level:
@@ -50,4 +59,8 @@ application:
     time-to-run-remove-expired-premium: "0 0 8 * * Sun" # every sunday at 8 a.m.
     batch-size: 100
 
+  publisher-messages:
+    event-registration:
+      notification:
+        telegram: Hello, you were successful registered for the event
 

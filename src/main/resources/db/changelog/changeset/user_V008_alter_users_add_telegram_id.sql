@@ -1,0 +1,4 @@
+ALTER TABLE users
+ADD COLUMN telegram_id VARCHAR(50)
+CHECK (LENGTH(telegram_id) BETWEEN 5 AND 50)
+NULL;

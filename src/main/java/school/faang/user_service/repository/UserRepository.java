@@ -1,16 +1,21 @@
 package school.faang.user_service.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+import school.faang.user_service.model.dto.UserWithoutFollowersDto;
+import school.faang.user_service.model.entity.Goal;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.entity.UserProfilePic;
-import school.faang.user_service.model.entity.Goal;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -48,4 +53,19 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("SELECT MAX(u.id) FROM User u")
     Long findMaxUserId();
+
+    @Query("""
+            SELECT new school.faang.user_service.model.dto.UserWithoutFollowersDto(
+                u.id, 
+                u.username, 
+                u.userProfilePic.fileId, 
+                u.userProfilePic.smallFileId
+            ) 
+            FROM User u
+            WHERE u.id = :id
+            """)
+    Optional<UserWithoutFollowersDto> findUserWithoutFollowers(@Param("id") Long id);
+
+    @Query("SELECT f.id FROM User u JOIN u.followers f WHERE u.id = :userId AND f.banned = false ORDER BY f.id ASC")
+    Page<Long> findUnbannedFollowerIdsByUserId(@Param("userId") Long userId, Pageable pageable);
 }

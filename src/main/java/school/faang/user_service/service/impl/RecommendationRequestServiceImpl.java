@@ -11,7 +11,7 @@ import school.faang.user_service.model.enums.RequestStatus;
 import school.faang.user_service.model.entity.RecommendationRequest;
 import school.faang.user_service.model.entity.SkillRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
+import school.faang.user_service.redis.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.RecommendationRequestRepository;
 import school.faang.user_service.repository.SkillRequestRepository;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;

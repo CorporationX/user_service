@@ -20,7 +20,7 @@ import school.faang.user_service.model.enums.PremiumPeriod;
 import school.faang.user_service.exception.ExistingPurchaseException;
 import school.faang.user_service.exception.PaymentFailureException;
 import school.faang.user_service.mapper.PremiumMapper;
-import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
+import school.faang.user_service.redis.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.PremiumRepository;
 import org.springframework.beans.factory.annotation.Value;

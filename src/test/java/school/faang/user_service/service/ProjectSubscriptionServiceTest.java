@@ -12,7 +12,7 @@ import school.faang.user_service.model.dto.ProjectSubscriptionDto;
 import school.faang.user_service.model.entity.ProjectSubscription;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.ProjectSubscriptionMapper;
-import school.faang.user_service.publisher.ProjectFollowerEventPublisher;
+import school.faang.user_service.redis.publisher.ProjectFollowerEventPublisher;
 import school.faang.user_service.repository.ProjectSubscriptionRepository;
 import school.faang.user_service.service.impl.ProjectSubscriptionServiceImpl;
 import school.faang.user_service.validator.ProjectSubscriptionValidator;

@@ -10,6 +10,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.core.RedisTemplate;
 import school.faang.user_service.model.dto.PremiumBoughtEventDto;
 import school.faang.user_service.model.enums.PremiumPeriod;
+import school.faang.user_service.redis.publisher.PremiumBoughtEventPublisher;
 
 import java.time.LocalDateTime;
 

@@ -18,7 +18,7 @@ import school.faang.user_service.exception.SkillAssignmentException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.model.entity.User;
 import school.faang.user_service.model.event.SkillAcquiredEvent;
-import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
+import school.faang.user_service.redis.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.model.entity.SkillOffer;

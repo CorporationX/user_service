@@ -20,7 +20,7 @@ import school.faang.user_service.model.enums.GoalStatus;
 import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+import school.faang.user_service.redis.publisher.GoalCompletedEventPublisher;
 
 import java.util.List;
 import java.util.Optional;

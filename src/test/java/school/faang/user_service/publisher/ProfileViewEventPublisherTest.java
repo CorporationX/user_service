@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.exception.EventPublishingException;
 import school.faang.user_service.model.event.ProfileViewEvent;
+import school.faang.user_service.redis.publisher.ProfileViewEventPublisher;
 
 import java.time.LocalDateTime;
 

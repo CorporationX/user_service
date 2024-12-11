@@ -9,46 +9,47 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.PersonToUserMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.model.dto.ContactInfoDto;
 import school.faang.user_service.model.dto.EducationDto;
 import school.faang.user_service.model.dto.PersonDto;
 import school.faang.user_service.model.dto.UserDto;
-import school.faang.user_service.model.event.ProfileViewEvent;
-import school.faang.user_service.model.event.SearchAppearanceEvent;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
 import school.faang.user_service.model.entity.Country;
-import school.faang.user_service.model.entity.User;
-import school.faang.user_service.model.entity.UserProfilePic;
 import school.faang.user_service.model.entity.Event;
 import school.faang.user_service.model.entity.Goal;
 import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.model.entity.TelegramContact;
-import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.mapper.PersonToUserMapper;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.publisher.ProfileViewEventPublisher;
-import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.UserProfilePic;
+import school.faang.user_service.model.event.ProfileViewEvent;
+import school.faang.user_service.model.event.SearchAppearanceEvent;
+import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.redis.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.redis.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.repository.EventRepository;
+import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.EventRepository;
-import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.service.CountryService;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.S3service;
 import school.faang.user_service.service.UserService;
+import school.faang.user_service.validator.UserServiceValidator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
-import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 @Service
@@ -71,6 +72,7 @@ public class UserServiceImpl implements UserService {
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
     private final ProfileViewEventPublisher profileViewEventPublisher;
     private final UserContext userContext;
+    private final UserServiceValidator validator;
 
     @Override
     @Transactional

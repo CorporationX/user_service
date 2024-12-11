@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.model.dto.UserDto;
 import school.faang.user_service.model.filter_dto.UserFilterDto;
-import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
+import school.faang.user_service.redis.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;

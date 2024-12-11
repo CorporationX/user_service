@@ -1,4 +1,4 @@
-package school.faang.user_service.publisher;
+package school.faang.user_service.redis.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,7 +9,7 @@ import school.faang.user_service.model.event.ProjectFollowerEvent;
 
 @Component
 public class ProjectFollowerEventPublisher extends AbstractEventPublisher<ProjectFollowerEvent> {
-    public ProjectFollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
+    public ProjectFollowerEventPublisher(@Qualifier("eventRedisTemplate") RedisTemplate<String, Object> redisTemplate,
                                          ObjectMapper objectMapper,
                                          @Qualifier("projectFollowerChannelTopic") ChannelTopic topic) {
         super(redisTemplate, objectMapper, topic);

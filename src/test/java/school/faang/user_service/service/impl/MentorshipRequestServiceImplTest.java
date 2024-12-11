@@ -33,11 +33,10 @@ import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipReques
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorshipRequestFilter.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
-import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.redis.publisher.MentorshipOfferedEventPublisher;
+import school.faang.user_service.redis.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.MentorshipRequestRepository;
-import school.faang.user_service.service.impl.MentorshipRequestServiceImpl;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.ArrayList;

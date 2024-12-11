@@ -1,4 +1,4 @@
-package school.faang.user_service.publisher;
+package school.faang.user_service.redis.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,7 +9,7 @@ import school.faang.user_service.model.event.SearchAppearanceEvent;
 
 @Component
 public class SearchAppearanceEventPublisher extends AbstractEventPublisher<SearchAppearanceEvent> {
-    public SearchAppearanceEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
+    public SearchAppearanceEventPublisher(@Qualifier("eventRedisTemplate") RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
                                           @Qualifier("searchAppearanceTopic") ChannelTopic channelTopic) {
         super(redisTemplate, objectMapper, channelTopic);
     }

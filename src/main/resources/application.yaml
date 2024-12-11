@@ -24,6 +24,26 @@ spring:
       port: 6379
       host: localhost
 
+  kafka:
+    admin:
+      auto-create-topics: false
+      client-id: user-service-kafka-admin
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      bootstrap-servers: localhost:9092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: faang.school.postservice.model.event.kafka,school.faang.user_service.model.event.kafka
+
+    listener:
+      ack-mode: manual
+
 services:
   s3:
     endpoint: http://127.0.0.1:9000
@@ -64,6 +84,27 @@ redis:
     skill-offered: skill_offered_channel
     recommendation-requested: recommendation_requested_channel
     premium-bought: premium_bought_channel
+  feed:
+    ttl:
+      user: 86400
+
+kafka:
+  batch-size:
+    follower: 1000
+  topics:
+    post: post_topic
+    author-published-post: author_published_post_topic
+    author-of-comment: author_of_comment_topic
+    feed-heat: feed_heat_topic
+    author-post-by-heat: author_post_by_heat_topic
+  consumer:
+    groups:
+      user-service:
+        concurrency: 3
+        group-id: user-service-group
+      feed-heat:
+        concurrency: 3
+        group-id: feed-heater-group
 
 scheduler:
   clear-events:
@@ -81,3 +122,5 @@ premium:
       max-pool-capacity: 16
       queue-capacity: 32
     interval: "@weekly"
+
+system-user-id: -1

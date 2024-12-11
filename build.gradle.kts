@@ -33,6 +33,7 @@ dependencies {
     implementation ("org.springframework.retry:spring-retry")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     implementation("io.swagger:swagger-annotations:1.6.14")
+    implementation("org.springframework.kafka:spring-kafka:3.3.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**

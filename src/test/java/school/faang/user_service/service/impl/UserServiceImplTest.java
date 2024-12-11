@@ -16,29 +16,30 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.filter.user.UserFilter;
-import school.faang.user_service.model.dto.UserDto;
-import school.faang.user_service.model.event.ProfileViewEvent;
-import school.faang.user_service.model.entity.TelegramContact;
-import school.faang.user_service.model.filter_dto.user.UserFilterDto;
-import school.faang.user_service.model.entity.Country;
-import school.faang.user_service.model.entity.User;
-import school.faang.user_service.model.entity.UserProfilePic;
-import school.faang.user_service.model.entity.Event;
-import school.faang.user_service.model.entity.Goal;
-import school.faang.user_service.model.entity.Promotion;
 import school.faang.user_service.filter.user.UserCreatedAfterFilter;
 import school.faang.user_service.filter.user.UserCreatedBeforeFilter;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.filter.user.UserPhoneFilter;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.publisher.ProfileViewEventPublisher;
-import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.model.dto.UserDto;
+import school.faang.user_service.model.entity.Country;
+import school.faang.user_service.model.entity.Event;
+import school.faang.user_service.model.entity.Goal;
+import school.faang.user_service.model.entity.Promotion;
+import school.faang.user_service.model.entity.TelegramContact;
+import school.faang.user_service.model.entity.User;
+import school.faang.user_service.model.entity.UserProfilePic;
+import school.faang.user_service.model.event.ProfileViewEvent;
+import school.faang.user_service.model.filter_dto.user.UserFilterDto;
+import school.faang.user_service.redis.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.redis.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.repository.EventRepository;
+import school.faang.user_service.repository.GoalRepository;
 import school.faang.user_service.repository.PromotionRepository;
 import school.faang.user_service.repository.TelegramContactRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.EventRepository;
-import school.faang.user_service.repository.GoalRepository;
+import school.faang.user_service.validator.UserServiceValidator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -94,6 +95,8 @@ public class UserServiceImplTest {
     private ProfileViewEventPublisher profileViewEventPublisher;
     @Mock
     private UserContext userContext;
+    @Mock
+    private UserServiceValidator validator;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -115,6 +118,8 @@ public class UserServiceImplTest {
         user.setGoals(new ArrayList<>());
         user.setOwnedEvents(new ArrayList<>());
         user.setParticipatedEvents(new ArrayList<>());
+
+        userContext.setUserId(1L);
 
         userDto = new UserDto();
         userDto.setId(user.getId());
@@ -526,6 +531,7 @@ public class UserServiceImplTest {
         verify(telegramContactRepository, never()).save(telegramContact);
         verify(telegramContactRepository, times(1)).findByTelegramUserName(telegramUserName);
     }
+
     @Test
     @DisplayName("Should publish ProfileViewEvent when viewer id is different from profile owner id")
     public void testPublishProfileViewEvent_Success() {

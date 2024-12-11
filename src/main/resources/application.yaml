@@ -4,8 +4,14 @@ spring:
       host: localhost
       port: 6379
       channel:
-        follower: follower_channel
-        unfollow: unfollow_channel
+        follower:
+          name: follower_channel
+        unfollow:
+          name: unfollow_channel
+        follower-project:
+          name: follower_project_channel
+        unfollow-project:
+          name: unfollow_project_channel
         mentorship-channel:
           name: mentorship_channel
         follower-event-channel:
@@ -14,6 +20,7 @@ spring:
           name: event_participation_channel
         search-appearance:
           name: search_appearance_topic
+
 
   datasource:
     driver-class-name: org.postgresql.Driver

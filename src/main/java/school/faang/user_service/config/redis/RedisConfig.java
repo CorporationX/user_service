@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,9 +21,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
-
-    @Value("${spring.data.redis.channel.search-appearance.name}")
-    private String searchAppearanceTopicName;
 
     private static final String CREATE_CHANNEL_LOG_MESSAGE = "Создание ChannelTopic для канала: {}";
 
@@ -56,8 +52,27 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic createAppearanceTopic() {
-        return new ChannelTopic(searchAppearanceTopicName);
+    ChannelTopic followerProjectChannel() {
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getProjectFollowerChannel());
+        return new ChannelTopic(redisProperties.getProjectFollowerChannel());
+    }
+
+    @Bean
+    ChannelTopic unfollowerProjectChannel() {
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getProjectUnfollowChannel());
+        return new ChannelTopic(redisProperties.getProjectUnfollowChannel());
+    }
+
+    @Bean
+    public ChannelTopic createAppearanceChannel() {
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getSearchAppearanceChannel());
+        return new ChannelTopic(redisProperties.getSearchAppearanceChannel());
+    }
+
+    @Bean
+    public ChannelTopic mentorshipChannel() {
+        log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getMentorshipChannel());
+        return new ChannelTopic(redisProperties.getMentorshipChannel());
     }
 
     @Bean

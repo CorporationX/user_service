@@ -5,9 +5,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ProjectFollowerEvent {
+public class ProjectFollowerEventDto {
     private Long projectId;
     private Long followerId;
     private Long creatorId;
 
+    public enum EventType {
+        FOLLOW, UNFOLLOW
+    }
 }

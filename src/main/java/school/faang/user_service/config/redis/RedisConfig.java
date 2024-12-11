@@ -24,10 +24,6 @@ public class RedisConfig {
 
     private final RedisProperties redisProperties;
 
-    @Value("${spring.data.redis.topic.search-appearance}")
-    private String searchAppearanceTopicName;
-
-
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
         log.info("Создание LettuceConnectionFactory для Redis с хостом: {} и портом:{}", redisProperties.getRedisHost(), redisProperties.getRedisPort());
@@ -57,7 +53,7 @@ public class RedisConfig {
 
     @Bean
     public ChannelTopic createAppearanceTopic() {
-        return new ChannelTopic(searchAppearanceTopicName);
+        return new ChannelTopic(redisProperties.getSearchAppearanceChannel());
     }
 
     @Bean

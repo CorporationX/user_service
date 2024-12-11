@@ -22,4 +22,7 @@ public class RedisProperties {
 
     @Value("${spring.data.redis.channel.follower-project}")
     private String projectFollowerChannel;
+
+    @Value("${spring.data.redis.channel.search-appearance}")
+    private String searchAppearanceChannel;
 }

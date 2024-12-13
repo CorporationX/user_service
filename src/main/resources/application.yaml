@@ -14,6 +14,8 @@ spring:
           name: event_participation_channel
         search-appearance:
           name: search_appearance_topic
+        profile-pic:
+          name: profile_pic_channel
 
   datasource:
     driver-class-name: org.postgresql.Driver

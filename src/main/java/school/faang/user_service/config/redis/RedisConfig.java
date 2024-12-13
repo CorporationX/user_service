@@ -44,6 +44,11 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic profilePicChannel() {
+        return new ChannelTopic(redisProperties.getProfilePicChannel());
+    }
+
+    @Bean
     public ChannelTopic followerChannel() {
         log.info(CREATE_CHANNEL_LOG_MESSAGE, redisProperties.getFollowerChannel());
         return new ChannelTopic(redisProperties.getFollowerChannel());

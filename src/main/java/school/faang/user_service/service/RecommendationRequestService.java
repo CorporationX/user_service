@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
@@ -12,8 +13,10 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.event.RecommendationRequestEvent;
 import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.publisher.RecommendationRequestEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;
 
@@ -23,6 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
@@ -32,6 +36,7 @@ public class RecommendationRequestService {
     private final UserService userService;
     private final RecommendationRequestValidator recommendationRequestValidator;
     private final List<Filter<RecommendationRequest, RequestFilterDto>> filters;
+    private final RecommendationRequestEventPublisher recommendationRequestEventPublisher;
 
     @Transactional
     public RecommendationRequestDto create(RecommendationRequestDto dto) {
@@ -60,6 +65,14 @@ public class RecommendationRequestService {
             savedRequest.getSkills().addAll(skillRequests);
             recommendationRequestRepository.save(savedRequest);
         }
+
+        recommendationRequestEventPublisher.publish(
+                RecommendationRequestEvent.builder()
+                        .requestId(savedRequest.getId())
+                        .receiverId(savedRequest.getReceiver().getId())
+                        .requesterId(savedRequest.getRequester().getId())
+                        .build()
+        );
 
         return recommendationRequestMapper.toDto(savedRequest);
     }

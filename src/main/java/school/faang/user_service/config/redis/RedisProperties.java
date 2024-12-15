@@ -14,6 +14,7 @@ public class RedisProperties {
 
     @Data
     public static class Channel {
+        private String recommendationRequestChannel;
         private String mentorshipChannel;
         private String followerChannel;
         private String recommendationChannel;

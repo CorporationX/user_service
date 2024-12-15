@@ -17,6 +17,7 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.RecommendationRequestNotFoundException;
 import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.publisher.RecommendationRequestEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;
@@ -66,6 +67,9 @@ class RecommendationRequestServiceTest {
     private SkillValidator skillValidator;
 
     @Mock
+    private RecommendationRequestEventPublisher recommendationRequestEventPublisher;
+
+    @Mock
     private Filter<RecommendationRequest, RequestFilterDto> endDateFilter;
     @Mock
     private Filter<RecommendationRequest, RequestFilterDto> receiverIdFilter;
@@ -109,7 +113,8 @@ class RecommendationRequestServiceTest {
                         requesterIdFilter,
                         skillTitleFilter,
                         startDateFilter,
-                        statusFilter)
+                        statusFilter),
+                recommendationRequestEventPublisher
         );
 
         requester = User.builder()

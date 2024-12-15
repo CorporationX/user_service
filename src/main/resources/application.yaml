@@ -25,6 +25,7 @@ spring:
         follower-channel: follower_event
         recommendation-channel: recommendation_channel
         user-ban-channel: user_ban_channel
+        recommendation-request-channel: recommendation_request_channel
 
   retry:
     maxAttempts: 3

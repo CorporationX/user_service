@@ -14,7 +14,7 @@ import school.faang.user_service.entity.contact.PreferredContact;
 public interface UserContactsMapper {
 
     @Mapping(source = "contactPreference.preference", target = "preference")
-    UserContactsDto toDto (User user);
+    UserContactsDto toDto(User user);
 
     default PreferredContact mapPreference(ContactPreference contactPreference) {
         return contactPreference != null ? contactPreference.getPreference() : null;

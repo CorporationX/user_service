@@ -1,16 +1,14 @@
 package school.faang.user_service.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +36,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -51,6 +50,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest
 @ContextConfiguration(classes = {UserController.class})
 class UserControllerTest {
+    private static final Long USER_ID = 1L;
+    private static final Long CURRENT_USER_ID = 2L;
+    private static final PreferredContact PREFERENCE = PreferredContact.EMAIL;
+    private static final String CHANNEL_NAME = "recommendation_request_channel";
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -65,6 +70,7 @@ class UserControllerTest {
 
     @Spy
     private UserMapper userMapper;
+
     @MockBean
     private UserValidator userValidator;
 
@@ -73,6 +79,9 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).
+                setControllerAdvice(new GlobalExceptionHandler())
+                .build();
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -215,6 +224,45 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
 
         verify(userService, times(1)).getUsersByIds(Arrays.asList(3L, 4L));
+        verifyNoMoreInteractions(userService);
+    }
+
+    @Test
+    @DisplayName("Update user's preferred contact method successfully")
+    void testUpdateUserPreference_Success() throws Exception {
+        UserContactsDto updatedUserContactsDto = UserContactsDto.builder()
+                .id(USER_ID)
+                .preference(PREFERENCE)
+                .build();
+
+        when(userService.updateUserPreferredContact(eq(USER_ID), eq(PREFERENCE), eq(CURRENT_USER_ID))).thenReturn(updatedUserContactsDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{userId}/contact-preference", USER_ID)
+                        .param("preference", PREFERENCE.name())
+                        .header("Current-User-Id", String.valueOf(CURRENT_USER_ID))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(USER_ID))
+                .andExpect(jsonPath("$.preference").value(PREFERENCE.name()));
+
+        verify(userService, times(1)).updateUserPreferredContact(eq(USER_ID), eq(PREFERENCE), eq(CURRENT_USER_ID));
+        verifyNoMoreInteractions(userValidator, userService);
+    }
+
+    @Test
+    @DisplayName("Update user's preferred contact method - Unauthorized")
+    void testUpdateUserPreference_Unauthorized() throws Exception {
+        doThrow(new SecurityException("Access denied"))
+                .when(userService)
+                .updateUserPreferredContact(eq(USER_ID), eq(PREFERENCE), eq(CURRENT_USER_ID));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{userId}/contact-preference", USER_ID)
+                        .param("preference", PREFERENCE.name())
+                        .header("Current-User-Id", String.valueOf(CURRENT_USER_ID))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verify(userService, times(1)).updateUserPreferredContact(eq(USER_ID), eq(PREFERENCE), eq(CURRENT_USER_ID));
         verifyNoMoreInteractions(userService);
     }
 

@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.listener.PatternTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -20,7 +19,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-    @Value("${spring.data.redis.channel.user-ban-channel}")
+
+    @Value("${spring.data.redis.channel.user-ban-channel:user_ban}")
     private String userBanTopic;
 
     private final RedisProperties redisProperties;
@@ -30,7 +30,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
         configuration.setHostName(redisProperties.getHost());
         configuration.setPort(redisProperties.getPort());
-        log.info("Jedis client for redis is configured: host = {}, port = {}", redisProperties.getHost(), redisProperties.getPort());
+        log.info("Jedis client for Redis configured: host = {}, port = {}", redisProperties.getHost(), redisProperties.getPort());
         return new JedisConnectionFactory(configuration);
     }
 
@@ -54,6 +54,8 @@ public class RedisConfig {
         MessageListenerAdapter listenerAdapter = createListenerAdapter(userBanSubscriber);
 
         container.addMessageListener(listenerAdapter, new PatternTopic(userBanTopic));
+
+        log.info("RedisMessageListenerContainer configured with topic: {}", userBanTopic);
 
         return container;
     }

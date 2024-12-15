@@ -2,9 +2,10 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.domain.Person;
@@ -17,7 +18,9 @@ import school.faang.user_service.dto.user_profile.UserProfileSettingsResponseDto
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.event.ContactPreferenceUpdateEvent;
 import school.faang.user_service.event.UserProfileDeactivatedEvent;
 import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.PersonToUserMapper;
@@ -26,6 +29,8 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.parser.CsvParser;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.contact.ContactPreferenceRepository;
+import school.faang.user_service.service.contact.ContactPreferenceService;
+import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
@@ -41,7 +46,6 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private final ApplicationEventPublisher eventPublisher;
     private final UserRepository userRepository;
@@ -49,10 +53,42 @@ public class UserService {
     private final PersonToUserMapper personToUserMapper;
     private final UserContactsMapper userContactsMapper;
     private final CountryService countryService;
+    private final EventService eventService;
+    private final ContactPreferenceService contactPreferenceService;
     private final CsvParser parser;
     private final List<Filter<User, UserFilterDto>> userFilters;
     private final UserValidator userValidator;
     private final ContactPreferenceRepository contactPreferenceRepository;
+    private final MentorshipService mentorshipService;
+
+    @Autowired
+    public UserService(UserRepository userRepository,
+                       UserMapper userMapper,
+                       PersonToUserMapper personToUserMapper,
+                       UserContactsMapper userContactsMapper,
+                       UserValidator userValidator,
+                       CountryService countryService,
+                       @Lazy MentorshipService mentorshipService,
+                       @Lazy EventService eventService,
+                       ContactPreferenceService contactPreferenceService,
+                       List<Filter<User, UserFilterDto>> userFilters,
+                       CsvParser parser,
+                       ApplicationEventPublisher eventPublisher,
+                       ContactPreferenceRepository contactPreferenceRepository) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.personToUserMapper = personToUserMapper;
+        this.userContactsMapper = userContactsMapper;
+        this.userValidator = userValidator;
+        this.countryService = countryService;
+        this.mentorshipService = mentorshipService;
+        this.eventService = eventService;
+        this.contactPreferenceService = contactPreferenceService;
+        this.userFilters = userFilters;
+        this.parser = parser;
+        this.eventPublisher = eventPublisher;
+        this.contactPreferenceRepository = contactPreferenceRepository;
+    }
 
     public boolean checkUserExistence(long userId) {
         return userRepository.existsById(userId);
@@ -145,6 +181,8 @@ public class UserService {
 
     public UserContactsDto getUserContacts(Long userId) {
         User user = findUserById(userId);
+        log.info("Fetched Contact Preference: {}", user.getContactPreference() != null ? user.getContactPreference().getPreference() : "null");
+
         return userContactsMapper.toDto(user);
     }
 
@@ -281,5 +319,20 @@ public class UserService {
                 person.getContactInfo().getAddress().getCountry());
         user.setCountry(country);
         return user;
+    }
+
+    @Transactional
+    public UserContactsDto updateUserPreferredContact(Long userId, PreferredContact contact, Long currentUserId) {
+        userValidator.hasAccess(currentUserId, userId);
+
+        User user = findUserById(userId);
+
+        contactPreferenceService.updatePreference(user, contact);
+
+        eventPublisher.publishEvent(new ContactPreferenceUpdateEvent(userId, contact, currentUserId));
+
+        User updatedUser = findUserById(userId);
+
+        return userContactsMapper.toDto(updatedUser);
     }
 }

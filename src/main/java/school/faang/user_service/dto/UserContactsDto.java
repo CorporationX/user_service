@@ -16,11 +16,12 @@ public class UserContactsDto {
     @NotNull(message = "Id is required")
     private Long id;
 
+    @Email
+    private String email;
+
     @Size(min = 5, max = 30, message = "Username must be between 5 and 30 characters")
     private String username;
 
-    @Email
-    private String email;
 
     @Pattern(
             regexp = "^(\\+\\d{1,3}[- ]?)?\\d{10}$",

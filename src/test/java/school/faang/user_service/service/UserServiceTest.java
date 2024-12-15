@@ -35,6 +35,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.parser.CsvParser;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.contact.ContactPreferenceRepository;
+import school.faang.user_service.service.contact.ContactPreferenceService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.UserValidator;
 
@@ -73,16 +74,18 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private UserMapper userMapper;
 
     @Mock
+    private MentorshipService mentorshipService;
+    @Mock
     private CountryService countryService;
+    @Mock
+    private EventService eventService;
 
     @Mock
     private PersonToUserMapper personToUserMapper;
-
     @Mock
     private UserContactsMapper userContactsMapper;
 
@@ -91,36 +94,30 @@ class UserServiceTest {
 
     @Mock
     private Filter<User, UserFilterDto> userNameFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userAboutFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userEmailFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userContactFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userCountryFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userCityFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userPhoneFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userSkillFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userExperienceMinFilter;
-
     @Mock
     private Filter<User, UserFilterDto> userExperienceMaxFilter;
+    @Mock
+    private ContactPreferenceService contactPreferenceService;
 
     @Mock
     private ContactPreferenceRepository contactPreferenceRepository;
+
 
     @Mock
     private UserValidator userValidator;
@@ -168,15 +165,18 @@ class UserServiceTest {
         );
 
         userService = new UserService(
-                eventPublisher,
                 userRepository,
                 userMapper,
                 personToUserMapper,
                 userContactsMapper,
-                countryService,
-                parser,
-                userFilters,
                 userValidator,
+                countryService,
+                mentorshipService,
+                eventService,
+                contactPreferenceService,
+                userFilters,
+                parser,
+                eventPublisher,
                 contactPreferenceRepository
         );
 

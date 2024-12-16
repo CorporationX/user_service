@@ -16,9 +16,14 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -160,6 +165,28 @@ public class EventServiceTest {
         Assertions.assertSame(result, eventDtos);
     }
 
+    @Test
+    public void testClearExpiredEventsWhenNoEvents() {
+        when(eventRepository.findAll()).thenReturn(Collections.emptyList());
+        CompletableFuture<Void> events = eventService.clearExpiredEvents();
+        assertThat(events).isCompleted();
+        verify(eventRepository, times(0)).deleteAllById(anyList());
+    }
+
+    @Test
+    public void testClearExpiredEventsWhenNoExpiredOnes() {
+        List<Event> events = List.of(
+                createActiveEvent(1L, "Event1", 10L),
+                createActiveEvent(2L, "Event2", 2L)
+        );
+        when(eventRepository.findAll()).thenReturn(events);
+        CompletableFuture<Void> result = eventService.clearExpiredEvents();
+        assertThat(result).isCompleted();
+
+        verify(eventRepository, times(1)).findAll();
+        verify(eventRepository, times(0)).deleteAllById(anyList());
+    }
+
     private EventDto getInputDto() {
         return EventDto.builder()
                 .id(testId)
@@ -170,6 +197,20 @@ public class EventServiceTest {
         return EventDto.builder()
                 .id(testId + 1)
                 .build();
+    }
+
+    private Event createExpiredEvent(long id, String title, long minusDays) {
+        return Event.builder()
+                .id(id)
+                .endDate(LocalDateTime.now().minusDays(minusDays))
+                .title(title).build();
+    }
+
+    private Event createActiveEvent(long id, String title, long plusDays) {
+        return Event.builder()
+                .id(id)
+                .endDate(LocalDateTime.now().plusDays(plusDays))
+                .title(title).build();
     }
 
     private List<EventDto> getEventDtoList() {

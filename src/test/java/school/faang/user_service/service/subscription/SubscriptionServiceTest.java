@@ -1,16 +1,21 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.SubscribeEventDto;
 import school.faang.user_service.dto.subscribe.UserDTO;
 import school.faang.user_service.dto.subscribe.UserFilterDTO;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.InvalidUserIdException;
 import school.faang.user_service.exception.SubscriptionNotFoundException;
+import school.faang.user_service.publisher.UnfollowEventPublisher;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.SubscriptionService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +28,12 @@ class SubscriptionServiceTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
+    @Mock
+    private UnfollowEventPublisher unfollowEventPublisher;
+
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
 
     @InjectMocks
     private SubscriptionService subscriptionService;
@@ -39,19 +50,33 @@ class SubscriptionServiceTest {
         assertEquals("Некорректные ID: ID не должны быть null и не должны совпадать.", exception.getMessage());
     }
 
-
-
     @Test
+
+    @DisplayName("Успешная отписка: Пользователь отписывается от другого пользователя")
     void unfollowUser_ShouldUnfollowUser_WhenSubscriptionExists() {
         Long followerId = 1L;
         Long followeeId = 2L;
-
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         subscriptionService.unfollowUser(followerId, followeeId);
 
         verify(subscriptionRepository).unfollowUser(followerId, followeeId);
+        verify(unfollowEventPublisher).publish(any(SubscribeEventDto.class));
+    }
+
+    @DisplayName("Успешная подписка: Пользователь подписывается на другого пользователя")
+    void followUser_ShouldFollowUser_WhenSubscriptionDoesNotExist() {
+        Long followerId = 1L;
+        Long followeeId = 2L;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+
+        subscriptionService.followUser(followerId, followeeId);
+
+        verify(subscriptionRepository).followUser(followerId, followeeId);
+        verify(followerEventPublisher).publish(any(SubscribeEventDto.class));
+        verifyNoMoreInteractions(followerEventPublisher);
     }
 
     @Test
@@ -72,7 +97,7 @@ class SubscriptionServiceTest {
     @Test
     void getFollowers_ShouldReturnFilteredFollowers_WhenFilterIsValid() {
         Long userId = 1L;
-        UserFilterDTO filter = new UserFilterDTO(); // Добавьте нужные параметры фильтра
+        UserFilterDTO filter = new UserFilterDTO();
 
         User user1 = new User();
         user1.setId(1L);
@@ -118,7 +143,7 @@ class SubscriptionServiceTest {
     @Test
     void getFollowing_ShouldReturnFilteredFollowing_WhenFilterIsValid() {
         Long followeeId = 1L;
-        UserFilterDTO filter = new UserFilterDTO(); // Добавьте нужные параметры фильтра
+        UserFilterDTO filter = new UserFilterDTO();
 
         User user1 = new User();
         user1.setId(2L);

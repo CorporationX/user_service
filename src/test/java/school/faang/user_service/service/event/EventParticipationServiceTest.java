@@ -12,10 +12,13 @@ import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.ParticipantRegistrationException;
 import school.faang.user_service.mapper.UserDTOMapperImpl;
+import school.faang.user_service.publisher.EventRegistrationEventPublisher;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,7 +32,11 @@ class EventParticipationServiceTest {
     @InjectMocks
     private EventParticipationService service;
     @Mock
+    private UserRepository userRepository;
+    @Mock
     private EventParticipationRepository repository;
+    @Mock
+    private EventRegistrationEventPublisher eventRegistrationEventPublisher;
     @Spy
     private UserDTOMapperImpl userDTOMapper;
 
@@ -37,6 +44,8 @@ class EventParticipationServiceTest {
     @Test
     void register_shouldRegisterUserForEvent_whenUserNotRegisteredYet() {
         // given
+        User user = createUser();
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(repository.existsByEventIdAndUserId(EVENT_ID, USER_ID)).thenReturn(false);
 
         // when
@@ -44,11 +53,14 @@ class EventParticipationServiceTest {
 
         // then
         verify(repository).register(EVENT_ID, USER_ID);
+        verify(eventRegistrationEventPublisher, times(1)).publish(any());
     }
 
     @Test
     void register_shouldThrowException_whenUserAlreadyRegistered() {
         // given
+        User user = createUser();
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(repository.existsByEventIdAndUserId(EVENT_ID, USER_ID)).thenReturn(true);
 
         // when
@@ -179,5 +191,20 @@ class EventParticipationServiceTest {
         users.add(user3);
 
         return users;
+    }
+
+    private User createUser(){
+        return User.builder()
+                .id(2L)
+                .username("jane_smith")
+                .email("jane@example.com")
+                .phone("+0987654321")
+                .password("password456")
+                .active(true)
+                .aboutMe("Project manager and team leader.")
+                .country(new Country(2L, "Canada", List.of()))
+                .city("Toronto")
+                .experience(8)
+                .build();
     }
 }

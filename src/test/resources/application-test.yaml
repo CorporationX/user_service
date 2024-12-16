@@ -22,3 +22,5 @@ application:
   constants:
     max-active-goals-count: 3
     max-month-limit-recommendation-request: 6
+  premium:
+    batch-size: 100

@@ -9,18 +9,21 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.service.user.UserService;
 import java.util.ArrayList;
 import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(UserController.class)
 @ContextConfiguration(classes = {UserController.class, UserService.class})
 public class UserControllerTest {
     private static final String GET_USER_URL = "/users/{userId}";
@@ -32,6 +35,10 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+
 
     @Test
     public void testGetUserByIdSuccess() throws Exception {
@@ -73,6 +80,28 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].username", is("johndoe")))
                 .andExpect(jsonPath("$[1].id", is(2)))
                 .andExpect(jsonPath("$[1].username", is("tomcat")));
+    }
+
+    @Test
+    void testSearchUsers(){
+        Long searchingUserId = 42L;
+        List<Long> userIds = List.of(1L, 2L, 3L);
+
+        when(userService.searchUsers(searchingUserId)).thenReturn(userIds);
+
+        try {
+            mockMvc.perform(get("/users/search")
+                            .param("searchingUserId", searchingUserId.toString()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(3)))
+                    .andExpect(jsonPath("$[0]").value(1L))
+                    .andExpect(jsonPath("$[1]").value(2L))
+                    .andExpect(jsonPath("$[2]").value(3L));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        verify(userService, times(1)).searchUsers(searchingUserId);
     }
 
     private UserDto createUserDto() {

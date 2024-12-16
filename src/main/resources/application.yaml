@@ -1,4 +1,24 @@
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      channel:
+        follower: follower_channel
+        unfollow: unfollow_channel
+        follower-project:
+          name: follower_project_channel
+        unfollow-project:
+          name: unfollow_project_channel
+        mentorship-channel:
+          name: mentorship_channel
+        follower-event-channel:
+          name: follower_event
+        event-participation:
+          name: event_participation_channel
+        search-appearance:
+          name: search_appearance_topic
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -15,16 +35,6 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-
-  data:
-    redis:
-      port: 6379
-      host: localhost
-      channels:
-        mentorship-channel:
-          name: mentorship_channel
-        follower-event-channel:
-          name: follower_event
 
 server:
   port: 8080
@@ -48,5 +58,17 @@ application:
     max-month-limit-recommendation-request: 6
   skill:
     minOffersRequired: 3
+  premium:
+    threads-number: 20
+    time-to-run-remove-expired-premium: "0 0 8 * * Sun" # every sunday at 8 a.m.
+    batch-size: 100
+  scheduler:
+    cron:
+      one_day: "0 0 0 1 * *"
+    batch-size: 5
 
+  publisher-messages:
+    event-registration:
+      notification:
+        telegram: Hello, you were successful registered for the event
 

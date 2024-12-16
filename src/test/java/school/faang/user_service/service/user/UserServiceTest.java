@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class UserServiceTest {
     private UserMapper userMapper;
 
     private UserDto userDto;
+
+    @Mock
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -93,6 +97,24 @@ public class UserServiceTest {
         assertEquals(secondUserDto.getId(), result.get(1).getId());
         assertEquals(firstUser.getUsername(), result.get(0).getUsername());
         assertEquals(secondUser.getUsername(), result.get(1).getUsername());
+    }
+
+    @Test
+    void testSearchUsers() {
+        Long searchingUserId = 42L;
+
+        List<Long> result = userService.searchUsers(searchingUserId);
+
+        assertEquals(List.of(1L, 2L, 3L), result);
+
+        for (Long userId : result) {
+            verify(searchAppearanceEventPublisher, times(1))
+                    .publishSearchAppearanceEvent(argThat(event ->
+                            event.getUserId().equals(userId) &&
+                                    event.getSearchingUserId().equals(searchingUserId) &&
+                                    event.getViewedAt() != null
+                    ));
+        }
     }
 
     private UserDto createUserDto(long id, String username, String email, String picUrl, long premiumId) {

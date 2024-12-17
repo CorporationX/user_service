@@ -14,9 +14,10 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.events.BanUserEvent;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.CreateUserMapper;
 import school.faang.user_service.mapper.PersonMapper;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.model.person.Person;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
@@ -163,7 +164,14 @@ public class UserService {
         }
 
         return s3Service.generatePresignedUrl(ulrOrKey);
+    }
 
+    public void banUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("user not found"));
+
+        user.setBanned(true);
+        userRepository.save(user);
     }
 
     private static boolean isValidURL(String urlString) {

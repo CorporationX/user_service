@@ -44,6 +44,8 @@ spring:
           name: mentorship_accepted_topic
         skill_acquired_topic:
           name: skill_acquire
+
+
   task:
     scheduling:
       cron-elastic-search-data-sync: 0 0/10 * * * ?
@@ -94,4 +96,3 @@ services:
 
 removeEventTime:
   cron: 0 0 * * * *
-

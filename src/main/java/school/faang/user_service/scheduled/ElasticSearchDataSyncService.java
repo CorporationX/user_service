@@ -12,7 +12,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.document.UserDocument;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.elasticsearch.UserElasticsearchRepository;
 
 import java.util.List;

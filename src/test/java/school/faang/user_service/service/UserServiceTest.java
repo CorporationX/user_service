@@ -23,9 +23,10 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.events.BanUserEvent;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.CreateUserMapperImpl;
 import school.faang.user_service.mapper.PersonMapper;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.goal.GoalService;
@@ -47,8 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -340,5 +340,28 @@ public class UserServiceTest {
         assertNull(user.getGoals());
         assertNull(user.getOwnedEvents());
         assertFalse(user.isActive());
+    }
+
+    @Test
+    void testBanUser_Success() {
+        Long userId = 1L;
+        User user = new User();
+        user.setBanned(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.banUser(userId);
+
+        assertTrue(user.isBanned());
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void testBanUser_UserNotFound() {
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(DataValidationException.class, () -> userService.banUser(userId));
+
+        verify(userRepository, times(0)).save(any());
     }
 }

@@ -29,6 +29,7 @@ public interface PersonMapper {
         return new Country(0, countryName, null);
     }
 
+
     default String mapAboutMe(Person person) {
         StringBuilder aboutMe = new StringBuilder();
         if (person.getContactInfo() != null && person.getContactInfo().getAddress() != null

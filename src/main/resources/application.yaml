@@ -26,7 +26,7 @@ spring:
         recommendation-channel: recommendation_channel
         goal-completed: goal_completed_channel
         user-ban-channel: user_ban_channel
-
+        skill-channel: skill_channel
 
   retry:
     maxAttempts: 3

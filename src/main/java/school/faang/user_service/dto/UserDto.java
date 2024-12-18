@@ -28,8 +28,9 @@ public class UserDto {
     @Email(message = "Email should be in valid email format")
     @Size(min = 3, max = 16, message = "Email length should be min 3, max 16")
     private String email;
-
     private List<Long> menteesId;
     private List<Long> mentorsId;
+    private Long skillId;
+    private List<Long> guarantorsId;
     private List<Long> skillsId;
 }

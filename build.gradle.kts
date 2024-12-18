@@ -29,6 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation ("org.springframework.retry:spring-retry")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

@@ -8,10 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapstruct.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -28,6 +30,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -61,6 +64,15 @@ public class MentorshipRequestService {
         mappedMentorshipRequest.setCreatedAt(LocalDateTime.now());
 
         MentorshipRequest savedMentorshipRequest = mentorshipRequestRepository.save(mappedMentorshipRequest);
+
+        mentorshipRequestedEventPublisher.publish(
+                MentorshipRequestedEvent.builder()
+                        .menteeId(mentorshipRequestDto.getRequesterId())
+                        .mentorId(mentorshipRequestDto.getReceiverId())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+
         return mentorshipRequestMapper.mapToDto(savedMentorshipRequest);
     }
 
@@ -107,15 +119,14 @@ public class MentorshipRequestService {
 
         if (mentorshipRequest.getStatus() == RequestStatus.ACCEPTED) {
             throw new IllegalStateException("This mentorship request has already been accepted.");
-        }
-        else if (mentorshipRequest.getStatus() == RequestStatus.REJECTED) {
+        } else if (mentorshipRequest.getStatus() == RequestStatus.REJECTED) {
             throw new IllegalStateException("This mentorship request has already been rejected.");
         }
 
         User requester = mentorshipRequest.getRequester();
         User receiver = mentorshipRequest.getReceiver();
 
-        if (requester.getMentors().contains(receiver) ) {
+        if (requester.getMentors().contains(receiver)) {
             throw new IllegalArgumentException("User is already a mentor");
         }
 

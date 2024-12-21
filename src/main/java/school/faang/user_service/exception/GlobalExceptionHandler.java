@@ -77,4 +77,9 @@ public class GlobalExceptionHandler {
                 .message(Objects.requireNonNullElse(ex.getMessage(), "No message available"))
                 .build();
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

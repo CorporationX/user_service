@@ -67,8 +67,12 @@ public class GoalService {
         goalRepository.deleteById(goalId);
     }
 
+    public Stream<Goal> getGoalsByUserId(Long userId) {
+        return goalRepository.findGoalsByUserId(userId);
+    }
+
     public List<GoalDto> getGoalsByUserId(Long userId, GoalFilterDto filter) {
-        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
+        Stream<Goal> goals = getGoalsByUserId(userId);
         List<Goal> filteredGoals = filterGoals(goals, filter).toList();
 
         return goalMapper.entityListToDtoList(filteredGoals);
@@ -81,7 +85,7 @@ public class GoalService {
         return goalMapper.entityListToDtoList(filteredGoals);
     }
 
-    private Goal getGoalById(Long goalId) {
+    public Goal getGoalById(Long goalId) {
         return goalRepository.findById(goalId)
                 .orElseThrow(() -> {
                     log.info("Goal with id '{}' does not exist", goalId);
@@ -114,7 +118,7 @@ public class GoalService {
         }
     }
 
-    private void validateUserGoalsAmount(Long userId) {
+    public void validateUserGoalsAmount(Long userId) {
         if (goalRepository.countActiveGoalsPerUser(userId) == maxGoalsAmount) {
             log.info("User with id '{}' already has max amount of active goals", userId);
             throw new IllegalStateException("User has max amount of active goals");

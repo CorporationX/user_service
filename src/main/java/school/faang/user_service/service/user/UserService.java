@@ -18,15 +18,18 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.event.ProfileViewEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.mapper.csv.CsvParser;
+import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.service.CountryService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,6 +52,7 @@ public class UserService {
     private final CountryService countryService;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     public Optional<User> findById(long userId) {
         return userRepository.findById(userId);
@@ -114,6 +118,12 @@ public class UserService {
     public UserDto getUserDtoById(long userId) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("user not found!"));
+        ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
+                .viewingId(userId)
+                .viewerId(userContext.getUserId())
+                .visitingTime(LocalDateTime.now())
+                .build();
+        profileViewEventPublisher.publish(profileViewEvent);
         return userMapper.toDto(user);
     }
 

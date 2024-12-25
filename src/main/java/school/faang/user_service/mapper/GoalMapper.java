@@ -2,16 +2,20 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalResponseDto;
 import school.faang.user_service.dto.goal.GoalStatusDto;
 import school.faang.user_service.dto.goal.UpdateGoalDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.dto.user.GoalSearchResponse;
+import school.faang.user_service.message.event.reindex.user.GoalNested;
+import school.faang.user_service.model.Skill;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.goal.Goal;
+import school.faang.user_service.model.goal.GoalStatus;
 
-@Mapper(componentModel = "spring", uses = GoalInvitationMapper.class, unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = {GoalInvitationMapper.class, SkillMapper.class},
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
     @Mapping(target = "parent", ignore = true)
@@ -33,6 +37,21 @@ public interface GoalMapper {
     @Mapping(source = "skillsToAchieve", target = "skillsToAchieveIds")
     @Mapping(source = "status", target = "status")
     GoalResponseDto toResponseDto(Goal goal);
+
+
+    @Mapping(source = "id", target = "goalId")
+    @Mapping(source = "skillsToAchieve", target = "skillsToAchieveNames",
+            qualifiedByName = "toSkillNameList")
+    GoalSearchResponse toSearchResponse(Goal goal);
+
+    @Mapping(source = "id", target = "goalId")
+    @Mapping(source = "skillsToAchieve", target = "skillsToAchieveNames",
+            qualifiedByName = "toSkillNameList")
+    GoalNested toGoalNested(Goal goal);
+
+    default String mapStatus(GoalStatus status) {
+        return status != null ? status.name() : null;
+    }
 
     default Long map(User user) {
         return user.getId();

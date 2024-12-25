@@ -3,7 +3,7 @@ package school.faang.user_service.dto;
 import jakarta.validation.constraints.NotEmpty;
 
 import lombok.Builder;
-import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.model.UserProfilePic;
 
 @Builder
 public record UserSubResponseDto(

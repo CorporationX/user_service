@@ -12,10 +12,10 @@ import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalResponseDto;
 import school.faang.user_service.dto.goal.UpdateGoalDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.model.Skill;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.goal.Goal;
+import school.faang.user_service.model.goal.GoalStatus;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.exceptions.ResourceNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
@@ -29,7 +29,13 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static school.faang.user_service.logging.goal.GoalMessages.*;
+import static school.faang.user_service.logging.goal.GoalMessages.GOAL_COMPLETED_ERROR;
+import static school.faang.user_service.logging.goal.GoalMessages.GOAL_IS_ALREADY_COMPLETED_FOR_GOAL_WITH_ID;
+import static school.faang.user_service.logging.goal.GoalMessages.GOAL_NOT_FOUND;
+import static school.faang.user_service.logging.goal.GoalMessages.MAXIMUM_NUMBER_OF_GOALS_ERROR;
+import static school.faang.user_service.logging.goal.GoalMessages.NO_SKILLS_FOUND;
+import static school.faang.user_service.logging.goal.GoalMessages.NUMBER_OF_ACTIVE_GOALS_REACHED_FOR_A_USER_IN_GOAL_WITH_ID;
+import static school.faang.user_service.logging.goal.GoalMessages.SUCCESSFULLY_DELETED_GOAL_AND_ALL_ITS_CHILDREN;
 
 
 @Slf4j
@@ -194,11 +200,13 @@ public class GoalService {
 
     private void updateUsersInGoal(Goal persistanceGoal, UpdateGoalDto updateGoalDto) {
         log.debug("Updating users for goal with id: {}", persistanceGoal.getId());
+
         List<User> updatedUsers = userService.getAllUsersByIds(updateGoalDto.userIds());
         if (updatedUsers.isEmpty()) {
             log.warn("No users found for provided IDs: {}", updateGoalDto.userIds());
             throw new ResourceNotFoundException("User", "id", updateGoalDto.userIds());
         }
+
         List<User> oldUsers = persistanceGoal.getUsers();
         List<User> removedUsers = CollectionUtils.findMissingElements(oldUsers, updatedUsers);
         List<User> newUsers = CollectionUtils.findMissingElements(updatedUsers, oldUsers);

@@ -1,5 +1,6 @@
 package school.faang.user_service.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,5 +32,15 @@ public class CollectionUtils {
         return source.stream()
                 .filter(skill -> !compareList.contains(skill))
                 .toList();
+    }
+
+    public static <T> List<T> merge(List<T> list1, List<T> list2) {
+        List<T> merged = new ArrayList<>(list1);
+        merged.addAll(list2);
+        return merged;
+    }
+
+    public static <T> boolean isNotEmpty(List<T> list) {
+        return list != null && !list.isEmpty();
     }
 }

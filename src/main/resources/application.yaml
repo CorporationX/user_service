@@ -15,6 +15,22 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+      jobs:
+        user-reindexing-job:
+          name: userReindexingJob
+          chunk-size: 1000
+          reader:
+            name: userItemReader
+            method-name: findAllInRange
+            sorts:
+              - field: id
+                direction: ASC
+          grid-size: 3
 
 
   liquibase:
@@ -33,6 +49,39 @@ spring:
           name: recommendation_channel
         users-ban-channel:
           name: users_ban_event
+      database: 0
+  elasticsearch:
+    uris: http://localhost:9200
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+  kafka:
+    bootstrap-servers: localhost:19092,localhost:19093,localhost:19094
+    producer:
+      properties:
+        spring.kafka.properties.spring.json.trusted.packages: "*"
+    topics:
+      user-indexing-topic:
+        name: user_indexing_topic
+        partitions: 3
+        replication_factor: 3
+      event-indexing-topic:
+        name: event_indexing_topic
+        partitions: 3
+        replication_factor: 3
+      update_user_topic:
+        name: update_user_topic
+        partitions: 3
+        replication_factor: 3
+
+thread-pool:
+  user-batch-thread-pool:
+    core-pool-size: 3
+    max-pool-size: 3
+    await-termination-seconds: 30
+  default-thread-pool:
+    core-pool-size: 5
 
 server:
   port: 8080
@@ -48,6 +97,11 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+promotion-service:
+  service:
+    url: http://localhost:8081
+
 
 integration:
   dice-bear:
@@ -74,6 +128,3 @@ services:
   user-service:
     host: http://localhost
     port: 8080
-
-thread-pool:
-  core-size: 5

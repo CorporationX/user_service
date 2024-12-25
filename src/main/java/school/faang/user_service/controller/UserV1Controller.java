@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +29,8 @@ import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.dto.UserSubResponseDto;
 import school.faang.user_service.dto.user.DeactivatedUserDto;
 import school.faang.user_service.dto.user.UserForNotificationDto;
+import school.faang.user_service.dto.user.UserSearchResponse;
+import school.faang.user_service.service.ReindexingService;
 import school.faang.user_service.service.user.UserDeactivationService;
 import school.faang.user_service.service.user.UserService;
 
@@ -40,6 +43,10 @@ import java.util.List;
 public class UserV1Controller {
     private final UserDeactivationService userDeactivationService;
     private final UserService userService;
+    private final ReindexingService reindexingService;
+
+    private static final int DEFAULT_PAGE_SIZE = 20;
+    private static final String DEFAULT_SORT_FIELD = "id";
 
     @GetMapping("/{userId}")
     public UserSubResponseDto getUser(@Positive @PathVariable long userId) {
@@ -49,6 +56,17 @@ public class UserV1Controller {
     @GetMapping("/notification/{userId}")
     public UserForNotificationDto getUserByIdForNotification(@Positive @PathVariable long userId) {
         return userService.getUserByIdForNotification(userId);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserSearchResponse getUserById(@PathVariable @Positive long id) {
+        return userService.findUserById(id);
+    }
+
+    @PostMapping("/jobs/reindex")
+    public void reindex() throws JobExecutionException {
+        reindexingService.reindexAllUsers();
     }
 
     @PostMapping("/get")
@@ -90,6 +108,6 @@ public class UserV1Controller {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.OK)
     public UserSubResponseDto registerUser(@RequestBody @Valid UserRegistrationDto userDto) {
-         return userService.registerUser(userDto);
+        return userService.registerUser(userDto);
     }
 }

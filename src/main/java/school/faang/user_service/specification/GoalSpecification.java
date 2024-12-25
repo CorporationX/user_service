@@ -5,9 +5,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalStatusDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.goal.Goal;
+import school.faang.user_service.model.goal.GoalStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -4,17 +4,26 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.kafka.KafkaTopicsProps;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.UserRegistrationDto;
 import school.faang.user_service.dto.UserSubResponseDto;
 import school.faang.user_service.dto.user.UserForNotificationDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.dto.user.UserProfileCreateDto;
+import school.faang.user_service.dto.user.UserProfileResponseDto;
+import school.faang.user_service.dto.user.UserProfileUpdateDto;
+import school.faang.user_service.dto.user.UserSearchResponse;
+import school.faang.user_service.exceptions.ResourceNotFoundException;
+import school.faang.user_service.message.event.reindex.user.UserDocument;
+import school.faang.user_service.message.producer.KeyedMessagePublisher;
+import school.faang.user_service.model.Country;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.UserProfilePic;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
@@ -51,6 +60,9 @@ public class UserService {
     private final AvatarService avatarService;
     private final CountryService countryService;
     private final PasswordService passwordService;
+    private final UserRepository userRepo;
+    private final KeyedMessagePublisher keyedMessagePublisher;
+    private final KafkaTopicsProps kafkaTopicsProps;
 
     @Transactional
     public void banUsers(List<Long> userIdsToBan) {
@@ -79,6 +91,12 @@ public class UserService {
     public User getUserById(long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new
                 EntityNotFoundException("User do not found by " + userId));
+    }
+
+    public UserSearchResponse findUserById(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new
+                EntityNotFoundException("User do not found by " + userId));
+        return userMapper.toSearchResponse(user);
     }
 
     public UserForNotificationDto getUserByIdForNotification(long userId) {
@@ -200,5 +218,67 @@ public class UserService {
 
     private double bytesToMegabytes(long bytes) {
         return bytes / (Math.pow(1024, 2));
+    }
+
+    public UserProfileResponseDto updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
+        User user = updateUserState(userId, userProfileUpdateDto);
+        userRepo.save(user);
+        reindexUser(user);
+
+        keyedMessagePublisher.send(
+                kafkaTopicsProps.getUpdateUserTopic().getName(),
+                userId.toString(),
+                userMapper.toSearchResponse(user));
+
+        return userMapper.toUserProfileResponseDto(user);
+    }
+
+    @NotNull
+    private User updateUserState(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
+        User user = getUserById(userId);
+        user.setUsername(userProfileUpdateDto.username());
+        user.setEmail(userProfileUpdateDto.email());
+        user.setAboutMe(userProfileUpdateDto.aboutMe());
+
+        mapIdToCountry(userProfileUpdateDto.countryId(), user);
+
+        user.setCity(userProfileUpdateDto.city());
+        user.setExperience(userProfileUpdateDto.experience());
+        return user;
+    }
+
+    public UserProfileResponseDto createUserProfile(UserProfileCreateDto userProfileCreateDto) {
+        User user = userMapper.toEntity(userProfileCreateDto);
+        mapIdToCountry(userProfileCreateDto.countryId(), user);
+        userRepo.save(user);
+        reindexUser(user);
+        return userMapper.toUserProfileResponseDto(user);
+    }
+
+    private void mapIdToCountry(Long countryId, User user) {
+        Country country = countryService.findCountryById(countryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "id", countryId));
+        user.setCountry(country);
+    }
+
+    private void reindexUser(User user) {
+        UserDocument userDocument = userMapper.toUserDocument(user);
+        keyedMessagePublisher.send(
+                kafkaTopicsProps.getUserIndexingTopic().getName(),
+                userDocument.getResourceId().toString(),
+                userDocument);
+    }
+
+    public int calculateGridSize(long partitionSize) {
+        long totalUsers = userRepo.count();
+        return (int) Math.ceil((double) totalUsers / partitionSize);
+    }
+
+    public Long findMaxId() {
+        return userRepo.findMaxId();
+    }
+
+    public Long findMinId() {
+        return userRepo.findMinId();
     }
 }

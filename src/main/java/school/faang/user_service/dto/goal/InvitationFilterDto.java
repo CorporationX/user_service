@@ -1,7 +1,7 @@
 package school.faang.user_service.dto.goal;
 
 import lombok.Builder;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.model.RequestStatus;
 
 @Builder
 public record InvitationFilterDto(

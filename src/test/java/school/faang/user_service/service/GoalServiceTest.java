@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.goal.Goal;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;

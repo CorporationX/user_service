@@ -1,9 +1,11 @@
 package school.faang.user_service.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.User;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,6 +27,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Query(nativeQuery = true, value = "SELECT MIN(id) FROM users")
+    Long findMinId();
+
+    @Query(nativeQuery = true, value = "SELECT MAX(id) FROM users")
+    Long findMaxId();
+
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE id BETWEEN ?1 AND ?2")
+    Page<User> findAllInRange(long minId, long maxId, Pageable pageable);
+
+    Page<User> findAllByExperienceBetween(Integer experienceAfter, Integer experienceBefore, Pageable pageable);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(*) > 0\s

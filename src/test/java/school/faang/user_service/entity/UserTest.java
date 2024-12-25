@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.model.event.Event;
+import school.faang.user_service.model.goal.Goal;
+import school.faang.user_service.model.User;
 
 import java.util.ArrayList;
 

@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class ThreadPoolConfig {
 
-    @Value("${thread-pool.core-size}")
+    @Value("${thread-pool.default-thread-pool.core-pool-size}")
     private int coreSize;
 
     @Bean

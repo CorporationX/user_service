@@ -3,10 +3,10 @@ package school.faang.user_service.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.model.Skill;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.recommendation.RecommendationRequest;
+import school.faang.user_service.model.recommendation.SkillRequest;
 
 import java.util.ArrayList;
 import java.util.List;

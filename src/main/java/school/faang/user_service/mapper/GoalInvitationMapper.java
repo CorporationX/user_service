@@ -6,8 +6,8 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.GoalInvitationResponseDto;
 import school.faang.user_service.dto.goal.RequestStatusDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.model.RequestStatus;
+import school.faang.user_service.model.goal.GoalInvitation;
 
 import java.util.List;
 
@@ -20,17 +20,18 @@ public interface GoalInvitationMapper {
     GoalInvitation toEntity(GoalInvitationDto goalInvitationDto);
 
     @Mapping(source = "inviter.id", target = "inviterId")
+    @Mapping(source = "goal.id", target = "goalId")
+    @Mapping(source = "status", target = "status")
+    GoalInvitationResponseDto toResponseDto(GoalInvitation goalInvitation);
+
+    @Mapping(source = "inviter.id", target = "inviterId")
     @Mapping(source = "invited.id", target = "invitedUserId")
     @Mapping(source = "goal.id", target = "goalId")
     GoalInvitationDto toDto(GoalInvitation goalInvitation);
 
-    @Mapping(source = "inviter.id", target = "inviterId")
-    @Mapping(source = "invited.id", target = "invitedId")
-    @Mapping(source = "status", target = "status")
-    GoalInvitationResponseDto toResponseDto(GoalInvitation goalInvitation);
-
     List<GoalInvitationDto> toDtoList(List<GoalInvitation> goalInvitations);
 
     List<GoalInvitation> toEntityList(List<GoalInvitationDto> goalInvitationDto);
+
     RequestStatusDto toRequestStatusDto(RequestStatus goalInvitation);
 }

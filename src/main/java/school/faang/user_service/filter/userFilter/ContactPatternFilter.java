@@ -2,8 +2,8 @@ package school.faang.user_service.filter.userFilter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.contact.Contact;
 
 @Component
 public class ContactPatternFilter extends UserFilter {

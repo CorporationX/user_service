@@ -2,7 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.model.recommendation.SkillRequest;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 @Service

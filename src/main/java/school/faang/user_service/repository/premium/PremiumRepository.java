@@ -3,8 +3,8 @@ package school.faang.user_service.repository.premium;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.model.User;
+import school.faang.user_service.model.premium.Premium;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -2,7 +2,7 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.model.recommendation.Recommendation;
 
 import java.time.Duration;
 

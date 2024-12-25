@@ -2,7 +2,7 @@ package school.faang.user_service.filter.userFilter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.model.User;
 
 @Component
 public class CityPatternFilter extends UserFilter {

@@ -2,7 +2,7 @@ package school.faang.user_service.dto.recommendation;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.model.RequestStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

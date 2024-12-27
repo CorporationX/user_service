@@ -8,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipStartEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapstruct.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -30,6 +32,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Transactional
@@ -136,6 +139,13 @@ public class MentorshipRequestService {
 
         requester.getMentors().add(receiver);
         userRepository.save(requester);
+
+        mentorshipStartEventPublisher.publish(
+                MentorshipStartEvent.builder()
+                        .menteeId(requester.getId())
+                        .mentorId(receiver.getId())
+                        .build()
+        );
 
         return mentorshipRequestMapper.mapToDto(mentorshipRequest);
     }

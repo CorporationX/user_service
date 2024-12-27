@@ -15,6 +15,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapstruct.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -108,6 +109,7 @@ public class MentorshipRequestServiceTest {
         assertEquals(1L, result.getId());
         assertEquals(RequestStatus.ACCEPTED, result.getStatus());
         assertTrue(requester.getMentors().contains(receiver));
+        verify(mentorshipStartEventPublisher).publish(any());
     }
 
     @Test
@@ -156,6 +158,9 @@ public class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+
+    @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;

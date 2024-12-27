@@ -36,6 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
+.DS_Store
+
 ### DOT ENV ###
 .env
 /logs/

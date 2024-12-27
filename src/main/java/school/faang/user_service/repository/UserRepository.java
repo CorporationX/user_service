@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -52,4 +53,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT id FROM User WHERE id IN :ids AND active = true")
     List<Long> findActiveUserIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT u FROM User u WHERE u.telegramToken = :telegramToken")
+    Optional<User> findByTelegramToken(@Param("telegramToken") String telegramToken);
 }

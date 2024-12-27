@@ -4,11 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.deeplink.DeepLinkResponseDto;
+import school.faang.user_service.dto.telegram.SetTelegramChatIdDto;
 import school.faang.user_service.annotation.publisher.PublishEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.premium.Premium;
@@ -16,15 +20,18 @@ import school.faang.user_service.exception.UserAlreadyExistsException;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.avatar.AvatarService;
+import school.faang.user_service.service.deeplink.DeepLinkService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
@@ -35,11 +42,13 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 public class UserService {
     private final UserRepository userRepository;
     private final PremiumRepository premiumRepository;
+    private final ContactPreferenceRepository contactPreferenceRepository;
     private final GoalService goalService;
     private final EventRepository eventRepository;
     private final MentorshipService mentorshipService;
     private final AvatarService avatarService;
     private final List<UserFilter> userFilters;
+    private final DeepLinkService deepLinkService;
 
     @Transactional
     public User registerUser(User user) {
@@ -158,5 +167,47 @@ public class UserService {
             throw new IllegalArgumentException("User ID list cannot be null or empty");
         }
         return userRepository.findActiveUserIds(ids);
+    }
+
+    @Transactional
+    public DeepLinkResponseDto setPreferredContact(long userId, PreferredContact preference) {
+        log.info("Setting preferred contact for userId: {}, preference: {}", userId, preference);
+
+        User user = findById(userId);
+
+        ContactPreference contactPreference = contactPreferenceRepository.findByUserId(userId)
+                .orElseGet(() -> ContactPreference.builder().user(user).build());
+
+        contactPreference.setPreference(preference);
+        contactPreferenceRepository.save(contactPreference);
+
+        if (preference == PreferredContact.TELEGRAM && user.getTelegramChatId() == null) {
+            return handleTelegramPreference(user);
+        }
+
+        return new DeepLinkResponseDto(null);
+    }
+
+    @Transactional
+    public void setTelegramChatId(SetTelegramChatIdDto dto) {
+        User user = userRepository.findByTelegramToken(dto.getToken())
+                .orElseThrow(UserNotFoundException::new);
+        user.setTelegramChatId(dto.getTelegramChatId());
+        user.setTelegramToken(null);
+        userRepository.save(user);
+    }
+
+    private DeepLinkResponseDto handleTelegramPreference(User user) {
+        log.info("Handling Telegram preference for userId: {}", user.getId());
+
+        String token = UUID.randomUUID().toString();
+        user.setTelegramToken(token);
+
+        userRepository.save(user);
+
+        String deepLink = deepLinkService.generateTelegramDeepLink(token);
+        log.info("Generated Telegram deep link for userId: {}", user.getId());
+
+        return new DeepLinkResponseDto(deepLink);
     }
 }

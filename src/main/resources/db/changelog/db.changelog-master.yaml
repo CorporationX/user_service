@@ -17,3 +17,7 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V008__user_and_event_promotion.sql
   - include:
       file: db/changelog/changeset/user_V009__add_banned_to_users.sql
+  - include:
+      file: db/changelog/changeset/user_V010__add_telegram_chat_id_to_users.sql
+  - include:
+      file: db/changelog/changeset/user_V011__add_telegram_token_to_users.sql

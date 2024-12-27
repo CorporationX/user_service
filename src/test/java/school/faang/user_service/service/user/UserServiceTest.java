@@ -5,15 +5,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.deeplink.DeepLinkResponseDto;
+import school.faang.user_service.dto.telegram.SetTelegramChatIdDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.AvatarStyle;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
@@ -21,9 +25,11 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.user.UserDeactivatedException;
 import school.faang.user_service.exception.user.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.avatar.AvatarService;
+import school.faang.user_service.service.deeplink.DeepLinkService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserEmailFilter;
@@ -36,11 +42,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,11 +68,16 @@ class UserServiceTest extends AbstractUserServiceTest {
     private AvatarService avatarService;
     @Mock
     private PremiumRepository premiumRepository;
+    @Mock
+    private ContactPreferenceRepository contactPreferenceRepository;
+    @Mock
+    private DeepLinkService deepLinkService;
     @InjectMocks
     private UserService userService;
 
     private User user;
     private static List<UserFilter> userFilters;
+    private String userNotFoundMessage;
 
     @BeforeAll
     static void setupAll() {
@@ -77,9 +90,14 @@ class UserServiceTest extends AbstractUserServiceTest {
     public void setUp() {
         ReflectionTestUtils.setField(userService, "userFilters", userFilters);
 
+        UserNotFoundException userNotFoundException = new UserNotFoundException();
+        userNotFoundMessage = userNotFoundException.getMessage();
+
         user = new User();
         user.setId(1L);
         user.setActive(true);
+        user.setTelegramChatId(null);
+        user.setTelegramToken(null);
 
         Goal goal1 = new Goal();
         goal1.setId(1L);
@@ -260,4 +278,131 @@ class UserServiceTest extends AbstractUserServiceTest {
         assertTrue(user.isBanned());
         verify(userRepository).save(user);
     }
+
+    @Test
+    void setPreferredContact_nonTelegramPreference_savesPreferenceWithoutDeepLink() {
+        long userId = 1L;
+        PreferredContact preference = PreferredContact.EMAIL;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(contactPreferenceRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
+        DeepLinkResponseDto response = userService.setPreferredContact(userId, preference);
+
+        verify(userRepository).findById(userId);
+
+        ArgumentCaptor<ContactPreference> captor = ArgumentCaptor.forClass(ContactPreference.class);
+        verify(contactPreferenceRepository).save(captor.capture());
+
+        ContactPreference savedPreference = captor.getValue();
+        System.out.println(savedPreference.getUser().getId());
+        assertEquals(user, savedPreference.getUser());
+        assertEquals(preference, savedPreference.getPreference());
+
+        verify(contactPreferenceRepository).save(any(ContactPreference.class));
+
+        assertNull(response.getDeepLink());
+    }
+
+    @Test
+    void setPreferredContact_telegramPreferenceWithoutChatId_generatesDeepLink() {
+        long userId = 1L;
+        PreferredContact preference = PreferredContact.TELEGRAM;
+        String generatedToken = "random-token";
+        String deepLink = "https://t.me/bot?start=" + generatedToken;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(contactPreferenceRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(deepLinkService.generateTelegramDeepLink(anyString())).thenReturn(deepLink);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        DeepLinkResponseDto response = userService.setPreferredContact(userId, preference);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        User savedUser = userCaptor.getValue();
+        assertNotNull(savedUser.getTelegramToken());
+
+        verify(deepLinkService).generateTelegramDeepLink(savedUser.getTelegramToken());
+
+        ArgumentCaptor<ContactPreference> captor = ArgumentCaptor.forClass(ContactPreference.class);
+        verify(contactPreferenceRepository).save(captor.capture());
+
+        ContactPreference savedPreference = captor.getValue();
+        assertEquals(savedPreference.getUser(), user);
+        assertEquals(savedPreference.getPreference(), preference);
+        assertEquals(response.getDeepLink(), deepLink);
+    }
+
+    @Test
+    void setPreferredContact_telegramPreferenceWithExistingChatId_savesPreferenceWithoutDeepLink() {
+        long userId = 1L;
+        PreferredContact preference = PreferredContact.TELEGRAM;
+
+        user.setTelegramChatId(11111L);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(contactPreferenceRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
+        DeepLinkResponseDto response = userService.setPreferredContact(userId, preference);
+
+        ArgumentCaptor<ContactPreference> captor = ArgumentCaptor.forClass(ContactPreference.class);
+        verify(contactPreferenceRepository).save(captor.capture());
+
+        ContactPreference savedPreference = captor.getValue();
+        assertEquals(savedPreference.getUser(), user);
+        assertEquals(savedPreference.getPreference(), preference);
+
+        verify(deepLinkService, never()).generateTelegramDeepLink(anyString());
+
+        assertNull(response.getDeepLink());
+    }
+
+    @Test
+    void setPreferredContact_userNotFound_throwsException() {
+        long userId = 1L;
+        PreferredContact preference = PreferredContact.EMAIL;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class,
+                () -> userService.setPreferredContact(userId, preference));
+
+        assertEquals(userNotFoundMessage, thrown.getMessage());
+    }
+
+    @Test
+    void setTelegramChatId_validToken() {
+        String token = "valid-token";
+        long newChatId = 111111L;
+        SetTelegramChatIdDto dto = new SetTelegramChatIdDto(token, newChatId);
+        user.setTelegramToken(dto.getToken());
+
+        when(userRepository.findByTelegramToken(dto.getToken())).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        userService.setTelegramChatId(dto);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+
+        User savedUser = userCaptor.getValue();
+        assertEquals(savedUser.getTelegramChatId(), newChatId);
+        assertNull(savedUser.getTelegramToken());
+    }
+
+    @Test
+    void setTelegramChatId_invalidToken_throwsException() {
+        String token = "valid-token";
+        long newChatId = 111111L;
+        SetTelegramChatIdDto dto = new SetTelegramChatIdDto(token, newChatId);
+
+        when(userRepository.findByTelegramToken(token)).thenReturn(Optional.empty());
+
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class,
+                () -> userService.setTelegramChatId(dto));
+
+        assertEquals(userNotFoundMessage, thrown.getMessage());
+    }
+
 }

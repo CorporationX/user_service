@@ -94,6 +94,12 @@ app:
     premium-bought-event-publish:
       trigger_interval_sec: 10
 
+telegram:
+  bot:
+    name: ${ENV_TELEGRAM_BOT_NAME}
+    base-url: ${ENV_TELEGRAM_BOT_BASE_URL}
+    start-parameter: ${ENV_TELEGRAM_BOT_START}
+
 minio:
   endpoint: http://localhost:9000
   accessKey: user

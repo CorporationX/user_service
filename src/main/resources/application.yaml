@@ -22,10 +22,13 @@ spring:
       host: localhost
       channel:
         subscription-channel: subscription_channel
+        mentorship-channel: mentorship_channel
+        follower-channel: follower_event
         recommendation-channel: recommendation_channel
         goal-completed: goal_completed_channel
         user-ban-channel: user_ban_channel
         mentorship-request: mentorship_request_channel
+        event-start-event-channel: event_start_event_channel
 
   retry:
     maxAttempts: 3
@@ -81,9 +84,19 @@ payment-service:
 
 cron:
   expressions:
+    clear-published-events: "0 0 0 * * *"
     clear-events: "0 0 0 * * *"
-    clean-outbox: "0 0 0 * * *" # every day at midnight
-    trigger-outbox-processing: "0 */1 * * * *" # every 60 seconds
+    clean-outbox: "0 0 0 * * *"
+    trigger-outbox-processing: "0 */1 * * * *"
+    load-upcoming-events: "0 0 0 */2 * *"
+    publish-event-start-event-fixed-rate: "0/30 * * * * *"
+
+scheduler:
+  core-pool-size: 4
+  event-start-notification:
+    upload-events-days-batch: 2
+    duration-to-publish-event-start-event-milliseconds: 0, 600000, 3600000, 18000000, 86400000
+
 
 batch:
   size:

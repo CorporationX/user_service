@@ -16,4 +16,9 @@ public class SkillValidatorTest {
     public void testThrowExceptionWhenSkillByMinSkillOffer() {
         Assertions.assertThrows(DataValidationException.class, () -> skillValidator.validateSkillByMinSkillOffer(2, 3L, 4L));
     }
+
+    @Test
+    public void test2() {
+        Assertions.assertEquals(1, 0);
+    }
 }

@@ -29,6 +29,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        profile-view-channel:
+          name: profile_view_channel
         ban-user-channel:
           name: ban_user_channel
         recommendation-channel:

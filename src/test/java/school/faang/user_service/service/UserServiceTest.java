@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -19,10 +20,12 @@ import school.faang.user_service.dto.UserSubResponseDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.message.event.ProfileViewEvent;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserProfilePicMapper;
+import school.faang.user_service.message.producer.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.Integrations.avatar.AvatarService;
@@ -68,6 +71,8 @@ public class UserServiceTest {
     private S3Service s3Service;
     @Mock
     private ImageUtils imageUtils;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     @Mock
     private CountryService countryService;
@@ -250,6 +255,25 @@ public class UserServiceTest {
         verify(userRepository).save(user);
         verify(s3Service).deleteFiles(fileId, smallFileId);
         assertNull(user.getUserProfilePic());
+    }
+
+    @Test
+    public void testPublishProfileViewEvent() {
+        // arrange
+        long actorId = 5L;
+        long receiverId = 2L;
+
+        // act
+        ArgumentCaptor<ProfileViewEvent> profileViewEventCaptor
+                = ArgumentCaptor.forClass(ProfileViewEvent.class);
+        userService.publishProfileViewEvent(receiverId, actorId);
+
+        // assert
+        verify(profileViewEventPublisher).publish(profileViewEventCaptor.capture());
+        ProfileViewEvent profileViewEvent = profileViewEventCaptor.getValue();
+
+        assertEquals(actorId, profileViewEvent.actorId());
+        assertEquals(receiverId, profileViewEvent.receiverId());
     }
 
     @Test

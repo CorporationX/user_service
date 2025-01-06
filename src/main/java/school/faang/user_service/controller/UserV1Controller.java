@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.dto.UserRegistrationDto;
@@ -40,10 +42,16 @@ import java.util.List;
 public class UserV1Controller {
     private final UserDeactivationService userDeactivationService;
     private final UserService userService;
+    private final UserContext userContext;
 
     @GetMapping("/subscription/{userId}")
     public UserSubResponseDto getUser(@Positive @PathVariable long userId) {
-        return userService.getUserDtoById(userId);
+        UserSubResponseDto userSubResponseDto = userService.getUserDtoById(userId);
+
+        long viewerUserId = userContext.getUserId();
+        userService.publishProfileViewEvent(userId, viewerUserId);
+
+        return userSubResponseDto;
     }
 
     @GetMapping("/notification/{userId}")

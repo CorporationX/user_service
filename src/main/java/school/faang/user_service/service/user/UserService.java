@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
@@ -15,10 +16,12 @@ import school.faang.user_service.dto.user.UserForNotificationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.message.event.ProfileViewEvent;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filter.userFilter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserProfilePicMapper;
+import school.faang.user_service.message.producer.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.CountryService;
@@ -29,6 +32,7 @@ import school.faang.user_service.util.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -48,6 +52,7 @@ public class UserService {
     private final S3Service s3Service;
     private final UserProfilePicMapper userProfilePicMapper;
     private final ImageUtils imageUtils;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
     private final AvatarService avatarService;
     private final CountryService countryService;
     private final PasswordService passwordService;
@@ -185,6 +190,17 @@ public class UserService {
         updateUser(user);
 
         s3Service.deleteFiles(fileId, smallFileId);
+    }
+
+    @Async("threadPool")
+    public void publishProfileViewEvent(long receiverId, long actorId) {
+        log.info("Trying to publish profile view event. ActorId: {} receiverId user: {}", receiverId, actorId);
+        ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
+                .receiverId(receiverId)
+                .actorId(actorId)
+                .receivedAt(LocalDateTime.now())
+                .build();
+        profileViewEventPublisher.publish(profileViewEvent);
     }
 
     private void validateAvatarSize(MultipartFile file) {

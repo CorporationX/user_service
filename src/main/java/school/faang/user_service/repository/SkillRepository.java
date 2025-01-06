@@ -46,4 +46,12 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             WHERE gs.goal_id = ?1)
             """)
     List<Skill> findSkillsByGoalId(long goalId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+                INSERT INTO goal_skill (goal_id, skill_id, created_at) 
+                VALUES (:goalId, :skillId, NOW())
+            """)
+    void assignSkillToGoal(long goalId, long skillId);
+
 }

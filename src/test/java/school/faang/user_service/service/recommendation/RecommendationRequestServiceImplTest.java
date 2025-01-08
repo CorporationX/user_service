@@ -58,11 +58,11 @@ class RecommendationRequestServiceImplTest {
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
 
+    @Spy
+    List<RecommendationRequestFilter> recommendationRequestFilters = new ArrayList<>();
+
     @BeforeEach
     public void setUp() {
-        List<RecommendationRequestFilter> filters = new ArrayList<>(List.of(new RecommendationRequestStatusFilter(), new RecommendationRequestRequesterFilter(), new RecommendationRequestReceiverFilter()));
-        recommendationRequestService = new RecommendationRequestService(userService, skillService, recommendationRequestRepository, recommendationRequestMapper, filters, recommendationRequestedEventPublisher);
-
         lenient().when(userService.findById(anyLong())).thenReturn(Optional.of(new User()));
         lenient().when(skillService.findUserSkill(anyLong(), anyLong())).thenReturn(Optional.of(new Skill()));
         lenient().when(skillService.existsById(anyLong())).thenReturn(true);

@@ -5,12 +5,9 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user.impl.UserServiceImpl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,15 +15,15 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class EventCheck {
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     public void eventCheck(EventDto event) {
-        if (event.getTitle() == null || event.getTitle().isEmpty()) {
+        if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException("Event title не может быть пустым");
         } else if (event.getTitle().length() > 64) {
             throw new DataValidationException("Длина Event title не может быть больше 64");
         }
-        if (event.getDescription() == null || event.getDescription().isEmpty()) {
+        if (event.getDescription() == null || event.getDescription().isBlank()) {
             throw new DataValidationException("Event description не может быть пустым");
         } else if (event.getDescription().length() > 4096) {
             throw new DataValidationException("Длина Event description не может быть больше 4096");
@@ -37,7 +34,7 @@ public class EventCheck {
         if (event.getEndDate() == null) {
             throw new DataValidationException("EndDate не может быть пустым");
         }
-        if (event.getLocation() == null || event.getLocation().isEmpty()) {
+        if (event.getLocation() == null || event.getLocation().isBlank()) {
             throw new DataValidationException("Event Location не может быть пустым");
         } else if (event.getLocation().length() > 128) {
             throw new DataValidationException("Длина Event Location не может быть больше 128");
@@ -59,5 +56,11 @@ public class EventCheck {
                 .map(Skill::getId)
                 .collect(Collectors.toSet());
         return userSkillIdList.containsAll(relatedSkillIds);
+    }
+
+    public void userCanCreateEventBySkills(Long ownerId, List<Long> relatedSkillIds) {
+        if (!userHasSkills(ownerId, relatedSkillIds)) {
+            throw new DataValidationException("Пользователь не может провести такое событие с такими навыками");
+        }
     }
 }

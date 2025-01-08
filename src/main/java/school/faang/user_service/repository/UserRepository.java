@@ -78,4 +78,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.id IN(:ids)
             """)
     Optional<List<User>> findAllByIds(@Param("ids") List<Long> ids);
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users u
+            JOIN user_goal ug ON u.id = ug.user_id 
+            AND ug.goal_id = ?1
+            """)
+    List<User> findUsersByGoalId(Long goalId);
 }

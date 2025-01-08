@@ -61,7 +61,7 @@ public class Goal {
     @OneToMany(mappedBy = "goal")
     private List<GoalInvitation> invitations;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_goal",
             joinColumns = @JoinColumn(name = "goal_id"),
@@ -69,7 +69,7 @@ public class Goal {
     )
     private List<User> users;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(
             name = "goal_skill",
             joinColumns = @JoinColumn(name = "goal_id"),

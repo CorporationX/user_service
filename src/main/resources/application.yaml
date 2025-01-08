@@ -73,3 +73,6 @@ scheduler:
     cron: 0 0 * * * 0
     thread-pool: 2
     batch-size: 50
+
+limits:
+  active-goals: 3

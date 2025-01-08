@@ -163,4 +163,9 @@ public class UserService {
     public String generateRandomPassword(User user) {
         return user.getEmail();
     }
+
+    @Transactional
+    public List<User> getUsersByGoalId(Long goalId) {
+        return userRepository.findUsersByGoalId(goalId);
+    }
 }

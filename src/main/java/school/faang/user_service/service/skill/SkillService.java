@@ -3,12 +3,14 @@ package school.faang.user_service.service.skill;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.skill.Skill;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.data.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
@@ -22,7 +24,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SkillService {
+public class SkillService implements SkillServiceInterface {
     final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
@@ -76,5 +78,22 @@ public class SkillService {
             log.error("Пустое имя умения.");
             throw new DataValidationException("Имя умения не должно быть пустым.");
         }
+    }
+
+    @Override
+    @Transactional
+    public List<Skill> getSKillsByIds(List<Long> skillIds) {
+        return skillRepository.findAllById(skillIds);
+    }
+
+    @Async
+    @Override
+    @Transactional
+    public void addSkillsToUsersByGoalId(Long goalId) {
+        var skills = skillRepository.findSkillsByGoalId(goalId);
+        var users = userService.getUsersByGoalId(goalId);
+        skills.forEach(skill -> {
+            skill.setUsers(users);
+        });
     }
 }

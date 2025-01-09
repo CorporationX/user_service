@@ -33,6 +33,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.ban_user_channel.name}")
     private String userBanChannelTopic;
 
+    @Value("${spring.data.redis.channels.achievement-goal.name}")
+    private String achieveGoalChannel;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(redisHost, redisPort);
@@ -53,6 +56,11 @@ public class RedisConfig {
         Map<String, ChannelTopic> result = new HashMap<>();
         result.put(UsersForBanReceivedEventListener.class.getName(), new ChannelTopic(userBanChannelTopic));
         return result;
+    }
+
+    @Bean
+    public ChannelTopic achievementGoalTopic() {
+        return new ChannelTopic(achieveGoalChannel);
     }
 
     @Bean

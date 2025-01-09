@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,4 +22,5 @@ public class UserDto {
     private List<Long> mentorIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private PreferredContact preference;
 }

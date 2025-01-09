@@ -37,6 +37,8 @@ spring:
           name: ban_user
         premium-bought-channel:
           name: premium_bought_channel
+        achievement-goal:
+          name: goal_achieve
 
 server:
   port: 8080
@@ -77,3 +79,6 @@ scheduler:
     cron: 0 0 * * * 0
     thread-pool: 2
     batch-size: 50
+
+limits:
+  active-goals: 3

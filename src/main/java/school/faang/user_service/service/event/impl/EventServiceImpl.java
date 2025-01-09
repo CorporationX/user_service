@@ -47,9 +47,11 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         Stream<Event> events = eventRepository.findAll().stream();
-        eventFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(events, filters));
+        for (EventFilter filter : eventFilters) {
+            if (filter.isApplicable(filters)) {
+                events = filter.apply(events, filters);
+            }
+        }
         return eventMapper.toDto(events.toList());
     }
 

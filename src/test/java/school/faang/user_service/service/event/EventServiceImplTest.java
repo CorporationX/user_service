@@ -1,22 +1,26 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.filter.EventFilter;
+import school.faang.user_service.service.event.filter.EventDescriptionFilter;
+import school.faang.user_service.service.event.filter.EventTitleFilter;
 import school.faang.user_service.service.event.impl.EventServiceImpl;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.impl.UserServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,11 +39,14 @@ public class EventServiceImplTest {
     @Mock
     private UserServiceImpl userService;
 
-    @Spy
-    private EventMapper eventMapper;
+    @Mock
+    private EventTitleFilter eventTitleFilter;
+
+    @Mock
+    private EventDescriptionFilter eventDescriptionFilter;
 
     @Spy
-    private List<EventFilter> eventFilters;
+    private EventMapper eventMapper;
 
     @Captor
     private ArgumentCaptor<Event> eventCaptor;
@@ -56,6 +63,11 @@ public class EventServiceImplTest {
     private static final Skill SECOND_SKILL = Skill.builder().id(2L).build();
     private static final List<Event> EVENTS = List.of(new Event(), new Event());
     private static final List<EventDto> EVENT_DTOS = List.of(new EventDto(), new EventDto());
+
+    @BeforeEach
+    void setUp() {
+        eventService = new EventServiceImpl(eventRepository, skillService, userService, eventMapper, List.of(eventTitleFilter, eventDescriptionFilter));
+    }
 
     @Test
     void testCreate_Success() {
@@ -191,20 +203,50 @@ public class EventServiceImplTest {
         verify(eventMapper, times(1)).toDto(EVENTS);
     }
 
-//    @Test
-//    void testGetEventsByFilter_Success() {
-//        EventFilterDto filters = new EventFilterDto();
-//
-//        when(eventRepository.findAll()).thenReturn(EVENTS);
-//        doReturn(EVENT_DTOS).when(eventMapper).toDto(anyList());
-//
-//        List<EventDto> result = eventService.getEventsByFilter(filters);
-//
-//        assertNotNull(result);
-//        assertEquals(EVENTS, result);
-//        verify(eventRepository).findAll();
-//        verify(eventMapper).toDto(eventsCaptor.capture());
-//        List<Event> capturedEvents = eventsCaptor.getValue();
-//        assertEquals(EVENTS, capturedEvents);
-//    }
+    @Test
+    void testGetEventsByFilter_Success() {
+        EventFilterDto filters = new EventFilterDto();
+        filters.setTitle("Test Title");
+        filters.setDescription("Test Description");
+
+        Event firstEvent = Event.builder()
+                .title("Test Title")
+                .description("Test Description")
+                .build();
+
+        Event secondEvent = Event.builder()
+                .title("Another Title")
+                .description("Another Description")
+                .build();
+
+        List<Event> events = List.of(firstEvent, secondEvent);
+        List<EventDto> eventDtos = List.of(new EventDto(), new EventDto());
+
+        when(eventRepository.findAll()).thenReturn(events);
+        doReturn(eventDtos).when(eventMapper).toDto(anyList());
+
+        when(eventTitleFilter.isApplicable(filters)).thenReturn(true);
+        when(eventTitleFilter.apply(any(Stream.class), eq(filters))).thenAnswer(invocation -> {
+            Stream<Event> eventStream = invocation.getArgument(0);
+            return eventStream.filter(event -> event.getTitle().contains(filters.getTitle()));
+        });
+        when(eventDescriptionFilter.isApplicable(filters)).thenReturn(true);
+        when(eventDescriptionFilter.apply(any(Stream.class), eq(filters))).thenAnswer(invocation -> {
+            Stream<Event> eventStream = invocation.getArgument(0);
+            return eventStream.filter(event -> event.getDescription().contains(filters.getDescription()));
+        });
+
+        List<EventDto> result = eventService.getEventsByFilter(filters);
+
+        assertNotNull(result);
+        assertEquals(eventDtos, result);
+        verify(eventRepository).findAll();
+        verify(eventMapper).toDto(eventsCaptor.capture());
+        verify(eventTitleFilter).isApplicable(filters);
+        verify(eventTitleFilter).apply(any(Stream.class), eq(filters));
+        verify(eventDescriptionFilter).isApplicable(filters);
+        verify(eventDescriptionFilter).apply(any(Stream.class), eq(filters));
+        List<Event> capturedEvents = eventsCaptor.getValue();
+        assertEquals(1, capturedEvents.size());
+    }
 }

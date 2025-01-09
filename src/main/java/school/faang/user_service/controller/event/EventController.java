@@ -36,7 +36,7 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventDto>> getEventsByFilter(@NotNull EventFilterDto filter) {
+    public ResponseEntity<List<EventDto>> getEventsByFilter(EventFilterDto filter) {
         return ResponseEntity.ok(eventService.getEventsByFilter(filter));
     }
 

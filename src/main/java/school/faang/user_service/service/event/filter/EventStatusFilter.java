@@ -16,7 +16,7 @@ public class EventStatusFilter implements EventFilter {
     }
 
     @Override
-    public void apply(Stream<Event> events, EventFilterDto filter) {
-        events.filter(event -> event.getStatus().getMessage().contains(filter.getEventStatus().getMessage()));
+    public Stream<Event> apply(Stream<Event> events, EventFilterDto filter) {
+        return events.filter(event -> event.getStatus().getMessage().contains(filter.getEventStatus().getMessage()));
     }
 }

@@ -57,7 +57,6 @@ public class EventController {
     }
 
     private void eventCheck(EventDto eventDto) {
-
         eventCheck.eventCheck(eventDto);
         eventCheck.userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
     }

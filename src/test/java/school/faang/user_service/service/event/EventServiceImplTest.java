@@ -225,10 +225,9 @@ public class EventServiceImplTest {
                 .build();
 
         List<Event> events = List.of(firstEvent, secondEvent);
-        List<EventDto> eventDtos = List.of(new EventDto(), new EventDto());
 
         when(eventRepository.findAll()).thenReturn(events);
-        doReturn(eventDtos).when(eventMapper).toDto(anyList());
+        doReturn(EVENT_DTOS).when(eventMapper).toDto(anyList());
 
         when(eventTitleFilter.isApplicable(filters)).thenReturn(true);
         when(eventTitleFilter.apply(any(Stream.class), eq(filters))).thenAnswer(invocation -> {
@@ -244,7 +243,7 @@ public class EventServiceImplTest {
         List<EventDto> result = eventService.getEventsByFilter(filters);
 
         assertNotNull(result);
-        assertEquals(eventDtos, result);
+        assertEquals(EVENT_DTOS, result);
         verify(eventRepository).findAll();
         verify(eventMapper).toDto(eventsCaptor.capture());
         verify(eventTitleFilter).isApplicable(filters);

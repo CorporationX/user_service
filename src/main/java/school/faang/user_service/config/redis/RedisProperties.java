@@ -35,6 +35,9 @@ public class RedisProperties {
     @Value("${spring.data.redis.channel.mentorship-channel.name}")
     private String mentorshipChannel;
 
+    @Value("${spring.data.redis.channel.recommendation-event.name}")
+    private String recommendationEventTopic;
+
     @Value("${spring.data.redis.channel.goal-completed-channel.name}")
     private String goalCompletedChannel;
 }

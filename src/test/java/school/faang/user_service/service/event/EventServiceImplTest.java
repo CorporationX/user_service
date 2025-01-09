@@ -66,7 +66,12 @@ public class EventServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        eventService = new EventServiceImpl(eventRepository, skillService, userService, eventMapper, List.of(eventTitleFilter, eventDescriptionFilter));
+        eventService = new EventServiceImpl(
+                eventRepository,
+                skillService,
+                userService,
+                eventMapper,
+                List.of(eventTitleFilter, eventDescriptionFilter));
     }
 
     @Test

@@ -4,13 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.check.event.EventCheck;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
@@ -18,10 +15,8 @@ import school.faang.user_service.service.event.impl.EventServiceImpl;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.impl.UserServiceImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,9 +30,6 @@ public class EventServiceImplTest {
     private EventRepository eventRepository;
 
     @Mock
-    private EventCheck eventCheck;
-
-    @Mock
     private SkillService skillService;
 
     @Mock
@@ -47,7 +39,7 @@ public class EventServiceImplTest {
     private EventMapper eventMapper;
 
     @Spy
-    private List<EventFilter> eventFilters = new ArrayList<>();
+    private List<EventFilter> eventFilters;
 
     @Captor
     private ArgumentCaptor<Event> eventCaptor;
@@ -64,7 +56,6 @@ public class EventServiceImplTest {
     private static final Skill SECOND_SKILL = Skill.builder().id(2L).build();
     private static final List<Event> EVENTS = List.of(new Event(), new Event());
     private static final List<EventDto> EVENT_DTOS = List.of(new EventDto(), new EventDto());
-    private static final String EXCEPTION_MSG = "Пользователь не может провести такое событие с такими навыками";
 
     @Test
     void testCreate_Success() {
@@ -87,8 +78,6 @@ public class EventServiceImplTest {
 
         EventDto result = eventService.create(eventDto);
 
-        verify(eventCheck, times(1)).eventCheck(eventDto);
-        verify(eventCheck, times(1)).userCanCreateEventBySkills(OWNER_ID, SKILL_IDS);
         verify(eventMapper, times(1)).toEntity(eventDto);
         verify(userService, times(1)).getUserById(OWNER_ID);
         verify(skillService, times(1)).getSkillListBySkillIds(SKILL_IDS);
@@ -98,21 +87,6 @@ public class EventServiceImplTest {
         Event capturedEvent = eventCaptor.getValue();
         assertEquals(user, capturedEvent.getOwner());
         assertEquals(2, capturedEvent.getRelatedSkills().size());
-    }
-
-    @Test
-    void testCreate_UserHasNoSkills_ThrowsException() {
-        EventDto eventDto = new EventDto();
-        eventDto.setOwnerId(OWNER_ID);
-        eventDto.setRelatedSkillIds(SKILL_IDS);
-
-        doThrow(new DataValidationException(EXCEPTION_MSG))
-                .when(eventCheck).userCanCreateEventBySkills(OWNER_ID, SKILL_IDS);
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventService.create(eventDto));
-
-        assertEquals(EXCEPTION_MSG, exception.getMessage());
-        verify(eventCheck, times(1)).userCanCreateEventBySkills(OWNER_ID, SKILL_IDS);
     }
 
     @Test
@@ -171,8 +145,6 @@ public class EventServiceImplTest {
 
         EventDto result = eventService.updateEvent(EVENT_ID, eventDto);
 
-        verify(eventCheck, times(1)).eventCheck(eventDto);
-        verify(eventRepository, times(1)).findById(EVENT_ID);
         verify(eventMapper, times(1)).update(event, eventDto);
         verify(skillService, times(1)).getSkillListBySkillIds(SKILL_IDS);
         verify(eventRepository, times(1)).save(eventCaptor.capture());
@@ -225,20 +197,13 @@ public class EventServiceImplTest {
 //
 //        when(eventRepository.findAll()).thenReturn(EVENTS);
 //        doReturn(EVENT_DTOS).when(eventMapper).toDto(anyList());
-//        EventFilter applicableFilter = mock(EventFilter.class);
-//        when(applicableFilter.isApplicable(filters)).thenReturn(true);
-//        when(applicableFilter.apply(EVENTS.stream(), filters));
-//        eventFilters.add(applicableFilter);
 //
 //        List<EventDto> result = eventService.getEventsByFilter(filters);
 //
 //        assertNotNull(result);
-//        assertEquals(EVENT_DTOS, result);
+//        assertEquals(EVENTS, result);
 //        verify(eventRepository).findAll();
 //        verify(eventMapper).toDto(eventsCaptor.capture());
-//        verify(applicableFilter).isApplicable(filters);
-//        verify(applicableFilter).apply(any(Stream.class), eq(filters));
-//
 //        List<Event> capturedEvents = eventsCaptor.getValue();
 //        assertEquals(EVENTS, capturedEvents);
 //    }

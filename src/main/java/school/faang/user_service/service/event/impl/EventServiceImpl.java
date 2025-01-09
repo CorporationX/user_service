@@ -2,9 +2,7 @@ package school.faang.user_service.service.event.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.annotation.ReadTransactional;
-import school.faang.user_service.annotation.WriteTransactional;
-import school.faang.user_service.check.event.EventCheck;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
@@ -21,7 +19,6 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
-    private final EventCheck eventCheck;
     private final EventRepository eventRepository;
     private final SkillService skillService;
     private final UserServiceImpl userService;
@@ -29,10 +26,8 @@ public class EventServiceImpl implements EventService {
     private final List<EventFilter> eventFilters;
 
     @Override
-    @WriteTransactional
+    @Transactional
     public EventDto create(EventDto eventDto) {
-        eventCheck(eventDto);
-
         Event event = eventMapper.toEntity(eventDto);
         event.setOwner(userService.getUserById(eventDto.getOwnerId()));
         event.setRelatedSkills(skillService.getSkillListBySkillIds(eventDto.getRelatedSkillIds()));
@@ -40,7 +35,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @ReadTransactional
+    @Transactional(readOnly = true)
     public EventDto getEvent(long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -49,7 +44,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @ReadTransactional
+    @Transactional(readOnly = true)
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         Stream<Event> events = eventRepository.findAll().stream();
         eventFilters.stream()
@@ -59,15 +54,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @WriteTransactional
+    @Transactional
     public void deleteEvent(long id) {
         eventRepository.deleteById(id);
     }
 
     @Override
-    @WriteTransactional
+    @Transactional
     public EventDto updateEvent(long id, EventDto eventDto) {
-        eventCheck(eventDto);
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         String.format("Событие по id: %s не найдено!", id)));
@@ -77,21 +71,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @ReadTransactional
+    @Transactional(readOnly = true)
     public List<EventDto> getOwnedEvents(long userId) {
         List<Event> eventsByUserId = eventRepository.findAllByUserId(userId);
         return eventMapper.toDto(eventsByUserId);
     }
 
     @Override
-    @ReadTransactional
+    @Transactional(readOnly = true)
     public List<EventDto> getParticipatedEvents(long userId) {
         List<Event> participatedEventsByUserId = eventRepository.findParticipatedEventsByUserId(userId);
         return eventMapper.toDto(participatedEventsByUserId);
-    }
-
-    private void eventCheck(EventDto eventDto) {
-        eventCheck.eventCheck(eventDto);
-        eventCheck.userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
     }
 }

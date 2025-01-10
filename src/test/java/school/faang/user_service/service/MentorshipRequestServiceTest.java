@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,12 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.MentorshipRequestService;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipMapper;
-import school.faang.user_service.mapper.MentorshipMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -28,7 +25,7 @@ public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Spy
-    private MentorshipMapperImpl mentorshipMapper;
+    private MentorshipMapper mentorshipMapper;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     @Mock

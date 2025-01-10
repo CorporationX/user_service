@@ -1,12 +1,13 @@
 package school.faang.user_service.repository.event;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.event.Event;
 
 import java.util.List;
 
-public interface EventRepository extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
     @Query(nativeQuery = true, value = """
             SELECT e.* FROM event e

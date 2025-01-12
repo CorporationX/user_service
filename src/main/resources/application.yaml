@@ -21,7 +21,13 @@ spring:
       port: 6379
       host: localhost
 
+app:
+  api:
+    version: v1
+
 server:
+  servlet:
+    context-path: /api/${app.api.version}
   port: 8080
 
 logging:

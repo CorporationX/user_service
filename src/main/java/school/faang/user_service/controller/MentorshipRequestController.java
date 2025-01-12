@@ -15,37 +15,30 @@ public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         checkDataBeforeCreateRequest(mentorshipRequestDto);
-        return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filters) {
         return mentorshipRequestService.getRequests(filters);
     }
 
-    public MentorshipRequestDto acceptRequest(Long id) {
-        checkDataBeforeAcceptRequest(id);
-        return mentorshipRequestService.acceptRequest(id);
+    public void acceptRequest(Long id) {
+        mentorshipRequestService.acceptRequest(id);
     }
 
-    public MentorshipRequestDto rejectRequest(MentorshipRejectionDto rejection) {
+    public void rejectRequest(MentorshipRejectionDto rejection) {
         checkDataBeforeRejectRequest(rejection);
-        return mentorshipRequestService.rejectRequest(rejection);
+        mentorshipRequestService.rejectRequest(rejection);
     }
 
     private void checkDataBeforeRejectRequest(MentorshipRejectionDto rejection) {
         if (rejection == null) {
             throw new IllegalArgumentException("Description is empty.");
         }
-        if (rejection.getReason().isEmpty() || rejection.getReason() == null) {
-            throw new IllegalArgumentException("The reason of rejection is empty.");
-        }
-    }
-
-    private void checkDataBeforeAcceptRequest(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID of request can't be NULL.");
+        if (rejection.getReason() == null || rejection.getReason().isEmpty()) {
+            throw new IllegalArgumentException("The reason of rejection can't be empty.");
         }
     }
 
@@ -55,8 +48,8 @@ public class MentorshipRequestController {
     }
 
     private void checkIsDescriptionIsEmpty(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Description is empty.");
+        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isEmpty()) {
+            throw new IllegalArgumentException("Description can't be empty.");
         }
     }
 

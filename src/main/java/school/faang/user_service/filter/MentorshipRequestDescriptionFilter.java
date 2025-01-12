@@ -15,7 +15,7 @@ public class MentorshipRequestDescriptionFilter implements MentorshipRequestFilt
     }
 
     @Override
-    public void apply(Stream<MentorshipRequest> requests, MentorshipRequestFilterDto filters) {
-        requests.filter(request -> request.getDescription().matches(filters.getDescription()));
+    public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> requests, MentorshipRequestFilterDto filters) {
+       return requests.filter(request -> request.getDescription().contains(filters.getDescription()));
     }
 }

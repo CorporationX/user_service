@@ -2,7 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRejectionDto;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestFilterDto;
@@ -20,21 +20,37 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     @Value("${app.number_months_membership}")
-    private final int numberMonthsMembership;
+    private Integer numberMonthsMembership;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipMapper mentorshipMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private static final RequestStatus ACCEPTED = RequestStatus.ACCEPTED;
+    private static final RequestStatus REJECTED = RequestStatus.REJECTED;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         checkDataBeforeCreateRequest(mentorshipRequestDto);
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId(),
-                mentorshipRequestDto.getDescription());
+
+        return mentorshipMapper.toDto(createRequestMentorship(mentorshipRequestDto));
+    }
+
+    public MentorshipRequestDto acceptRequest(Long id) {
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
+        checkDataBeforeAcceptRequest(mentorshipRequest);
+        acceptRequestMentorship(mentorshipRequest);
+
+        return mentorshipMapper.toDto(mentorshipRequest);
+    }
+
+    public MentorshipRequestDto rejectRequest(MentorshipRejectionDto rejection) {
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(rejection.getId());
+        checkDataBeforeRejectRequest(mentorshipRequest);
+        rejectRequestMentorship(mentorshipRequest, rejection);
+
         return mentorshipMapper.toDto(mentorshipRequest);
     }
 
@@ -44,41 +60,48 @@ public class MentorshipRequestService {
         mentorshipRequestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(mentorshipRequests, filters));
-        return mentorshipRequests.map(mentorshipRequest -> mentorshipMapper.toDto(mentorshipRequest)).toList();
+
+        return mentorshipRequests.map(mentorshipMapper::toDto).toList();
     }
 
-    public MentorshipRequestDto acceptRequest(Long id) {
-        MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
-        checkDataBeforeAcceptRequest(mentorshipRequest);
+    public void setNumberMonthsMembership(Integer numberMonthsMembership) {
+        this.numberMonthsMembership = numberMonthsMembership;
+    }
 
+    private void acceptRequestMentorship(MentorshipRequest mentorshipRequest) {
         User mentor = mentorshipRequest.getReceiver();
         mentorshipRequest.getRequester().getMentors().add(mentor);
-        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequest.setStatus(ACCEPTED);
         mentorshipRequest.setUpdatedAt(LocalDateTime.now());
-
-        return mentorshipMapper.toDto(mentorshipRequest);
+        mentorshipRequestRepository.save(mentorshipRequest);
     }
 
-    public MentorshipRequestDto rejectRequest(MentorshipRejectionDto rejection) {
-        MentorshipRequest mentorshipRequest = getMentorshipRequest(rejection.getId());
-        mentorshipRequest.setStatus(RequestStatus.REJECTED);
-        mentorshipRequest.setUpdatedAt(LocalDateTime.now());
-        mentorshipRequest.setRejectionReason(rejection.getReason());
+    private void checkDataBeforeRejectRequest(MentorshipRequest mentorshipRequest) {
+        if (Objects.equals(mentorshipRequest.getStatus(), ACCEPTED)) {
+            throw new IllegalArgumentException("Accepted request can't be rejected.");
+        }
+        if (Objects.equals(mentorshipRequest.getStatus(), REJECTED)) {
+            throw new IllegalArgumentException("The reject is already rejected.");
+        }
+    }
 
-        return mentorshipMapper.toDto(mentorshipRequest);
+    private void rejectRequestMentorship(MentorshipRequest mentorshipRequest, MentorshipRejectionDto rejection) {
+        mentorshipRequest.setStatus(REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
+        mentorshipRequest.setUpdatedAt(LocalDateTime.now());
+        mentorshipRequestRepository.save(mentorshipRequest);
     }
 
     private MentorshipRequest getMentorshipRequest(Long id) {
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository
+        return mentorshipRequestRepository
                 .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("There is no request with id %d.", id)));
-        return mentorshipRequest;
     }
 
     private void checkDataBeforeAcceptRequest(MentorshipRequest mentorshipRequest) {
         List<User> mentors = mentorshipRequest.getRequester().getMentors();
         User mentor = mentorshipRequest.getReceiver();
-        if (mentors.contains(mentorshipRequest.getReceiver())) {
+        if (mentors.contains(mentor)) {
             throw new IllegalArgumentException(String.format("The mentor %s is already helps user %s",
                     mentor.getUsername(),
                     mentorshipRequest.getRequester().getUsername()));
@@ -104,9 +127,9 @@ public class MentorshipRequestService {
         if (lastRequest == null) {
             return;
         }
-        LocalDateTime dateFrom = lastRequest.getUpdatedAt().plusMonths(numberMonthsMembership);
+        LocalDateTime dateFrom = lastRequest.getCreatedAt().plusMonths(numberMonthsMembership);
         if (dateNow.isBefore(dateFrom)) {
-            throw new IllegalArgumentException("Only one request for mentorship in period");
+            throw new IllegalArgumentException("You can send only one request for mentorship in period");
         }
     }
 
@@ -119,5 +142,11 @@ public class MentorshipRequestService {
         if (!userRepository.existsById(id)) {
             throw new IllegalArgumentException(String.format("No such user in database with id: %d", id));
         }
+    }
+
+    private MentorshipRequest createRequestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        return mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(),
+                mentorshipRequestDto.getReceiverId(),
+                mentorshipRequestDto.getDescription());
     }
 }

@@ -7,11 +7,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.MentorshipRejectionDto;
+import school.faang.user_service.dto.MentorshipRequestFilterDto;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+
+import java.util.List;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestControllerTest {
@@ -27,7 +34,9 @@ public class MentorshipRequestControllerTest {
 
     private static final Long REQUESTER_ID = 1L;
     private static final Long RECEIVER_ID = 2L;
+    private static final Long ACCEPTED_ID = 1L;
     private static final String DESCRIPTION = "I want you to be my mentor";
+    private static final String REASON = "I'm very busy now. Sorry. Find another mentor.";
     private static final RequestStatus REQUEST_STATUS = RequestStatus.PENDING;
 
     @Test
@@ -35,13 +44,13 @@ public class MentorshipRequestControllerTest {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
 
         Assert.assertThrows(
-                NullPointerException.class,
+                IllegalArgumentException.class,
                 () -> mentorshipRequestController.requestMentorship(mentorshipRequestDto));
     }
 
     @Test
     public void testDescriptionIsEmpty() {
-        MentorshipRequestDto mentorshipRequestDto = prepareDataToDto(REQUESTER_ID,
+        MentorshipRequestDto mentorshipRequestDto = prepareDataToCreateRequestDto(REQUESTER_ID,
                 RECEIVER_ID,
                 "",
                 REQUEST_STATUS);
@@ -53,17 +62,65 @@ public class MentorshipRequestControllerTest {
 
     @Test
     public void testMentorshipRequestCreate() {
-        MentorshipRequestDto mentorshipRequestDto = prepareDataToDto(
+        MentorshipRequestDto mentorshipRequestDto = prepareDataToCreateRequestDto(
                 REQUESTER_ID,
                 RECEIVER_ID,
                 DESCRIPTION,
                 REQUEST_STATUS);
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
-        Mockito.verify(mentorshipRequestService, Mockito.times(1))
+        verify(mentorshipRequestService, Mockito.times(1))
                 .requestMentorship(mentorshipRequestDto);
     }
 
-    private MentorshipRequestDto prepareDataToDto(Long requesterId, Long receiverId, String description, RequestStatus requestStatus) {
+    @Test
+    public void testAcceptRequest() {
+        mentorshipRequestController.acceptRequest(ACCEPTED_ID);
+        verify(mentorshipRequestService, Mockito.times(1))
+                .acceptRequest(ACCEPTED_ID);
+    }
+
+    @Test
+    public void testRejectRequestIsNull() {
+        MentorshipRejectionDto mentorshipRejectionDto = new MentorshipRejectionDto();
+
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> mentorshipRequestController.rejectRequest(mentorshipRejectionDto));
+    }
+
+    @Test
+    public void testRejectRequest() {
+        MentorshipRejectionDto mentorshipRejectionDto = prepareDataToCreateRejectionDto();
+        mentorshipRequestController.rejectRequest(mentorshipRejectionDto);
+        verify(mentorshipRequestService, Mockito.times(1))
+                .rejectRequest(mentorshipRejectionDto);
+    }
+
+    @Test
+    public void testGetRequests() {
+        MentorshipRequestFilterDto filters = prepareDataToGetRequestsDto();
+        mentorshipRequestController.getRequests(filters);
+        verify(mentorshipRequestService, Mockito.times(1))
+                .getRequests(filters);
+    }
+
+    private MentorshipRequestFilterDto prepareDataToGetRequestsDto() {
+        MentorshipRequestFilterDto filters = new MentorshipRequestFilterDto();
+        filters.setRequesterId(REQUESTER_ID);
+        return filters;
+    }
+
+    private MentorshipRejectionDto prepareDataToCreateRejectionDto() {
+        MentorshipRejectionDto mentorshipRejectionDto = new MentorshipRejectionDto();
+        mentorshipRejectionDto.setId(1L);
+        mentorshipRejectionDto.setRequesterId(REQUESTER_ID);
+        mentorshipRejectionDto.setReceiverId(RECEIVER_ID);
+        mentorshipRejectionDto.setDescription(DESCRIPTION);
+        mentorshipRejectionDto.setReason(REASON);
+        return mentorshipRejectionDto;
+    }
+
+    private MentorshipRequestDto prepareDataToCreateRequestDto(Long requesterId, Long receiverId, String description, RequestStatus requestStatus) {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
         mentorshipRequestDto.setRequesterId(requesterId);
         mentorshipRequestDto.setReceiverId(receiverId);

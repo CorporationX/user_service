@@ -197,7 +197,6 @@ class EventServiceTest {
 
     @Test
     void shouldGetEventsByFilters() {
-        // Arrange
         EventFilterDto filterDto = new EventFilterDto();
         filterDto.setId(1L);
 

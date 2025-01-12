@@ -41,9 +41,8 @@ public class EventController {
 
     @PatchMapping("/{eventId}")
     public EventResponseDto updateEvent(
-            @PathVariable @Positive Long eventId, // ID из URL
+            @PathVariable @Positive Long eventId,
             @Valid @RequestBody UpdateEventRequestDto updateRequest) throws DataValidationException {
-        // Устанавливаем ID из PathVariable в DTO
         updateRequest.setId(eventId);
         return eventService.updateEvent(updateRequest);
     }

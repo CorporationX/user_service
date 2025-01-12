@@ -58,4 +58,9 @@ public class UserController {
 
         return ResponseEntity.ok(avatarUrl);
     }
+
+    @GetMapping("/findByPhone/{phone}")
+    public Long findUserByPhone(@PathVariable String phone){
+        return userService.findUserByPhone(phone);
+    }
 }

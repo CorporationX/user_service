@@ -189,4 +189,8 @@ public class UserService {
         UserSearchAppearanceEvent userSearchAppearanceEvent = new UserSearchAppearanceEvent(user.getId(), userContext.getUserId(), LocalDateTime.now());
         userSearchAppearanceEventPublisher.publish(userSearchAppearanceEvent);
     }
+
+    public Long findUserByPhone(String phone) {
+        return userRepository.findIdByPhone(phone);
+    }
 }

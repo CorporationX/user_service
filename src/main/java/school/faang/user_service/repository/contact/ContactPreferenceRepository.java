@@ -6,4 +6,5 @@ import school.faang.user_service.entity.contact.ContactPreference;
 
 @Repository
 public interface ContactPreferenceRepository extends JpaRepository<ContactPreference, Long> {
+
 }

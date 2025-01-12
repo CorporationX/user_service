@@ -39,7 +39,7 @@ spring:
         recommendation_topic:
           name: recommendation_topic
         goal_completed_topic:
-          name: goal_complete
+          name: goal_complete_topic
         mentorship_accepted:
           name: mentorship_accepted_topic
         skill_acquired_topic:

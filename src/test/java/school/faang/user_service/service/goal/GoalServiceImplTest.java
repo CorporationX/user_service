@@ -249,4 +249,9 @@ public class GoalServiceImplTest {
         verifyNoMoreInteractions(goalRepository, goalMapper);
     }
 
+    @Test
+    public void foo() {
+        assertEquals("a", "b");
+    }
+
 }

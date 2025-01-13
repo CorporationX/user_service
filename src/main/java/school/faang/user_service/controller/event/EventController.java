@@ -25,7 +25,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventResponseDto getEvent(@PathVariable @Positive Long eventId) throws DataValidationException {
+    public EventResponseDto getEvent(@PathVariable @Valid @Positive Long eventId) throws DataValidationException {
         return eventService.getEvent(eventId);
     }
 
@@ -48,12 +48,12 @@ public class EventController {
     }
 
     @GetMapping("/owner/{userId}")
-    public List<EventResponseDto> getEventsByOwner(@PathVariable @Positive Long userId) {
+    public List<EventResponseDto> getEventsByOwner(@PathVariable @Valid @Positive Long userId) {
         return eventService.getEventsByOwner(userId);
     }
 
     @GetMapping("/participant/{userId}")
-    public List<EventResponseDto> getEventsByParticipant(@PathVariable @Positive Long userId) {
+    public List<EventResponseDto> getEventsByParticipant(@PathVariable @Valid @Positive Long userId) {
         return eventService.getEventsByParticipant(userId);
     }
 }

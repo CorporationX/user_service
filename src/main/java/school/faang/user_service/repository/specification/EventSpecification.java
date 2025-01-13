@@ -1,4 +1,4 @@
-package school.faang.user_service.specification;
+package school.faang.user_service.repository.specification;
 
 import org.springframework.data.jpa.domain.Specification;
 import school.faang.user_service.entity.event.Event;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.event.CreateEventRequestDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventResponseDto;
@@ -17,10 +18,11 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.specification.EventSpecification;
+import school.faang.user_service.repository.specification.EventSpecification;
 
 import java.util.List;
 
+@Validated
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -35,11 +37,8 @@ public class EventService {
     public EventResponseDto createEvent(CreateEventRequestDto createRequest) throws DataValidationException {
         Event event = eventMapper.toEntity(createRequest);
         event.setOwner(userService.getUser(createRequest.getOwnerId()));
-        List<Long> skillIds = createRequest.getRelatedSkills();
-        List<Skill> relatedSkills = skillIds.stream()
-                .map(skillId -> skillRepository.findById(skillId)
-                        .orElseThrow(() -> new DataValidationException("Skill not found with ID: " + skillId)))
-                .toList();
+
+        List<Skill> relatedSkills = getSkillsByIds(createRequest.getRelatedSkills());
         event.setRelatedSkills(relatedSkills);
 
         return eventMapper.toResponseDto(eventRepository.save(event));
@@ -57,11 +56,7 @@ public class EventService {
 
         Event updatedEvent = eventMapper.toEntity(updateRequest);
 
-        List<Skill> relatedSkills = updateRequest.getRelatedSkills().stream()
-                .map(skillId -> skillRepository.findById(skillId)
-                        .orElseThrow(() -> new DataValidationException("Skill not found with ID: " + skillId)))
-                .toList();
-
+        List<Skill> relatedSkills = getSkillsByIds(updateRequest.getRelatedSkills());
         updatedEvent.setRelatedSkills(relatedSkills);
 
         updatedEvent.setOwner(userService.getUser(updateRequest.getOwnerId()));
@@ -120,5 +115,12 @@ public class EventService {
     private Event findEventById(Long eventId) throws DataValidationException {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataValidationException("Event not found with ID: " + eventId));
+    }
+
+    private List<Skill> getSkillsByIds(List<Long> skillIds) throws DataValidationException {
+        return skillIds.stream()
+                .map(skillId -> skillRepository.findById(skillId)
+                        .orElseThrow(() -> new DataValidationException("Skill not found with ID: " + skillId)))
+                .toList();
     }
 }

@@ -17,7 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestRequesterFilterTest {
     private static final Long REQUESTER_ID = 1L;
-    private final MentorshipRequestRequesterFilter mentorshipRequestRequesterFilter = new MentorshipRequestRequesterFilter();
+    private final MentorshipRequestRequesterFilter mentorshipRequestRequesterFilter =
+            new MentorshipRequestRequesterFilter();
 
     @Test
     public void testIsNotApplicable() {
@@ -45,9 +46,8 @@ public class MentorshipRequestRequesterFilterTest {
 
     private Stream<MentorshipRequest> prepareStreamOfRequests() {
         List<MentorshipRequest> mentorshipRequestList = fillListOfRequests();
-        Stream<MentorshipRequest> requests = mentorshipRequestList.stream();
 
-        return requests;
+        return mentorshipRequestList.stream();
     }
 
     private List<MentorshipRequest> fillListOfRequests() {

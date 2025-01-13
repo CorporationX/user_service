@@ -8,14 +8,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.MentorshipRejectionDto;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.filter.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipMapper;
-import school.faang.user_service.mapper.MentorshipMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -25,27 +28,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipRequestServiceTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class MentorshipRequestServiceImplTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Spy
     private MentorshipMapper mentorshipMapper;
-    @Spy
-    private MentorshipMapperImpl mentorshipMapperImpl;
     @Mock
     private UserRepository userRepository;
-//    @Mock
-//    private List<MentorshipRequestFilter> mentorshipRequestFilters;
-//    @Mock
-//    private MentorshipRequest mentorshipRequest;
+    @Mock
+    private List<MentorshipRequestFilter> mentorshipRequestFilters;
 
     @InjectMocks
-    private MentorshipRequestService mentorshipRequestService;
+    private MentorshipRequestServiceImpl mentorshipRequestService;
 
     private static final Long REQUESTER_ID = 1L;
     private static final Long REQUESTER_ID_FAIL = 23L;
@@ -172,7 +171,39 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testGetRequests() {
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDtoForFilters(REQUEST_STATUS);
+        Stream<MentorshipRequest> requests = prepareStreamOfRequests();
+        mentorshipRequestFilters.add(new MentorshipRequestStatusFilter());
+        when(mentorshipRequestRepository.findAll()).thenReturn(requests.toList());
+        List<MentorshipRequestDto> resultRequest = mentorshipRequestService.getRequests(mentorshipRequestFilterDto);
+        verify(mentorshipRequestFilters, Mockito.times(NUMBER_INVOCATION)).stream();
+    }
 
+    private MentorshipRequestFilterDto prepareDataToDtoForFilters(RequestStatus requestStatus) {
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
+        mentorshipRequestFilterDto.setStatus(requestStatus);
+        return mentorshipRequestFilterDto;
+    }
+
+    private Stream<MentorshipRequest> prepareStreamOfRequests() {
+        List<MentorshipRequest> mentorshipRequestList = fillListOfRequests();
+
+        return mentorshipRequestList.stream();
+    }
+
+    private List<MentorshipRequest> fillListOfRequests() {
+        List<MentorshipRequest> mentorshipRequestList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            User user = new User();
+            user.setId((long) i);
+            MentorshipRequest mentorshipRequest = new MentorshipRequest();
+            mentorshipRequest.setRequester(user);
+            if (i < 5 ) {
+                mentorshipRequest.setStatus(REQUEST_STATUS);
+            }
+            mentorshipRequestList.add(mentorshipRequest);
+        }
+        return mentorshipRequestList;
     }
 
     private MentorshipRejectionDto prepareDataToRejectionDto(Long rejectId, String rejectReason) {
@@ -182,7 +213,6 @@ public class MentorshipRequestServiceTest {
 
         return mentorshipRejectionDto;
     }
-
 
     private MentorshipRequest prepareDataForRequest(Long requestId, boolean isExist) {
         User userRequester = preparaDataForUser(REQUESTER_ID, new ArrayList<>());

@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestReceiverFilterTest {
     private static final Long RECEIVER_ID = 1L;
-    private final MentorshipRequestReceiverFilter mentorshipRequestReceiverFilter = new MentorshipRequestReceiverFilter();
+    private final MentorshipRequestReceiverFilter mentorshipRequestReceiverFilter =
+            new MentorshipRequestReceiverFilter();
 
     @Test
     public void testIsNotApplicable() {
@@ -39,14 +42,17 @@ public class MentorshipRequestReceiverFilterTest {
         List<MentorshipRequest> mentorshipRequests = mentorshipRequestReceiverFilter.apply(requests,
                 mentorshipRequestFilterDto).toList();
         assertEquals(1, mentorshipRequests.size());
-        assertEquals(RECEIVER_ID, Optional.ofNullable(mentorshipRequests.get(0).getReceiver().getId()).orElse(null));
+        assertEquals(RECEIVER_ID, Optional.ofNullable(mentorshipRequests
+                        .get(0)
+                        .getReceiver()
+                        .getId())
+                .orElse(null));
     }
 
     private Stream<MentorshipRequest> prepareStreamOfRequests() {
         List<MentorshipRequest> mentorshipRequestList = fillListOfRequests();
-        Stream<MentorshipRequest> requests = mentorshipRequestList.stream();
 
-        return requests;
+        return mentorshipRequestList.stream();
     }
 
     private List<MentorshipRequest> fillListOfRequests() {

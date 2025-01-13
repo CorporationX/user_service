@@ -9,17 +9,18 @@ import school.faang.user_service.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestDescriptionFilterTest {
     private static final String DESCRIPTION = "Hard work";
     private static final String DESCRIPTION_ANOTHER = "Work";
-    private final MentorshipRequestDescriptionFilter mentorshipRequestDescriptionFilter = new MentorshipRequestDescriptionFilter();
+    private final MentorshipRequestDescriptionFilter mentorshipRequestDescriptionFilter =
+            new MentorshipRequestDescriptionFilter();
 
     @Test
     public void testIsNotApplicable() {
@@ -45,9 +46,8 @@ public class MentorshipRequestDescriptionFilterTest {
 
     private Stream<MentorshipRequest> prepareStreamOfRequests() {
         List<MentorshipRequest> mentorshipRequestList = fillListOfRequests();
-        Stream<MentorshipRequest> requests = mentorshipRequestList.stream();
 
-        return requests;
+        return mentorshipRequestList.stream();
     }
 
     private List<MentorshipRequest> fillListOfRequests() {
@@ -57,9 +57,9 @@ public class MentorshipRequestDescriptionFilterTest {
             user.setId((long) i);
             MentorshipRequest mentorshipRequest = new MentorshipRequest();
             mentorshipRequest.setRequester(user);
-            if (i < 5 ) {
+            if (i < 5) {
                 mentorshipRequest.setDescription(DESCRIPTION);
-            }else {
+            } else {
                 mentorshipRequest.setDescription(DESCRIPTION_ANOTHER);
             }
             mentorshipRequestList.add(mentorshipRequest);

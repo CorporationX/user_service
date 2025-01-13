@@ -10,7 +10,6 @@ import school.faang.user_service.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,9 +44,8 @@ public class MentorshipRequestStatusFilterTest {
 
     private Stream<MentorshipRequest> prepareStreamOfRequests() {
         List<MentorshipRequest> mentorshipRequestList = fillListOfRequests();
-        Stream<MentorshipRequest> requests = mentorshipRequestList.stream();
 
-        return requests;
+        return mentorshipRequestList.stream();
     }
 
     private List<MentorshipRequest> fillListOfRequests() {

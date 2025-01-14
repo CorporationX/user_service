@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRejectionDto;
 import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -44,7 +45,7 @@ public class MentorshipRequestControllerTest {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestController.requestMentorship(mentorshipRequestDto));
     }
 
@@ -56,7 +57,7 @@ public class MentorshipRequestControllerTest {
                 REQUEST_STATUS);
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestController.requestMentorship(mentorshipRequestDto));
     }
 
@@ -84,7 +85,7 @@ public class MentorshipRequestControllerTest {
         MentorshipRejectionDto mentorshipRejectionDto = new MentorshipRejectionDto();
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestController.rejectRequest(mentorshipRejectionDto));
     }
 

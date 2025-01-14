@@ -1,61 +1,43 @@
 package school.faang.user_service.service.skill;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.adapter.SkillRepositoryAdapter;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class SkillService {
 
-    private final SkillRepository skillRepository;
+    private final SkillRepositoryAdapter skillRepositoryAdapter;
 
-    @Autowired
-    public SkillService(SkillRepository skillRepository) {
-        this.skillRepository = skillRepository;
-    }
-
-    public Skill findSkillById(Long id) {
-        Optional<Skill> skill = skillRepository.findById(id);
-        return skill.orElse(null);
+    public Optional<Skill> findSkillById(Long id) {
+        return skillRepositoryAdapter.findById(id);
     }
 
     public List<Skill> findSkillsByIds(List<Long> ids) {
-        return skillRepository.findAllById(ids);
+        return skillRepositoryAdapter.findAllById(ids);
     }
 
     public List<Skill> findSkillsByUserId(long userId) {
-        return skillRepository.findAllByUserId(userId);
-    }
-
-    public List<Skill> findSkillsOfferedToUser(long userId) {
-        return skillRepository.findSkillsOfferedToUser(userId);
-    }
-
-    public Optional<Skill> findUserSkill(long skillId, long userId) {
-        return skillRepository.findUserSkill(skillId, userId);
+        return skillRepositoryAdapter.findAllByUserId(userId);
     }
 
     public boolean skillExistsByTitle(String title) {
-        return skillRepository.existsByTitle(title);
+        return skillRepositoryAdapter.existsByTitle(title);
     }
 
     public void assignSkillToUser(long skillId, long userId) {
-        skillRepository.assignSkillToUser(skillId, userId);
-    }
-
-    public List<Skill> findSkillsByGoalId(long goalId) {
-        return skillRepository.findSkillsByGoalId(goalId);
-    }
-
-    public int countExistingSkills(List<Long> ids) {
-        return skillRepository.countExisting(ids);
+        if (!skillRepositoryAdapter.existsById(skillId)) {
+            throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");
+        }
+        skillRepositoryAdapter.assignSkillToUser(skillId, userId);
     }
 
     public List<Skill> getAllSkills() {
-        return skillRepository.findAll();
+        return skillRepositoryAdapter.findAll();
     }
 }

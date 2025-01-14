@@ -26,4 +26,5 @@ public class EventFilterDto {
     private EventStatus eventStatus;
     private Long ownerId;
     private List<Long> skillIds;
+    private List<Long> relatedSkills;
 }

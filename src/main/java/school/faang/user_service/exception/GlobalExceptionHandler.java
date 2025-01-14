@@ -1,9 +1,8 @@
 package school.faang.user_service.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -23,10 +22,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
     protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -42,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        logger.warn("Validation failed for request: {}", errors);
+        log.warn("Validation failed for request: {}", errors);
 
         ApiError apiError = createApiError(HttpStatus.BAD_REQUEST, "Validation failed", errors);
         return ResponseEntity.badRequest().body(apiError);
@@ -72,7 +70,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, @NotNull HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        logger.error("Malformed JSON request: {}", ex.getMessage());
+        log.error("Malformed JSON request: {}", ex.getMessage());
         ApiError apiError = createApiError(HttpStatus.BAD_REQUEST, "Malformed JSON request", null);
         return ResponseEntity.badRequest().body(apiError);
     }
@@ -86,42 +84,42 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        logger.warn("Constraint violation: {}", errors);
+        log.warn("Constraint violation: {}", errors);
         return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, "Constraint violation", errors));
     }
 
     @ExceptionHandler(DataValidationException.class)
     public ResponseEntity<ApiError> handleDataValidationException(DataValidationException ex) {
-        logger.warn("Data validation error: {}", ex.getMessage());
+        log.warn("Data validation error: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), null));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiError> handleEntityNotFoundException(EntityNotFoundException ex) {
-        logger.error("Entity not found: {}", ex.getMessage());
+        log.error("Entity not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createApiError(HttpStatus.NOT_FOUND, ex.getMessage(), null));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
-        logger.warn("Access denied: {}", ex.getMessage());
+        log.warn("Access denied: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(createApiError(HttpStatus.FORBIDDEN, "Access is denied", null));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
-        logger.warn("Illegal argument: {}", ex.getMessage());
+        log.warn("Illegal argument: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, "Invalid argument", null));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex) {
-        logger.error("Unexpected runtime error: {}", ex.getMessage(), ex);
+        log.error("Unexpected runtime error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Runtime error occurred", null));
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleAllExceptions(Exception ex) {
-        logger.error("Unexpected global error: {}", ex.getMessage(), ex);
+        log.error("Unexpected global error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred", null));
     }
     private ApiError createApiError(HttpStatus status, String message, Map<String, String> errors) {

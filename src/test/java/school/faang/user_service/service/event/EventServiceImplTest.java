@@ -16,7 +16,7 @@ import school.faang.user_service.service.event.filter.EventDescriptionFilter;
 import school.faang.user_service.service.event.filter.EventTitleFilter;
 import school.faang.user_service.service.event.impl.EventServiceImpl;
 import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.user.impl.UserServiceImpl;
+import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class EventServiceImplTest {
     private SkillService skillService;
 
     @Mock
-    private UserServiceImpl userService;
+    private UserRepositoryAdapter userRepositoryAdapter;
 
     @Mock
     private EventTitleFilter eventTitleFilter;
@@ -69,7 +69,7 @@ public class EventServiceImplTest {
         eventService = new EventServiceImpl(
                 eventRepository,
                 skillService,
-                userService,
+                userRepositoryAdapter,
                 eventMapper,
                 List.of(eventTitleFilter, eventDescriptionFilter));
     }
@@ -88,7 +88,7 @@ public class EventServiceImplTest {
         EventDto savedEventDto = new EventDto();
 
         when(eventMapper.toEntity(eventDto)).thenReturn(event);
-        when(userService.getUserById(OWNER_ID)).thenReturn(user);
+        when(userRepositoryAdapter.getUserById(OWNER_ID)).thenReturn(user);
         when(skillService.getSkillListBySkillIds(SKILL_IDS)).thenReturn(List.of(FIRST_SKILL, SECOND_SKILL));
         when(eventRepository.save(event)).thenReturn(savedEvent);
         when(eventMapper.toDto(savedEvent)).thenReturn(savedEventDto);
@@ -96,7 +96,7 @@ public class EventServiceImplTest {
         EventDto result = eventService.create(eventDto);
 
         verify(eventMapper, times(1)).toEntity(eventDto);
-        verify(userService, times(1)).getUserById(OWNER_ID);
+        verify(userRepositoryAdapter, times(1)).getUserById(OWNER_ID);
         verify(skillService, times(1)).getSkillListBySkillIds(SKILL_IDS);
         verify(eventRepository, times(1)).save(eventCaptor.capture());
         verify(eventMapper, times(1)).toDto(savedEvent);

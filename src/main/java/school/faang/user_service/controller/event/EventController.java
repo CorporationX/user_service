@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.check.event.EventCheck;
+import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
@@ -17,24 +17,24 @@ import java.util.List;
 @RequestMapping("/api/v1/events")
 public class EventController {
     private final EventService eventService;
-    private final EventCheck eventCheck;
-    private static final String ID = "/{id}";
-    private static final String USER_ID = "/{userId}";
-    private static final String OWNED_EVENTS = "/users" + USER_ID;
-    private static final String PARTICIPATED_EVENTS = "/participation" + USER_ID;
+    private final EventValidator eventValidator;
+    private static final String ID_PATH = "/{id}";
+    private static final String USER_ID_PATH = "/{userId}";
+    private static final String OWNED_EVENTS_PATH = "/users" + USER_ID_PATH;
+    private static final String PARTICIPATED_EVENTS_PATH = "/participation" + USER_ID_PATH;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<EventDto> create(@NotNull @RequestBody EventDto event) {
-        eventCheck(event);
+        validateEvent(event);
         return new ResponseEntity<>(eventService.create(event), HttpStatus.CREATED);
     }
 
-    @GetMapping(ID)
+    @GetMapping(ID_PATH)
     public ResponseEntity<EventDto> getEvent(@PathVariable long id) {
         return ResponseEntity.ok(eventService.getEvent(id));
     }
 
-    @DeleteMapping(ID)
+    @DeleteMapping(ID_PATH)
     public ResponseEntity<String> deleteEvent(@PathVariable long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.ok("Событие успешно удалено!");
@@ -45,24 +45,24 @@ public class EventController {
         return ResponseEntity.ok(eventService.getEventsByFilter(filter));
     }
 
-    @PutMapping(ID)
+    @PutMapping(ID_PATH)
     public ResponseEntity<EventDto> updateEvent(@PathVariable long id, @NotNull @RequestBody EventDto event) {
-        eventCheck(event);
+        validateEvent(event);
         return ResponseEntity.ok(eventService.updateEvent(id, event));
     }
 
-    @GetMapping(OWNED_EVENTS)
+    @GetMapping(OWNED_EVENTS_PATH)
     public ResponseEntity<List<EventDto>> getOwnedEvents(@PathVariable long userId) {
         return ResponseEntity.ok(eventService.getOwnedEvents(userId));
     }
 
-    @GetMapping(PARTICIPATED_EVENTS)
+    @GetMapping(PARTICIPATED_EVENTS_PATH)
     public ResponseEntity<List<EventDto>> getParticipatedEvents(@PathVariable long userId) {
         return ResponseEntity.ok(eventService.getParticipatedEvents(userId));
     }
 
-    private void eventCheck(EventDto eventDto) {
-        eventCheck.eventCheck(eventDto);
-        eventCheck.userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
+    private void validateEvent(EventDto eventDto) {
+        eventValidator.validateEvent(eventDto);
+        eventValidator.userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
     }
 }

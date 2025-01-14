@@ -11,7 +11,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.user.impl.UserServiceImpl;
+import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final SkillService skillService;
-    private final UserServiceImpl userService;
+    private final UserRepositoryAdapter userRepositoryAdapter;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
 
@@ -29,7 +29,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventDto create(EventDto eventDto) {
         Event event = eventMapper.toEntity(eventDto);
-        event.setOwner(userService.getUserById(eventDto.getOwnerId()));
+        event.setOwner(userRepositoryAdapter.getUserById(eventDto.getOwnerId()));
         event.setRelatedSkills(skillService.getSkillListBySkillIds(eventDto.getRelatedSkillIds()));
         return eventMapper.toDto(eventRepository.save(event));
     }

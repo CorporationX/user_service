@@ -1,4 +1,4 @@
-package school.faang.user_service.check.event;
+package school.faang.user_service.validator.event;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +11,7 @@ import school.faang.user_service.dto.entity.Skill;
 import school.faang.user_service.dto.entity.User;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.user.impl.UserServiceImpl;
+import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
 import java.util.List;
 
@@ -19,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EventCheckTest {
+public class EventValidatorTest {
 
     @InjectMocks
-    private EventCheck eventCheck;
+    private EventValidator eventValidator;
 
     @Mock
-    private UserServiceImpl userService;
+    private UserRepositoryAdapter userService;
 
     @Captor
     private ArgumentCaptor<Long> longCaptor;
@@ -40,7 +40,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setTitle(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event title не может быть пустым", exception.getMessage());
     }
 
@@ -49,7 +49,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setTitle("  ");
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event title не может быть пустым", exception.getMessage());
     }
 
@@ -58,7 +58,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setTitle("A".repeat(65));
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event title не может быть больше 64", exception.getMessage());
     }
 
@@ -67,7 +67,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setDescription(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event description не может быть пустым", exception.getMessage());
     }
 
@@ -76,7 +76,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setDescription("  ");
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event description не может быть пустым", exception.getMessage());
     }
 
@@ -85,7 +85,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setDescription("A".repeat(4096));
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event description не может быть больше 4096", exception.getMessage());
     }
 
@@ -94,7 +94,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setStartDate(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("StartDate не может быть пустым", exception.getMessage());
     }
 
@@ -103,7 +103,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setEndDate(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("EndDate не может быть пустым", exception.getMessage());
     }
 
@@ -112,7 +112,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setLocation(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event Location не может быть пустым", exception.getMessage());
     }
 
@@ -121,7 +121,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setLocation("  ");
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event Location не может быть пустым", exception.getMessage());
     }
 
@@ -130,7 +130,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setLocation("A".repeat(128));
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event Location не может быть больше 128", exception.getMessage());
     }
 
@@ -139,7 +139,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setOwnerId(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("OwnerId не может быть пустым", exception.getMessage());
     }
 
@@ -148,7 +148,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setEventType(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("EventType не может быть пустым", exception.getMessage());
     }
 
@@ -157,7 +157,7 @@ public class EventCheckTest {
         EventDto eventDto = new EventDto();
         eventDto.setEventStatus(null);
         Exception exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.eventCheck(eventDto));
+                () -> eventValidator.validateEvent(eventDto));
         assertEquals("EventStatus не может быть пустым", exception.getMessage());
     }
 
@@ -166,7 +166,7 @@ public class EventCheckTest {
         User user = new User();
         user.setSkills(List.of(FIRST_SKILL, SECOND_SKILL));
         when(userService.getUserById(OWNER_ID)).thenReturn(user);
-        boolean result = eventCheck.userHasSkills(OWNER_ID, RELATED_SKILL_IDS);
+        boolean result = eventValidator.userHasSkills(OWNER_ID, RELATED_SKILL_IDS);
         assertTrue(result);
         verify(userService, times(1)).getUserById(longCaptor.capture());
         assertEquals(OWNER_ID, longCaptor.getValue());
@@ -177,7 +177,7 @@ public class EventCheckTest {
         User user = new User();
         user.setSkills(List.of(FIRST_SKILL));
         when(userService.getUserById(OWNER_ID)).thenReturn(user);
-        boolean result = eventCheck.userHasSkills(OWNER_ID, RELATED_SKILL_IDS);
+        boolean result = eventValidator.userHasSkills(OWNER_ID, RELATED_SKILL_IDS);
         assertFalse(result);
         verify(userService, times(1)).getUserById(longCaptor.capture());
         assertEquals(OWNER_ID, longCaptor.getValue());
@@ -188,7 +188,7 @@ public class EventCheckTest {
         User user = new User();
         user.setSkills(List.of(FIRST_SKILL, SECOND_SKILL));
         when(userService.getUserById(OWNER_ID)).thenReturn(user);
-        assertDoesNotThrow(() -> eventCheck.userCanCreateEventBySkills(OWNER_ID, RELATED_SKILL_IDS));
+        assertDoesNotThrow(() -> eventValidator.userCanCreateEventBySkills(OWNER_ID, RELATED_SKILL_IDS));
         verify(userService, times(1)).getUserById(longCaptor.capture());
         assertEquals(OWNER_ID, longCaptor.getValue());
     }
@@ -199,7 +199,7 @@ public class EventCheckTest {
         user.setSkills(List.of(FIRST_SKILL));
         when(userService.getUserById(OWNER_ID)).thenReturn(user);
         DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventCheck.userCanCreateEventBySkills(OWNER_ID, RELATED_SKILL_IDS));
+                () -> eventValidator.userCanCreateEventBySkills(OWNER_ID, RELATED_SKILL_IDS));
         assertEquals("Пользователь не может провести такое событие с такими навыками", exception.getMessage());
         verify(userService, times(1)).getUserById(longCaptor.capture());
         assertEquals(OWNER_ID, longCaptor.getValue());

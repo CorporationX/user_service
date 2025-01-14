@@ -1,12 +1,12 @@
-package school.faang.user_service.check.event;
+package school.faang.user_service.validator.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 import school.faang.user_service.dto.entity.Skill;
 import school.faang.user_service.dto.entity.User;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.user.impl.UserServiceImpl;
 
 import java.util.List;
 import java.util.Set;
@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class EventCheck {
-    private final UserServiceImpl userService;
+public class EventValidator {
+    private final UserRepositoryAdapter userRepositoryAdapter;
 
-    public void eventCheck(EventDto event) {
+    public void validateEvent(EventDto event) {
         if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException("Event title не может быть пустым");
         } else if (event.getTitle().length() > 64) {
@@ -51,7 +51,7 @@ public class EventCheck {
     }
 
     public boolean userHasSkills(Long ownerId, List<Long> relatedSkillIds) {
-        User user = userService.getUserById(ownerId);
+        User user = userRepositoryAdapter.getUserById(ownerId);
         Set<Long> userSkillIdList = user.getSkills().stream()
                 .map(Skill::getId)
                 .collect(Collectors.toSet());

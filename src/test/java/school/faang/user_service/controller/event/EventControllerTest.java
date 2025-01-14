@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import school.faang.user_service.check.event.EventCheck;
+import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
@@ -21,7 +21,7 @@ public class EventControllerTest {
     private EventController eventController;
 
     @Mock
-    private EventCheck eventCheck;
+    private EventValidator eventValidator;
 
     @Mock
     private EventService eventService;
@@ -42,8 +42,8 @@ public class EventControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(createdEventDto, response.getBody());
-        verify(eventCheck, times(1)).eventCheck(eventDto);
-        verify(eventCheck, times(1))
+        verify(eventValidator, times(1)).validateEvent(eventDto);
+        verify(eventValidator, times(1))
                 .userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
         verify(eventService, times(1)).create(eventDto);
     }
@@ -52,12 +52,12 @@ public class EventControllerTest {
     void testCreate_UserCannotCreateEvent_ThrowsException() {
         EventDto eventDto = new EventDto();
         doThrow(new DataValidationException(EXCEPTION_MSG_CREATE))
-                .when(eventCheck).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
+                .when(eventValidator).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
 
         DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> eventController.create(eventDto));
         assertEquals(EXCEPTION_MSG_CREATE, exception.getMessage());
-        verify(eventCheck).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
+        verify(eventValidator).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
         verify(eventService, never()).create(eventDto);
     }
 
@@ -72,8 +72,8 @@ public class EventControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedEventDto, response.getBody());
-        verify(eventCheck, times(1)).eventCheck(eventDto);
-        verify(eventCheck, times(1))
+        verify(eventValidator, times(1)).validateEvent(eventDto);
+        verify(eventValidator, times(1))
                 .userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
         verify(eventService, times(1)).updateEvent(EVENT_ID, eventDto);
     }
@@ -82,12 +82,12 @@ public class EventControllerTest {
     void testUpdateEvent_UserCannotUpdateEvent_ThrowsException() {
         EventDto eventDto = new EventDto();
         doThrow(new DataValidationException(EXCEPTION_MSG_UPDATE))
-                .when(eventCheck).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
+                .when(eventValidator).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
 
         DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> eventController.updateEvent(EVENT_ID, eventDto));
         assertEquals(EXCEPTION_MSG_UPDATE, exception.getMessage());
-        verify(eventCheck).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
+        verify(eventValidator).userCanCreateEventBySkills(eventDto.getOwnerId(), eventDto.getRelatedSkillIds());
         verify(eventService, never()).updateEvent(EVENT_ID, eventDto);
     }
 }

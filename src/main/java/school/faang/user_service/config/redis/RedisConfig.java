@@ -30,6 +30,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.ban_user_channel}")
     private String userBanChannelTopic;
 
+    @Value("${spring.data.redis.channels.user_profile_filter_view_channel}")
+    private String userProfileFilterViewChannel;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(redisHost, redisPort);
@@ -61,5 +64,10 @@ public class RedisConfig {
             container.addMessageListener(listener, topics.get(listener.getClass().getName()));
         }
         return container;
+    }
+
+    @Bean
+    public ChannelTopic userProfileFilterViewTopic() {
+        return new ChannelTopic(userProfileFilterViewChannel);
     }
 }

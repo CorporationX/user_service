@@ -18,10 +18,11 @@ import school.faang.user_service.dto.user.UpdateUsersRankDto;
 import school.faang.user_service.entity.country.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.data.DataValidationException;
-import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.mapper.csv.CsvParser;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
+import school.faang.user_service.service.notification.NotificationService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -69,6 +70,8 @@ public class UserServiceTest {
 
     @Mock
     private CountryService countryService;
+    @Mock
+    private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {

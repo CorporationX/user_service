@@ -30,6 +30,7 @@ spring:
         ban_user_channel: ban_user
         premium-bought-channel: premium_bought_channel
         recommendation-requested-channel: recommendation_requested_channel
+        user_profile_filter_view_channel: user_profile_filter_view
 
 server:
   port: 8080

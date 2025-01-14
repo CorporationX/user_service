@@ -21,6 +21,7 @@ spring:
       port: 6379
       host: localhost
 
+server:
   port: 8080
 
 logging:

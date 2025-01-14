@@ -9,13 +9,11 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String username;
     private String email;
-    private String phoneNumber;
     private List<SkillDto> skills;
 }

@@ -12,9 +12,12 @@ import school.faang.user_service.entity.event.Event;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {EventSkillMapper.class, EventUserMapper.class})
 public abstract class EventMapper {
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "attendees", ignore = true)
+    @Mapping(target = "ratings", ignore = true)
     @Mapping(target = "relatedSkills", source = "skills")
     @Mapping(target = "maxAttendees", source = "createRequest.maxAttendees")
     @Mapping(target = "type", source = "createRequest.eventType")
@@ -24,6 +27,9 @@ public abstract class EventMapper {
     @Mapping(target = "owner", ignore = true)
     public abstract Event toEntity(CreateEventRequestDto createRequest, List<Skill> skills);
 
+    @Mapping(target = "id", source = "updateRequest.id")
+    @Mapping(target = "attendees", ignore = true)
+    @Mapping(target = "ratings", ignore = true)
     @Mapping(target = "relatedSkills", source = "skills")
     @Mapping(target = "maxAttendees", source = "updateRequest.maxAttendees")
     @Mapping(target = "type", source = "updateRequest.eventType")
@@ -37,6 +43,7 @@ public abstract class EventMapper {
     @Mapping(target = "ownerId", source = "owner.id")
     @Mapping(target = "eventType", source = "type")
     @Mapping(target = "eventStatus", source = "status")
+    @Mapping(target = "createdAt", source = "createdAt")
     public abstract EventResponseDto toResponseDto(Event event);
 
     public List<EventResponseDto> toResponseDtoList(List<Event> events) {

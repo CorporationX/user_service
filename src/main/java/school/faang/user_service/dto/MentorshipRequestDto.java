@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class MentorshipRequestDto {
-    private long id;
+    private Long id;
     private String description;
     private Long requesterId;
     private Long receiverId;

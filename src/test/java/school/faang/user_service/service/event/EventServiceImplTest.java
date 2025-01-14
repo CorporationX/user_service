@@ -45,7 +45,7 @@ public class EventServiceImplTest {
     @Mock
     private EventDescriptionFilter eventDescriptionFilter;
 
-    @Spy
+    @Mock
     private EventMapper eventMapper;
 
     @Captor

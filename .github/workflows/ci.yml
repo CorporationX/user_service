@@ -3,10 +3,10 @@ name: Build
 on:
   pull_request:
     branches:
-      - 'kraken-master-stream8'
+      - 'feature/pipline-BC-BJS2-54075'
   push:
     branches:
-      - 'kraken-master-stream8'
+      - 'feature/pipline-BC-BJS2-54075'
 
 jobs:
   build:

@@ -17,6 +17,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.user.UserCsvDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -167,14 +168,14 @@ class UserServiceTest {
     public void createPersonsAsyncWhenEmailExists() {
         PersonSchemaForUser personOne = new PersonSchemaForUser();
         personOne.setEmail("john.doe@example.com");
-        UserDto result = UserDto.builder()
+        UserCsvDto result = UserCsvDto.builder()
                 .email(personOne.getEmail())
                 .aboutMe("Already exists")
                 .build();
         when(userRepository.existsByEmail(personOne.getEmail())).thenReturn(true);
-        List<CompletableFuture<UserDto>> futures = userService.createPersonsAsync(List.of(personOne));
-        for (CompletableFuture<UserDto> future : futures) {
-            UserDto expected = future.join();
+        List<CompletableFuture<UserCsvDto>> futures = userService.createPersonsAsync(List.of(personOne));
+        for (CompletableFuture<UserCsvDto> future : futures) {
+            UserCsvDto expected = future.join();
             assertEquals(expected, result);
         }
     }
@@ -187,7 +188,7 @@ class UserServiceTest {
         PersonSchemaForUser personTwo = new PersonSchemaForUser();
         personTwo.setEmail("jane.smith@example.com");
         List<PersonSchemaForUser> persons = List.of(personOne, personTwo);
-        List<CompletableFuture<UserDto>> createdUsers = userService.createPersonsAsync(persons);
+        List<CompletableFuture<UserCsvDto>> createdUsers = userService.createPersonsAsync(persons);
         Assertions.assertNotNull(createdUsers);
         Assertions.assertEquals(2, createdUsers.size());
     }
@@ -212,16 +213,16 @@ class UserServiceTest {
     @Test
     @DisplayName("Create User from CSV - Successful Creation")
     void testCreateUserFromCsv_SuccessfulCreation() {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("test@example.com");
-        userDto.setCountry(new Country());
+        UserCsvDto userCsvDto = new UserCsvDto();
+        userCsvDto.setEmail("test@example.com");
+        userCsvDto.setCountry(new Country());
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setParticipatedEvents(new ArrayList<>());
         when(countryService.createCountryIfNotExists(any())).thenReturn(new Country());
-        when(userMapper.toEntity(userDto)).thenReturn(savedUser);
+        when(userMapper.toCsvEntity(userCsvDto)).thenReturn(savedUser);
         when(userRepository.save(any())).thenReturn(savedUser);
-        assertDoesNotThrow(() -> userService.createUserFromCsv(userDto));
+        assertDoesNotThrow(() -> userService.createUserFromCsv(userCsvDto));
         verify(userRepository).save(any());
     }
 
@@ -247,17 +248,17 @@ class UserServiceTest {
     @Test
     @DisplayName("Generate Username from Email")
     void testGenerateUsername_WithEmail() {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("john.doe@example.com");
-        String username = invokeGenerateUsername(userDto);
+        UserCsvDto userCsvDto = new UserCsvDto();
+        userCsvDto.setEmail("john.doe@example.com");
+        String username = invokeGenerateUsername(userCsvDto);
         assertEquals("john.doe", username);
     }
 
     @Test
     @DisplayName("Generate Random Username When No Email")
     void testGenerateUsername_WithoutEmail() {
-        UserDto userDto = new UserDto();
-        String username = invokeGenerateUsername(userDto);
+        UserCsvDto userCsvDto = new UserCsvDto();
+        String username = invokeGenerateUsername(userCsvDto);
         assertTrue(username.startsWith("user_"));
         assertEquals(13, username.length());
     }
@@ -289,11 +290,11 @@ class UserServiceTest {
         assertFalse(result);
     }
 
-    private String invokeGenerateUsername(UserDto userDto) {
+    private String invokeGenerateUsername(UserCsvDto userCsvDto) {
         try {
-            java.lang.reflect.Method method = UserService.class.getDeclaredMethod("generateUsername", UserDto.class);
+            java.lang.reflect.Method method = UserService.class.getDeclaredMethod("generateUsername", UserCsvDto.class);
             method.setAccessible(true);
-            return (String) method.invoke(userService, userDto);
+            return (String) method.invoke(userService, userCsvDto);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

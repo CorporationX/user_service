@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.event.UserProfileEvent;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.analyticsevent.SearchAppearanceEvent;
+import school.faang.user_service.dto.user.UserCsvDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserResponseCsvDto;
@@ -152,9 +153,9 @@ public class UserService {
         searchAppearanceEventPublisher.publish(event);
     }
 
-    private String generateUsername(UserDto userDto) {
-        if (StringUtils.isNotEmpty(userDto.getEmail())) {
-            return userDto.getEmail().split("@")[0];
+    private String generateUsername(UserCsvDto userCsvDto) {
+        if (StringUtils.isNotEmpty(userCsvDto.getEmail())) {
+            return userCsvDto.getEmail().split("@")[0];
         }
         return "user_" + UUID.randomUUID().toString().substring(0, 8);
     }
@@ -171,7 +172,7 @@ public class UserService {
         } catch (IOException e) {
             throw new ReadFileException("File exception: " + e);
         }
-        List<CompletableFuture<UserDto>> futures = createPersonsAsync(persons);
+        List<CompletableFuture<UserCsvDto>> futures = createPersonsAsync(persons);
         return completeCreatingPersonsAsync(futures).stream()
                 .map(this::convertToUserResponseDto)
                 .toList();
@@ -192,13 +193,13 @@ public class UserService {
         }
     }
 
-    public void createUserFromCsv(UserDto userDto) {
-        log.info("Starting user creation with email: {}", userDto.getEmail());
-        userDto.setUsername(generateUsername(userDto));
-        userDto.setPassword(generateDefaultPassword());
-        userDto.setCountry(countryService.createCountryIfNotExists(userDto.getCountry().getTitle()));
-        log.debug("User after installing default setting: {}", userDto);
-        User user = userMapper.toEntity(userDto);
+    public void createUserFromCsv(UserCsvDto userCsvDto) {
+        log.info("Starting user creation with email: {}", userCsvDto.getEmail());
+        userCsvDto.setUsername(generateUsername(userCsvDto));
+        userCsvDto.setPassword(generateDefaultPassword());
+        userCsvDto.setCountry(countryService.createCountryIfNotExists(userCsvDto.getCountry().getTitle()));
+        log.debug("User after installing default setting: {}", userCsvDto);
+        User user = userMapper.toCsvEntity(userCsvDto);
         synchronized (userRepository) {
             try {
                 user = userRepository.save(user);
@@ -221,27 +222,27 @@ public class UserService {
         return isValid;
     }
 
-    public List<CompletableFuture<UserDto>> createPersonsAsync(List<PersonSchemaForUser> persons) {
+    public List<CompletableFuture<UserCsvDto>> createPersonsAsync(List<PersonSchemaForUser> persons) {
         return persons.stream()
                 .map(person -> CompletableFuture.supplyAsync(() -> {
                     log.info("Starting processing for user: {}", person.getEmail());
                     try {
                         if (userRepository.existsByEmail(person.getEmail())) {
                             log.warn("User with email {} already exists. Skipping creation.", person.getEmail());
-                            return UserDto.builder()
+                            return UserCsvDto.builder()
                                     .email(person.getEmail())
                                     .aboutMe("Already exists")
                                     .build();
                         }
 
-                        UserDto userDto = userMapper.personToUserDto(person);
-                        userDto.setPassword(ThreadLocalRandom.current().nextInt() + "");
-                        createUserFromCsv(userDto);
-                        log.info("User successfully created: {}", userDto.getUsername());
-                        return userDto;
+                        UserCsvDto userCsvDto = userMapper.personToUserCsvDto(person);
+                        userCsvDto.setPassword(ThreadLocalRandom.current().nextInt() + "");
+                        createUserFromCsv(userCsvDto);
+                        log.info("User successfully created: {}", userCsvDto.getUsername());
+                        return userCsvDto;
                     } catch (Exception e) {
                         log.error("Warning while creating user: {}", e.getMessage(), e);
-                        return UserDto.builder()
+                        return UserCsvDto.builder()
                                 .email(person.getEmail())
                                 .aboutMe("Warning: " + e.getMessage())
                                 .build();
@@ -250,7 +251,7 @@ public class UserService {
                 .toList();
     }
 
-    public List<UserDto> completeCreatingPersonsAsync(List<CompletableFuture<UserDto>> futures) {
+    public List<UserCsvDto> completeCreatingPersonsAsync(List<CompletableFuture<UserCsvDto>> futures) {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenApply(dto -> futures.stream()
                         .map(CompletableFuture::join)
@@ -258,10 +259,10 @@ public class UserService {
                 .join();
     }
 
-    private UserResponseCsvDto convertToUserResponseDto(UserDto userDto) {
+    private UserResponseCsvDto convertToUserResponseDto(UserCsvDto userCsvDto) {
         return UserResponseCsvDto.builder()
-                .email(userDto.getEmail())
-                .response(userDto.getAboutMe())
+                .email(userCsvDto.getEmail())
+                .response(userCsvDto.getAboutMe())
                 .build();
     }
 

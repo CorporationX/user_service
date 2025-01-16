@@ -39,5 +39,5 @@ payment-service:
   host: localhost
   port: 9080
 
-  app:
-  app.number_months_membership: 3
+app:
+  number_months_membership: 3

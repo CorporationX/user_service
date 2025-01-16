@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterParticipantDto {
-    private long userId;
-    private long eventId;
+    private Long userId;
+    private Long eventId;
 }

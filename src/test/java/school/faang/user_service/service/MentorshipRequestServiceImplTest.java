@@ -16,6 +16,7 @@ import school.faang.user_service.dto.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.MentorshipRequestFilter;
 import school.faang.user_service.filter.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipMapper;
@@ -72,7 +73,7 @@ public class MentorshipRequestServiceImplTest {
         when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(false);
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
     }
 
@@ -89,7 +90,7 @@ public class MentorshipRequestServiceImplTest {
         when(userRepository.existsById(mentorshipRequestDto.getReceiverId())).thenReturn(false);
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
     }
 
@@ -106,7 +107,7 @@ public class MentorshipRequestServiceImplTest {
         when(userRepository.existsById(mentorshipRequestDto.getReceiverId())).thenReturn(true);
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
     }
 
@@ -114,7 +115,7 @@ public class MentorshipRequestServiceImplTest {
     public void testCheckLastRequest() {
         MentorshipRequestDto mentorshipRequestDto = prepareDataForLastRequest(LocalDateTime.now().minusDays(4));
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
     }
 
@@ -132,7 +133,7 @@ public class MentorshipRequestServiceImplTest {
     @Test
     public void testAcceptRequestNotExist() {
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.acceptRequest(REQUEST_ID_FAIL));
     }
 
@@ -141,7 +142,7 @@ public class MentorshipRequestServiceImplTest {
         MentorshipRequest mentorshipRequest = prepareDataForRequest(REQUEST_ID, true);
 
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
     }
 
@@ -156,7 +157,7 @@ public class MentorshipRequestServiceImplTest {
     public void testRejectRequestNotExist() {
         MentorshipRejectionDto mentorshipRejectionDto = prepareDataToRejectionDto(REJECT_ID_FAIL, REJECT_REASON);
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> mentorshipRequestService.rejectRequest(mentorshipRejectionDto));
     }
 
@@ -198,7 +199,7 @@ public class MentorshipRequestServiceImplTest {
             user.setId((long) i);
             MentorshipRequest mentorshipRequest = new MentorshipRequest();
             mentorshipRequest.setRequester(user);
-            if (i < 5 ) {
+            if (i < 5) {
                 mentorshipRequest.setStatus(REQUEST_STATUS);
             }
             mentorshipRequestList.add(mentorshipRequest);

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRejectionDto;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.MentorshipRequestService;
 
 import java.util.List;
@@ -35,10 +36,10 @@ public class MentorshipRequestController {
 
     private void checkDataBeforeRejectRequest(MentorshipRejectionDto rejection) {
         if (rejection == null) {
-            throw new IllegalArgumentException("Description is empty.");
+            throw new DataValidationException("Description is empty.");
         }
         if (rejection.getReason() == null || rejection.getReason().isEmpty()) {
-            throw new IllegalArgumentException("The reason of rejection can't be empty.");
+            throw new DataValidationException("The reason of rejection can't be empty.");
         }
     }
 
@@ -49,13 +50,13 @@ public class MentorshipRequestController {
 
     private void checkIsDescriptionIsEmpty(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Description can't be empty.");
+            throw new DataValidationException("Description can't be empty.");
         }
     }
 
     private void checkIsDtoNull(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto == null) {
-            throw new IllegalArgumentException("There is no data.");
+            throw new DataValidationException("There is no data.");
         }
     }
 }

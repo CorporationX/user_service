@@ -9,6 +9,7 @@ import school.faang.user_service.dto.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -82,10 +83,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private void checkDataBeforeRejectRequest(MentorshipRequest mentorshipRequest) {
         if (Objects.equals(mentorshipRequest.getStatus(), ACCEPTED)) {
-            throw new IllegalArgumentException("Accepted request can't be rejected.");
+            throw new DataValidationException("Accepted request can't be rejected.");
         }
         if (Objects.equals(mentorshipRequest.getStatus(), REJECTED)) {
-            throw new IllegalArgumentException("The reject is already rejected.");
+            throw new DataValidationException("The reject is already rejected.");
         }
     }
 
@@ -99,14 +100,14 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private MentorshipRequest getMentorshipRequest(Long id) {
         return mentorshipRequestRepository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("There is no request with id %d.", id)));
+                .orElseThrow(() -> new DataValidationException(String.format("There is no request with id %d.", id)));
     }
 
     private void checkDataBeforeAcceptRequest(MentorshipRequest mentorshipRequest) {
         List<User> mentors = mentorshipRequest.getRequester().getMentors();
         User mentor = mentorshipRequest.getReceiver();
         if (mentors.contains(mentor)) {
-            throw new IllegalArgumentException(String.format("The mentor %s is already helps user %s",
+            throw new DataValidationException(String.format("The mentor %s is already helps user %s",
                     mentor.getUsername(),
                     mentorshipRequest.getRequester().getUsername()));
         }
@@ -120,7 +121,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private void checkIsDifferentUsers(Long requesterId, Long receiverId) {
         if (Objects.equals(requesterId, receiverId)) {
-            throw new IllegalArgumentException("The user can't send request to himself.");
+            throw new DataValidationException("The user can't send request to himself.");
         }
     }
 
@@ -133,7 +134,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         }
         LocalDateTime dateFrom = lastRequest.getCreatedAt().plusMonths(numberMonthsMembership);
         if (dateNow.isBefore(dateFrom)) {
-            throw new IllegalArgumentException("You can send only one request for mentorship in period");
+            throw new DataValidationException("You can send only one request for mentorship in period");
         }
     }
 
@@ -144,7 +145,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private void checkUserInRepository(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException(String.format("No such user in database with id: %d", id));
+            throw new DataValidationException(String.format("No such user in database with id: %d", id));
         }
     }
 

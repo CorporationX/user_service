@@ -12,13 +12,12 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import static school.faang.user_service.service.mentorship.MentorshipRequestServiceTestConstants.EMPTY_MENTORSHIP_REQUEST_FILTER_DTO;
 import static school.faang.user_service.service.mentorship.MentorshipRequestServiceTestConstants.INVALID_MENTORSHIP_REQUEST_DTO;
@@ -43,7 +42,7 @@ class MentorshipRequestServiceTest {
     @Spy
     private List<MentorshipRequestFilter> mentorshipRequestFilters;
     @Spy
-    private MentorshipRequestMapper mentorshipRequestMapper;
+    private MentorshipRequestMapperImpl mentorshipRequestMapper;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -91,9 +90,16 @@ class MentorshipRequestServiceTest {
         Mockito.when(userService.existsById(VALID_USER_ID_2)).thenReturn(true);
 
         Mockito.when(mentorshipRequestRepository.findLatestRequest(VALID_USER_ID_1, VALID_USER_ID_2))
-                .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(VALID_MENTORSHIP_REQUEST));
+
+        Mockito.doNothing().when(mentorshipRequestRepository)
+                .create(VALID_USER_ID_1, VALID_USER_ID_2, VALID_MENTORSHIP_REQUEST_DESCRIPTION);
 
         mentorshipRequestService.requestMentorship(VALID_MENTORSHIP_REQUEST_DTO);
+
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(2))
+                .findLatestRequest(VALID_USER_ID_1, VALID_USER_ID_2);
 
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
                 .create(VALID_USER_ID_1, VALID_USER_ID_2, VALID_MENTORSHIP_REQUEST_DESCRIPTION);
@@ -101,8 +107,7 @@ class MentorshipRequestServiceTest {
 
     @Test
     void getRequests_shouldReturnAllMentorshipRequests() {
-        Mockito.when(StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false).toList())
-                .thenReturn(MENTORSHIP_REQUESTS);
+        Mockito.when(mentorshipRequestRepository.findAll()).thenReturn(MENTORSHIP_REQUESTS);
 
         Mockito.when(mentorshipRequestFilters.iterator()).thenReturn(MENTORSHIP_REQUEST_FILTER_ITERATOR);
 

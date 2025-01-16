@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class MentorshipRequestService {
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestMapper mentorshipRequestMapper;
 
+    @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         Long requesterId = mentorshipRequestDto.getRequesterId();
         Long receiverId = mentorshipRequestDto.getReceiverId();
@@ -60,15 +61,16 @@ public class MentorshipRequestService {
             }
         }
 
-        MentorshipRequest createdMentorshipRequest
-                = mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
+        mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
+
+        MentorshipRequest createdMentorshipRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId)
+                .orElseThrow(() -> new DataValidationException("An error occurred while saving the mentorship request"));
 
         return mentorshipRequestMapper.toDto(createdMentorshipRequest);
     }
 
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filter) {
-        List<MentorshipRequest> mentorshipRequests
-                = StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false).toList();
+        List<MentorshipRequest> mentorshipRequests = mentorshipRequestRepository.findAll();
 
         for (MentorshipRequestFilter mentorshipRequestFilter : mentorshipRequestFilters) {
             if (mentorshipRequestFilter.isApplicable(filter)) {

@@ -16,7 +16,9 @@ public interface UserSkillGuaranteeRepository extends CrudRepository<UserSkillGu
     List<UserSkillGuarantee> findAllByUserId(long userId);
 
     @Modifying
-    @Query("DELETE FROM UserSkillGuarantee g" +
-            " WHERE g.guarantor.id = :guarantorId")
+    @Query(nativeQuery = true, value = """
+            DELETE FROM user_skill_guarantee
+            WHERE guarantor_id = :guarantorId
+    """)
     void deleteAllByGuarantorId(@Param("guarantorId") Long guarantorId);
 }

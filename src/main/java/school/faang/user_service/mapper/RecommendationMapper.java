@@ -30,6 +30,8 @@ public interface RecommendationMapper {
         if (userId == null) {
             return null;
         }
-        return User.builder().id(userId).build();
+        return User.builder()
+                .id(userId)
+                .build();
     }
 }

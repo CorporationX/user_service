@@ -17,6 +17,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class RecommendationService {
         User receiver = recommendation.getReceiver();
         User author = recommendation.getAuthor();
 
-        updateGuaranteesAndSkillOffers(recommendation, receiver, author);
+        updateSkillOffers(recommendation, receiver, author);
         Long id = recommendationRepository.create(
                 author.getId(),
                 receiver.getId(),
@@ -61,7 +62,7 @@ public class RecommendationService {
         User author = recommendation.getAuthor();
 
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-        updateGuaranteesAndSkillOffers(recommendation, receiver, author);
+        updateSkillOffers(recommendation, receiver, author);
         recommendationRepository.update(
                 author.getId(), receiver.getId(), recommendation.getContent());
 
@@ -95,28 +96,19 @@ public class RecommendationService {
                 authorId, Pageable.unpaged()).toList();
     }
 
-    private void updateGuaranteesAndSkillOffers(Recommendation recommendation, User receiver, User author) {
+    private void updateSkillOffers(Recommendation recommendation, User receiver, User author) {
         List<SkillOffer> skillOffersOfReceiver = skillOfferRepository.findAllByUserId(
                 receiver.getId());
-        List<UserSkillGuarantee> guarantees = userSkillGuaranteeRepository.findAllByUserId(
-                receiver.getId());
+        List<UserSkillGuarantee> updateGuarantees = new ArrayList<>();
 
         recommendation.getSkillOffers().forEach(skillOffer -> {
             if (skillOffersOfReceiver.contains(skillOffer)) {
-                boolean isNotGuaranteed = guarantees.stream()
-                        .filter(guarantee ->
-                                guarantee.getGuarantor().getId().equals(author.getId()))
-                        .toList()
-                        .isEmpty();
-
-                if (isNotGuaranteed) {
-                    var userSkillGuarantee = UserSkillGuarantee.builder()
-                            .skill(skillOffer.getSkill())
-                            .user(receiver)
-                            .guarantor(author)
-                            .build();
-                    userSkillGuaranteeRepository.save(userSkillGuarantee);
-                }
+                updateGuarantees.add(UserSkillGuarantee.builder()
+                        .skill(skillOffer.getSkill())
+                        .user(receiver)
+                        .guarantor(author)
+                        .build()
+                );
             } else {
                 skillOfferRepository.create(
                         skillOffer.getSkill().getId(),
@@ -124,6 +116,12 @@ public class RecommendationService {
                 );
             }
         });
+
+        if (!updateGuarantees.isEmpty()) {
+            updateGuarantees.removeAll(
+                    userSkillGuaranteeRepository.findAllByUserId(receiver.getId()));
+            updateGuarantees.forEach(userSkillGuaranteeRepository::save);
+        }
     }
 
     private void validateRecommendation(Recommendation recommendation) {

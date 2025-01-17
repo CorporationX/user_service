@@ -73,7 +73,7 @@ public class PremiumServiceImpl implements PremiumService {
         Random random = new Random();
         try {
             ResponseEntity<String> responseEntity = paymentServiceClient.pay(
-                    new PaymentRequest(random.nextInt(), amount, currency));
+                    new PaymentRequest(random.nextInt(0, 1000000), amount, currency));
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 String response = responseEntity.getBody();
                 ObjectMapper mapper = Utils.createJsonMapper();

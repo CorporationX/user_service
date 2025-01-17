@@ -51,7 +51,7 @@ public class PremiumServiceImpl implements PremiumService {
         }
 
         PaymentResponse paymentResponse = sendPayment(premiumPeriod.getPrice(), Currency.USD);
-        if (!paymentResponse.status().equals(PaymentStatus.SUCCESS)) {
+        if (!paymentResponse.getStatus().equals(PaymentStatus.SUCCESS)) {
             throw new IllegalArgumentException("Оплата не прошла!Повторите попытку!");
         }
         LocalDateTime currentDateTime = LocalDateTime.now();

@@ -1,5 +1,6 @@
 package school.faang.user_service.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -20,5 +21,14 @@ public final class Utils implements Serializable {
                 configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).
                 registerModule(new JavaTimeModule()).
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    public static String objectToJsonString(Object object) {
+        try {
+            return createJsonMapper().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
     }
 }

@@ -36,14 +36,14 @@ public class EventParticipationService {
     }
 
     @Transactional
-    public void registerParticipant(long eventID, long userID) throws DataValidationException {
+    public void registerParticipant(long eventID, long userID) {
         eventValidationExist(eventID);
         userValidationExist(userID);
         eventParticipationRepository.register(eventID, userID);
     }
 
     @Transactional
-    public void unregisterParticipant(long eventID, long userID) throws DataValidationException {
+    public void unregisterParticipant(long eventID, long userID) {
         eventValidationExist(eventID);
         List<User> participationList = eventParticipationRepository.findAllParticipantsByEventId(eventID);
         boolean userWasRegister = participationList.stream().anyMatch(user -> user.getId() == userID);

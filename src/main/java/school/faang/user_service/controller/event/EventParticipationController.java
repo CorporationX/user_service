@@ -13,7 +13,7 @@ import school.faang.user_service.service.event.EventParticipationService;
 public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
-    @PostMapping("")
+    @PostMapping
     public void registerParticipant(RegisterParticipantDto registerParticipantDto) {
         long eventId = registerParticipantDto.getEventId();
         long userId = registerParticipantDto.getUserId();

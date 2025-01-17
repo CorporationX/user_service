@@ -1,6 +1,6 @@
 package school.faang.user_service.service;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,19 +30,22 @@ public class MentorshipServiceTest {
     @InjectMocks
     private MentorshipService mentorshipService;
 
-    private static User mentor;
-    private static User mentee;
-    private static Long mentorId;
+    private User mentor;
+    private User mentee;
+    private Long mentorId;
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         mentorId = 1L;
         mentor = new User();
         mentor.setId(mentorId);
         mentee = new User();
         mentee.setId(2L);
         mentee.setMentors(Collections.singletonList(mentor));
-        mentee.setGoals(Collections.singletonList(new Goal()));
+        Goal goal = new Goal();
+        goal.setMentor(mentor);
+        mentee.setGoals(Collections.singletonList(goal));
+        mentor.setMentees(Collections.singletonList(mentee));
     }
 
     @Test
@@ -62,7 +65,7 @@ public class MentorshipServiceTest {
 
         mentorshipService.stopUserMentorship(mentorId);
 
-        verify(mentorshipRepository).findById(mentorId);
+        verify(mentorshipRepository, times(1)).findById(mentorId);
         verify(userRepository, times(2)).save(any(User.class));
     }
 }

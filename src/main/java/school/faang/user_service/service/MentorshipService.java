@@ -7,16 +7,19 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class MentorshipService {
-    private static MentorshipRepository mentorshipRepository;
-    private static UserRepository userRepository;
+    private final MentorshipRepository mentorshipRepository;
+    private final UserRepository userRepository;
 
     public void stopUserMentorship(Long userId) {
-        if (mentorshipRepository.findById(userId).isPresent()) {
-            mentorshipRepository.findById(userId).get().getMentees().forEach(mentee ->
+        Optional<User> userOptional = mentorshipRepository.findById(userId);
+
+        if (userOptional.isPresent() && userOptional.get().getMentees() != null) {
+            userOptional.get().getMentees().forEach(mentee ->
             {
                 removeMentorFromMentees(mentee);
                 removeMentorFromGoals(mentee, userId);

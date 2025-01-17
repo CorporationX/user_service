@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.entity.User;
 import school.faang.user_service.dto.entity.premium.Premium;
@@ -19,7 +20,7 @@ import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.premium.PremiumService;
 import school.faang.user_service.util.Utils;
@@ -33,16 +34,16 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class PremiumServiceImpl implements PremiumService {
-    private final UserRepository userRepository;
+    private final UserRepositoryAdapter userRepositoryAdapter;
     private final PremiumRepository premiumRepository;
     private final PaymentServiceClient paymentServiceClient;
+    private final PremiumMapper premiumMapper;
     private static final String INTEGRATION_ERR_MSG = "Ошибка взаимодействия с сервисом оплат!";
 
     @Override
     @Transactional
     public PremiumDto buyPremium(long userid, PremiumPeriod premiumPeriod) {
-        User user = userRepository.findById(userid).orElseThrow(() ->
-                new IllegalArgumentException(String.format("Пользователь с id: %s не найден", userid)));
+        User user = userRepositoryAdapter.getUserById(userid);
 
         if (premiumRepository.existsByUserId(userid)) {
             throw new IllegalArgumentException(
@@ -54,13 +55,12 @@ public class PremiumServiceImpl implements PremiumService {
             throw new IllegalArgumentException("Оплата не прошла!Повторите попытку!");
         }
         LocalDateTime currentDateTime = LocalDateTime.now();
-        premiumRepository.save(Premium.builder()
-                .user(user)
-                .startDate(currentDateTime)
-                .endDate(currentDateTime.plusMonths(premiumPeriod.getMonths()))
-                .build());
-
-        return null;
+        return premiumMapper.toDto(
+                premiumRepository.save(Premium.builder()
+                        .user(user)
+                        .startDate(currentDateTime)
+                        .endDate(currentDateTime.plusMonths(premiumPeriod.getMonths()))
+                        .build()));
     }
 
     private PaymentResponse sendPayment(@NotNull BigDecimal amount, @NotNull Currency currency) {

@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Component
 public class RequesterMentorshipRequestFilter implements MentorshipRequestFilter {
@@ -15,10 +15,8 @@ public class RequesterMentorshipRequestFilter implements MentorshipRequestFilter
     }
 
     @Override
-    public List<MentorshipRequest> apply(List<MentorshipRequest> mentorshipRequests, MentorshipRequestFilterDto mentorshipRequestFilterDto) {
-        return mentorshipRequests.stream()
-                .filter(mentorshipRequest
-                        -> Objects.equals(mentorshipRequest.getRequester().getId(), mentorshipRequestFilterDto.getRequesterId()))
-                .toList();
+    public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> mentorshipRequests, MentorshipRequestFilterDto mentorshipRequestFilterDto) {
+        return mentorshipRequests.filter(mentorshipRequest
+                -> Objects.equals(mentorshipRequest.getRequester().getId(), mentorshipRequestFilterDto.getRequesterId()));
     }
 }

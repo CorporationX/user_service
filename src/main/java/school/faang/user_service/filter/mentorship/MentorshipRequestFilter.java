@@ -3,11 +3,11 @@ package school.faang.user_service.filter.mentorship;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface MentorshipRequestFilter {
 
     boolean isApplicable(MentorshipRequestFilterDto mentorshipRequestFilterDto);
 
-    List<MentorshipRequest> apply(List<MentorshipRequest> mentorshipRequests, MentorshipRequestFilterDto mentorshipRequestFilterDto);
+    Stream<MentorshipRequest> apply(Stream<MentorshipRequest> mentorshipRequests, MentorshipRequestFilterDto mentorshipRequestFilterDto);
 }

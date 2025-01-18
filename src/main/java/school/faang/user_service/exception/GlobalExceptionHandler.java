@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
-import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,30 +39,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        log.warn("Validation failed for request: {}", errors);
+        log.warn("Validation failed: {}", errors);
 
-        ApiError apiError = createApiError(HttpStatus.BAD_REQUEST, "Validation failed", errors);
-        return ResponseEntity.badRequest().body(apiError);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex,
-            Object body,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
-
-        if (ex instanceof BindException bindException) {
-            Map<String, String> errors = new HashMap<>();
-            bindException.getBindingResult().getFieldErrors()
-                    .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-
-            ApiError apiError = createApiError((HttpStatus) status, "Binding failed", errors);
-            return ResponseEntity.status(status).headers(headers).body(apiError);
-        }
-
-        return super.handleExceptionInternal(ex, body, headers, status, request);
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Validation failed", errors);
     }
 
     @Override
@@ -71,58 +49,46 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex, @NotNull HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         log.error("Malformed JSON request: {}", ex.getMessage());
-        ApiError apiError = createApiError(HttpStatus.BAD_REQUEST, "Malformed JSON request", null);
-        return ResponseEntity.badRequest().body(apiError);
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Malformed JSON request", null);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolation(ConstraintViolationException ex) {
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getConstraintViolations().forEach(violation -> {
-            String fieldName = violation.getPropertyPath().toString();
-            String errorMessage = violation.getMessage();
-            errors.put(fieldName, errorMessage);
-        });
+        ex.getConstraintViolations().forEach(violation ->
+                errors.put(violation.getPropertyPath().toString(), violation.getMessage())
+        );
 
         log.warn("Constraint violation: {}", errors);
-        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, "Constraint violation", errors));
-    }
-
-    @ExceptionHandler(DataValidationException.class)
-    public ResponseEntity<ApiError> handleDataValidationException(DataValidationException ex) {
-        log.warn("Data validation error: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), null));
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiError> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.error("Entity not found: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createApiError(HttpStatus.NOT_FOUND, ex.getMessage(), null));
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Constraint violation", errors);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
+    public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Access denied: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(createApiError(HttpStatus.FORBIDDEN, "Access is denied", null));
+        return buildResponseEntity(HttpStatus.FORBIDDEN, "Access is denied", null);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("Illegal argument: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, "Invalid argument", null));
+    @ExceptionHandler(DataValidationException.class)
+    public ResponseEntity<Object> handleDataValidationException(DataValidationException ex) {
+        log.warn("Data validation error: {}", ex.getMessage());
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex) {
-        log.error("Unexpected runtime error: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Runtime error occurred", null));
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
+        log.error("Entity not found: {}", ex.getMessage());
+        return buildResponseEntity(HttpStatus.NOT_FOUND, ex.getMessage(), null);
     }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleAllExceptions(Exception ex) {
-        log.error("Unexpected global error: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred", null));
+    public Object handleGlobalException(Exception ex) {
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred", null);
     }
-    private ApiError createApiError(HttpStatus status, String message, Map<String, String> errors) {
-        return new ApiError(status, message, errors, LocalDateTime.now());
+
+    private ResponseEntity<Object> buildResponseEntity(HttpStatus status, String message, Map<String, String> errors) {
+        ApiError apiError = new ApiError(status, message, errors, LocalDateTime.now());
+        return ResponseEntity.status(status).body(apiError);
     }
 }

@@ -1,6 +1,8 @@
 package school.faang.user_service.repository.goal;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -31,13 +33,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     int countActiveGoalsPerUser(long userId);
 
     @Query(nativeQuery = true, value = """
-            WITH RECURSIVE subtasks AS (
-            SELECT * FROM goal WHERE id = :goalId
-            UNION
-            SELECT g.* FROM goal g
-            JOIN subtasks st ON st.id = g.parent_goal_id
-            )
-            SELECT * FROM subtasks WHERE id != :goalId
+            SELECT * FROM goal WHERE parent_goal_id = :goalId
             """)
     Stream<Goal> findByParent(long goalId);
 
@@ -47,4 +43,19 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Transactional
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            INSERT INTO goal_skill (goal_id, skill_id)
+            VALUES (:goalId, :skillId)
+            """)
+    void addSkillToGoalById(Long goalId, Long skillId);
+
+    @Transactional
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            DELETE FROM goal_skill WHERE goal_id = ?1
+            """)
+    void removeSkillsFromGoal(Long goalId);
 }

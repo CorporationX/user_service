@@ -1,8 +1,8 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
-import school.faang.user_service.dto.MentorshipRejectionDto;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipRejectionDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 
 import java.util.List;
 

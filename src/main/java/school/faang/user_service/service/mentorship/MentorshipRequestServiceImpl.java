@@ -1,18 +1,20 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.MentorshipRejectionDto;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipRejectionDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
-import school.faang.user_service.mapper.MentorshipMapper;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.adapter.mentorship.MentorshipRequestRepositoryAdapter;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
@@ -25,8 +27,10 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Value("${app.number_months_membership}")
+    @Setter
     private Integer numberMonthsMembership;
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter;
     private final UserRepository userRepository;
     private final MentorshipMapper mentorshipMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
@@ -69,15 +73,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         return mentorshipRequests.map(mentorshipMapper::toDto).toList();
     }
 
-    public void setNumberMonthsMembership(Integer numberMonthsMembership) {
-        this.numberMonthsMembership = numberMonthsMembership;
-    }
-
     private void acceptRequestMentorship(MentorshipRequest mentorshipRequest) {
         User mentor = mentorshipRequest.getReceiver();
         mentorshipRequest.getRequester().getMentors().add(mentor);
         mentorshipRequest.setStatus(ACCEPTED);
-        mentorshipRequest.setUpdatedAt(LocalDateTime.now());
         mentorshipRequestRepository.save(mentorshipRequest);
     }
 
@@ -93,14 +92,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private void rejectRequestMentorship(MentorshipRequest mentorshipRequest, MentorshipRejectionDto rejection) {
         mentorshipRequest.setStatus(REJECTED);
         mentorshipRequest.setRejectionReason(rejection.getReason());
-        mentorshipRequest.setUpdatedAt(LocalDateTime.now());
         mentorshipRequestRepository.save(mentorshipRequest);
     }
 
     private MentorshipRequest getMentorshipRequest(Long id) {
-        return mentorshipRequestRepository
-                .findById(id)
-                .orElseThrow(() -> new DataValidationException(String.format("There is no request with id %d.", id)));
+        return mentorshipRequestRepositoryAdapter.getMentorshipRequest(id);
     }
 
     private void checkDataBeforeAcceptRequest(MentorshipRequest mentorshipRequest) {

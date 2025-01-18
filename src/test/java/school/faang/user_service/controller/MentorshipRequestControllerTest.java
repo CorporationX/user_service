@@ -7,19 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.MentorshipRejectionDto;
-import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.controller.mentorship.MentorshipRequestController;
+import school.faang.user_service.dto.mentorship.MentorshipRejectionDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.MentorshipRequestService;
-import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
-import java.util.List;
-
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestControllerTest {

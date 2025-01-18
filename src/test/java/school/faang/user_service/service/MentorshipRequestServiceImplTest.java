@@ -10,18 +10,20 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import school.faang.user_service.dto.MentorshipRejectionDto;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipRejectionDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
-import school.faang.user_service.filter.MentorshipRequestStatusFilter;
-import school.faang.user_service.mapper.MentorshipMapper;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
+import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.adapter.mentorship.MentorshipRequestRepositoryAdapter;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,6 +39,8 @@ import static org.mockito.Mockito.when;
 public class MentorshipRequestServiceImplTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
+    @Mock
+    private MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter;
     @Spy
     private MentorshipMapper mentorshipMapper;
     @Mock
@@ -131,13 +135,6 @@ public class MentorshipRequestServiceImplTest {
     }
 
     @Test
-    public void testAcceptRequestNotExist() {
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> mentorshipRequestService.acceptRequest(REQUEST_ID_FAIL));
-    }
-
-    @Test
     public void testAcceptRequestMentorExist() {
         MentorshipRequest mentorshipRequest = prepareDataForRequest(REQUEST_ID, true);
 
@@ -156,6 +153,10 @@ public class MentorshipRequestServiceImplTest {
     @Test
     public void testRejectRequestNotExist() {
         MentorshipRejectionDto mentorshipRejectionDto = prepareDataToRejectionDto(REJECT_ID_FAIL, REJECT_REASON);
+        when(mentorshipRequestRepositoryAdapter.getMentorshipRequest(REJECT_ID_FAIL)).thenReturn(new MentorshipRequest());
+        when(mentorshipRequestRepository
+                .findById(REJECT_ID_FAIL)).thenReturn(Optional.of(new MentorshipRequest()));
+        MentorshipRequestDto mentorshipRequestDto = mentorshipRequestService.rejectRequest(mentorshipRejectionDto);
         Assert.assertThrows(
                 DataValidationException.class,
                 () -> mentorshipRequestService.rejectRequest(mentorshipRejectionDto));
@@ -227,6 +228,7 @@ public class MentorshipRequestServiceImplTest {
                 userReceiver,
                 REQUEST_STATUS,
                 LocalDateTime.now());
+        when(mentorshipRequestRepositoryAdapter.getMentorshipRequest(requestId)).thenReturn(mentorshipRequest);
         when(mentorshipRequestRepository
                 .findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
 

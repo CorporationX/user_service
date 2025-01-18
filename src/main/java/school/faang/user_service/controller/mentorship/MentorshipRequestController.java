@@ -1,37 +1,44 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRejectionDto;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.mentorship.MentorshipRejectionDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@RequestMapping("/mentorship-requests")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    @PostMapping
+    public void requestMentorship(@NotNull @RequestBody MentorshipRequestDto mentorshipRequestDto) {
         checkDataBeforeCreateRequest(mentorshipRequestDto);
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filters) {
+    @PostMapping("/filter")
+    public List<MentorshipRequestDto> getRequests(@RequestBody MentorshipRequestFilterDto filters) {
         return mentorshipRequestService.getRequests(filters);
     }
 
-    public void acceptRequest(Long id) {
-        mentorshipRequestService.acceptRequest(id);
+    @PutMapping("/{id}/accept")
+    public MentorshipRequestDto acceptRequest(@PathVariable Long id) {
+       return mentorshipRequestService.acceptRequest(id);
     }
 
-    public void rejectRequest(MentorshipRejectionDto rejection) {
+    @PutMapping("/{id}/reject")
+    public MentorshipRequestDto rejectRequest(@NotNull @RequestBody MentorshipRejectionDto rejection) {
         checkDataBeforeRejectRequest(rejection);
-        mentorshipRequestService.rejectRequest(rejection);
+       return mentorshipRequestService.rejectRequest(rejection);
     }
 
     private void checkDataBeforeRejectRequest(MentorshipRejectionDto rejection) {

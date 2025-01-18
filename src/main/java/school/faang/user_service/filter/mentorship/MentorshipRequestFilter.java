@@ -1,6 +1,6 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.mentorship;
 
-import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
 import java.util.stream.Stream;

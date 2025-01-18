@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,6 @@ import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.adapter.mentorship.MentorshipRequestRepositoryAdapter;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

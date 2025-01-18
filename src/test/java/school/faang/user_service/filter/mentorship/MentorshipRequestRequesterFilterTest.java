@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.mentorship;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,7 +6,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFilter;
 
 import java.util.ArrayList;
 import java.util.List;

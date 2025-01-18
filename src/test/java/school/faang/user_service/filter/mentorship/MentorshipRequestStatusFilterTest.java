@@ -1,53 +1,45 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.mentorship;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipRequestReceiverFilterTest {
-    private static final Long RECEIVER_ID = 1L;
-    private final MentorshipRequestReceiverFilter mentorshipRequestReceiverFilter =
-            new MentorshipRequestReceiverFilter();
+public class MentorshipRequestStatusFilterTest {
+    private static final RequestStatus REQUEST_STATUS = RequestStatus.PENDING;
+    private final MentorshipRequestStatusFilter mentorshipRequestStatusFilter = new MentorshipRequestStatusFilter();
 
     @Test
     public void testIsNotApplicable() {
-        boolean isApplicable = mentorshipRequestReceiverFilter.isApplicable(new MentorshipRequestFilterDto());
+        boolean isApplicable = mentorshipRequestStatusFilter.isApplicable(new MentorshipRequestFilterDto());
         assertFalse(isApplicable);
     }
 
     @Test
     public void testIsApplicable() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(RECEIVER_ID);
-        boolean isApplicable = mentorshipRequestReceiverFilter.isApplicable(mentorshipRequestFilterDto);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(REQUEST_STATUS);
+        boolean isApplicable = mentorshipRequestStatusFilter.isApplicable(mentorshipRequestFilterDto);
         assertTrue(isApplicable);
     }
 
     @Test
     public void testApply() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(RECEIVER_ID);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(REQUEST_STATUS);
         Stream<MentorshipRequest> requests = prepareStreamOfRequests();
-        List<MentorshipRequest> mentorshipRequests = mentorshipRequestReceiverFilter.apply(requests,
+        List<MentorshipRequest> mentorshipRequests = mentorshipRequestStatusFilter.apply(requests,
                 mentorshipRequestFilterDto).toList();
-        assertEquals(1, mentorshipRequests.size());
-        assertEquals(RECEIVER_ID, Optional.ofNullable(mentorshipRequests
-                        .get(0)
-                        .getReceiver()
-                        .getId())
-                .orElse(null));
+        assertEquals(5, mentorshipRequests.size());
     }
 
     private Stream<MentorshipRequest> prepareStreamOfRequests() {
@@ -62,15 +54,18 @@ public class MentorshipRequestReceiverFilterTest {
             User user = new User();
             user.setId((long) i);
             MentorshipRequest mentorshipRequest = new MentorshipRequest();
-            mentorshipRequest.setReceiver(user);
+            mentorshipRequest.setRequester(user);
+            if (i < 5 ) {
+                mentorshipRequest.setStatus(REQUEST_STATUS);
+            }
             mentorshipRequestList.add(mentorshipRequest);
         }
         return mentorshipRequestList;
     }
 
-    private MentorshipRequestFilterDto prepareDataToDto(Long id) {
+    private MentorshipRequestFilterDto prepareDataToDto(RequestStatus requestStatus) {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
-        mentorshipRequestFilterDto.setReceiverId(id);
+        mentorshipRequestFilterDto.setStatus(requestStatus);
         return mentorshipRequestFilterDto;
     }
 }

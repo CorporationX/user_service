@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.mentorship.MentorshipRequestController;
 import school.faang.user_service.dto.mentorship.MentorshipRejectionDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;

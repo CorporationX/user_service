@@ -1,44 +1,45 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.mentorship;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipRequestStatusFilterTest {
-    private static final RequestStatus REQUEST_STATUS = RequestStatus.PENDING;
-    private final MentorshipRequestStatusFilter mentorshipRequestStatusFilter = new MentorshipRequestStatusFilter();
+public class MentorshipRequestDescriptionFilterTest {
+    private static final String DESCRIPTION = "Hard work";
+    private static final String DESCRIPTION_ANOTHER = "Work";
+    private final MentorshipRequestDescriptionFilter mentorshipRequestDescriptionFilter =
+            new MentorshipRequestDescriptionFilter();
 
     @Test
     public void testIsNotApplicable() {
-        boolean isApplicable = mentorshipRequestStatusFilter.isApplicable(new MentorshipRequestFilterDto());
+        boolean isApplicable = mentorshipRequestDescriptionFilter.isApplicable(new MentorshipRequestFilterDto());
         assertFalse(isApplicable);
     }
 
     @Test
     public void testIsApplicable() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(REQUEST_STATUS);
-        boolean isApplicable = mentorshipRequestStatusFilter.isApplicable(mentorshipRequestFilterDto);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(DESCRIPTION);
+        boolean isApplicable = mentorshipRequestDescriptionFilter.isApplicable(mentorshipRequestFilterDto);
         assertTrue(isApplicable);
     }
 
     @Test
     public void testApply() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(REQUEST_STATUS);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = prepareDataToDto(DESCRIPTION);
         Stream<MentorshipRequest> requests = prepareStreamOfRequests();
-        List<MentorshipRequest> mentorshipRequests = mentorshipRequestStatusFilter.apply(requests,
+        List<MentorshipRequest> mentorshipRequests = mentorshipRequestDescriptionFilter.apply(requests,
                 mentorshipRequestFilterDto).toList();
         assertEquals(5, mentorshipRequests.size());
     }
@@ -56,17 +57,19 @@ public class MentorshipRequestStatusFilterTest {
             user.setId((long) i);
             MentorshipRequest mentorshipRequest = new MentorshipRequest();
             mentorshipRequest.setRequester(user);
-            if (i < 5 ) {
-                mentorshipRequest.setStatus(REQUEST_STATUS);
+            if (i < 5) {
+                mentorshipRequest.setDescription(DESCRIPTION);
+            } else {
+                mentorshipRequest.setDescription(DESCRIPTION_ANOTHER);
             }
             mentorshipRequestList.add(mentorshipRequest);
         }
         return mentorshipRequestList;
     }
 
-    private MentorshipRequestFilterDto prepareDataToDto(RequestStatus requestStatus) {
+    private MentorshipRequestFilterDto prepareDataToDto(String description) {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
-        mentorshipRequestFilterDto.setStatus(requestStatus);
+        mentorshipRequestFilterDto.setDescription(description);
         return mentorshipRequestFilterDto;
     }
 }

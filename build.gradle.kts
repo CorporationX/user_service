@@ -4,6 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
     kotlin("jvm")
+    jacoco
 }
 
 group = "faang.school"
@@ -79,6 +80,51 @@ jsonSchema2Pojo {
     targetDirectory = file("${project.buildDir}/generated-sources/js2p")
     targetPackage = "com.json.student"
     setSourceType("jsonschema")
+}
+
+// JACOCO
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+val includes = arrayOf(
+    "school/faang/user_service/controller/**",
+    "school/faang/user_service/filters/**",
+    "school/faang/user_service/mapper/**",
+    "school/faang/user_service/service/**"
+)
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                include(includes)
+            }
+        })
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.5".toBigDecimal()
+            }
+        }
+    }
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                include(includes)
+            }
+        })
+    )
+}
+
+tasks.named("check") {
+    dependsOn(tasks.named("jacocoTestCoverageVerification"))
 }
 
 tasks.withType<Test> {

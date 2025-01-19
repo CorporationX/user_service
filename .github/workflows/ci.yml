@@ -1,26 +1,29 @@
 name: CI Pipeline
 
 on:
-  pull_request:
+  pull_request: # Указывает, что пайплайн будет запускаться при создании пулл-реквеста.
     branches:
-      - feature/pipline-BC-BJS2-54079
+      - feature/pipline-BC-BJS2-54079  # Пулл-реквесты в эту конкретную ветку будут триггером для запуска пайплайна.
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Выполнение на последней версии ubuntu
 
-    steps:
-      - name: Checkout code
+    steps: # Шаги, которые будут выполнены в рамках задания.
+      - name: Check code style  # Проверка стиля кода
+        run: ./gradlew checkstyle
+
+      - name: Checkout code  # Извлечение кода из репо
         uses: actions/checkout@v2
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v2  # Установка JDK
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: '17'  # Версия JDK
+          distribution: 'temurin'  # Дистрибутив
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build  # Запуск команды сборки через Gradle.
 
       - name: Run tests
-        run: ./gradlew
+        run: ./gradlew test  # Запуск тестов через Gradle.

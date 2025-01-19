@@ -40,7 +40,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         checkDataBeforeCreateRequest(mentorshipRequestDto);
-
         return mentorshipMapper.toDto(createRequestMentorship(mentorshipRequestDto));
     }
 
@@ -49,7 +48,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
         checkDataBeforeAcceptRequest(mentorshipRequest);
         acceptRequestMentorship(mentorshipRequest);
-
         return mentorshipMapper.toDto(mentorshipRequest);
     }
 
@@ -58,7 +56,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         MentorshipRequest mentorshipRequest = getMentorshipRequest(rejection.getId());
         checkDataBeforeRejectRequest(mentorshipRequest);
         rejectRequestMentorship(mentorshipRequest, rejection);
-
         return mentorshipMapper.toDto(mentorshipRequest);
     }
 
@@ -69,7 +66,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         mentorshipRequestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(mentorshipRequests, filters));
-
         return mentorshipRequests.map(mentorshipMapper::toDto).toList();
     }
 

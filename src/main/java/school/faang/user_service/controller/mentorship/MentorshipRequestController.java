@@ -32,13 +32,13 @@ public class MentorshipRequestController {
 
     @PutMapping("/{id}/accept")
     public MentorshipRequestDto acceptRequest(@PathVariable Long id) {
-       return mentorshipRequestService.acceptRequest(id);
+        return mentorshipRequestService.acceptRequest(id);
     }
 
     @PutMapping("/{id}/reject")
     public MentorshipRequestDto rejectRequest(@NotNull @RequestBody MentorshipRejectionDto rejection) {
         checkDataBeforeRejectRequest(rejection);
-       return mentorshipRequestService.rejectRequest(rejection);
+        return mentorshipRequestService.rejectRequest(rejection);
     }
 
     private void checkDataBeforeRejectRequest(MentorshipRejectionDto rejection) {

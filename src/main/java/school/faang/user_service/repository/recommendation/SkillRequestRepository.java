@@ -3,7 +3,8 @@ package school.faang.user_service.repository.recommendation;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import school.faang.user_service.entity.recommendation.SkillRequest;
+import org.springframework.data.repository.query.Param;
+import school.faang.user_service.dto.entity.recommendation.SkillRequest;
 
 public interface SkillRequestRepository extends CrudRepository<SkillRequest, Long> {
 
@@ -13,4 +14,12 @@ public interface SkillRequestRepository extends CrudRepository<SkillRequest, Lon
             """)
     @Modifying
     SkillRequest create(long requestId, long skillId);
+
+    @Modifying
+    @Query(value = """
+            INSERT INTO skill_request (request_id, skill_id)
+            VALUES (:requestId, :skillId)
+            """, nativeQuery = true)
+    void create(@Param("requestId") Long requestId, @Param("skillId") Long skillId);
+
 }

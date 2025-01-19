@@ -2,7 +2,7 @@ package school.faang.user_service.repository.recommendation;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.dto.entity.recommendation.SkillOffer;
 
 import java.util.List;
 

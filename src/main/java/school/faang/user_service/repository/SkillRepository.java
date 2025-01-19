@@ -46,4 +46,5 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             WHERE gs.goal_id = ?1)
             """)
     List<Skill> findSkillsByGoalId(long goalId);
+
 }

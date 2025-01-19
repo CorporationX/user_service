@@ -16,19 +16,18 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -91,4 +90,20 @@ public class Goal {
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> skillsToAchieve;
+
+    public void addUser(User user) {
+        if (users == null) {
+            users = new ArrayList<>();
+        }
+        users.add(user);
+        user.getGoals().add(this);
+    }
+
+    public void addSkill(Skill skill) {
+        if(skillsToAchieve == null) {
+            skillsToAchieve = new ArrayList<>();
+        }
+        skillsToAchieve.add(skill);
+        skill.getGoals().add(this);
+    }
 }

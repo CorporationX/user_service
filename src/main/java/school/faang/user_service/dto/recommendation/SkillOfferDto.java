@@ -7,7 +7,7 @@ import lombok.Data;
 public class SkillOfferDto {
     Long id;
 
-    @NotNull
+    @NotNull(message = "The skillId cannot be null")
     Long skillId;
 
     Long recommendationId;

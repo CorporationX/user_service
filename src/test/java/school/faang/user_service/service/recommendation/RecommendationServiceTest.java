@@ -13,6 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.messages.ErrorMessageSource;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -47,6 +48,9 @@ public class RecommendationServiceTest {
 
     @Mock
     private SkillRepository skillRepository;
+
+    @Mock
+    private ErrorMessageSource errorMessageSource;
 
     @InjectMocks
     private RecommendationService recommendationService;

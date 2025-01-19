@@ -11,6 +11,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.messages.ErrorMessageSource;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -19,16 +20,18 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillRepository skillRepository;
-    private final int numberOfMonthAfterCreatedRecommendation = 6;
+    private final ErrorMessageSource errorMessageSource;
+    private final int monthsAllowedAfterRecommendationCreation = 6;
 
     @Transactional
     public Recommendation create(Recommendation recommendation) {
@@ -52,9 +55,8 @@ public class RecommendationService {
         validateRecommendation(recommendation);
         recommendationRepository.findById(recommendation.getId())
                 .orElseThrow(() -> {
-                    var message = String.format("Recommendation with this id "
-                            + "are not relevant: %s", recommendation.getId());
-                    log.error(message);
+                    var message = errorMessageSource.getMessage(
+                            "error.recommendation.not.found", recommendation.getId());
                     return new DataValidationException(message);
                 });
 
@@ -74,9 +76,8 @@ public class RecommendationService {
     public void delete(long id) {
         Recommendation recommendationToDelete = recommendationRepository.findById(id)
                 .orElseThrow(() -> {
-                    var message = String.format("The recommendation with this id "
-                            + "was not found: %s", id);
-                    log.error(message);
+                    var message = errorMessageSource.getMessage(
+                            "error.recommendation.not.found", id);
                     return new DataValidationException(message);
                 });
 
@@ -125,26 +126,22 @@ public class RecommendationService {
     }
 
     private void validateRecommendation(Recommendation recommendation) {
-        if (recommendation.getContent() == null || recommendation.getContent().isBlank()) {
-            var message = "The recommendation should have a content";
-            log.error(message);
-            throw new DataValidationException(message);
-        }
+        Optional<Recommendation> pastRecommendation = recommendationRepository
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendation.getId(), recommendation.getReceiver().getId());
 
-        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-                        recommendation.getId(), recommendation.getReceiver().getId())
-                .ifPresent(pastRecommendation -> {
-                    boolean isLaterThanPeriod = pastRecommendation.getCreatedAt()
-                            .plusMonths(numberOfMonthAfterCreatedRecommendation)
-                            .isAfter(LocalDateTime.now());
-                    if (!isLaterThanPeriod) {
-                        var message = String.format("The period for issuing "
-                                        + "recommendations should be %s months",
-                                numberOfMonthAfterCreatedRecommendation);
-                        log.error(message);
-                        throw new DataValidationException(message);
-                    }
-                });
+        pastRecommendation.ifPresent(rec -> {
+            LocalDateTime expirationDate = rec.getCreatedAt()
+                    .plusMonths(monthsAllowedAfterRecommendationCreation);
+            boolean isWithinAllowedPeriod = expirationDate.isAfter(LocalDateTime.now());
+
+            if (!isWithinAllowedPeriod) {
+                var message = errorMessageSource.getMessage(
+                        "error.recommendation.period",
+                        monthsAllowedAfterRecommendationCreation);
+                throw new DataValidationException(message);
+            }
+        });
 
         List<Skill> allSkills = skillRepository.findAll()
                 .stream()
@@ -152,9 +149,8 @@ public class RecommendationService {
 
         recommendation.getSkillOffers().forEach(skillOffer -> {
             if (!allSkills.contains(skillOffer.getSkill())) {
-                var message = String.format("There is no Skill with"
-                        + "this id in the DB: %s", skillOffer.getId());
-                log.error(message);
+                var message = errorMessageSource.getMessage(
+                        "error.skill.not.found", skillOffer.getSkill().getId());
                 throw new DataValidationException(message);
             }
         });

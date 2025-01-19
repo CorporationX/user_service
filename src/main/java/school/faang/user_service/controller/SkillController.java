@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skills.SkillService;
 
 import java.util.List;
 

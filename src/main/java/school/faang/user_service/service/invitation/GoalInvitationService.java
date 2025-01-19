@@ -13,12 +13,14 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.specifications.GaolInvitationSpecification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,17 +63,15 @@ public class GoalInvitationService {
                 .filter(g -> g.getStatus() == GoalStatus.ACTIVE)
                 .count();
         if (userActiveGoals >= activeGoals) {
-            throw new RuntimeException("already have " + activeGoals + " active goals");
+            throw new BadRequestException("already have " + activeGoals + " active goals");
         }
         invited.getGoals().forEach(g -> {
             if (g.getId().equals(goal.getId())) {
-                throw new RuntimeException("already have this goal");
+                throw new BadRequestException("already have this goal");
             }
         });
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
-        invited.getGoals().add(goal);
-        goal.getUsers().add(invited);
-
+        goal.addUser(invited);
     }
 
     @Transactional
@@ -82,23 +82,28 @@ public class GoalInvitationService {
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
-        Specification<GoalInvitation> spec = Specification.where(null);
+        List<Specification<GoalInvitation>> specs = new ArrayList<>();
+
         if (filter.getInvitedId() != null) {
-            spec = spec.and(GaolInvitationSpecification.getInvitedId(filter.getInvitedId()));
+            specs.add(GaolInvitationSpecification.getInvitedId(filter.getInvitedId()));
         }
         if (filter.getInviterId() != null) {
-            spec = spec.and(GaolInvitationSpecification.getInviterId(filter.getInviterId()));
+            specs.add(GaolInvitationSpecification.getInviterId(filter.getInviterId()));
         }
         if (filter.getInvitedNamePattern() != null) {
-            spec = spec.and(GaolInvitationSpecification.invitedNamePattern(filter.getInvitedNamePattern()));
+            specs.add(GaolInvitationSpecification.invitedNamePattern(filter.getInvitedNamePattern()));
         }
         if (filter.getInviterNamePattern() != null) {
-            spec = spec.and(GaolInvitationSpecification.inviterNamePattern(filter.getInviterNamePattern()));
+            specs.add(GaolInvitationSpecification.inviterNamePattern(filter.getInviterNamePattern()));
+        }
+        if (filter.getStatus() != null) {
+            specs.add(GaolInvitationSpecification.getByStatus(filter.getStatus()));
         }
 
-        if (filter.getStatus() != null) {
-            spec = spec.and(GaolInvitationSpecification.getByStatus(filter.getStatus()));
-        }
+        Specification<GoalInvitation> spec = specs.stream()
+                .reduce(Specification::and)
+                .orElse(null);
+
         List<GoalInvitation> goalInvitations = goalInvitationRepository.findAll(spec);
         return goalInvitationMapper.toDtoList(goalInvitations);
     }

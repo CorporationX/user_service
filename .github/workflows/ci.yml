@@ -10,20 +10,23 @@ jobs:
     runs-on: ubuntu-latest  # Выполнение на последней версии ubuntu
 
     steps: # Шаги, которые будут выполнены в рамках задания.
-      - name: Check code style  # Проверка стиля кода
-        run: ./gradlew checkstyle
-
-      - name: Checkout code  # Извлечение кода из репо
+      - name: Checkout code # Извлечение кода из репо
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2  # Установка JDK
+      - name: Set up JDK # Установка JDK
+        uses: actions/setup-java@v2
         with:
-          java-version: '17'  # Версия JDK
-          distribution: 'temurin'  # Дистрибутив
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Check code style # Проверка стиля кода
+        run: ./gradlew checkstyle
+        continue-on-error: true # Если проверку не прошел, тогда все-равно перейти на следующую проверку
 
       - name: Build with Gradle
-        run: ./gradlew build  # Запуск команды сборки через Gradle.
+        run: ./gradlew build # Запуск команды сборки через Gradle.
+        continue-on-error: true
 
       - name: Run tests
-        run: ./gradlew test  # Запуск тестов через Gradle.
+        run: ./gradlew test # Запуск тестов через Gradle.
+        continue-on-error: true

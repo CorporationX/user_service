@@ -21,12 +21,9 @@ jobs:
 
       - name: Check code style # Проверка стиля кода
         run: ./gradlew checkstyle
-        continue-on-error: true # Если проверку не прошел, тогда все-равно перейти на следующую проверку
 
       - name: Build with Gradle
         run: ./gradlew build # Запуск команды сборки через Gradle.
-        continue-on-error: true
 
       - name: Run tests
         run: ./gradlew test # Запуск тестов через Gradle.
-        continue-on-error: true

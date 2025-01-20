@@ -42,6 +42,22 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testUserExists() {
+        Long userId = 1L;
+        boolean expectedResult = true;
+
+        when(userRepository.existsById(userId))
+                .thenReturn(expectedResult);
+
+        boolean actualResult = userService.userExists(userId);
+
+        verify(userRepository, times(1))
+                .existsById(eq(userId));
+
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
     public void testGetUserThrowExceptionWhenNotFound() {
         long userId = 1;
         when(userRepository.findById(userId))
@@ -66,21 +82,5 @@ public class UserServiceTest {
 
         assertEquals(expectedUserList, actualUserList);
         verify(userRepository, times(1)).findAllById(ids);
-    }
-
-    @Test
-    public void testUserExists() {
-        Long userId = 1L;
-        boolean expectedResult = true;
-
-        when(userRepository.existsById(userId))
-                .thenReturn(expectedResult);
-
-        boolean actualResult = userService.userExists(userId);
-
-        verify(userRepository, times(1))
-                .existsById(eq(userId));
-
-        assertEquals(expectedResult, actualResult);
     }
 }

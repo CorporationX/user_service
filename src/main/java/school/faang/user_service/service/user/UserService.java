@@ -17,19 +17,15 @@ public class UserService {
     }
 
     public User getUser(long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> {
                     var message = "User with this id not found: " + id;
                     return new IllegalArgumentException(message);
                 });
+        return user;
     }
 
     public List<User> getUsersByIds(List<Long> ids) {
-        List<User> users = userRepository.findAllById(ids);
-        if (users.isEmpty()) {
-            var message = "Users with this ids not found";
-            throw new IllegalArgumentException(message);
-        }
-        return users;
+        return userRepository.findAllById(ids);
     }
 }

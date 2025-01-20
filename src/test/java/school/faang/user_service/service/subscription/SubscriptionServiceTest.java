@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import kotlin.Pair;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.filters.user.UserFilter;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;

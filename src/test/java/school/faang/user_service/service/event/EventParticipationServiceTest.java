@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.event;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.service.event.EventParticipationService;
 
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {

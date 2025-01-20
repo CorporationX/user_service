@@ -1,6 +1,5 @@
-package school.faang.user_service.service.filters.user;
+package school.faang.user_service.filter.user;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;

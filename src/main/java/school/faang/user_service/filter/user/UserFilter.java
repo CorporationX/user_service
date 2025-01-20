@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filters.user;
+package school.faang.user_service.filter.user;
 
 import lombok.NonNull;
 import school.faang.user_service.dto.UserFilterDto;

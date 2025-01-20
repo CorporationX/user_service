@@ -15,7 +15,7 @@ public class EventValidator implements ConstraintValidator<CustomValidation, Eve
 
         if (eventDto.getStartTime().isAfter(eventDto.getEndTime())) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Start time bust be before end")
+            context.buildConstraintViolationWithTemplate("Start time must be before end")
                     .addPropertyNode("startTime")
                     .addConstraintViolation();
             return false;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.SubscriptionUserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.DtoValidator;
 
@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
-    private final UserMapper userMapper;
+    private final SubscriptionUserMapper userMapper;
     private final DtoValidator<SubscriptionUserDto> validator;
 
     @PostMapping("/follow/{followerId}/{followeeId}")

@@ -1,7 +1,7 @@
 package school.faang.user_service.repository.premium;
 
 import org.springframework.data.repository.CrudRepository;
-import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.dto.entity.premium.Premium;
 
 import java.time.LocalDateTime;
 import java.util.List;

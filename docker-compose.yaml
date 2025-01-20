@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  master_postgres:
+    image: postgres:16.1
+    env_file:
+      - local.env
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  master_redis:
+    image: redis/redis-stack:latest
+    ports:
+      - '6379:6379'
+    restart: unless-stopped
+
+#  minio:
+#    image: minio/minio:latest
+#    ports:
+#      - '9000:9000'
+#      - '9001:9001'
+#    volumes:
+#      - ~/minio/data:/data
+#    env_file:
+#      - local.env
+#    command: server --console-address :9001 /data
+#    restart: unless-stopped
+#
+#  createbuckets:
+#    image: minio/mc:latest
+#    depends_on:
+#      - minio
+#    entrypoint: >
+#      /bin/sh -c "
+#      sleep 10;
+#      /usr/bin/mc alias set minio http://minio:9000 user password;
+#      /usr/bin/mc mb minio/corpbucket;
+#      /usr/bin/mc anonymous set public minio/corpbucket;
+#      exit 0;
+#      "
+#    restart: on-failure
+
+volumes:
+  postgres_data:

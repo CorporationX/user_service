@@ -20,6 +20,8 @@ public interface GoalMapper {
     @Mapping(source = "parentId", target = "parent.id")
     Goal toEntity(GoalDto dto);
 
+    List<GoalDto> toDtoList(List<Goal> entities);
+
     @Named("mapSkills")
     default List<Long> mapSkills(List<Skill> skills) {
         if (skills == null) {

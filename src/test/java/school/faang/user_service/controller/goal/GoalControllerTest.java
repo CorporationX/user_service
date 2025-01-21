@@ -100,7 +100,7 @@ class GoalControllerTest {
         GoalDto goalDto = new GoalDto();
         List<GoalDto> goalDtoList = Collections.singletonList(goalDto);
         when(goalService.findSubGoalsByParentId(anyLong(), any(GoalFilterDto.class))).thenReturn(Collections.singletonList(new Goal()));
-        when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDto);
+        when(goalMapper.toDtoList(any(List.class))).thenReturn(goalDtoList);
 
         ResponseEntity<List<GoalDto>> response = goalController.findSubGoalsByParentIdWithFilter(1L, filterDto);
 
@@ -114,7 +114,7 @@ class GoalControllerTest {
         GoalDto goalDto = new GoalDto();
         List<GoalDto> goalDtoList = Collections.singletonList(goalDto);
         when(goalService.findSubGoalsByUserId(anyLong(), any(GoalFilterDto.class))).thenReturn(Collections.singletonList(new Goal()));
-        when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDto);
+        when(goalMapper.toDtoList(any(List.class))).thenReturn(goalDtoList);
 
         ResponseEntity<List<GoalDto>> response = goalController.findGoalsByUserIdWithFilter(1L, filterDto);
 

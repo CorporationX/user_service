@@ -13,6 +13,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -43,6 +44,9 @@ class GoalServiceTest {
     private GoalFilter goalFilter;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private List<GoalFilter> goalFilters;
 
     @InjectMocks
@@ -60,6 +64,7 @@ class GoalServiceTest {
         goal.setId(1L);
         when(goalRepository.create(anyString(), anyString(), anyLong())).thenReturn(goal);
         when(skillService.findSkillById(anyLong())).thenReturn(Optional.of(new Skill()));
+        when(userService.userExists(anyLong())).thenReturn(true);
 
         Goal result = goalService.createGoal(1L, "title", "description", 1L, List.of(1L));
 
@@ -71,7 +76,15 @@ class GoalServiceTest {
     }
 
     @Test
+    void createGoal_ShouldThrowExceptionWhenUserNotFound() {
+        when(userService.userExists(anyLong())).thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () -> goalService.createGoal(1L, "title", "description", 1L, List.of(1L)));
+    }
+
+    @Test
     void createGoal_ShouldThrowExceptionWhenExceedsMaxActiveGoals() {
+        when(userService.userExists(anyLong())).thenReturn(true);
         when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(3);
 
         assertThrows(IllegalStateException.class, () -> goalService.createGoal(1L, "title", "description", 1L, List.of(1L)));
@@ -79,6 +92,7 @@ class GoalServiceTest {
 
     @Test
     void createGoal_ShouldThrowException_NotExistentSkill() {
+        when(userService.userExists(anyLong())).thenReturn(true);
         when(skillService.findSkillById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> goalService.createGoal(1L, "title", "description", 1L, List.of(1L)));
@@ -202,11 +216,19 @@ class GoalServiceTest {
         when(goalFilter.isApplicable(any())).thenReturn(true);
         when(goalFilter.apply(any(GoalFilterDto.class), any(Goal.class))).thenReturn(true);
         when(goalFilters.stream()).thenReturn(Stream.of(goalFilter));
+        when(userService.userExists(anyLong())).thenReturn(true);
 
         List<Goal> result = goalService.findSubGoalsByUserId(1L, new GoalFilterDto());
 
         assertEquals(List.of(goal), result);
         verify(goalRepository, times(1)).findGoalsByUserId(1L);
+    }
+
+    @Test
+    void findSubGoalsByUserId_ShouldThrowExceptionWhenUserNotExist() {
+        when(userService.userExists(anyLong())).thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () -> goalService.findSubGoalsByUserId(1L, new GoalFilterDto()));
     }
 
     @Test
@@ -216,6 +238,7 @@ class GoalServiceTest {
         when(goalFilter.isApplicable(any())).thenReturn(true);
         when(goalFilter.apply(any(GoalFilterDto.class), any(Goal.class))).thenReturn(false);
         when(goalFilters.stream()).thenReturn(Stream.of(goalFilter));
+        when(userService.userExists(anyLong())).thenReturn(true);
 
         List<Goal> result = goalService.findSubGoalsByUserId(1L, new GoalFilterDto());
 
@@ -230,6 +253,7 @@ class GoalServiceTest {
         when(goalFilter.isApplicable(any())).thenReturn(false);
         when(goalFilter.apply(any(GoalFilterDto.class), any(Goal.class))).thenReturn(true);
         when(goalFilters.stream()).thenReturn(Stream.of(goalFilter));
+        when(userService.userExists(anyLong())).thenReturn(true);
 
         List<Goal> result = goalService.findSubGoalsByUserId(1L, new GoalFilterDto());
 

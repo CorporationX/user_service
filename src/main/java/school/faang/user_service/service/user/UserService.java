@@ -12,6 +12,10 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
+    public boolean userExists(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
     public User getUser(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> {

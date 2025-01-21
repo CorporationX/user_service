@@ -12,7 +12,7 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
-@Component
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/mentorship-requests")
 public class MentorshipRequestController {

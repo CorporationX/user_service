@@ -39,10 +39,8 @@ public class GoalInvitationService {
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         validateInvitation(invitation);
         GoalInvitation entity = goalInvitationMapper.toEntity(invitation);
-        User inviter = userRepositoryAdapter.findById(invitation.getInviterId()).orElseThrow(
-                () -> new EntityNotFoundException("inviter not found"));
-        User invited = userRepositoryAdapter.findById(invitation.getInvitedUserId()).orElseThrow(
-                () -> new EntityNotFoundException("invited user not found"));
+        User inviter = userRepositoryAdapter.findById(invitation.getInviterId());
+        User invited = userRepositoryAdapter.findById(invitation.getInvitedUserId());
         entity.setInviter(inviter);
         entity.setInvited(invited);
         Goal goal = goalRepository.findById(invitation.getGoalId()).orElseThrow(

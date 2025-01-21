@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity;
+package school.faang.user_service.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

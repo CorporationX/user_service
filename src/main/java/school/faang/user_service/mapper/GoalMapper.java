@@ -6,8 +6,8 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.response.CreateGoalResponseDto;
 import school.faang.user_service.dto.response.GoalDto;
-import school.faang.user_service.dto.entity.Skill;
-import school.faang.user_service.dto.entity.goal.Goal;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity.recommendation;
+package school.faang.user_service.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,25 +11,28 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.dto.entity.Skill;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "skill_offer")
-public class SkillOffer {
+@Table(name = "user_skill_guarantee")
+public class UserSkillGuarantee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "skill_id", nullable = false)
-    public Skill skill;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "recommendation_id", nullable = false)
-    private Recommendation recommendation;
+    @JoinColumn(name = "skill_id")
+    private Skill skill;
+
+    @ManyToOne
+    @JoinColumn(name = "guarantor_id")
+    private User guarantor;
 }

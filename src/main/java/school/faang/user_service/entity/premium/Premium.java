@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity.premium;
+package school.faang.user_service.entity.premium;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.dto.entity.User;
+import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity.recommendation;
+package school.faang.user_service.entity.recommendation;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,7 +21,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
-import school.faang.user_service.dto.entity.User;
+import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

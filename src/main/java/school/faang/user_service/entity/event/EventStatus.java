@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity.event;
+package school.faang.user_service.entity.event;
 
 public enum EventStatus {
     PLANNED("Planned"),

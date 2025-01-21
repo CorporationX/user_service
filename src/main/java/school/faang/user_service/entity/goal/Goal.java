@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity.goal;
+package school.faang.user_service.entity.goal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,14 +25,12 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.proxy.HibernateProxy;
-import school.faang.user_service.dto.entity.Skill;
-import school.faang.user_service.dto.entity.User;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @NamedEntityGraph(

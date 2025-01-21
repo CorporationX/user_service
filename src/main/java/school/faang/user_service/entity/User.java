@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity;
+package school.faang.user_service.entity;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -23,14 +23,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import school.faang.user_service.dto.entity.contact.Contact;
-import school.faang.user_service.dto.entity.contact.ContactPreference;
-import school.faang.user_service.dto.entity.event.Event;
-import school.faang.user_service.dto.entity.goal.Goal;
-import school.faang.user_service.dto.entity.goal.GoalInvitation;
-import school.faang.user_service.dto.entity.event.Rating;
-import school.faang.user_service.dto.entity.premium.Premium;
-import school.faang.user_service.dto.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.entity.event.Rating;
+import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
 import java.util.List;

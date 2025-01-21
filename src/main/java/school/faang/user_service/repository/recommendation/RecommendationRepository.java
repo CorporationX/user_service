@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import school.faang.user_service.dto.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.util.Optional;
 

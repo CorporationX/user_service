@@ -7,8 +7,8 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.request.RecommendationRequestDto;
 import school.faang.user_service.dto.response.RecommendationRequestResponseDto;
-import school.faang.user_service.dto.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.dto.entity.recommendation.SkillRequest;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.entity.goal;
+package school.faang.user_service.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,8 +17,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import school.faang.user_service.dto.entity.User;
-import school.faang.user_service.dto.entity.RequestStatus;
 
 import java.time.LocalDateTime;
 
@@ -26,28 +24,30 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "goal_invitation")
-public class GoalInvitation {
+@Table(name = "mentorship_request")
+public class MentorshipRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "goal_id", nullable = false)
-    private Goal goal;
+    @Column(name = "description", nullable = false, length = 4096)
+    private String description;
 
     @ManyToOne
-    @JoinColumn(name = "inviter_id", nullable = false)
-    private User inviter;
+    @JoinColumn(name = "requester_id", nullable = false)
+    private User requester;
 
     @ManyToOne
-    @JoinColumn(name = "invited_id", nullable = false)
-    private User invited;
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private RequestStatus status;
+
+    @Column(name = "rejection_reason", length = 4096)
+    private String rejectionReason;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

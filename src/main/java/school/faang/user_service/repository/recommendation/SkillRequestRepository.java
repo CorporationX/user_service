@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import school.faang.user_service.dto.entity.recommendation.SkillRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 
 public interface SkillRequestRepository extends CrudRepository<SkillRequest, Long> {
 

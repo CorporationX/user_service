@@ -1,0 +1,2842 @@
+[33mcommit a0cc3982a3ffd3b7cd36ab1eb6d421c9414d4e24[m[33m ([m[1;31morigin/unicorn-master-stream8-feature-BJS2-52649[m[33m)[m
+Author: Artur Suleymanov <suleymanov.usa@gmail.com>
+Date:   Wed Jan 15 16:04:43 2025 -0800
+
+    Организация события
+    Task: BJS2-52649
+
+[33mcommit 3293efb8f29c6efc0f3f1f3af207d492c95be718[m[33m ([m[1;31morigin/unicorn-master-stream8[m[33m, [m[1;31morigin/hippogriff-master-stream8-BJS2-53997-goal-invitation[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/basilisk8/BJS2-52620-request-recommendation[m[33m, [m[1;31morigin/basilisk-master-stream8[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32municorn-master-stream8[m[33m, [m[1;32mdev[m[33m)[m
+Merge: 72ec419db 6fb127e5f
+Author: Maria Sakhno <69187205+mysosnovskaya@users.noreply.github.com>
+Date:   Thu Dec 26 00:17:24 2024 +0500
+
+    Merge pull request #2188 from CorporationX/clean-up-dev
+    
+    clean up
+
+[33mcommit 6fb127e5f2f8129cc07508890ccbd025c9c267b6[m[33m ([m[1;31morigin/clean-up-dev[m[33m)[m
+Author: Maria Sahno <sahnomyu@m2.ru>
+Date:   Sun Dec 22 01:52:23 2024 +0500
+
+    clean up
+
+[33mcommit 72ec419db41563b48d8a0809155ad999e668f26e[m[33m ([m[1;31morigin/feature/pipeline-test-BC-BJS2-40777[m[33m)[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Tue Oct 29 16:11:28 2024 +0100
+
+    Added user search method by a username
+
+[33mcommit 32c8874aeb9187a4db43c78ba1bb7185477f06c4[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Sat Oct 26 11:45:35 2024 +0200
+
+    Removed student's commit
+
+[33mcommit 479a1c5290d2312148d00ab233e57ce70ba4af5c[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Fri Oct 11 12:20:24 2024 +0200
+
+    Revert "Выполнен пункты 1-4 кроме валидациии запросов"
+    
+    This reverts commit 845c54e6c524a7103e7393d1d60de1f709922aca.
+
+[33mcommit b5e802498823eb7a11c23c4f2778d55810243540[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Fri Oct 11 12:20:24 2024 +0200
+
+    Revert "Сделал проверку на участие пользователя и регистрацию пользователя"
+    
+    This reverts commit 7d7b900c97a20143260c0289ddca58952098ee12.
+
+[33mcommit d0f4e9ef185797c12390d68691da0a055c338e79[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Fri Oct 11 12:20:24 2024 +0200
+
+    Revert "Выполнил все пункты кроме написания тестов."
+    
+    This reverts commit 9893a7c90e440e5045e792f2c6cea24c5aa6f8e8.
+
+[33mcommit 70a2537ccb371cba9af93b71e463ab2d2b3624d9[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Fri Oct 11 12:20:24 2024 +0200
+
+    Revert "Корректировка файлов"
+    
+    This reverts commit 986449b821b91ece1497b974dac7550a30430974.
+
+[33mcommit 72adfe1011980588b211992db3f8c36e7c49ac25[m
+Merge: 1c617c134 986449b82
+Author: Pesspa <81650672+Pesspa@users.noreply.github.com>
+Date:   Tue Sep 17 13:06:51 2024 +0300
+
+    Merge pull request #1539 from CorporationX/BJS2-26629
+    
+    Bjs2 26629
+
+[33mcommit 986449b821b91ece1497b974dac7550a30430974[m
+Author: kukushkin <maxim-kukushkin65@yandex.ru>
+Date:   Tue Sep 17 13:05:16 2024 +0300
+
+    Корректировка файлов
+
+[33mcommit 9893a7c90e440e5045e792f2c6cea24c5aa6f8e8[m
+Author: kukushkin <maxim-kukushkin65@yandex.ru>
+Date:   Mon Sep 16 18:24:23 2024 +0300
+
+    Выполнил все пункты кроме написания тестов.
+
+[33mcommit 1c617c1343577329e03edc1290298cfa29613097[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Fri Sep 13 18:37:49 2024 +0200
+
+    Fixed broken SQL queries
+
+[33mcommit 7d7b900c97a20143260c0289ddca58952098ee12[m
+Author: kukushkin <maxim-kukushkin65@yandex.ru>
+Date:   Fri Sep 13 18:29:19 2024 +0300
+
+    Сделал проверку на участие пользователя и регистрацию пользователя
+
+[33mcommit 845c54e6c524a7103e7393d1d60de1f709922aca[m
+Author: kukushkin <maxim-kukushkin65@yandex.ru>
+Date:   Thu Sep 12 15:20:42 2024 +0300
+
+    Выполнен пункты 1-4 кроме валидациии запросов
+
+[33mcommit 4ec1ed92a659a23607360ddade37cb3688445bee[m
+Author: mighty-mhsl <mihusle@gmail.com>
+Date:   Sat Sep 7 18:12:29 2024 +0200
+
+    Fixed broken SQL queries
+
+[33mcommit c12f29a9014dcfa8b8f8610411b59c2e900c2c8a[m
+Merge: 07d75d925 612fe1304
+Author: pablo023 <117492207+pablo023@users.noreply.github.com>
+Date:   Fri Sep 6 06:14:16 2024 +0200
+
+    Merge pull request #1239 from CorporationX/feature-BJS2-15939
+    
+    BJS2-15939 Подписка на других пользователей
+
+[33mcommit 07d75d925cd5dda3c4121ad1d00f1b99b7843390[m[33m ([m[1;31morigin/feature-BJS2-27588[m[33m)[m
+Author: Irina Vereshchagina <irankamoya@gmail.com>
+Date:   Sun Sep 1 18:51:03 2024 +0200
+
+    cleaned dev
+
+[33mcommit 36fbbb6719ee7920d876e42bf0e94d862d21d002[m
+Merge: fec633e26 3d3736a0e
+Author: pablo023 <117492207+pablo023@users.noreply.github.com>
+Date:   Mon Aug 5 19:11:16 2024 +0200
+
+    Merge pull request #1213 from CorporationX/exception-x-user-id
+    
+    added exception
+
+[33mcommit fec633e26551845ac73dfa808533c36cc2bb91ce[m
+Merge: 37d747528 74fef694c
+Author: mihanchik94 <65723214+mihanchik94@users.noreply.github.com>
+Date:   Wed Jul 17 20:04:20 2024 +0300
+
+    Merge pull request #1243 from CorporationX/mpo-feature-BJS2-7201
+    
+    Mpo feature bjs2 7201
+
+[33mcommit 74fef694c219a8b551475b4eebde720619611750[m[33m ([m[1;31morigin/mpo-feature-BJS2-7201[m[33m)[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Wed Jul 17 20:01:35 2024 +0300
+
+    добавил existsById в контроллер
+
+[33mcommit 612fe130485e109effd82bdcc79e74f0ae82daa8[m[33m ([m[1;31morigin/feature-BJS2-15939[m[33m)[m
+Author: s.kolbasov <s.kolbasov@bftcom.com>
+Date:   Tue Jul 16 21:50:25 2024 +0300
+
+    BJS2-15939 Подписка на других пользователей
+
+[33mcommit 3d3736a0ebf5e8a2d096d981183689df078a3a0f[m[33m ([m[1;31morigin/exception-x-user-id[m[33m)[m
+Author: Irina Vereshchagina <irankamoya@gmail.com>
+Date:   Fri Jul 12 15:30:15 2024 +0200
+
+    added exception
+
+[33mcommit 37d7475282197889fdb16a23357974bce32c5f14[m
+Author: imishustina <mishusitina12@inbox.ru>
+Date:   Thu Jul 11 09:13:35 2024 +0400
+
+    Revert "added exception when you miss x-user-id in the request"
+    
+    This reverts commit 4e342fcc843d22faa89b18abe5ba10ae2ff58d39.
+
+[33mcommit 40fee9fd7e88833cb09e80d944e04804cc351401[m[33m ([m[1;31morigin/vovohka_BJS2-16312[m[33m)[m
+Author: Irina Vereshchagina <irankamoya@gmail.com>
+Date:   Sun Jun 23 11:05:12 2024 +0200
+
+    added modifying annotation
+
+[33mcommit 4e342fcc843d22faa89b18abe5ba10ae2ff58d39[m
+Author: Irina Vereshchagina <irankamoya@gmail.com>
+Date:   Sun Jun 23 10:33:07 2024 +0200
+
+    added exception when you miss x-user-id in the request
+
+[33mcommit 2f8feab9241b79ab0a013d2fc20040210b90aece[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat Jun 15 13:15:48 2024 +0300
+
+    добавил функцию анализа подписок пользователя
+
+[33mcommit 1a8603ac1f8b39618d119fd7fabfdc83a60a253e[m
+Merge: 75774d7e2 0f607e2ab
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Thu Jun 13 11:45:10 2024 +0300
+
+    Merge pull request #1113 from CorporationX/mpo-feature-BJS2-7334
+    
+    добавил функцию получения достижения сенсей
+
+[33mcommit 0f607e2ab13ab3dce8dc8babe2889c84a1f2c815[m[33m ([m[1;31morigin/mpo-feature-BJS2-7334[m[33m)[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Mon Jun 10 15:47:15 2024 +0300
+
+    добавил функцию получения достижения сенсей
+
+[33mcommit 75774d7e270a3d9d813b89f86a9dfa5d6d43dd2b[m
+Merge: f2c9ac59e 00fa1493c
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Sun Jun 9 18:57:40 2024 +0300
+
+    Merge pull request #1096 from CorporationX/mpo-feature-BJS2-6801
+    
+    google calendar + refactoring after rebase
+
+[33mcommit 00fa1493cdb5164f0da7abedf672fc3a7a7e17ca[m[33m ([m[1;31morigin/mpo-feature-BJS2-6801[m[33m)[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat Jun 8 21:59:23 2024 +0300
+
+    refactoring  after rebase
+
+[33mcommit c2889a981bd84a11900049f16dba630f2f3f36fa[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Thu May 30 19:24:29 2024 +0300
+
+    refactoring after rebase
+
+[33mcommit f2c9ac59e2e1977933cdcfeba3760230b1b5b936[m
+Merge: 8365cdfe3 73695e39b
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Sat Jun 8 16:42:48 2024 +0300
+
+    Merge pull request #1103 from CorporationX/mpo-feature-BJS2-6360
+    
+    добавил возможность деактивации пользователя (устранение замечаний + …правка классов после слияния веток)
+
+[33mcommit 73695e39b7ed9cf1121ac4bd5ef19ce9b8790853[m[33m ([m[1;31morigin/mpo-feature-BJS2-6360[m[33m)[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Thu Jun 6 21:47:16 2024 +0300
+
+    добавил возможность деактивации пользователя(устранение замечаний)
+
+[33mcommit f61d19779bc9ecfdf313251ec6ea6ad7ffc40d56[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Wed Jun 5 20:15:18 2024 +0300
+
+    добавил возможность деактивации пользователя (устранение замечаний + правка классов после слияния веток)
+
+[33mcommit 8365cdfe37b08c36878f2656a7868dcbd5a4636c[m
+Merge: 9425b6313 d1a33e4a7
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Fri May 31 21:51:53 2024 +0300
+
+    Merge pull request #1094 from CorporationX/feature-BJS2-6746
+    
+    added global exception handler to user_service
+
+[33mcommit d1a33e4a72131e13935f7c6f05cc33d22dbc9787[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Thu May 30 13:53:15 2024 +0400
+
+    Исправил тесты в классе SubscriptionControllerTest.java
+
+[33mcommit 463f2f3c59bcd820423ac1f9c00de7c13d8afa3c[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Thu May 30 12:43:58 2024 +0400
+
+    added global exception handler to user_service
+
+[33mcommit 9425b6313155e57169ba68bb6918d747107afee4[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Wed May 29 18:20:05 2024 +0400
+
+    Отремонтировал UserDTO
+
+[33mcommit 072c3ef04979f1d477119e61093cc97062d3e036[m
+Merge: 24aea56fa d58e6b14d
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Fri May 24 13:39:09 2024 +0300
+
+    Merge pull request #1060 from CorporationX/mpo-feature-BJS2-6590
+    
+    добавил генератор случайных аватаров юзера
+
+[33mcommit 24aea56fa7b42b4abb743507c17d7f567d04a0bd[m
+Author: Liza Yudelevich <elizaveta.fr@gmail.com>
+Date:   Thu May 23 22:33:51 2024 +0300
+
+    Redo the pull request. Made a new thread.
+
+[33mcommit d58e6b14d06ff602dc0ce407c83fea8df68fb568[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Wed May 15 17:09:39 2024 +0300
+
+    добавил генератор случайных аватаров юзера
+
+[33mcommit 8bb01668b73badf7fb1a2043081a0f457f004d02[m
+Merge: 4875de6f4 8ccde220a
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Wed May 22 11:53:28 2024 +0300
+
+    Merge pull request #1071 from CorporationX/chimera-master-bc4-feature-6434
+    
+    Chimera master bc4 feature 6434
+
+[33mcommit 8ccde220abd623d5d2fb5413ae1505108a8d4e51[m[33m ([m[1;31morigin/chimera-master-bc4-feature-6434[m[33m)[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Mon May 20 19:36:58 2024 +0300
+
+    BJS2-6434
+    Дописал остальные контроллеры в userService
+
+[33mcommit be3075edc38ca630accaf7844c93afe48036074e[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Mon May 20 13:22:10 2024 +0300
+
+    BJS2-6434
+    Дополнил swagger
+
+[33mcommit 633efa6dd020b62c9115a78f04badea82eb8b542[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Fri May 17 20:36:00 2024 +0300
+
+    BJS2-6434
+    - Добавил зависимости в Build_gradle
+    - Добавил аннотации в MentorshipController
+    - Создал в config класс SwaggerConfig для конфигурации Swagger
+
+[33mcommit 4875de6f42a728191d73d22174821875d64f3739[m
+Merge: ed9d8986e b228bf4c0
+Author: rommstein <148458259+rommstein@users.noreply.github.com>
+Date:   Thu May 16 21:50:16 2024 +0300
+
+    Merge pull request #1012 from CorporationX/chimera-master-bc4-feature-6262
+    
+    BJS2-6262
+
+[33mcommit b228bf4c0ed5108898a07fce657ddf924629a621[m[33m ([m[1;31morigin/chimera-master-bc4-feature-6262[m[33m)[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Thu May 16 21:45:48 2024 +0300
+
+    BJS2-6262
+    Исправил недочёты
+
+[33mcommit 0c561948213f01bd2210cd0fb5ce13534097391c[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Thu May 16 20:16:37 2024 +0300
+
+    BJS2-6262
+    Исправил недочёты, но метод в MentorshipService getUserById используется у меня в тестах testGetUserByIdWithException() и в testGetUserByIdAndRightReturnUser(), поэтому сделать его private не могу
+
+[33mcommit d63e19bd177593d1666c6b0a015d709658debe15[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Mon May 13 22:06:40 2024 +0300
+
+    BJS2-6262
+    + DataValidationException
+
+[33mcommit 9ad35d23675afda687a64a1bf60eae3164739045[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Mon May 13 21:53:24 2024 +0300
+
+    BJS2-6262
+    1-Удалил UserService раз он нигде не используется
+    2-из UserMapper убрал INSTANCE и добавил аннотацию @Mapper(componentModel = "spring")
+    3- переписал все методы в MentorshipService
+    4-Убрал MentorshipControllerTest, т.к. сказали что он вообще не нужен
+    5-Переписал все тесты на методы MentorshipService...
+
+[33mcommit 34fd251cae97af2fee2deb4e9f792677b7638424[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Mon May 13 21:09:47 2024 +0300
+
+    BJS2-6262
+    1-Удалил UserService раз он нигде не используется
+    2-из UserMapper убрал INSTANCE и добавил аннотацию @Mapper(componentModel = "spring")
+    3- переписал все методы в MentorshipService
+    4-Убрал MentorshipControllerTest, т.к. сказали что он вообще не нужен
+    5-Переписал все тесты на методы MentorshipService
+
+[33mcommit 99e4a5c713a240b4e43d3cba650b048266f6a7a0[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Sat May 11 19:15:03 2024 +0300
+
+    BJS2-6262
+    Заменил на @ExtendWith(MockitoExtension.class) в MentorshipControllerTest
+
+[33mcommit de6e7427dd117668bfe93828455e83028cd5ba94[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Thu May 9 18:51:31 2024 +0300
+
+    BJS2-6262
+    Снова просматривали мой старый код, до из менений всех которые я внёс
+
+[33mcommit cc52e3e247b2b338b64485326d7a6a6f3bd49d4c[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Wed May 8 21:21:07 2024 +0300
+
+    BJS2-6262
+    Смотрели старую версию кода
+    Я присылал после того как пофиксил те недочёты, на которые мне указал Миша
+
+[33mcommit e75e8174374274a6eb2f623423010f0450b7de8a[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Mon May 6 12:26:56 2024 +0300
+
+    BJS2-6262
+    Исправил методы getMentors() и getMentee() в MentorshipService
+    Перенёс классы в соответсвующие пакеты
+    Исправил аннотации
+    Исправил тесты
+
+[33mcommit fb533cd3382cb56809cbab2d0745cb4d907d126d[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Sun May 5 17:28:12 2024 +0300
+
+    BJS2-6262
+    Добавил дополнительные тесты
+
+[33mcommit a56578953e17e0a898b6a85ffae0e8988a4af153[m
+Author: Roman Antonov <romzesvxo@mail.ru>
+Date:   Sun May 5 10:09:01 2024 +0300
+
+    BJS2-6262
+    Стать ментором
+
+[33mcommit ed9d8986e8ced9a66f93cbcc9c6a165ed14d4f99[m
+Merge: 302ed2e19 673db3aa0
+Author: SoslanDzgoev <106087534+SoslanDzgoev@users.noreply.github.com>
+Date:   Wed May 15 15:56:55 2024 +0400
+
+    Merge pull request #1014 from CorporationX/feature-BJS2-6287
+    
+    Added EventParticipationController and UserMapper
+
+[33mcommit 673db3aa061bc7910d9ef3c48e6d25f977da16b9[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Wed May 15 15:33:03 2024 +0400
+
+    Провел рефакторинг кода после ревью
+
+[33mcommit 6ca08bd4ccbbd37a5b7dbbb14a6811eee17b7c98[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Mon May 13 18:41:36 2024 +0400
+
+    Провел рефакторинг кода после ревью
+
+[33mcommit fa458bb00504a0ef62210f564e9037389cfab86c[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Mon May 13 14:09:13 2024 +0400
+
+    Added EventParticipationController and UserMapper
+    
+    - Implemented EventParticipationController with methods to register and unregister participants, and to get participants list and count
+    - Added UserMapper interface to map between User and UserDTO objects
+    - Сorrected the mistakes.
+
+[33mcommit f48787c384e22cafa5ce74aca00baa1453323943[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Mon May 13 14:04:12 2024 +0400
+
+    Added EventParticipationController and UserMapper
+    
+    - Implemented EventParticipationController with methods to register and unregister participants, and to get participants list and count
+    - Added UserMapper interface to map between User and UserDTO objects
+    - Сorrected the mistakes.
+
+[33mcommit f1fe713973022c1b2b8cd0297a60c9af9c6978bd[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Mon May 13 13:39:37 2024 +0400
+
+    Added EventParticipationController and UserMapper
+    
+    - Implemented EventParticipationController with methods to register and unregister participants, and to get participants list and count
+    - Added UserMapper interface to map between User and UserDTO objects
+
+[33mcommit 302ed2e19d9a23fe5f5b6ace2b68a6b1d2f53f5e[m
+Merge: 34b5a2262 70a83e7f6
+Author: mihanchik94 <65723214+mihanchik94@users.noreply.github.com>
+Date:   Sat May 11 18:24:46 2024 +0300
+
+    Merge pull request #1048 from CorporationX/mpo-feature-pipeline-BC-BJS2-6431
+    
+    добавил CI
+
+[33mcommit 70a83e7f63304afc1cb850c8cf70cf239a1d0ceb[m[33m ([m[1;31morigin/mpo-feature-pipeline-BC-BJS2-6431[m[33m)[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat May 11 15:21:47 2024 +0300
+
+    добавил CI
+
+[33mcommit 34b5a22624ef2815da84e8f5b8920282b901be68[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Wed May 8 22:38:38 2024 +0300
+
+    conflicts solving
+
+[33mcommit 6970d7b6343e902e90e577c4e8d87c994dcb86ea[m
+Merge: ae79adc55 e36847963
+Author: Vlasov Pavel <ivlasov.spb@gmail.com>
+Date:   Wed May 8 12:23:32 2024 +0300
+
+    Merge pull request #1008 from CorporationX/mpo-feature-BJS2-6253
+    
+    Mpo feature bjs2 6253
+
+[33mcommit e368479639aef24d06b4acb3c9e97f402d42b83a[m[33m ([m[1;31morigin/mpo-feature-BJS2-6253[m[33m)[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Tue May 7 17:35:01 2024 +0300
+
+    Провел рефакторинг кода после ревью
+
+[33mcommit 894fb4e0b458be7a9d699270f5b52a20ae5a4f64[m
+Author: SoslanDzgoev <dzgsoslan@gmail.com>
+Date:   Mon May 6 15:21:42 2024 +0400
+
+    Added EventParticipationController and UserMapper
+    
+    - Implemented EventParticipationController with methods to register and unregister participants, and to get participants list and count
+    - Added UserMapper interface to map between User and UserDTO objects
+
+[33mcommit 9969329d09814f6c89857b59cbc445feab5ad2aa[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat May 4 23:06:45 2024 +0300
+
+    вынес тесты для фильтров в отдельные классы, сделал отдельный класс для валидатора и вынес тесты для валидатора в отдельные классы
+
+[33mcommit ae79adc552a4d2fe6679b784ca8d45147064aa37[m
+Merge: fc56485fb d62df9c2e
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sun May 5 15:35:32 2024 +0300
+
+    Merge pull request #992 from CorporationX/mpo-feature-BJS2-6245
+    
+    добавил функции создания, получения скиллов пользователя, получения и…
+
+[33mcommit d62df9c2ef2a67887cceb05af290e4e0f55d7997[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sun May 5 13:57:47 2024 +0300
+
+    исправил замечания после ревью
+
+[33mcommit bb35b5eba97ab7ed231631c1fef3d4662ec5eff4[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat May 4 17:43:06 2024 +0300
+
+    добавил возможность отклонения запроса рекомендации с указанием причины
+
+[33mcommit e0b33b9df71bbbb8e115e9edd211cd19fb752e39[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat May 4 15:50:07 2024 +0300
+
+    добавил возможность получить конкретный запрос на рекомендацию по id
+
+[33mcommit 889548dbfc4c42e6b24ac88a8e10e9886abf32ac[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Sat May 4 15:10:28 2024 +0300
+
+    добавил возможность запрашивать рекомендации с фильтрами
+
+[33mcommit 66b7ef8a0a8fa8846f0cb1b22ee250b1fed80cb4[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Fri May 3 21:35:38 2024 +0300
+
+    добавил возможность запрашивать рекомендации
+
+[33mcommit e18d77e958ea3fd63daa15dc1178fd8743c28e2f[m
+Author: mihanchik94 <mihanchik94@gmail.com>
+Date:   Wed May 1 11:52:09 2024 +0300
+
+    добавил функции создания, получения скиллов пользователя, получения и приобретения предложенных скиллов
+
+[33mcommit fc56485fbfcf5adc09c2233ba904b16c4ae1e19f[m[33m ([m[1;31morigin/kirillgutorov[m[33m, [m[1;31morigin/feature-BJS2-6279[m[33m)[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Mar 9 21:36:26 2024 +0100
+
+    Fixed getting a specific user skill
+
+[33mcommit 5deb19d7caa9309c62bf1c614cd9f0c0615f6b2d[m
+Merge: 67dde6b90 5cbea0e4e
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Mar 9 21:29:17 2024 +0100
+
+    Merge remote-tracking branch 'origin/dev' into dev
+    
+    # Conflicts:
+    #       src/test/java/school/faang/user_service/service/UserServiceTest.java
+
+[33mcommit 67dde6b90a3accbe1ec985656cf74462145999f3[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Mar 9 21:28:59 2024 +0100
+
+    Removed wrongly merged test from another branch
+
+[33mcommit 5cbea0e4eedb9956d79b55b3a72ebe95a52c8452[m
+Author: IrinaVereshchagina13 <135438153+IrinaVereshchagina13@users.noreply.github.com>
+Date:   Fri Mar 8 14:48:10 2024 +0300
+
+    Update GoalRepository.java
+
+[33mcommit e673ea6de63933c55057a50dbb26c43f89641831[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Fri Mar 1 12:24:39 2024 +0300
+
+    deleted repository method
+
+[33mcommit c36f0da266ebf16560806aa20f89e69c0430a26c[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Thu Feb 29 18:47:11 2024 +0300
+
+    refactor
+
+[33mcommit 250e5acbfe21f8644535d19da9490218c598a899[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Feb 4 13:37:00 2024 +0300
+
+    deleted branch after merging
+
+[33mcommit 31551f67c5d0b446428085bdd00b40caa314ad98[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Feb 4 13:34:37 2024 +0300
+
+    Revert "Resolved (31.01.24)"
+    
+    This reverts commit b85e4747
+
+[33mcommit e108fe43259c29e513ddcb7b12a8f7e405bf9a21[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Feb 4 13:34:27 2024 +0300
+
+    Revert "Fixed EventAnnotations"
+    
+    This reverts commit 92091753
+
+[33mcommit df1d92590c0ec238f923d30203f55ea63108a1cd[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Feb 4 13:32:44 2024 +0300
+
+    Revert "Fixed BJS2-1524"
+    
+    This reverts commit de474d32
+
+[33mcommit a4b398e93255716277cbd286ec1af94ad38c4bd1[m
+Merge: 0881e41e6 9d0a47ba9
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Feb 3 20:47:11 2024 +0300
+
+    Merge pull request #799 from CorporationX/feature-BJS2-1435
+    
+    Feature bjs2 1435
+
+[33mcommit 9d0a47ba95113f0ff4bff8e808d3f2c16e05f6c6[m
+Merge: 54184a210 92091753f
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Feb 3 20:45:30 2024 +0300
+
+    Merge branch 'werewolf-master-bc2' into feature-BJS2-1435
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/test/java/school/faang/user_service/service/event/EventServiceTest.java
+
+[33mcommit 54184a210111a6b33c6390a5665aae8003d18218[m
+Merge: dfa113afe de474d32f
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Feb 3 20:41:09 2024 +0300
+
+    Merge pull request #797 from CorporationX/feature-BJS2-1524_phoen1x
+    
+    Feature bjs2 1524 phoen1x
+
+[33mcommit de474d32f1523e5b1fd5b5a4033176fab3418275[m[33m ([m[1;31morigin/feature-BJS2-1524_phoen1x[m[33m)[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Feb 3 20:40:14 2024 +0300
+
+    Fixed BJS2-1524
+
+[33mcommit 2121fd072789216312b5696ef53d04aa709712fc[m
+Merge: c7b322068 dfa113afe
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Feb 3 15:52:35 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1524_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/main/java/school/faang/user_service/validator/event/EventValidator.java
+    #       src/test/java/school/faang/user_service/controller/event/EventControllerTest.java
+    #       src/test/java/school/faang/user_service/service/event/EventServiceTest.java
+
+[33mcommit 92091753f0582f24e93528f9c21ec38dc7dc07d0[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Feb 3 12:01:49 2024 +0300
+
+    Fixed EventAnnotations
+
+[33mcommit e14e66bd01c8200084f97d8baf2e373fada82c7a[m
+Merge: f6feeb3c2 dfa113afe
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Feb 2 22:17:28 2024 +0300
+
+    Merge pull request #796 from CorporationX/feature-BJS2-1435
+    
+    Added tests.
+
+[33mcommit dfa113afe5a337365259263e8ac99ce0ff9e6d52[m
+Merge: b85e4747b 3e9687fec
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Feb 2 22:15:57 2024 +0300
+
+    Merge branch 'werewolf-master-bc2' into feature-BJS2-1435
+
+[33mcommit b85e4747b9986312cfccf95f388b61cefc2ef0e3[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Feb 2 22:14:49 2024 +0300
+
+    Resolved (31.01.24)
+
+[33mcommit 3e9687fecb1dbc1ddd74939645a1aa016ccbed10[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 31 18:10:11 2024 +0300
+
+    Fixed merge conflict
+
+[33mcommit 6a39b9a816ffe40cc560efb4609608cf5478a4b7[m
+Merge: f85cfa5ba 28f7c03e9
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 31 17:57:38 2024 +0300
+
+    Merge branch 'werewolf-master-bc2' into feature-BJS2-1431
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/service/user/UserService.java
+    #       src/test/java/school/faang/user_service/service/UserServiceTest.java
+
+[33mcommit 28f7c03e9ee8eb07950409d934427291d7c5da58[m
+Merge: ac83708b6 6ccf9d38b
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 17:41:51 2024 +0300
+
+    Merge pull request #788 from CorporationX/feature-BJS2-1435
+    
+    Feature bjs2 1435 finished and resolved
+
+[33mcommit 6ccf9d38b937666dc6f70ffacba7222b07dffeca[m
+Merge: 34c453870 ac83708b6
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 17:40:20 2024 +0300
+
+    Merge branch 'werewolf-master-bc2' into feature-BJS2-1435
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/exception/DataValidationException.java
+    #       src/main/java/school/faang/user_service/service/user/UserService.java
+    #       src/test/java/school/faang/user_service/service/user/UserServiceTest.java
+
+[33mcommit 34c4538700d6c3f42c1ce48037e3eb8c1dd1563f[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 17:33:28 2024 +0300
+
+    Fixed.
+
+[33mcommit f85cfa5ba211bc0e006a687236c98b2046e5c4d2[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 31 17:03:55 2024 +0300
+
+    reset
+
+[33mcommit 9e1496c3207f5c7067b9272130b48214ef8c9f0f[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 31 16:47:50 2024 +0300
+
+    Last fixes into feature-BJS2-1431
+
+[33mcommit 66160c0b35e24829588c8a3f66693e4434ad369a[m
+Merge: 7dca9f461 6b04711b6
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 00:48:29 2024 +0300
+
+    Merge pull request #697 from CorporationX/feature-BJS2-1530_phoen1x
+    
+    Feature bjs2 1530 phoen1x
+
+[33mcommit 6b04711b699d85852378df1a39a0889fbba5663f[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 00:47:45 2024 +0300
+
+    Resolved conflicts (31.01.24)
+
+[33mcommit 52f39107d91e8e9219033401ca988f844fe219e5[m
+Merge: fce542ea9 7dca9f461
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 00:41:23 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1530_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/mapper/event/EventMapper.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/main/java/school/faang/user_service/service/user/UserService.java
+    #       src/main/java/school/faang/user_service/validator/event/EventValidator.java
+    #       src/test/java/school/faang/user_service/service/event/EventServiceTest.java
+    #       src/test/java/school/faang/user_service/service/user/UserServiceTest.java
+
+[33mcommit fce542ea923ca93f44c60978f0bafa609a9c5f57[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Wed Jan 31 00:11:53 2024 +0300
+
+    Finished task "UpdateEvent" BJS2-1530
+
+[33mcommit 6e99c6c7f0c5df37f47c481ae25509a81b7de226[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 30 17:59:59 2024 +0300
+
+    Fix method to add Goal in user goalList feature-BJS2-1431
+
+[33mcommit ac83708b68e1766f0c21e832d006052ee6c09360[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Tue Jan 30 01:25:14 2024 +0300
+
+    JaCoCo added with 70% coverage
+
+[33mcommit 5e80354a97f15380bf0b1593abb031579a755ac1[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Tue Jan 30 01:16:27 2024 +0300
+
+    JaCoCo added with 70% coverage
+
+[33mcommit 9bfe065e936704151230d9bec6a318b52d637a4a[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 29 15:06:30 2024 +0300
+
+    Fix by last reveiw feature-BJS2-1431
+
+[33mcommit c7b32206809a8cb089e6b5b5f798673f47c1c446[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sun Jan 28 21:08:18 2024 +0300
+
+    Resolved conflicts. (28.01.24)
+
+[33mcommit 860a4a99c46c591f3c65012696d8146e497ca6db[m
+Merge: fcd04e743 7dca9f461
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sun Jan 28 20:57:51 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1524_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/mapper/event/EventMapper.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/test/java/school/faang/user_service/service/EventServiceTest.java
+    #       src/test/java/school/faang/user_service/service/UserServiceTest.java
+
+[33mcommit 7dca9f4619517c4b959d4e6f2349e823973b1b69[m
+Merge: b331004da 27723ba65
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sun Jan 28 19:32:45 2024 +0300
+
+    Merge pull request #761 from CorporationX/feature-BJS2-1518_phoen1x
+    
+    Feature bjs2 1518 phoen1x
+
+[33mcommit f6feeb3c223069011e6b7d485896c8a4983886b6[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Jan 28 19:00:14 2024 +0300
+
+    fixes after merging
+
+[33mcommit 526171218dc34da6bdd6f745e1bd169c8f62eb10[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Jan 27 19:25:57 2024 +0300
+
+    fixed after review.
+
+[33mcommit 27723ba657d83155c4c26f150d37e1608b8d97c0[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Jan 27 16:42:10 2024 +0300
+
+    Resolved conflicts (27.1.24)
+
+[33mcommit 1a7fdfdcb34bd2464812fd0c5b0b831a2e63d147[m
+Merge: 63e50346e b331004da
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Jan 27 16:14:16 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1518_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/dto/event/EventDto.java
+    #       src/main/java/school/faang/user_service/mapper/event/EventMapper.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/test/java/school/faang/user_service/service/EventServiceTest.java
+
+[33mcommit 63e50346e381b2575be1acd7f055b43e6f0f4cb7[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Sat Jan 27 16:06:15 2024 +0300
+
+    Task 1518 fixed after Inna's review (27.1.24)
+
+[33mcommit b331004da6f3538c1d9beaf5b788ec3851d08cce[m
+Merge: 1738e2a06 e4417059c
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 22:21:26 2024 +0300
+
+    Merge pull request #694 from CorporationX/feature-BJS2-1533_phoen1x
+    
+    Finished task BJS2-1533 and resolved conflicts.
+
+[33mcommit e4417059c1f781a7eee8e7fe62bfcc074478d0e8[m
+Merge: 3edb9aed1 1738e2a06
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 22:19:31 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1533_phoen1x
+
+[33mcommit 3edb9aed14cfef80a6b455b72d04696df66724cc[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 22:14:07 2024 +0300
+
+    Task 1533 resolved (26.1.24)
+
+[33mcommit 9ae8cd354d4eec70d01fed45b9720fe9220e8a7e[m
+Merge: c97a9b9b9 5e862b317
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 22:11:18 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1533_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/mapper/event/EventMapper.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/test/java/school/faang/user_service/service/EventServiceTest.java
+
+[33mcommit 1738e2a06480aeb30763ecad7bc6ca536abeae1d[m
+Merge: 5e862b317 469a603ef
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 22:00:14 2024 +0300
+
+    Merge pull request #692 from CorporationX/feature-BJS2-1536_phoen1x
+    
+    Finished task BJS2-1536 and resolved conflicts.
+
+[33mcommit 469a603ef3b151f9f205e829fec05c7df1c9b230[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 21:56:58 2024 +0300
+
+    resolved (26.1.24)
+
+[33mcommit d9f245ca76f17e9237e5d551dddc62f4746eb9b3[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 21:48:20 2024 +0300
+
+    Fixed "Get events by filter" (25.1.24) after last Inna's review.
+
+[33mcommit 8275b65724083b6fbff3eb7db4a9a4ea83eccc20[m
+Merge: 152965528 5e862b317
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Fri Jan 26 21:11:50 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1536_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/test/java/school/faang/user_service/service/EventServiceTest.java
+
+[33mcommit 87e59d15bd904b5ca9b04260bca62d54bd1f226a[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 19:01:04 2024 +0300
+
+    Fix create method with swagger-ui in feature-BJS2-1431
+
+[33mcommit 56e3539bfe7224f24fbf92d98546641ff0a8b1a8[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 18:18:10 2024 +0300
+
+    Edit  create method feature-BJS2-1431
+
+[33mcommit 595df81d2a05c954a161a3ca775ba6f017107181[m
+Merge: 4610b7290 e5897ed36
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Fri Jan 26 18:14:45 2024 +0300
+
+    Merge pull request #779 from CorporationX/werewolf-bc2-BJS2-1418
+    
+    Werewolf bc2 bjs2 1418
+
+[33mcommit e5897ed365cbf170d80c967f2bd49f6970036406[m
+Merge: f3ce31e6e 4610b7290
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Fri Jan 26 18:14:35 2024 +0300
+
+    Merge branch 'werewolf-master-bc2' into werewolf-bc2-BJS2-1418
+
+[33mcommit 50ebb9e1388cea954da37e823d745f0774a3c6fb[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 18:10:30 2024 +0300
+
+    Playing with create method feature-BJS2-1431
+
+[33mcommit f3ce31e6e75df6c42a55da2097c01a2bcdeb792d[m
+Merge: 262b0c7c3 ae252a584
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Fri Jan 26 18:08:52 2024 +0300
+
+    Merge pull request #710 from CorporationX/werewolf-bc2-BJS2-1512
+    
+    create method to get followee by followerId with filters
+
+[33mcommit ae252a584bfa4b67ee62e4e279f23c2c404cfafa[m
+Merge: e47cdb571 262b0c7c3
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Fri Jan 26 18:08:44 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1512
+
+[33mcommit 62f30236e2b9583667d52caff944ae8757731228[m
+Merge: 697398c08 0e9d93702
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 17:26:00 2024 +0300
+
+    Resolved conflicts from BJS2-1575 into feature-BJS2-1431
+
+[33mcommit 697398c083fe7e3578e37435a014f9a28cc1f818[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 16:18:18 2024 +0300
+
+    Resolved conflicts from BJS2-1572 into feature-BJS2-1431
+
+[33mcommit 90beb0b2067537f3ee539b5231a206a7999a95c9[m
+Merge: 650677a81 364094078
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 15:48:52 2024 +0300
+
+    Merge remote-tracking branch 'origin/BJS2-1572' into feature-BJS2-1431
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/goal/GoalInvitationController.java
+    #       src/main/java/school/faang/user_service/service/goal/GoalInvitationService.java
+    #       src/main/java/school/faang/user_service/service/user/UserService.java
+    #       src/main/java/school/faang/user_service/validator/goal/GoalInvitationValidator.java
+    #       src/test/java/school/faang/user_service/controller/goal/GoalInvitationControllerTest.java
+    #       src/test/java/school/faang/user_service/service/goal/GoalInvitationServiceTest.java
+
+[33mcommit 650677a8132f9d57164658278afae95a33a57f31[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 14:50:39 2024 +0300
+
+    Resolved conflicts by feature-BJS2-1431
+
+[33mcommit 675afaff8ada276a52964e90adac0ab3cc159fa9[m
+Merge: 5c97751e1 cea4c0b90
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 26 14:15:59 2024 +0300
+
+    Merge branch 'BJS2-1569' into feature-BJS2-1431
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/goal/GoalInvitationController.java
+    #       src/main/java/school/faang/user_service/dto/goal/GoalInvitationDto.java
+    #       src/main/java/school/faang/user_service/exception/goal/DataValidationException.java
+    #       src/main/java/school/faang/user_service/exception/goal/EntityNotFoundException.java
+    #       src/main/java/school/faang/user_service/service/goal/GoalInvitationService.java
+    #       src/main/java/school/faang/user_service/service/user/UserService.java
+    #       src/main/java/school/faang/user_service/validator/goal/GoalInvitationValidator.java
+    #       src/test/java/school/faang/user_service/controller/goal/GoalInvitationControllerTest.java
+    #       src/test/java/school/faang/user_service/mapper/goal/GoalInvitationMapperTest.java
+    #       src/test/java/school/faang/user_service/service/UserServiceTest.java
+    #       src/test/java/school/faang/user_service/service/goal/GoalInvitationServiceTest.java
+    #       src/test/java/school/faang/user_service/validator/goal/GoalInvitationValidatorTest.java
+
+[33mcommit 262b0c7c39a8cb8d7ddde6914fda08ed2a3be2c1[m
+Merge: 7bcebfc23 54fde610d
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Fri Jan 26 11:40:14 2024 +0300
+
+    Merge pull request #711 from CorporationX/werewolf-bc2-BJS2-1506
+    
+    Werewolf bc2 bjs2 1506
+
+[33mcommit fcd04e7434d49fd5694884a5e20ed2ec1d55245e[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Thu Jan 25 21:36:43 2024 +0300
+
+    Fixed "Get events by filter" (25.1.24) after last Inna's review.
+
+[33mcommit 3a89ab5ed6ca9a52492b03d3c7df72e75f51d767[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 24 22:28:49 2024 +0300
+
+    Fixed "Update event" (24.1.24) after last Inna's review.
+
+[33mcommit 5c97751e1da9cac5d885c679929827efe536f910[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 24 22:19:33 2024 +0300
+
+    Add @Request Body in createInvitation method by controller BJS2-1431
+
+[33mcommit 0e9d937025a62e9fe10819630fd10a06687349b1[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 24 22:06:42 2024 +0300
+
+    Fix post mapping in controller BJS2-1575
+
+[33mcommit e47cdb5716497fba1390c872e8dece4363264807[m
+Merge: 1e15d6d30 7bcebfc23
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Wed Jan 24 19:57:44 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1512
+
+[33mcommit 54fde610df9eaee5d4041f41b74cc5da5ab5599b[m[33m ([m[1;31morigin/werewolf-bc2-BJS2-1506[m[33m)[m
+Merge: 3c62c009c 7bcebfc23
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Wed Jan 24 19:52:30 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1506
+
+[33mcommit 1e15d6d30ea2dc6608d9d5c72a1a80ce56a8351a[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 24 19:03:35 2024 +0300
+
+    refactor contactFilter and create experienceFilter
+
+[33mcommit 3c62c009c45fcdf47ca4f14ae462f09b95d5cc6a[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 24 18:54:47 2024 +0300
+
+    refactor contactFilter and create experienceFilter
+
+[33mcommit 33f0ae4986fcbecc34b0fcf84010949eeaac9b07[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 24 17:03:07 2024 +0300
+
+    Fix exception handler  after review BJS2-1575
+
+[33mcommit 787f005d5d14452cca5198faae28580848cf0945[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 24 16:53:20 2024 +0300
+
+    Fix after review BJS2-1575
+
+[33mcommit 17732c36a37e071df4c01a054769b5ce97426b76[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 24 16:31:33 2024 +0300
+
+    Fixed after last Inna's review. (23.1.24)
+
+[33mcommit 364094078d42158e449a712deeaa95f573705250[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 24 02:26:05 2024 +0300
+
+    Fix after review BJS2-1572
+
+[33mcommit 2df21f146ecc00a8b0b292633abcc28a9bd3bafd[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Tue Jan 23 19:33:12 2024 +0300
+
+    Fixed after last Inna's review. (23.1.24)
+
+[33mcommit b372677b61e38c013099cf3387cad3b15bf09145[m
+Merge: 972ac8896 9b5405f49
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Tue Jan 23 15:34:30 2024 +0300
+
+    Merge remote-tracking branch 'origin/feature-BJS2-1518_phoen1x' into feature-BJS2-1518_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/dto/event/EventDto.java
+    #       src/main/java/school/faang/user_service/mapper/event/EventMapper.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+
+[33mcommit cea4c0b9021f5147f2d24010201ba2e4dff78170[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 23 15:05:29 2024 +0300
+
+    Fix after review BJS2-1569
+
+[33mcommit 79b28582c953fe5cb391a248ee32a8cba4fdeecd[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 23 14:36:27 2024 +0300
+
+    Add any fixes
+
+[33mcommit 46fec2cc4ecc869654b7abb9259fc03837ac3032[m
+Merge: 638642562 3176da57b
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Tue Jan 23 14:12:34 2024 +0300
+
+    Merge pull request #667 from CorporationX/BJS2-1566
+    
+    Complete task 'Invitation to join the goal' BJS2-1566
+
+[33mcommit 3176da57b302cb10c3293e5240d128964f67d065[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 23 14:08:57 2024 +0300
+
+    Fix after review BJS2-1566
+
+[33mcommit 5e862b3170bd1433c6a938cc23517865a6b72b47[m
+Merge: df39c5a88 471e2375b
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Tue Jan 23 13:44:22 2024 +0300
+
+    Merge pull request #686 from CorporationX/feature-BJS2-1527_phoen1x
+    
+    Finished task BJS2-1527
+
+[33mcommit 471e2375bf8ccf12ce17420b98a61b3d4751882c[m
+Merge: ebb6ebb91 df39c5a88
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue Jan 23 13:43:50 2024 +0300
+
+    Merge branch 'feature-BJS2-1435' into feature-BJS2-1527_phoen1x
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/event/EventController.java
+    #       src/main/java/school/faang/user_service/service/event/EventService.java
+    #       src/test/java/school/faang/user_service/service/EventServiceTest.java
+
+[33mcommit b252fa6910fa4f17032bd399debab3090c92b2d6[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 23 12:48:45 2024 +0300
+
+    Fix mergeBJS2-1566 into BJS2-1569
+
+[33mcommit 25698270a54160911fc36654d0bca585000e797a[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 23 12:38:00 2024 +0300
+
+    Fix after review to task BJS2-1566
+
+[33mcommit 8dcd3cfdd34b5f9289a1879c4962698d591da75f[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 23 09:56:26 2024 +0300
+
+    Fix check filter to task BJS2-1575
+
+[33mcommit 665ef2c6318b1ccfd632753607f0812eddefe5c3[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 22:23:17 2024 +0300
+
+    Fix test filters to task BJS2-1575
+
+[33mcommit 7bcebfc231a5311dbf43a7eb35111847be613890[m
+Merge: 9e353ea13 d3f22d521
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Mon Jan 22 21:59:04 2024 +0300
+
+    Merge pull request #712 from CorporationX/werewolf-bc2-BJS2-1509
+    
+    create method to get followers count by followeeId
+
+[33mcommit d3f22d521ddc66c7a8c42263fb8b199da60742ff[m
+Merge: 84110f01e 9e353ea13
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Mon Jan 22 21:58:55 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1509
+
+[33mcommit 9e353ea13d7badd606277dfc4799ad644f370c48[m
+Merge: 3dd826b87 b5c820859
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Mon Jan 22 21:52:29 2024 +0300
+
+    Merge pull request #709 from CorporationX/werewolf-bc2-BJS2-1515
+    
+    create method to get following count by followerId
+
+[33mcommit b5c820859e5cab117fc948a5cf682165073cd45c[m
+Merge: 0abce8a7d 3dd826b87
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Mon Jan 22 21:52:20 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1515
+
+[33mcommit 12174925d8e7b55969551ce64e5547e1cf43d3e2[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 21:24:24 2024 +0300
+
+    Fix filters to task BJS2-1575
+
+[33mcommit 3dd826b873601e5e9a713f21a2b05a02e361ed3c[m
+Merge: 4a2fb5b88 2229c22d7
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Mon Jan 22 20:45:46 2024 +0300
+
+    Merge pull request #714 from CorporationX/werewolf-bc2-BJS2-1503
+    
+    create Controller and Service with unfollow method
+
+[33mcommit 771f004b59cacc240700f183b1436cdad5df16e5[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 18:10:50 2024 +0300
+
+    Add validator test to task BJS2-1575
+
+[33mcommit 0ee77aaaba32892bde14e6d0495aa3389d4e18ac[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 18:06:32 2024 +0300
+
+    fixes to task BJS2-1575
+
+[33mcommit dbcac56ff1f76d5d074ee65f9d8022ac3de8e9ab[m
+Merge: b00cac61c d60572193
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 17:49:21 2024 +0300
+
+    Merge branch 'BJS2-1572' into BJS2-1575
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/goal/GoalInvitationController.java
+    #       src/main/java/school/faang/user_service/service/goal/GoalInvitationService.java
+    #       src/test/java/school/faang/user_service/controller/goal/GoalInvitationControllerTest.java
+    #       src/test/java/school/faang/user_service/service/goal/GoalInvitationServiceTest.java
+
+[33mcommit d60572193942ef7fe014f5bffd3ffacd6feac40d[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 17:42:51 2024 +0300
+
+    fixes to task BJS2-1572
+
+[33mcommit 152965528cc643c4cc14769393a38df7f7dfb1dc[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Mon Jan 22 17:16:04 2024 +0300
+
+    Fixed after Inna's review.
+
+[33mcommit 358c311e1b0f83449d6a085e2fa737d4cbc5f4f4[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 16:30:18 2024 +0300
+
+    fixes to task BJS2-1569
+
+[33mcommit ebb6ebb91d219f55864a77bedcb6b10c5b727821[m
+Author: Vladislav Menyaylov <vlad.meniailov@yandex.ru>
+Date:   Mon Jan 22 15:22:42 2024 +0300
+
+    Fixed after last Inna's review.
+
+[33mcommit 9b5405f49ded7e8e8935461ad0eb5d08493f09b2[m
+Author: Vladislav Menyaylov <vlad.meniailov@yandex.ru>
+Date:   Mon Jan 22 14:23:56 2024 +0300
+
+    Fixed after Inna's review.
+
+[33mcommit eb2f5ece3f07e1d7b42662fdc1eb4ac0d5ac352d[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 14:05:00 2024 +0300
+
+    Any fixes to task BJS2-1569
+
+[33mcommit b00cac61c8ba42118d354dbab413e2eed6e189fc[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Mon Jan 22 03:02:35 2024 +0300
+
+    Fix duplication from filters task BJS2-1575
+
+[33mcommit 0126fd46935d2d7257118a5b481efba25affaef4[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sun Jan 21 16:27:13 2024 +0300
+
+    Fix any review's comments task BJS2-1575
+
+[33mcommit c9c9930f2d19c6f85fe502577def8eecf3558514[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sun Jan 21 16:25:17 2024 +0300
+
+    Fix any review's comments task BJS2-1566
+
+[33mcommit 01da75d5a0cb716c35b0ee6f1682c990490c6ddf[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 21 16:15:13 2024 +0300
+
+    add implementation for filters, tests, @RestController
+
+[33mcommit 84110f01e6d0c314265a538222b15abeb32d8a38[m
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:43:51 2024 +0300
+
+    Update SubscriptionService.java
+
+[33mcommit c674f6aa7a86d506c9da2f7e111e5342724f05f2[m
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:43:29 2024 +0300
+
+    Update SubscriptionController.java
+
+[33mcommit fc8403a67e4f95e3b759fddc74cfe06c08aa0852[m
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:42:54 2024 +0300
+
+    Update SubscriptionControllerTest.java
+
+[33mcommit 7d772fb9dfaad46ac7e92dadb010ef98c868acff[m
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:42:27 2024 +0300
+
+    Update SubscriptionServiceTest.java
+
+[33mcommit 2020cf6ff86e2d5fc444b287ca55fd03bfb3a724[m
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:42:05 2024 +0300
+
+    Update SubscriptionValidatorTest.java
+
+[33mcommit 0abce8a7d51ce27e5dd65d26dbe35295f4af65a1[m
+Merge: 491ecf8ad 4a2fb5b88
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:40:40 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1515
+
+[33mcommit 75b929adec5a81e6e885c4f8f28dae13e410a813[m
+Merge: e6f728a4e 4a2fb5b88
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 15:29:09 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1509
+
+[33mcommit 2229c22d7f5629a055c6e46e912eaed512c21c03[m
+Merge: ef19dfc03 4a2fb5b88
+Author: Ruslan <70484456+ruslanator@users.noreply.github.com>
+Date:   Sun Jan 21 14:57:37 2024 +0300
+
+    Merge branch 'werewolf-bc2-BJS2-1418' into werewolf-bc2-BJS2-1503
+
+[33mcommit 9f799a7ae7760bc23b162062a96fb72209847efd[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sun Jan 21 14:26:43 2024 +0300
+
+    Fix review's comments task BJS2-1566
+
+[33mcommit ccf46b5f3eec214f2c60faa6fabe68b1648480b2[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sun Jan 21 13:45:09 2024 +0300
+
+    Refactor test: add filters task BJS2-1575
+
+[33mcommit 03ca330925935de1242cb1a34080e33ad8684838[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 21 11:48:38 2024 +0300
+
+    add implementation for filters, tests, @RestController
+
+[33mcommit df39c5a88e52efb84d021d5a6431ea850bbc67c5[m
+Merge: 057058b7d 27e83bb39
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sun Jan 21 11:35:31 2024 +0300
+
+    Merge pull request #691 from CorporationX/feature-BJS2-1521_phoen1x
+    
+    Finished task BJS2-1521
+
+[33mcommit 4610b7290a6fb7734580fa8b0a29ae26b4293ea9[m
+Merge: 057058b7d 55f23ebce
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sun Jan 21 11:14:53 2024 +0300
+
+    Merge pull request #735 from CorporationX/feature-BJS2-1411
+    
+    Стать ментором
+
+[33mcommit 0881e41e643d5ddc4503b8bc6b66b87fff145cc7[m
+Author: fd_shell <dariuskpp@gmail.com>
+Date:   Sun Jan 21 09:08:22 2024 +0300
+
+    remove ci
+
+[33mcommit 8051ff64c1e25f6b47a81759552c67773975d710[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sat Jan 20 21:18:47 2024 +0300
+
+    Refactor test: add with some parametrs in filter task BJS2-1575
+
+[33mcommit 0270215654c4255d0056de66a8cb7deab790d010[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sat Jan 20 21:05:22 2024 +0300
+
+    Refactor test task BJS2-1575
+
+[33mcommit ae6141073f845a178fb982411c84ba9bc4950273[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sat Jan 20 20:41:56 2024 +0300
+
+    Small refactors task BJS2-1575
+
+[33mcommit 5de445ea060db7dd4cd3d51a12fcbaa46b7cf811[m
+Author: Shellkpp <107442192+Shellkpp@users.noreply.github.com>
+Date:   Sat Jan 20 16:39:11 2024 +0300
+
+    Update ci.yml
+
+[33mcommit 291aa2ad10658d671194d6027d6b408e7b399f1b[m
+Author: Shellkpp <107442192+Shellkpp@users.noreply.github.com>
+Date:   Sat Jan 20 16:33:04 2024 +0300
+
+    Update ci.yml
+
+[33mcommit d6a879eb547471bffb49e497a4cf191c2d6b0d43[m
+Author: Shellkpp <107442192+Shellkpp@users.noreply.github.com>
+Date:   Sat Jan 20 16:23:11 2024 +0300
+
+    Update ci.yml
+
+[33mcommit 8e488d797f2b5a76246983e42c568eb0c892f28b[m
+Author: Shellkpp <107442192+Shellkpp@users.noreply.github.com>
+Date:   Sat Jan 20 16:21:21 2024 +0300
+
+    Update ci.yml
+
+[33mcommit e43ec037dab7bdcd85a237fdf52341e48c524d63[m
+Author: Shellkpp <107442192+Shellkpp@users.noreply.github.com>
+Date:   Sat Jan 20 16:14:09 2024 +0300
+
+    Update ci.yml
+
+[33mcommit 9e59a96336b45b7ae472ed61e35e2221dbde1b63[m
+Author: Shellkpp <107442192+Shellkpp@users.noreply.github.com>
+Date:   Sat Jan 20 16:11:56 2024 +0300
+
+    Create ci.yml
+    
+    Create CI pipeline
+
+[33mcommit 972ac8896e056c7b55916f5f6ad779b71d8fc27f[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sat Jan 20 12:16:20 2024 +0300
+
+    First changes.
+
+[33mcommit 0e48d69db587ae58aa5fe2f14a8d4f7c8ea5f935[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 19 23:56:28 2024 +0300
+
+    Add nullable filter then return all goalInvitations task BJS2-1575
+
+[33mcommit f15e6224394bd32f21a026668ad6ef187f79774e[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 19 23:33:46 2024 +0300
+
+    Add test service in task BJS2-1575
+
+[33mcommit eccf153b8e7e8be0d8ad6022211c10dea7b90aee[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 19 20:18:24 2024 +0300
+
+    Add test controller in task BJS2-1575
+
+[33mcommit 55f23ebcea8df281e279a5a45275c914ce422be7[m[33m ([m[1;31morigin/feature-BJS2-1411[m[33m)[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Fri Jan 19 07:34:44 2024 +0300
+
+    added global exception handler
+
+[33mcommit 417fba965db1798d01b40e9ec339812fe6d1addb[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Fri Jan 19 07:16:18 2024 +0300
+
+    added global exception handler
+
+[33mcommit 55aac80c9440b098f27ae74362cd1db06c71e829[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 19 04:38:25 2024 +0300
+
+    Edit one Exception in task BJS2-1575
+
+[33mcommit 3218368bc1ded1356bd42aee8ffafc96d44777d4[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Fri Jan 19 04:33:04 2024 +0300
+
+    Add tests task BJS2-1575
+
+[33mcommit d0c770c5d26115c6ddc661c0cdf6d71451769fa9[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Thu Jan 18 22:40:01 2024 +0300
+
+    Complete task BJS2-1575
+
+[33mcommit adafce1676a1925c62f03ba49f6a7bc8f9a060c2[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Thu Jan 18 20:04:43 2024 +0300
+
+    Mentorship Validator
+    Refactor
+
+[33mcommit 4a2fb5b880baedddfbf525a7d6e9a24eafc84274[m
+Merge: 057058b7d aa54e4e7c
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Thu Jan 18 16:51:04 2024 +0300
+
+    Merge pull request #708 from CorporationX/werewolf-bc2-BJS2-1500
+    
+    Werewolf bc2 bjs2 1500
+
+[33mcommit aefff2284a3b9f6c3aee006d5fb0b3f19ea68fb0[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Thu Jan 18 13:06:41 2024 +0300
+
+    Add some classes to task BJS2-1575
+
+[33mcommit 491ecf8ad3bdda6c76175269695069d35393b469[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Thu Jan 18 00:59:54 2024 +0300
+
+    fix validator test
+
+[33mcommit e6f728a4e75dd002b89513b6ebfebe077e59cbb0[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Thu Jan 18 00:54:31 2024 +0300
+
+    fix validator test
+
+[33mcommit ef19dfc0321ee578851ffe81ac12f54f9c748958[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Thu Jan 18 00:50:18 2024 +0300
+
+    add restcontroller annotation,refactor validator class
+
+[33mcommit aa54e4e7c03a9508455c610cb9634e66dde6a068[m[33m ([m[1;31morigin/werewolf-bc2-BJS2-1500[m[33m)[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Thu Jan 18 00:39:26 2024 +0300
+
+    add restcontroller annotation,refactor validator class
+
+[33mcommit 61c3e09413fec006c1db786e0cbc3bf790d5c680[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 17 23:39:35 2024 +0300
+
+    add filter implementation
+
+[33mcommit c97a9b9b9b926996db55de343affb300efa371de[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 17 23:07:30 2024 +0300
+
+    Fixed "getOwnedEvents" after Inna's review.
+
+[33mcommit 888e8566a0453de65075fe33a76988f3d7e33a1c[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 22:53:59 2024 +0300
+
+    conflicts resolved
+
+[33mcommit 67e98ba26cd085e5338abe634e0cff67d04ede9d[m
+Merge: 4dbea2cb2 25facb783
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 22:45:34 2024 +0300
+
+    Merge branch 'feature-BJS2-1485' into feature-BJS2-1411
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/mentorship/MentorshipController.java
+    #       src/main/java/school/faang/user_service/service/mentorship/MentorshipService.java
+    #       src/test/java/school/faang/user_service/service/mentorship/MentorshipServiceTest.java
+
+[33mcommit 25facb78302268c9d4d46e0d0963acb2f469fe22[m[33m ([m[1;31morigin/feature-BJS2-1485[m[33m)[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 22:42:33 2024 +0300
+
+    conflicts resolved
+
+[33mcommit 1990308a3d79e69efa5250a2bdbf13d0326150e9[m
+Merge: f30f813d7 41ac701fa
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 22:41:34 2024 +0300
+
+    Merge branch 'feature-BJS2-1482' into feature-BJS2-1485
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/mentorship/MentorshipController.java
+    #       src/main/java/school/faang/user_service/service/mentorship/MentorshipService.java
+    #       src/test/java/school/faang/user_service/service/mentorship/MentorshipServiceTest.java
+
+[33mcommit 4dbea2cb2a45ea84b4bc6c913bac1161039782c6[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 22:36:23 2024 +0300
+
+    conflicts resolved
+
+[33mcommit ab2b76b0f85763b1b11876e80c3b76b43e11419e[m
+Merge: 795257251 ae2ccf094
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 22:30:32 2024 +0300
+
+    Merge branch 'feature-BJS2-1479' into feature-BJS2-1411
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/mentorship/MentorshipController.java
+    #       src/main/java/school/faang/user_service/mapper/UserMapper.java
+    #       src/main/java/school/faang/user_service/service/mentorship/MentorshipService.java
+    #       src/test/java/school/faang/user_service/service/mentorship/MentorshipServiceTest.java
+
+[33mcommit 7346e63d8ea3412ca8e6688aa4705643827e3e73[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 17 22:23:13 2024 +0300
+
+    Fixed "getParticipatedEventsByUserId" after Inna's review.
+
+[33mcommit 27e83bb396e1c8701f6ae76b7d2789dc44f99311[m[33m ([m[1;31morigin/feature-BJS2-1521_phoen1x[m[33m)[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 17 21:30:09 2024 +0300
+
+    Fixed "getEvent" after Inna's review.
+
+[33mcommit b43c0fc7f3b9fc70f38a9bdd3c36f53671f286b3[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 17 20:58:35 2024 +0300
+
+    Fixed after Inna's review.
+
+[33mcommit fe9e37196841c41249e0ebbb969f885f829d9c5d[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 17 19:18:27 2024 +0300
+
+    refactor validator with userService and controller with annotations @RestController
+
+[33mcommit c1d960c4904ea86bacc9be3057c16472fb24f0f1[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 17 19:16:06 2024 +0300
+
+    Revert "refactor validator with userService and controller with annotations @RestController"
+    
+    This reverts commit 012de7b85d0d2bfebd42029e62f31a3237d77815.
+
+[33mcommit 012de7b85d0d2bfebd42029e62f31a3237d77815[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 17 19:14:16 2024 +0300
+
+    refactor validator with userService and controller with annotations @RestController
+
+[33mcommit e7e3a6eb69e96a41e3e0c40c7c0b46fb18defede[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 17 18:51:39 2024 +0300
+
+    refactor validator with userService and controller with annotations @RestController
+
+[33mcommit 5feba8b0d17bf1577068a9c1fd199a2bb947e261[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Wed Jan 17 18:46:36 2024 +0300
+
+    refactor validator with userService and controller with annotations @RestController
+
+[33mcommit 3bb39cce42d6ae3156179be30a9417f5430e1c03[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Wed Jan 17 17:43:55 2024 +0300
+
+    Added 1 test to create Event without required skills.
+
+[33mcommit 587470bf4355b0fa3d0153127e914a92e68e2957[m
+Merge: b4cb016b6 f5b76f6c5
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 17:14:19 2024 +0300
+
+    Merge branch 'BJS2-1572' into BJS2-1575
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/goal/GoalInvitationController.java
+
+[33mcommit f5b76f6c525523e627aa531f61f3c0a276558f3a[m
+Merge: baede21c5 6ef988526
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 17:09:49 2024 +0300
+
+    Merge branch 'BJS2-1569' into BJS2-1572
+
+[33mcommit 6ef988526f03b2eb6375485c664753f1facdbbee[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 17:09:09 2024 +0300
+
+    Add fix controller to task BJS2-1569
+
+[33mcommit b4cb016b6b3c842e2c27c81f1ba6702fc6b9cc18[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 17:07:26 2024 +0300
+
+    Add fix to task BJS2-1575
+
+[33mcommit baede21c5a134e3b88ef2f307e8a3b696d3c142f[m
+Merge: 2e163954e da85620c4
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 16:38:55 2024 +0300
+
+    Add fix to task BJS2-1572
+
+[33mcommit da85620c499f51c58b26c14e5a86132700ab4a81[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 16:19:43 2024 +0300
+
+    Add fix to task BJS2-1569
+
+[33mcommit e284c9ddda40df395f302a3fcf80c6e2a415ac0c[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 15:07:02 2024 +0300
+
+    Add test user service to task BJS2-1566
+
+[33mcommit 20ad05c965a3061f4d006625b2e723c6a0a64901[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 15:03:11 2024 +0300
+
+    Add fixes to task BJS2-1569
+
+[33mcommit 8bbfedc94af60fc0cb3a9b03347dbfa1983c1078[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 13:59:17 2024 +0300
+
+    Fix task BJS2-1566
+
+[33mcommit 7952572510644d3c8e6bdfdff98bbf5d7b3b547a[m
+Merge: 057058b7d 1796d17dd
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Wed Jan 17 13:39:29 2024 +0300
+
+    Merge pull request #659 from CorporationX/feature-BJS2-1476
+    
+    init commit. Получить всех менти одного пользователя. With unit tests
+
+[33mcommit f30f813d70fa2f5f00094bce34e4bc1293233756[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 08:18:38 2024 +0300
+
+    updated tests, naming and deleting method
+
+[33mcommit 41ac701fa5cad6e4354fcd7b841c9e44f16f4918[m
+Author: Edisolt5498 <48184500+Edisolt5498@users.noreply.github.com>
+Date:   Wed Jan 17 08:15:03 2024 +0300
+
+    Update MentorshipServiceTest.java
+
+[33mcommit 696681dc39015beda94402f50f06eb17a9f1b8d9[m
+Author: Edisolt5498 <48184500+Edisolt5498@users.noreply.github.com>
+Date:   Wed Jan 17 08:12:17 2024 +0300
+
+    Update MentorshipServiceTest.java
+
+[33mcommit e9a7e6044c87b3447372d4bddd6d1c9f226afc7c[m
+Author: Edisolt5498 <48184500+Edisolt5498@users.noreply.github.com>
+Date:   Wed Jan 17 08:03:18 2024 +0300
+
+    Update MentorshipService.java
+
+[33mcommit ae2ccf0946411e307b42657f1eee9272627cb36d[m
+Merge: 21c53e954 c10e9ecc2
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 07:57:40 2024 +0300
+
+    Merge remote-tracking branch 'origin/feature-BJS2-1479' into feature-BJS2-1479
+    
+    # Conflicts:
+    #       src/test/java/school/faang/user_service/service/mentorship/MentorshipServiceTest.java
+
+[33mcommit 1796d17dd986068104c641c46ae080f10797f0c9[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 07:54:29 2024 +0300
+
+    naming
+
+[33mcommit 21c53e9542b7524026622c1b2dba8eddaab0fd55[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 07:51:56 2024 +0300
+
+    fix
+
+[33mcommit c14dc3ab196c2c9edcabecb2680546f642a5a9e8[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 05:46:17 2024 +0300
+
+    Реализовать возможность ментору удалять менти. Tests upgraded.
+
+[33mcommit 89b8687fad3374dbf505181300fc548a0d7d29eb[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 04:41:26 2024 +0300
+
+    Получить всех ментории одного пользователя. Fixed.
+
+[33mcommit c10e9ecc229d40f6df5ff75faaa1a3c03e58e6c7[m
+Author: Edisolt5498 <48184500+Edisolt5498@users.noreply.github.com>
+Date:   Wed Jan 17 04:39:30 2024 +0300
+
+    Update MentorshipServiceTest.java
+
+[33mcommit 9a6642b51c2ab235e0556be693b77e4237a6e8d7[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 04:32:15 2024 +0300
+
+    Получить всех менторов одного пользователя. Fixed.
+
+[33mcommit 9d15757ca9d7b7776445f3f31df55f9fc2450d50[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 04:31:11 2024 +0300
+
+    Получить всех менти одного пользователя. Fixed.
+
+[33mcommit 92a51830206ee38afdf115940cb3d4ab2e5d4dbe[m
+Author: Edisolt5498 <48184500+Edisolt5498@users.noreply.github.com>
+Date:   Wed Jan 17 04:27:57 2024 +0300
+
+    Update MentorshipServiceTest.java
+
+[33mcommit 1c3b403598326111e6d5000484d717e710971191[m
+Author: Edisolt5498 <48184500+Edisolt5498@users.noreply.github.com>
+Date:   Wed Jan 17 04:13:50 2024 +0300
+
+    Update MentorshipServiceTest.java
+
+[33mcommit d2b3c20961551c7b0c7b6f3adc8c123cc8bdf474[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Wed Jan 17 03:44:03 2024 +0300
+
+    Add some fixes task BJS2-1566
+
+[33mcommit ac9cd7b024e84208e5968a523a907a40b16d53e7[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 03:21:36 2024 +0300
+
+    Получить всех менти одного пользователя. Fixed.
+    naming, one more test and validation in controller
+
+[33mcommit c4b6d7f7fdae9f6bd51052c6943e9a7eacff0a71[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Wed Jan 17 02:38:44 2024 +0300
+
+    Получить всех менти одного пользователя. Fixed.
+
+[33mcommit f0972f1c31a101e2c4278ac91ea06718a944c561[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Tue Jan 16 22:17:29 2024 +0300
+
+    refactor validator
+
+[33mcommit 892b0979a2d9014371eceb2e94e743d5ec2d3433[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 16 20:42:32 2024 +0300
+
+    Cosmetic fixes task BJS2-1569
+
+[33mcommit 2e163954ef0cc856a7727515ff75c3332de2be17[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 16 20:32:29 2024 +0300
+
+    Complete task BJS2-1572
+
+[33mcommit d3a7654260525add46dd80d5b70432747acd5376[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 16 19:40:59 2024 +0300
+
+    editing http method
+
+[33mcommit 9829ffcd9c43fc30a539841ea054feb233ebc883[m
+Author: AlexanderBulgakov <asbulgakov@MBP-Aleksandr.Dlink>
+Date:   Tue Jan 16 19:33:52 2024 +0300
+
+    Create task BJS2-1572
+
+[33mcommit b56fe5b22c319990fe69d00e4edf36015a133d8e[m
+Author: AlexanderBulgakov <asbulgakov@MBP-Aleksandr.Dlink>
+Date:   Tue Jan 16 18:06:38 2024 +0300
+
+    Complete task BJS2-1569
+
+[33mcommit 4ca7cf539b5245a6b27327b1735b1845bdc0e9c0[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Tue Jan 16 07:54:54 2024 +0300
+
+    Получить всех менти одного пользователя. Fixed.
+
+[33mcommit 7d87008a1f0f6c60ce744f001d686095ae398346[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Tue Jan 16 07:49:26 2024 +0300
+
+    Получить всех менти одного пользователя. Fixed.
+
+[33mcommit e9a6b3a13f10dab8a8fc0a3cfe09613c127a328e[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Tue Jan 16 03:30:17 2024 +0300
+
+    Add files to BJS2-1569
+
+[33mcommit cfb6875a96a1906e595059e22ee994e46382f248[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Mon Jan 15 21:48:41 2024 +0300
+
+    Finished BJS2-1524 "Get Events with filters"
+
+[33mcommit ee6071445702d8141a806cec642b4a421b4f2605[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Mon Jan 15 05:39:38 2024 +0300
+
+    Added one more test UserHasNotMentors
+
+[33mcommit 86b4a405016dcbc3b4d40a5aa3037436cf4cb560[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 23:04:11 2024 +0300
+
+    Finished task BJS2-1530
+
+[33mcommit f9b16c51a8499b7dd8c7fb87f4fe3254657e87ae[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 21:01:16 2024 +0300
+
+    Finished task BJS2-1533
+
+[33mcommit 16ef45500951b2cfc0b34f7137096eb9e31b1814[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 20:14:10 2024 +0300
+
+    Finished task BJS2-1533
+
+[33mcommit a39d8d3b66b9e54953ee95ce5c8448e8c4a44ea7[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 16:58:44 2024 +0300
+
+    Finished task BJS2-1536
+
+[33mcommit ea0b2ea47e26d14d684c05a260ae85ba0281313b[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 15:54:56 2024 +0300
+
+    Finished task BJS2-1521
+
+[33mcommit 4b3647779e88dc7241027f98c1dc4292743eae9a[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 14 15:54:33 2024 +0300
+
+    create method to get following count by followerId
+
+[33mcommit 49d200abcd1a827fb6c14ab1a4f152fa08c7675f[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 14 15:44:01 2024 +0300
+
+    create method to get followee by followerId with filters
+
+[33mcommit b519bcd632692cb08471be5f56dad71e079a3268[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 15:31:00 2024 +0300
+
+    Finished task BJS2-1527
+
+[33mcommit 8ba780ba3e0a7e34ac9e6f41e09616efae868f5b[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 14 15:23:14 2024 +0300
+
+    fix
+
+[33mcommit 0edbada75b4ca6023a04e458d685e678a5279672[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sun Jan 14 15:21:37 2024 +0300
+
+    Finished task BJS-1518.
+
+[33mcommit c28459a2c0e9a56d2335323f0ed7a9990364f3ef[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 14 15:20:01 2024 +0300
+
+    create method to get followers count by followeeId
+
+[33mcommit 2e7a0ed421d669d6f3b192613b8153dbb2b42e3d[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sun Jan 14 14:18:07 2024 +0300
+
+    create method to get followers by followeeId with filters
+
+[33mcommit 12ab903c62458b7d58628b1f78fc49fc6647bd98[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sun Jan 14 05:41:54 2024 +0300
+
+    Реализовать возможность менти удалять ментора.
+
+[33mcommit 5a39a624c1859a1608a2737c72e48b7901690863[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sat Jan 13 22:06:40 2024 +0300
+
+    Last fixed valid title check
+
+[33mcommit f49ab562b2b01f4a3017df7d0a9112466155bffd[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sat Jan 13 22:03:09 2024 +0300
+
+    Fixed valid title check
+
+[33mcommit d81be4d970dfe2c5df8bd800510cf6021cea4c7e[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sat Jan 13 22:00:54 2024 +0300
+
+    Fixed valid check
+
+[33mcommit 73bfd4f29a326cae05ebe86c53554f2d99e829a1[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sat Jan 13 21:32:38 2024 +0300
+
+    Add validate null EventDto in EventController.
+
+[33mcommit a57f481dda280a7813f5f2151e8ee274c623b830[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sat Jan 13 19:45:53 2024 +0300
+
+    create Controller and Service with unfollow method
+
+[33mcommit e245ae8870beebfb09fc957dba869dfe5c56ac82[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Sat Jan 13 18:31:50 2024 +0300
+
+    Fixed classes and add Tests.
+
+[33mcommit c11359285904843ac5bd4ebb5dc0c8c14e1a5aec[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Sat Jan 13 15:09:14 2024 +0300
+
+    create SubscriptionValidator and refactor tests
+
+[33mcommit 638642562a88d23df182039bc8be5a4ebb39021e[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sat Jan 13 13:12:31 2024 +0300
+
+    Create BJS2-1431
+
+[33mcommit 2a4859519ec24e40c457d4c7de967e0fe787cf23[m
+Author: Alexander Bulgakov <asbulgakov90@gmail.com>
+Date:   Sat Jan 13 12:58:30 2024 +0300
+
+    Complete task 'Invitation to join the goal' BJS2-1566
+
+[33mcommit bd445ddb9647e00bca807626c243eb4633bfaae4[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sat Jan 13 08:22:51 2024 +0300
+
+    Fixed deleteMentee method and test
+
+[33mcommit 196a3196640b788c5eed0d49f25849b382055b6c[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sat Jan 13 07:55:04 2024 +0300
+
+    List of mentees can be null now. Customer will get empty list
+
+[33mcommit 4b6bb8e04eee4244b82cf642d7469b38e206f5ee[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sat Jan 13 07:50:59 2024 +0300
+
+    Получить всех менторов одного пользователя. With tests
+
+[33mcommit 5aed96a671eb8ac2a08dfd578308afd59d16373f[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sat Jan 13 07:17:48 2024 +0300
+
+    Реализовать возможность ментору удалять менти. With tests
+
+[33mcommit 3d7ffc6bb0fa859e6f2808543f9f192f10a4b157[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sat Jan 13 05:20:13 2024 +0300
+
+    Unit tests upgraded. Little fixes for mapper.
+
+[33mcommit bc7172401bb6d04dc3cdeb47bb44c0b89dfdf706[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Sat Jan 13 04:33:47 2024 +0300
+
+    init commit. Реализовать возможность ментору удалять менти.
+
+[33mcommit fbf9eed8daa3e001ac301ce9c0ff7d320f2b8459[m
+Author: Edisolt Khatsiev <Edisolt Khatsiev>
+Date:   Fri Jan 12 07:21:07 2024 +0300
+
+    init commit. Получить всех менти одного пользователя. With unit tests
+
+[33mcommit 9499c08ff246d7f5ae90ba5376f98cd116bee3ac[m
+Author: phoen1x <106927036+vladmeniailov@users.noreply.github.com>
+Date:   Thu Jan 11 20:44:46 2024 +0300
+
+    Delete src/main/java/school/faang/user_service/controller/EventController.java
+    
+    delete copy EventController
+
+[33mcommit 0f4cfa8e0671f4a18a58b7b30d22728691aa2b70[m
+Author: Ruslan Latyshev <latyshevruslan@ya.ru>
+Date:   Thu Jan 11 18:28:54 2024 +0300
+
+    create SubscriptionController and SubscriptionService with unit tests
+
+[33mcommit 507ead475fe4d3d141ac2077ab2ecec25add6996[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Thu Jan 11 17:18:34 2024 +0300
+
+    fixed structure and Add EventFilter.
+
+[33mcommit ab1709c3e7b81b7b4c3db7ec1c95ad35a565c696[m
+Author: Vlad Meniailov <vlad.meniailov@yandex.ru>
+Date:   Thu Jan 11 00:24:52 2024 +0300
+
+    First commit BJS2-1518 without UnitTests.
+
+[33mcommit 057058b7d9c4b2bcf00852a7bfa9d4cd426fd109[m
+Author: Abramov Nikita <mr.abramovn@gmail.com>
+Date:   Wed Nov 15 01:02:08 2023 +0300
+
+    delete
+
+[33mcommit 8b543628da5de011fdd6279e140ce1c8a28f4a83[m
+Author: Abramov Nikita <mr.abramovn@gmail.com>
+Date:   Wed Nov 15 00:26:32 2023 +0300
+
+    init commit
+
+[33mcommit b09337026f5007ce82a7aa3d23c083a8e42f5bd8[m[33m ([m[1;31morigin/feature-BC-3842[m[33m, [m[1;31morigin/cer[m[33m, [m[1;31morigin/Sri[m[33m)[m
+Author: flyfalldie <kolya_cypandin@mail.ru>
+Date:   Sun Jul 23 19:48:10 2023 +0300
+
+    pull_all.sh script
+
+[33mcommit abb35238fb6a6ca3cc543f29731e354bc8a7693f[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Tue Jul 18 15:19:41 2023 +0200
+
+    Added skill offer retrieval by user id
+
+[33mcommit 9a734d9c9d9eaae3008a0b346a4a2de793f8c6d3[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Jul 15 16:18:32 2023 +0200
+
+    Added outdated Premium entities fetching method
+
+[33mcommit b85a1d2e1d45500f7a1f7fce4ef02fc870c36505[m
+Merge: 3d746cbe6 440a88b92
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Fri Jul 14 12:12:32 2023 +0300
+
+    Merge pull request #78 from CorporationX/werewolf-master
+    
+    minor fix
+
+[33mcommit 440a88b9223339dcca6972d1f80a88b4619eab05[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Fri Jul 14 12:09:58 2023 +0300
+
+    minor fix
+
+[33mcommit 3d746cbe660f39f791ddc08f7397d8531d9e7ed2[m
+Merge: bd748f036 6dd1d8407
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Fri Jul 14 12:11:00 2023 +0300
+
+    Merge pull request #77 from CorporationX/hotfix-minor
+    
+    Hotfix minor
+
+[33mcommit 6dd1d8407f48f6a0812f90f74b190e0cbbe0f034[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Fri Jul 14 12:09:58 2023 +0300
+
+    minor fix
+
+[33mcommit ca2f8d45bb4c54fa2605b0d2f0cb9f1e23f0f9d8[m
+Merge: bd748f036 e5af17042
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Mon Jul 10 17:09:18 2023 +0200
+
+    Merge remote-tracking branch 'origin/werewolf-master' into werewolf-master
+
+[33mcommit bd748f0361beda515a2f11b46facc1996760744e[m
+Merge: 9b6971631 290076832
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Mon Jul 10 17:02:20 2023 +0200
+
+    Merge remote-tracking branch 'origin/dev' into dev
+
+[33mcommit 9b6971631c3e49b2b3b44737d4a55c11ee55ee79[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Mon Jul 10 17:02:11 2023 +0200
+
+    Fixed skill repo bugs
+
+[33mcommit e5af170427a61a021a53fc9d68e5b25e3f1a5bf7[m
+Author: Viktor Ivanov <avacode78@gmail.com>
+Date:   Mon Jul 10 12:27:50 2023 +0700
+
+    add empty and all arguments constructor to Premium class
+
+[33mcommit 29007683293583b42aeb820b923e1d14a7e69f37[m
+Author: Viktor Ivanov <avacode78@gmail.com>
+Date:   Mon Jul 10 12:27:50 2023 +0700
+
+    add empty and all arguments constructor to Premium class
+
+[33mcommit 4002723af0ad65c74b439266cad17b4deba8102b[m
+Author: rlrio <svetlana.kras881@gmail.com>
+Date:   Sun Jul 9 19:55:43 2023 +0600
+
+    fix migration
+
+[33mcommit b2f53d1c83397cb8be65086a848e6c81b5b6b743[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sun Jul 9 13:30:33 2023 +0200
+
+    Fixed clients
+
+[33mcommit 19ef70ba422ab48c7269c2b6915ca371b1801b0c[m
+Author: rlrio <svetlana.kras881@gmail.com>
+Date:   Sun Jul 9 19:55:43 2023 +0600
+
+    fix migration
+
+[33mcommit 831151736fa220ea74b0cbe9c479252d5a3360cd[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sun Jul 9 13:30:33 2023 +0200
+
+    Fixed clients
+
+[33mcommit 1a9c6fd4e758b8aa5cf7fc07e4d2fb4af04a5596[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Thu Jul 6 18:21:46 2023 +0200
+
+    Updated migrations for data insertion by default
+
+[33mcommit 36a8d0d974432576f02f29d1718421f2a1cf7b4e[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Wed Jul 5 09:24:37 2023 +0200
+
+    Prepared base dev branch
+
+[33mcommit 3eb861abe070bdcac88f2b3d77377fe07acac22e[m
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sat Jun 17 22:25:12 2023 +0300
+
+    Feature/ci pipeline (#12)
+    
+    ci-pipeline distribution
+
+[33mcommit a66665cf87249070b45e83a63ceefe923cee194a[m
+Merge: 67809e135 12e776f72
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sat Jun 17 22:00:27 2023 +0300
+
+    Merge pull request #10 from FAANG-School/feature/ci-pipeline
+    
+    ci-pipeline
+
+[33mcommit 12e776f7231b7be48a2ceeff794604e62a0c5616[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sat Jun 17 22:00:05 2023 +0300
+
+    ci-pipeline
+
+[33mcommit 67809e135a6e3248bb61c1f552cc73f396fe5f8e[m
+Merge: 939402e13 e32a434fb
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sat Jun 17 21:48:36 2023 +0300
+
+    Merge pull request #9 from FAANG-School/feature/jacoco
+    
+    jacoco
+
+[33mcommit e32a434fb33c72000ba718c17977ddfec56390e7[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sat Jun 17 21:28:23 2023 +0300
+
+    jacoco
+
+[33mcommit 939402e13605aa5793a65c3149d05722eee0dea4[m
+Merge: dd741073a dd2fdb3de
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Tue Jun 13 15:59:35 2023 +0300
+
+    Merge pull request #8 from FAANG-School/swagger
+    
+    swagger initial
+
+[33mcommit dd741073a3f511091ee08ae8c83e39c0e0c85c69[m
+Merge: 802faa22d 74c2a83ff
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Tue Jun 13 15:57:44 2023 +0300
+
+    Merge pull request #7 from FAANG-School/multipart/users
+    
+    upload and parse user csv
+
+[33mcommit 74c2a83fffa6aab61f7b9eb59a20f34cf6043c5a[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue Jun 13 15:57:20 2023 +0300
+
+    conflicts
+
+[33mcommit 9262aef952d090378239448ac2cb203d4f90141f[m
+Merge: 6fec41d64 802faa22d
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue Jun 13 15:53:59 2023 +0300
+
+    Merge branch 'master' into multipart/users
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/service/UserService.java
+
+[33mcommit dd2fdb3de700adc35dcfa01a36c3f8aadc8a6450[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue Jun 13 15:29:46 2023 +0300
+
+    swagger initial
+
+[33mcommit 802faa22d5641133488f146d04c17af65cd2b481[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Mon Jun 5 16:41:32 2023 +0200
+
+    Added an endpoint for buying a premium access for a user
+    Added an endpoint for fetching all premium users with filters
+
+[33mcommit 6fec41d64805821e02af1cf92551b1aa8a5fee22[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Mon Jun 5 14:08:18 2023 +0300
+
+    fixed csv parser
+
+[33mcommit d06e87cd933da3fa42a83067aa8fdb40fb071007[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Jun 4 18:53:04 2023 +0300
+
+    imports
+
+[33mcommit 360cd96cba426ce54aeedb302f13235ad2974f0e[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Jun 4 18:46:38 2023 +0300
+
+    upload and parse user csv
+
+[33mcommit 8a382edeec86f8f09d738fd0911676a260c8f944[m
+Author: flyfalldie <kolya_cypandin@mail.ru>
+Date:   Wed May 24 17:32:39 2023 +0300
+
+    migration_prefix
+
+[33mcommit 9a27779656fdd935efcc7019578edab3bb989667[m
+Merge: d00e05c9c d1be1514e
+Author: mighty-mhsl <61280870+mighty-mhsl@users.noreply.github.com>
+Date:   Wed May 24 14:31:46 2023 +0200
+
+    Merge pull request #6 from FAANG-School/infra-dockerfile-1
+    
+    Dockerfile, testcontainers
+
+[33mcommit d1be1514eb5fdfed773efc8c96a2ac5e5bf28c18[m
+Author: flyfalldie <kolya_cypandin@mail.ru>
+Date:   Wed May 24 05:19:49 2023 +0300
+
+    Dockerfile, testcontainers
+
+[33mcommit d00e05c9ca50fc8ea2554a0998f2a9602d32a5e9[m
+Merge: 6d3e5a99b 5f9f242d2
+Author: mighty-mhsl <61280870+mighty-mhsl@users.noreply.github.com>
+Date:   Tue May 23 12:54:59 2023 +0200
+
+    Merge pull request #3 from FAANG-School/feature/goal
+    
+    added methods for goals
+
+[33mcommit 5f9f242d290b2dddbd15146178c858dd16fa3e5a[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue May 23 12:55:06 2023 +0300
+
+    fixes after merging
+
+[33mcommit deaf3cb5056d12bb965f80db7fafea5b9a6e4846[m
+Merge: 8a04da659 6d3e5a99b
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue May 23 12:51:59 2023 +0300
+
+    Merge branch 'master' into feature/goal
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/FEATURES.md
+    #       src/main/java/school/faang/user_service/controller/mentorship/MentorshipRequestController.java
+    #       src/main/java/school/faang/user_service/dto/UserDto.java
+    #       src/main/java/school/faang/user_service/dto/skill/SkillDto.java
+    #       src/main/java/school/faang/user_service/exception/ErrorMessage.java
+    #       src/main/java/school/faang/user_service/mapper/UserMapper.java
+    #       src/main/java/school/faang/user_service/repository/SubscriptionRepository.java
+    #       src/main/resources/db/changelog/db.changelog-master.yaml
+
+[33mcommit 8a04da65960b2258f4d5ac277c4adb6c35d50fca[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Tue May 23 12:44:54 2023 +0300
+
+    updated user-skill-guarantee for goal and mentorship
+
+[33mcommit 6d3e5a99b0b1b5138b9a70f7f342d91b75ad4905[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sun May 21 22:16:30 2023 +0200
+
+    Introduced contact preferences for a user & an endpoint for changing this preference
+
+[33mcommit 55c8e0395d1c4daa078abcbb46c7fd9714823c63[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri May 19 15:15:20 2023 +0200
+
+    Introduced profile view endpoint & profile view event publishing
+
+[33mcommit 3ca66b0ae66c2c9ef98cb43a546c817231e55f36[m
+Merge: 2f2b9dc34 49d943d1d
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri May 19 15:10:40 2023 +0200
+
+    Merge remote-tracking branch 'origin/master'
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/EventParticipationController.java
+    #       src/main/java/school/faang/user_service/controller/SubscriptionController.java
+    #       src/main/java/school/faang/user_service/controller/UserController.java
+    #       src/main/java/school/faang/user_service/controller/mentorship/MentorshipController.java
+    #       src/main/java/school/faang/user_service/dto/event/EventDto.java
+    #       src/main/java/school/faang/user_service/service/UserService.java
+
+[33mcommit 2f2b9dc349af1f47d5b6ef90465caa70a68975ff[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri May 19 15:05:54 2023 +0200
+
+    Introduced profile view endpoint & profile view event publishing
+
+[33mcommit 49d943d1d4a4eb3806a8050d7353417e14842804[m
+Merge: 555b096f3 6bf0d3c30
+Author: mighty-mhsl <61280870+mighty-mhsl@users.noreply.github.com>
+Date:   Fri May 19 13:08:06 2023 +0200
+
+    Merge pull request #5 from FAANG-School/production-353
+    
+    added ProfilePic endpoints and jakarta validation
+
+[33mcommit 6bf0d3c30f4e9538c6a3bec3dacf95f7cdd5f5ac[m
+Author: rlrio <svetlana.kras881@gmail.com>
+Date:   Fri May 12 23:00:32 2023 +0600
+
+    added ProfilePic endpoints and jakarta validation
+
+[33mcommit 555b096f3935c483c48d220bb432ec740981de72[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Tue May 16 14:55:02 2023 +0200
+
+    Added follower event publishing
+
+[33mcommit 6d67bd57a03bdfdf3f34fdad0136b2321bad71c3[m
+Author: flyfalldie <kolya_cypandin@mail.ru>
+Date:   Mon May 15 01:51:51 2023 +0300
+
+    Redis channels config update, now supports many channels
+
+[33mcommit 768a3b49c2f072a15feb8c9b2b83ce873531f2c0[m
+Author: flyfalldie <kolya_cypandin@mail.ru>
+Date:   Mon May 15 01:39:34 2023 +0300
+
+    Module name CamelCase convention
+
+[33mcommit 28b444dd22ce0a2220c83544b4b19844e8ae2e82[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri May 12 20:15:51 2023 +0200
+
+    Introduced Redis pub/sub publisher example
+
+[33mcommit 4d540ee412f343de53e0dc1bdc62beb337b92cd5[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Thu May 11 14:39:57 2023 +0200
+
+    Introduced feign client & feign client interceptor for user id header propagation to other services
+
+[33mcommit b0aee4d6f0400a5716e010bb7eb916ac531af8ea[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Thu May 11 13:32:26 2023 +0200
+
+    Introduced user context filter for constant x-user-id header parsing for every request
+
+[33mcommit 0c2d0210db67c5f76336ecc87a97455023c404f6[m
+Merge: f4490eb12 bb73cf882
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Mon May 8 18:04:10 2023 +0300
+
+    Merge branch 'master' into feature/goal
+
+[33mcommit f4490eb12a27aa896a31b71a32b23076a76947d2[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Mon May 8 18:03:33 2023 +0300
+
+    updated goals and invitations
+
+[33mcommit bb73cf882f8f1465200c62db9e3a6dbbdbbd6aaf[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Mon May 8 14:35:10 2023 +0200
+
+    Added /users endpoint for retrieving List of users by list of their ids
+
+[33mcommit f75bbe34425bf86c607633d4eacb943850b747e7[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Fri May 5 12:41:18 2023 +0300
+
+    FEATURES.md updated with goal invitations
+
+[33mcommit d1ac7d44da2d4fa939ca226869dd90257c8861ee[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Fri May 5 12:09:10 2023 +0300
+
+    added goals changeset
+
+[33mcommit d64e849216f095f1f3b6082af1c10ad925e6a0e0[m
+Merge: 259522ac8 afadca4ca
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Thu May 4 16:18:57 2023 +0300
+
+    Merge branch 'master' into feature/goal
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/entity/User.java
+
+[33mcommit 259522ac887ae0803a1fe7b77e904abb0ac9d2cd[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Wed May 3 21:38:42 2023 +0300
+
+    added goal invitations
+
+[33mcommit afadca4ca5f249516cb34b5afded45a903aebf5b[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Wed May 3 17:22:10 2023 +0200
+
+    - Added event entity sql structure
+    - Added drop.sql for resetting DB
+    - Fixed some code problems related to circular dependencies and entity mappings
+
+[33mcommit be7b1f8b4b69d10841a72099706fd24a7027739a[m
+Merge: bd177e5ba 4ffddd848
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Wed May 3 16:41:43 2023 +0200
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit bd177e5ba9c51ec01c4606ef98b6f25d68fa6428[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Wed May 3 16:41:25 2023 +0200
+
+    - Added Liquibase
+    - Moved gradle template to user service
+    - Introduced basic SQL structure migration
+    - Fixed tests
+    - Copied spring & logback configs from service template
+    - Adjusted some code problems appearing when running migrations
+
+[33mcommit 62622e25005a3a63d7ce554abb4cb791cb7339b3[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Wed May 3 14:20:28 2023 +0300
+
+    goal fixes
+
+[33mcommit 51c1a12a9cdf217320526107a1ece82e1e99ceae[m
+Merge: 5c521f787 4ffddd848
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Wed May 3 13:50:22 2023 +0300
+
+    Merge branch 'master' into feature/goal
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/FEATURES.md
+    #       src/main/java/school/faang/user_service/entity/Skill.java
+    #       src/main/java/school/faang/user_service/exception/EntityNotFoundException.java
+    #       src/main/java/school/faang/user_service/exception/ErrorMessage.java
+
+[33mcommit 4ffddd848a97d01df032555c2d8e3df77c318227[m
+Merge: 82c9bebfe ab1db99b8
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Wed May 3 13:47:21 2023 +0300
+
+    Merge pull request #2 from FAANG-School/feature/event
+    
+    Introduced:
+
+[33mcommit ab1db99b880c144b988864af02b7075af529da1d[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Wed May 3 13:46:39 2023 +0300
+
+    fixed event filter type
+
+[33mcommit 5c521f78727a37bb6ccce597a410cf5b1305d933[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Mon May 1 18:25:26 2023 +0300
+
+    added methods for goals
+    
+    planned:
+    add controllers for join goals invitation
+
+[33mcommit 12a3c4ad2f6cf02dfc84eafa40a680ad623b0ff7[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Apr 30 20:40:10 2023 +0300
+
+    several more event fixes + features.md
+
+[33mcommit 2cafaead71721286558ec0b6bf9d669ac0882f98[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Apr 30 17:16:44 2023 +0300
+
+    event fixes
+
+[33mcommit b51641b223c7eb861fe831be31688c4b18812620[m
+Merge: a229d55d9 82c9bebfe
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sat Apr 29 19:46:49 2023 +0300
+
+    Merge branch 'master' into feature/event
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/controller/recommendation/RecommendationController.java
+    #       src/main/java/school/faang/user_service/exception/ErrorMessage.java
+    #       src/main/java/school/faang/user_service/service/UserService.java
+
+[33mcommit 82c9bebfe09e3b12a64378998f6fdda0efa57e4d[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Apr 29 13:37:03 2023 +0200
+
+    - Added a mentor deletion endpoint
+    - Added a mentee deletion endpoint
+
+[33mcommit 52c4a65b51905863fc9aba05b0036af31e44bea8[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Apr 29 11:02:22 2023 +0200
+
+    - Added endpoint for a mentorship request acceptance
+    - Added endpoint for a mentorship request rejection
+
+[33mcommit 0b6f5e2e155d1c3f0afd799df62762d28707bd91[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Apr 29 10:42:19 2023 +0200
+
+    - Added mentorship request creation endpoint
+    - Added mentorship requests fetching endpoint with various filters
+
+[33mcommit b1bacc2bdc404ac79bbbfbb28ec533c8c64fc09c[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Apr 29 09:48:23 2023 +0200
+
+    - Added recommendation request rejection endpoint
+    - Added recommendation request acceptance when creating a recommendation for the same author/receiver
+
+[33mcommit 9b3c0fe20b199849237574398fa0d63532d347df[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri Apr 28 20:44:07 2023 +0200
+
+    Added recommendation request filter by status of a request
+
+[33mcommit 16cf4f3aac228e204d3a4ca6f50c63b55161b573[m
+Merge: e630d2928 7c02a38b3
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri Apr 28 20:41:29 2023 +0200
+
+    Merge remote-tracking branch 'origin/master'
+    
+    # Conflicts:
+    #       src/main/java/school/faang/user_service/FEATURES.md
+
+[33mcommit e630d2928cc10d6b715acae6bb9da54ec6f88150[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri Apr 28 20:37:54 2023 +0200
+
+    Introduced recommendation request list endpoint with filters
+    Introduced recommendation request endpoint for retrieving by id
+
+[33mcommit 7c02a38b319ce372f5fc039087a9de4fe97a82bb[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri Apr 28 20:37:54 2023 +0200
+
+    Introduced recommendation request list endpoint with filters
+    Introduced recommendation request endpoint for retrieving by id
+
+[33mcommit 044eedf4db299fa3017ec37de24689363b023537[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Fri Apr 28 20:05:26 2023 +0200
+
+    Introduced recommendation request creation endpoint
+    Did some refactoring
+
+[33mcommit a229d55d9c1d2842935bcb442933281f28215cbc[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Fri Apr 28 18:26:29 2023 +0300
+
+    Introduced:
+    - Draft event assignment
+    - Draft event participation
+    - Draft event filter framework
+    - Draft event rating (just started)
+    
+    - A couple of new methods in UserService and SkillService
+    
+    To do:
+    - Describe features with natural language in FEATURES.md
+    - Testing :c
+
+[33mcommit 695182f47bf1585dbed9a6ad593f6847b725b72a[m
+Merge: 72211202e f55d96c2c
+Author: Inna Mishustina <52246032+InnMish@users.noreply.github.com>
+Date:   Sun Apr 23 18:37:09 2023 +0300
+
+    Merge pull request #1 from FAANG-School/feature/Beans_DI_1
+    
+    added some tests for SkillController and SkillService and enum for ex…
+
+[33mcommit f55d96c2c4a7612d51f593bdded20d2f8d3b457f[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Apr 23 18:36:31 2023 +0300
+
+    fixed tests
+
+[33mcommit f1adf753bd63a1cc642432734b2e853afb2eeefc[m
+Author: InnMish <inn.mishustina@gmail.com>
+Date:   Sun Apr 23 17:34:16 2023 +0300
+
+    added some tests for SkillController and SkillService and enum for exceptions
+
+[33mcommit 72211202e5574ba2bfd5a587be14e8b236679ad4[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sun Apr 23 11:50:03 2023 +0200
+
+    Introduced:
+    - Draft skill guarantees assignment
+    - Draft user subscriptions CRUD
+    - Draft user filter framework
+    - A couple of new fields in User entity and a new Country entity
+    - Described some features with natural language in FEATURES.md
+    
+    To do:
+    - Testing. Probably the app doesn't even start up now, because of some Spring Data shit
+
+[33mcommit 837930a63661edef8ea417afccf2a9823d2b3cb8[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Apr 22 20:15:33 2023 +0200
+
+    Introduced:
+    - Draft entities structure
+    - Draft recommendation management
+    - Draft skills management
+    
+    To do:
+    - DB schema
+    - Dockerfile
+    - Testing => fixes of bugs/non-working SQL/JPA queries
+
+[33mcommit 2664babc1e0a06464e409d87fea7af2141c2b88e[m
+Author: mighty-mhsl <mihusle@protonmail.com>
+Date:   Sat Apr 22 13:28:05 2023 +0200
+
+    Initial commit

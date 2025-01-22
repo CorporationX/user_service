@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Component
-public class UserNamePattern implements UserFilter{
+public class UserNamePattern implements UserFilter {
     @Override
-    public boolean isApplicable(UserFilterDto filter){
+    public boolean isApplicable(UserFilterDto filter) {
         return filter.getNamePattern() != null;
     }
 
     @Override
-    public List<User> apply(List<User> users, UserFilterDto filter){
-        return users.stream().filter(user -> user.getUsername().contains(filter.getNamePattern())).toList();
+    public List<User> apply(List<User> users, UserFilterDto filter) {
+        return users.stream().filter(user -> user.getUsername().matches(filter.getNamePattern())).toList();
     }
 
 }

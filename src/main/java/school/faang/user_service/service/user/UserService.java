@@ -30,5 +30,10 @@ public class UserService {
                 .map(userMapper::toDto)
                 .toList();
     }
+    public List<UserDto> getPremiumUsers(){
+        return userRepository.findPremiumUsers()
+                .map(userMapper::toDto)
+                .toList();
+    }
 
 }

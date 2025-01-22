@@ -14,9 +14,9 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto){
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         if (userFilterDto == null){
-            throw new NullUserFilterException("Empty filter");
+            return userService.getPremiumUsers();
         }
         return userService.getPremiumUsers(userFilterDto);
     }

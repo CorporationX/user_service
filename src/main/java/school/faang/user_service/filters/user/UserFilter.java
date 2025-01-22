@@ -8,5 +8,6 @@ import java.util.stream.Stream;
 
 public interface UserFilter {
     boolean isApplicable(UserFilterDto filter);
+
     List<User> apply(List<User> users, UserFilterDto filter);
 }

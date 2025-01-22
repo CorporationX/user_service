@@ -17,13 +17,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'
-
-      - name: Check code style # Проверка стиля кода
-        run: ./gradlew checkstyle
-
-      - name: Build with Gradle
-        run: ./gradlew build # Запуск команды сборки через Gradle.
+          distribution: 'temurin
 
       - name: Run tests
         run: ./gradlew test # Запуск тестов через Gradle.

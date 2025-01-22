@@ -18,7 +18,7 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.specifications.GaolInvitationSpecification;
+import school.faang.user_service.repository.specifications.GoalInvitationSpecification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,19 +83,19 @@ public class GoalInvitationService {
         List<Specification<GoalInvitation>> specs = new ArrayList<>();
 
         if (filter.getInvitedId() != null) {
-            specs.add(GaolInvitationSpecification.getInvitedId(filter.getInvitedId()));
+            specs.add(GoalInvitationSpecification.getInvitedId(filter.getInvitedId()));
         }
         if (filter.getInviterId() != null) {
-            specs.add(GaolInvitationSpecification.getInviterId(filter.getInviterId()));
+            specs.add(GoalInvitationSpecification.getInviterId(filter.getInviterId()));
         }
         if (filter.getInvitedNamePattern() != null) {
-            specs.add(GaolInvitationSpecification.invitedNamePattern(filter.getInvitedNamePattern()));
+            specs.add(GoalInvitationSpecification.invitedNamePattern(filter.getInvitedNamePattern()));
         }
         if (filter.getInviterNamePattern() != null) {
-            specs.add(GaolInvitationSpecification.inviterNamePattern(filter.getInviterNamePattern()));
+            specs.add(GoalInvitationSpecification.inviterNamePattern(filter.getInviterNamePattern()));
         }
         if (filter.getStatus() != null) {
-            specs.add(GaolInvitationSpecification.getByStatus(filter.getStatus()));
+            specs.add(GoalInvitationSpecification.getByStatus(filter.getStatus()));
         }
 
         Specification<GoalInvitation> spec = specs.stream()

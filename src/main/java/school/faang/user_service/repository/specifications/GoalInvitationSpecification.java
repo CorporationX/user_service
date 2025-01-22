@@ -5,7 +5,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.goal.GoalInvitation;
 
 
-public class GaolInvitationSpecification {
+public class GoalInvitationSpecification {
 
     public static Specification<GoalInvitation> getByStatus(RequestStatus status) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);

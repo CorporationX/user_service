@@ -105,7 +105,7 @@ class GoalServiceTest {
         when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
         when(skillService.findSkillById(anyLong())).thenReturn(Optional.of(new Skill()));
 
-        Goal result = goalService.updateGoal(1L, goal, List.of(1L));
+        Goal result = goalService.updateGoal(1L, goal, 1L, List.of(1L));
 
         assertEquals(goal, result);
         verify(goalRepository, times(1)).findById(1L);
@@ -124,7 +124,7 @@ class GoalServiceTest {
         when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
         when(skillService.findSkillById(anyLong())).thenReturn(Optional.of(new Skill()));
 
-        Goal result = goalService.updateGoal(1L, goal, List.of(1L));
+        Goal result = goalService.updateGoal(1L, goal, 1L, List.of(1L));
 
         assertEquals(goal, result);
         verify(goalRepository, times(1)).findById(1L);
@@ -138,7 +138,7 @@ class GoalServiceTest {
     void updateGoal_ShouldThrowNoSuchElementException_WhenGoalNotFound() {
         when(goalRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> goalService.updateGoal(1L, new Goal(), List.of()));
+        assertThrows(NoSuchElementException.class, () -> goalService.updateGoal(1L, new Goal(), 1L, List.of()));
     }
 
     @Test
@@ -147,7 +147,7 @@ class GoalServiceTest {
         goal.setStatus(COMPLETED);
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
 
-        assertThrows(IllegalStateException.class, () -> goalService.updateGoal(1L, goal, List.of()));
+        assertThrows(IllegalStateException.class, () -> goalService.updateGoal(1L, goal, 1L, List.of()));
     }
 
     @Test
@@ -155,7 +155,7 @@ class GoalServiceTest {
         when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
         when(skillService.findSkillById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> goalService.updateGoal(1L, new Goal(), List.of(1L)));
+        assertThrows(NoSuchElementException.class, () -> goalService.updateGoal(1L, new Goal(), 1L, List.of(1L)));
     }
 
     @Test

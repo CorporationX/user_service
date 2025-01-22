@@ -66,7 +66,7 @@ class GoalControllerTest {
     void updateGoal_ShouldReturnUpdatedGoal() {
         GoalDto goalDto = new GoalDto();
         Goal goal = new Goal();
-        when(goalService.updateGoal(anyLong(), any(Goal.class), anyList())).thenReturn(goal);
+        when(goalService.updateGoal(anyLong(), any(Goal.class), anyLong(), anyList())).thenReturn(goal);
         when(goalMapper.toDto(any())).thenReturn(goalDto);
         when(goalMapper.toEntity(any())).thenReturn(goal);
 
@@ -79,7 +79,7 @@ class GoalControllerTest {
     @Test
     void updateGoal_ShouldThrowException_WhenServiceThrowsException() {
         GoalDto goalDto = new GoalDto();
-        when(goalService.updateGoal(any(), any(), any())).thenThrow(new RuntimeException("Error"));
+        when(goalService.updateGoal(any(), any(), any(), any())).thenThrow(new RuntimeException("Error"));
 
         assertThrows(RuntimeException.class, () -> goalController.updateGoal(1L, goalDto));
     }
@@ -118,7 +118,7 @@ class GoalControllerTest {
 
         ResponseEntity<List<GoalDto>> response = goalController.findGoalsByUserIdWithFilter(1L, filterDto);
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(goalDtoList, response.getBody());
     }
 }

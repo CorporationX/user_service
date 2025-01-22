@@ -1,6 +1,5 @@
 package school.faang.user_service.repository.goal;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -44,7 +43,6 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             """)
     List<User> findUsersByGoalId(long goalId);
 
-    @Transactional
     @Modifying
     @Query(nativeQuery = true, value = """
             INSERT INTO goal_skill (goal_id, skill_id)
@@ -52,7 +50,6 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             """)
     void addSkillToGoalById(Long goalId, Long skillId);
 
-    @Transactional
     @Modifying
     @Query(nativeQuery = true, value = """
             DELETE FROM goal_skill WHERE goal_id = ?1

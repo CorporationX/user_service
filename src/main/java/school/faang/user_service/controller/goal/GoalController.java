@@ -21,6 +21,7 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Validated
@@ -32,27 +33,38 @@ public class GoalController {
     private final GoalService goalService;
     private final GoalMapper goalMapper;
 
-    @PostMapping("/create/{userId}")
+    @PostMapping("/{userId}")
     public ResponseEntity<GoalDto> createGoal(
             @PathVariable @Positive(message = "Please, provide positive user ID") Long userId,
             @RequestBody @Valid GoalDto goalDto) {
 
-        Goal createdGoal = goalService.createGoal(userId, goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId(), goalDto.getSkillIds());
+        Goal createdGoal = goalService.createGoal(userId,
+                goalDto.getTitle(),
+                goalDto.getDescription(),
+                goalDto.getParentId(),
+                Optional.ofNullable(goalDto.getSkillIds()).orElse(List.of())
+        );
+        GoalDto createdGoalDto = goalMapper.toDto(createdGoal);
         return ResponseEntity.status(HttpStatus.CREATED).
-                body(goalMapper.toDto(createdGoal));
+                body(createdGoalDto);
     }
 
-    @PatchMapping("/update/{goalId}")
+    @PatchMapping("/{goalId}")
     public ResponseEntity<GoalDto> updateGoal(
             @PathVariable @Positive(message = "Please, provide positive goal ID") Long goalId,
             @RequestBody @Valid GoalDto goalDto) {
 
-        Goal updatedGoal = goalService.updateGoal(goalId, goalMapper.toEntity(goalDto), goalDto.getSkillIds());
+        Goal updatedGoal = goalService.updateGoal(goalId,
+                goalMapper.toEntity(goalDto),
+                goalDto.getParentId(),
+                Optional.ofNullable(goalDto.getSkillIds()).orElse(List.of())
+        );
+        GoalDto updatedGoalDto = goalMapper.toDto(updatedGoal);
         return ResponseEntity.status(HttpStatus.OK).
-                body(goalMapper.toDto(updatedGoal));
+                body(updatedGoalDto);
     }
 
-    @DeleteMapping("/delete/{goalId}")
+    @DeleteMapping("/{goalId}")
     public ResponseEntity<String> deleteGoal(
             @PathVariable @Positive(message = "Please, provide positive goal ID") Long goalId) {
 
@@ -66,8 +78,9 @@ public class GoalController {
             @RequestBody GoalFilterDto goalFilterDto) {
 
         List<Goal> goalsList = goalService.findSubGoalsByParentId(parentGoalId, goalFilterDto);
+        List<GoalDto> goalsDtoList = goalMapper.toDtoList(goalsList);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(goalMapper.toDtoList(goalsList));
+                .body(goalsDtoList);
     }
 
     @PostMapping("/find-goals/{userId}")
@@ -76,7 +89,8 @@ public class GoalController {
             @RequestBody GoalFilterDto goalFilterDto) {
 
         List<Goal> goalsList = goalService.findSubGoalsByUserId(userId, goalFilterDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(goalMapper.toDtoList(goalsList));
+        List<GoalDto> goalsDtoList = goalMapper.toDtoList(goalsList);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(goalsDtoList);
     }
 }

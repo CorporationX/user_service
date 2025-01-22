@@ -20,7 +20,7 @@ public class UserService {
 
     public void deactivateUser(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
-            throw new IllegalArgumentException("User not found!");
+            throw new IllegalArgumentException("User not found with id: " + userId);
         }
         onBeforeDeactivateUser(userId);
         userRepository.findById(userId).get()
@@ -39,12 +39,12 @@ public class UserService {
 
     private void removeUserFromGoals(Long userId) {
         goalRepository.findGoalsByUserId(userId).forEach(goal -> {
-            if (goal.getUsers().size() == 1) {
+            if (goal.getUsers() == null || goal.getUsers().isEmpty()) {
+                throw new IllegalStateException("Goal has no associated users!");
+            } else if (goal.getUsers().size() == 1) {
                 goalRepository.delete(goal);
             } else {
-                goal.setUsers(goal.getUsers().stream()
-                        .filter(user -> !Objects.equals(user.getId(), userId))
-                        .toList());
+                goal.getUsers().removeIf(user -> Objects.equals(user.getId(), userId));
                 goalRepository.save(goal);
             }
         });

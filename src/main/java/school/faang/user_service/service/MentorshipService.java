@@ -16,15 +16,14 @@ public class MentorshipService {
     private final UserRepository userRepository;
 
     public void stopUserMentorship(Long userId) {
-        Optional<User> userOptional = mentorshipRepository.findById(userId);
-
-        if (userOptional.isPresent() && userOptional.get().getMentees() != null) {
-            userOptional.get().getMentees().forEach(mentee ->
-            {
-                removeMentorFromMentees(mentee);
-                removeMentorFromGoals(mentee, userId);
-            });
-        }
+        mentorshipRepository.findById(userId).ifPresent(user -> {
+            if (user.getMentees() != null) {
+                user.getMentees().forEach(mentee -> {
+                    removeMentorFromMentees(mentee);
+                    removeMentorFromGoals(mentee, userId);
+                });
+            }
+        });
     }
 
     private void removeMentorFromMentees(User mentee) {

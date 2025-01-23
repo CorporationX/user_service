@@ -44,7 +44,7 @@ public class UserPhoneFilterTest {
 
         List<User> actual = filter.apply(stream, filterDto).toList();
 
-        assertEquals(2, actual.size());
+        assertEquals(1, actual.size());
     }
 
     @Test

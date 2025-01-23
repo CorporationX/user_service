@@ -11,7 +11,6 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.messages.ErrorMessageSource;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -22,6 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static school.faang.user_service.service.recommendation.RecommendationErrorMessage.RECOMMENDATION_NOT_FOUND;
+import static school.faang.user_service.service.recommendation.RecommendationErrorMessage.RECOMMENDATION_PERIOD;
+import static school.faang.user_service.service.recommendation.RecommendationErrorMessage.SKILL_NOT_FOUND;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -30,7 +33,6 @@ public class RecommendationService {
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillRepository skillRepository;
-    private final ErrorMessageSource errorMessageSource;
     private final int monthsAllowedAfterRecommendationCreation = 6;
 
     @Transactional
@@ -53,22 +55,23 @@ public class RecommendationService {
     @Transactional
     public Recommendation update(Recommendation recommendation) {
         validateRecommendation(recommendation);
+        Long recommendationId = recommendation.getId();
         recommendationRepository.findById(recommendation.getId())
                 .orElseThrow(() -> {
-                    var message = errorMessageSource.getMessage(
-                            "error.recommendation.not.found", recommendation.getId());
+                    var message = String.format(RECOMMENDATION_NOT_FOUND,
+                            recommendationId);
                     return new DataValidationException(message);
                 });
 
         User receiver = recommendation.getReceiver();
         User author = recommendation.getAuthor();
 
-        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        skillOfferRepository.deleteAllByRecommendationId(recommendationId);
         updateSkillOffers(recommendation, receiver, author);
         recommendationRepository.update(
                 author.getId(), receiver.getId(), recommendation.getContent());
 
-        return recommendationRepository.findById(recommendation.getId()).get();
+        return recommendationRepository.findById(recommendationId).get();
     }
 
 
@@ -76,8 +79,7 @@ public class RecommendationService {
     public void delete(long id) {
         Recommendation recommendationToDelete = recommendationRepository.findById(id)
                 .orElseThrow(() -> {
-                    var message = errorMessageSource.getMessage(
-                            "error.recommendation.not.found", id);
+                    var message = String.format(RECOMMENDATION_NOT_FOUND, id);
                     return new DataValidationException(message);
                 });
 
@@ -136,8 +138,7 @@ public class RecommendationService {
             boolean isWithinAllowedPeriod = expirationDate.isAfter(LocalDateTime.now());
 
             if (!isWithinAllowedPeriod) {
-                var message = errorMessageSource.getMessage(
-                        "error.recommendation.period",
+                var message = String.format(RECOMMENDATION_PERIOD,
                         monthsAllowedAfterRecommendationCreation);
                 throw new DataValidationException(message);
             }
@@ -149,8 +150,8 @@ public class RecommendationService {
 
         recommendation.getSkillOffers().forEach(skillOffer -> {
             if (!allSkills.contains(skillOffer.getSkill())) {
-                var message = errorMessageSource.getMessage(
-                        "error.skill.not.found", skillOffer.getSkill().getId());
+                var message = String.format(SKILL_NOT_FOUND,
+                        skillOffer.getSkill().getId());
                 throw new DataValidationException(message);
             }
         });

@@ -1,7 +1,5 @@
 package school.faang.user_service.service.premium.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +18,14 @@ import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
+import school.faang.user_service.exception.CheckException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.premium.PremiumService;
-import school.faang.user_service.util.Utils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Random;
 
 @Slf4j
 @Service
@@ -42,17 +39,17 @@ public class PremiumServiceImpl implements PremiumService {
 
     @Override
     @Transactional
-    public PremiumDto buyPremium(long userid, PremiumPeriod premiumPeriod) {
+    public PremiumDto buyPremium(long userid, long paymentNumber, PremiumPeriod premiumPeriod) {
         User user = userRepositoryAdapter.getUserById(userid);
 
-        if (premiumRepository.existsByUserId(userid)) {
+        if (premiumRepository.existsByUserIdAndEndDateGreaterThan(userid, LocalDateTime.now())) {
             throw new IllegalArgumentException(
                     String.format("У пользователя с id: %s уже есть премиум-доступ", userid));
         }
 
-        PaymentResponse paymentResponse = sendPayment(premiumPeriod.getPrice(), Currency.USD);
-        if (!paymentResponse.getStatus().equals(PaymentStatus.SUCCESS)) {
-            throw new IllegalArgumentException("Оплата не прошла!Повторите попытку!");
+        PaymentResponse paymentResponse = sendPayment(premiumPeriod.getPrice(), Currency.USD, paymentNumber);
+        if (paymentResponse.getStatus() != PaymentStatus.SUCCESS) {
+            throw new CheckException("Оплата не прошла!Повторите попытку!");
         }
         LocalDateTime currentDateTime = LocalDateTime.now();
         return premiumMapper.toDto(
@@ -63,32 +60,25 @@ public class PremiumServiceImpl implements PremiumService {
                         .build()));
     }
 
-    private PaymentResponse sendPayment(@NotNull BigDecimal amount, @NotNull Currency currency) {
+    private PaymentResponse sendPayment(@NotNull BigDecimal amount, @NotNull Currency currency, long paymentNumber) {
         if (amount.compareTo(BigDecimal.ZERO) == 0) {
             throw new IllegalArgumentException("Amount не может быть 0");
         }
         if (!Arrays.asList(Currency.values()).contains(currency)) {
             throw new IllegalArgumentException("Неверный параметр currency");
         }
-        Random random = new Random();
         try {
-            ResponseEntity<String> responseEntity = paymentServiceClient.pay(
-                    new PaymentRequest(random.nextInt(0, 1000000), amount, currency));
+            ResponseEntity<PaymentResponse> responseEntity = paymentServiceClient.pay(
+                    new PaymentRequest(paymentNumber, amount, currency));
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                String response = responseEntity.getBody();
-                ObjectMapper mapper = Utils.createJsonMapper();
-                PaymentResponse paymentResponse = mapper.readValue(responseEntity.getBody(), PaymentResponse.class);
-                log.debug("paymentResponse response:{} {}", responseEntity.getStatusCode(), response);
-                return paymentResponse;
+                log.debug("paymentResponse response:{} {}", responseEntity.getStatusCode(), responseEntity.getBody());
+                return responseEntity.getBody();
             } else {
                 log.warn("paymentResponse response:{} {}", responseEntity.getStatusCode(), responseEntity.getBody());
                 throw new IllegalArgumentException(responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR ? INTEGRATION_ERR_MSG : String.valueOf(responseEntity.getBody()));
             }
         } catch (FeignException e) {
             log.error("paymentResponse response:{}", e.toString());
-            throw new IllegalArgumentException(INTEGRATION_ERR_MSG);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
             throw new IllegalArgumentException(INTEGRATION_ERR_MSG);
         }
     }

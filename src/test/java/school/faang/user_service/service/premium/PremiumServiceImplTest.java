@@ -19,10 +19,12 @@ import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
+import school.faang.user_service.exception.CheckException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.premium.impl.PremiumServiceImpl;
-import school.faang.user_service.util.Utils;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -43,6 +45,7 @@ public class PremiumServiceImplTest {
     private ArgumentCaptor<Premium> premiumCaptor;
 
     private static final long USER_ID = 1L;
+    private static final long PAYMENT_NUMBER = 999L;
 
     private User user;
     private PaymentResponse paymentSuccesResponse;
@@ -68,17 +71,17 @@ public class PremiumServiceImplTest {
         PremiumDto savedPremiumDto = new PremiumDto();
 
         when(userRepositoryAdapter.getUserById(USER_ID)).thenReturn(user);
-        when(premiumRepository.existsByUserId(USER_ID)).thenReturn(false);
+        when(premiumRepository.existsByUserIdAndEndDateGreaterThan(eq(USER_ID), any(LocalDateTime.class))).thenReturn(false);
         when(paymentServiceClient.pay(any(PaymentRequest.class)))
-                .thenReturn(new ResponseEntity<>(Utils.objectToJsonString(paymentSuccesResponse), HttpStatus.OK));
+                .thenReturn(new ResponseEntity<>(paymentSuccesResponse, HttpStatus.OK));
         when(premiumRepository.save(any(Premium.class))).thenReturn(savedPremium);
         when(premiumMapper.toDto(savedPremium)).thenReturn(savedPremiumDto);
 
-        PremiumDto result = premiumServiceImpl.buyPremium(USER_ID, period);
+        PremiumDto result = premiumServiceImpl.buyPremium(USER_ID, PAYMENT_NUMBER, period);
 
         assertNotNull(result);
         verify(userRepositoryAdapter, times(1)).getUserById(USER_ID);
-        verify(premiumRepository, times(1)).existsByUserId(USER_ID);
+        verify(premiumRepository, times(1)).existsByUserIdAndEndDateGreaterThan(eq(USER_ID), any(LocalDateTime.class));
         verify(paymentServiceClient, times(1)).pay(any(PaymentRequest.class));
         verify(premiumRepository, times(1)).save(premiumCaptor.capture());
         verify(premiumMapper, times(1)).toDto(savedPremium);
@@ -90,27 +93,27 @@ public class PremiumServiceImplTest {
     @Test
     public void testBuyPremium_userAlreadyHasPremium() {
         when(userRepositoryAdapter.getUserById(USER_ID)).thenReturn(user);
-        when(premiumRepository.existsByUserId(USER_ID)).thenReturn(true);
+        when(premiumRepository.existsByUserIdAndEndDateGreaterThan(eq(USER_ID), any(LocalDateTime.class))).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> premiumServiceImpl.buyPremium(1L, period));
+                () -> premiumServiceImpl.buyPremium(USER_ID, PAYMENT_NUMBER, period));
 
         verify(userRepositoryAdapter, times(1)).getUserById(USER_ID);
-        verify(premiumRepository, times(1)).existsByUserId(USER_ID);
+        verify(premiumRepository, times(1)).existsByUserIdAndEndDateGreaterThan(eq(USER_ID), any(LocalDateTime.class));
     }
 
     @Test
     public void testBuyPremium_paymentFailed() {
         when(userRepositoryAdapter.getUserById(USER_ID)).thenReturn(user);
-        when(premiumRepository.existsByUserId(USER_ID)).thenReturn(false);
+        when(premiumRepository.existsByUserIdAndEndDateGreaterThan(eq(USER_ID), any(LocalDateTime.class))).thenReturn(false);
         when(paymentServiceClient.pay(any(PaymentRequest.class)))
-                .thenReturn(new ResponseEntity<>(Utils.objectToJsonString(paymentFailedResponse), HttpStatus.OK));
+                .thenReturn(new ResponseEntity<>(paymentFailedResponse, HttpStatus.OK));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> premiumServiceImpl.buyPremium(1L, period));
+        CheckException exception = assertThrows(CheckException.class,
+                () -> premiumServiceImpl.buyPremium(USER_ID, PAYMENT_NUMBER, period));
 
         verify(userRepositoryAdapter, times(1)).getUserById(USER_ID);
-        verify(premiumRepository, times(1)).existsByUserId(USER_ID);
+        verify(premiumRepository, times(1)).existsByUserIdAndEndDateGreaterThan(eq(USER_ID), any(LocalDateTime.class));
         verify(paymentServiceClient, times(1)).pay(any(PaymentRequest.class));
         assertEquals("Оплата не прошла!Повторите попытку!", exception.getMessage());
     }

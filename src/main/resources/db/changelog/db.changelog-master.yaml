@@ -17,8 +17,4 @@ databaseChangeLog:
       file: db/changelog/changeset/promotion_plan_V001__initial.sql
   - include:
       file: db/changelog/changeset/promotion_V002__initial.sql
-  - include:
-      file: db/changelog/changeset/promotion_plan_V003_insert.sql
-  - include:
-      file: db/changelog/changeset/promotion_V004_insert.sql
 

@@ -28,9 +28,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGenericException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Произошла ошибка: " + ex.getMessage());
     }
-
-    @ExceptionHandler(PaymentFailedException.class)
-    public ResponseEntity<String> handlePaymentFailedException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Произошла ошибка: " + ex.getMessage());
-    }
 }

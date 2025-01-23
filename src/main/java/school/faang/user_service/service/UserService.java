@@ -12,6 +12,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -43,6 +44,23 @@ public class UserService {
         Stream<User> users = userRepository.findPremiumUsers();
         return users.filter(user -> userFilters.stream().filter(filter -> filter.isApplicable(userFilterDto))
                         .anyMatch(filter -> filter.filterEntity(user, userFilterDto)))
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId + " не найден"));
+
+        return userMapper.toDto(user);
+    }
+
+    @Transactional
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+
+        return users.stream()
                 .map(userMapper::toDto)
                 .toList();
     }

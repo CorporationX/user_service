@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -101,6 +102,23 @@ public class UserServiceTest {
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(user.getUsername(), result.get(0).username());
 
+    }
+
+    @Test
+    void testGetUserSuccessfully() {
+        User user = new User();
+        user.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        assertDoesNotThrow(() -> userService.getUser(1L));
+    }
+
+    @Test
+    void testGetNotExistsUser() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.getUser(1L));
     }
 
 }

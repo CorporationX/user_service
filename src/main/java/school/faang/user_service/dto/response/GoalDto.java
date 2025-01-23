@@ -2,7 +2,7 @@ package school.faang.user_service.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import school.faang.user_service.dto.entity.goal.GoalStatus;
+import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

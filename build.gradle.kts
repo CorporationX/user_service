@@ -1,5 +1,8 @@
+import java.math.RoundingMode
+
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
@@ -93,3 +96,72 @@ tasks.bootJar {
 kotlin {
     jvmToolchain(17)
 }
+/**
+ * Jacoco setting
+ */
+jacoco {
+    toolVersion = "0.8.12"
+    reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            include(jacocoInclude)
+            exclude(jacocoExclude)
+        }
+    )
+}
+tasks.jacocoTestCoverageVerification {
+    // Задаем уровень покрытия тестов
+    violationRules {
+        rule {
+            element = "CLASS"
+            classDirectories.setFrom(
+                sourceSets.main.get().output.asFileTree.matching {
+                    include(jacocoInclude)
+                }
+            )
+            enabled = true
+            limit {
+                minimum = BigDecimal.valueOf(0.7).setScale(2, RoundingMode.HALF_UP)
+            }
+        }
+    }
+}
+
+val jacocoInclude = listOf(
+    //Пакеты, которые покрывают тесты
+    "**/controller/**",
+    "**/service/**",
+    "**/validator/**",
+    "**/mapper/**",
+    "**/dto/**"
+)
+
+val jacocoExclude = listOf(
+    //Пакеты, которые не надо покрывать тестами
+    "**/config/context/**",
+    "**/constants/**",
+    "**/enums/**",
+    "**/client/**",
+    "**/exception/**",
+    "**/repository/**",
+    "**/UserServiceApplication**"
+)
+
+
+
+
+

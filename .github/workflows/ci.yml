@@ -1,23 +1,23 @@
 name: CI Pipeline
 
 on:
-  pull_request: # Указывает, что пайплайн будет запускаться при создании пулл-реквеста.
+  pull_request:
     branches:
-      - feature/pipline-BC-BJS2-54079  # Пулл-реквесты в эту конкретную ветку будут триггером для запуска пайплайна.
+      - phoenix-master-stream8
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Выполнение на последней версии ubuntu
+    runs-on: ubuntu-latest
 
-    steps: # Шаги, которые будут выполнены в рамках задания.
-      - name: Checkout code # Извлечение кода из репо
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up JDK # Установка JDK
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin
 
       - name: Run tests
-        run: ./gradlew test # Запуск тестов через Gradle.
+        run: ./gradlew test

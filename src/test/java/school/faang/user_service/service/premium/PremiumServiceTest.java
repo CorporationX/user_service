@@ -1,6 +1,5 @@
 package school.faang.user_service.service.premium;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -9,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.payment.Currency;
 import school.faang.user_service.dto.payment.PaymentRequest;
@@ -54,6 +55,13 @@ public class PremiumServiceTest {
 
     @Test
     public void testPremiumExistByUserId() {
+        User user = User.builder()
+                .id(userId)
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.ofNullable(user));
+
         when(premiumRepository.existsByUserId(userId))
                 .thenReturn(true);
 
@@ -63,7 +71,13 @@ public class PremiumServiceTest {
 
     @Test
     public void testPaymentFailed() {
-        Pair<PaymentRequest, PaymentResponse> paymentPair = setUpPaymentRequestAndResponse(null);
+        Pair<PaymentRequest, ResponseEntity<PaymentResponse>> paymentPair = setUpPaymentRequestAndResponse(false);
+        User user = User.builder()
+                .id(userId)
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.ofNullable(user));
 
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class)))
                 .thenReturn(paymentPair.getSecond());
@@ -74,10 +88,7 @@ public class PremiumServiceTest {
 
     @Test
     public void testPremiumFindByUserId() {
-        Pair<PaymentRequest, PaymentResponse> paymentPair = setUpPaymentRequestAndResponse(PaymentStatus.SUCCESS);
-
-        when(paymentServiceClient.sendPayment(any(PaymentRequest.class)))
-                .thenReturn(paymentPair.getSecond());
+        Pair<PaymentRequest, ResponseEntity<PaymentResponse>> paymentPair = setUpPaymentRequestAndResponse(false);
 
         when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
@@ -88,14 +99,16 @@ public class PremiumServiceTest {
 
     @Test
     public void testSavePremium() {
-        Pair<PaymentRequest, PaymentResponse> paymentPair = setUpPaymentRequestAndResponse(PaymentStatus.SUCCESS);
-        User user = User.builder().build();
-
-        when(paymentServiceClient.sendPayment(any(PaymentRequest.class)))
-                .thenReturn(paymentPair.getSecond());
+        Pair<PaymentRequest, ResponseEntity<PaymentResponse>> paymentPair = setUpPaymentRequestAndResponse(true);
+        User user = User.builder()
+                .id(1L)
+                .build();
 
         when(userRepository.findById(userId))
                 .thenReturn(Optional.ofNullable(user));
+
+        when(paymentServiceClient.sendPayment(any(PaymentRequest.class)))
+                .thenReturn(paymentPair.getSecond());
 
         premiumService.buyPremium(userId, premiumPeriod);
 
@@ -103,14 +116,14 @@ public class PremiumServiceTest {
                 .save(premiumArgumentCaptor.capture());
     }
 
-    private Pair<PaymentRequest, PaymentResponse> setUpPaymentRequestAndResponse(PaymentStatus status) {
+    private Pair<PaymentRequest, ResponseEntity<PaymentResponse>> setUpPaymentRequestAndResponse(boolean isSuccessResponse) {
         long paymentNumber = 12345L;
         BigDecimal amount = BigDecimal.valueOf(99.99);
         Currency currency = Currency.USD;
         PaymentRequest paymentRequest = new PaymentRequest(paymentNumber, amount, currency);
 
         PaymentResponse paymentResponse = new PaymentResponse(
-                status,
+                PaymentStatus.SUCCESS,
                 1234,
                 paymentNumber,
                 amount,
@@ -118,6 +131,12 @@ public class PremiumServiceTest {
                 "Payment successful"
         );
 
-        return Pair.of(paymentRequest, paymentResponse);
+        if (isSuccessResponse) {
+            return Pair.of(paymentRequest, ResponseEntity.ok(paymentResponse));
+        }
+        return Pair.of(
+                paymentRequest,
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(paymentResponse)
+        );
     }
 }

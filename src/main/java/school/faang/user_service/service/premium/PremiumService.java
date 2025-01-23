@@ -1,7 +1,9 @@
 package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
@@ -18,8 +20,8 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Objects;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -30,21 +32,13 @@ public class PremiumService {
 
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod premiumPeriod) {
-        if (premiumRepository.existsByUserId(userId)) {
+
+        User user = userRepository.findById(userId).orElseThrow();
+        if (premiumRepository.existsByUserId(user.getId())) {
             throw new IllegalStateException("The user with id " + userId + " already has a premium subscription.");
         }
 
-        long paymentNumber = ThreadLocalRandom.current().nextLong();
-        BigDecimal amount = BigDecimal.valueOf(premiumPeriod.getPrice());
-        PaymentRequest paymentRequest = new PaymentRequest(paymentNumber, amount, Currency.USD);
-
-        PaymentResponse paymentResponse = paymentServiceClient.sendPayment(paymentRequest);
-
-        if (paymentResponse.status() != PaymentStatus.SUCCESS) {
-            throw new PaymentFailedException(paymentResponse.message());
-        }
-
-        User user = userRepository.findById(userId).orElseThrow();
+        makePayment(premiumPeriod);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalDateTime premiumEndDate = currentDateTime.plusDays(premiumPeriod.getDays());
@@ -58,13 +52,16 @@ public class PremiumService {
         return premiumRepository.save(premium);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void checkPremiumExpiration() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(now);
+    private void makePayment(PremiumPeriod premiumPeriod) {
+        long paymentNumber = UUID.randomUUID().getLeastSignificantBits();
+        BigDecimal amount = BigDecimal.valueOf(premiumPeriod.getPrice());
+        PaymentRequest paymentRequest = new PaymentRequest(paymentNumber, amount, Currency.USD);
 
-        // Можно к примеру отправить уведомление пользователю, об истёкшем премиуме
-        expiredPremiums.forEach(premium ->
-                premiumRepository.deleteById(premium.getId()));
+        ResponseEntity<PaymentResponse> paymentResponse = paymentServiceClient.sendPayment(paymentRequest);
+
+        if (paymentResponse.getStatusCode() != HttpStatus.OK) {
+            String message = Objects.requireNonNull(paymentResponse.getBody()).message();
+            throw new PaymentFailedException(message);
+        }
     }
 }

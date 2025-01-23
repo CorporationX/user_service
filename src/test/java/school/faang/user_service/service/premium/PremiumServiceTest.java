@@ -1,6 +1,5 @@
 package school.faang.user_service.service.premium;
 
-import kotlin.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.util.Pair;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.payment.Currency;
 import school.faang.user_service.dto.payment.PaymentRequest;
@@ -118,6 +118,6 @@ public class PremiumServiceTest {
                 "Payment successful"
         );
 
-        return new Pair<>(paymentRequest, paymentResponse);
+        return Pair.of(paymentRequest, paymentResponse);
     }
 }

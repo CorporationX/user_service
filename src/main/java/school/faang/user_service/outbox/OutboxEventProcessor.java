@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.event.OutboxEvent;
+import school.faang.user_service.entity.OutboxEvent;
 import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.repository.OutboxEventRepository;
 

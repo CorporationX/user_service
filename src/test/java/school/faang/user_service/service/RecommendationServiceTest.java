@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
+import school.faang.user_service.entity.OutboxEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
@@ -21,25 +22,17 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.event.RecommendationReceivedEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
-import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
+import school.faang.user_service.outbox.OutboxEventProcessor;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.utils.Helper;
 import school.faang.user_service.validator.RecommendationValidator;
 import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -66,10 +59,10 @@ class RecommendationServiceTest {
     private SkillService skillService;
 
     @Mock
-    private RecommendationService recommendationServiceMock;
+    private OutboxEventProcessor outboxEventProcessor;
 
     @Mock
-    private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
+    private Helper helper;
 
     @InjectMocks
     private RecommendationService recommendationService;
@@ -139,7 +132,8 @@ class RecommendationServiceTest {
         verify(skillOfferService, times(1)).findAllByUserId(dto.getReceiverId());
         verify(skillOfferService, times(1)).create(1L, recommendation.getId());
         verify(skillService, times(1)).addGuarantee(recommendation);
-        verify(recommendationReceivedEventPublisher, times(1)).publish(any(RecommendationReceivedEvent.class));
+        verify(helper, times(1)).serializeToJson(any(RecommendationReceivedEvent.class));
+        verify(outboxEventProcessor, times(1)).saveOutboxEvent(any(OutboxEvent.class));
     }
 
     @Test

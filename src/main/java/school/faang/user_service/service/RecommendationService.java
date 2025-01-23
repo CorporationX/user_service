@@ -8,11 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.RecommendationDto;
+import school.faang.user_service.entity.OutboxEvent;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.event.RecommendationReceivedEvent;
 import school.faang.user_service.mapper.RecommendationMapper;
-import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
+import school.faang.user_service.outbox.OutboxEventProcessor;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.utils.Helper;
 import school.faang.user_service.validator.RecommendationValidator;
 import school.faang.user_service.validator.UserValidator;
 
@@ -22,6 +24,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class RecommendationService {
+    private static final String AGGREGATE_TYPE = "Recommendation";
     private final RecommendationRepository recommendationRepository;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationValidator recommendationValidator;
@@ -29,7 +32,8 @@ public class RecommendationService {
     private final UserService userService;
     private final SkillOfferService skillOfferService;
     private final SkillService skillService;
-    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
+    private final OutboxEventProcessor outboxEventProcessor;
+    private final Helper helper;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -41,17 +45,12 @@ public class RecommendationService {
         saveNewSkillOffers(recommendation);
         skillService.addGuarantee(recommendation);
 
-        recommendationReceivedEventPublisher.publish(new RecommendationReceivedEvent(
-                        recommendation.getId(),
-                        recommendation.getReceiver().getId(),
-                        recommendation.getAuthor().getId()
-                )
-        );
-        log.info("Recommendation with id: {} was created successfully.", recommendation.getId());
-        log.info("Published Recommendation Received Event for user with id: {}", recommendation.getReceiver().getId());
-
+        RecommendationReceivedEvent recommendationReceivedEvent = createRecommendationReceivedEvent(recommendation);
+        OutboxEvent outboxEvent = createOutboxEvent(recommendation, recommendationReceivedEvent);
+        outboxEventProcessor.saveOutboxEvent(outboxEvent);
         return recommendationMapper.toDto(recommendation);
     }
+
 
     @Transactional
     public RecommendationDto update(RecommendationDto recommendationDto) {
@@ -98,6 +97,25 @@ public class RecommendationService {
         recommendation.setReceiver(userService.findUserById(recommendationDto.getReceiverId()));
         recommendation.setSkillOffers(skillOfferService.findAllByUserId(recommendationDto.getReceiverId()));
         return recommendation;
+    }
+
+    private RecommendationReceivedEvent createRecommendationReceivedEvent(Recommendation recommendation) {
+        return RecommendationReceivedEvent.builder()
+                .recommendationId(recommendation.getId())
+                .receiverId(recommendation.getReceiver().getId())
+                .authorId(recommendation.getAuthor().getId())
+                .build();
+    }
+
+    private OutboxEvent createOutboxEvent(Recommendation recommendation, RecommendationReceivedEvent recommendationReceivedEvent) {
+        return OutboxEvent.builder()
+                .aggregateId(recommendation.getId())
+                .aggregateType(AGGREGATE_TYPE)
+                .eventType(recommendationReceivedEvent.getClass().getSimpleName())
+                .payload(helper.serializeToJson(recommendationReceivedEvent))
+                .createdAt(recommendation.getCreatedAt())
+                .processed(false)
+                .build();
     }
 
     private List<Recommendation> getAllRecommendationsByReceiverId(long receiverId) {

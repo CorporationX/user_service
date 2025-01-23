@@ -7,15 +7,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.entity.OutboxEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.event.GoalCompletedEvent;
-import school.faang.user_service.event.OutboxEvent;
 import school.faang.user_service.exception.GoalAlreadyCompletedException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.outbox.OutboxEventProcessor;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.UserService;

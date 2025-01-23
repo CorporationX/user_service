@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserContactsDto;
-import school.faang.user_service.event.OutboxEvent;
+import school.faang.user_service.entity.OutboxEvent;
 import school.faang.user_service.outbox.OutboxEventProcessor;
 import school.faang.user_service.publisher.SubscriptionEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -17,11 +17,7 @@ import school.faang.user_service.validator.UserValidator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
@@ -53,7 +49,6 @@ class SubscriptionServiceTest {
     private final long followerId = 1;
     private final long followeeId = 2;
     private UserContactsDto userContactsDto;
-    private String userName;
 
     @BeforeEach
     void setUp() {

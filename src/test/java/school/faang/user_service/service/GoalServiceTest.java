@@ -16,7 +16,7 @@ import school.faang.user_service.exception.GoalAlreadyCompletedException;
 import school.faang.user_service.outbox.OutboxEventProcessor;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
-import school.faang.user_service.event.OutboxEvent;
+import school.faang.user_service.entity.OutboxEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;

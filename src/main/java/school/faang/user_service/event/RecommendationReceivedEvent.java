@@ -1,12 +1,7 @@
 package school.faang.user_service.event;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 
-@Data
-@RequiredArgsConstructor
-public class RecommendationReceivedEvent {
-    private final Long recommendationId;
-    private final Long receiverId;
-    private final Long authorId;
+@Builder
+public record RecommendationReceivedEvent(Long recommendationId, Long receiverId, Long authorId) {
 }

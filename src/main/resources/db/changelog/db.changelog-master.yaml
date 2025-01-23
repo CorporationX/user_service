@@ -12,6 +12,10 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
+      file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
       file: db/changelog/changeset/user_V008__files.sql
   - include:
       file: db/changelog/changeset/user_V009__banned.sql
+  - include:
+      file: db/changelog/changeset/user_V010__outbox_add.sql

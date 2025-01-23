@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import school.faang.user_service.event.OutboxEvent;
+import school.faang.user_service.entity.OutboxEvent;
 
 import java.util.List;
 

@@ -13,3 +13,7 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/promotion_plan_V001__initial.sql
+  - include:
+      file: db/changelog/changeset/promotion_V002__initial.sql

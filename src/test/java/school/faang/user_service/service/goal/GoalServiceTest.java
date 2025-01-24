@@ -19,7 +19,7 @@ import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.filters.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skills.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

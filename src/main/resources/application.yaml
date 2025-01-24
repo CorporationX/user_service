@@ -21,6 +21,19 @@ spring:
       port: 6379
       host: localhost
 
+services:
+  s3:
+    endpoint: https://s3.storage.selcloud.ru
+    accessKey: 12d79a21feca4323bd8146eb5a3b6405
+    secretKey: 80de617d75f14947b76492b4b46be9aa
+    region: ru-1
+    bucket: alterality-s3
+
+avatar_api:
+  dice_bear:
+    url: "https://api.dicebear.com/9.x/initials/svg?scale=50&backgroundType=gradientLinear&radius=50&seed="
+
+
 server:
   port: 8080
 

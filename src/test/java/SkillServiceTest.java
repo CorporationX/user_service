@@ -19,7 +19,7 @@ import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.ArrayList;
 import java.util.List;

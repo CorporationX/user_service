@@ -21,6 +21,19 @@ spring:
       port: 6379
       host: localhost
 
+  application:
+    name: user-service
+
+  aws:
+    s3:
+      bucket:
+        name: your-bucket-name
+    region: us-east-1
+
+  dicebear:
+    api:
+      url: https://avatars.dicebear.com/api
+
 server:
   port: 8080
 

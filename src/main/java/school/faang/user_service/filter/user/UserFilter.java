@@ -13,5 +13,5 @@ public abstract class UserFilter {
 
     public abstract Object getFilterFieldValue(UserFilterDto filters);
 
-    public abstract Stream<User> apply(Stream<User> users, UserFilterDto filters);
+    public abstract boolean apply(User user, UserFilterDto filters);
 }

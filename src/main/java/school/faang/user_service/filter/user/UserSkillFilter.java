@@ -18,11 +18,9 @@ public class UserSkillFilter extends UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user -> {
-            return Objects.requireNonNullElse(user.getSkills(), Collections.<Skill>emptyList()).stream()
-                    .anyMatch(skill ->
-                            skill.getTitle().contains(filters.getSkillPattern()));
-        });
+    public boolean apply(User user, UserFilterDto filters) {
+        return Objects.requireNonNullElse(user.getSkills(), Collections.<Skill>emptyList()).stream()
+                .anyMatch(skill ->
+                        skill.getTitle().contains(filters.getSkillPattern()));
     }
 }

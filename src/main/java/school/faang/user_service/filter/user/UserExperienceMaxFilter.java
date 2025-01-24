@@ -16,8 +16,7 @@ public class UserExperienceMaxFilter extends UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user ->
-                Objects.requireNonNullElse(user.getExperience(), 0) <= filters.getExperienceMax());
+    public boolean apply(User user, UserFilterDto filters) {
+        return Objects.requireNonNullElse(user.getExperience(), 0) <= filters.getExperienceMax();
     }
 }

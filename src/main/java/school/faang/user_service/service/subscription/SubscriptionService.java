@@ -69,14 +69,13 @@ public class SubscriptionService {
     }
 
     private Stream<User> filterUsers(Stream<User> users, UserFilterDto filters) {
-        if (filters == null) {
-            return users;
-        }
-        for (UserFilter filter : userFilters) {
-            if (filter.isApplicable(filters)) {
-                users = filter.apply(users, filters);
-            }
-        }
-        return users;
+        List<UserFilter> applicableFilters = userFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .toList();
+
+        return users.filter(user ->
+                applicableFilters.stream()
+                        .allMatch(userFilter ->
+                                userFilter.apply(user, filters)));
     }
 }

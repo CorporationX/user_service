@@ -1,5 +1,7 @@
 package school.faang.user_service.filter.user;
 
+import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
@@ -16,9 +18,8 @@ public class UserCountryFilter extends UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user ->
-                Objects.requireNonNullElse(user.getCountry(), Country.builder().build())
-                        .getTitle().contains(filters.getCountryPattern()));
+    public boolean apply(User user, UserFilterDto filters) {
+        return Objects.requireNonNullElse(user.getCountry(), Country.builder().build())
+                .getTitle().contains(filters.getCountryPattern());
     }
 }

@@ -16,9 +16,8 @@ public class UserPhoneFilter extends UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user ->
-                Objects.requireNonNullElse(user.getPhone(), "")
-                        .contains(filters.getPhonePattern()));
+    public boolean apply(User user, UserFilterDto filters) {
+        return Objects.requireNonNullElse(user.getPhone(), "")
+                .contains(filters.getPhonePattern());
     }
 }

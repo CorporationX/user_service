@@ -1,5 +1,6 @@
 package school.faang.user_service.filter.user;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -17,11 +18,11 @@ public class UserContactFilter extends UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user -> {
-            return Objects.requireNonNullElse(user.getContacts(), Collections.<Contact>emptyList()).stream()
-                    .anyMatch(contact ->
-                            contact.getContact().contains(filters.getContactPattern()));
-        });
+    public boolean apply(User user, UserFilterDto filters) {
+        return Objects.requireNonNullElse(user.getContacts(), Collections.<Contact>emptyList())
+                .stream()
+                .anyMatch(contact ->
+                        contact.getContact()
+                                .contains(filters.getContactPattern()));
     }
 }

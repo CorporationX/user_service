@@ -1,4 +1,4 @@
-package school.faang.user_service.service.recommendation;
+package school.faang.user_service.utils;
 
 public final class RecommendationErrorMessage {
     public static final String RECOMMENDATION_NOT_FOUND = "The recommendation with this id was not found: %s";

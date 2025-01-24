@@ -1,5 +1,6 @@
 package school.faang.user_service.filter.user;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,9 +17,8 @@ public class UserCityFilter extends UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user ->
-                Objects.requireNonNullElse(user.getCity(), "")
-                        .contains(filters.getCityPattern()));
+    public boolean apply(User user, UserFilterDto filters) {
+        return StringUtils.contains(user.getCity(),
+                filters.getCityPattern());
     }
 }

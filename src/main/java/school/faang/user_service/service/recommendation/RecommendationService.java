@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static school.faang.user_service.service.recommendation.RecommendationErrorMessage.RECOMMENDATION_NOT_FOUND;
-import static school.faang.user_service.service.recommendation.RecommendationErrorMessage.RECOMMENDATION_PERIOD;
-import static school.faang.user_service.service.recommendation.RecommendationErrorMessage.SKILL_NOT_FOUND;
+import static school.faang.user_service.utils.RecommendationErrorMessage.RECOMMENDATION_NOT_FOUND;
+import static school.faang.user_service.utils.RecommendationErrorMessage.RECOMMENDATION_PERIOD;
+import static school.faang.user_service.utils.RecommendationErrorMessage.SKILL_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -24,6 +24,15 @@ spring:
       port: 6379
       host: localhost
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          payment-service:
+            url: http://localhost:9080/api/
+            connect-timeout: 5000
+            read-timeout: 5000
+
 server:
   port: 8080
 

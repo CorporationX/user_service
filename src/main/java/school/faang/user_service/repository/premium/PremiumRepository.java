@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PremiumRepository extends CrudRepository<Premium, Long> {
 
-    boolean existsByUserId(long userId);
+    boolean existsByUserIdAndEndDateGreaterThan(long userId, LocalDateTime endDate);
 
     List<Premium> findAllByEndDateBefore(LocalDateTime endDate);
 }

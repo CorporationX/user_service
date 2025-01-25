@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.repository.adapter.MentorshipRequestRepositoryAdapter;
@@ -23,8 +24,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MentorshipRequestService {
 
     private static final int NUMBER_OF_MONTH_THAT_MUST_PASS = 3;
@@ -45,7 +48,13 @@ public class MentorshipRequestService {
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestRequestDto.description());
 
         MentorshipRequest createdMentorshipRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId)
-                .orElseThrow(() -> new DataValidationException("An error occurred while saving the mentorship request"));
+                .orElseThrow(() -> {
+                    log.error("An error occurred while saving the mentorship request");
+
+                    return new DataValidationException("An error occurred while saving the mentorship request");
+                });
+
+        log.info("Mentorship request from user with ID {} to user with ID {} created", requesterId, receiverId);
 
         return mentorshipRequestResponseMapper.toDto(createdMentorshipRequest);
     }
@@ -59,7 +68,11 @@ public class MentorshipRequestService {
             }
         }
 
-        return mentorshipRequestResponseMapper.toDtoList(mentorshipRequests.toList());
+        List<MentorshipRequest> mentorshipRequestsList = mentorshipRequests
+                .peek(mentorshipRequest -> log.info("Mentorship request with ID {} found", mentorshipRequest.getId()))
+                .toList();
+
+        return mentorshipRequestResponseMapper.toDtoList(mentorshipRequestsList);
     }
 
     @Transactional
@@ -70,11 +83,19 @@ public class MentorshipRequestService {
         User receiver = mentorshipRequest.getReceiver();
 
         if (requester.getMentors().contains(receiver)) {
-            throw new DataValidationException("Recipient is already a mentor to the requestor");
+            Long receiverId = receiver.getId();
+            Long requesterId = requester.getId();
+
+            log.error("The user with ID {} is already a mentor for the user with ID {}", receiverId, requesterId);
+
+            throw new DataValidationException("The user with ID " + receiverId
+                    + " is already a mentor for the user with ID " + requesterId);
         }
 
         requester.getMentors().add(receiver);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+
+        log.info("Mentorship request with ID {} accepted", mentorshipRequest.getId());
 
         return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
     }
@@ -86,19 +107,27 @@ public class MentorshipRequestService {
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason(rejection.reason());
 
+        log.info("Mentorship request with ID {} rejected", mentorshipRequest.getId());
+
         return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
     }
 
     private void validateRequestMentorship(Long requesterId, Long receiverId) {
         if (!userRepositoryAdapter.existsById(requesterId)) {
-            throw new DataValidationException("User with identifier \"" + requesterId + "\" does not exist");
+            log.error("User with ID {} does not exist", requesterId);
+
+            throw new DataValidationException("User with ID \"" + requesterId + "\" does not exist");
         }
 
         if (!userRepositoryAdapter.existsById(receiverId)) {
-            throw new DataValidationException("User with identifier \"" + receiverId + "\" does not exist");
+            log.error("User with ID {} does not exist", receiverId);
+
+            throw new DataValidationException("User with ID \"" + receiverId + "\" does not exist");
         }
 
         if (Objects.equals(requesterId, receiverId)) {
+            log.error("User cannot send a mentorship request to himself");
+
             throw new DataValidationException("User cannot send a mentorship request to himself");
         }
 
@@ -110,6 +139,7 @@ public class MentorshipRequestService {
 
             if (LocalDateTime.now().getMonth().getValue()
                     < latestMentorshipRequest.getCreatedAt().getMonth().getValue() + NUMBER_OF_MONTH_THAT_MUST_PASS) {
+                log.error("Mentorship request can be made once every {} months", NUMBER_OF_MONTH_THAT_MUST_PASS);
 
                 throw new DataValidationException("Mentorship request can be made once every "
                         + NUMBER_OF_MONTH_THAT_MUST_PASS + " months");

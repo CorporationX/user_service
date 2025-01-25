@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -17,6 +18,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
+  
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+  
+    public User getUser(Long userId) {
+        if (userId == null) {
+            logger.error("User ID is null");
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
+        return userRepository.findById(userId).orElseThrow(() -> {
+            logger.warn("User with ID {} not found", userId);
+            return new EntityNotFoundException("User with ID: " + userId + " not found");
+        });
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto){
         List<User> users = userRepository.findPremiumUsers().toList();
@@ -37,3 +51,4 @@ public class UserService {
     }
 
 }
+

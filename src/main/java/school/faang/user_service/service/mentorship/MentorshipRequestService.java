@@ -1,8 +1,9 @@
 package school.faang.user_service.service.mentorship;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.repository.adapter.MentorshipRequestRepositoryAdapter;
 import school.faang.user_service.dto.mentorship.MentorshipRequestRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestResponseDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -13,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestResponseMapper;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
@@ -28,7 +30,8 @@ public class MentorshipRequestService {
     private static final int NUMBER_OF_MONTH_THAT_MUST_PASS = 3;
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final UserService userService;
+    private final MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestResponseMapper mentorshipRequestResponseMapper;
 
@@ -37,31 +40,7 @@ public class MentorshipRequestService {
         Long requesterId = mentorshipRequestRequestDto.requesterId();
         Long receiverId = mentorshipRequestRequestDto.receiverId();
 
-        if (!userService.existsById(requesterId)) {
-            throw new DataValidationException("User with identifier \"" + requesterId + "\" does not exist");
-        }
-
-        if (!userService.existsById(receiverId)) {
-            throw new DataValidationException("User with identifier \"" + receiverId + "\" does not exist");
-        }
-
-        if (Objects.equals(requesterId, receiverId)) {
-            throw new DataValidationException("User cannot send a mentorship request to himself");
-        }
-
-        Optional<MentorshipRequest> optionalLatestMentorshipRequest
-                = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
-
-        if (optionalLatestMentorshipRequest.isPresent()) {
-            MentorshipRequest latestMentorshipRequest = optionalLatestMentorshipRequest.get();
-
-            if (LocalDateTime.now().getMonth().getValue()
-                    < latestMentorshipRequest.getCreatedAt().getMonth().getValue() + NUMBER_OF_MONTH_THAT_MUST_PASS) {
-
-                throw new DataValidationException("Mentorship request can be made once every "
-                        + NUMBER_OF_MONTH_THAT_MUST_PASS + " months");
-            }
-        }
+        validateRequestMentorship(requesterId, receiverId);
 
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestRequestDto.description());
 
@@ -83,8 +62,9 @@ public class MentorshipRequestService {
         return mentorshipRequestResponseMapper.toDtoList(mentorshipRequests.toList());
     }
 
+    @Transactional
     public MentorshipRequestResponseDto acceptRequest(long id) {
-        MentorshipRequest mentorshipRequest = findById(id);
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepositoryAdapter.findById(id);
 
         User requester = mentorshipRequest.getRequester();
         User receiver = mentorshipRequest.getReceiver();
@@ -96,23 +76,44 @@ public class MentorshipRequestService {
         requester.getMentors().add(receiver);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
-        mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
     }
 
+    @Transactional
     public MentorshipRequestResponseDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest mentorshipRequest = findById(id);
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepositoryAdapter.findById(id);
 
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason(rejection.reason());
 
-        mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
     }
 
-    public MentorshipRequest findById(long id) {
-        return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Mentorship request with identifier \"" + id
-                        + "\" does not exist"));
+    private void validateRequestMentorship(Long requesterId, Long receiverId) {
+        if (!userRepositoryAdapter.existsById(requesterId)) {
+            throw new DataValidationException("User with identifier \"" + requesterId + "\" does not exist");
+        }
+
+        if (!userRepositoryAdapter.existsById(receiverId)) {
+            throw new DataValidationException("User with identifier \"" + receiverId + "\" does not exist");
+        }
+
+        if (Objects.equals(requesterId, receiverId)) {
+            throw new DataValidationException("User cannot send a mentorship request to himself");
+        }
+
+        Optional<MentorshipRequest> optionalLatestMentorshipRequest
+                = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
+
+        if (optionalLatestMentorshipRequest.isPresent()) {
+            MentorshipRequest latestMentorshipRequest = optionalLatestMentorshipRequest.get();
+
+            if (LocalDateTime.now().getMonth().getValue()
+                    < latestMentorshipRequest.getCreatedAt().getMonth().getValue() + NUMBER_OF_MONTH_THAT_MUST_PASS) {
+
+                throw new DataValidationException("Mentorship request can be made once every "
+                        + NUMBER_OF_MONTH_THAT_MUST_PASS + " months");
+            }
+        }
     }
 }

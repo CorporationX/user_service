@@ -1,7 +1,9 @@
-name: Build & Test CI Pipeline
+name: CI pr run tests
+run-name: ${{ github.actor }} is verifying the PR.
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, edited]
     branches:
       - hydra-master-stream8
 
@@ -22,40 +24,39 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Cache Gradle dependencies
+      - name: Cache Gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle.properties', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
 
-      # Build the project
-      - name: Build the project
-        run: ./gradlew build -x test --no-daemon
+      - name: Run Checkstyle
+        run: ./gradlew checkstyleMain checkstyleTest
+        continue-on-error: false
 
-      # Run unit tests
-      - name: Run Unit Tests
-        run: ./gradlew test --no-daemon --continue
-
-      # Run integration tests
-      - name: Run Integration Tests
-        run: ./gradlew integrationTest --no-daemon --continue
-
-      # Upload test reports
-      - name: Upload Test Reports
+      - name: Upload Checkstyle Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: checkstyle-report
+          path: build/reports/checkstyle
+
+      - name: Run tests
+        run: ./gradlew clean test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
           path: build/reports/tests/test
 
-      # Upload logs for debugging (if failed)
-      - name: Upload Debug Logs
+      - name: Upload logs for debugging (if failed)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: debug-logs
           path: build

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -51,6 +52,7 @@ public class UserServiceTest {
     @Test
     public void testDeactivateUser_UserNotFound() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
         assertThrows(IllegalArgumentException.class, () -> userService.deactivateUser(userId));
     }
 
@@ -71,6 +73,8 @@ public class UserServiceTest {
         verify(eventRepository).findParticipatedEventsByUserId(userId);
         verify(userRepository).save(user);
         verify(mentorshipService).stopUserMentorship(userId);
+
+        assertFalse(user.isActive());
     }
 
     @Test

@@ -2,8 +2,6 @@ package school.faang.user_service.exception;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,8 +12,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.nio.charset.StandardCharsets;
 
-
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor

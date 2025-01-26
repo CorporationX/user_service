@@ -2,6 +2,7 @@ package school.faang.user_service.service.subscription;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Validated
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {

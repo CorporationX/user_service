@@ -7,12 +7,12 @@ import school.faang.user_service.service.AvatarService;
 import school.faang.user_service.service.S3Service;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -32,15 +32,14 @@ public class AvatarServiceTest {
     @Test
     void testGenerateAndSaveAvatar_Success() {
         String username = "testuser";
-        String avatarUrl = "https://s3.amazonaws.com/bucket-name/avatars/testuser.svg";
-        when(diceBearClient.generateAvatar(any(), eq(username))).thenReturn(new byte[]{});
-        when(s3Service.uploadFile(any(), any())).thenReturn(avatarUrl);
+        byte[] avatarBytes = new byte[]{};
 
-        String result = avatarService.generateAndSaveAvatar(username);
+        when(diceBearClient.generateAvatar(any(), eq(username))).thenReturn(avatarBytes);
 
-        assertEquals(avatarUrl, result);
+        avatarService.generateAndSaveAvatar(username);
+
         verify(diceBearClient, times(1)).generateAvatar("adventurer", username);
-        verify(s3Service, times(1)).uploadFile(any(), eq("avatars/testuser.svg"));
+        verify(s3Service, times(1)).uploadFile(eq(avatarBytes), eq("avatars/testuser.svg"));
     }
 
     @Test
@@ -48,7 +47,8 @@ public class AvatarServiceTest {
         String username = "testuser";
         when(diceBearClient.generateAvatar(any(), eq(username))).thenThrow(new RuntimeException("Error"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> avatarService.generateAndSaveAvatar(username));
-        assertEquals("Failed to generate and save avatar for user: testuser", exception.getMessage());
+        assertThrows(RuntimeException.class, () -> avatarService.generateAndSaveAvatar(username));
+        verify(diceBearClient, times(1)).generateAvatar("adventurer", username);
+        verifyNoInteractions(s3Service);
     }
 }

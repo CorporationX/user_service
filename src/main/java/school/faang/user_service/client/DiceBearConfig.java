@@ -4,7 +4,6 @@ import feign.Logger;
 import feign.codec.ErrorDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import school.faang.user_service.client.DiceBearErrorDecoder;
 
 @Configuration
 public class DiceBearConfig {

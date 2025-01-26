@@ -1,40 +1,33 @@
 package school.faang.user_service.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.AvatarDto;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.repository.UserRepository;
 
-@Service
+import java.util.Optional;
+
+@RequiredArgsConstructor
 @Slf4j
+@Service
 public class UserService {
+
     private final UserRepository userRepository;
     private final AvatarService avatarService;
-
-    public UserService(UserRepository userRepository, AvatarService avatarService) {
-        this.userRepository = userRepository;
-        this.avatarService = avatarService;
-    }
+    private final S3Service s3Service;
 
     @Transactional
-    public User createUserWithAvatar(UserDto userDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-
+    public User createUserWithAvatar(User user) {
         user = userRepository.save(user);
 
         log.info("User created with ID: {}, generating avatar.", user.getId());
-        String avatarUrl = avatarService.generateAndSaveAvatar(user.getUsername());
+        avatarService.generateAndSaveAvatar(user.getUsername());
+        String avatarUrl = s3Service.generateS3Url("avatars/" + user.getUsername() + ".svg");
 
-        UserProfilePic profilePic = user.getUserProfilePic();
-        if (profilePic == null) {
-            profilePic = new UserProfilePic();
-        }
+        UserProfilePic profilePic = Optional.ofNullable(user.getUserProfilePic()).orElse(new UserProfilePic());
         profilePic.setAvatarUrl(avatarUrl);
         user.setUserProfilePic(profilePic);
 
@@ -44,21 +37,18 @@ public class UserService {
     }
 
     @Transactional
-    public AvatarDto updateAvatar(String username) {
+    public String updateAvatar(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
-        String newAvatarUrl = avatarService.generateAndSaveAvatar(username);
+        avatarService.generateAndSaveAvatar(username);
+        String avatarUrl = s3Service.generateS3Url("avatars/" + username + ".svg");
 
-        UserProfilePic profilePic = user.getUserProfilePic();
-        if (profilePic == null) {
-            profilePic = new UserProfilePic();
-        }
-        profilePic.setAvatarUrl(newAvatarUrl);
+        UserProfilePic profilePic = Optional.ofNullable(user.getUserProfilePic()).orElse(new UserProfilePic());
+        profilePic.setAvatarUrl(avatarUrl);
         user.setUserProfilePic(profilePic);
 
         userRepository.save(user);
-
-        return new AvatarDto(user.getUsername(), newAvatarUrl);
+        return avatarUrl;
     }
 }

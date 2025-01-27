@@ -1,7 +1,7 @@
 package school.faang.user_service.service.event.filter;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.entity.event.Event;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.dto.event.EventFilterDto;
 
 import java.util.stream.Stream;

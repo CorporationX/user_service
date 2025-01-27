@@ -2,8 +2,8 @@ package school.faang.user_service.dto.event;
 
 import lombok.Getter;
 import lombok.Setter;
-import school.faang.user_service.dto.entity.event.EventStatus;
-import school.faang.user_service.dto.entity.event.EventType;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 
 @Getter
 @Setter

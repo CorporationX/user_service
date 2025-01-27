@@ -3,7 +3,7 @@ package school.faang.user_service.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import school.faang.user_service.dto.entity.RequestStatus;
+import school.faang.user_service.entity.RequestStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -14,11 +14,10 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.SkillService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -51,23 +50,16 @@ public class SkillServiceImpl implements SkillService {
     @Override
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
-        Map<Skill, Long> offersCount = new HashMap<>();
 
-        for (Skill skill : skills) {
-            offersCount.put(skill, offersCount.getOrDefault(skill, 0L) + 1);
-        }
+        Map<Skill, Long> offersCount = skills.stream()
+                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
 
-        List<SkillCandidateDto> skillDtos = new ArrayList<>();
-
-        for (Map.Entry<Skill, Long> entry : offersCount.entrySet()) {
-            SkillCandidateDto dto = SkillCandidateDto.builder()
-                    .skill(skillMapper.toSkillDto(entry.getKey()))
-                    .offersAmount(entry.getValue())
-                    .build();
-            skillDtos.add(dto);
-        }
-
-        return skillDtos;
+        return offersCount.entrySet().stream()
+                .map(entry -> SkillCandidateDto.builder()
+                        .skill(skillMapper.toSkillDto(entry.getKey()))
+                        .offersAmount(entry.getValue())
+                        .build())
+                .toList();
     }
 
     @Override

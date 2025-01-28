@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.UserCacheDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.user_profile.UserProfileSettingsResponseDto;
 import school.faang.user_service.entity.Skill;
@@ -37,6 +38,9 @@ public interface UserMapper {
     default List<Long> mapToUsersId(List<User> users) {
         return mapToIds(users, User::getId);
     }
+
+    @Mapping(source = "followees", target = "followeesIds", qualifiedByName = "mapToUsersId")
+    UserCacheDto toCacheDto(User user);
 
     @Named("mapToSkillsId")
     default List<Long> mapToSkillsId(List<Skill> skills) {

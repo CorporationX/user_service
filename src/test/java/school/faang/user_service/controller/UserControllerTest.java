@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import school.faang.user_service.dto.ProcessResultDto;
+import school.faang.user_service.dto.UserCacheDto;
 import school.faang.user_service.dto.UserContactsDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -253,6 +254,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.userId").value(userId));
     }
 
+    @Test
     @DisplayName("Get user contacts success")
     void testGetUserContactsSuccess() throws Exception {
         Long userId = 1L;
@@ -285,6 +287,41 @@ class UserControllerTest {
         Long userId = null;
 
         mockMvc.perform(get("/users/{userId}/contacts", userId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Get cache user  success")
+    void testGetCacheUserSuccess() throws Exception {
+        Long userId = 1L;
+        UserCacheDto dto = UserCacheDto.builder()
+                .userId(1L)
+                .username("John")
+                .followeesIds(List.of(1L, 2L, 3L))
+                .build();
+        when(userService.getCacheUser(userId)).thenReturn(dto);
+        mockMvc.perform(get("/users/{userId}/cache", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.username").value("John"));
+    }
+
+    @Test
+    @DisplayName("Get cache user fail: Negative  id")
+    void testGetCacheUserNegativeFail() throws Exception {
+        Long userId = -1L;
+
+        mockMvc.perform(get("/users/{userId}/cache", userId))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("User id should be a positive integer")));
+    }
+
+    @Test
+    @DisplayName("Get cache user fail: null id")
+    void testCacheUserNullIdFail() throws Exception {
+        Long userId = null;
+
+        mockMvc.perform(get("/users/{userId}/cache", userId))
                 .andExpect(status().isNotFound());
     }
 }

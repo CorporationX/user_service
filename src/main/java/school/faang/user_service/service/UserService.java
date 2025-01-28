@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.domain.Person;
 import school.faang.user_service.dto.ProcessResultDto;
+import school.faang.user_service.dto.UserCacheDto;
 import school.faang.user_service.dto.UserContactsDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -182,6 +183,11 @@ public class UserService {
         User user = userRepository.findById(userId).get();
 
         return userMapper.toDto(contactPreferenceRepository.findByUserId(user.getId()).get());
+    }
+
+    public UserCacheDto getCacheUser(Long userId) {
+        User user = findUserById(userId);
+        return userMapper.toCacheDto(user);
     }
 
     private List<Person> parsePersons(InputStream inputStream) throws IOException {

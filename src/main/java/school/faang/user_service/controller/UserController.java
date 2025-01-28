@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.ProcessResultDto;
+import school.faang.user_service.dto.UserCacheDto;
 import school.faang.user_service.dto.UserContactsDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -111,8 +112,16 @@ public class UserController {
     @GetMapping("/{userId}/contacts")
     @Operation(summary = "Get contacts of a user", description = "Retrieve a list of contact preferences of a user ")
     public ResponseEntity<UserContactsDto> getUserContacts(
-            @PathVariable @Positive (message = "User id should be a positive integer") Long userId) {
+            @PathVariable @Positive(message = "User id should be a positive integer") Long userId) {
         log.info("Getting contacts of user with id {}", userId);
         return ResponseEntity.ok(userService.getUserContacts(userId));
+    }
+
+    @GetMapping("/{userId}/cache")
+    @Operation(summary = "Get contacts of a user", description = "Retrieve user  for cache ")
+    public ResponseEntity<UserCacheDto> getCacheUser(
+            @PathVariable @Positive(message = "User id should be a positive integer") Long userId) {
+        log.info("Getting  user with id {}__________________________________________________", userId);
+        return ResponseEntity.ok(userService.getCacheUser(userId));
     }
 }

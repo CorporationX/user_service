@@ -17,6 +17,7 @@ import school.faang.user_service.domain.ContactInfo;
 import school.faang.user_service.domain.Education;
 import school.faang.user_service.domain.Person;
 import school.faang.user_service.dto.ProcessResultDto;
+import school.faang.user_service.dto.UserCacheDto;
 import school.faang.user_service.dto.UserContactsDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -918,6 +919,33 @@ class UserServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> userService.getUserContacts(userId));
     }
+
+    @Test
+    @DisplayName("Get cache user success")
+    void testGetCacheUserSuccess() {
+        Long userId = 1L;
+        UserCacheDto dto = UserCacheDto.builder()
+                .userId(1L)
+                .username("John")
+                .followeesIds(List.of(1L, 2L, 3L))
+                .build();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+        when(userMapper.toCacheDto(mockUser)).thenReturn(dto);
+
+        UserCacheDto result = userService.getCacheUser(userId);
+
+        assertEquals(dto, result);
+    }
+
+    @Test
+    @DisplayName("Get cache user when user not found")
+    void testGetCacheUserWhenUserNotFound() {
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.getCacheUser(userId));
+    }
+
 
     private Person createMockPerson(String firstName, String lastName, String email) {
         Address address = new Address("123 Street", "New York", "NY", "Country1", "10001");

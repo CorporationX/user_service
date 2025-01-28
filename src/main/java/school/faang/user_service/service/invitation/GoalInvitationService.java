@@ -39,8 +39,8 @@ public class GoalInvitationService {
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         validateInvitation(invitation);
         GoalInvitation entity = goalInvitationMapper.toEntity(invitation);
-        User inviter = userRepositoryAdapter.findById(invitation.getInviterId());
-        User invited = userRepositoryAdapter.findById(invitation.getInvitedUserId());
+        User inviter = userRepositoryAdapter.getById(invitation.getInviterId());
+        User invited = userRepositoryAdapter.getById(invitation.getInvitedUserId());
         entity.setInviter(inviter);
         entity.setInvited(invited);
         Goal goal = goalRepository.findById(invitation.getGoalId()).orElseThrow(

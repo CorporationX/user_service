@@ -204,8 +204,8 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testCreateInvitation_GoalNotFound() {
-        when(userRepositoryAdapter.findById(1L)).thenReturn(inviter);
-        when(userRepositoryAdapter.findById(2L)).thenReturn(invited);
+        when(userRepositoryAdapter.getById(1L)).thenReturn(inviter);
+        when(userRepositoryAdapter.getById(2L)).thenReturn(invited);
         when(goalInvitationMapper.toEntity(invitationDto)).thenReturn(invitationEntity);
         when(goalRepository.findById(3L)).thenReturn(Optional.empty());
 
@@ -232,8 +232,8 @@ public class GoalInvitationServiceTest {
     @Test
     void testCreateInvitation_Success() {
         when(goalInvitationMapper.toEntity(invitationDto)).thenReturn(invitationEntity);
-        when(userRepositoryAdapter.findById(1L)).thenReturn(null);
-        when(userRepositoryAdapter.findById(2L)).thenReturn(null);
+        when(userRepositoryAdapter.getById(1L)).thenReturn(null);
+        when(userRepositoryAdapter.getById(2L)).thenReturn(null);
         when(goalRepository.findById(3L)).thenReturn(Optional.of(goal));
         when(goalInvitationRepository.save(invitationEntity)).thenReturn(invitationEntity);
         when(goalInvitationMapper.toDto(invitationEntity)).thenReturn(invitationDto);

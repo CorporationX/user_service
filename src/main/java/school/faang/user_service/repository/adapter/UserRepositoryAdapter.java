@@ -1,8 +1,5 @@
 package school.faang.user_service.repository.adapter;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,7 +15,7 @@ public class UserRepositoryAdapter {
         return userRepository.existsById(id);
     }
 
-    public User findById(Long id) {
+    public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
     }
 }

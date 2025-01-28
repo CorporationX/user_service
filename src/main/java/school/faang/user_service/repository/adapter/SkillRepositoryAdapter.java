@@ -35,10 +35,18 @@ public class SkillRepositoryAdapter {
     }
 
     public void assignSkillToUser(long skillId, long userId) {
+        if (!skillRepository.existsById(skillId)) {
+            throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");
+        }
         skillRepository.assignSkillToUser(skillId, userId);
     }
 
     public List<Skill> findAll() {
         return skillRepository.findAll();
+    }
+
+    public boolean skillsExist(List<Long> ids) {
+        int existing = skillRepository.countExisting(ids);
+        return existing == ids.size();
     }
 }

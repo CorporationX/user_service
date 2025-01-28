@@ -1,13 +1,16 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.adapter.GoalRepositoryAdapter;
-import school.faang.user_service.adapter.UserRepositoryAdapter;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.dto.goal.GoalDTO;
 import school.faang.user_service.dto.goal.GoalFilterDTO;
 import school.faang.user_service.entity.Skill;
@@ -18,8 +21,9 @@ import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.filters.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
+import school.faang.user_service.repository.adapter.SkillRepositoryAdapter;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skills.SkillService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +42,7 @@ public class GoalServiceTest {
     @Mock
     private GoalMapper goalMapper;
     @Mock
-    private SkillService skillService;
+    private SkillRepositoryAdapter skillRepositoryAdapter;
     @Mock
     private GoalRepositoryAdapter goalRepositoryAdapter;
     @Mock
@@ -59,7 +63,7 @@ public class GoalServiceTest {
 
         GoalFilter goalFilterMock = Mockito.mock(GoalFilter.class);
         filters = List.of(goalFilterMock);
-        goalService = new GoalService(goalRepository, goalMapper, skillService,
+        goalService = new GoalService(goalRepository, goalMapper, skillRepositoryAdapter,
                 userRepositoryAdapter, filters, goalRepositoryAdapter);
     }
 
@@ -187,9 +191,9 @@ public class GoalServiceTest {
         skill2.setGoals(new ArrayList<>());
         existingGoal.setSkillsToAchieve(new ArrayList<>(List.of(skill1)));
 
-        Mockito.when(skillService.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
+        Mockito.when(skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
         Mockito.when(goalRepositoryAdapter.getById(goalId)).thenReturn(existingGoal);
-        Mockito.when(skillService.findByIds(goalDTO.getSkillToAchieveIds()))
+        Mockito.when(skillRepositoryAdapter.findAllById(goalDTO.getSkillToAchieveIds()))
                 .thenReturn(List.of(skill1, skill2));
         Mockito.when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
         goalService.updateGoal(goalId, goalDTO);
@@ -210,7 +214,7 @@ public class GoalServiceTest {
     public void testUpdateWithGoalCompleted() {
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);
-        Mockito.when(skillService.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
+        Mockito.when(skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
         Mockito.when(goalRepositoryAdapter.getById(1L)).thenReturn(goal);
 
         Assertions.assertThrows(BadRequestException.class, () -> goalService.updateGoal(1L, goalDTO));
@@ -219,14 +223,14 @@ public class GoalServiceTest {
 
     @Test
     public void testCreateWithSkillsNotExists() {
-        Mockito.when(skillService.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(false);
+        Mockito.when(skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(false);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> goalService.createGoal(1L, goalDTO));
     }
 
     @Test
     public void testCreateUserHaveMoreActiveGoalsThanIsAllowed() {
         long userId = 1L;
-        Mockito.when(skillService.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
+        Mockito.when(skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
         Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(4);
         Assertions.assertThrows(BadRequestException.class, () -> goalService.createGoal(userId, goalDTO));
     }
@@ -237,11 +241,11 @@ public class GoalServiceTest {
         Goal goalFromDTO = new Goal();
         goalFromDTO.setTitle("Title");
         User user;
-        Mockito.when(skillService.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
+        Mockito.when(skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())).thenReturn(true);
         Mockito.when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(1);
         Mockito.when(userRepositoryAdapter.getById(userId)).thenReturn(user = new User());
         user.setGoals(new ArrayList<>());
-        Mockito.when(skillService.findByIds(goalDTO.getSkillToAchieveIds())).thenReturn(new ArrayList<>());
+        Mockito.when(skillRepositoryAdapter.findAllById(goalDTO.getSkillToAchieveIds())).thenReturn(new ArrayList<>());
         Mockito.when(goalMapper.toEntity(goalDTO)).thenReturn(goalFromDTO);
         goalService.createGoal(userId, goalDTO);
 

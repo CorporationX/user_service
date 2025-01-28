@@ -3,8 +3,8 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.adapter.GoalRepositoryAdapter;
-import school.faang.user_service.adapter.UserRepositoryAdapter;
+import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.dto.goal.GoalDTO;
 import school.faang.user_service.dto.goal.GoalFilterDTO;
 import school.faang.user_service.entity.Skill;
@@ -15,8 +15,9 @@ import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.exception.ResourceNotFoundException;
 import school.faang.user_service.filters.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.repository.adapter.SkillRepositoryAdapter;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skills.SkillService;
+
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,7 @@ public class GoalService {
 
     private final GoalRepository goalRepository;
     private final GoalMapper goalMapper;
-    private final SkillService skillService;
+    private final SkillRepositoryAdapter skillRepositoryAdapter;
     private final UserRepositoryAdapter userRepositoryAdapter;
     private final List<GoalFilter> goalFilters;
     private final GoalRepositoryAdapter goalRepositoryAdapter;
@@ -56,7 +57,7 @@ public class GoalService {
         goal.setStatus(GoalStatus.ACTIVE);
         User user = userRepositoryAdapter.getById(userId);
         goal.addUser(user);
-        List<Skill> skills = skillService.findByIds(goalDTO.getSkillToAchieveIds());
+        List<Skill> skills = skillRepositoryAdapter.findAllById(goalDTO.getSkillToAchieveIds());
         skills.forEach(goal::addSkill);
         return goalMapper.toDto(goalRepository.save(goal));
     }
@@ -81,7 +82,7 @@ public class GoalService {
             for (Skill skill : goal.getSkillsToAchieve()) {
                 for (User user : users) {
                     if (!user.getSkills().contains(skill)) {
-                        skillService.assignSkillsToUser(skill.getId(), user.getId()); // TODO N+1 problem
+                        skillRepositoryAdapter.assignSkillToUser(skill.getId(), user.getId()); // TODO N+1 problem
                     }
                 }
             }
@@ -132,12 +133,12 @@ public class GoalService {
         }
 
         goal.getSkillsToAchieve().clear();
-        List<Skill> newSkills = skillService.findByIds(newSkillIds);
+        List<Skill> newSkills = skillRepositoryAdapter.findAllById(newSkillIds);
         newSkills.forEach(goal::addSkill);
     }
 
     private void validateGoal(GoalDTO goalDTO) {
-        if (!skillService.skillsExist(goalDTO.getSkillToAchieveIds())) {
+        if (!skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())) {
             throw new ResourceNotFoundException("Unable to find skills");
         }
 

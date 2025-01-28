@@ -1,4 +1,4 @@
-package school.faang.user_service.adapter;
+package school.faang.user_service.repository.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -32,7 +32,7 @@ public interface UserMapper {
 
     @Named("mapToPreference")
     default PreferredContact map(ContactPreference contactPreference) {
-        return contactPreference.getPreference();
+        return contactPreference != null ? contactPreference.getPreference() : null;
     }
 
     default User toEntity(Person person) {

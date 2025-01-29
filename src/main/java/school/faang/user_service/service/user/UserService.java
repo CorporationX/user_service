@@ -124,8 +124,10 @@ public class UserService {
     }
 
     public ShortUserWithAvatarDto getShortUserWithAvatarById(long userId) {
+        log.info("Getting short user with avatar by id {}", userId);
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("user not found!"));
+        log.info("Retrieved short user with avatar {}", user);
         return shortUserWithAvatarMapper.toDto(user);
     }
 
@@ -189,5 +191,10 @@ public class UserService {
         user.setActive(false);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    public List<Long> getUserIds(long page, long pageSize) {
+        long offset = page * pageSize;
+        return userRepository.getUserIds(pageSize, offset);
     }
 }

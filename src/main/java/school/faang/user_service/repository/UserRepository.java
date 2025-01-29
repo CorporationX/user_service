@@ -49,8 +49,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Modifying
     @Query("""
-        UPDATE User u SET u.rankScore = :maxValue WHERE u.id = :userId
-        """)
+            UPDATE User u SET u.rankScore = :maxValue WHERE u.id = :userId
+            """)
     void updateUserRankByUserIdToMax(@Param("userId") Long userId, @Param("maxValue") BigDecimal maxValue);
 
     @Modifying
@@ -78,4 +78,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.id IN(:ids)
             """)
     Optional<List<User>> findAllByIds(@Param("ids") List<Long> ids);
+
+    @Query(nativeQuery = true, value = """
+            SELECT id FROM users
+            ORDER BY id
+            LIMIT :limit OFFSET :offset
+            """)
+    List<Long> getUserIds(long limit, long offset);
 }

@@ -22,6 +22,7 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.data.DataValidationException;
 import school.faang.user_service.mapper.csv.CsvParser;
 import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.country.CountryService;
 import school.faang.user_service.service.mentorship.MentorshipService;
@@ -75,6 +76,8 @@ public class UserServiceTest {
     private CountryService countryService;
     @Mock
     private MentorshipService mentorshipService;
+    @Mock
+    private SubscriptionRepository subscriptionRepository;
 
     @BeforeEach
     void setUp() {

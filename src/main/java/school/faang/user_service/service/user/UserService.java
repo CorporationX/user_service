@@ -11,16 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.subscription.SubscriptionDto;
 import school.faang.user_service.dto.user.Person;
 import school.faang.user_service.dto.user.UpdateUsersRankDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserProfilePic;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.data.DataValidationException;
-import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.mapper.csv.CsvParser;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.service.country.CountryService;
@@ -29,11 +31,7 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
@@ -52,6 +50,7 @@ public class UserService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
+    private final SubscriptionRepository subscriptionRepository;
 
     public Optional<User> findById(long userId) {
         return userRepository.findById(userId);
@@ -180,5 +179,16 @@ public class UserService {
         user.setActive(false);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    public List<SubscriptionDto> findUsersFollowees() {
+       var tuples = subscriptionRepository.findUsersFolloweesTuple()
+                .orElseThrow(() -> new EntityNotFoundException("Users not found!"));
+        return tuples.stream()
+                .map(row -> new SubscriptionDto(
+                        row.get("userId", Long.class),
+                        Arrays.asList((Long[]) row.get("followeeIds"))
+                ))
+                .toList();
     }
 }

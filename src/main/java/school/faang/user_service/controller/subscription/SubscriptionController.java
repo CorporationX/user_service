@@ -64,4 +64,9 @@ public class SubscriptionController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    @GetMapping("{userId}")
+    public List<Long> getUserFollowers(@PathVariable long userId) {
+        return subscriptionService.getFollowers(userId);
+    }
+
 }

@@ -10,8 +10,8 @@ import school.faang.user_service.entity.user.User;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Repository

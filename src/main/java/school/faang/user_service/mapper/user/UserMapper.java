@@ -1,9 +1,6 @@
 package school.faang.user_service.mapper.user;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.Person;
 import school.faang.user_service.entity.contact.ContactPreference;
@@ -19,6 +16,7 @@ public interface UserMapper {
     @Mapping(source = "mentees", target = "menteeIds", qualifiedByName = "mapToId")
     @Mapping(source = "mentors", target = "mentorIds", qualifiedByName = "mapToId")
     @Mapping(source = "contactPreference", target = "preference", qualifiedByName = "mapToPreference")
+    @BeanMapping(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
     UserDto toDto(User user);
 
     @Mapping(target = "mentees", ignore = true)

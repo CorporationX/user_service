@@ -14,9 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import school.faang.user_service.dto.user.UserAvatarSize;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.Person;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
 
@@ -32,7 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,7 +49,11 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private CountryRepository countryRepository;
+    @Mock
     private UserMapper userMapper;
+    @Mock
+    private PersonToUserMapper personToUserMapper;
     @Mock
     private S3Service s3Service;
     @InjectMocks

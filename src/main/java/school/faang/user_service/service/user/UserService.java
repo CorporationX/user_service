@@ -1,6 +1,9 @@
 package school.faang.user_service.service.user;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserAvatarSize;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.Person;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
 
@@ -22,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,7 +38,9 @@ import java.util.List;
 public class UserService {
     private static final String JPEG = "jpeg";
     private final UserRepository userRepository;
+    private final CountryRepository countryRepository;
     private final UserMapper userMapper;
+    private final PersonToUserMapper personToUserMapper;
     private final S3Service s3Service;
 
     @Value("${services.s3.max-image-size-mb}")
@@ -152,5 +163,50 @@ public class UserService {
             log.error("Invalid user ID passed. User ID must not be less than 1");
             throw new IllegalArgumentException("Invalid user ID passed. User ID must not be less than 1");
         }
+    }
+
+    @Transactional
+    public void importUsersFromCSV(InputStream csvInputStream) throws IOException {
+        List<Person> persons = null;
+        try {
+            persons = parseCsv(csvInputStream);
+        } catch (IOException e) {
+            log.error("File processing error", e);
+            throw new IOException("File processing error", e);
+        }
+
+        for (Person person : persons) {
+            Optional<User> existingUser = userRepository.findByEmail(person.getEmail());
+            if (existingUser.isPresent()) {
+                log.warn("User with email {} already exists. Skipping...", person.getEmail());
+                continue;
+            }
+
+            User user = personToUserMapper.personToUser(person);
+            user.setPassword(generateRandomPassword());
+
+            // Check if country exists in the database, if not - create a new one
+            Country country = countryRepository.findByTitle(person.getCountry())
+                    .orElseGet(() -> {
+                        Country c = new Country();
+                        c.setTitle(person.getCountry());
+                        return countryRepository.save(c);
+                    });
+
+            user.setCountry(country);
+
+            userRepository.save(user);
+        }
+    }
+
+    private List<Person> parseCsv(InputStream csvInputStream) throws IOException {
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnReordering(true);
+        MappingIterator<Person> it = csvMapper.readerFor(Person.class).with(schema).readValues(csvInputStream);
+        return it.readAll();
+    }
+
+    private String generateRandomPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 }

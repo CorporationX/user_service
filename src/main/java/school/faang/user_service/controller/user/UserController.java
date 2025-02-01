@@ -3,6 +3,7 @@ package school.faang.user_service.controller.user;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +17,8 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.utilities.UrlUtils;
 
 import java.time.LocalDateTime;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,5 +65,19 @@ public class UserController {
     @DeleteMapping(UrlUtils.ID + UrlUtils.AVATAR)
     public void deleteUserAvatar(@PathVariable("id") @Min(1) Long id) {
         userService.deleteUserAvatar(id);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file uploaded");
+        }
+
+        try (InputStream is = file.getInputStream()) {
+            userService.importUsersFromCSV(is);
+            return ResponseEntity.ok("Users successfully imported");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file");
+        }
     }
 }

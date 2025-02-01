@@ -8,6 +8,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -41,4 +42,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.userProfilePic = null WHERE u.id = ?1")
     void deleteUserProfilePicByUserId(Long userId);
+
+    Optional<User> findByEmail(String email);
 }

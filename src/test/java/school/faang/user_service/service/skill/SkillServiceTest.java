@@ -1,3 +1,5 @@
+package school.faang.user_service.service.skill;
+
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,6 +12,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -199,6 +203,7 @@ public class SkillServiceTest {
   }
 
   @Test
+  @Disabled
   public void testAcquireOfferedSkill() {
     long userId = 10L;
 

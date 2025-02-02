@@ -1,5 +1,8 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
@@ -92,4 +95,69 @@ tasks.bootJar {
 }
 kotlin {
     jvmToolchain(17)
+}
+
+/**
+ * JaCoCo Configuration
+ */
+val jacocoIncludes = listOf(
+    "**/controller/**",
+    "**/filter/**",
+    "**/mapper/**",
+    "**/service/**",
+    "**/validation/**"
+)
+val jacocoExcludes = listOf(
+    "**/adapter/**",
+    "**/client/**",
+    "**/config/**",
+    "**/dto/**",
+    "**/entity/**",
+    "**/exception/**",
+    "**/repository/**"
+)
+
+jacoco {
+    toolVersion = "0.8.12"
+    reportsDirectory.set(layout.buildDirectory.dir("reports/jacoco"))
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+        csv.required.set(false)
+
+        classDirectories.setFrom(
+            sourceSets.main.get().output.asFileTree.matching {
+                include(jacocoIncludes)
+                exclude(jacocoExcludes)
+            }
+        )
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            element = "CLASS"
+            limit {
+                minimum = "0.7".toBigDecimal()
+            }
+        }
+    }
 }

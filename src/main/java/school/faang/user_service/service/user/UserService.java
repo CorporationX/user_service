@@ -1,8 +1,7 @@
 package school.faang.user_service.service.user;
 
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,46 +13,42 @@ import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final List<UserFilter> userFilters;
-    private final UserMapper userMapper;
-  
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-  
-    public User getUser(Long userId) {
-        if (userId == null) {
-            logger.error("User ID is null");
-            throw new IllegalArgumentException("User ID must not be null");
-        }
+  private final UserRepository userRepository;
+  private final List<UserFilter> userFilters;
+  private final UserMapper userMapper;
 
-        return userRepository.findById(userId).orElseThrow(() -> {
-            logger.warn("User with ID {} not found", userId);
-            return new EntityNotFoundException("User with ID: " + userId + " not found");
-        });
+  private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+  public User getUser(Long userId) {
+    if (userId == null) {
+      logger.error("User ID is null");
+      throw new IllegalArgumentException("User ID must not be null");
     }
 
-    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto){
-        List<User> users = userRepository.findPremiumUsers().toList();
-        for (UserFilter filter: userFilters){
-            if (filter.isApplicable(userFilterDto)){
-                users = filter.apply(users,userFilterDto);
-            }
-        }
+    return userRepository
+        .findById(userId)
+        .orElseThrow(
+            () -> {
+              logger.warn("User with ID {} not found", userId);
+              return new EntityNotFoundException("User with ID: " + userId + " not found");
+            });
+  }
 
-        return users.stream()
-                .map(userMapper::toDto)
-                .toList();
-    }
-    public List<UserDto> getPremiumUsers(){
-        return userRepository.findPremiumUsers()
-                .map(userMapper::toDto)
-                .toList();
+  public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+    List<User> users = userRepository.findPremiumUsers().toList();
+    for (UserFilter filter : userFilters) {
+      if (filter.isApplicable(userFilterDto)) {
+        users = filter.apply(users, userFilterDto);
+      }
     }
 
+    return users.stream().map(userMapper::toDto).toList();
+  }
+
+  public List<UserDto> getPremiumUsers() {
+    return userRepository.findPremiumUsers().map(userMapper::toDto).toList();
+  }
 }
-

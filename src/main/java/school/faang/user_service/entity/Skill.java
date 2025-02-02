@@ -12,6 +12,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,9 +23,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -32,38 +31,36 @@ import java.util.List;
 @Table(name = "skill")
 public class Skill {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @Column(name = "title", length = 64, nullable = false, unique = true)
-    private String title;
+  @Column(name = "title", length = 64, nullable = false, unique = true)
+  private String title;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_skill",
-            joinColumns = @JoinColumn(name = "skill_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users;
+  @ManyToMany
+  @JoinTable(
+      name = "user_skill",
+      joinColumns = @JoinColumn(name = "skill_id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id"))
+  private List<User> users;
 
-    @OneToMany(mappedBy = "skill")
-    private List<UserSkillGuarantee> guarantees;
+  @OneToMany(mappedBy = "skill")
+  private List<UserSkillGuarantee> guarantees;
 
-    @ManyToMany(mappedBy = "relatedSkills")
-    private List<Event> events;
+  @ManyToMany(mappedBy = "relatedSkills")
+  private List<Event> events;
 
+  @ManyToMany(mappedBy = "skillsToAchieve")
+  private List<Goal> goals;
 
-    @ManyToMany(mappedBy = "skillsToAchieve")
-    private List<Goal> goals;
+  @CreationTimestamp
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "created_at")
+  private LocalDateTime createdAt;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+  @UpdateTimestamp
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 }

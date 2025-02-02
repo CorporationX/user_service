@@ -9,13 +9,15 @@ import school.faang.user_service.repository.UserRepository;
 @Component
 @RequiredArgsConstructor
 public class UserRepositoryAdapter {
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    public boolean existsById(long id) {
-        return userRepository.existsById(id);
-    }
+  public boolean existsById(long id) {
+    return userRepository.existsById(id);
+  }
 
-    public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
-    }
+  public User getById(Long id) {
+    return userRepository
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+  }
 }

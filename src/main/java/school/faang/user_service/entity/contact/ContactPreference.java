@@ -24,15 +24,15 @@ import school.faang.user_service.entity.User;
 @Table(name = "contact_preferences")
 public class ContactPreference {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "preference", nullable = false)
-    private PreferredContact preference;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "preference", nullable = false)
+  private PreferredContact preference;
 }

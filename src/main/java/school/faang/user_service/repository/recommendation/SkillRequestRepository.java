@@ -7,10 +7,13 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 
 public interface SkillRequestRepository extends CrudRepository<SkillRequest, Long> {
 
-    @Query(nativeQuery = true, value = """
+  @Query(
+      nativeQuery = true,
+      value =
+          """
             INSERT INTO skill_request (request_id, skill_id)
             VALUES (:requestId, :skillId)
             """)
-    @Modifying
-    SkillRequest create(long requestId, long skillId);
+  @Modifying
+  SkillRequest create(long requestId, long skillId);
 }

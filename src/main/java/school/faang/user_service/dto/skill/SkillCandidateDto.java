@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SkillCandidateDto {
-    private SkillDto skillDto;
-    private long offersAmount;
+  private SkillDto skillDto;
+  private long offersAmount;
 }

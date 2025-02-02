@@ -10,6 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GoalFilterDTO {
-    private String title;
-    private String status;
+  private String title;
+  private String status;
 }

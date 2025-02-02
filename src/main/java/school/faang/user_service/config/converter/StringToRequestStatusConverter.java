@@ -6,8 +6,8 @@ import school.faang.user_service.entity.RequestStatus;
 
 @Component
 public class StringToRequestStatusConverter implements Converter<String, RequestStatus> {
-    @Override
-    public RequestStatus convert(String source) {
-        return RequestStatus.valueOf(source.toUpperCase());
-    }
+  @Override
+  public RequestStatus convert(String source) {
+    return RequestStatus.valueOf(source.toUpperCase());
+  }
 }

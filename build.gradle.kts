@@ -7,7 +7,9 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("com.diffplug.spotless") version "6.25.0"
     kotlin("jvm")
+
 }
 
 group = "faang.school"
@@ -122,7 +124,12 @@ tasks.named<Checkstyle>("checkstyleTest") {
 kotlin {
     jvmToolchain(17)
 }
-
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat()
+    }
+}
 /**
  * JaCoCo Configuration
  */

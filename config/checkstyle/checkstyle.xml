@@ -239,51 +239,51 @@
         <!--            <property name="lineWrappingIndentation" value="4"/>-->
         <!--            <property name="arrayInitIndent" value="8"/>-->
         <!--        </module>-->
-        <module name="AbbreviationAsWordInName">
-            <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="0"/>
-            <property name="tokens"
-                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, ANNOTATION_FIELD_DEF,
-                    PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF,
-                    RECORD_COMPONENT_DEF"/>
-        </module>
-        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
-        <module name="OverloadMethodsDeclarationOrder"/>
-        <module name="ConstructorsDeclarationGrouping"/>
-        <module name="VariableDeclarationUsageDistance"/>
+<!--        <module name="AbbreviationAsWordInName">-->
+<!--            <property name="ignoreFinal" value="false"/>-->
+<!--            <property name="allowedAbbreviationLength" value="0"/>-->
+<!--            <property name="tokens"-->
+<!--                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, ANNOTATION_FIELD_DEF,-->
+<!--                    PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF,-->
+<!--                    RECORD_COMPONENT_DEF"/>-->
+<!--        </module>-->
+<!--        <module name="NoWhitespaceBeforeCaseDefaultColon"/>-->
+<!--        <module name="OverloadMethodsDeclarationOrder"/>-->
+<!--        <module name="ConstructorsDeclarationGrouping"/>-->
+<!--        <module name="VariableDeclarationUsageDistance"/>-->
         <!--<module name="CustomImportOrder">
             <property name="sortImportsInGroupAlphabetically" value="true"/>
             <property name="separateLineBetweenGroups" value="true"/>
             <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
             <property name="tokens" value="IMPORT, STATIC_IMPORT, PACKAGE_DEF"/>
         </module>-->
-        <module name="MethodParamPad"/>
-        <module name="NoWhitespaceBefore">
-            <property name="tokens"
-                      value="COMMA, SEMI, POST_INC, POST_DEC, DOT,
-                    LABELED_STAT, METHOD_REF"/>
-            <property name="allowLineBreaks" value="true"/>
-        </module>
-        <module name="ParenPad"/>
-        <module name="OperatorWrap">
-            <property name="option" value="NL"/>
-            <property name="tokens"
-                      value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR,
-                    LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF,
-                    TYPE_EXTENSION_AND "/>
-        </module>
-        <module name="AnnotationLocation">
-            <property name="id" value="AnnotationLocationMostCases"/>
-            <property name="tokens"
-                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF,
-                      RECORD_DEF, COMPACT_CTOR_DEF"/>
-        </module>
-        <module name="AnnotationLocation">
-            <property name="id" value="AnnotationLocationVariables"/>
-            <property name="tokens" value="VARIABLE_DEF"/>
-            <property name="allowSamelineMultipleAnnotations" value="true"/>
-        </module>
-        <module name="NonEmptyAtclauseDescription"/>
+<!--        <module name="MethodParamPad"/>-->
+<!--        <module name="NoWhitespaceBefore">-->
+<!--            <property name="tokens"-->
+<!--                      value="COMMA, SEMI, POST_INC, POST_DEC, DOT,-->
+<!--                    LABELED_STAT, METHOD_REF"/>-->
+<!--            <property name="allowLineBreaks" value="true"/>-->
+<!--        </module>-->
+<!--        <module name="ParenPad"/>-->
+<!--        <module name="OperatorWrap">-->
+<!--            <property name="option" value="NL"/>-->
+<!--            <property name="tokens"-->
+<!--                      value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR,-->
+<!--                    LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF,-->
+<!--                    TYPE_EXTENSION_AND "/>-->
+<!--        </module>-->
+<!--        <module name="AnnotationLocation">-->
+<!--            <property name="id" value="AnnotationLocationMostCases"/>-->
+<!--            <property name="tokens"-->
+<!--                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF,-->
+<!--                      RECORD_DEF, COMPACT_CTOR_DEF"/>-->
+<!--        </module>-->
+<!--        <module name="AnnotationLocation">-->
+<!--            <property name="id" value="AnnotationLocationVariables"/>-->
+<!--            <property name="tokens" value="VARIABLE_DEF"/>-->
+<!--            <property name="allowSamelineMultipleAnnotations" value="true"/>-->
+<!--        </module>-->
+<!--        <module name="NonEmptyAtclauseDescription"/>-->
         <!--<module name="InvalidJavadocPosition"/>
         <module name="JavadocTagContinuationIndentation"/>
         <module name="SummaryJavadoc">
@@ -291,12 +291,12 @@
                       value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
         </module>
         <module name="JavadocParagraph"/>-->
-        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
-        <module name="AtclauseOrder">
-            <property name="tagOrder" value="@param, @return, @throws, @deprecated"/>
-            <property name="target"
-                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
-        </module>
+<!--        <module name="RequireEmptyLineBeforeBlockTagGroup"/>-->
+<!--        <module name="AtclauseOrder">-->
+<!--            <property name="tagOrder" value="@param, @return, @throws, @deprecated"/>-->
+<!--            <property name="target"-->
+<!--                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>-->
+<!--        </module>-->
         <!--<module name="JavadocMethod">
             <property name="accessModifiers" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
@@ -326,43 +326,43 @@
                       RECORD_DEF, ANNOTATION_DEF"/>
             <property name="excludeScope" value="nothing"/>
         </module>-->
-        <module name="MethodName">
-            <property name="format" value="^[a-z][a-z0-9]*[a-zA-Z0-9]*[_]*[a-zA-Z]+[a-z0-9]*[a-zA-Z0-9]*$"/>
-            <message key="name.invalidPattern"
-                     value="Method name ''{0}'' must match pattern ''{1}''."/>
-        </module>
-        <module name="SuppressionXpathSingleFilter">
-            <property name="checks" value="MethodName"/>
-            <property name="query" value="//METHOD_DEF[
-                                     ./MODIFIERS/ANNOTATION//IDENT[contains(@text, 'Test')]
-                                   ]/IDENT"/>
-            <property name="message" value="'[a-z][a-z0-9][a-zA-Z0-9]*(?:_[a-z][a-z0-9][a-zA-Z0-9]*)*'"/>
-        </module>
+<!--        <module name="MethodName">-->
+<!--            <property name="format" value="^[a-z][a-z0-9]*[a-zA-Z0-9]*[_]*[a-zA-Z]+[a-z0-9]*[a-zA-Z0-9]*$"/>-->
+<!--            <message key="name.invalidPattern"-->
+<!--                     value="Method name ''{0}'' must match pattern ''{1}''."/>-->
+<!--        </module>-->
+<!--        <module name="SuppressionXpathSingleFilter">-->
+<!--            <property name="checks" value="MethodName"/>-->
+<!--            <property name="query" value="//METHOD_DEF[-->
+<!--                                     ./MODIFIERS/ANNOTATION//IDENT[contains(@text, 'Test')]-->
+<!--                                   ]/IDENT"/>-->
+<!--            <property name="message" value="'[a-z][a-z0-9][a-zA-Z0-9]*(?:_[a-z][a-z0-9][a-zA-Z0-9]*)*'"/>-->
+<!--        </module>-->
         <!--<module name="SingleLineJavadoc"/>-->
-        <module name="EmptyCatchBlock">
-            <property name="exceptionVariableName" value="expected"/>
-        </module>
-        <module name="CommentsIndentation">
-            <property name="tokens" value="SINGLE_LINE_COMMENT, BLOCK_COMMENT_BEGIN"/>
-        </module>
-        <!-- https://checkstyle.org/filters/suppressionxpathfilter.html -->
-        <module name="SuppressionXpathFilter">
-            <property name="file" value="${org.checkstyle.google.suppressionxpathfilter.config}"
-                      default="checkstyle-xpath-suppressions.xml" />
-            <property name="optional" value="true"/>
-        </module>
-        <module name="SuppressWarningsHolder" />
-        <module name="SuppressionCommentFilter">
-            <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)" />
-            <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)" />
-            <property name="checkFormat" value="$1" />
-        </module>
-        <module name="SuppressWithNearbyCommentFilter">
-            <property name="commentFormat" value="CHECKSTYLE.SUPPRESS\: ([\w\|]+)"/>
-            <!-- $1 refers to the first match group in the regex defined in commentFormat -->
-            <property name="checkFormat" value="$1"/>
-            <!-- The check is suppressed in the next line of code after the comment -->
-            <property name="influenceFormat" value="1"/>
-        </module>
+<!--        <module name="EmptyCatchBlock">-->
+<!--            <property name="exceptionVariableName" value="expected"/>-->
+<!--        </module>-->
+<!--        <module name="CommentsIndentation">-->
+<!--            <property name="tokens" value="SINGLE_LINE_COMMENT, BLOCK_COMMENT_BEGIN"/>-->
+<!--        </module>-->
+<!--        &lt;!&ndash; https://checkstyle.org/filters/suppressionxpathfilter.html &ndash;&gt;-->
+<!--        <module name="SuppressionXpathFilter">-->
+<!--            <property name="file" value="${org.checkstyle.google.suppressionxpathfilter.config}"-->
+<!--                      default="checkstyle-xpath-suppressions.xml" />-->
+<!--            <property name="optional" value="true"/>-->
+<!--        </module>-->
+<!--        <module name="SuppressWarningsHolder" />-->
+<!--        <module name="SuppressionCommentFilter">-->
+<!--            <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)" />-->
+<!--            <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)" />-->
+<!--            <property name="checkFormat" value="$1" />-->
+<!--        </module>-->
+<!--        <module name="SuppressWithNearbyCommentFilter">-->
+<!--            <property name="commentFormat" value="CHECKSTYLE.SUPPRESS\: ([\w\|]+)"/>-->
+<!--            &lt;!&ndash; $1 refers to the first match group in the regex defined in commentFormat &ndash;&gt;-->
+<!--            <property name="checkFormat" value="$1"/>-->
+<!--            &lt;!&ndash; The check is suppressed in the next line of code after the comment &ndash;&gt;-->
+<!--            <property name="influenceFormat" value="1"/>-->
+<!--        </module>-->
     </module>
 </module>

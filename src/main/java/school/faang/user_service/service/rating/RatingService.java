@@ -90,45 +90,21 @@ public class RatingService {
         if (topUsers == null || topUsers.isEmpty()) {
             List<UserRating> userRatings = calculateAllRatings();
             updateFullRating(calculateFullScores(userRatings));
+            topUsers = topUserRepository.getTopUsersWithScores();
         }
 
-        return topUserRepository.getTopUsersWithScores().entrySet().stream()
+        return topUsers.entrySet().stream()
                 .sorted(Comparator.comparingDouble(longDoubleEntry -> -longDoubleEntry.getValue()))
                 .map(Map.Entry::getKey)
                 .toList();
     }
 
-    public void updateAllRatings() {
-        log.info("Updating all ratings");
-        List<UserRating> userRatings = calculateAllRatings();
-        updateFullRating(calculateFullScores(userRatings));
-        updateAllUserRatings(userRatings);
-    }
-
-    private void updateAllUserRatings(List<UserRating> userRatings) {
-        userRatings.stream()
-                .forEach(userRating -> {
-                    UserRating rating = userRatingRepository.findByUserIdAndTypeNameIs(userRating.getUser().getId(),
-                            userRating.getType().getName());
-                    if (rating == null) {
-                        rating = UserRating.builder()
-                                .user(userRating.getUser())
-                                .type(userRating.getType())
-                                .build();
-                    }
-                    rating.setScore(userRating.getScore());
-                    log.debug("Updating user rating {}", rating);
-                    userRatingRepository.save(rating);
-                });
-    }
-
     private void updateFullRating(Map<Long, Integer> scoreMap) {
         log.info("Updating full rating");
-        scoreMap.entrySet().stream()
-                .forEach(entry -> {
-                    log.debug("Updating user rating {}", entry.getKey());
-                    topUserRepository.save(entry.getKey(), entry.getValue().doubleValue());
-                });
+        scoreMap.forEach((key, value) -> {
+            log.debug("Updating user rating {}", key);
+            topUserRepository.save(key, value.doubleValue());
+        });
     }
 
     private Map<Long, Integer> calculateFullScores(List<UserRating> userRatings) {
@@ -145,6 +121,7 @@ public class RatingService {
                 .followeeRating(true)
                 .goalRating(true)
                 .menteeRating(true)
+                .premiumRating(true)
                 .skillRating(true)
                 .build();
 

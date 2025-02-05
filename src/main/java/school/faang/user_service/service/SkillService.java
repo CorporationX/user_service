@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.service.rating.annotation.AcquireSkill;
+import school.faang.user_service.service.rating.annotation.CreateSkill;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -26,9 +28,8 @@ import java.util.Optional;
 @Service
 public class SkillService {
 
-    private final SkillValidator skillValidator;
     private static final int MIN_SKILL_OFFERS = 3;
-
+    private final SkillValidator skillValidator;
     private final SkillOfferRepository skillOfferRepository;
     private final UserRepository userRepository;
     private final SkillCandidateMapper skillCandidateMapper;
@@ -67,6 +68,7 @@ public class SkillService {
         return skills;
     }
 
+    @CreateSkill
     @Transactional
     public Skill create(Skill skill) {
         skillValidator.validateSkill(skill);
@@ -96,6 +98,7 @@ public class SkillService {
                 .toList();
     }
 
+    @AcquireSkill
     @Transactional
     public Skill acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = getSkillById(skillId);

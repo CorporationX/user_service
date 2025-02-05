@@ -22,7 +22,7 @@ public class PremiumRank implements UserRank {
 
     @Override
     public boolean isApplicable(UserRatingDto ratings) {
-        return ratings != null && ratings.isSkillRating();
+        return ratings != null && ratings.isPremiumRating();
     }
 
     @Override

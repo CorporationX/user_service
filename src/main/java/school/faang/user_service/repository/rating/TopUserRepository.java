@@ -6,7 +6,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -16,14 +16,14 @@ public class TopUserRepository {
     private final RedisTemplate<String, Long> redisTemplate;
 
     public boolean save(Long userId, Double score) {
-        //TODO
-        return redisTemplate.opsForZSet().add(REDIS_KEY_TOP_USERS, userId, score);
+        Boolean addedResult = redisTemplate.opsForZSet().add(REDIS_KEY_TOP_USERS, userId, score);
+        return Boolean.TRUE.equals(addedResult);
     }
 
     public Map<Long, Double> getTopUsersWithScores() {
         try {
-            return ((Set<ZSetOperations.TypedTuple<Long>>) redisTemplate.opsForZSet()
-                    .reverseRangeWithScores(REDIS_KEY_TOP_USERS, 0, 100))
+            return Objects.requireNonNull(redisTemplate.opsForZSet()
+                            .reverseRangeWithScores(REDIS_KEY_TOP_USERS, 0, 100))
                     .stream()
                     .collect(Collectors.toMap(ZSetOperations.TypedTuple::getValue, ZSetOperations.TypedTuple::getScore));
         } catch (NullPointerException e) {

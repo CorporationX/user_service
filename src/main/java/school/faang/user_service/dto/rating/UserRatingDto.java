@@ -12,4 +12,5 @@ public class UserRatingDto {
     private final boolean skillRating;
     private final boolean followeeRating;
     private final boolean menteeRating;
+    private final boolean premiumRating;
 }

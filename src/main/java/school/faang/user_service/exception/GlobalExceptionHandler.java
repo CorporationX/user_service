@@ -33,6 +33,9 @@ public class GlobalExceptionHandler {
         ERROR_STATUS_MAP.put(Exception.class, ErrorMessages.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Обработка ошибок валидации
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         log.error("Validation exception: {}", ex.getMessage(), ex);
@@ -45,6 +48,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Универсальный обработчик ошибок
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception ex) {
         ErrorMessages errorMessage = ERROR_STATUS_MAP.getOrDefault(ex.getClass(), ErrorMessages.INTERNAL_SERVER_ERROR);

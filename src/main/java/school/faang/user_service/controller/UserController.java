@@ -1,8 +1,8 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.UserService;
@@ -16,7 +16,7 @@ public class UserController {
 
     private UserService userService;
 
-    @DeleteMapping(USER_ID_PATH)
+    @PutMapping(USER_ID_PATH)
     public void deactivateUser(@PathVariable Long userId) {
         userService.deactivateUser(userId);
     }

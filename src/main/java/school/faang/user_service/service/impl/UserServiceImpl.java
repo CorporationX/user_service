@@ -26,13 +26,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deactivateUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with [%s] not found", userId)));
 
         deactivateUserActivities(user);
-
         user.setActive(false);
-        userRepository.save(user);
-
         deactivateMentorship(user);
     }
 
@@ -43,7 +40,6 @@ public class UserServiceImpl implements UserService {
         List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(user.getId());
         participatedEvents.forEach(event -> {
             event.getAttendees().remove(user);
-            eventRepository.save(event);
         });
 
         List<Goal> userGoals = goalRepository.findGoalsByUserId(user.getId()).toList();
@@ -53,7 +49,6 @@ public class UserServiceImpl implements UserService {
                 goalRepository.deleteById(goal.getId());
             } else {
                 goal.getUsers().remove(user);
-                goalRepository.save(goal);
             }
         });
     }
@@ -61,18 +56,15 @@ public class UserServiceImpl implements UserService {
     private void deactivateMentorship(User user) {
         user.getMentees().forEach(mentee -> {
             mentee.getMentors().remove(user);
-            userRepository.save(mentee);
         });
 
         user.getMentors().forEach(mentor -> {
             mentor.getMentees().remove(user);
-            userRepository.save(mentor);
         });
 
         List<Goal> mentoredGoals = goalRepository.findAllByMentorId(user.getId());
         mentoredGoals.forEach(goal -> {
             goal.setMentor(null);
-            goalRepository.save(goal);
         });
     }
 }

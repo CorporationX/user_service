@@ -80,7 +80,6 @@ public class UserServiceImplTest {
         userService.deactivateUser(userId);
 
         assertFalse(user.isActive());
-        verify(userRepository, times(1)).save(user);
         verify(eventRepository, times(1)).findAllByUserId(userId);
         verify(eventRepository, times(1)).findParticipatedEventsByUserId(userId);
         verify(goalRepository, times(1)).findGoalsByUserId(userId);
@@ -101,7 +100,6 @@ public class UserServiceImplTest {
         userService.deactivateUser(userId);
 
         verify(eventRepository).deleteById(eventId);
-        verify(eventRepository).save(participatedEvent);
         assertFalse(participatedEvent.getAttendees().contains(user));
     }
 
@@ -156,8 +154,6 @@ public class UserServiceImplTest {
 
         assertFalse(goal.getUsers().contains(userToDeactivate));
 
-        verify(goalRepository, times(1)).save(goal);
-
         verify(goalRepository, never()).deleteById(goalId);
     }
 
@@ -177,8 +173,6 @@ public class UserServiceImplTest {
 
         userService.deactivateUser(userId);
 
-        verify(userRepository).save(mentee);
-        verify(userRepository).save(mentor);
         assertFalse(mentee.getMentors().contains(user));
         assertFalse(mentor.getMentees().contains(user));
     }
@@ -193,8 +187,6 @@ public class UserServiceImplTest {
         when(goalRepository.findAllByMentorId(userId)).thenReturn(List.of(goal));
 
         userService.deactivateUser(userId);
-
-        verify(goalRepository).save(goal);
         assertNull(goal.getMentor());
     }
 }

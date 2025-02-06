@@ -38,9 +38,7 @@ public class UserServiceImpl implements UserService {
         ownedEvents.forEach(event -> eventRepository.deleteById(event.getId()));
 
         List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(user.getId());
-        participatedEvents.forEach(event -> {
-            event.getAttendees().remove(user);
-        });
+        participatedEvents.forEach(event -> event.getAttendees().remove(user));
 
         List<Goal> userGoals = goalRepository.findGoalsByUserId(user.getId()).toList();
         userGoals.forEach(goal -> {
@@ -54,17 +52,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void deactivateMentorship(User user) {
-        user.getMentees().forEach(mentee -> {
-            mentee.getMentors().remove(user);
-        });
-
-        user.getMentors().forEach(mentor -> {
-            mentor.getMentees().remove(user);
-        });
+        user.getMentees().forEach(mentee -> mentee.getMentors().remove(user));
+        user.getMentors().forEach(mentor -> mentor.getMentees().remove(user));
 
         List<Goal> mentoredGoals = goalRepository.findAllByMentorId(user.getId());
-        mentoredGoals.forEach(goal -> {
-            goal.setMentor(null);
-        });
+        mentoredGoals.forEach(goal -> goal.setMentor(null));
     }
 }

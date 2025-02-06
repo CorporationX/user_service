@@ -23,6 +23,8 @@ public class GlobalExceptionHandler {
     static {
         ERROR_STATUS_MAP.put(DataValidationException.class, ErrorMessages.BAD_REQUEST);
         ERROR_STATUS_MAP.put(BusinessException.class, ErrorMessages.UNPROCESSABLE_ENTITY);
+        ERROR_STATUS_MAP.put(DiceBearException.class, ErrorMessages.INTERNAL_SERVER_ERROR);
+        ERROR_STATUS_MAP.put(S3Exception.class, ErrorMessages.INTERNAL_SERVER_ERROR);
 
         ERROR_STATUS_MAP.put(NoSuchElementException.class, ErrorMessages.NOT_FOUND);
         ERROR_STATUS_MAP.put(IllegalStateException.class, ErrorMessages.CONFLICT);
@@ -31,6 +33,9 @@ public class GlobalExceptionHandler {
         ERROR_STATUS_MAP.put(Exception.class, ErrorMessages.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Обработка ошибок валидации
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         log.error("Validation exception: {}", ex.getMessage(), ex);
@@ -43,6 +48,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Универсальный обработчик ошибок
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception ex) {
         ErrorMessages errorMessage = ERROR_STATUS_MAP.getOrDefault(ex.getClass(), ErrorMessages.INTERNAL_SERVER_ERROR);

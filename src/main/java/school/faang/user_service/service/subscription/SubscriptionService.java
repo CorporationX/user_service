@@ -9,8 +9,8 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.redis.publisher.UserFollowerEventPublisher;
 import school.faang.user_service.redis.event.UserFollowerEvent;
+import school.faang.user_service.redis.publisher.UserFollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.subscription.SubscriptionValidator;
@@ -97,5 +97,10 @@ public class SubscriptionService {
 
     public boolean checkFollowerOfFollowee(long followeeId, long followerId) {
         return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+    }
+
+    public List<Long> getActiveFollowersBatch(Long authorId, Long lastId, int batchSize) {
+        log.info("Fetching follower IDs by followee IDs");
+        return subscriptionRepository.findActiveFollowersBatch(authorId, lastId, batchSize);
     }
 }

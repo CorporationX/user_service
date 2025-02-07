@@ -39,11 +39,19 @@ public class AvatarService {
     private final DiceBearService diceBearService;
 
     @Transactional(readOnly = true)
-    public byte[] getUserAvatar(Long userId) {
-        log.info("Start receiving avatar for user ID: {}", userId);
+    public byte[] getOriginalUserAvatar(Long userId) {
+        log.info("Start receiving original avatar for user ID: {}", userId);
         UserProfilePic userProfilePic = userRepository.findUserProfilePicByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(AVATAR_NOT_FOUND, userId)));
         return minioService.downloadFile(userProfilePic.getFileId());
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getSmallUserAvatar(Long userId) {
+        log.info("Start receiving small avatar for user ID: {}", userId);
+        UserProfilePic userProfilePic = userRepository.findUserProfilePicByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(AVATAR_NOT_FOUND, userId)));
+        return minioService.downloadFile(userProfilePic.getSmallFileId());
     }
 
     @Transactional

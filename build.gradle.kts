@@ -49,6 +49,12 @@ dependencies {
     implementation("io.minio:minio:8.3.3")
 
     /**
+     * Kafka
+     */
+    implementation("org.springframework.kafka:spring-kafka:3.0.9")
+    testImplementation("org.springframework.kafka:spring-kafka-test:3.0.9")
+
+    /**
      * Swagger
      */
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3")

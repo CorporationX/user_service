@@ -29,6 +29,9 @@ spring:
     redis:
       port: 6379
       host: localhost
+      cache:
+        users:
+          ttl-seconds: 86400
       channel:
         follower: follower_channel
         skill: skill_channel
@@ -37,6 +40,20 @@ spring:
         mentorship:
           accepted: mentorship_accepted_channel
           requested: mentorship_requested_channel
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      retries: 10
+      acks: all
+    group-id: my-group
+    event:
+      feed-distribution:
+        batch-size: 500
+        db-batch-size: 2500
+    topics:
+      post-published: post.published
+      post-feed-distribution: post.feed-distribution
 
   servlet:
     multipart:
@@ -79,3 +96,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+executor:
+  feed-distribution:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 1000
+    keep-alive-time: 60

@@ -112,7 +112,7 @@ public class UserController {
 
     @GetMapping("/{userId}/avatar")
     public ResponseEntity<Resource> getUserAvatar(@PathVariable Long userId) {
-        byte[] avatarData = avatarService.getUserAvatar(userId);
+        byte[] avatarData = avatarService.getOriginalUserAvatar(userId);
         ByteArrayResource resource = new ByteArrayResource(avatarData);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)

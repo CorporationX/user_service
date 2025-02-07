@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V009__user_banned.sql
   - include:
       file: db/changelog/changeset/user_V010__user_telegram_chat_id.sql
+  - include:
+      file: db/changelog/changeset/user_V011__add_indexes_for_user_ids.sql

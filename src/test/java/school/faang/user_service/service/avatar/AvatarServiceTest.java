@@ -76,25 +76,25 @@ class AvatarServiceTest {
     }
 
     @Test
-    void getUserAvatarSuccessTest() {
+    void getOriginalUserAvatarSuccessTest() {
         byte[] avatarData = "user_avatar_data".getBytes();
         UserProfilePic userProfilePic = new UserProfilePic("fileId", "smallFileId");
 
         when(userRepository.findUserProfilePicByUserId(USER_ID)).thenReturn(Optional.of(userProfilePic));
         when(minioService.downloadFile("fileId")).thenReturn(avatarData);
 
-        byte[] result = avatarService.getUserAvatar(USER_ID);
+        byte[] result = avatarService.getOriginalUserAvatar(USER_ID);
 
         assertNotNull(result);
         assertEquals(avatarData.length, result.length);
     }
 
     @Test
-    void getUserAvatarNotFoundTest() {
+    void getOriginalUserAvatarNotFoundTest() {
         when(userRepository.findUserProfilePicByUserId(USER_ID)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            avatarService.getUserAvatar(USER_ID);
+            avatarService.getOriginalUserAvatar(USER_ID);
         });
 
         assertEquals("Avatar not found for user ID: " + USER_ID, exception.getMessage());

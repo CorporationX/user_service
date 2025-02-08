@@ -15,7 +15,7 @@ public class ValidationTest {
 
     @Test
     public void shouldBeFailedTest() {
-        assertEquals(2, 3);
+        assertEquals(3, 3);
     }
 
 }

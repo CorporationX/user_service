@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ValidationTest {
 
     @Test
-    public void shouldBeSuccess() {
+    public void shouldBeSuccess(){
         String t1 = "aj";
         String k2 = "aa";
         assertEquals(t1, k2);

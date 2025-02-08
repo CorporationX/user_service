@@ -23,10 +23,10 @@ jobs:
       #  run: ./gradlew checkstyle
 
       - name: Build with Gradle
-        run: ./gradlew build --no-deamon
+        run: ./gradlew build 
 
       - name: Run tests
-        run: ./gradlew test --no-deamon
+        run: ./gradlew test 
 
 
       - name: Checkstyle report

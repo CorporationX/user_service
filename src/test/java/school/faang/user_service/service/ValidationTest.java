@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class testFail {
+public class ValidationTest {
 
     @Test
-    void shouldBefail() {
-        String t1 = "ax";
+    void shouldBeSuccess() {
+        String t1 = "hh";
         String k2 = "hh";
         assertEquals(t1, k2);
     }

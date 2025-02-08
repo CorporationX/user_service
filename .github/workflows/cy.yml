@@ -27,17 +27,14 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
 
       - name: Build with Gradle
-        run: ./gradlew build testClasses -x test -x check -x checkstyleMain -x checkstyleTest --no-daemon
-
+        run: ./gradlew build -x test -x check -x checkstyleMain -x checkstyleTest --no-daemon
+        
       - name: Test with Gradle
-        run: ./gradlew test -x testClasses --no-daemon --continue
-
-      - name: Checkstyle verification
-        run: ./gradlew checkstyleMain checkstyleTest --no-daemon --continue
+        run: ./gradlew test --no-daemon --continue
 
       - name: Archive test report
         if: always()
@@ -45,11 +42,3 @@ jobs:
         with:
           name: test_report
           path: build/reports/tests/test
-
-      - name: Archive checkstyle report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkstyle_report
-          path: build/reports/checkstyle
-

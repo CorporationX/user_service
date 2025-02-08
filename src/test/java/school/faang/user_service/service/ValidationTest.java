@@ -18,8 +18,4 @@ public class ValidationTest {
         assertEquals(3, 3);
     }
 
-    @Test
-    public void newTest() {
-        assertEquals(1, 1);
-    }
 }

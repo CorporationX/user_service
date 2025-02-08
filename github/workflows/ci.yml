@@ -22,7 +22,7 @@ jobs:
           distribution: 'corretto'
 
       - name: build, checkstyle, test
-        run: ./gradlew build test -x testClasses checkstyleMain checkstyleTest --no-daemon --continue
+        run: ./gradlew build test -x testClasses checkstyleTest --no-daemon --continue
 
       - name: Checkstyle report
         if: always()

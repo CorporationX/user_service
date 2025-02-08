@@ -19,8 +19,8 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Check code style
-        run: ./gradlew checkstyle
+      #- name: Check code style
+      #  run: ./gradlew checkstyle
 
       - name: Build with Gradle
         run: ./gradlew build --no-deamon

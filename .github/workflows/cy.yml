@@ -53,5 +53,3 @@ jobs:
           name: checkstyle_report
           path: build/reports/checkstyle
 
-              body: message
-            });

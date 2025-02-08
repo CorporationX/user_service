@@ -16,10 +16,10 @@ public class ValidationTest {
     @Test
     public void checkstyleShoulfail() {
         if (true){
-            System.out.println("it's true");
+            System.out.println("It's true");
         }
         if( 3 < 5 ) {
-            System.out.println("no space after if");
+            System.out.println("No space after if");
         }
     }
 

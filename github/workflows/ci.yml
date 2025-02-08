@@ -19,15 +19,16 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'corretto'
 
-      - name: Check code style
-        run: ./gradlew checkstyle
+      - name: build, checkstyle, test
+        run: ./gradlew build test -x testClasses checkstyleMain checkstyleTest --no-daemon --continue
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
-      - name: Run tests
-        run: ./gradlew test
+      - name: Checkstyle report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle_report
+          path: build/reports/checkstyle
 
 

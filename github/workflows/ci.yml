@@ -21,8 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: build, checkstyle, test
-        run: ./gradlew build test -x testClasses checkstyleTest --no-daemon --continue
+      - name: Run build
+        run: ./gradlew build
+
+      - name: Run tests
+        run: ./gradlew test --no-daemon
 
       - name: Checkstyle report
         if: always()
@@ -30,5 +33,6 @@ jobs:
         with:
           name: checkstyle_report
           path: build/reports/checkstyle
+
 
 

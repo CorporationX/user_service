@@ -8,7 +8,7 @@ public class ValidationTest {
 
     @Test
     public void shouldBeSuccess() {
-        String t1 = "aa";
+        String t1 = "aj";
         String k2 = "aa";
         assertEquals(t1, k2);
     }

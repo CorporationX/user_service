@@ -18,6 +18,8 @@ import school.faang.user_service.service.event.impl.EventServiceImpl;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -63,6 +65,8 @@ public class EventServiceImplTest {
     private static final Skill SECOND_SKILL = Skill.builder().id(2L).build();
     private static final List<Event> EVENTS = List.of(new Event(), new Event());
     private static final List<EventDto> EVENT_DTOS = List.of(new EventDto(), new EventDto());
+    private static final int BATCH_SIZE = 4;
+    private static final List<Long> EVENTS_ID = List.of(1L, 2L, 3L, 4L, 5L, 6L);
 
     @BeforeEach
     void setUp() {
@@ -72,6 +76,7 @@ public class EventServiceImplTest {
                 userRepositoryAdapter,
                 eventMapper,
                 List.of(eventTitleFilter, eventDescriptionFilter));
+        eventService.setBatchSize(BATCH_SIZE);
     }
 
     @Test
@@ -252,5 +257,17 @@ public class EventServiceImplTest {
         verify(eventDescriptionFilter).apply(any(Stream.class), eq(filters));
         List<Event> capturedEvents = eventsCaptor.getValue();
         assertEquals(1, capturedEvents.size());
+    }
+
+    @Test
+    public void testDeleteEvents() {
+        when(eventRepository.findAllEndEvents(any(LocalDateTime.class))).thenReturn(EVENTS_ID);
+        eventService.clearEvents();
+    }
+
+    @Test
+    public void testDeleteEventsFailed() {
+        when(eventRepository.findAllEndEvents(any(LocalDateTime.class))).thenReturn(new ArrayList<>());
+        eventService.clearEvents();
     }
 }

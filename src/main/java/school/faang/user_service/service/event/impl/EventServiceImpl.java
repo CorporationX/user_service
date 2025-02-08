@@ -1,6 +1,11 @@
 package school.faang.user_service.service.event.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.event.Event;
@@ -13,17 +18,23 @@ import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final SkillService skillService;
     private final UserRepositoryAdapter userRepositoryAdapter;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
+
+    @Value("${app.batch_size}")
+    @Setter
+    private int batchSize;
 
     @Override
     @Transactional
@@ -84,5 +95,22 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> getParticipatedEvents(long userId) {
         List<Event> participatedEventsByUserId = eventRepository.findParticipatedEventsByUserId(userId);
         return eventMapper.toDto(participatedEventsByUserId);
+    }
+
+    @Override
+    @Async("cachedThreadPool")
+    public void clearEvents() {
+        LocalDateTime date = LocalDateTime.now();
+        List<Long> events = eventRepository.findAllEndEvents(date);
+        if (events.isEmpty()) {
+            log.info("There is no events to delete.");
+            return;
+        }
+        log.info("Found {} events to delete.", events.size());
+        Iterable<List<Long>> eventPartitions = ListUtils.partition(events, batchSize);
+        eventPartitions.forEach(list -> {
+            eventRepository.deleteAllByIdInBatch(list);
+            log.info("Delete {} rows. ID:{}", list.size(), list.toString());
+        });
     }
 }

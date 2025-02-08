@@ -31,7 +31,7 @@ jobs:
           restore-keys: gradle-${{ runner.os }}-
 
       - name: Build with Gradle
-        run: ./gradlew build -x test -x check -x checkstyleMain -x checkstyleTest --no-daemon
+        run: ./gradlew build -x test --no-daemon
         
       - name: Test with Gradle
         run: ./gradlew test --no-daemon --continue

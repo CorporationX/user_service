@@ -8,14 +8,14 @@ public class ValidationTest {
 
     @Test
     public void shouldBeSuccess(){
-        String t1 = "aj";
-        String k2 = "aa";
-        assertEquals(t1, k2);
+        String t1 = "aa";
+        String t2 = "aa";
+        assertEquals(t1, t2);
     }
 
     @Test
     public void shouldBeFailedTest() {
-        assertEquals(3, 3);
+        assertEquals(2, 3);
     }
 
 }

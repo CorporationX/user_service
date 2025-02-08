@@ -20,12 +20,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+  
+      - name: Check code style
+        run: ./gradlew checkstyle
 
-      - name: Run build
-        run: ./gradlew build
+      - name: Build with Gradle
+        run: ./gradlew build --no-deamon
 
       - name: Run tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew test --no-deamon
 
       - name: Checkstyle report
         if: always()

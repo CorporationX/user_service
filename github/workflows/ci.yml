@@ -1,4 +1,4 @@
-name: CI pipeline for user_service (unicorn8 team)
+name: CI unicorn8 user_service
 
 on:
   pull_request:

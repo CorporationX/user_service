@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ValidationTest {
 
@@ -15,12 +16,7 @@ public class ValidationTest {
 
     @Test
     public void checkstyleShoulfail() {
-        if (true){
-            System.out.println("It's true");
-        }
-        if( 3 < 5 ) {
-            System.out.println("No space after if");
-        }
+        assertFalse(false);
     }
 
     @Test

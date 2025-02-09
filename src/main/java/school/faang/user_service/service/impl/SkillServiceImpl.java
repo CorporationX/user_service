@@ -1,10 +1,12 @@
 package school.faang.user_service.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.entity.Skill;
-import school.faang.user_service.dto.entity.UserSkillGuarantee;
-import school.faang.user_service.dto.entity.recommendation.SkillOffer;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -20,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class SkillServiceImpl implements SkillService {
 
@@ -85,6 +88,12 @@ public class SkillServiceImpl implements SkillService {
         Skill assignedSkill = skillRepository.findUserSkill(skillId, userId)
                 .orElseThrow(() -> new DataValidationException("Не удалось назначить навык"));
         return skillMapper.toSkillDto(assignedSkill);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Skill> getSkillListBySkillIds(List<Long> ids) {
+        return skillRepository.findAllById(ids);
     }
 
 }

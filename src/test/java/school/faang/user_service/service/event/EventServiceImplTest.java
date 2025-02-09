@@ -15,7 +15,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventDescriptionFilter;
 import school.faang.user_service.service.event.filter.EventTitleFilter;
 import school.faang.user_service.service.event.impl.EventServiceImpl;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
 import java.time.LocalDateTime;

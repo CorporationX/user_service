@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
@@ -13,6 +14,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public interface GoalRepository extends JpaRepository<Goal, Long>, JpaSpecificationExecutor<Goal> {
+
+    @Query("SELECT g FROM Goal g WHERE g.mentor.id = :mentorId")
+    List<Goal> findAllByMentorId(@Param("mentorId") Long mentorId);
 
     @EntityGraph(value = "Goal.graph", type = EntityGraph.EntityGraphType.LOAD)
     List<Goal> findAll(Specification<Goal> spec);

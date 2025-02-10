@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import java.util.Objects;
 import static school.faang.user_service.utils.user.UserErrorMessage.USERS_NOT_FOUND;
 import static school.faang.user_service.utils.user.UserErrorMessage.USER_NOT_FOUND;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -151,6 +153,14 @@ public class UserService {
 
         currentUser.setUserProfilePic(null);
         userRepository.save(currentUser);
+    }
+
+    @Transactional
+    public void banUser(Long userId) {
+        User user = getUserById(userId);
+        user.setBanned(true);
+        userRepository.save(user);
+        log.info("User with id {}. Was banned", userId);
     }
 
     private void deactivateUserDependencies(Long userId) {

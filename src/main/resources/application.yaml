@@ -24,6 +24,12 @@ spring:
     multipart:
       max-file-size: 5MB
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+
 swagger:
   api-docs:
     path: /v1/api-docs
@@ -39,6 +45,11 @@ server:
 logging:
   level:
     root: info
+
+kafka:
+  topic:
+    ban_user: "user_ban"
+
 
 s3:
   endpoint: http://localhost:9000

@@ -47,6 +47,11 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
 
     /**
+     * Apache Kafka
+     */
+    implementation("org.springframework.kafka:spring-kafka:3.3.2")
+
+    /**
      * Utils & Logging
      */
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")

@@ -19,15 +19,15 @@ import school.faang.user_service.entity.Skill;
 @Table(name = "skill_request")
 public class SkillRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "request_id", nullable = false)
-    private RecommendationRequest request;
+  @ManyToOne
+  @JoinColumn(name = "request_id", nullable = false)
+  private RecommendationRequest request;
 
-    @ManyToOne
-    @JoinColumn(name = "skill_id", nullable = false)
-    private Skill skill;
+  @ManyToOne
+  @JoinColumn(name = "skill_id", nullable = false)
+  private Skill skill;
 }

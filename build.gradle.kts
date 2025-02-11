@@ -1,9 +1,15 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
+    checkstyle
     java
+    jacoco
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("com.diffplug.spotless") version "6.25.0"
     kotlin("jvm")
+
 }
 
 group = "faang.school"
@@ -90,6 +96,101 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 tasks.bootJar {
     archiveFileName.set("service.jar")
 }
+
+checkstyle {
+    toolVersion = "10.17.0"
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    configProperties = mapOf(
+        "checkstyle.suppressions.file" to "${project.rootDir}/config/checkstyle/checkstyle-suppressions.xml"
+    )
+    checkstyle.enableExternalDtdLoad.set(true)
+    isIgnoreFailures = false
+}
+
+tasks.named<Checkstyle>("checkstyleMain") {
+    source = fileTree("${project.rootDir}/src/main/java") {
+        include("**/*.java")
+        exclude("**/entity/**", "**/repository/**")
+    }
+    classpath = files()
+}
+
+tasks.named<Checkstyle>("checkstyleTest") {
+    source = fileTree("${project.rootDir}/src/test") {
+        include("/*.java")
+    }
+    classpath = files()
+}
 kotlin {
     jvmToolchain(17)
+}
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat()
+    }
+}
+/**
+ * JaCoCo Configuration
+ */
+val jacocoIncludes = listOf(
+    "**/controller/**",
+    "**/filter/**",
+    "**/mapper/**",
+    "**/service/**",
+    "**/validation/**"
+)
+val jacocoExcludes = listOf(
+    "**/adapter/**",
+    "**/client/**",
+    "**/config/**",
+    "**/dto/**",
+    "**/entity/**",
+    "**/exception/**",
+    "**/repository/**"
+)
+
+jacoco {
+    toolVersion = "0.8.12"
+    reportsDirectory.set(layout.buildDirectory.dir("reports/jacoco"))
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+        csv.required.set(false)
+
+        classDirectories.setFrom(
+            sourceSets.main.get().output.asFileTree.matching {
+                include(jacocoIncludes)
+                exclude(jacocoExcludes)
+            }
+        )
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            element = "CLASS"
+            limit {
+                minimum = "0.7".toBigDecimal()
+            }
+        }
+    }
 }

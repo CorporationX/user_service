@@ -15,8 +15,7 @@ public class KafkaConsumer {
     private final UserService userService;
 
     @KafkaListener(topics = "${kafka.topic.ban_user}", groupId = "ban_user_consumer")
-    public void listener(Long userId) {
-        System.out.println("Message recieved: " + userId);
+    public void banUserListener(Long userId) {
         userService.banUser(userId);
     }
 }

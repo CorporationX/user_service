@@ -3,6 +3,8 @@ package school.faang.user_service.service.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -61,6 +64,9 @@ public class UserServiceTest {
 
     private long userId;
     private User user;
+
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
 
     @BeforeEach
     void setUp() {
@@ -160,6 +166,17 @@ public class UserServiceTest {
         userService.deactivateUser(userId);
 
         verify(goalRepository).delete(goal);
+    }
+
+    @Test
+    public void testBanUser() {
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.banUser(userId);
+
+        verify(userRepository, times(1)).save(userCaptor.capture());
+        User captured = userCaptor.getValue();
+        assertTrue(captured.isBanned());
     }
 
     @org.junit.Test

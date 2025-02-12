@@ -32,14 +32,12 @@ public class MentorshipController {
     @DeleteMapping("/delete-mentee")
     public ResponseEntity<String> deleteMentee(@RequestParam Long mentorId, @RequestParam Long menteeId) {
         mentorshipService.deleteMentee(mentorId, menteeId);
-        return ResponseEntity.ok().
-                body("The mentee was successfully deleted");
+        return ResponseEntity.ok().body("The mentee was successfully deleted");
     }
 
     @DeleteMapping("/delete-mentor")
     public ResponseEntity<String> deleteMentor(@RequestParam Long mentorId, @RequestParam Long menteeId) {
         mentorshipService.deleteMentor(mentorId, menteeId);
-        return ResponseEntity.ok().
-                body("The mentor was successfully deleted");
+        return ResponseEntity.ok().body("The mentor was successfully deleted");
     }
 }

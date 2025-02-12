@@ -68,10 +68,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
 }

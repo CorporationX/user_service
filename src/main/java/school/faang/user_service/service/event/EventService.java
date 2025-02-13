@@ -2,9 +2,12 @@ package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.PromotionServiceClient;
+import school.faang.user_service.config.AppConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventResponse;
@@ -12,6 +15,7 @@ import school.faang.user_service.dto.promotion.EventPromotionRequest;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.service.event.filter.EventFilter;
@@ -31,7 +35,6 @@ import static school.faang.user_service.config.KafkaConstants.PAYMENT_PROMOTION_
 @Service
 @RequiredArgsConstructor
 public class EventService {
-
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
@@ -40,6 +43,7 @@ public class EventService {
     private final ConverterUtil converterUtil;
     private final PromotionServiceClient promotionServiceClient;
     private final UserValidator userValidator;
+    private final AppConfig appConfig;
 
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
@@ -139,6 +143,22 @@ public class EventService {
                     return eventMapper.toEventResponse(eventRepository.findById(event).get());
                 })
                 .toList();
+    }
+
+    public void removeAllPastEvents() {
+        Page<Event> currentPage;
+        int currentPageNumber = 1;
+        do {
+            currentPage = eventRepository.findAllByStatusIs(
+                    EventStatus.COMPLETED,
+                    PageRequest.of(currentPageNumber, appConfig.getMaxDataGroupSize()));
+
+            Page<Event> finalCurrentPage = currentPage;
+            appConfig.getThreadPool().submit(() -> {
+                finalCurrentPage.forEach(event -> deleteEvent(event.getId()));
+            });
+            currentPageNumber++;
+        } while (currentPage.hasNext());
     }
 
     private void validateEvent(Long eventId) {

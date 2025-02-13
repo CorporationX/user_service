@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication
+@EnableScheduling
 @EnableFeignClients("school.faang.user_service.client")
 @EnableAsync
 @EnableScheduling

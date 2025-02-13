@@ -8,6 +8,8 @@ app:
     avatar_bucket_name: user-avatars
     avatar_large_file_size: 1080
     avatar_small_file_size: 170
+    max_data_group_size: 1000
+    clear_events_sheduled_cron: "0 0 * * 1"
 
 spring:
   mvc:

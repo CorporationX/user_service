@@ -23,4 +23,16 @@ public class UserDto {
     @NotNull(message = "email must not be null")
     @Email(message = "email is not correct")
     private String email;
+
+    private String phone;
+
+    private String aboutMe;
+
+    private String country;
+
+    private String city;
+
+    private Integer experience;
+
+    private String createdAt;
 }

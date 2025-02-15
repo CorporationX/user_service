@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.user;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,11 +50,12 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Test must returned user by id")
     void getUser() throws Exception {
         Mockito.when(userService.getUserById(1L)).thenReturn(dto);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/1")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("John"))
@@ -63,7 +65,8 @@ class UserControllerTest {
     }
 
     @Test
-    void getUsersByIds() throws Exception{
+    @DisplayName("Test must returned users by id")
+    void getUsersByIds() throws Exception {
         Mockito.when(userService.getUsersByIds(List.of(1L))).thenReturn(List.of(dto));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/users")

@@ -1,12 +1,15 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
+    checkstyle
     java
     jacoco
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("com.diffplug.spotless") version "6.25.0"
     kotlin("jvm")
+
 }
 
 group = "faang.school"
@@ -93,10 +96,40 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 tasks.bootJar {
     archiveFileName.set("service.jar")
 }
+
+checkstyle {
+    toolVersion = "10.17.0"
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    configProperties = mapOf(
+        "checkstyle.suppressions.file" to "${project.rootDir}/config/checkstyle/checkstyle-suppressions.xml"
+    )
+    checkstyle.enableExternalDtdLoad.set(true)
+    isIgnoreFailures = false
+}
+
+tasks.named<Checkstyle>("checkstyleMain") {
+    source = fileTree("${project.rootDir}/src/main/java") {
+        include("**/*.java")
+        exclude("**/entity/**", "**/repository/**")
+    }
+    classpath = files()
+}
+
+tasks.named<Checkstyle>("checkstyleTest") {
+    source = fileTree("${project.rootDir}/src/test") {
+        include("/*.java")
+    }
+    classpath = files()
+}
 kotlin {
     jvmToolchain(17)
 }
-
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat()
+    }
+}
 /**
  * JaCoCo Configuration
  */

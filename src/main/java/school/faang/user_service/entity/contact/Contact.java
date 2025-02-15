@@ -24,18 +24,18 @@ import school.faang.user_service.entity.User;
 @Table
 public class Contact {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @Column(name = "contact", length = 128, nullable = false, unique = true)
-    private String contact;
+  @Column(name = "contact", length = 128, nullable = false, unique = true)
+  private String contact;
 
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
-    private ContactType type;
+  @Column(name = "type", nullable = false)
+  @Enumerated(EnumType.ORDINAL)
+  private ContactType type;
 }

@@ -1,4 +1,3 @@
 package school.faang.user_service.dto.mentorship;
 
-public record RejectionDto(String reason) {
-}
+public record RejectionDto(String reason) {}

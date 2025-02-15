@@ -1,5 +1,10 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -12,17 +17,13 @@ import school.faang.user_service.dto.event.UpdateEventRequestDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.adapter.EventParticipationAdapter;
-import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
+import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.specification.EventSpecification;
 import school.faang.user_service.service.user.UserService;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Validated
 @Service
@@ -34,9 +35,10 @@ public class EventService {
     private final UserService userService;
     private final EventParticipationRepository eventParticipationRepository;
     private final SkillRepository skillRepository;
+    private final EventParticipationAdapter eventParticipationAdapter;
 
     @Transactional
-    public EventResponseDto createEvent(CreateEventRequestDto createRequest) throws DataValidationException {
+    public EventResponseDto createEvent(CreateEventRequestDto createRequest) {
         List<Skill> relatedSkills = getSkillsByIds(createRequest.getRelatedSkills());
         Event event = eventMapper.toEntity(createRequest, relatedSkills);
         event.setOwner(userService.getUser(createRequest.getOwnerId()));
@@ -45,13 +47,13 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventResponseDto getEvent(Long eventId) throws DataValidationException {
+    public EventResponseDto getEvent(Long eventId) {
         Event event = eventRepositoryAdapter.getEventById(eventId);
         return eventMapper.toResponseDto(event);
     }
 
     @Transactional
-    public EventResponseDto updateEvent(UpdateEventRequestDto updateRequest) throws DataValidationException {
+    public EventResponseDto updateEvent(UpdateEventRequestDto updateRequest) {
         Event existingEvent = eventRepositoryAdapter.getEventById(updateRequest.getId());
 
         List<Skill> relatedSkills = getSkillsByIds(updateRequest.getRelatedSkills());
@@ -60,8 +62,9 @@ public class EventService {
 
         return eventMapper.toResponseDto(eventRepositoryAdapter.save(updatedEvent));
     }
+
     @Transactional
-    public void deleteEvent(Long eventId) throws DataValidationException {
+    public void deleteEvent(Long eventId) {
         Event event = eventRepositoryAdapter.getEventById(eventId);
 
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
@@ -76,23 +79,45 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public List<EventResponseDto> getEventsByFilters(EventFilterDto filterDto) {
-        Specification<Event> specification = Stream.of(
-                        filterDto.getId() != null ? EventSpecification.hasId(filterDto.getId()) : null,
-                        filterDto.getTitle() != null ? EventSpecification.hasTitle(filterDto.getTitle()) : null,
-                        filterDto.getDescription() != null ? EventSpecification.hasDescription(filterDto.getDescription()) : null,
-                        filterDto.getLocation() != null ? EventSpecification.hasLocation(filterDto.getLocation()) : null,
-                        filterDto.getMaxAttendees() != null ? EventSpecification.hasMaxAttendees(filterDto.getMaxAttendees()) : null,
-                        filterDto.getStartDate() != null ? EventSpecification.hasStartDate(filterDto.getStartDate()) : null,
-                        filterDto.getEndDate() != null ? EventSpecification.hasEndDate(filterDto.getEndDate()) : null,
-                        filterDto.getEventType() != null ? EventSpecification.hasEventType(filterDto.getEventType()) : null,
-                        filterDto.getEventStatus() != null ? EventSpecification.hasEventStatus(filterDto.getEventStatus()) : null,
-                        filterDto.getOwnerId() != null ? EventSpecification.hasOwner(filterDto.getOwnerId()) : null,
-                        filterDto.getSkillIds() != null ? EventSpecification.hasSkillIds(filterDto.getSkillIds()) : null,
-                        filterDto.getRelatedSkills() != null ? EventSpecification.hasSkillIds(filterDto.getRelatedSkills()) : null
-                )
-                .filter(spec -> spec != null)
-                .reduce(Specification::and)
-                .orElse(null);
+        Specification<Event> specification =
+                Stream.of(
+                                filterDto.getId() != null ? EventSpecification.hasId(filterDto.getId()) : null,
+                                filterDto.getTitle() != null
+                                        ? EventSpecification.hasTitle(filterDto.getTitle())
+                                        : null,
+                                filterDto.getDescription() != null
+                                        ? EventSpecification.hasDescription(filterDto.getDescription())
+                                        : null,
+                                filterDto.getLocation() != null
+                                        ? EventSpecification.hasLocation(filterDto.getLocation())
+                                        : null,
+                                filterDto.getMaxAttendees() != null
+                                        ? EventSpecification.hasMaxAttendees(filterDto.getMaxAttendees())
+                                        : null,
+                                filterDto.getStartDate() != null
+                                        ? EventSpecification.hasStartDate(filterDto.getStartDate())
+                                        : null,
+                                filterDto.getEndDate() != null
+                                        ? EventSpecification.hasEndDate(filterDto.getEndDate())
+                                        : null,
+                                filterDto.getEventType() != null
+                                        ? EventSpecification.hasEventType(filterDto.getEventType())
+                                        : null,
+                                filterDto.getEventStatus() != null
+                                        ? EventSpecification.hasEventStatus(filterDto.getEventStatus())
+                                        : null,
+                                filterDto.getOwnerId() != null
+                                        ? EventSpecification.hasOwner(filterDto.getOwnerId())
+                                        : null,
+                                filterDto.getSkillIds() != null
+                                        ? EventSpecification.hasSkillIds(filterDto.getSkillIds())
+                                        : null,
+                                filterDto.getRelatedSkills() != null
+                                        ? EventSpecification.hasSkillIds(filterDto.getRelatedSkills())
+                                        : null)
+                        .filter(spec -> spec != null)
+                        .reduce(Specification::and)
+                        .orElse(null);
 
         List<Event> events = eventRepositoryAdapter.findAll(specification);
 
@@ -108,15 +133,14 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public List<EventResponseDto> getEventsByParticipant(Long userId) {
-        EventParticipationAdapter eventParticipationAdapter = null;
         List<Event> events = eventParticipationAdapter.findParticipatedEventsByUserId(userId);
         return eventMapper.toResponseDtoList(events);
     }
 
-    private List<Skill> getSkillsByIds(List<Long> skillIds) throws DataValidationException {
+    private List<Skill> getSkillsByIds(List<Long> skillIds) {
         return skillIds.stream()
                 .map(skillId -> skillRepository.findById(skillId)
-                        .orElseThrow(() -> new DataValidationException("Skill not found with ID: " + skillId)))
+                        .orElseThrow(() -> new EntityNotFoundException("Skill not found with ID: " + skillId)))
                 .toList();
     }
 }

@@ -21,6 +21,10 @@ spring:
       port: 6379
       host: localhost
 
+redis:
+  topic:
+    user-profile-view: UserProfileView
+
 server:
   port: 8080
   servlet:

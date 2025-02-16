@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserResponseDto;
 import school.faang.user_service.service.users.UsersService;
 
 @Slf4j
@@ -18,7 +19,7 @@ public class UserController {
     private final UsersService usersService;
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) {
+    public UserResponseDto getUser(@PathVariable Long userId) {
         return usersService.getUser(userId);
     }
 }

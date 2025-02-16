@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.events.UserProfileViewEvent;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -32,11 +32,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public UserDto getUser(Long userId) {
+    public UserResponseDto getUser(Long userId) {
         User user = findByIdOrThrow(userId);
-        UserDto userDto = userMapper.toUserDto(user);
+        UserResponseDto userDto = userMapper.toUserResponseDto(user);
         Long visitorId = userContext.getUserId();
-        userProfileViewEventPublisher.publish(new UserProfileViewEvent(userId, visitorId, LocalDateTime.now()));
+        if (visitorId > 0) {
+            userProfileViewEventPublisher.publish(new UserProfileViewEvent(userId, visitorId, LocalDateTime.now()));
+        }
         log.info("Profile of user {} was viewed", userDto.getUsername());
         return userDto;
     }

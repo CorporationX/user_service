@@ -4,10 +4,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.event.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.SkillMapper;
 
 @Mapper(
     componentModel = "spring",
-    uses = {EventSkillMapper.class})
+    uses = {SkillMapper.class})
 public interface EventUserMapper {
 
   @Mapping(target = "id", source = "userDto.id", ignore = true)

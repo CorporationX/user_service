@@ -10,10 +10,11 @@ import school.faang.user_service.dto.event.EventResponseDto;
 import school.faang.user_service.dto.event.UpdateEventRequestDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.SkillMapper;
 
 @Mapper(
     componentModel = "spring",
-    uses = {EventSkillMapper.class, EventUserMapper.class})
+    uses = {SkillMapper.class, EventUserMapper.class})
 public abstract class EventMapper {
 
   @Mapping(target = "id", ignore = true)

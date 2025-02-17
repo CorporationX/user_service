@@ -124,12 +124,17 @@ tasks.named<Checkstyle>("checkstyleTest") {
 kotlin {
     jvmToolchain(17)
 }
+
 spotless {
     java {
-        target("src/**/*.java")
-        googleJavaFormat()
+        target("src/*/.java")
+        googleJavaFormat().aosp()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }
+
 /**
  * JaCoCo Configuration
  */

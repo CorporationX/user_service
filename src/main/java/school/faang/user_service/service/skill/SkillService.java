@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -58,6 +60,7 @@ public class SkillService {
         .toList();
   }
 
+  @Transactional
   public SkillDto acquireSkillFromOffer(long skillId, long userId) {
     Optional<Skill> optionalSkill = skillRepository.findUserSkill(skillId, userId);
     if (optionalSkill.isPresent()) {

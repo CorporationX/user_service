@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -34,13 +33,15 @@ import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
   @InjectMocks private SkillService skillService;
 
   @InjectMocks private SkillController skillController;
+
+  @Mock private UserService userService;
 
   @Mock private SkillRepository skillRepository;
 
@@ -203,7 +204,6 @@ public class SkillServiceTest {
   }
 
   @Test
-  @Disabled
   public void testAcquireOfferedSkill() {
     long userId = 10L;
 
@@ -212,6 +212,8 @@ public class SkillServiceTest {
     proposedSkill.setTitle("Java");
 
     User guarantor = new User();
+    User owner = new User();
+    owner.setId(10L);
 
     Recommendation recommendation = new Recommendation();
     recommendation.setAuthor(guarantor);
@@ -230,6 +232,7 @@ public class SkillServiceTest {
         .thenReturn(skillOffers);
     when(skillMapper.toDto(any())).thenReturn(dto);
     when(skillRepository.findById(proposedSkill.getId())).thenReturn(Optional.of(proposedSkill));
+    when(userService.getUser(10L)).thenReturn(owner);
 
     SkillDto result = skillService.acquireSkillFromOffer(proposedSkill.getId(), userId);
 
@@ -237,6 +240,7 @@ public class SkillServiceTest {
     verify(userSkillGuaranteeRepository, times(3))
         .save(argThat(userSkillGuarantee -> userSkillGuarantee.getGuarantor() != null));
     verify(skillRepository, times(1)).findById(proposedSkill.getId());
+    verify(userService, times(3)).getUser(10L);
 
     assertNotNull(result);
     assertEquals(dto.getId(), result.getId());

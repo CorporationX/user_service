@@ -13,6 +13,27 @@ spring:
       hibernate:
         format_sql: true
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+      group-id: user-group
+    topics:
+      user-ban-topic:
+        name: user_ban_topic
+        num-partitions: 1
+        replication-factor: 1
+
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
   data:
@@ -24,14 +45,7 @@ spring:
     multipart:
       max-file-size: 5MB
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.LongDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.LongSerializer
+
 
 swagger:
   api-docs:
@@ -49,9 +63,6 @@ logging:
   level:
     root: info
 
-kafka:
-  topic:
-    ban_user: "user_ban"
 
 
 s3:

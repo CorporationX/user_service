@@ -31,7 +31,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
         }
 )
 @Testcontainers
-public class KafkaConsumerIntegrationTest {
+public class BanConsumerIntegrationTest {
 
     @Autowired
     private KafkaTemplate<String, Long> kafkaTemplate;

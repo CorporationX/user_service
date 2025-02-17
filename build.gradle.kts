@@ -90,6 +90,12 @@ dependencies {
      * Thumbnail generation
      */
     implementation("net.coobird:thumbnailator:0.4.20")
+
+
+    /**
+     * Kafka events
+     */
+    implementation("io.github.narol01:kafkaEvent:latest.release")
 }
 
 jsonSchema2Pojo {

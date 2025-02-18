@@ -1,7 +1,9 @@
 package school.faang.user_service.service.kafka;
 
+import faang.school.event.UserBanEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -34,10 +36,13 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 public class BanConsumerIntegrationTest {
 
     @Autowired
-    private KafkaTemplate<String, Long> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${spring.kafka.topics.user-ban-topic.name}")
+    private String userBanTopicName;
 
     @Container
     static final KafkaContainer kafka = new KafkaContainer(
@@ -61,7 +66,7 @@ public class BanConsumerIntegrationTest {
 
     @Test
     public void banUserListenerTest() {
-        kafkaTemplate.send("user_ban", 1L);
+        kafkaTemplate.send(userBanTopicName, new UserBanEvent(1L, false));
 
         await()
                 .pollInterval(Duration.ofSeconds(3))

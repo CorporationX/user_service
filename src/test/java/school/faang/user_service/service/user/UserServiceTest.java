@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.BadRequestException;
@@ -19,17 +20,17 @@ import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventParticipationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
 import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
-import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     private UserService userService;
 
@@ -37,23 +38,42 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private DeactivatedUserMapper deactivatedUserMapper;
+
     @Mock
     private UserRepositoryAdapter userRepositoryAdapter;
+
     @Mock
     private GoalRepositoryAdapter goalRepositoryAdapter;
+
     @Mock
     private EventRepositoryAdapter eventRepositoryAdapter;
+
     @Mock
     private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+
     @Mock
     private MentorshipService mentorshipService;
 
+    private UserDto dto = new UserDto();
+
+    private User user = new User();
+
     @BeforeEach
     void init() {
+        dto.setId(1L);
+        dto.setUsername("John");
+        dto.setEmail("john@gmail.com");
+
+        user.setId(1L);
+        user.setUsername("John");
+        user.setEmail("john@gmail.com");
+
         UserFilter mockFirstUserFilter = Mockito.mock(UserFilter.class);
         UserFilter mockSecondUserFilter = Mockito.mock(UserFilter.class);
         userFilters = List.of(mockFirstUserFilter, mockSecondUserFilter);
@@ -88,6 +108,49 @@ public class UserServiceTest {
         ArgumentCaptor<List<User>> listUsers = ArgumentCaptor.forClass(List.class);
         Mockito.verify(userFilters.get(0), Mockito.times(1)).apply(listUsers.capture(),
                 Mockito.eq(userFilterDto));
+    }
+
+    @Test
+    @DisplayName("Test must return user when id is exist")
+    void testGetUserByIdSuccess() {
+        Mockito.when(userRepositoryAdapter.getById(1L)).thenReturn(user);
+        Mockito.when(userMapper.toDto(user)).thenReturn(dto);
+
+        UserDto result = userService.getUserById(1L);
+
+        Assertions.assertEquals(dto.getUsername(), result.getUsername());
+        Assertions.assertEquals(dto, result);
+    }
+
+    @Test
+    @DisplayName("Test must return exception when user not exist data base")
+    void testGetUserByIdFailed() {
+        Long userId = 1L;
+        Mockito.when(userRepositoryAdapter.getById(userId))
+                .thenThrow(new EntityNotFoundException("User not found with id: " + userId));
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
+
+    @Test
+    @DisplayName("Test must return users when id is exist")
+    void testGetUsersByIdsSuccess() {
+        Long userId = 1L;
+
+        List<Long> userIds = List.of(userId);
+
+        List<UserDto> listDto = List.of(dto);
+
+        List<User> listUser = List.of(user);
+
+        Mockito.when(userRepositoryAdapter.getUsersByIds(userIds)).thenReturn(listUser);
+        Mockito.when(userMapper.toListDto(listUser)).thenReturn(listDto);
+
+        List<UserDto> result = userService.getUsersByIds(userIds);
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("John", result.get(0).getUsername());
+        Assertions.assertEquals(listDto, result);
     }
 
     @Test

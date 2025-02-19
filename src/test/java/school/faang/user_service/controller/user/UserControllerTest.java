@@ -12,13 +12,19 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.DeactivatedUserDto;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.exception.GlobalExceptionHandler;
 import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,11 +38,53 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    private ObjectMapper objectMapper;
+
     private MockMvc mockMvc;
+
+    private UserDto dto = new UserDto();
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+
+        dto.setId(1L);
+        dto.setUsername("John");
+        dto.setEmail("john@gmail.com");
+
+        objectMapper = new ObjectMapper();
+    }
+
+    @Test
+    @DisplayName("Test must returned user by id")
+    void getUser() throws Exception {
+        Mockito.when(userService.getUserById(1L)).thenReturn(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("John"))
+                .andExpect(jsonPath("$.email").value("john@gmail.com"));
+
+        Mockito.verify(userService, Mockito.times(1)).getUserById(1L);
+    }
+
+    @Test
+    @DisplayName("Test must returned users by id")
+    void getUsersByIds() throws Exception {
+        Mockito.when(userService.getUsersByIds(List.of(1L))).thenReturn(List.of(dto));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(1L))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].username").value("John"))
+                .andExpect(jsonPath("$[0].email").value("john@gmail.com"));
+
+        Mockito.verify(userService, times(1)).getUsersByIds(List.of(1L));
     }
 
     @Test

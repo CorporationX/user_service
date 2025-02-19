@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.DeactivatedUserDto;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -55,11 +57,11 @@ public class UserService {
         });
     }
 
-    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto){
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         List<User> users = userRepository.findPremiumUsers().toList();
-        for (UserFilter filter: userFilters){
-            if (filter.isApplicable(userFilterDto)){
-                users = filter.apply(users,userFilterDto);
+        for (UserFilter filter : userFilters) {
+            if (filter.isApplicable(userFilterDto)) {
+                users = filter.apply(users, userFilterDto);
             }
         }
 
@@ -67,10 +69,19 @@ public class UserService {
                 .map(userMapper::toDto)
                 .toList();
     }
-    public List<UserDto> getPremiumUsers(){
+
+    public List<UserDto> getPremiumUsers() {
         return userRepository.findPremiumUsers()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    public UserDto getUserById(Long userId) {
+        return userMapper.toDto(userRepositoryAdapter.getById(userId));
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userMapper.toListDto(userRepositoryAdapter.getUsersByIds(ids));
     }
 
     @Transactional

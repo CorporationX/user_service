@@ -1,3 +1,18 @@
+package school.faang.user_service.service.skill;
+
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -18,242 +33,216 @@ import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.skill.SkillService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import school.faang.user_service.service.user.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
-    @InjectMocks
-    private SkillService skillService;
+  @InjectMocks private SkillService skillService;
 
-    @InjectMocks
-    private SkillController skillController;
+  @InjectMocks private SkillController skillController;
 
-    @Mock
-    private SkillRepository skillRepository;
+  @Mock private UserService userService;
 
-    @Mock
-    private SkillOfferRepository skillOfferRepository;
+  @Mock private SkillRepository skillRepository;
 
-    @Mock
-    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+  @Mock private SkillOfferRepository skillOfferRepository;
 
-    @Spy
-    private SkillMapperImpl skillMapper;
+  @Mock private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
-    @Captor
-    private ArgumentCaptor<Skill> captor;
+  @Spy private SkillMapperImpl skillMapper;
 
-    @Test
-    public void testCreateWithBlankTitle() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setTitle(" ");
-        assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-    }
+  @Captor private ArgumentCaptor<Skill> captor;
 
-    @Test
-    public void testCreateWithExistingTitle() {
-        SkillDto dto = prepareData(true);
+  @Test
+  public void testCreateWithBlankTitle() {
+    SkillDto skillDto = new SkillDto();
+    skillDto.setTitle(" ");
+    assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
+  }
 
-        assertThrows(DataValidationException.class, () -> skillService.createSkill(dto));
+  @Test
+  public void testCreateWithExistingTitle() {
+    SkillDto dto = prepareData(true);
 
-        verify(skillRepository, times(1)).existsByTitle(dto.getTitle());
-    }
+    assertThrows(DataValidationException.class, () -> skillService.createSkill(dto));
 
-    @Test
-    public void testSavesSkillInDataBase() {
-        SkillDto dto = prepareData(false);
+    verify(skillRepository, times(1)).existsByTitle(dto.getTitle());
+  }
 
-        when(skillRepository.save(captor.capture()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+  @Test
+  public void testSavesSkillInDataBase() {
+    SkillDto dto = prepareData(false);
 
-        SkillDto result = skillService.createSkill(dto);
+    when(skillRepository.save(captor.capture()))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
-        verify(skillRepository, times(1)).save(captor.capture());
+    SkillDto result = skillService.createSkill(dto);
 
-        Skill skill = captor.getValue();
-        assertEquals("title", skill.getTitle());
-        assertEquals(dto.getTitle(), result.getTitle());
-    }
+    verify(skillRepository, times(1)).save(captor.capture());
 
-    public SkillDto prepareData(boolean existTitle) {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setTitle("title");
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(existTitle);
-        return skillDto;
-    }
+    Skill skill = captor.getValue();
+    assertEquals("title", skill.getTitle());
+    assertEquals(dto.getTitle(), result.getTitle());
+  }
 
-    @Test
-    public void testGetUserSkillsById() {
-        long userId = 1L;
-        List<Skill> allSkills = prepareListSkills();
-        when(skillRepository.findAllByUserId(userId)).thenReturn(allSkills);
+  public SkillDto prepareData(boolean existTitle) {
+    SkillDto skillDto = new SkillDto();
+    skillDto.setTitle("title");
+    when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(existTitle);
+    return skillDto;
+  }
 
-        SkillDto skillDto = new SkillDto(10L, "Java");
-        SkillDto skillDto1 = new SkillDto(11L, "Python");
-        when(skillMapper.toDto(allSkills.get(0))).thenReturn(skillDto);
-        when(skillMapper.toDto(allSkills.get(1))).thenReturn(skillDto1);
+  @Test
+  public void testGetUserSkillsById() {
+    long userId = 1L;
+    List<Skill> allSkills = prepareListSkills();
+    when(skillRepository.findAllByUserId(userId)).thenReturn(allSkills);
 
-        List<SkillDto> result = skillService.getUserSkills(userId);
+    SkillDto skillDto = new SkillDto(10L, "Java");
+    SkillDto skillDto1 = new SkillDto(11L, "Python");
+    when(skillMapper.toDto(allSkills.get(0))).thenReturn(skillDto);
+    when(skillMapper.toDto(allSkills.get(1))).thenReturn(skillDto1);
 
-        assertEquals(2, result.size());
-        assertEquals("Java", result.get(0).getTitle());
-        assertEquals("Python", result.get(1).getTitle());
-        assertEquals(10L, result.get(0).getId());
-        assertEquals(11L, result.get(1).getId());
+    List<SkillDto> result = skillService.getUserSkills(userId);
 
-        verify(skillMapper, times(2)).toDto(any(Skill.class));
-        verify(skillRepository, times(1)).findAllByUserId(userId);
-    }
+    assertEquals(2, result.size());
+    assertEquals("Java", result.get(0).getTitle());
+    assertEquals("Python", result.get(1).getTitle());
+    assertEquals(10L, result.get(0).getId());
+    assertEquals(11L, result.get(1).getId());
 
-    private List<Skill> prepareListSkills() {
-        return List.of(Skill.builder()
-                        .id(10L)
-                        .title("Java")
-                        .build(),
-                Skill.builder()
-                        .id(11L)
-                        .title("Python")
-                        .build());
-    }
+    verify(skillMapper, times(2)).toDto(any(Skill.class));
+    verify(skillRepository, times(1)).findAllByUserId(userId);
+  }
 
-    @Test
-    public void testGetOfferedSkills() {
-        long userId = 1L;
-        List<Skill> allOfferedSkills = prepareListSkills();
-        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(allOfferedSkills);
+  private List<Skill> prepareListSkills() {
+    return List.of(
+        Skill.builder().id(10L).title("Java").build(),
+        Skill.builder().id(11L).title("Python").build());
+  }
 
-        SkillDto skillDto = new SkillDto(10L, "Java");
-        SkillDto skillDto1 = new SkillDto(11L, "Python");
-        when(skillMapper.toDto(allOfferedSkills.get(0))).thenReturn(skillDto);
-        when(skillMapper.toDto(allOfferedSkills.get(1))).thenReturn(skillDto1);
+  @Test
+  public void testGetOfferedSkills() {
+    long userId = 1L;
+    List<Skill> allOfferedSkills = prepareListSkills();
+    when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(allOfferedSkills);
 
-        List<SkillCandidateDto> result = skillService.getOfferedSkills(userId);
+    SkillDto skillDto = new SkillDto(10L, "Java");
+    SkillDto skillDto1 = new SkillDto(11L, "Python");
+    when(skillMapper.toDto(allOfferedSkills.get(0))).thenReturn(skillDto);
+    when(skillMapper.toDto(allOfferedSkills.get(1))).thenReturn(skillDto1);
 
-        SkillCandidateDto javaSkill = result.stream()
-                .filter(dto -> dto.getSkillDto() == skillDto)
-                .findFirst()
-                .orElseThrow();
+    List<SkillCandidateDto> result = skillService.getOfferedSkills(userId);
 
-        SkillCandidateDto pythonSkill = result.stream()
-                .filter(dto -> dto.getSkillDto() == skillDto1)
-                .findFirst()
-                .orElseThrow();
+    SkillCandidateDto javaSkill =
+        result.stream().filter(dto -> dto.getSkillDto() == skillDto).findFirst().orElseThrow();
 
-        assertEquals(1, javaSkill.getOffersAmount());
-        assertEquals(skillDto, javaSkill.getSkillDto());
-        assertEquals(1, pythonSkill.getOffersAmount());
-        assertEquals(skillDto1, pythonSkill.getSkillDto());
+    SkillCandidateDto pythonSkill =
+        result.stream().filter(dto -> dto.getSkillDto() == skillDto1).findFirst().orElseThrow();
 
-        verify(skillRepository, times(1)).findSkillsOfferedToUser(userId);
-        verify(skillMapper, times(2)).toDto(any(Skill.class));
-    }
+    assertEquals(1, javaSkill.getOffersAmount());
+    assertEquals(skillDto, javaSkill.getSkillDto());
+    assertEquals(1, pythonSkill.getOffersAmount());
+    assertEquals(skillDto1, pythonSkill.getSkillDto());
 
-    @Test
-    public void testExistOfferedSkill() {
-        Skill testSkill = new Skill();
-        testSkill.setId(1L);
+    verify(skillRepository, times(1)).findSkillsOfferedToUser(userId);
+    verify(skillMapper, times(2)).toDto(any(Skill.class));
+  }
 
-        List<Skill> skillsUser = new ArrayList<>();
-        skillsUser.add(testSkill);
+  @Test
+  public void testExistOfferedSkill() {
+    Skill testSkill = new Skill();
+    testSkill.setId(1L);
 
-        User testUser = new User();
-        testUser.setId(100L);
-        testUser.setSkills(skillsUser);
+    List<Skill> skillsUser = new ArrayList<>();
+    skillsUser.add(testSkill);
 
-        when(skillRepository.findUserSkill(testSkill.getId(), testUser.getId()))
-                .thenReturn(Optional.of(testSkill));
+    User testUser = new User();
+    testUser.setId(100L);
+    testUser.setSkills(skillsUser);
 
-        assertThrows(DataValidationException.class,
-                () -> skillService.acquireSkillFromOffer(testSkill.getId(), testUser.getId()));
+    when(skillRepository.findUserSkill(testSkill.getId(), testUser.getId()))
+        .thenReturn(Optional.of(testSkill));
 
-        verify(skillRepository, times(1))
-                .findUserSkill(testSkill.getId(), testUser.getId());
-    }
+    assertThrows(
+        DataValidationException.class,
+        () -> skillService.acquireSkillFromOffer(testSkill.getId(), testUser.getId()));
 
-    @Test
-    public void testNotEnoughOfferedToAcquire() {
-        Skill proposedSkill = new Skill();
-        proposedSkill.setId(1L);
-        proposedSkill.setTitle("Java");
+    verify(skillRepository, times(1)).findUserSkill(testSkill.getId(), testUser.getId());
+  }
 
-        User testUser = new User();
-        testUser.setId(100L);
+  @Test
+  public void testNotEnoughOfferedToAcquire() {
+    Skill proposedSkill = new Skill();
+    proposedSkill.setId(1L);
+    proposedSkill.setTitle("Java");
 
-        when(skillRepository.findUserSkill(proposedSkill.getId(), testUser.getId()))
-                .thenReturn(Optional.empty());
+    User testUser = new User();
+    testUser.setId(100L);
 
-        SkillOffer firstSkillOffer = new SkillOffer();
-        firstSkillOffer.setSkill(proposedSkill);
+    when(skillRepository.findUserSkill(proposedSkill.getId(), testUser.getId()))
+        .thenReturn(Optional.empty());
 
-        SkillOffer secondSkillOffer = new SkillOffer();
-        secondSkillOffer.setSkill(proposedSkill);
+    SkillOffer firstSkillOffer = new SkillOffer();
+    firstSkillOffer.setSkill(proposedSkill);
 
-        List<SkillOffer> skillOffers = List.of(firstSkillOffer, secondSkillOffer);
+    SkillOffer secondSkillOffer = new SkillOffer();
+    secondSkillOffer.setSkill(proposedSkill);
 
-        when(skillOfferRepository.findAllOffersOfSkill(proposedSkill.getId(), testUser.getId()))
-                .thenReturn(skillOffers);
+    List<SkillOffer> skillOffers = List.of(firstSkillOffer, secondSkillOffer);
 
+    when(skillOfferRepository.findAllOffersOfSkill(proposedSkill.getId(), testUser.getId()))
+        .thenReturn(skillOffers);
 
-        assertThrows(DataValidationException.class,
-                () -> skillService.acquireSkillFromOffer(proposedSkill.getId(), testUser.getId()));
+    assertThrows(
+        DataValidationException.class,
+        () -> skillService.acquireSkillFromOffer(proposedSkill.getId(), testUser.getId()));
 
-        verify(skillRepository, times(1))
-                .findUserSkill(proposedSkill.getId(), testUser.getId());
-        verify(skillOfferRepository, times(1))
-                .findAllOffersOfSkill(proposedSkill.getId(), testUser.getId());
-    }
+    verify(skillRepository, times(1)).findUserSkill(proposedSkill.getId(), testUser.getId());
+    verify(skillOfferRepository, times(1))
+        .findAllOffersOfSkill(proposedSkill.getId(), testUser.getId());
+  }
 
-    @Test
-    public void testAcquireOfferedSkill() {
-        long userId = 10L;
+  @Test
+  public void testAcquireOfferedSkill() {
+    long userId = 10L;
 
-        Skill proposedSkill = new Skill();
-        proposedSkill.setId(1L);
-        proposedSkill.setTitle("Java");
+    Skill proposedSkill = new Skill();
+    proposedSkill.setId(1L);
+    proposedSkill.setTitle("Java");
 
-        User guarantor = new User();
+    User guarantor = new User();
+    User owner = new User();
+    owner.setId(10L);
 
-        Recommendation recommendation = new Recommendation();
-        recommendation.setAuthor(guarantor);
+    Recommendation recommendation = new Recommendation();
+    recommendation.setAuthor(guarantor);
 
-        SkillOffer offerSkill = new SkillOffer();
-        offerSkill.setSkill(proposedSkill);
-        offerSkill.setRecommendation(recommendation);
+    SkillOffer offerSkill = new SkillOffer();
+    offerSkill.setSkill(proposedSkill);
+    offerSkill.setRecommendation(recommendation);
 
-        List<SkillOffer> skillOffers = List.of(offerSkill, offerSkill, offerSkill);
+    List<SkillOffer> skillOffers = List.of(offerSkill, offerSkill, offerSkill);
 
-        SkillDto dto = new SkillDto();
-        dto.setId(100L);
+    SkillDto dto = new SkillDto();
+    dto.setId(100L);
 
-        when(skillRepository.findUserSkill(proposedSkill.getId(), userId))
-                .thenReturn(Optional.empty());
-        when(skillOfferRepository.findAllOffersOfSkill(proposedSkill.getId(), userId))
-                .thenReturn(skillOffers);
-        when(skillMapper.toDto(any())).thenReturn(dto);
-        when(skillRepository.findById(proposedSkill.getId())).thenReturn(Optional.of(proposedSkill));
+    when(skillRepository.findUserSkill(proposedSkill.getId(), userId)).thenReturn(Optional.empty());
+    when(skillOfferRepository.findAllOffersOfSkill(proposedSkill.getId(), userId))
+        .thenReturn(skillOffers);
+    when(skillMapper.toDto(any())).thenReturn(dto);
+    when(skillRepository.findById(proposedSkill.getId())).thenReturn(Optional.of(proposedSkill));
+    when(userService.getUser(10L)).thenReturn(owner);
 
-        SkillDto result = skillService.acquireSkillFromOffer(proposedSkill.getId(), userId);
+    SkillDto result = skillService.acquireSkillFromOffer(proposedSkill.getId(), userId);
 
-        verify(skillRepository, times(1))
-                .assignSkillToUser(proposedSkill.getId(), userId);
-        verify(userSkillGuaranteeRepository, times(3))
-                .save(argThat(userSkillGuarantee -> userSkillGuarantee.getGuarantor() != null));
-        verify(skillRepository, times(1)).findById(proposedSkill.getId());
+    verify(skillRepository, times(1)).assignSkillToUser(proposedSkill.getId(), userId);
+    verify(userSkillGuaranteeRepository, times(3))
+        .save(argThat(userSkillGuarantee -> userSkillGuarantee.getGuarantor() != null));
+    verify(skillRepository, times(1)).findById(proposedSkill.getId());
+    verify(userService, times(3)).getUser(10L);
 
-        assertNotNull(result);
-        assertEquals(dto.getId(), result.getId());
-    }
+    assertNotNull(result);
+    assertEquals(dto.getId(), result.getId());
+  }
 }

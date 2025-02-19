@@ -7,8 +7,8 @@ import school.faang.user_service.config.converter.StringToRequestStatusConverter
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new StringToRequestStatusConverter());
-    }
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(new StringToRequestStatusConverter());
+  }
 }

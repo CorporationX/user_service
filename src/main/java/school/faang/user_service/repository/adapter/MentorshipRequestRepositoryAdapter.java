@@ -11,14 +11,17 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestRepositoryAdapter {
-    private final MentorshipRequestRepository mentorshipRequestRepository;
+  private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    public MentorshipRequest findById(long id) {
-        return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Mentorship request with ID {} does not exist", id);
+  public MentorshipRequest findById(long id) {
+    return mentorshipRequestRepository
+        .findById(id)
+        .orElseThrow(
+            () -> {
+              log.error("Mentorship request with ID {} does not exist", id);
 
-                    return new DataValidationException("Mentorship request with ID \"" + id + "\" does not exist");
-                });
-    }
+              return new DataValidationException(
+                  "Mentorship request with ID \"" + id + "\" does not exist");
+            });
+  }
 }

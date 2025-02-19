@@ -17,11 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "content_data")
 public class ContentData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @Lob
-    @Column
-    private byte[] content;
+  @Lob @Column private byte[] content;
 }

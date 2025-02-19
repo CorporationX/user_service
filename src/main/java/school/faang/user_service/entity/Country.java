@@ -7,12 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -22,13 +21,13 @@ import java.util.List;
 @Table(name = "country")
 public class Country {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @Column(name = "title", length = 64, nullable = false, unique = true)
-    private String title;
+  @Column(name = "title", length = 64, nullable = false, unique = true)
+  private String title;
 
-    @OneToMany(mappedBy = "country")
-    private List<User> residents;
+  @OneToMany(mappedBy = "country")
+  private List<User> residents;
 }

@@ -73,6 +73,7 @@ class GoalServiceTest {
         verify(skillService, times(1)).findSkillById(1L);
         verify(goalRepository, times(1)).create("title", "description", 1L);
         verify(goalRepository, times(1)).addSkillToGoalById(1L, 1L);
+        verify(goalRepository, times(1)).addUserToGoal(1L, 1L);
     }
 
     @Test

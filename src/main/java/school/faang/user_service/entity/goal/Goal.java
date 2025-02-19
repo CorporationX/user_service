@@ -48,7 +48,7 @@ public class Goal {
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
 
-    @Column(name = "description", length = 128, nullable = false, unique = true)
+    @Column(name = "description", length = 128, nullable = false)
     private String description;
 
     @Column(name = "status", nullable = false)

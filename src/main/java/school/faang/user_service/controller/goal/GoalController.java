@@ -21,7 +21,6 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Validated
@@ -42,7 +41,7 @@ public class GoalController {
                 goalDto.getTitle(),
                 goalDto.getDescription(),
                 goalDto.getParentId(),
-                Optional.ofNullable(goalDto.getSkillIds()).orElse(List.of())
+                goalDto.getSkillIds()
         );
         GoalDto createdGoalDto = goalMapper.toDto(createdGoal);
         return ResponseEntity.status(HttpStatus.CREATED).
@@ -57,7 +56,7 @@ public class GoalController {
         Goal updatedGoal = goalService.updateGoal(goalId,
                 goalMapper.toEntity(goalDto),
                 goalDto.getParentId(),
-                Optional.ofNullable(goalDto.getSkillIds()).orElse(List.of())
+                goalDto.getSkillIds()
         );
         GoalDto updatedGoalDto = goalMapper.toDto(updatedGoal);
         return ResponseEntity.status(HttpStatus.OK).

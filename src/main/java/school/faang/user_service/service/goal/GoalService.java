@@ -38,7 +38,6 @@ public class GoalService {
 
     @Transactional
     public Goal createGoal(Long userId, String title, String description, Long parentId, List<Long> skillIds) {
-        //validation
         if (!userService.userExists(userId)) {
             log.error("User with id {} doesn't exist", userId);
             throw new NoSuchElementException(String.format("User with id %s doesn't exist", userId));
@@ -53,26 +52,31 @@ public class GoalService {
 
         validateSkills(skillIds);
 
-        //perform goal creation
         Goal createdGoal = goalRepository.create(title, description, parentId);
         assignSkillsToGoal(createdGoal.getId(), skillIds);
+        goalRepository.addUserToGoal(userId, createdGoal.getId());
 
-        log.info("Goal with id {} and title {} has been created successfully and skills {} have been assigned", createdGoal.getId(), createdGoal.getTitle(), skillIds);
+        log.info("Goal with id {} and title {} has been created successfully and skills {} have been assigned",
+                createdGoal.getId(),
+                createdGoal.getTitle(),
+                skillIds);
         return createdGoal;
     }
 
     @Transactional
     public Goal updateGoal(Long goalId, Goal goalUpdated, Long goalParentId, List<Long> skillIds) {
-        //validation
-        Goal goalOld = goalRepository.findById(goalId).orElseThrow(() -> new NoSuchElementException(String.format("No goal found with such id %s", goalId)));
+        Goal goalOld = goalRepository.findById(goalId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("No goal found with such id %s", goalId)));
         if (goalOld.getStatus() == GoalStatus.COMPLETED) {
-            log.error("The goal with id {} and title {} is already completed and impossible to modify", goalId, goalOld.getTitle());
-            throw new IllegalStateException(String.format("The goal with id %s and title %s is already completed and impossible to modify", goalId, goalOld.getTitle()));
+            String exceptionMessage = String.format("The goal with id %s and title %s is already completed and impossible to modify",
+                    goalId,
+                    goalOld.getTitle()
+            );
+            throw new IllegalStateException(exceptionMessage);
         }
 
         validateSkills(skillIds);
 
-        //perform goal update
         if (goalParentId != null) {
             goalUpdated.setParent(Goal.builder().id(goalParentId).build());
         }
@@ -80,7 +84,6 @@ public class GoalService {
         goalUpdated = goalRepository.save(goalUpdated);
         log.info("Goal with id {} and title {} has been updated successfully", goalUpdated.getId(), goalUpdated.getTitle());
 
-        //update skills assigned to the goal
         if (!skillIds.isEmpty()) {
             goalRepository.removeSkillsFromGoal(goalId);
             assignSkillsToGoal(goalId, skillIds);
@@ -89,7 +92,11 @@ public class GoalService {
 
         if (goalUpdated.getStatus() == GoalStatus.COMPLETED) {
             skillService.assignSkillsFromGoalToUsers(goalId, goalUpdated.getUsers());
-            log.info("Skills from the goal with id {} have been assigned to the users {}", goalId, goalUpdated.getUsers().stream().map(User::getId).toList());
+            log.info("Skills from the goal with id {} have been assigned to the users {}",
+                    goalId,
+                    goalUpdated.getUsers().stream()
+                            .map(User::getId).toList()
+            );
         }
 
         return goalUpdated;
@@ -118,13 +125,11 @@ public class GoalService {
 
     @Transactional(readOnly = true)
     public List<Goal> findSubGoalsByUserId(Long userId, GoalFilterDto filterDto) {
-        //validation
         if (!userService.userExists(userId)) {
             log.error("User with id {} doesn't exist", userId);
             throw new NoSuchElementException(String.format("User with id %s doesn't exist", userId));
         }
 
-        //perform retrieval and filtration
         Stream<Goal> subGoals = goalRepository.findGoalsByUserId(userId);
         List<GoalFilter> applicableFilters = goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(filterDto))

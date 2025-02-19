@@ -10,9 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,6 +67,7 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_DescriptionIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
         eventDto.setDescription(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -74,6 +77,7 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_DescriptionIsBlank_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
         eventDto.setDescription("  ");
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -83,7 +87,8 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_DescriptionIsTooLong_ThrowsException() {
         EventDto eventDto = new EventDto();
-        eventDto.setDescription("A".repeat(4096));
+        eventDto.setTitle("A");
+        eventDto.setDescription("A".repeat(4097));
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event description не может быть больше 4096", exception.getMessage());
@@ -92,6 +97,8 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_StartDateIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
         eventDto.setStartDate(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -101,6 +108,9 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_EndDateIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
         eventDto.setEndDate(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -110,6 +120,10 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_LoactionIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now().plusMonths(3));
         eventDto.setLocation(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -119,6 +133,10 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_LoactionIsBlank_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now().plusMonths(3));
         eventDto.setLocation("  ");
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -128,7 +146,11 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_LoactionIsTooLong_ThrowsException() {
         EventDto eventDto = new EventDto();
-        eventDto.setLocation("A".repeat(128));
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now().plusMonths(3));
+        eventDto.setLocation("A".repeat(129));
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event Location не может быть больше 128", exception.getMessage());
@@ -137,6 +159,11 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_OwnerIdIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now().plusMonths(3));
+        eventDto.setLocation("A");
         eventDto.setOwnerId(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -146,6 +173,12 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_EventTypeIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now().plusMonths(3));
+        eventDto.setLocation("A");
+        eventDto.setOwnerId(1L);
         eventDto.setEventType(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -155,6 +188,13 @@ public class EventValidatorTest {
     @Test
     void testEventCheck_EventStatusIsNull_ThrowsException() {
         EventDto eventDto = new EventDto();
+        eventDto.setTitle("A");
+        eventDto.setDescription("A");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now().plusMonths(3));
+        eventDto.setLocation("A");
+        eventDto.setOwnerId(1L);
+        eventDto.setEventType(EventType.POLL);
         eventDto.setEventStatus(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));

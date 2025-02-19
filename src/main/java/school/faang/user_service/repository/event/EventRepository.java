@@ -1,5 +1,8 @@
 package school.faang.user_service.repository.event;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.event.Event;
@@ -26,5 +29,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             SELECT e.id FROM event e
             WHERE e.end_date <= :date
             """)
-    List<Long> findAllEndEvents(LocalDateTime date);
+    Page<Long> findAllEndEvents(LocalDateTime date, Pageable pageable);
 }

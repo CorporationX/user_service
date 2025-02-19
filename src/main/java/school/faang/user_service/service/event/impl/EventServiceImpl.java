@@ -5,6 +5,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,9 @@ public class EventServiceImpl implements EventService {
     @Value("${app.batch_size}")
     @Setter
     private int batchSize;
+    @Value("${app.max_iterations_to_find_db}")
+    @Setter
+    private int maxIterations;
 
     @Override
     @Transactional
@@ -99,18 +105,32 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Async("cachedThreadPool")
+    @Transactional
     public void clearEvents() {
         LocalDateTime date = LocalDateTime.now();
-        List<Long> events = eventRepository.findAllEndEvents(date);
-        if (events.isEmpty()) {
-            log.info("There is no events to delete.");
-            return;
+        int iterations = 0;
+        while (iterations < maxIterations) {
+            boolean isExit = findAndDeleteEndEvents(date);
+            if (isExit) {
+                break;
+            }
+            iterations++;
+            if (iterations >= maxIterations) {
+                log.error("Maximum number of loop iterations reached when worked method 'clear events'.");
+            }
         }
-        log.info("Found {} events to delete.", events.size());
-        Iterable<List<Long>> eventPartitions = ListUtils.partition(events, batchSize);
-        eventPartitions.forEach(list -> {
-            eventRepository.deleteAllByIdInBatch(list);
-            log.info("Delete {} rows. ID:{}", list.size(), list.toString());
-        });
+    }
+
+    private boolean findAndDeleteEndEvents(LocalDateTime date) {
+        Pageable pageable = PageRequest.of(0, batchSize);
+        Page<Long> events = eventRepository.findAllEndEvents(date, pageable);
+        if (events.isEmpty()) {
+            log.info("There are no events to delete.");
+            return true;
+        }
+        log.info("Founded {} events to delete.", events.getContent().size());
+        eventRepository.deleteAllByIdInBatch(events.getContent());
+        log.info("Deleted {} rows. ID:{}", events.getContent().size(), events.getContent().toString());
+        return false;
     }
 }

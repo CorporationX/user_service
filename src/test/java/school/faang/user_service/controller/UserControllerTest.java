@@ -42,7 +42,7 @@ class UserControllerTest {
 
     private MockMvc mockMvc;
 
-    private UserDto dto = new UserDto();
+    private final UserDto dto = new UserDto();
 
     @BeforeEach
     void setUp() {

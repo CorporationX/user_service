@@ -21,6 +21,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.specification.EventSpecification;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Validated
@@ -51,8 +52,6 @@ public class EventService {
 
     @Transactional
     public EventResponseDto updateEvent(UpdateEventRequestDto updateRequest) {
-        Event existingEvent = eventRepositoryAdapter.getEventById(updateRequest.getId());
-
         List<Skill> relatedSkills = getSkillsByIds(updateRequest.getRelatedSkills());
         Event updatedEvent = eventMapper.toEntity(updateRequest, relatedSkills);
         updatedEvent.setOwner(userRepositoryAdapter.getById(updateRequest.getOwnerId()));

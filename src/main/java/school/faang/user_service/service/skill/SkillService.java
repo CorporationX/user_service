@@ -36,8 +36,7 @@ public class SkillService {
 
     Skill skill = skillMapper.toEntity(skillDto);
     skill = skillRepository.save(skill);
-    SkillDto dto = skillMapper.toDto(skill);
-    return dto;
+    return skillMapper.toDto(skill);
   }
 
   private void validateSkill(SkillDto skill) {

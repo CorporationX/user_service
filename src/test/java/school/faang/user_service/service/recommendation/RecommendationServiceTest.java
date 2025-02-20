@@ -19,7 +19,6 @@ import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.recommendation.RecommendationService;
 import school.faang.user_service.validation.RecommendationValidation;
 
 public class RecommendationServiceTest {

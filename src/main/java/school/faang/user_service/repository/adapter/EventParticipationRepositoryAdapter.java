@@ -12,12 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventParticipationRepositoryAdapter {
 
-    private final EventRepository eventRepository;
     private final EventParticipationRepository eventParticipationRepository;
-
-    public List<Event> findParticipatedEventsByUserId(Long userId) {
-        return eventRepository.findParticipatedEventsByUserId(userId);
-    }
 
     public void unregisterAll(long eventId) {
         eventParticipationRepository.unregisterAll(eventId);

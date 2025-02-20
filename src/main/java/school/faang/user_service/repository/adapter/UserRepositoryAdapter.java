@@ -18,7 +18,8 @@ public class UserRepositoryAdapter {
     }
 
     public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User with ID " + id + " not found"));
     }
 
     public List<User> getUsersByIds(List<Long> ids) {

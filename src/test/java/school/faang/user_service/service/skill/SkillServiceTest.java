@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.SkillController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -32,33 +31,32 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.user.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
-  @InjectMocks private SkillService skillService;
 
-  @InjectMocks private SkillController skillController;
+  @Mock
+  private UserRepositoryAdapter userRepositoryAdapter;
 
-  @Mock private UserService userService;
+  @Mock
+  private SkillRepository skillRepository;
 
-  @Mock private SkillRepository skillRepository;
+  @Mock
+  private SkillOfferRepository skillOfferRepository;
 
-  @Mock private SkillOfferRepository skillOfferRepository;
+  @Mock
+  private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
-  @Mock private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+  @Spy
+  private SkillMapperImpl skillMapper;
 
-  @Spy private SkillMapperImpl skillMapper;
+  @Captor
+  private ArgumentCaptor<Skill> captor;
 
-  @Captor private ArgumentCaptor<Skill> captor;
-
-  @Test
-  public void testCreateWithBlankTitle() {
-    SkillDto skillDto = new SkillDto();
-    skillDto.setTitle(" ");
-    assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-  }
+  @InjectMocks
+  private SkillService skillService;
 
   @Test
   public void testCreateWithExistingTitle() {
@@ -232,7 +230,7 @@ public class SkillServiceTest {
         .thenReturn(skillOffers);
     when(skillMapper.toDto(any())).thenReturn(dto);
     when(skillRepository.findById(proposedSkill.getId())).thenReturn(Optional.of(proposedSkill));
-    when(userService.getUser(10L)).thenReturn(owner);
+    when(userRepositoryAdapter.getById(10L)).thenReturn(owner);
 
     SkillDto result = skillService.acquireSkillFromOffer(proposedSkill.getId(), userId);
 
@@ -240,7 +238,7 @@ public class SkillServiceTest {
     verify(userSkillGuaranteeRepository, times(3))
         .save(argThat(userSkillGuarantee -> userSkillGuarantee.getGuarantor() != null));
     verify(skillRepository, times(1)).findById(proposedSkill.getId());
-    verify(userService, times(3)).getUser(10L);
+    verify(userRepositoryAdapter, times(3)).getById(10L);
 
     assertNotNull(result);
     assertEquals(dto.getId(), result.getId());

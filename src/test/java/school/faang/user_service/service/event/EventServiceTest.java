@@ -22,24 +22,31 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.service.user.UserService;
 
 class EventServiceTest {
 
-  @InjectMocks private EventService eventService;
+  @Mock
+  private EventRepositoryAdapter eventRepositoryAdapter;
 
-  @Mock private EventRepositoryAdapter eventRepositoryAdapter;
+  @Mock
+  private EventMapper eventMapper;
 
-  @Mock private EventMapper eventMapper;
+  @Mock
+  private UserRepositoryAdapter userRepositoryAdapter;
 
-  @Mock private UserService userService;
+  @Mock
+  private SkillRepository skillRepository;
 
-  @Mock private SkillRepository skillRepository;
+  @Mock
+  private EventParticipationRepository eventParticipationRepository;
 
-  @Mock private EventParticipationRepository eventParticipationRepository;
+  @Captor
+  private ArgumentCaptor<Event> eventCaptor;
 
-  @Captor private ArgumentCaptor<Event> eventCaptor;
+  @InjectMocks
+  private EventService eventService;
 
   @BeforeEach
   void setUp() {
@@ -70,7 +77,7 @@ class EventServiceTest {
     event.setTitle("Test Event");
 
     when(skillRepository.findById(1L)).thenReturn(Optional.of(skill));
-    when(userService.getUser(1L)).thenReturn(user);
+    when(userRepositoryAdapter.getById(1L)).thenReturn(user);
     when(eventMapper.toEntity(any(CreateEventRequestDto.class), anyList())).thenReturn(event);
     when(eventRepositoryAdapter.save(any(Event.class))).thenReturn(event);
     when(eventMapper.toResponseDto(any(Event.class)))
@@ -81,7 +88,7 @@ class EventServiceTest {
     assertNotNull(result);
     assertEquals(1L, result.getId());
     verify(skillRepository, times(1)).findById(1L);
-    verify(userService, times(1)).getUser(1L);
+    verify(userRepositoryAdapter, times(1)).getById(1L);
     verify(eventMapper, times(1)).toEntity(createRequest, List.of(skill));
     verify(eventRepositoryAdapter, times(1)).save(eventCaptor.capture());
     assertEquals("Test Event", eventCaptor.getValue().getTitle());
@@ -105,7 +112,7 @@ class EventServiceTest {
 
     assertEquals("Skill not found with ID: 999", exception.getMessage());
     verify(skillRepository, times(1)).findById(999L);
-    verifyNoInteractions(userService, eventRepositoryAdapter, eventMapper);
+    verifyNoInteractions(userRepositoryAdapter, eventRepositoryAdapter, eventMapper);
   }
 
   @Test

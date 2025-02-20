@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,9 +60,9 @@ class UserServiceTest {
     @Mock
     private MentorshipService mentorshipService;
 
-    private UserDto dto = new UserDto();
+    private final UserDto dto = new UserDto();
 
-    private User user = new User();
+    private final User user = new User();
 
     @BeforeEach
     void init() {
@@ -116,7 +116,7 @@ class UserServiceTest {
         Mockito.when(userRepositoryAdapter.getById(1L)).thenReturn(user);
         Mockito.when(userMapper.toDto(user)).thenReturn(dto);
 
-        UserDto result = userService.getUserById(1L);
+        UserDto result = userService.getUser(1L);
 
         Assertions.assertEquals(dto.getUsername(), result.getUsername());
         Assertions.assertEquals(dto, result);
@@ -129,7 +129,7 @@ class UserServiceTest {
         Mockito.when(userRepositoryAdapter.getById(userId))
                 .thenThrow(new EntityNotFoundException("User not found with id: " + userId));
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUser(userId));
     }
 
     @Test

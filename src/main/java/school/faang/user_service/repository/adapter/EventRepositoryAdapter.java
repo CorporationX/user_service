@@ -17,7 +17,7 @@ public class EventRepositoryAdapter {
 
     public Event getEventById(Long eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + eventId));
+                .orElseThrow(() -> new EntityNotFoundException("Event with ID: " + eventId + " not found"));
     }
 
     public Event save(Event event) {
@@ -38,5 +38,9 @@ public class EventRepositoryAdapter {
 
     public void deleteAll(Iterable<Event> events) {
         eventRepository.deleteAll(events);
+    }
+
+    public List<Event> findParticipatedEventsByUserId(Long userId) {
+        return eventRepository.findParticipatedEventsByUserId(userId);
     }
 }

@@ -18,8 +18,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.user.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class SkillService {
   private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
   private final SkillOfferRepository skillOfferRepository;
   private final SkillMapper skillMapper;
-  private final UserService userService;
+  private final UserRepositoryAdapter userRepositoryAdapter;
 
   public SkillDto createSkill(SkillDto skillDto) {
     validateSkill(skillDto);
@@ -86,7 +86,7 @@ public class SkillService {
                 UserSkillGuarantee.builder()
                     .guarantor(offer.getRecommendation().getAuthor())
                     .skill(offer.getSkill())
-                    .user(userService.getUser(ownerId))
+                    .user(userRepositoryAdapter.getById(ownerId))
                     .build()));
   }
 

@@ -15,11 +15,10 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.adapter.EventParticipationAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.specification.EventSpecification;
-import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,16 +30,15 @@ public class EventService {
 
     private final EventRepositoryAdapter eventRepositoryAdapter;
     private final EventMapper eventMapper;
-    private final UserService userService;
+    private final UserRepositoryAdapter userRepositoryAdapter;
     private final EventParticipationRepository eventParticipationRepository;
     private final SkillRepository skillRepository;
-    private final EventParticipationAdapter eventParticipationAdapter;
 
     @Transactional
     public EventResponseDto createEvent(CreateEventRequestDto createRequest) {
         List<Skill> relatedSkills = getSkillsByIds(createRequest.getRelatedSkills());
         Event event = eventMapper.toEntity(createRequest, relatedSkills);
-        event.setOwner(userService.getUser(createRequest.getOwnerId()));
+        event.setOwner(userRepositoryAdapter.getById(createRequest.getOwnerId()));
 
         return eventMapper.toResponseDto(eventRepositoryAdapter.save(event));
     }
@@ -57,7 +55,7 @@ public class EventService {
 
         List<Skill> relatedSkills = getSkillsByIds(updateRequest.getRelatedSkills());
         Event updatedEvent = eventMapper.toEntity(updateRequest, relatedSkills);
-        updatedEvent.setOwner(userService.getUser(updateRequest.getOwnerId()));
+        updatedEvent.setOwner(userRepositoryAdapter.getById(updateRequest.getOwnerId()));
 
         return eventMapper.toResponseDto(eventRepositoryAdapter.save(updatedEvent));
     }
@@ -132,14 +130,14 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public List<EventResponseDto> getEventsByParticipant(Long userId) {
-        List<Event> events = eventParticipationAdapter.findParticipatedEventsByUserId(userId);
+        List<Event> events = eventRepositoryAdapter.findParticipatedEventsByUserId(userId);
         return eventMapper.toResponseDtoList(events);
     }
 
     private List<Skill> getSkillsByIds(List<Long> skillIds) {
         return skillIds.stream()
                 .map(skillId -> skillRepository.findById(skillId)
-                        .orElseThrow(() -> new EntityNotFoundException("Skill not found with ID: " + skillId)))
+                        .orElseThrow(() -> new EntityNotFoundException("Skill with ID " + skillId + " not found")))
                 .toList();
     }
 }

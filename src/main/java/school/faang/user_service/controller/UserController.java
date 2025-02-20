@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.user;
+package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 
 import java.util.List;
 
@@ -21,22 +21,22 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable long userId) {
+        return userService.getUser(userId);
+    }
+
+    @PostMapping
+    List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return userService.getUsersByIds(ids);
+    }
+
     @GetMapping("/premium")
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         if (userFilterDto == null) {
             return userService.getPremiumUsers();
         }
         return userService.getPremiumUsers(userFilterDto);
-    }
-
-    @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable long userId) {
-        return userService.getUserById(userId);
-    }
-
-    @PostMapping
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersByIds(ids);
     }
 
     @PostMapping("/{id}/deactivate")

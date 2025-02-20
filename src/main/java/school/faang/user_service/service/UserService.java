@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service;
 
 
 import lombok.RequiredArgsConstructor;
@@ -7,15 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.DeactivatedUserDto;
-import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.BadRequestException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
@@ -44,18 +41,6 @@ public class UserService {
     private final EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
 
     private final MentorshipService mentorshipService;
-  
-    public User getUser(Long userId) {
-        if (userId == null) {
-            log.error("User ID is null");
-            throw new IllegalArgumentException("User ID must not be null");
-        }
-
-        return userRepository.findById(userId).orElseThrow(() -> {
-            log.warn("User with ID {} not found", userId);
-            return new EntityNotFoundException("User with ID: " + userId + " not found");
-        });
-    }
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         List<User> users = userRepository.findPremiumUsers().toList();
@@ -76,7 +61,7 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto getUserById(Long userId) {
+    public UserDto getUser(Long userId) {
         return userMapper.toDto(userRepositoryAdapter.getById(userId));
     }
 
@@ -89,7 +74,6 @@ public class UserService {
         User user = userRepositoryAdapter.getById(id);
 
         if (!user.isActive()) {
-            log.error("User with ID {} is already deactivated", id);
             throw new BadRequestException("User with ID " + id + " is already deactivated");
         }
 

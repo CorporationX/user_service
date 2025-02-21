@@ -7,15 +7,15 @@ import school.faang.user_service.entity.User;
 
 @Component
 public class UserNamePattern implements UserFilter {
-  @Override
-  public boolean isApplicable(UserFilterDto filter) {
-    return filter.getNamePattern() != null;
-  }
+    @Override
+    public boolean isApplicable(UserFilterDto filter) {
+        return filter.getNamePattern() != null;
+    }
 
-  @Override
-  public List<User> apply(List<User> users, UserFilterDto filter) {
-    return users.stream()
-        .filter(user -> user.getUsername().matches(filter.getNamePattern()))
-        .toList();
-  }
+    @Override
+    public List<User> apply(List<User> users, UserFilterDto filter) {
+        return users.stream()
+                .filter(user -> user.getUsername().matches(filter.getNamePattern()))
+                .toList();
+    }
 }

@@ -15,27 +15,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateEventRequestDto {
 
-  private Long id;
+    private Long id;
 
-  @NotNull
-  @Size(max = 255)
-  private String title;
+    @NotNull
+    @Size(max = 255)
+    private String title;
 
-  private String description;
+    private String description;
 
-  private String location;
+    private String location;
 
-  @NotNull private Long ownerId;
+    @NotNull private Long ownerId;
 
-  @NotNull private List<Long> relatedSkills;
+    @NotNull private List<Long> relatedSkills;
 
-  @NotNull private LocalDateTime startDate;
+    @NotNull private LocalDateTime startDate;
 
-  @NotNull private LocalDateTime endDate;
+    @NotNull private LocalDateTime endDate;
 
-  @NotNull private Integer maxAttendees;
+    @NotNull private Integer maxAttendees;
 
-  @NotNull private String eventType;
+    @NotNull private String eventType;
 
-  @NotNull private String eventStatus;
+    @NotNull private String eventStatus;
 }

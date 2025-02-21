@@ -22,43 +22,44 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/mentorship/requests")
 public class MentorshipRequestController {
-  private final MentorshipRequestService mentorshipRequestService;
+    private final MentorshipRequestService mentorshipRequestService;
 
-  @PostMapping
-  public ResponseEntity<MentorshipRequestResponseDto> requestMentorship(
-      @RequestBody MentorshipRequestRequestDto mentorshipRequestRequestDto) {
-    String mentorshipRequestDescription = mentorshipRequestRequestDto.description();
-    if (mentorshipRequestDescription == null || mentorshipRequestDescription.isBlank()) {
-      return ResponseEntity.badRequest().build();
+    @PostMapping
+    public ResponseEntity<MentorshipRequestResponseDto> requestMentorship(
+            @RequestBody MentorshipRequestRequestDto mentorshipRequestRequestDto) {
+        String mentorshipRequestDescription = mentorshipRequestRequestDto.description();
+        if (mentorshipRequestDescription == null || mentorshipRequestDescription.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(
+                mentorshipRequestService.requestMentorship(mentorshipRequestRequestDto));
     }
-    return ResponseEntity.ok(
-        mentorshipRequestService.requestMentorship(mentorshipRequestRequestDto));
-  }
 
-  @GetMapping
-  public ResponseEntity<List<MentorshipRequestResponseDto>> getRequests(
-      @RequestParam(required = false) String descriptionPattern,
-      @RequestParam(required = false) Long requesterId,
-      @RequestParam(required = false) Long receiverId,
-      @RequestParam(required = false) RequestStatus requestStatus) {
-    MentorshipRequestFilterDto mentorshipRequestDto =
-        new MentorshipRequestFilterDto(descriptionPattern, requesterId, receiverId, requestStatus);
+    @GetMapping
+    public ResponseEntity<List<MentorshipRequestResponseDto>> getRequests(
+            @RequestParam(required = false) String descriptionPattern,
+            @RequestParam(required = false) Long requesterId,
+            @RequestParam(required = false) Long receiverId,
+            @RequestParam(required = false) RequestStatus requestStatus) {
+        MentorshipRequestFilterDto mentorshipRequestDto =
+                new MentorshipRequestFilterDto(
+                        descriptionPattern, requesterId, receiverId, requestStatus);
 
-    return ResponseEntity.ok(mentorshipRequestService.getRequests(mentorshipRequestDto));
-  }
-
-  @PatchMapping("/{id}/accept")
-  public ResponseEntity<MentorshipRequestResponseDto> acceptRequest(@PathVariable long id) {
-    return ResponseEntity.ok(mentorshipRequestService.acceptRequest(id));
-  }
-
-  @PatchMapping("/{id}/reject")
-  public ResponseEntity<MentorshipRequestResponseDto> rejectRequest(
-      @PathVariable long id, @RequestBody RejectionDto rejection) {
-    String rejectionReason = rejection.reason();
-    if (rejectionReason == null || rejectionReason.isBlank()) {
-      return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(mentorshipRequestService.getRequests(mentorshipRequestDto));
     }
-    return ResponseEntity.ok(mentorshipRequestService.rejectRequest(id, rejection));
-  }
+
+    @PatchMapping("/{id}/accept")
+    public ResponseEntity<MentorshipRequestResponseDto> acceptRequest(@PathVariable long id) {
+        return ResponseEntity.ok(mentorshipRequestService.acceptRequest(id));
+    }
+
+    @PatchMapping("/{id}/reject")
+    public ResponseEntity<MentorshipRequestResponseDto> rejectRequest(
+            @PathVariable long id, @RequestBody RejectionDto rejection) {
+        String rejectionReason = rejection.reason();
+        if (rejectionReason == null || rejectionReason.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(mentorshipRequestService.rejectRequest(id, rejection));
+    }
 }

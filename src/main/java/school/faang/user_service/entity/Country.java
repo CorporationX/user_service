@@ -21,13 +21,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "country")
 public class Country {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "title", length = 64, nullable = false, unique = true)
-  private String title;
+    @Column(name = "title", length = 64, nullable = false, unique = true)
+    private String title;
 
-  @OneToMany(mappedBy = "country")
-  private List<User> residents;
+    @OneToMany(mappedBy = "country")
+    private List<User> residents;
 }

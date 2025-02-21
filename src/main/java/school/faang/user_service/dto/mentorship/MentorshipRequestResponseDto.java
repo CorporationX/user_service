@@ -11,16 +11,16 @@ import school.faang.user_service.entity.RequestStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MentorshipRequestResponseDto {
-  private long id;
-  private String description;
-  private Long requesterId;
-  private Long receiverId;
-  private RequestStatus status;
-  private String rejectionReason;
+    private long id;
+    private String description;
+    private Long requesterId;
+    private Long receiverId;
+    private RequestStatus status;
+    private String rejectionReason;
 
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
 
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
 }

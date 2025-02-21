@@ -25,85 +25,87 @@ import school.faang.user_service.validation.RecommendationValidation;
 
 public class RecommendationValidationExceptionTest {
 
-  @Mock private RecommendationRepository recommendationRepository;
+    @Mock private RecommendationRepository recommendationRepository;
 
-  @Mock private SkillRepository skillRepository;
+    @Mock private SkillRepository skillRepository;
 
-  @Mock private RecommendationMapper recommendationMapper;
+    @Mock private RecommendationMapper recommendationMapper;
 
-  @InjectMocks private RecommendationValidation recommendationValidation;
+    @InjectMocks private RecommendationValidation recommendationValidation;
 
-  @BeforeEach
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
-  @Test
-  public void testValidateOfSkillsWithNullSkills() {
-    assertThrows(SkillException.class, () -> recommendationValidation.validateOfSkills(null));
-  }
+    @Test
+    public void testValidateOfSkillsWithNullSkills() {
+        assertThrows(SkillException.class, () -> recommendationValidation.validateOfSkills(null));
+    }
 
-  @Test
-  public void testSkillsNotFoundInSystem() {
+    @Test
+    public void testSkillsNotFoundInSystem() {
 
-    SkillOfferDto firstSkill = new SkillOfferDto(1L, 1L);
-    SkillOfferDto secondSkill = new SkillOfferDto(2L, 2L);
-    List<SkillOfferDto> skills = List.of(firstSkill, secondSkill);
+        SkillOfferDto firstSkill = new SkillOfferDto(1L, 1L);
+        SkillOfferDto secondSkill = new SkillOfferDto(2L, 2L);
+        List<SkillOfferDto> skills = List.of(firstSkill, secondSkill);
 
-    when(skillRepository.countExisting(List.of(firstSkill.getSkillId(), secondSkill.getSkillId())))
-        .thenReturn(1);
+        when(skillRepository.countExisting(
+                        List.of(firstSkill.getSkillId(), secondSkill.getSkillId())))
+                .thenReturn(1);
 
-    assertThrows(SkillException.class, () -> recommendationValidation.validateOfSkills(skills));
-  }
+        assertThrows(SkillException.class, () -> recommendationValidation.validateOfSkills(skills));
+    }
 
-  @Test
-  public void testSkillsWithoutThrowException() {
-    SkillOfferDto firstSkill = new SkillOfferDto(1L, 1L);
-    SkillOfferDto secondSkill = new SkillOfferDto(2L, 2L);
-    List<SkillOfferDto> skills = List.of(firstSkill, secondSkill);
+    @Test
+    public void testSkillsWithoutThrowException() {
+        SkillOfferDto firstSkill = new SkillOfferDto(1L, 1L);
+        SkillOfferDto secondSkill = new SkillOfferDto(2L, 2L);
+        List<SkillOfferDto> skills = List.of(firstSkill, secondSkill);
 
-    when(skillRepository.countExisting(List.of(firstSkill.getSkillId(), secondSkill.getSkillId())))
-        .thenReturn(2);
+        when(skillRepository.countExisting(
+                        List.of(firstSkill.getSkillId(), secondSkill.getSkillId())))
+                .thenReturn(2);
 
-    assertDoesNotThrow(() -> recommendationValidation.validateOfSkills(skills));
-  }
+        assertDoesNotThrow(() -> recommendationValidation.validateOfSkills(skills));
+    }
 
-  // TODO Исправить тест
-  @Test
-  @Disabled
-  public void testLastRecommendationIsPresentAndRecommendationException() {
-    RecommendationDto recommendation = new RecommendationDto();
-    recommendation.setAuthorId(1L);
-    recommendation.setReceiverId(1l);
-    recommendation.setCreatedAt(LocalDateTime.now());
+    // TODO Исправить тест
+    @Test
+    @Disabled
+    public void testLastRecommendationIsPresentAndRecommendationException() {
+        RecommendationDto recommendation = new RecommendationDto();
+        recommendation.setAuthorId(1L);
+        recommendation.setReceiverId(1l);
+        recommendation.setCreatedAt(LocalDateTime.now());
 
-    Recommendation lastRecommendation = new Recommendation();
-    lastRecommendation.setCreatedAt(LocalDateTime.now().minusMonths(5));
+        Recommendation lastRecommendation = new Recommendation();
+        lastRecommendation.setCreatedAt(LocalDateTime.now().minusMonths(5));
 
-    when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-            recommendation.getAuthorId(), recommendation.getReceiverId()))
-        .thenReturn(Optional.of(lastRecommendation));
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendation.getAuthorId(), recommendation.getReceiverId()))
+                .thenReturn(Optional.of(lastRecommendation));
 
-    assertThrows(
-        RecommendationException.class,
-        () -> recommendationValidation.validateOfLatestRecommendation(recommendation));
-  }
+        assertThrows(
+                RecommendationException.class,
+                () -> recommendationValidation.validateOfLatestRecommendation(recommendation));
+    }
 
-  @Test
-  public void testLastRecommendationIsPresentWithoutRecommendationException() {
-    RecommendationDto recommendation = new RecommendationDto();
-    recommendation.setAuthorId(1L);
-    recommendation.setReceiverId(1l);
-    recommendation.setCreatedAt(LocalDateTime.now());
+    @Test
+    public void testLastRecommendationIsPresentWithoutRecommendationException() {
+        RecommendationDto recommendation = new RecommendationDto();
+        recommendation.setAuthorId(1L);
+        recommendation.setReceiverId(1l);
+        recommendation.setCreatedAt(LocalDateTime.now());
 
-    Recommendation lastRecommendation = new Recommendation();
-    lastRecommendation.setCreatedAt(LocalDateTime.now().minusMonths(9));
+        Recommendation lastRecommendation = new Recommendation();
+        lastRecommendation.setCreatedAt(LocalDateTime.now().minusMonths(9));
 
-    when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-            recommendation.getAuthorId(), recommendation.getReceiverId()))
-        .thenReturn(Optional.of(lastRecommendation));
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendation.getAuthorId(), recommendation.getReceiverId()))
+                .thenReturn(Optional.of(lastRecommendation));
 
-    assertDoesNotThrow(
-        () -> recommendationValidation.validateOfLatestRecommendation(recommendation));
-  }
+        assertDoesNotThrow(
+                () -> recommendationValidation.validateOfLatestRecommendation(recommendation));
+    }
 }

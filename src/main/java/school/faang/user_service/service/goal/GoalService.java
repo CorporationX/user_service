@@ -27,21 +27,22 @@ import school.faang.user_service.repository.goal.GoalRepository;
 @Transactional(readOnly = true)
 public class GoalService {
 
-  private static final int MAX_ACTIVE_GOAL = 3;
+    private static final int MAX_ACTIVE_GOAL = 3;
 
-  private final GoalRepository goalRepository;
-  private final GoalMapper goalMapper;
-  private final SkillRepositoryAdapter skillRepositoryAdapter;
-  private final UserRepositoryAdapter userRepositoryAdapter;
-  private final List<GoalFilter> goalFilters;
-  private final GoalRepositoryAdapter goalRepositoryAdapter;
+    private final GoalRepository goalRepository;
+    private final GoalMapper goalMapper;
+    private final SkillRepositoryAdapter skillRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final List<GoalFilter> goalFilters;
+    private final GoalRepositoryAdapter goalRepositoryAdapter;
 
-  @Transactional
-  public GoalDTO createGoal(Long userId, GoalDTO goalDTO) {
-    validateGoal(goalDTO);
+    @Transactional
+    public GoalDTO createGoal(Long userId, GoalDTO goalDTO) {
+        validateGoal(goalDTO);
 
         if (goalRepository.countActiveGoalsPerUser(userId) > MAX_ACTIVE_GOAL) {
-            throw new DataValidationException("User have more than " + MAX_ACTIVE_GOAL + " active goals");
+            throw new DataValidationException(
+                    "User have more than " + MAX_ACTIVE_GOAL + " active goals");
         }
         Goal goal = goalMapper.toEntity(goalDTO);
         if (goalDTO.getParentId() != null) {
@@ -60,10 +61,10 @@ public class GoalService {
         return goalMapper.toDto(goalRepository.save(goal));
     }
 
-  @Transactional
-  public GoalDTO updateGoal(Long goalId, GoalDTO goalDTO) {
-    validateGoal(goalDTO);
-    Goal goal = goalRepositoryAdapter.getById(goalId);
+    @Transactional
+    public GoalDTO updateGoal(Long goalId, GoalDTO goalDTO) {
+        validateGoal(goalDTO);
+        Goal goal = goalRepositoryAdapter.getById(goalId);
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
             throw new DataValidationException("This goal is already completed");
@@ -73,70 +74,67 @@ public class GoalService {
         goal.setDeadline(goalDTO.getDeadline());
         updateSkills(goal, goalDTO.getSkillToAchieveIds());
 
-    if (goalDTO.getStatus() != null
-        && Objects.equals(goalDTO.getStatus(), GoalStatus.COMPLETED.name())) {
-      List<User> users = goal.getUsers();
-      for (Skill skill : goal.getSkillsToAchieve()) {
-        for (User user : users) {
-          if (!user.getSkills().contains(skill)) {
-            skillRepositoryAdapter.assignSkillToUser(
-                skill.getId(), user.getId()); // TODO N+1 problem
-          }
+        if (goalDTO.getStatus() != null
+                && Objects.equals(goalDTO.getStatus(), GoalStatus.COMPLETED.name())) {
+            List<User> users = goal.getUsers();
+            for (Skill skill : goal.getSkillsToAchieve()) {
+                for (User user : users) {
+                    if (!user.getSkills().contains(skill)) {
+                        skillRepositoryAdapter.assignSkillToUser(
+                                skill.getId(), user.getId()); // TODO N+1 problem
+                    }
+                }
+            }
+            goal.setStatus(GoalStatus.COMPLETED);
         }
-      }
-      goal.setStatus(GoalStatus.COMPLETED);
-    }
-    return goalMapper.toDto(goalRepository.save(goal));
-  }
-
-  @Transactional
-  public void deleteGoal(Long id) {
-    Goal goal = goalRepositoryAdapter.getById(id);
-    Stream<Goal> parent = goalRepository.findByParent(goal.getId());
-    parent.forEach(e -> e.setParent(null));
-    goalRepository.delete(goal);
-  }
-
-  public List<GoalDTO> getGoalsByUser(Long userId, GoalFilterDTO goalFilterDTO) {
-    List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
-
-    for (GoalFilter filter : goalFilters) {
-      if (filter.isApplicable(goalFilterDTO)) {
-        goals = filter.apply(goals, goalFilterDTO);
-      }
-    }
-    return goalMapper.toDtoList(goals);
-  }
-
-  public List<GoalDTO> getSubGoals(Long parentId, GoalFilterDTO goalFilterDTO) {
-    List<Goal> parent = goalRepository.findByParent(parentId).toList();
-    for (GoalFilter filter : goalFilters) {
-      if (filter.isApplicable(goalFilterDTO)) {
-        parent = filter.apply(parent, goalFilterDTO);
-      }
-    }
-    return goalMapper.toDtoList(parent);
-  }
-
-  private void updateSkills(Goal goal, List<Long> newSkillIds) {
-    List<Long> currentSkillIds = goal.getSkillsToAchieve().stream().map(Skill::getId).toList();
-
-    if (new HashSet<>(currentSkillIds).containsAll(newSkillIds)
-        && new HashSet<>(newSkillIds).containsAll(currentSkillIds)) {
-      return;
+        return goalMapper.toDto(goalRepository.save(goal));
     }
 
-    goal.getSkillsToAchieve().clear();
-    List<Skill> newSkills = skillRepositoryAdapter.findAllById(newSkillIds);
-    newSkills.forEach(goal::addSkill);
-  }
+    @Transactional
+    public void deleteGoal(Long id) {
+        Goal goal = goalRepositoryAdapter.getById(id);
+        Stream<Goal> parent = goalRepository.findByParent(goal.getId());
+        parent.forEach(e -> e.setParent(null));
+        goalRepository.delete(goal);
+    }
+
+    public List<GoalDTO> getGoalsByUser(Long userId, GoalFilterDTO goalFilterDTO) {
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
+
+        for (GoalFilter filter : goalFilters) {
+            if (filter.isApplicable(goalFilterDTO)) {
+                goals = filter.apply(goals, goalFilterDTO);
+            }
+        }
+        return goalMapper.toDtoList(goals);
+    }
+
+    public List<GoalDTO> getSubGoals(Long parentId, GoalFilterDTO goalFilterDTO) {
+        List<Goal> parent = goalRepository.findByParent(parentId).toList();
+        for (GoalFilter filter : goalFilters) {
+            if (filter.isApplicable(goalFilterDTO)) {
+                parent = filter.apply(parent, goalFilterDTO);
+            }
+        }
+        return goalMapper.toDtoList(parent);
+    }
+
+    private void updateSkills(Goal goal, List<Long> newSkillIds) {
+        List<Long> currentSkillIds = goal.getSkillsToAchieve().stream().map(Skill::getId).toList();
+
+        if (new HashSet<>(currentSkillIds).containsAll(newSkillIds)
+                && new HashSet<>(newSkillIds).containsAll(currentSkillIds)) {
+            return;
+        }
+
+        goal.getSkillsToAchieve().clear();
+        List<Skill> newSkills = skillRepositoryAdapter.findAllById(newSkillIds);
+        newSkills.forEach(goal::addSkill);
+    }
 
     private void validateGoal(GoalDTO goalDTO) {
         if (!skillRepositoryAdapter.skillsExist(goalDTO.getSkillToAchieveIds())) {
             throw new EntityNotFoundException("Unable to find skills");
         }
-
     }
-
-
 }

@@ -12,26 +12,26 @@ import school.faang.user_service.entity.goal.Goal;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
-  @Mapping(source = "parent.id", target = "parentId")
-  @Mapping(source = "mentor.id", target = "mentorId")
-  @Mapping(source = "users", target = "userIds", qualifiedByName = "mapUserToId")
-  @Mapping(
-      source = "skillsToAchieve",
-      target = "skillToAchieveIds",
-      qualifiedByName = "mapAchieveToId")
-  GoalDTO toDto(Goal goal);
+    @Mapping(source = "parent.id", target = "parentId")
+    @Mapping(source = "mentor.id", target = "mentorId")
+    @Mapping(source = "users", target = "userIds", qualifiedByName = "mapUserToId")
+    @Mapping(
+            source = "skillsToAchieve",
+            target = "skillToAchieveIds",
+            qualifiedByName = "mapAchieveToId")
+    GoalDTO toDto(Goal goal);
 
-  Goal toEntity(GoalDTO dto);
+    Goal toEntity(GoalDTO dto);
 
-  List<GoalDTO> toDtoList(List<Goal> list);
+    List<GoalDTO> toDtoList(List<Goal> list);
 
-  @Named("mapUserToId")
-  default List<Long> mapUserToId(List<User> users) {
-    return users.stream().map(User::getId).toList();
-  }
+    @Named("mapUserToId")
+    default List<Long> mapUserToId(List<User> users) {
+        return users.stream().map(User::getId).toList();
+    }
 
-  @Named("mapAchieveToId")
-  default List<Long> mapAchieveToId(List<Skill> skills) {
-    return skills.stream().map(Skill::getId).toList();
-  }
+    @Named("mapAchieveToId")
+    default List<Long> mapAchieveToId(List<Skill> skills) {
+        return skills.stream().map(Skill::getId).toList();
+    }
 }

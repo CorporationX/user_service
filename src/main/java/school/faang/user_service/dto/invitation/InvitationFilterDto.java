@@ -11,13 +11,13 @@ import school.faang.user_service.entity.RequestStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InvitationFilterDto {
-  private String inviterNamePattern;
+    private String inviterNamePattern;
 
-  private String invitedNamePattern;
+    private String invitedNamePattern;
 
-  private Long inviterId;
+    private Long inviterId;
 
-  private Long invitedId;
+    private Long invitedId;
 
-  private RequestStatus status;
+    private RequestStatus status;
 }

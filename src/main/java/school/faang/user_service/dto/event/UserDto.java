@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-  private Long id;
-  private String username;
-  private String email;
-  private List<SkillDto> skills;
+    private Long id;
+    private String username;
+    private String email;
+    private List<SkillDto> skills;
 }

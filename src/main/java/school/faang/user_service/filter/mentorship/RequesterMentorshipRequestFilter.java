@@ -8,19 +8,19 @@ import school.faang.user_service.entity.MentorshipRequest;
 
 @Component
 public class RequesterMentorshipRequestFilter implements MentorshipRequestFilter {
-  @Override
-  public boolean isApplicable(MentorshipRequestFilterDto mentorshipRequestFilterDto) {
-    return mentorshipRequestFilterDto.getRequesterId() != null;
-  }
+    @Override
+    public boolean isApplicable(MentorshipRequestFilterDto mentorshipRequestFilterDto) {
+        return mentorshipRequestFilterDto.getRequesterId() != null;
+    }
 
-  @Override
-  public Stream<MentorshipRequest> apply(
-      Stream<MentorshipRequest> mentorshipRequests,
-      MentorshipRequestFilterDto mentorshipRequestFilterDto) {
-    return mentorshipRequests.filter(
-        mentorshipRequest ->
-            Objects.equals(
-                mentorshipRequest.getRequester().getId(),
-                mentorshipRequestFilterDto.getRequesterId()));
-  }
+    @Override
+    public Stream<MentorshipRequest> apply(
+            Stream<MentorshipRequest> mentorshipRequests,
+            MentorshipRequestFilterDto mentorshipRequestFilterDto) {
+        return mentorshipRequests.filter(
+                mentorshipRequest ->
+                        Objects.equals(
+                                mentorshipRequest.getRequester().getId(),
+                                mentorshipRequestFilterDto.getRequesterId()));
+    }
 }

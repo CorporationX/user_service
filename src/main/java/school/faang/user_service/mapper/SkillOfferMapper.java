@@ -8,7 +8,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillOfferMapper {
 
-  SkillOfferDto toDto(SkillOffer skillOffer);
+    SkillOfferDto toDto(SkillOffer skillOffer);
 
-  SkillOffer toEntity(SkillOfferDto skillOfferDto);
+    SkillOffer toEntity(SkillOfferDto skillOfferDto);
 }

@@ -11,41 +11,41 @@ import school.faang.user_service.repository.SkillRepository;
 @RequiredArgsConstructor
 public class SkillRepositoryAdapter {
 
-  private final SkillRepository skillRepository;
+    private final SkillRepository skillRepository;
 
-  public Optional<Skill> findById(Long id) {
-    return skillRepository.findById(id);
-  }
-
-  public List<Skill> findAllById(List<Long> ids) {
-    return skillRepository.findAllById(ids);
-  }
-
-  public List<Skill> findAllByUserId(long userId) {
-    return skillRepository.findAllByUserId(userId);
-  }
-
-  public boolean existsById(Long id) {
-    return skillRepository.existsById(id);
-  }
-
-  public boolean existsByTitle(String title) {
-    return skillRepository.existsByTitle(title);
-  }
-
-  public void assignSkillToUser(long skillId, long userId) {
-    if (!skillRepository.existsById(skillId)) {
-      throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");
+    public Optional<Skill> findById(Long id) {
+        return skillRepository.findById(id);
     }
-    skillRepository.assignSkillToUser(skillId, userId);
-  }
 
-  public List<Skill> findAll() {
-    return skillRepository.findAll();
-  }
+    public List<Skill> findAllById(List<Long> ids) {
+        return skillRepository.findAllById(ids);
+    }
 
-  public boolean skillsExist(List<Long> ids) {
-    int existing = skillRepository.countExisting(ids);
-    return existing == ids.size();
-  }
+    public List<Skill> findAllByUserId(long userId) {
+        return skillRepository.findAllByUserId(userId);
+    }
+
+    public boolean existsById(Long id) {
+        return skillRepository.existsById(id);
+    }
+
+    public boolean existsByTitle(String title) {
+        return skillRepository.existsByTitle(title);
+    }
+
+    public void assignSkillToUser(long skillId, long userId) {
+        if (!skillRepository.existsById(skillId)) {
+            throw new IllegalArgumentException("Skill with ID " + skillId + " does not exist.");
+        }
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
+    public List<Skill> findAll() {
+        return skillRepository.findAll();
+    }
+
+    public boolean skillsExist(List<Long> ids) {
+        int existing = skillRepository.countExisting(ids);
+        return existing == ids.size();
+    }
 }

@@ -31,38 +31,38 @@ import school.faang.user_service.entity.User;
 @Table(name = "recommendation")
 public class Recommendation {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "content", length = 4096, nullable = false)
-  private String content;
+    @Column(name = "content", length = 4096, nullable = false)
+    private String content;
 
-  @ManyToOne
-  @JoinColumn(name = "author_id", nullable = false)
-  private User author;
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
-  @ManyToOne
-  @JoinColumn(name = "receiver_id", nullable = false)
-  private User receiver;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
 
-  @OneToMany(mappedBy = "recommendation", cascade = CascadeType.ALL)
-  private List<SkillOffer> skillOffers;
+    @OneToMany(mappedBy = "recommendation", cascade = CascadeType.ALL)
+    private List<SkillOffer> skillOffers;
 
-  @OneToOne(mappedBy = "recommendation")
-  private RecommendationRequest request;
+    @OneToOne(mappedBy = "recommendation")
+    private RecommendationRequest request;
 
-  @CreationTimestamp
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  @UpdateTimestamp
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public void addSkillOffer(SkillOffer skillOffer) {
-    skillOffers.add(skillOffer);
-  }
+    public void addSkillOffer(SkillOffer skillOffer) {
+        skillOffers.add(skillOffer);
+    }
 }

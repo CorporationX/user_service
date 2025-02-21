@@ -33,137 +33,155 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
 
-  private final MentorshipRequestRepository mentorshipRequestRepository =
-      Mockito.mock(MentorshipRequestRepository.class);
-  private final MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter =
-      Mockito.mock(MentorshipRequestRepositoryAdapter.class);
-  private final UserRepositoryAdapter userRepositoryAdapter =
-      Mockito.mock(UserRepositoryAdapter.class);
-  private final List<MentorshipRequestFilter> mentorshipRequestFilters = MENTORSHIP_REQUEST_FILTERS;
-  private final MentorshipRequestResponseMapper mentorshipRequestResponseMapper =
-      Mockito.mock(MentorshipRequestResponseMapper.class);
+    private final MentorshipRequestRepository mentorshipRequestRepository =
+            Mockito.mock(MentorshipRequestRepository.class);
 
-  private final MentorshipRequestService mentorshipRequestService =
-      new MentorshipRequestService(
-          mentorshipRequestRepository,
-          mentorshipRequestRepositoryAdapter,
-          userRepositoryAdapter,
-          mentorshipRequestFilters,
-          mentorshipRequestResponseMapper);
+    private final MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter =
+            Mockito.mock(MentorshipRequestRepositoryAdapter.class);
 
-  @Test
-  void requestMentorship_shouldThrowDataValidationException_whenRequesterIdIsInvalid() {
-    Mockito.when(userRepositoryAdapter.existsById(Mockito.anyLong())).thenReturn(false);
+    private final UserRepositoryAdapter userRepositoryAdapter =
+            Mockito.mock(UserRepositoryAdapter.class);
 
-    Assertions.assertThrows(
-        DataValidationException.class,
-        () -> mentorshipRequestService.requestMentorship(INVALID_MENTORSHIP_REQUEST_REQUEST_DTO));
-  }
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters =
+            MENTORSHIP_REQUEST_FILTERS;
 
-  @Test
-  void requestMentorship_shouldThrowDataValidationException_whenReceiverIdIsInvalid() {
-    Mockito.when(userRepositoryAdapter.existsById(Mockito.anyLong())).thenReturn(false);
+    private final MentorshipRequestResponseMapper mentorshipRequestResponseMapper =
+            Mockito.mock(MentorshipRequestResponseMapper.class);
 
-    Assertions.assertThrows(
-        DataValidationException.class,
-        () -> mentorshipRequestService.requestMentorship(INVALID_MENTORSHIP_REQUEST_REQUEST_DTO));
-  }
+    private final MentorshipRequestService mentorshipRequestService =
+            new MentorshipRequestService(
+                    mentorshipRequestRepository,
+                    mentorshipRequestRepositoryAdapter,
+                    userRepositoryAdapter,
+                    mentorshipRequestFilters,
+                    mentorshipRequestResponseMapper);
 
-  @Test
-  void requestMentorship_shouldThrowDataValidationException_whenRequesterIdEqualsReceiverId() {
-    Mockito.when(
-            userRepositoryAdapter.existsById(INVALID_MENTORSHIP_REQUEST_REQUEST_DTO.requesterId()))
-        .thenReturn(true);
-    Mockito.when(
-            userRepositoryAdapter.existsById(INVALID_MENTORSHIP_REQUEST_REQUEST_DTO.receiverId()))
-        .thenReturn(true);
+    @Test
+    void requestMentorship_shouldThrowDataValidationException_whenRequesterIdIsInvalid() {
+        Mockito.when(userRepositoryAdapter.existsById(Mockito.anyLong())).thenReturn(false);
 
-    Assertions.assertThrows(
-        DataValidationException.class,
-        () -> mentorshipRequestService.requestMentorship(INVALID_MENTORSHIP_REQUEST_REQUEST_DTO));
-  }
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () ->
+                        mentorshipRequestService.requestMentorship(
+                                INVALID_MENTORSHIP_REQUEST_REQUEST_DTO));
+    }
 
-  @Test
-  void requestMentorship_shouldThrowDataValidationException_whenNotEnoughMonthsHavePassed() {
-    Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_1)).thenReturn(true);
-    Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_2)).thenReturn(true);
+    @Test
+    void requestMentorship_shouldThrowDataValidationException_whenReceiverIdIsInvalid() {
+        Mockito.when(userRepositoryAdapter.existsById(Mockito.anyLong())).thenReturn(false);
 
-    Mockito.when(mentorshipRequestRepository.findLatestRequest(VALID_USER_ID_1, VALID_USER_ID_2))
-        .thenReturn(Optional.of(VALID_MENTORSHIP_REQUEST));
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () ->
+                        mentorshipRequestService.requestMentorship(
+                                INVALID_MENTORSHIP_REQUEST_REQUEST_DTO));
+    }
 
-    Assertions.assertThrows(
-        DataValidationException.class,
-        () -> mentorshipRequestService.requestMentorship(MENTORSHIP_REQUEST_REQUEST_DTO));
-  }
+    @Test
+    void requestMentorship_shouldThrowDataValidationException_whenRequesterIdEqualsReceiverId() {
+        Mockito.when(
+                        userRepositoryAdapter.existsById(
+                                INVALID_MENTORSHIP_REQUEST_REQUEST_DTO.requesterId()))
+                .thenReturn(true);
+        Mockito.when(
+                        userRepositoryAdapter.existsById(
+                                INVALID_MENTORSHIP_REQUEST_REQUEST_DTO.receiverId()))
+                .thenReturn(true);
 
-  @Test
-  void requestMentorship_shouldCreateRequestMentorship_whenMentorshipRequestDtoIsValid() {
-    Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_1)).thenReturn(true);
-    Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_2)).thenReturn(true);
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () ->
+                        mentorshipRequestService.requestMentorship(
+                                INVALID_MENTORSHIP_REQUEST_REQUEST_DTO));
+    }
 
-    Mockito.when(mentorshipRequestRepository.findLatestRequest(VALID_USER_ID_1, VALID_USER_ID_2))
-        .thenReturn(Optional.empty())
-        .thenReturn(Optional.of(VALID_MENTORSHIP_REQUEST));
+    @Test
+    void requestMentorship_shouldThrowDataValidationException_whenNotEnoughMonthsHavePassed() {
+        Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_1)).thenReturn(true);
+        Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_2)).thenReturn(true);
 
-    Mockito.doNothing()
-        .when(mentorshipRequestRepository)
-        .create(VALID_USER_ID_1, VALID_USER_ID_2, VALID_MENTORSHIP_REQUEST_DESCRIPTION);
+        Mockito.when(
+                        mentorshipRequestRepository.findLatestRequest(
+                                VALID_USER_ID_1, VALID_USER_ID_2))
+                .thenReturn(Optional.of(VALID_MENTORSHIP_REQUEST));
 
-    mentorshipRequestService.requestMentorship(MENTORSHIP_REQUEST_REQUEST_DTO);
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> mentorshipRequestService.requestMentorship(MENTORSHIP_REQUEST_REQUEST_DTO));
+    }
 
-    Mockito.verify(mentorshipRequestRepository, Mockito.times(2))
-        .findLatestRequest(VALID_USER_ID_1, VALID_USER_ID_2);
+    @Test
+    void requestMentorship_shouldCreateRequestMentorship_whenMentorshipRequestDtoIsValid() {
+        Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_1)).thenReturn(true);
+        Mockito.when(userRepositoryAdapter.existsById(VALID_USER_ID_2)).thenReturn(true);
 
-    Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
-        .create(VALID_USER_ID_1, VALID_USER_ID_2, VALID_MENTORSHIP_REQUEST_DESCRIPTION);
-  }
+        Mockito.when(
+                        mentorshipRequestRepository.findLatestRequest(
+                                VALID_USER_ID_1, VALID_USER_ID_2))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(VALID_MENTORSHIP_REQUEST));
 
-  @Test
-  void getRequests_shouldReturnAllMentorshipRequests() {
-    Mockito.when(mentorshipRequestRepository.findAll()).thenReturn(VALID_MENTORSHIP_REQUESTS);
+        Mockito.doNothing()
+                .when(mentorshipRequestRepository)
+                .create(VALID_USER_ID_1, VALID_USER_ID_2, VALID_MENTORSHIP_REQUEST_DESCRIPTION);
 
-    Mockito.when(mentorshipRequestResponseMapper.toDtoList(VALID_MENTORSHIP_REQUESTS))
-        .thenReturn(VALID_MENTORSHIP_REQUEST_RESPONSE_DTOS);
+        mentorshipRequestService.requestMentorship(MENTORSHIP_REQUEST_REQUEST_DTO);
 
-    Assertions.assertEquals(
-        VALID_MENTORSHIP_REQUEST_RESPONSE_DTOS,
-        mentorshipRequestService.getRequests(EMPTY_MENTORSHIP_REQUEST_FILTER_DTO));
-  }
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(2))
+                .findLatestRequest(VALID_USER_ID_1, VALID_USER_ID_2);
 
-  @Test
-  void acceptRequest_shouldThrowDataValidationException_whenReceiverIsAMentorToRequester() {
-    VALID_MENTORSHIP_REQUEST.getRequester().setMentors(List.of(USER_2));
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
+                .create(VALID_USER_ID_1, VALID_USER_ID_2, VALID_MENTORSHIP_REQUEST_DESCRIPTION);
+    }
 
-    Mockito.when(mentorshipRequestRepositoryAdapter.findById(VALID_MENTORSHIP_REQUEST_ID))
-        .thenReturn(VALID_MENTORSHIP_REQUEST);
+    @Test
+    void getRequests_shouldReturnAllMentorshipRequests() {
+        Mockito.when(mentorshipRequestRepository.findAll()).thenReturn(VALID_MENTORSHIP_REQUESTS);
 
-    Assertions.assertThrows(
-        DataValidationException.class,
-        () -> mentorshipRequestService.acceptRequest(VALID_MENTORSHIP_REQUEST_ID));
-  }
+        Mockito.when(mentorshipRequestResponseMapper.toDtoList(VALID_MENTORSHIP_REQUESTS))
+                .thenReturn(VALID_MENTORSHIP_REQUEST_RESPONSE_DTOS);
 
-  @Test
-  void acceptRequest_shouldAcceptMentorshipRequest_whenIdIsValid() {
-    VALID_MENTORSHIP_REQUEST.getRequester().setMentors(new ArrayList<>());
+        Assertions.assertEquals(
+                VALID_MENTORSHIP_REQUEST_RESPONSE_DTOS,
+                mentorshipRequestService.getRequests(EMPTY_MENTORSHIP_REQUEST_FILTER_DTO));
+    }
 
-    Mockito.when(mentorshipRequestRepositoryAdapter.findById(VALID_MENTORSHIP_REQUEST_ID))
-        .thenReturn(VALID_MENTORSHIP_REQUEST);
+    @Test
+    void acceptRequest_shouldThrowDataValidationException_whenReceiverIsAMentorToRequester() {
+        VALID_MENTORSHIP_REQUEST.getRequester().setMentors(List.of(USER_2));
 
-    mentorshipRequestService.acceptRequest(VALID_MENTORSHIP_REQUEST_ID);
+        Mockito.when(mentorshipRequestRepositoryAdapter.findById(VALID_MENTORSHIP_REQUEST_ID))
+                .thenReturn(VALID_MENTORSHIP_REQUEST);
 
-    Assertions.assertEquals(RequestStatus.ACCEPTED, VALID_MENTORSHIP_REQUEST.getStatus());
-    Assertions.assertEquals(List.of(USER_2), VALID_MENTORSHIP_REQUEST.getRequester().getMentors());
-  }
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> mentorshipRequestService.acceptRequest(VALID_MENTORSHIP_REQUEST_ID));
+    }
 
-  @Test
-  void rejectRequest_shouldRejectMentorshipRequest_whenIdAndRejectionDtoIsValid() {
-    Mockito.when(mentorshipRequestRepositoryAdapter.findById(VALID_MENTORSHIP_REQUEST_ID))
-        .thenReturn(VALID_MENTORSHIP_REQUEST);
+    @Test
+    void acceptRequest_shouldAcceptMentorshipRequest_whenIdIsValid() {
+        VALID_MENTORSHIP_REQUEST.getRequester().setMentors(new ArrayList<>());
 
-    mentorshipRequestService.rejectRequest(VALID_MENTORSHIP_REQUEST_ID, VALID_REJECTION_DTO);
+        Mockito.when(mentorshipRequestRepositoryAdapter.findById(VALID_MENTORSHIP_REQUEST_ID))
+                .thenReturn(VALID_MENTORSHIP_REQUEST);
 
-    Assertions.assertEquals(RequestStatus.REJECTED, VALID_MENTORSHIP_REQUEST.getStatus());
-    Assertions.assertEquals(
-        VALID_REJECTION_DTO.reason(), VALID_MENTORSHIP_REQUEST.getRejectionReason());
-  }
+        mentorshipRequestService.acceptRequest(VALID_MENTORSHIP_REQUEST_ID);
+
+        Assertions.assertEquals(RequestStatus.ACCEPTED, VALID_MENTORSHIP_REQUEST.getStatus());
+        Assertions.assertEquals(
+                List.of(USER_2), VALID_MENTORSHIP_REQUEST.getRequester().getMentors());
+    }
+
+    @Test
+    void rejectRequest_shouldRejectMentorshipRequest_whenIdAndRejectionDtoIsValid() {
+        Mockito.when(mentorshipRequestRepositoryAdapter.findById(VALID_MENTORSHIP_REQUEST_ID))
+                .thenReturn(VALID_MENTORSHIP_REQUEST);
+
+        mentorshipRequestService.rejectRequest(VALID_MENTORSHIP_REQUEST_ID, VALID_REJECTION_DTO);
+
+        Assertions.assertEquals(RequestStatus.REJECTED, VALID_MENTORSHIP_REQUEST.getStatus());
+        Assertions.assertEquals(
+                VALID_REJECTION_DTO.reason(), VALID_MENTORSHIP_REQUEST.getRejectionReason());
+    }
 }

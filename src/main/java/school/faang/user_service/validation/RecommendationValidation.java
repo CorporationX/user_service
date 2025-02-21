@@ -18,33 +18,34 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 @Component
 @RequiredArgsConstructor
 public class RecommendationValidation {
-  private final RecommendationRepository recommendationRepository;
-  private final SkillRepository skillRepository;
-  private final RecommendationMapper recommendationMapper;
-  private static final int DATE_LAST_RECOMMENDATION = 6;
+    private final RecommendationRepository recommendationRepository;
+    private final SkillRepository skillRepository;
+    private final RecommendationMapper recommendationMapper;
+    private static final int DATE_LAST_RECOMMENDATION = 6;
 
-  public void validateOfSkills(List<SkillOfferDto> skills) {
-    if (skills == null || skills.isEmpty()) {
-      throw new SkillException("You didn't specify skills");
+    public void validateOfSkills(List<SkillOfferDto> skills) {
+        if (skills == null || skills.isEmpty()) {
+            throw new SkillException("You didn't specify skills");
+        }
+        List<Long> skillIds = skills.stream().map(SkillOfferDto::getSkillId).toList();
+        if (skills.size() != skillRepository.countExisting(skillIds)) {
+            throw new SkillException("Some skills are not found in the systems");
+        }
     }
-    List<Long> skillIds = skills.stream().map(SkillOfferDto::getSkillId).toList();
-    if (skills.size() != skillRepository.countExisting(skillIds)) {
-      throw new SkillException("Some skills are not found in the systems");
-    }
-  }
 
-  public void validateOfLatestRecommendation(RecommendationDto recommendation) {
-    Optional<Recommendation> lastRecommendation =
-        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-            recommendation.getAuthorId(), recommendation.getReceiverId());
-    if (lastRecommendation.isPresent()) {
-      LocalDateTime lastRecommendationDate = lastRecommendation.get().getCreatedAt();
+    public void validateOfLatestRecommendation(RecommendationDto recommendation) {
+        Optional<Recommendation> lastRecommendation =
+                recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendation.getAuthorId(), recommendation.getReceiverId());
+        if (lastRecommendation.isPresent()) {
+            LocalDateTime lastRecommendationDate = lastRecommendation.get().getCreatedAt();
 
-      if (ChronoUnit.MONTHS.between(recommendation.getCreatedAt(), lastRecommendationDate)
-          > DATE_LAST_RECOMMENDATION) {
-        throw new RecommendationException(
-            "You have already given a recommendation to this " + "user within the last 6 months");
-      }
+            if (ChronoUnit.MONTHS.between(recommendation.getCreatedAt(), lastRecommendationDate)
+                    > DATE_LAST_RECOMMENDATION) {
+                throw new RecommendationException(
+                        "You have already given a recommendation to this "
+                                + "user within the last 6 months");
+            }
+        }
     }
-  }
 }

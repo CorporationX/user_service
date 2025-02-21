@@ -29,36 +29,36 @@ import school.faang.user_service.entity.User;
 @Table(name = "rating")
 public class Rating {
 
-  private static final int RATE_MIN_VALUE = 0;
-  private static final int RATE_MAX_VALUE = 5;
+    private static final int RATE_MIN_VALUE = 0;
+    private static final int RATE_MAX_VALUE = 5;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "comment", length = 4096)
-  private String comment;
+    @Column(name = "comment", length = 4096)
+    private String comment;
 
-  @Min(RATE_MIN_VALUE)
-  @Max(RATE_MAX_VALUE)
-  @Column(name = "rate", nullable = false)
-  private int rate;
+    @Min(RATE_MIN_VALUE)
+    @Max(RATE_MAX_VALUE)
+    @Column(name = "rate", nullable = false)
+    private int rate;
 
-  @ManyToOne
-  @JoinColumn(name = "event_id", nullable = false)
-  private Event event;
+    @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
 
-  @ManyToOne
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @CreationTimestamp
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  @UpdateTimestamp
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

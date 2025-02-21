@@ -10,29 +10,29 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 
 public interface RecommendationRepository extends CrudRepository<Recommendation, Long> {
 
-  @Query(
-      nativeQuery = true,
-      value =
-          """
+    @Query(
+            nativeQuery = true,
+            value =
+                    """
             INSERT INTO recommendation (author_id, receiver_id, content)
             VALUES (?1, ?2, ?3) returning id
             """)
-  Long create(long authorId, long receiverId, String content);
+    Long create(long authorId, long receiverId, String content);
 
-  @Query(
-      nativeQuery = true,
-      value =
-          """
+    @Query(
+            nativeQuery = true,
+            value =
+                    """
             UPDATE recommendation SET content = :content, updated_at = now()
             WHERE author_id = :authorId AND receiver_id = :receiverId
             """)
-  @Modifying
-  void update(long authorId, long receiverId, String content);
+    @Modifying
+    void update(long authorId, long receiverId, String content);
 
-  Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);
+    Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);
 
-  Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
+    Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
 
-  Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-      long authorId, long receiverId);
+    Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+            long authorId, long receiverId);
 }

@@ -1,5 +1,13 @@
 package school.faang.user_service.controller;
 
+import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,29 +22,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.dto.DeactivatedUserDto;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.GlobalExceptionHandler;
 import school.faang.user_service.service.UserService;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @InjectMocks
-    private UserController userController;
+    @InjectMocks private UserController userController;
 
     private ObjectMapper objectMapper;
 
@@ -46,9 +43,10 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(userController)
+                        .setControllerAdvice(new GlobalExceptionHandler())
+                        .build();
 
         dto.setId(1L);
         dto.setUsername("John");
@@ -62,8 +60,9 @@ class UserControllerTest {
     void getUser() throws Exception {
         Mockito.when(userService.getUser(1L)).thenReturn(dto);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/users/1")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("John"))
@@ -77,9 +76,10 @@ class UserControllerTest {
     void getUsersByIds() throws Exception {
         Mockito.when(userService.getUsersByIds(List.of(1L))).thenReturn(List.of(dto));
 
-        mockMvc.perform(post("/api/v1/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(List.of(1L))))
+        mockMvc.perform(
+                        post("/api/v1/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(List.of(1L))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value("John"))
                 .andExpect(jsonPath("$[0].email").value("john@gmail.com"));
@@ -88,7 +88,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Test should return DeactivatedUserDto when the ID of the non-deactivated user is transmitted")
+    @DisplayName(
+            "Test should return DeactivatedUserDto when the ID of the non-deactivated user is transmitted")
     void testDeactivateUserSuccessful() throws Exception {
         String dateTimeString = "2025-02-01 12:00:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -111,8 +112,9 @@ class UserControllerTest {
 
         Mockito.when(userService.deactivateUser(deactivatedUserId)).thenReturn(deactivatedUserDto);
 
-        mockMvc.perform(post("/api/v1/users/{id}/deactivate", deactivatedUserId)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        post("/api/v1/users/{id}/deactivate", deactivatedUserId)
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(deactivatedUserDto.getId()))
                 .andExpect(jsonPath("$.username").value(deactivatedUserDto.getUsername()))

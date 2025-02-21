@@ -13,20 +13,20 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationMapper {
 
-  @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "mapToDtoList")
-  RecommendationDto toDto(Recommendation recommendation);
+    @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "mapToDtoList")
+    RecommendationDto toDto(Recommendation recommendation);
 
-  Recommendation toEntity(RecommendationDto recommendationDto);
+    Recommendation toEntity(RecommendationDto recommendationDto);
 
-  @Named("mapToDtoList")
-  default List<SkillOfferDto> mapToDtoList(List<SkillOffer> skillOffers) {
-    return skillOffers.stream().map(this::mapToDto).toList();
-  }
+    @Named("mapToDtoList")
+    default List<SkillOfferDto> mapToDtoList(List<SkillOffer> skillOffers) {
+        return skillOffers.stream().map(this::mapToDto).toList();
+    }
 
-  private SkillOfferDto mapToDto(SkillOffer skillOffer) {
-    SkillOfferDto skillOfferDto = new SkillOfferDto();
-    skillOfferDto.setId(skillOffer.getId());
-    skillOfferDto.setSkillId(skillOffer.getSkill().getId());
-    return skillOfferDto;
-  }
+    private SkillOfferDto mapToDto(SkillOffer skillOffer) {
+        SkillOfferDto skillOfferDto = new SkillOfferDto();
+        skillOfferDto.setId(skillOffer.getId());
+        skillOfferDto.setSkillId(skillOffer.getSkill().getId());
+        return skillOfferDto;
+    }
 }

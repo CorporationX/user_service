@@ -2,13 +2,12 @@ package school.faang.user_service.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
-
-import java.time.LocalDateTime;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -17,8 +16,10 @@ public class ApiError {
 
     private HttpStatus status;
     private String message;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, String> errors;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp = LocalDateTime.now();
 

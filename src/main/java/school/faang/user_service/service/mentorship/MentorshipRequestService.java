@@ -29,142 +29,148 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 @Transactional(readOnly = true)
 public class MentorshipRequestService {
 
-  private static final int NUMBER_OF_MONTH_THAT_MUST_PASS = 3;
+    private static final int NUMBER_OF_MONTH_THAT_MUST_PASS = 3;
 
-  private final MentorshipRequestRepository mentorshipRequestRepository;
-  private final MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter;
-  private final UserRepositoryAdapter userRepositoryAdapter;
-  private final List<MentorshipRequestFilter> mentorshipRequestFilters;
-  private final MentorshipRequestResponseMapper mentorshipRequestResponseMapper;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipRequestRepositoryAdapter mentorshipRequestRepositoryAdapter;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipRequestResponseMapper mentorshipRequestResponseMapper;
 
-  @Transactional
-  public MentorshipRequestResponseDto requestMentorship(
-      MentorshipRequestRequestDto mentorshipRequestRequestDto) {
-    Long requesterId = mentorshipRequestRequestDto.requesterId();
-    Long receiverId = mentorshipRequestRequestDto.receiverId();
+    @Transactional
+    public MentorshipRequestResponseDto requestMentorship(
+            MentorshipRequestRequestDto mentorshipRequestRequestDto) {
+        Long requesterId = mentorshipRequestRequestDto.requesterId();
+        Long receiverId = mentorshipRequestRequestDto.receiverId();
 
-    validateRequestMentorship(requesterId, receiverId);
+        validateRequestMentorship(requesterId, receiverId);
 
-    mentorshipRequestRepository.create(
-        requesterId, receiverId, mentorshipRequestRequestDto.description());
+        mentorshipRequestRepository.create(
+                requesterId, receiverId, mentorshipRequestRequestDto.description());
 
-    MentorshipRequest createdMentorshipRequest =
-        mentorshipRequestRepository
-            .findLatestRequest(requesterId, receiverId)
-            .orElseThrow(
-                () -> {
-                  log.error("An error occurred while saving the mentorship request");
+        MentorshipRequest createdMentorshipRequest =
+                mentorshipRequestRepository
+                        .findLatestRequest(requesterId, receiverId)
+                        .orElseThrow(
+                                () -> {
+                                    log.error(
+                                            "An error occurred while saving the mentorship request");
 
-                  return new DataValidationException(
-                      "An error occurred while saving the mentorship request");
-                });
+                                    return new DataValidationException(
+                                            "An error occurred while saving the mentorship request");
+                                });
 
-    log.info(
-        "Mentorship request from user with ID {} to user with ID {} created",
-        requesterId,
-        receiverId);
+        log.info(
+                "Mentorship request from user with ID {} to user with ID {} created",
+                requesterId,
+                receiverId);
 
-    return mentorshipRequestResponseMapper.toDto(createdMentorshipRequest);
-  }
-
-  public List<MentorshipRequestResponseDto> getRequests(MentorshipRequestFilterDto filter) {
-    Stream<MentorshipRequest> mentorshipRequests = mentorshipRequestRepository.findAll().stream();
-
-    for (MentorshipRequestFilter mentorshipRequestFilter : mentorshipRequestFilters) {
-      if (mentorshipRequestFilter.isApplicable(filter)) {
-        mentorshipRequests = mentorshipRequestFilter.apply(mentorshipRequests, filter);
-      }
+        return mentorshipRequestResponseMapper.toDto(createdMentorshipRequest);
     }
 
-    List<MentorshipRequest> mentorshipRequestsList =
-        mentorshipRequests
-            .peek(
-                mentorshipRequest ->
-                    log.info("Mentorship request with ID {} found", mentorshipRequest.getId()))
-            .toList();
+    public List<MentorshipRequestResponseDto> getRequests(MentorshipRequestFilterDto filter) {
+        Stream<MentorshipRequest> mentorshipRequests =
+                mentorshipRequestRepository.findAll().stream();
 
-    return mentorshipRequestResponseMapper.toDtoList(mentorshipRequestsList);
-  }
+        for (MentorshipRequestFilter mentorshipRequestFilter : mentorshipRequestFilters) {
+            if (mentorshipRequestFilter.isApplicable(filter)) {
+                mentorshipRequests = mentorshipRequestFilter.apply(mentorshipRequests, filter);
+            }
+        }
 
-  @Transactional
-  public MentorshipRequestResponseDto acceptRequest(long id) {
-    MentorshipRequest mentorshipRequest = mentorshipRequestRepositoryAdapter.findById(id);
+        List<MentorshipRequest> mentorshipRequestsList =
+                mentorshipRequests
+                        .peek(
+                                mentorshipRequest ->
+                                        log.info(
+                                                "Mentorship request with ID {} found",
+                                                mentorshipRequest.getId()))
+                        .toList();
 
-    User requester = mentorshipRequest.getRequester();
-    User receiver = mentorshipRequest.getReceiver();
-
-    if (requester.getMentors().contains(receiver)) {
-      Long receiverId = receiver.getId();
-      Long requesterId = requester.getId();
-
-      log.error(
-          "The user with ID {} is already a mentor for the user with ID {}",
-          receiverId,
-          requesterId);
-
-      throw new DataValidationException(
-          "The user with ID "
-              + receiverId
-              + " is already a mentor for the user with ID "
-              + requesterId);
+        return mentorshipRequestResponseMapper.toDtoList(mentorshipRequestsList);
     }
 
-    requester.getMentors().add(receiver);
-    mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+    @Transactional
+    public MentorshipRequestResponseDto acceptRequest(long id) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepositoryAdapter.findById(id);
 
-    log.info("Mentorship request with ID {} accepted", mentorshipRequest.getId());
+        User requester = mentorshipRequest.getRequester();
+        User receiver = mentorshipRequest.getReceiver();
 
-    return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
-  }
+        if (requester.getMentors().contains(receiver)) {
+            Long receiverId = receiver.getId();
+            Long requesterId = requester.getId();
 
-  @Transactional
-  public MentorshipRequestResponseDto rejectRequest(long id, RejectionDto rejection) {
-    MentorshipRequest mentorshipRequest = mentorshipRequestRepositoryAdapter.findById(id);
+            log.error(
+                    "The user with ID {} is already a mentor for the user with ID {}",
+                    receiverId,
+                    requesterId);
 
-    mentorshipRequest.setStatus(RequestStatus.REJECTED);
-    mentorshipRequest.setRejectionReason(rejection.reason());
+            throw new DataValidationException(
+                    "The user with ID "
+                            + receiverId
+                            + " is already a mentor for the user with ID "
+                            + requesterId);
+        }
 
-    log.info("Mentorship request with ID {} rejected", mentorshipRequest.getId());
+        requester.getMentors().add(receiver);
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
-    return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
-  }
+        log.info("Mentorship request with ID {} accepted", mentorshipRequest.getId());
 
-  private void validateRequestMentorship(Long requesterId, Long receiverId) {
-    if (!userRepositoryAdapter.existsById(requesterId)) {
-      log.error("User with ID {} does not exist", requesterId);
-
-      throw new DataValidationException("User with ID \"" + requesterId + "\" does not exist");
+        return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
     }
 
-    if (!userRepositoryAdapter.existsById(receiverId)) {
-      log.error("User with ID {} does not exist", receiverId);
+    @Transactional
+    public MentorshipRequestResponseDto rejectRequest(long id, RejectionDto rejection) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepositoryAdapter.findById(id);
 
-      throw new DataValidationException("User with ID \"" + receiverId + "\" does not exist");
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.reason());
+
+        log.info("Mentorship request with ID {} rejected", mentorshipRequest.getId());
+
+        return mentorshipRequestResponseMapper.toDto(mentorshipRequest);
     }
 
-    if (Objects.equals(requesterId, receiverId)) {
-      log.error("User cannot send a mentorship request to himself");
+    private void validateRequestMentorship(Long requesterId, Long receiverId) {
+        if (!userRepositoryAdapter.existsById(requesterId)) {
+            log.error("User with ID {} does not exist", requesterId);
 
-      throw new DataValidationException("User cannot send a mentorship request to himself");
+            throw new DataValidationException(
+                    "User with ID \"" + requesterId + "\" does not exist");
+        }
+
+        if (!userRepositoryAdapter.existsById(receiverId)) {
+            log.error("User with ID {} does not exist", receiverId);
+
+            throw new DataValidationException("User with ID \"" + receiverId + "\" does not exist");
+        }
+
+        if (Objects.equals(requesterId, receiverId)) {
+            log.error("User cannot send a mentorship request to himself");
+
+            throw new DataValidationException("User cannot send a mentorship request to himself");
+        }
+
+        Optional<MentorshipRequest> optionalLatestMentorshipRequest =
+                mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
+
+        if (optionalLatestMentorshipRequest.isPresent()) {
+            MentorshipRequest latestMentorshipRequest = optionalLatestMentorshipRequest.get();
+
+            if (LocalDateTime.now().getMonth().getValue()
+                    < latestMentorshipRequest.getCreatedAt().getMonth().getValue()
+                            + NUMBER_OF_MONTH_THAT_MUST_PASS) {
+                log.error(
+                        "Mentorship request can be made once every {} months",
+                        NUMBER_OF_MONTH_THAT_MUST_PASS);
+
+                throw new DataValidationException(
+                        "Mentorship request can be made once every "
+                                + NUMBER_OF_MONTH_THAT_MUST_PASS
+                                + " months");
+            }
+        }
     }
-
-    Optional<MentorshipRequest> optionalLatestMentorshipRequest =
-        mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
-
-    if (optionalLatestMentorshipRequest.isPresent()) {
-      MentorshipRequest latestMentorshipRequest = optionalLatestMentorshipRequest.get();
-
-      if (LocalDateTime.now().getMonth().getValue()
-          < latestMentorshipRequest.getCreatedAt().getMonth().getValue()
-              + NUMBER_OF_MONTH_THAT_MUST_PASS) {
-        log.error(
-            "Mentorship request can be made once every {} months", NUMBER_OF_MONTH_THAT_MUST_PASS);
-
-        throw new DataValidationException(
-            "Mentorship request can be made once every "
-                + NUMBER_OF_MONTH_THAT_MUST_PASS
-                + " months");
-      }
-    }
-  }
 }

@@ -7,7 +7,7 @@ import school.faang.user_service.entity.premium.Premium;
 
 public interface PremiumRepository extends CrudRepository<Premium, Long> {
 
-  boolean existsByUserId(long userId);
+    boolean existsByUserId(long userId);
 
-  List<Premium> findAllByEndDateBefore(LocalDateTime endDate);
+    List<Premium> findAllByEndDateBefore(LocalDateTime endDate);
 }

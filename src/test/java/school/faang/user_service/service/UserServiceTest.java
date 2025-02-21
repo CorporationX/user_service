@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,22 +14,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.BadRequestException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventParticipationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
 import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.service.mentorship.MentorshipService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -36,29 +35,21 @@ class UserServiceTest {
 
     private List<UserFilter> userFilters;
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private UserMapper userMapper;
+    @Mock private UserMapper userMapper;
 
-    @Mock
-    private DeactivatedUserMapper deactivatedUserMapper;
+    @Mock private DeactivatedUserMapper deactivatedUserMapper;
 
-    @Mock
-    private UserRepositoryAdapter userRepositoryAdapter;
+    @Mock private UserRepositoryAdapter userRepositoryAdapter;
 
-    @Mock
-    private GoalRepositoryAdapter goalRepositoryAdapter;
+    @Mock private GoalRepositoryAdapter goalRepositoryAdapter;
 
-    @Mock
-    private EventRepositoryAdapter eventRepositoryAdapter;
+    @Mock private EventRepositoryAdapter eventRepositoryAdapter;
 
-    @Mock
-    private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    @Mock private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
 
-    @Mock
-    private MentorshipService mentorshipService;
+    @Mock private MentorshipService mentorshipService;
 
     private final UserDto dto = new UserDto();
 
@@ -78,9 +69,17 @@ class UserServiceTest {
         UserFilter mockSecondUserFilter = Mockito.mock(UserFilter.class);
         userFilters = List.of(mockFirstUserFilter, mockSecondUserFilter);
 
-        userService = new UserService(userRepository, userFilters, userMapper, deactivatedUserMapper,
-                userRepositoryAdapter, goalRepositoryAdapter, eventRepositoryAdapter,
-                eventParticipationRepositoryAdapter, mentorshipService);
+        userService =
+                new UserService(
+                        userRepository,
+                        userFilters,
+                        userMapper,
+                        deactivatedUserMapper,
+                        userRepositoryAdapter,
+                        goalRepositoryAdapter,
+                        eventRepositoryAdapter,
+                        eventParticipationRepositoryAdapter,
+                        mentorshipService);
     }
 
     @Test
@@ -97,7 +96,10 @@ class UserServiceTest {
 
         List<User> users = List.of(user1, user2);
 
-        Mockito.when(userFilters.get(0).apply(userRepository.findPremiumUsers().toList(), userFilterDto))
+        Mockito.when(
+                        userFilters
+                                .get(0)
+                                .apply(userRepository.findPremiumUsers().toList(), userFilterDto))
                 .thenReturn(users);
         Mockito.when(userFilters.get(0).isApplicable(userFilterDto)).thenReturn(true);
         Mockito.when(userMapper.toDto(user1)).thenReturn(firstUserDto);
@@ -106,8 +108,8 @@ class UserServiceTest {
 
         Mockito.verify(userFilters.get(0), Mockito.times(1)).isApplicable(userFilterDto);
         ArgumentCaptor<List<User>> listUsers = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(userFilters.get(0), Mockito.times(1)).apply(listUsers.capture(),
-                Mockito.eq(userFilterDto));
+        Mockito.verify(userFilters.get(0), Mockito.times(1))
+                .apply(listUsers.capture(), Mockito.eq(userFilterDto));
     }
 
     @Test
@@ -139,22 +141,23 @@ class UserServiceTest {
 
         List<Long> userIds = List.of(userId);
 
-        List<UserDto> listDto = List.of(dto);
+        List<UserDto> dtoList = List.of(dto);
 
-        List<User> listUser = List.of(user);
+        List<User> userList = List.of(user);
 
-        Mockito.when(userRepositoryAdapter.getUsersByIds(userIds)).thenReturn(listUser);
-        Mockito.when(userMapper.toListDto(listUser)).thenReturn(listDto);
+        Mockito.when(userRepositoryAdapter.getAllById(userIds)).thenReturn(userList);
+        Mockito.when(userMapper.toDtoList(userList)).thenReturn(dtoList);
 
         List<UserDto> result = userService.getUsersByIds(userIds);
 
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals("John", result.get(0).getUsername());
-        Assertions.assertEquals(listDto, result);
+        Assertions.assertEquals(dtoList, result);
     }
 
     @Test
-    @DisplayName("Test should throw BadRequestException when the ID of the deactivated user is transmitted")
+    @DisplayName(
+            "Test should throw BadRequestException when the ID of the deactivated user is transmitted")
     void testDeactivateUserThrowBadRequestException() {
         long deactivatedUserId = 1L;
 
@@ -163,12 +166,13 @@ class UserServiceTest {
         deactivatedUser.setActive(false);
 
         Mockito.when(userRepositoryAdapter.getById(deactivatedUserId)).thenReturn(deactivatedUser);
-        Assertions.assertThrows(BadRequestException.class,
-                () -> userService.deactivateUser(deactivatedUserId));
+        Assertions.assertThrows(
+                BadRequestException.class, () -> userService.deactivateUser(deactivatedUserId));
     }
 
     @Test
-    @DisplayName("Test should return DeactivatedUserDto when the ID of the non-deactivated user is transmitted")
+    @DisplayName(
+            "Test should return DeactivatedUserDto when the ID of the non-deactivated user is transmitted")
     void testDeactivateUserSuccessful() {
         long userId = 1L;
 

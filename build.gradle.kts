@@ -128,7 +128,7 @@ kotlin {
 
 spotless {
     java {
-        target("src/*/.java")
+        target("src/**/*.java")
         googleJavaFormat().aosp()
         indentWithSpaces(4)
         trimTrailingWhitespace()
@@ -141,11 +141,12 @@ spotless {
  */
 val jacocoIncludes = listOf(
     "**/controller/**",
-    "**/service/**",
-    "**/validation/**",
     "**/filter/**",
-    "**/mapper/**"
+    "**/mapper/**",
+    "**/service/**",
+    "**/validation/**"
 )
+
 val jacocoExcludes = listOf(
     "**/adapter/**",
     "**/client/**",

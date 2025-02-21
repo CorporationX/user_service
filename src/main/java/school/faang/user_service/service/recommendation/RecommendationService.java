@@ -16,54 +16,58 @@ import school.faang.user_service.validation.RecommendationValidation;
 @RequiredArgsConstructor
 @Service
 public class RecommendationService {
-  private final RecommendationRepository recommendationRepository;
-  private final SkillOfferRepository skillOfferRepository;
-  private final RecommendationMapper recommendationMapper;
-  private final RecommendationValidation recommendationValidation;
+    private final RecommendationRepository recommendationRepository;
+    private final SkillOfferRepository skillOfferRepository;
+    private final RecommendationMapper recommendationMapper;
+    private final RecommendationValidation recommendationValidation;
 
-  public RecommendationDto create(RecommendationDto recommendation) {
-    recommendationValidation.validateOfLatestRecommendation(recommendation);
-    recommendationValidation.validateOfSkills(recommendation.getSkillOffers());
-    saveSkillOffers(recommendation);
-    recommendationRepository.create(
-        recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
-    return recommendation;
-  }
-
-  public RecommendationDto update(RecommendationDto recommendation) {
-    recommendationValidation.validateOfLatestRecommendation(recommendation);
-    recommendationValidation.validateOfSkills(recommendation.getSkillOffers());
-    recommendationRepository.update(
-        recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
-    skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-    return saveSkillOffers(recommendation);
-  }
-
-  public void delete(long id) {
-    recommendationRepository.deleteById(id);
-  }
-
-  public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
-    Page<Recommendation> recommendations =
-        recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
-
-    return recommendations.stream()
-        .map(recommendation -> recommendationMapper.toDto(recommendation))
-        .toList();
-  }
-
-  public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
-    Page<Recommendation> recommendations =
-        recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
-    return recommendations.stream()
-        .map(recommendation -> recommendationMapper.toDto(recommendation))
-        .toList();
-  }
-
-  private RecommendationDto saveSkillOffers(RecommendationDto recommendation) {
-    for (SkillOfferDto skillOfferDto : recommendation.getSkillOffers()) {
-      skillOfferRepository.create(skillOfferDto.getId(), recommendation.getId());
+    public RecommendationDto create(RecommendationDto recommendation) {
+        recommendationValidation.validateOfLatestRecommendation(recommendation);
+        recommendationValidation.validateOfSkills(recommendation.getSkillOffers());
+        saveSkillOffers(recommendation);
+        recommendationRepository.create(
+                recommendation.getAuthorId(),
+                recommendation.getReceiverId(),
+                recommendation.getContent());
+        return recommendation;
     }
-    return recommendation;
-  }
+
+    public RecommendationDto update(RecommendationDto recommendation) {
+        recommendationValidation.validateOfLatestRecommendation(recommendation);
+        recommendationValidation.validateOfSkills(recommendation.getSkillOffers());
+        recommendationRepository.update(
+                recommendation.getAuthorId(),
+                recommendation.getReceiverId(),
+                recommendation.getContent());
+        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        return saveSkillOffers(recommendation);
+    }
+
+    public void delete(long id) {
+        recommendationRepository.deleteById(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+        Page<Recommendation> recommendations =
+                recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
+
+        return recommendations.stream()
+                .map(recommendation -> recommendationMapper.toDto(recommendation))
+                .toList();
+    }
+
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        Page<Recommendation> recommendations =
+                recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
+        return recommendations.stream()
+                .map(recommendation -> recommendationMapper.toDto(recommendation))
+                .toList();
+    }
+
+    private RecommendationDto saveSkillOffers(RecommendationDto recommendation) {
+        for (SkillOfferDto skillOfferDto : recommendation.getSkillOffers()) {
+            skillOfferRepository.create(skillOfferDto.getId(), recommendation.getId());
+        }
+        return recommendation;
+    }
 }

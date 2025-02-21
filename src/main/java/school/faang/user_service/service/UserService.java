@@ -1,8 +1,7 @@
 package school.faang.user_service.service;
 
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +21,6 @@ import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
 import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
 import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.service.mentorship.MentorshipService;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -50,15 +47,11 @@ public class UserService {
             }
         }
 
-        return users.stream()
-                .map(userMapper::toDto)
-                .toList();
+        return users.stream().map(userMapper::toDto).toList();
     }
 
     public List<UserDto> getPremiumUsers() {
-        return userRepository.findPremiumUsers()
-                .map(userMapper::toDto)
-                .toList();
+        return userRepository.findPremiumUsers().map(userMapper::toDto).toList();
     }
 
     public UserDto getUser(Long userId) {
@@ -66,7 +59,7 @@ public class UserService {
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        return userMapper.toListDto(userRepositoryAdapter.getUsersByIds(ids));
+        return userMapper.toDtoList(userRepositoryAdapter.getAllById(ids));
     }
 
     @Transactional
@@ -100,11 +93,12 @@ public class UserService {
     private void deleteUserEvents(User user) {
         List<Event> userEvents = user.getOwnedEvents();
         for (Event event : userEvents) {
-            log.info("Registration for event with ID {} has been canceled for all users", event.getId());
+            log.info(
+                    "Registration for event with ID {} has been canceled for all users",
+                    event.getId());
             eventParticipationRepositoryAdapter.unregisterAll(event.getId());
         }
         log.info("All user events with ID {} have been deleted", user.getId());
         eventRepositoryAdapter.deleteAll(userEvents);
     }
 }
-

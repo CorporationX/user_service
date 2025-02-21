@@ -6,9 +6,9 @@ import school.faang.user_service.entity.MentorshipRequest;
 
 public interface MentorshipRequestFilter {
 
-  boolean isApplicable(MentorshipRequestFilterDto mentorshipRequestFilterDto);
+    boolean isApplicable(MentorshipRequestFilterDto mentorshipRequestFilterDto);
 
-  Stream<MentorshipRequest> apply(
-      Stream<MentorshipRequest> mentorshipRequests,
-      MentorshipRequestFilterDto mentorshipRequestFilterDto);
+    Stream<MentorshipRequest> apply(
+            Stream<MentorshipRequest> mentorshipRequests,
+            MentorshipRequestFilterDto mentorshipRequestFilterDto);
 }

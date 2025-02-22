@@ -118,17 +118,20 @@ public class MentorshipServiceImplTest {
     @Test
     public void test_getMentees_correctMapping_toUserDto() {
         User mentor = new User();
+        String mentorName = "Ivan";
         mentor.setId(1L);
-        mentor.setUsername("Ivan");
+        mentor.setUsername(mentorName);
 
         User mentee = new User();
+        String  menteeName = "Kirill";
         mentee.setId(2L);
-        mentee.setUsername("Kirill");
+        mentee.setUsername(menteeName);
         mentor.setMentees(List.of(mentee));
 
         UserDto menteeDto = new UserDto();
+        String menteeDtoName = "Kirill";
         menteeDto.setId(2L);
-        menteeDto.setUsername("Kirill");
+        menteeDto.setUsername(menteeDtoName);
 
         Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.of(mentor));
         Mockito.when(mentorshipMapper.toUserDto(Mockito.anyList())).thenReturn(List.of(menteeDto));
@@ -137,7 +140,7 @@ public class MentorshipServiceImplTest {
 
         assertFalse(mentees.isEmpty());
         assertEquals(1, mentees.size());
-        assertEquals("Kirill", mentees.get(0).getUsername());
+        assertEquals(menteeName, mentees.get(0).getUsername());
 
         Mockito.verify(mentorshipMapper, Mockito.times(1)).toUserDto(Mockito.anyList());
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(Mockito.eq(1L));
@@ -146,17 +149,20 @@ public class MentorshipServiceImplTest {
     @Test
     public void test_getMentors_returnListOfUserDto_whenUserExistsWithMentors() {
         User mentee = new User();
+        String menteeName = "Ivan";
         mentee.setId(1L);
-        mentee.setUsername("Ivan");
+        mentee.setUsername(menteeName);
 
         User mentor = new User();
+        String mentorName = "Oleg";
         mentor.setId(2L);
-        mentor.setUsername("Oleg");
+        mentor.setUsername(mentorName);
 
         mentee.setMentors(List.of(mentor));
 
         UserDto mentorDto = new UserDto();
-        mentorDto.setUsername("Oleg");
+        String mentorDtoName = "Oleg";
+        mentorDto.setUsername(mentorDtoName);
 
         Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.of(mentee));
         Mockito.when(mentorshipMapper.toUserDto(List.of(mentor))).thenReturn(List.of(mentorDto));
@@ -164,7 +170,7 @@ public class MentorshipServiceImplTest {
         final List<UserDto> mentors = mentorshipService.getMentors(1L);
 
         assertEquals(1, mentors.size());
-        assertEquals("Oleg", mentors.get(0).getUsername());
+        assertEquals(mentorName, mentors.get(0).getUsername());
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(1L);
         Mockito.verify(mentorshipMapper, Mockito.times(2)).toUserDto(List.of(mentor));

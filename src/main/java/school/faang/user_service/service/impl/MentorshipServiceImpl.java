@@ -46,7 +46,7 @@ public class MentorshipServiceImpl implements MentorshipService {
     public void deleteMentee(long menteeId, long mentorId) {
 
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException("Ментор с ID " + mentorId + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException( String.format("Ментор с ID %s не найден", mentorId)));
 
         List<User> mentees = mentor.getMentees();
         if (mentees == null) {
@@ -92,7 +92,8 @@ public class MentorshipServiceImpl implements MentorshipService {
         }
 
         if (userMentor == null) {
-            throw new EntityNotFoundException("Ментор с ID " + mentorId + " не найден у менти с ID " + menteeId);
+            throw new EntityNotFoundException
+                    (String.format("Ментор с ID %s не найден у менти с ID %s", mentorId, menteeId));
         }
 
         mentors.remove(userMentor);

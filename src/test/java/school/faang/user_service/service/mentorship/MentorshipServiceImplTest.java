@@ -41,12 +41,14 @@ public class MentorshipServiceImplTest {
     @Test
     public void test_getMentees_returnMentees_whenUserHasMentees() {
         User mentor = new User();
+        String mentorName = "Ivan";
         mentor.setId(1L);
-        mentor.setUsername("Ivan");
+        mentor.setUsername(mentorName);
 
         User mentee = new User();
+        String menteeName = "Oleg";
         mentee.setId(2L);
-        mentee.setUsername("Oleg");
+        mentee.setUsername(menteeName);
 
         mentor.setMentees(List.of(mentee));
 

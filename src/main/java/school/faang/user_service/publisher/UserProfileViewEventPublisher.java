@@ -15,7 +15,7 @@ public class UserProfileViewEventPublisher {
     private final ObjectMapper objectMapper;
 
     @Value("${redis.topic.user-profile-view}")
-    private String redisTopic;
+    private final String redisTopic;
 
     public void publish(Object message) {
         try {

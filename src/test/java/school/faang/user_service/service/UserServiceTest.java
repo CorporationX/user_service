@@ -2,17 +2,21 @@ package school.faang.user_service.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.publisher.ProfileViewEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
@@ -21,6 +25,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.adapter.EventParticipationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
@@ -35,21 +40,41 @@ class UserServiceTest {
 
     private List<UserFilter> userFilters;
 
-    @Mock private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-    @Mock private UserMapper userMapper;
+    @Mock
+    private UserMapper userMapper;
 
-    @Mock private DeactivatedUserMapper deactivatedUserMapper;
+    @Mock
+    private UserContext userContext;
 
-    @Mock private UserRepositoryAdapter userRepositoryAdapter;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
-    @Mock private GoalRepositoryAdapter goalRepositoryAdapter;
+    @Mock
+    private DeactivatedUserMapper deactivatedUserMapper;
 
-    @Mock private EventRepositoryAdapter eventRepositoryAdapter;
+    @Mock
+    private UserRepositoryAdapter userRepositoryAdapter;
 
-    @Mock private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    @Mock
+    private GoalRepositoryAdapter goalRepositoryAdapter;
 
-    @Mock private MentorshipService mentorshipService;
+    @Mock
+    private EventRepositoryAdapter eventRepositoryAdapter;
+
+    @Mock
+    private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+
+    @Mock
+    private MentorshipService mentorshipService;
+
+    @Captor
+    private ArgumentCaptor<List<User>> listUsers;
+
+    @Captor
+    private ArgumentCaptor<ProfileViewEvent> profileViewEvent;
 
     private final UserDto dto = new UserDto();
 
@@ -73,6 +98,8 @@ class UserServiceTest {
                 new UserService(
                         userRepository,
                         userFilters,
+                        profileViewEventPublisher,
+                        userContext,
                         userMapper,
                         deactivatedUserMapper,
                         userRepositoryAdapter,
@@ -107,7 +134,6 @@ class UserServiceTest {
         userService.getPremiumUsers(userFilterDto);
 
         Mockito.verify(userFilters.get(0), Mockito.times(1)).isApplicable(userFilterDto);
-        ArgumentCaptor<List<User>> listUsers = ArgumentCaptor.forClass(List.class);
         Mockito.verify(userFilters.get(0), Mockito.times(1))
                 .apply(listUsers.capture(), Mockito.eq(userFilterDto));
     }
@@ -115,13 +141,29 @@ class UserServiceTest {
     @Test
     @DisplayName("Test must return user when id is exist")
     void testGetUserByIdSuccess() {
-        Mockito.when(userRepositoryAdapter.getById(1L)).thenReturn(user);
-        Mockito.when(userMapper.toDto(user)).thenReturn(dto);
+        mockUserRepositoryAdapterAndMapper();
 
         UserDto result = userService.getUser(1L);
 
         Assertions.assertEquals(dto.getUsername(), result.getUsername());
         Assertions.assertEquals(dto, result);
+    }
+
+    @Test
+    @DisplayName("The test successfully publishes an event about viewing the user's profile to redis")
+    void testSuccessfullyPublishedEventAboutProfileViewing() {
+        mockUserRepositoryAdapterAndMapper();
+
+        Mockito.when(userContext.getUserId()).thenReturn(2L);
+
+        userService.getUser(1L);
+
+        Mockito.verify(profileViewEventPublisher, Mockito.times(1))
+                .publish(profileViewEvent.capture());
+
+        ProfileViewEvent resultEvent = profileViewEvent.getValue();
+        Assertions.assertEquals(1, resultEvent.getProfileId());
+        Assertions.assertEquals(2, resultEvent.getViewId());
     }
 
     @Test
@@ -228,5 +270,10 @@ class UserServiceTest {
 
         Mockito.verify(mentorshipService, Mockito.times(1)).stopMentorship(user);
         Mockito.verify(deactivatedUserMapper, Mockito.times(1)).toDto(user);
+    }
+
+    private void mockUserRepositoryAdapterAndMapper() {
+        Mockito.when(userRepositoryAdapter.getById(1L)).thenReturn(user);
+        Mockito.when(userMapper.toDto(user)).thenReturn(dto);
     }
 }

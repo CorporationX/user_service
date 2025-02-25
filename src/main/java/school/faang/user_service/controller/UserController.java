@@ -17,6 +17,7 @@ import school.faang.user_service.service.UserService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
+
 public class UserController {
     private final UserService userService;
 
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 

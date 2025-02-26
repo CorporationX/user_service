@@ -36,7 +36,7 @@ public class MentorshipServiceImplTest {
     private MentorshipRepository mentorshipRepository;
 
     @Spy
-    private MentorshipMapper mentorshipMapper = Mockito.spy(new MentorshipMapperImpl());
+    private MentorshipMapper mentorshipMapper = new MentorshipMapperImpl();
 
     @Test
     public void test_getMentees_returnMentees_whenUserHasMentees() {
@@ -80,39 +80,23 @@ public class MentorshipServiceImplTest {
     }
 
     @Test
-    public void test_getMentees_returnEmptyList_whenUserNotFound() {
+    public void test_getMentees_throwsException_whenUserNotFound() {
+
         Mockito.when(mentorshipRepository.findById(Mockito.eq(3L))).thenReturn(Optional.empty());
 
-        final List<UserDto> mentees = mentorshipService.getMentees(3L);
-
-        assertTrue(mentees.isEmpty());
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(3L));
     }
 
+
     @Test
-    public void test_getMentees_returnEmptyList_whenIdIsZeroOrNegative() {
+    public void test_getMentees_throwsException_whenIdIsZeroOrNegative() {
         long invalidId1 = 0L;
         long invalidId2 = -1L;
 
-        final List<UserDto> mentees = mentorshipService.getMentees(invalidId1);
-        final List<UserDto> mentees1 = mentorshipService.getMentees(invalidId2);
-
-        assertTrue(mentees.isEmpty());
-        assertTrue(mentees1.isEmpty());
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(invalidId1));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(invalidId2));
 
         Mockito.verify(mentorshipRepository, Mockito.times(2)).findById(Mockito.anyLong());
-    }
-
-    @Test
-    public void test_getMentees_returnEmptyList_whenIdIsNegative() {
-        final long invalidId = -1L;
-
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(invalidId))).thenReturn(Optional.empty());
-
-        List<UserDto> mentees = mentorshipService.getMentees(invalidId);
-
-        assertTrue(mentees.isEmpty(), "Список подопечных должен быть пустым для некорректного ID");
-
-        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(Mockito.eq(invalidId));
     }
 
     @Test
@@ -123,7 +107,7 @@ public class MentorshipServiceImplTest {
         mentor.setUsername(mentorName);
 
         User mentee = new User();
-        String  menteeName = "Kirill";
+        String menteeName = "Kirill";
         mentee.setId(2L);
         mentee.setUsername(menteeName);
         mentor.setMentees(List.of(mentee));

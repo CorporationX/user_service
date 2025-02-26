@@ -9,10 +9,7 @@ import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,80 +20,50 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public List<UserDto> getMentees(long userId) {
-        final Optional<User> UserById = mentorshipRepository.findById(userId);
-        if (UserById.isPresent()) {
-            final List<User> mentees = UserById.get().getMentees();
-            return mentorshipMapper.toUserDto(mentees);
-        }
-        return Collections.emptyList();
+        final User userById = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с userID %s не найден", userId)));
+        return mentorshipMapper.toUserDto(userById.getMentees());
     }
 
     @Override
     public List<UserDto> getMentors(long userId) {
-        final User UserById = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь с таким userID не найден"));
-        List<User> mentors = UserById.getMentors();
-        if (mentors == null) {
-            mentors = Collections.emptyList();
-        }
-        return mentorshipMapper.toUserDto(mentors);
+        final User userById = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с userID %s не найден", userId)));
+        return mentorshipMapper.toUserDto(userById.getMentors());
     }
 
     @Override
     public void deleteMentee(long menteeId, long mentorId) {
-
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException( String.format("Ментор с ID %s не найден", mentorId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Ментор с ID %s не найден", mentorId)));
 
-        List<User> mentees = mentor.getMentees();
-        if (mentees == null) {
-            mentees = new ArrayList<>();
-            mentor.setMentees(mentees);
-        }
+        User userMentee = mentor.getMentees()
+                .stream()
+                .filter(mentee -> mentee.getId() == menteeId)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Менти с ID %s не найден у ментора с ID %s", menteeId, mentorId)
+                ));
 
-        User userMentee = null;
-        for (User mentee : mentees) {
-            if (mentee.getId() == menteeId) {
-                userMentee = mentee;
-                break;
-            }
-        }
-
-        if (userMentee == null) {
-            throw new EntityNotFoundException("Менти с ID " + menteeId + " не найден у ментора с ID " + mentorId);
-        }
-
-        mentees.remove(userMentee);
+        mentor.getMentees().remove(userMentee);
 
         mentorshipRepository.save(mentor);
     }
 
     @Override
     public void deleteMentor(long menteeId, long mentorId) {
-
         User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new EntityNotFoundException("Менти с ID " + menteeId + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Менти с ID %s не найден", menteeId)));
 
-        List<User> mentors = mentee.getMentors();
-        if (mentors == null) {
-            mentors = new ArrayList<>();
-            mentee.setMentors(mentors);
-        }
+        User userMentor = mentee.getMentors()
+                .stream()
+                .filter(mentor -> mentor.getId() == mentorId)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Ментор с ID %s не найден у менти с ID %s", mentorId, menteeId)
+                ));
 
-        User userMentor = null;
-        for (User mentor : mentors) {
-            if (mentor.getId() == mentorId) {
-                userMentor = mentor;
-                break;
-            }
-        }
-
-        if (userMentor == null) {
-            throw new EntityNotFoundException
-                    (String.format("Ментор с ID %s не найден у менти с ID %s", mentorId, menteeId));
-        }
-
-        mentors.remove(userMentor);
+        mentee.getMentors().remove(userMentor);
 
         mentorshipRepository.save(mentee);
     }

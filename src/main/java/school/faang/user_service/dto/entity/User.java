@@ -33,6 +33,7 @@ import school.faang.user_service.dto.entity.premium.Premium;
 import school.faang.user_service.dto.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -97,7 +98,7 @@ public class User {
     private List<Event> ownedEvents;
 
     @ManyToMany(mappedBy = "mentors")
-    private List<User> mentees;
+    private List<User> mentees = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "mentorship",

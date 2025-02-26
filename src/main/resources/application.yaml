@@ -20,10 +20,9 @@ spring:
     redis:
       port: 6379
       host: localhost
-
-redis:
-  topic:
-    user-profile-view: UserProfileView
+      channel:
+        profile-view: profile_view
+        channelFollower: user_follow_channel
 
 server:
   port: 8080

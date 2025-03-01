@@ -1,8 +1,8 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.*;
-import school.faang.user_service.dto.entity.Skill;
-import school.faang.user_service.dto.entity.event.Event;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.dto.event.EventDto;
 
 import java.util.List;

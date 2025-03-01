@@ -3,7 +3,7 @@ package school.faang.user_service.repository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import school.faang.user_service.dto.entity.User;
+import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 

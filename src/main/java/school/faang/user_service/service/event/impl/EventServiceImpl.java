@@ -3,14 +3,14 @@ package school.faang.user_service.service.event.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.entity.event.Event;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.event.filter.EventFilter;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
 import java.util.List;

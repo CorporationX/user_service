@@ -12,7 +12,7 @@ import school.faang.user_service.dto.request.RecommendationRequestDto;
 import school.faang.user_service.dto.request.RejectionDto;
 import school.faang.user_service.dto.request.SearchRequest;
 import school.faang.user_service.dto.response.RecommendationRequestResponseDto;
-import school.faang.user_service.dto.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RecommendationFrequencyException;
 import school.faang.user_service.repository.genericSpecification.GenericSpecification;
 import school.faang.user_service.mapper.RecommendationRequestMapper;

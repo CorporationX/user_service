@@ -8,7 +8,7 @@ import school.faang.user_service.dto.request.RecommendationRequestDto;
 import school.faang.user_service.dto.request.RejectionDto;
 import school.faang.user_service.dto.request.SearchRequest;
 import school.faang.user_service.dto.response.RecommendationRequestResponseDto;
-import school.faang.user_service.dto.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RecommendationFrequencyException;
 import school.faang.user_service.repository.genericSpecification.GenericSpecification;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
@@ -22,8 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static school.faang.user_service.dto.entity.RequestStatus.PENDING;
-import static school.faang.user_service.dto.entity.RequestStatus.REJECTED;
+import static school.faang.user_service.entity.RequestStatus.PENDING;
+import static school.faang.user_service.entity.RequestStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor

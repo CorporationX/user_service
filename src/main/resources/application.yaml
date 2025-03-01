@@ -12,6 +12,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  mvc:
+    servlet:
+      path: /api/v1
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -20,6 +23,15 @@ spring:
     redis:
       port: 6379
       host: localhost
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          payment-service:
+            url: http://localhost:9080/api/
+            connect-timeout: 5000
+            read-timeout: 5000
 
 server:
   port: 8080
@@ -35,3 +47,12 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+app:
+  number_months_membership: 3
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

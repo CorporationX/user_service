@@ -63,11 +63,12 @@ public class UserService {
     public UserDto getUser(Long userId) {
         UserDto userDto = userMapper.toDto(userRepositoryAdapter.getById(userId));
 
-        ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
-                .profileId(userDto.getId())
-                .viewId(userContext.getUserId())
-                .timestamp(LocalDateTime.now())
-                .build();
+        ProfileViewEvent profileViewEvent =
+                ProfileViewEvent.builder()
+                        .profileId(userDto.getId())
+                        .viewId(userContext.getUserId())
+                        .timestamp(LocalDateTime.now())
+                        .build();
 
         profileViewEventPublisher.publish(profileViewEvent);
         log.info("The profile view event was successfully published to redis");

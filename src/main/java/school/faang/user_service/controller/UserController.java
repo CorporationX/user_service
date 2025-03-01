@@ -17,7 +17,6 @@ import school.faang.user_service.service.UserService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
-
 public class UserController {
     private final UserService userService;
 

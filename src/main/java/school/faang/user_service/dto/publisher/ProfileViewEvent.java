@@ -1,21 +1,12 @@
 package school.faang.user_service.dto.publisher;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+import lombok.Builder;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class ProfileViewEvent {
-    private long profileId;
-    private long viewId;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime timestamp;
-}
+public record ProfileViewEvent(
+        long profileId,
+        long viewId,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+                LocalDateTime timestamp) {}

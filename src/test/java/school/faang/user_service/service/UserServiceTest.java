@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,41 +39,29 @@ class UserServiceTest {
 
     private List<UserFilter> userFilters;
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private UserMapper userMapper;
+    @Mock private UserMapper userMapper;
 
-    @Mock
-    private UserContext userContext;
+    @Mock private UserContext userContext;
 
-    @Mock
-    private ProfileViewEventPublisher profileViewEventPublisher;
+    @Mock private ProfileViewEventPublisher profileViewEventPublisher;
 
-    @Mock
-    private DeactivatedUserMapper deactivatedUserMapper;
+    @Mock private DeactivatedUserMapper deactivatedUserMapper;
 
-    @Mock
-    private UserRepositoryAdapter userRepositoryAdapter;
+    @Mock private UserRepositoryAdapter userRepositoryAdapter;
 
-    @Mock
-    private GoalRepositoryAdapter goalRepositoryAdapter;
+    @Mock private GoalRepositoryAdapter goalRepositoryAdapter;
 
-    @Mock
-    private EventRepositoryAdapter eventRepositoryAdapter;
+    @Mock private EventRepositoryAdapter eventRepositoryAdapter;
 
-    @Mock
-    private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    @Mock private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
 
-    @Mock
-    private MentorshipService mentorshipService;
+    @Mock private MentorshipService mentorshipService;
 
-    @Captor
-    private ArgumentCaptor<List<User>> listUsers;
+    @Captor private ArgumentCaptor<List<User>> listUsers;
 
-    @Captor
-    private ArgumentCaptor<ProfileViewEvent> profileViewEvent;
+    @Captor private ArgumentCaptor<ProfileViewEvent> profileViewEvent;
 
     private final UserDto dto = new UserDto();
 
@@ -150,7 +137,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("The test successfully publishes an event about viewing the user's profile to redis")
+    @DisplayName(
+            "The test successfully publishes an event about viewing the user's profile to redis")
     void testSuccessfullyPublishedEventAboutProfileViewing() {
         mockUserRepositoryAdapterAndMapper();
 
@@ -162,8 +150,8 @@ class UserServiceTest {
                 .publish(profileViewEvent.capture());
 
         ProfileViewEvent resultEvent = profileViewEvent.getValue();
-        Assertions.assertEquals(1, resultEvent.getProfileId());
-        Assertions.assertEquals(2, resultEvent.getViewId());
+        Assertions.assertEquals(1, resultEvent.profileId());
+        Assertions.assertEquals(2, resultEvent.viewId());
     }
 
     @Test

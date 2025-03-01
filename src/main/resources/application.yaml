@@ -21,6 +21,17 @@ spring:
       port: 6379
       host: localhost
 
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    region: bucket_region
+    bucketName: user-avatar
+    maxSize: 5242880
+    largePhotoSize: 1080
+    smallPhotoSize: 170
+
 server:
   port: 8080
 

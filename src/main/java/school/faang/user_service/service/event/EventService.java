@@ -19,4 +19,6 @@ public interface EventService {
     List<EventDto> getOwnedEvents(long userId);
 
     List<EventDto> getParticipatedEvents(long userId);
+
+    void clearEvents();
 }

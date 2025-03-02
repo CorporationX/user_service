@@ -25,4 +25,9 @@ public class UserController {
     public UserDto getUser(@PathVariable long userId) {
         return userMapper.toDto(userService.getUserById(userId));
     }
+
+    @PutMapping(USER_ID_PATH)
+    public void deactivateUser(@PathVariable Long userId) {
+        userService.deactivateUser(userId);
+    }
 }

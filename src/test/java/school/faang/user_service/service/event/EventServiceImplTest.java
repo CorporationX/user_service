@@ -1,10 +1,15 @@
 package school.faang.user_service.service.event;
 
+import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -18,8 +23,8 @@ import school.faang.user_service.service.event.filter.EventTitleFilter;
 import school.faang.user_service.service.event.impl.EventServiceImpl;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,6 +68,9 @@ public class EventServiceImplTest {
     private static final Skill SECOND_SKILL = Skill.builder().id(2L).build();
     private static final List<Event> EVENTS = List.of(new Event(), new Event());
     private static final List<EventDto> EVENT_DTOS = List.of(new EventDto(), new EventDto());
+    private static final int BATCH_SIZE = 4;
+    private static final int MAX_ITERATIONS = 1;
+    private static final List<Long> EVENTS_ID = List.of(1L, 2L, 3L, 4L, 5L, 6L);
 
     @BeforeEach
     void setUp() {
@@ -72,6 +80,8 @@ public class EventServiceImplTest {
                 userRepositoryAdapter,
                 eventMapper,
                 List.of(eventTitleFilter, eventDescriptionFilter));
+        eventService.setBatchSize(BATCH_SIZE);
+        eventService.setMaxIterations(MAX_ITERATIONS);
     }
 
     @Test
@@ -252,5 +262,23 @@ public class EventServiceImplTest {
         verify(eventDescriptionFilter).apply(any(Stream.class), eq(filters));
         List<Event> capturedEvents = eventsCaptor.getValue();
         assertEquals(1, capturedEvents.size());
+    }
+
+    @Test
+    public void testDeleteEvents() {
+        Pageable pageable = PageRequest.of(0, BATCH_SIZE);
+        Page<Long> eventPage = new PageImpl<>(EVENTS_ID, pageable, EVENTS_ID.size());
+        Iterable<List<Long>> eventPartitions = ListUtils.partition(eventPage.getContent(), BATCH_SIZE / 2);
+        when(eventRepository.findAllEndEvents(any(LocalDateTime.class), any(PageRequest.class))).thenReturn(eventPage);
+        eventService.clearEvents();
+        verify(eventRepository, times(1)).findAllEndEvents(any(LocalDateTime.class),
+                any(PageRequest.class));
+    }
+
+    @Test
+    public void testDeleteEventsFailed() {
+        when(eventRepository.findAllEndEvents(any(LocalDateTime.class), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(Collections.emptyList()));
+        eventService.clearEvents();
     }
 }

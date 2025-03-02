@@ -50,9 +50,17 @@ payment-service:
 
 app:
   number_months_membership: 3
+  batch_size: 100
+  max_iterations_to_find_db: 1000
 
 springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+cron:
+  expression:
+    delete_old_events: "0 23 * * * 6"
+
+

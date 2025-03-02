@@ -2,15 +2,17 @@ package school.faang.user_service.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import liquibase.ui.UIService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
+    private final UserRepositoryAdapter userRepositoryAdapter;
     private EventRepository eventRepository;
     private GoalRepository goalRepository;
 
@@ -31,6 +34,16 @@ public class UserServiceImpl implements UserService {
         deactivateUserActivities(user);
         user.setActive(false);
         deactivateMentorship(user);
+    }
+
+    @Override
+    public User getUserById(long userId) {
+        return userRepositoryAdapter.getUserById(userId);
+    }
+
+    @Override
+    public List<User> getUsersByIds(List<Long> ids) {
+        return userRepository.findAllById(ids);
     }
 
     private void deactivateUserActivities(User user) {
@@ -58,4 +71,6 @@ public class UserServiceImpl implements UserService {
         List<Goal> mentoredGoals = goalRepository.findAllByMentorId(user.getId());
         mentoredGoals.forEach(goal -> goal.setMentor(null));
     }
+
+
 }

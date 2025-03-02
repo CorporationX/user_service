@@ -8,4 +8,6 @@ public interface UserService {
     User getUserById(long userId);
 
     List<User> getUsersByIds(List<Long> ids);
+
+    void deactivateUser(Long userId);
 }

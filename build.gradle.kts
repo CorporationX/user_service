@@ -49,6 +49,7 @@ dependencies {
      */
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
     implementation("net.coobird:thumbnailator:0.4.19")
+
     /**
      * Utils & Logging
      */
@@ -135,6 +136,7 @@ spotless {
         endWithNewline()
     }
 }
+
 /**
  * JaCoCo Configuration
  */

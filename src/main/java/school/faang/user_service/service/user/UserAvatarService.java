@@ -3,22 +3,22 @@ package school.faang.user_service.service.user;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Objects;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.properties.ProfilePicProperties;
+import school.faang.user_service.config.properties.S3Properties;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.FileSizeException;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.*;
 import school.faang.user_service.repository.UserRepository;
 
 @Slf4j
@@ -28,96 +28,65 @@ public class UserAvatarService {
 
     private final UserRepository userRepository;
     private final AmazonS3 s3Client;
+    private final S3Properties s3Properties;
+    private final ProfilePicProperties profilePicProperties;
 
-    @Value("${services.s3.bucketName}")
-    private String bucketName;
-
-    @Value("${services.s3.maxSize}")
-    private long maxFileSize;
-
-    @Value("${services.s3.largePhotoSize}")
-    private int largePhotoSize;
-
-    @Value("${services.s3.smallPhotoSize}")
-    private int smallPhotoSize;
-
+    @Transactional
     public void uploadAvatar(Long userId, MultipartFile file) {
         validateFile(file);
-
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        if (user.getUserProfilePic() != null) {
-            deleteExistingAvatars(user);
-        }
+        User user = getUser(userId);
+        deleteExistingAvatars(user);
 
         try {
-            String largeKey = processAndUploadImage(file, largePhotoSize);
-            String smallKey = processAndUploadImage(file, smallPhotoSize);
-            user.setUserProfilePic(new UserProfilePic(largeKey, smallKey));
+            String largeAvatarKey =
+                    processAndUploadImage(file, profilePicProperties.getLargePhotoSize());
+            String smallAvatarKey =
+                    processAndUploadImage(file, profilePicProperties.getSmallPhotoSize());
+
+            user.setUserProfilePic(new UserProfilePic(largeAvatarKey, smallAvatarKey));
             userRepository.save(user);
         } catch (IOException e) {
             log.error("Error processing avatar for user {}", userId, e);
-            throw new FileSizeException("Error processing image");
+            throw new AvatarProcessingException("Error processing image", e);
         }
     }
 
-    public byte[] downloadLargeAvatar(Long userId) {
+    public InputStreamResource downloadLargeAvatar(Long userId) {
         return downloadAvatar(userId, false);
     }
 
-    public byte[] downloadSmallAvatar(Long userId) {
+    public InputStreamResource downloadSmallAvatar(Long userId) {
         return downloadAvatar(userId, true);
     }
 
-    public byte[] downloadAvatar(Long userId, boolean isSmall) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException("User not found"));
+    @Transactional
+    public void deleteAvatar(Long userId) {
+        User user = getUser(userId);
+        deleteExistingAvatars(user);
+    }
+
+    private InputStreamResource downloadAvatar(Long userId, boolean isSmall) {
+        User user = getUser(userId);
 
         if (user.getUserProfilePic() == null) {
-            throw new UserNotFoundException("Avatar not found for user " + userId);
+            throw new AvatarNotFoundException("Avatar not found for user " + userId);
         }
 
-        String fileKey =
+        String avatarKey =
                 isSmall
                         ? user.getUserProfilePic().getSmallFileId()
                         : user.getUserProfilePic().getFileId();
 
-        try (S3Object s3Object = s3Client.getObject(bucketName, fileKey);
-                S3ObjectInputStream stream = s3Object.getObjectContent()) {
-            return stream.readAllBytes();
-        } catch (IOException e) {
-            log.error("Error downloading avatar for user {}", userId, e);
-            throw new FileSizeException("Error downloading file");
-        }
-    }
-
-    public void deleteAvatar(Long userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        if (user.getUserProfilePic() == null) {
-            return;
-        }
-
-        deleteFromS3(user.getUserProfilePic().getFileId());
-        deleteFromS3(user.getUserProfilePic().getSmallFileId());
-        user.setUserProfilePic(null);
-        userRepository.save(user);
+        S3Object s3Object = s3Client.getObject(s3Properties.getBucketName(), avatarKey);
+        return new InputStreamResource(s3Object.getObjectContent());
     }
 
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new FileSizeException("File is empty");
         }
-        if (file.getSize() > maxFileSize) {
-            throw new FileSizeException("File size exceeds limit");
+        if (file.getSize() > profilePicProperties.getMaxSize()) {
+            throw new FileSizeException("File size exceeds the limit");
         }
         if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
             throw new FileSizeException("Only images are allowed");
@@ -128,23 +97,43 @@ public class UserAvatarService {
         BufferedImage image =
                 Thumbnails.of(file.getInputStream()).size(size, size).asBufferedImage();
 
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", os);
-        String key = UUID.randomUUID().toString();
-        s3Client.putObject(bucketName, key, new ByteArrayInputStream(os.toByteArray()), null);
-        return key;
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            ImageIO.write(image, "jpg", os);
+            String key = UUID.randomUUID().toString();
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("image/jpeg");
+            metadata.setContentLength(os.size());
+
+            s3Client.putObject(
+                    new PutObjectRequest(
+                            s3Properties.getBucketName(),
+                            key,
+                            new ByteArrayInputStream(os.toByteArray()),
+                            metadata));
+
+            return key;
+        }
     }
 
     private void deleteExistingAvatars(User user) {
         if (user.getUserProfilePic() != null) {
             deleteFromS3(user.getUserProfilePic().getFileId());
             deleteFromS3(user.getUserProfilePic().getSmallFileId());
+            user.setUserProfilePic(null);
+            userRepository.save(user);
         }
     }
 
     private void deleteFromS3(String fileKey) {
-        if (fileKey != null) {
-            s3Client.deleteObject(bucketName, fileKey);
+        if (fileKey != null && s3Client.doesObjectExist(s3Properties.getBucketName(), fileKey)) {
+            s3Client.deleteObject(s3Properties.getBucketName(), fileKey);
         }
+    }
+
+    private User getUser(Long userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID " + userId));
     }
 }

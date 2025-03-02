@@ -1,5 +1,6 @@
 package school.faang.user_service.validator.event;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,9 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.adapter.user.UserRepositoryAdapter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,9 +39,22 @@ public class EventValidatorTest {
     private static final Skill FIRST_SKILL = Skill.builder().id(1L).build();
     private static final Skill SECOND_SKILL = Skill.builder().id(2L).build();
 
+    private static @NotNull EventDto getEventDto() {
+        EventDto eventDto = new EventDto();
+        eventDto.setTitle("Title");
+        eventDto.setDescription("Description");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setEndDate(LocalDateTime.now());
+        eventDto.setLocation("Location");
+        eventDto.setOwnerId(OWNER_ID);
+        eventDto.setEventType(EventType.GIVEAWAY);
+        eventDto.setEventStatus(EventStatus.COMPLETED);
+        return eventDto;
+    }
+
     @Test
     void testEventCheck_TitleIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setTitle(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -46,7 +63,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_TitleIsBlank_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setTitle("  ");
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -55,7 +72,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_TitleIsTooLong_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setTitle("A".repeat(65));
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -64,7 +81,8 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_DescriptionIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
+//        eventDto.setTitle("Title");
         eventDto.setDescription(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -73,8 +91,9 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_DescriptionIsBlank_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setDescription("  ");
+//        eventDto.setTitle("Title");
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
         assertEquals("Event description не может быть пустым", exception.getMessage());
@@ -82,8 +101,9 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_DescriptionIsTooLong_ThrowsException() {
-        EventDto eventDto = new EventDto();
-        eventDto.setDescription("A".repeat(4096));
+        final EventDto eventDto = getEventDto();
+//        eventDto.setTitle("Title");
+        eventDto.setDescription("A".repeat(4097));
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event description не может быть больше 4096", exception.getMessage());
@@ -91,7 +111,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_StartDateIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setStartDate(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -100,7 +120,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_EndDateIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setEndDate(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -109,7 +129,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_LoactionIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setLocation(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -118,7 +138,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_LoactionIsBlank_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setLocation("  ");
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -127,8 +147,8 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_LoactionIsTooLong_ThrowsException() {
-        EventDto eventDto = new EventDto();
-        eventDto.setLocation("A".repeat(128));
+        final EventDto eventDto = getEventDto();
+        eventDto.setLocation("A".repeat(129));
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
         assertEquals("Длина Event Location не может быть больше 128", exception.getMessage());
@@ -136,7 +156,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_OwnerIdIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setOwnerId(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -145,7 +165,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_EventTypeIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setEventType(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));
@@ -154,7 +174,7 @@ public class EventValidatorTest {
 
     @Test
     void testEventCheck_EventStatusIsNull_ThrowsException() {
-        EventDto eventDto = new EventDto();
+        final EventDto eventDto = getEventDto();
         eventDto.setEventStatus(null);
         Exception exception = assertThrows(DataValidationException.class,
                 () -> eventValidator.validateEvent(eventDto));

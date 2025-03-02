@@ -2,10 +2,8 @@ package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.entity.User;
 import school.faang.user_service.dto.users.UserDto;
 import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.service.impl.MentorshipServiceImpl;
 
 import java.util.List;
 

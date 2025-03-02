@@ -40,7 +40,7 @@ public class EventControllerTest {
         ResponseEntity<EventDto> response = eventController.create(eventDto);
 
         assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(createdEventDto, response.getBody());
         verify(eventValidator, times(1)).validateEvent(eventDto);
         verify(eventValidator, times(1))

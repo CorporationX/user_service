@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class UserRepositoryAdapterTest {
     void testGetUserById_UserNotFound() {
         long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        Exception exception = assertThrows(IllegalArgumentException.class,
+        Exception exception = assertThrows(DataNotFoundException.class,
                 () -> userRepositoryAdapter.getUserById(userId));
         assertEquals("User с id: 1 не найден!", exception.getMessage());
     }

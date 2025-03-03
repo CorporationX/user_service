@@ -8,7 +8,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -39,6 +39,8 @@ server:
 logging:
   level:
     root: info
+    org.hibernate.SQL: info
+    org.hibernate.type.descriptor.sql.BasicBinder: info
 
 services:
   s3:
@@ -46,7 +48,6 @@ services:
     accessKey: user
     secretKey: password
     bucketName: corpbucket
-
 
   project-service:
     host: localhost
@@ -68,18 +69,17 @@ task:
       core-size: 4
       max-size: 8
       keep-alive: 60
----
 
+---
 spring:
   config:
     activate:
       on-profile: local
 
----
 logging:
   level:
     root: debug
-
+    org.hibernate.SQL: debug
 
 ---
 spring:
@@ -90,4 +90,3 @@ spring:
 logging:
   level:
     root: info
-

@@ -1,31 +1,34 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-
-import java.util.Objects;
+import school.faang.user_service.utils.validationUtils.GoalInvitationValidation;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalInvitationMapper goalInvitationMapper;
+    private final GoalInvitationValidation goalInvitationValidation;
 
     public void createInvitation(GoalInvitationDto invitationDto) {
-        if (invitationDto.inviterId() == null || invitationDto.invitedUserId() == null) {
-            throw new DataValidationException("Inviter ID and Invited User ID cannot be null");
-        } else if (Objects.equals(invitationDto.inviterId(), invitationDto.invitedUserId())) {
-            throw new DataValidationException("Inviter ID and Invited User ID must be different");
-        }
-        if (!goalInvitationRepository.existsByInvitedId(invitationDto.invitedUserId())) {
-            throw new DataValidationException("Invited User doesn't exist in DB");
-        } else if (!goalInvitationRepository.existsByInviterId(invitationDto.inviterId())) {
-            throw new DataValidationException("Inviter User doesn't exist in DB");
-        }
+        goalInvitationValidation.validateGoalInvitationDtoInCreation(invitationDto);
         goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
+    }
+
+    public void acceptGoalInvitation(long id) {
+        GoalInvitation goalInvitation = goalInvitationRepository.getReferenceById(id);
+        if (goalInvitationValidation.validateGoalInvitationInAccept(goalInvitation)) {
+            goalInvitation.getInvited().getReceivedGoalInvitations().add(goalInvitation);
+            goalInvitation.setStatus(RequestStatus.ACCEPTED);
+        }
     }
 }

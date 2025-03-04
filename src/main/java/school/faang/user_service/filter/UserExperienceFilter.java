@@ -10,7 +10,8 @@ public class UserExperienceFilter implements UserFilter {
     public boolean isApplicable(UserFilterDto userFilterDto) {
         if (userFilterDto.experienceMin() < 0) {
             throw new IllegalArgumentException("Minimal experience must be positive.");
-        } else if (userFilterDto.experienceMax() < 0) {
+        }
+        if (userFilterDto.experienceMax() < 0) {
             throw new IllegalArgumentException("Maximal experience must be positive.");
         }
         return true;

@@ -1,20 +1,19 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 @RequiredArgsConstructor
 @Controller
+@Slf4j
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("User cannot unsubscribe from himself");
-        }
+        log.info("Unfollow request received: Follower ID = {}, Followee ID = {}", followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
+        log.info("Successfully unfollowed: Follower ID = {}, Followee ID = {}", followerId, followeeId);
     }
 }

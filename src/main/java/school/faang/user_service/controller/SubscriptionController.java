@@ -1,20 +1,19 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 @RequiredArgsConstructor
 @Controller
+@Slf4j
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeId) {
-        if (followerId == followeId) {
-            throw new DataValidationException("User can't subscribe to himself.");
-        }
-        subscriptionService.followUser(followerId, followeId);
+    public void followUser(long followerId, long followeeId) {
+        log.info("Received request to follow user. FollowerId: {}, FolloweeId: {}", followerId, followeeId);
+        subscriptionService.followUser(followerId, followeeId);
+        log.info("User {} successfully followed user {}", followerId, followeeId);
     }
 }

@@ -17,7 +17,7 @@ public class RecommendationRequestController {
 
     public RecommendationRequestDto requestRecommendation (@NonNull RecommendationRequestDto requestDto) {
         if (requestDto.getMessage().trim().isEmpty()) {
-            throw new IllegalArgumentException("Сообщение не млжет быть пустым");
+            throw new IllegalArgumentException("Сообщение не может быть пустым");
         }
 
         return recommendationRequestService.create(requestDto);

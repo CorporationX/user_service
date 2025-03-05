@@ -22,7 +22,7 @@ public class RecommendationRequestController {
         return recommendationRequestService.create(requestDto);
     }
 
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+    public List<RecommendationRequestDto> getRecommendationRequests(@NonNull RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 }

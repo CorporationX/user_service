@@ -119,33 +119,37 @@ public class RecommendationRequestService {
                 .allMatch(skill -> skillRepository.existsById(skill.getId()));
     }
 
-    private boolean filterByCondition(RecommendationRequest request, RequestFilterDto filterDto) {
-        if (validateRequestFilter(filterDto) ||
-                        !request.getRequester().equals(filterDto.getRequester()) ||
-                        !request.getReceiver().equals(filterDto.getReceiver()) ||
-                        !request.getStatus().equals(filterDto.getStatus()) ||
-                        !request.getSkills().containsAll(filterDto.getSkills()) ||
-                        !request.getCreatedAt().isBefore(filterDto.getCreatedAt()) ||
-                        !request.getUpdatedAt().isAfter(filterDto.getUpdatedAt())
-        ) {
+    private boolean filterByCondition(RecommendationRequest request, RequestFilterDto filter) {
+        if (filter.getRequester() != null && !filter.getRequester().equals(request.getRequester())) {
             return false;
         }
 
-        return true;
-    }
-
-    private boolean validateRequestFilter(RequestFilterDto filter) {
-        if (
-                filter.getRequester() == null ||
-                filter.getReceiver() == null ||
-                filter.getStatus() == null ||
-                filter.getCreatedAt() == null ||
-                filter.getUpdatedAt() == null ||
-                filter.getSkills() == null ||
-                filter.getSkills().isEmpty()
-        ) {
+        if (filter.getReceiver() != null && !filter.getReceiver().equals(request.getReceiver())) {
             return false;
         }
+
+        if (filter.getStatus() != null && !filter.getStatus().equals(request.getStatus())) {
+            return false;
+        }
+
+        if (filter.getSkills() != null && !filter.getSkills().isEmpty()) {
+            if (request.getSkills() == null ||
+                    request.getSkills().isEmpty() ||
+                    !request.getSkills().containsAll(filter.getSkills())) {
+                return false;
+            }
+        }
+
+        if (filter.getCreatedAt() != null && request.getCreatedAt() != null &&
+                request.getCreatedAt().isBefore(filter.getCreatedAt())) {
+            return false;
+        }
+
+        if (filter.getUpdatedAt() != null && request.getUpdatedAt() != null &&
+                request.getUpdatedAt().isBefore(filter.getUpdatedAt())) {
+            return false;
+        }
+
         return true;
     }
 }

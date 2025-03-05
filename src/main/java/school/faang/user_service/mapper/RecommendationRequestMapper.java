@@ -6,7 +6,7 @@ import org.mapstruct.Mapping;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
-@Mapper(componentModel = "spring", uses = {SkillMapper.class})
+@Mapper(componentModel = "spring", uses = {SkillRequestMapper.class})
 public interface RecommendationRequestMapper {
 
     @Mapping(source = "requesterId", target = "requester.id")

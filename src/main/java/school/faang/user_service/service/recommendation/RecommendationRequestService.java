@@ -7,6 +7,7 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.NotFoundRequestException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -23,6 +24,7 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private static int SIX_MONTHS = 6;
+    private static String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id:";
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
@@ -61,6 +63,16 @@ public class RecommendationRequestService {
                 .filter(request -> filterByCondition(request, filterDto))
                 .map(recommendationRequestMapper::toRecommendationRequestDto)
                 .toList();
+    }
+
+    public RecommendationRequestDto getRequest(long requestId) {
+        Optional<RecommendationRequest> request = recommendationRequestRepository.findById(requestId);
+
+        if (request.isPresent()) {
+            return recommendationRequestMapper.toRecommendationRequestDto(request.get());
+        } else {
+            throw new NotFoundRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId));
+        }
     }
 
     private boolean canRequestRecommendation(User requester, User receiver) {

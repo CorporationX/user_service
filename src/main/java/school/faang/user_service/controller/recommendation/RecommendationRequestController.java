@@ -25,4 +25,8 @@ public class RecommendationRequestController {
     public List<RecommendationRequestDto> getRecommendationRequests(@NonNull RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
+
+    public RecommendationRequestDto getRecommendationRequest(long id) {
+        return recommendationRequestService.getRequest(id);
+    }
 }

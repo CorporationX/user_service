@@ -7,6 +7,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface GoalInvitationMapper {
     @Mapping(source = "inviterId", target = "inviter")
@@ -14,17 +16,30 @@ public interface GoalInvitationMapper {
     @Mapping(source = "goalId", target = "goal")
     GoalInvitation toEntity(GoalInvitationDto goalInvitationDto);
 
+    @Mapping(target = "inviterId", source = "inviter")
+    @Mapping(target = "invitedUserId", source = "invited")
+    @Mapping(target = "goalId", source = "goal")
     GoalInvitationDto toDto(GoalInvitation goalInvitation);
 
-    default User toInviter(long inviterId) {
+    List<GoalInvitationDto> toDtoList(List<GoalInvitation> goalInvitations);
+
+    default Long userToId(User user) {
+        return user.getId();
+    }
+
+    default Long goalToId(Goal goal) {
+        return goal.getId();
+    }
+
+    default User idToUser(Long id) {
         User user = new User();
-        user.setId(inviterId);
+        user.setId(id);
         return user;
     }
 
-    default Goal toGoal(long goalId) {
+    default Goal idToGoal(Long id) {
         Goal goal = new Goal();
-        goal.setId(goalId);
+        goal.setId(id);
         return goal;
     }
 }

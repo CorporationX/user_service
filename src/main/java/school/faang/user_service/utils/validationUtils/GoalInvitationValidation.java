@@ -14,6 +14,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class GoalInvitationValidation {
+    private static final String GOAL_INVITATION_VALIDATION_LOG = "Validating GoalInvitation with ID: {}";
+    private static final String GOAL_INVITATION_VALIDATION_SUCCESS_LOG = "GoalInvitation validation passed successfully";
     private static final String ERROR_INVITER_ID_NULL = "Inviter ID and Invited User ID cannot be null";
     private static final String ERROR_SAME_IDS = "Inviter ID and Invited User ID must be different";
     private static final String ERROR_INVITED_NOT_FOUND = "Invited User doesn't exist in DB";
@@ -56,28 +58,28 @@ public class GoalInvitationValidation {
             log.error(ERROR_INVITER_NOT_FOUND);
             throw new DataValidationException(ERROR_INVITER_NOT_FOUND);
         }
-        log.info("GoalInvitationDto validation passed successfully");
+        log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
     }
 
     public void validateGoalInvitationForAcceptance(GoalInvitation goalInvitation) {
-        log.info("Validating GoalInvitation with ID: {}", goalInvitation.getId());
+        log.info(GOAL_INVITATION_VALIDATION_LOG, goalInvitation.getId());
         if (!goalInvitationRepository.existsById(goalInvitation.getId())) {
             log.error(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
             throw new DataValidationException(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
         }
         validateInvitedUser(goalInvitation);
         validateReceivedInvitations(goalInvitation);
-        log.info("GoalInvitation validation passed successfully");
+        log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
     }
 
     public void validateGoalInvitationForRejection(GoalInvitation goalInvitation) {
-        log.info("Validating GoalInvitation with ID: {}", goalInvitation.getId());
+        log.info(GOAL_INVITATION_VALIDATION_LOG, goalInvitation.getId());
         if (!goalInvitationRepository.existsById(goalInvitation.getId())) {
             log.error(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
             throw new DataValidationException(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
         }
         validateInvitedUser(goalInvitation);
         validateReceivedInvitations(goalInvitation);
-        log.info("GoalInvitation validation passed successfully");
+        log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
     }
 }

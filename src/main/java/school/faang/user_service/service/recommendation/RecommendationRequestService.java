@@ -3,7 +3,9 @@ package school.faang.user_service.service.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -73,6 +75,27 @@ public class RecommendationRequestService {
         } else {
             throw new NotFoundRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId));
         }
+    }
+
+    public RecommendationRequestDto rejectRequest(long requestId, RejectionDto rejection) {
+        if (rejection.getReason().trim().isEmpty()) {
+            throw new IllegalArgumentException("Сообщение не может быть пустым");
+        }
+
+        RecommendationRequest request = recommendationRequestRepository
+                .findById(requestId)
+                .orElseThrow(
+                        () -> new NotFoundRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId))
+                );
+
+        if (request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStatus().equals(RequestStatus.REJECTED)) {
+            throw new IllegalArgumentException("Запрос уже обработан");
+        }
+
+        request.setStatus(RequestStatus.REJECTED);
+        recommendationRequestRepository.save(request);
+        request.setRejectionReason(rejection.getReason());
+        return recommendationRequestMapper.toRecommendationRequestDto(request);
     }
 
     private boolean canRequestRecommendation(User requester, User receiver) {

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
@@ -28,5 +29,9 @@ public class RecommendationRequestController {
 
     public RecommendationRequestDto getRecommendationRequest(long id) {
         return recommendationRequestService.getRequest(id);
+    }
+
+    public RecommendationRequestDto rejectRequest(long id, @NonNull RejectionDto rejection) {
+        return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

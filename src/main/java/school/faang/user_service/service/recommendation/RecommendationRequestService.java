@@ -3,6 +3,7 @@ package school.faang.user_service.service.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,17 @@ public class RecommendationRequestService {
         return null;
     }
 
+    public List<RecommendationRequestDto> getRequests(RequestFilterDto filterDto) {
+        List<RecommendationRequest> requests = StreamSupport
+                .stream(recommendationRequestRepository.findAll().spliterator(), false)
+                .toList();
+        return requests
+                .stream()
+                .filter(request -> filterByCondition(request, filterDto))
+                .map(recommendationRequestMapper::toRecommendationRequestDto)
+                .toList();
+    }
+
     private boolean canRequestRecommendation(User requester, User receiver) {
         Optional<RecommendationRequest> request =
                 recommendationRequestRepository.findLatestPendingRequest(requester.getId(), receiver.getId());
@@ -67,5 +80,35 @@ public class RecommendationRequestService {
         return skills
                 .stream()
                 .allMatch(skill -> skillRepository.existsById(skill.getId()));
+    }
+
+    private boolean filterByCondition(RecommendationRequest request, RequestFilterDto filterDto) {
+        if (validateRequestFilter(filterDto) ||
+                        !request.getRequester().equals(filterDto.getRequester()) ||
+                        !request.getReceiver().equals(filterDto.getReceiver()) ||
+                        !request.getStatus().equals(filterDto.getStatus()) ||
+                        !request.getSkills().containsAll(filterDto.getSkills()) ||
+                        !request.getCreatedAt().isBefore(filterDto.getCreatedAt()) ||
+                        !request.getUpdatedAt().isAfter(filterDto.getUpdatedAt())
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateRequestFilter(RequestFilterDto filter) {
+        if (
+                filter.getRequester() == null ||
+                filter.getReceiver() == null ||
+                filter.getStatus() == null ||
+                filter.getCreatedAt() == null ||
+                filter.getUpdatedAt() == null ||
+                filter.getSkills() == null ||
+                filter.getSkills().isEmpty()
+        ) {
+            return false;
+        }
+        return true;
     }
 }

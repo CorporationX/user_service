@@ -6,13 +6,15 @@ import org.mapstruct.Mapping;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {SkillMapper.class})
 public interface RecommendationRequestMapper {
 
-    @Mapping(source = "requesterId", target = "entity.id")
-    @Mapping(source = "receiverId", target = "entity.id")
-    RecommendationRequestDto toRecommendationRequestDto(RecommendationRequest recommendationRequest);
+    @Mapping(source = "requesterId", target = "requester.id")
+    @Mapping(source = "receiverId", target = "receiver.id")
+    RecommendationRequest toRecommendationRequest(RecommendationRequestDto recommendationRequestDto);
 
     @InheritInverseConfiguration
-    RecommendationRequest toRecommendationRequest(RecommendationRequestDto recommendationRequestDto);
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    RecommendationRequestDto toRecommendationRequestDto(RecommendationRequest recommendationRequest);
 }

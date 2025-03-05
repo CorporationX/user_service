@@ -15,12 +15,15 @@ public class GoalInvitationController {
     public void createInvitation(GoalInvitationDto invitationDto) {
         log.info("Creating goal invitation for: {}", invitationDto);
         goalInvitationService.createInvitation(invitationDto);
-        log.info("Goal invitation created successfully for: {}", invitationDto);
     }
 
     public void acceptGoalInvitation(long id) {
         log.info("Accepting goal invitation with ID: {}", id);
         goalInvitationService.acceptGoalInvitation(id);
-        log.info("Goal invitation with ID: {} accepted successfully", id);
+    }
+
+    public void rejectGoalInvitation(long id) {
+        log.info("Rejecting goal invitation with ID: {}", id);
+        goalInvitationService.rejectGoalInvitation(id);
     }
 }

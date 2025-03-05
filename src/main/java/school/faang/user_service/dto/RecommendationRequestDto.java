@@ -2,7 +2,6 @@ package school.faang.user_service.dto;
 
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.Skill;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +11,7 @@ public class RecommendationRequestDto {
     private Long id;
     private String message;
     private RequestStatus status;
-    private List<Skill> skills;
+    private List<SkillRequestDto> skills;
     private Long requesterId;
     private Long receiverId;
     private LocalDateTime createdAt;

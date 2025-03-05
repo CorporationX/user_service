@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.SkillRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.NotFoundRequestException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -111,7 +113,7 @@ public class RecommendationRequestService {
         }
     }
 
-    private boolean allSkillsExist(List<Skill> skills) {
+    private boolean allSkillsExist(List<SkillRequestDto> skills) {
         return skills
                 .stream()
                 .allMatch(skill -> skillRepository.existsById(skill.getId()));

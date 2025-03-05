@@ -37,7 +37,7 @@ public class SubscriptionService {
                 followees = filter.apply(followees, userFilterDto);
             }
         }
-        return followees.map(userMapper::toDto).toList();
+        return userMapper.toDtoList(followees.toList());
     }
 
     public int getFollowingCount(long followerId) {

@@ -1,10 +1,12 @@
 package school.faang.user_service.filter;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 
+@Component
 public class UserExperienceFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {

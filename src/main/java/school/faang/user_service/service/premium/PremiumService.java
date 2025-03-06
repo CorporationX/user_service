@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
 
@@ -44,7 +45,7 @@ public class PremiumService {
         premiumRepository.save(premium);
 
         log.debug("Premium for user {} with start date {} and end date {} created",
-                user.getUsername(), premiumStartDate, premiumEndDate );
+                user.getUsername(), premiumStartDate, premiumEndDate);
 
         return premiumToDto(premium);
     }

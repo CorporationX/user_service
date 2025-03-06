@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.PremiumActivatedDto;
 import school.faang.user_service.dto.PremiumRequestDto;
-import school.faang.user_service.service.PremiumService;
+import school.faang.user_service.service.premium.PremiumService;
 
 @RestController
 @RequiredArgsConstructor

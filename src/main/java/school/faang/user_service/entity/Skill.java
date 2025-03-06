@@ -53,7 +53,6 @@ public class Skill {
     @ManyToMany(mappedBy = "relatedSkills")
     private List<Event> events;
 
-
     @ManyToMany(mappedBy = "skillsToAchieve")
     private List<Goal> goals;
 

@@ -10,8 +10,6 @@ import school.faang.user_service.repository.goal.GoalInvitationRepository;
 
 import java.util.Objects;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
 public class GoalInvitationValidation {
     private static final String GOAL_INVITATION_VALIDATION_LOG = "Validating GoalInvitation with ID: {}";
@@ -24,23 +22,21 @@ public class GoalInvitationValidation {
     private static final String INVITED_USER_CANNOT_BE_NULL = "Invited user can't be null";
     private static final String RECEIVED_GOAL_INVITATIONS_CANNOT_BE_NULL = "Received goal invitations for the invited user cannot be null.";
 
-    private final GoalInvitationRepository goalInvitationRepository;
-
-    public void validateInvitedUser(GoalInvitation goalInvitation) {
+    public static void validateInvitedUser(GoalInvitation goalInvitation) {
         if (goalInvitation.getInvited() == null) {
             log.error(INVITED_USER_CANNOT_BE_NULL);
             throw new DataValidationException(INVITED_USER_CANNOT_BE_NULL);
         }
     }
 
-    public void validateReceivedInvitations(GoalInvitation goalInvitation) {
+    public static void validateReceivedInvitations(GoalInvitation goalInvitation) {
         if (goalInvitation.getInvited().getReceivedGoalInvitations() == null) {
             log.error(RECEIVED_GOAL_INVITATIONS_CANNOT_BE_NULL);
             throw new DataValidationException(RECEIVED_GOAL_INVITATIONS_CANNOT_BE_NULL);
         }
     }
 
-    public void validateGoalInvitationDtoForCreation(GoalInvitationDto invitationDto) {
+    public static void validateGoalInvitationDtoForCreation(GoalInvitationDto invitationDto, GoalInvitationRepository goalInvitationRepository) {
         log.info("Validating GoalInvitationDto: {}", invitationDto);
         if (invitationDto.inviterId() == null || invitationDto.invitedUserId() == null) {
             log.error(ERROR_INVITER_ID_NULL);
@@ -61,7 +57,7 @@ public class GoalInvitationValidation {
         log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
     }
 
-    public void validateGoalInvitationForAcceptance(GoalInvitation goalInvitation) {
+    public static void validateGoalInvitationForAcceptance(GoalInvitation goalInvitation, GoalInvitationRepository goalInvitationRepository) {
         log.info(GOAL_INVITATION_VALIDATION_LOG, goalInvitation.getId());
         if (!goalInvitationRepository.existsById(goalInvitation.getId())) {
             log.error(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
@@ -72,7 +68,7 @@ public class GoalInvitationValidation {
         log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
     }
 
-    public void validateGoalInvitationForRejection(GoalInvitation goalInvitation) {
+    public static void validateGoalInvitationForRejection(GoalInvitation goalInvitation, GoalInvitationRepository goalInvitationRepository) {
         log.info(GOAL_INVITATION_VALIDATION_LOG, goalInvitation.getId());
         if (!goalInvitationRepository.existsById(goalInvitation.getId())) {
             log.error(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));

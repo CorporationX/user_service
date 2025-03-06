@@ -26,11 +26,10 @@ public class GoalInvitationService {
 
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalInvitationMapper goalInvitationMapper;
-    private final GoalInvitationValidation goalInvitationValidation;
     private final List<GoalInvitationFilter> filters;
 
     public void createInvitation(GoalInvitationDto invitationDto) {
-        goalInvitationValidation.validateGoalInvitationDtoForCreation(invitationDto);
+        GoalInvitationValidation.validateGoalInvitationDtoForCreation(invitationDto, goalInvitationRepository);
         goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
         log.info("Goal invitation created successfully for: {}", invitationDto);
     }
@@ -47,7 +46,7 @@ public class GoalInvitationService {
             log.warn("User with ID {} is already working on this goal", goalInvitation.getId());
             return;
         }
-        goalInvitationValidation.validateGoalInvitationForAcceptance(goalInvitation);
+        GoalInvitationValidation.validateGoalInvitationForAcceptance(goalInvitation, goalInvitationRepository);
         goalInvitation.getInvited().getReceivedGoalInvitations().add(goalInvitation);
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
         log.info("Goal invitation with ID: {} accepted successfully", id);
@@ -55,7 +54,7 @@ public class GoalInvitationService {
 
     public void rejectGoalInvitation(long id) {
         GoalInvitation goalInvitation = goalInvitationRepository.getReferenceById(id);
-        goalInvitationValidation.validateGoalInvitationForRejection(goalInvitation);
+        GoalInvitationValidation.validateGoalInvitationForRejection(goalInvitation, goalInvitationRepository);
         goalInvitation.getInvited().getReceivedGoalInvitations().remove(goalInvitation);
         goalInvitation.setStatus(RequestStatus.REJECTED);
         log.info("Goal invitation with ID: {} rejected successfully", id);

@@ -27,6 +27,7 @@ public class SubscriptionService {
                     USER_ALREADY_FOLLOWING_ERROR, followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
+    }
 
     public void unfollowUser(long followerId, long followeeId) {
         if (followerId == followeeId) {

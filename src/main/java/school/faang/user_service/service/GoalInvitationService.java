@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class GoalInvitationService {
     private final GoalInvitationMapper goalInvitationMapper;
     private final List<GoalInvitationFilter> filters;
 
-    public void createInvitation(GoalInvitationDto invitationDto) {
+    public void createInvitation(@NotNull GoalInvitationDto invitationDto) {
         GoalInvitationValidation.validateGoalInvitationDtoForCreation(invitationDto, goalInvitationRepository);
         goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
         log.info("Goal invitation created successfully for: {}", invitationDto);

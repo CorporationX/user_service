@@ -43,7 +43,7 @@ public class PremiumService {
         premium.setEndDate(premiumEndDate);
         premiumRepository.save(premium);
 
-        log.info("Premium for user {} with start date {} and end date {} created",
+        log.debug("Premium for user {} with start date {} and end date {} created",
                 user.getUsername(), premiumStartDate, premiumEndDate );
 
         return premiumToDto(premium);

@@ -10,7 +10,10 @@ import school.faang.user_service.repository.SubscriptionRepository;
 @Service
 @Slf4j
 public class SubscriptionService {
+
     public static final String USER_ALREADY_FOLLOWING_ERROR = "User with ID %d is already following user with ID %d.";
+    public static final String USER_CANNOT_UNSUBSCRIBE_FROM_HIMSELF = "User cannot unsubscribe from himself";
+    public static final String USER_NOT_SUBSCRIBED_MESSAGE = "User with ID %d is not subscribed to user with ID %d.";
     private final SubscriptionRepository subscriptionRepository;
 
     public void followUser(long followerId, long followeeId) {
@@ -24,5 +27,17 @@ public class SubscriptionService {
                     USER_ALREADY_FOLLOWING_ERROR, followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
+
+    public void unfollowUser(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            log.error(USER_CANNOT_UNSUBSCRIBE_FROM_HIMSELF);
+            throw new DataValidationException(USER_CANNOT_UNSUBSCRIBE_FROM_HIMSELF);
+        }
+        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            String errorMessage = String.format(USER_NOT_SUBSCRIBED_MESSAGE, followerId, followeeId);
+            log.error(errorMessage);
+            throw new DataValidationException(errorMessage);
+        }
+        subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 }

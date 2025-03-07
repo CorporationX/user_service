@@ -24,7 +24,7 @@ public class PremiumController {
         return premiumService.getPremiumForUserId(id);
     }
 
-    @PostMapping("/subscribe")
+    @PostMapping("/subscription")
     public PremiumActivated subscribeToPremium(@NotNull @Valid @RequestBody PremiumRequest premiumRequest) {
         return premiumService.subscribeToPremium(premiumRequest);
     }

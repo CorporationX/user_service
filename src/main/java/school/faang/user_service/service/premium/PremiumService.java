@@ -13,6 +13,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.PaymentProceedException;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.mapper.impl.PremiumMapperImpl;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PaymentService;
 import school.faang.user_service.service.UserService;
@@ -26,11 +27,12 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final UserService userService;
     private final PaymentService paymentService;
+    private final PremiumMapperImpl premiumMapper;
 
     public PremiumActivated getPremiumForUserId(Long userId) {
         return premiumRepository.findByUserId(userId)
                 .filter(premium -> premium.getEndDate().isAfter(LocalDateTime.now()))
-                .map(this::premiumToDto)
+                .map(premiumMapper::premiumToPremiumActivated)
                 .orElse(null);
     }
 
@@ -55,16 +57,12 @@ public class PremiumService {
         log.debug("Premium for user {} with start date {} and end date {} created",
                 user.getUsername(), premiumStartDate, premiumEndDate);
 
-        return premiumToDto(premium);
+        return premiumMapper.premiumToPremiumActivated(premium);
     }
 
     private User getUserById(long userId) {
         return userService.findUserById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID: " + userId + " не найден."));
-    }
-
-    private PremiumActivated premiumToDto(Premium premium) {
-        return new PremiumActivated(premium.getStartDate(), premium.getEndDate());
     }
 
     private void validatePremium(PremiumRequest premiumRequest) {

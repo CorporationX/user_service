@@ -3,13 +3,18 @@ package school.faang.user_service.service.premium;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.PremiumActivatedDto;
-import school.faang.user_service.dto.PremiumRequestDto;
+import school.faang.user_service.dto.PaymentRequest;
+import school.faang.user_service.dto.PaymentResponse;
+import school.faang.user_service.dto.PaymentStatus;
+import school.faang.user_service.dto.PremiumActivated;
+import school.faang.user_service.dto.PremiumRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.PaymentProceedException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.PaymentService;
 import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
@@ -20,16 +25,19 @@ import java.time.LocalDateTime;
 public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final UserService userService;
+    private final PaymentService paymentService;
 
-    public PremiumActivatedDto getPremiumForUserId(Long userId) {
+    public PremiumActivated getPremiumForUserId(Long userId) {
         return premiumRepository.findByUserId(userId)
                 .filter(premium -> premium.getEndDate().isAfter(LocalDateTime.now()))
                 .map(this::premiumToDto)
                 .orElse(null);
     }
 
-    public PremiumActivatedDto subscribeToPremium(PremiumRequestDto premiumRequest) {
+    public PremiumActivated subscribeToPremium(PremiumRequest premiumRequest) {
         validatePremium(premiumRequest);
+
+        payPremium(premiumRequest);
 
         Long userId = premiumRequest.userId();
         Long days = premiumRequest.daysCount();
@@ -55,15 +63,31 @@ public class PremiumService {
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID: " + userId + " не найден."));
     }
 
-    private PremiumActivatedDto premiumToDto(Premium premium) {
-        return new PremiumActivatedDto(premium.getStartDate(), premium.getEndDate());
+    private PremiumActivated premiumToDto(Premium premium) {
+        return new PremiumActivated(premium.getStartDate(), premium.getEndDate());
     }
 
-    private void validatePremium(PremiumRequestDto premiumRequest) {
+    private void validatePremium(PremiumRequest premiumRequest) {
         Long userId = premiumRequest.userId();
 
         if (premiumRepository.existsByUserIdAndEndDateAfter(userId, LocalDateTime.now())) {
             throw new DataValidationException("Премиум для текущего пользователя уже имеется.");
         }
+    }
+
+    private void payPremium(PremiumRequest premiumRequest) {
+        PaymentRequest paymentRequest = new PaymentRequest(
+                paymentService.getNextPaymentId(),
+                premiumRequest.amount(),
+                premiumRequest.currency()
+        );
+
+        PaymentResponse paymentResponse = paymentService.initPayment(paymentRequest);
+
+        if (!paymentResponse.status().equals(PaymentStatus.SUCCESS)) {
+            throw new PaymentProceedException("Ошибка платежа: " + paymentResponse.message());
+        }
+
+        log.debug("Подписка оплачена успешно. Код верификации: {}", paymentResponse.verificationCode());
     }
 }

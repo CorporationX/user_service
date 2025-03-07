@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.PremiumActivatedDto;
-import school.faang.user_service.dto.PremiumRequestDto;
+import school.faang.user_service.dto.PremiumActivated;
+import school.faang.user_service.dto.PremiumRequest;
 import school.faang.user_service.service.premium.PremiumService;
 
 @RestController
@@ -20,12 +20,12 @@ public class PremiumController {
     private final PremiumService premiumService;
 
     @GetMapping("/{userId}")
-    public PremiumActivatedDto getPremiumForUserId(@NotNull @PathVariable("userId") Long userId) {
+    public PremiumActivated getPremiumForUserId(@NotNull @PathVariable("userId") Long userId) {
         return premiumService.getPremiumForUserId(userId);
     }
 
     @PostMapping("/subscribe")
-    public PremiumActivatedDto subscribeToPremium(@NotNull @Valid @RequestBody PremiumRequestDto premiumRequestDto) {
-        return premiumService.subscribeToPremium(premiumRequestDto);
+    public PremiumActivated subscribeToPremium(@NotNull @Valid @RequestBody PremiumRequest premiumRequest) {
+        return premiumService.subscribeToPremium(premiumRequest);
     }
 }

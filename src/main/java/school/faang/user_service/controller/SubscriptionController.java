@@ -28,4 +28,18 @@ public class SubscriptionController {
         log.info("Retrieved followers count: {} for followeeId: {}", followersCount, followeeId);
         return followersCount;
     }
+
+    public void followUser(long followerId, long followeeId) {
+        log.info("Received request to follow user. FollowerId: {}, FolloweeId: {}", followerId, followeeId);
+        subscriptionService.followUser(followerId, followeeId);
+        log.info("User {} successfully followed user {}", followerId, followeeId);
+    }
+
+    public void unfollowUser(long followerId, long followeeId) {
+        log.info("Unfollow request received: Follower ID = {}, Followee ID = {}", followerId, followeeId);
+        subscriptionService.unfollowUser(followerId, followeeId);
+        log.info("Successfully unfollowed: Follower ID = {}, Followee ID = {}", followerId, followeeId);
+    }
+
+
 }

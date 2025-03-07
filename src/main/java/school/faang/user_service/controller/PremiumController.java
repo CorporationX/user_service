@@ -19,9 +19,9 @@ import school.faang.user_service.service.premium.PremiumService;
 public class PremiumController {
     private final PremiumService premiumService;
 
-    @GetMapping("/{userId}")
-    public PremiumActivated getPremiumForUserId(@NotNull @PathVariable("userId") Long userId) {
-        return premiumService.getPremiumForUserId(userId);
+    @GetMapping("/users/{id}")
+    public PremiumActivated getPremiumForUserId(@NotNull @PathVariable("id") Long id) {
+        return premiumService.getPremiumForUserId(id);
     }
 
     @PostMapping("/subscribe")

@@ -3,15 +3,11 @@ package school.faang.user_service.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.UserProfileDto;
 import school.faang.user_service.service.UserService;
 
 @RestController
@@ -41,5 +37,17 @@ public class UserController {
     @PostMapping("/{id}/deactivate")
     public ResponseEntity<DeactivatedUserDto> deactivateUser(@PathVariable long id) {
         return ResponseEntity.ok(userService.deactivateUser(id));
+    }
+
+    @PutMapping("/{userId}/telegram")
+    public ResponseEntity<Void> updateTelegramChatId(
+            @PathVariable long userId, @RequestParam("chatId") Long telegramChatId) {
+        userService.updateTelegramChatId(userId, telegramChatId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/profile")
+    public UserProfileDto getUserProfile(@PathVariable long userId) {
+        return userService.getUserProfile(userId);
     }
 }

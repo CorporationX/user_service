@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -263,5 +264,66 @@ class UserServiceTest {
     private void mockUserRepositoryAdapterAndMapper() {
         Mockito.when(userRepositoryAdapter.getById(1L)).thenReturn(user);
         Mockito.when(userMapper.toDto(user)).thenReturn(dto);
+    }
+
+    @Test
+    @DisplayName("Update Telegram Chat ID for an existing user with a valid chatId")
+    void testUpdateTelegramChatId_Success() {
+        long userId = 1L;
+        Long chatId = 12345L;
+        User user = new User();
+        user.setId(userId);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.updateTelegramChatId(userId, chatId);
+
+        Assertions.assertEquals(chatId, user.getTelegramChatId());
+        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+    }
+
+    @Test
+    @DisplayName("Attempt to update for a non-existent user")
+    void testUpdateTelegramChatId_UserNotFound() {
+        long userId = 999L;
+        Long chatId = 12345L;
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.updateTelegramChatId(userId, chatId));
+    }
+
+    @Test
+    @DisplayName("Attempt to update with an invalid chatId = null")
+    void testUpdateTelegramChatId_NullChatId() {
+        long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.updateTelegramChatId(userId, null));
+    }
+
+    @Test
+    @DisplayName("Attempt to update with an invalid chatId <= 0")
+    void testUpdateTelegramChatId_InvalidChatId() {
+        long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(
+                IllegalArgumentException.class, () -> userService.updateTelegramChatId(userId, 0L));
+
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.updateTelegramChatId(userId, -100L));
     }
 }

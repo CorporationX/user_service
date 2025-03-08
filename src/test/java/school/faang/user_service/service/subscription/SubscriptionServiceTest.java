@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -32,6 +34,8 @@ public class SubscriptionServiceTest {
     @Mock private List<UserFilter> userFilters;
 
     @InjectMocks private SubscriptionService subscriptionService;
+
+    @Mock private KafkaTemplate<String, FollowerEvent> kafkaTemplate;
 
     private User user;
     private UserDto userDto;
@@ -62,8 +66,14 @@ public class SubscriptionServiceTest {
     public void testFollowUser() throws DataValidationException {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
                 .thenReturn(false);
+
         subscriptionService.followUser(followerId, followeeId);
+
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
+        verify(kafkaTemplate, times(1))
+                .send(
+                        eq("follower_events"),
+                        any(FollowerEvent.class)); // Проверяем отправку в Kafka
     }
 
     @Test

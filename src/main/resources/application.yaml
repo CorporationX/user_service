@@ -22,7 +22,15 @@ spring:
       host: localhost
       channel:
         profile-view: profile_view_channel
-
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      properties:
+        spring.json.add.type.headers: false
+        spring.json.trusted.packages: "school.faang.user_service.dto"
+        spring.json.use.type.headers: false
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 server:
   port: 8080
 

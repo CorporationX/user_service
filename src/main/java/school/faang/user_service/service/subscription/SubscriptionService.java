@@ -3,9 +3,12 @@ package school.faang.user_service.service.subscription;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -14,6 +17,7 @@ import school.faang.user_service.filters.subscription.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+@Slf4j
 @Validated
 @Service
 @RequiredArgsConstructor
@@ -21,14 +25,21 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final KafkaTemplate<String, FollowerEvent> kafkaTemplate;
 
     @Transactional
-    public void followUser(long followerId, long followeeId) throws DataValidationException {
+    public void followUser(long followerId, long followeeId) {
         validateIds(followerId, followeeId);
+
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Эта подписка уже существует!");
         }
+
         subscriptionRepository.followUser(followerId, followeeId);
+
+        FollowerEvent event = new FollowerEvent(followerId, followeeId);
+        kafkaTemplate.send("follower_events", event);
+        log.info("Sent FollowerEvent: {}", event);
     }
 
     @Transactional

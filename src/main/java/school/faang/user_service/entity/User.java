@@ -159,4 +159,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Column(name = "telegram_chat_id", unique = true)
+    private Long telegramChatId;
 }

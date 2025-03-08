@@ -10,11 +10,13 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.UserProfileDto;
 import school.faang.user_service.dto.publisher.ProfileViewEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.BadRequestException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
@@ -117,5 +119,32 @@ public class UserService {
         }
         log.info("All user events with ID {} have been deleted", user.getId());
         eventRepositoryAdapter.deleteAll(userEvents);
+    }
+
+    @Transactional
+    public void updateTelegramChatId(long userId, Long chatId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "User not found with id: " + userId));
+
+        if (chatId == null || chatId <= 0) {
+            throw new IllegalArgumentException("Invalid Telegram Chat ID");
+        }
+
+        user.setTelegramChatId(chatId);
+        userRepository.save(user);
+        log.info("Telegram Chat ID {} saved for user {}", chatId, userId);
+    }
+
+    public UserProfileDto getUserProfile(long userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return userMapper.toProfileDto(user);
     }
 }

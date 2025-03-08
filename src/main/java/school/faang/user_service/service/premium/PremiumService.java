@@ -13,7 +13,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.PaymentProceedException;
 import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.mapper.impl.PremiumMapperImpl;
+import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PaymentService;
 import school.faang.user_service.service.UserService;
@@ -27,7 +27,7 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final UserService userService;
     private final PaymentService paymentService;
-    private final PremiumMapperImpl premiumMapper;
+    private final PremiumMapper premiumMapper;
 
     public PremiumActivated getPremiumForUserId(Long userId) {
         return premiumRepository.findByUserId(userId)

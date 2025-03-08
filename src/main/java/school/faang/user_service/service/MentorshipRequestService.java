@@ -1,38 +1,55 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
+    private static final int MIN_DESCRIPTION_LENGTH = 10;
+    private static final int REQUEST_COOLDOWN_MONTHS = 3;
+
+    private static final String ERROR_NULL_DTO = "MentorshipRequestDto can't be null.";
+    private static final String ERROR_SHORT_DESCRIPTION = String.format("Description should be at least %d characters long.%n",
+            MIN_DESCRIPTION_LENGTH);
+    private static final String ERROR_SELF_REQUEST = "You cannot request mentorship from yourself.";
+    private static final String ERROR_TOO_FREQUENT_REQUESTS = String.format("You can only request mentorship once every %d months.%n",
+            REQUEST_COOLDOWN_MONTHS);
+
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final UserService userService;
     private final MentorshipRequestMapper mentorshipRequestMapper;
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        User register = userService.findById(mentorshipRequestDto.getRequesterId());
-        User receiver = userService.findById(mentorshipRequestDto.getReceiverId());
-
-        if (register.getId().equals(receiver.getId())) {
-            throw new IllegalArgumentException("You can only request mentorship yourself.");
+        Objects.requireNonNull(mentorshipRequestDto,
+                ERROR_NULL_DTO);
+        if (mentorshipRequestDto.getDescription().length() < MIN_DESCRIPTION_LENGTH) {
+            log.error(ERROR_SHORT_DESCRIPTION);
+            throw new IllegalArgumentException(ERROR_SHORT_DESCRIPTION);
         }
 
-        LocalDateTime threeMouthAgo = LocalDateTime.now().minusMonths(3);
+        if (mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
+            log.error(ERROR_SELF_REQUEST);
+            throw new IllegalArgumentException(ERROR_SELF_REQUEST);
+        }
+
+        LocalDateTime threeMouthAgo = LocalDateTime.now().minusMonths(REQUEST_COOLDOWN_MONTHS);
         Optional<MentorshipRequest> recentRequest = mentorshipRequestRepository
-                .findLatestRequest(register.getId(), receiver.getId());
+                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
         if (recentRequest.isPresent()) {
             if (recentRequest.get().getCreatedAt().isAfter(threeMouthAgo)) {
-                throw new IllegalArgumentException("You can only request mentorship once every 3 mouths.");
+                log.error(ERROR_TOO_FREQUENT_REQUESTS);
+                throw new IllegalArgumentException(ERROR_TOO_FREQUENT_REQUESTS);
             }
         }
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);

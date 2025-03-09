@@ -4,7 +4,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
-
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -21,11 +20,6 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-            name: profile_view_channel
 
 server:
   port: 8080
@@ -41,13 +35,3 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
-
-aws:
-  accessKey: access_key
-  secretKey: secret_key
-  region: bucket_region
-
-services:
-  s3:
-    bucket-name: user_backet
-    isMocked: true

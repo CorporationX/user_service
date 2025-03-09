@@ -5,12 +5,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.util.Optional;
 
-@Repository
 public interface RecommendationRepository extends CrudRepository<Recommendation, Long> {
 
     @Query(nativeQuery = true, value = """
@@ -21,7 +19,7 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
 
     @Query(nativeQuery = true, value = """
             UPDATE recommendation SET content = :content, updated_at = now()
-            WHERE author_id = :authorId AND receiverId = :receiverId
+            WHERE author_id = :authorId AND receiver_id = :receiverId
             """)
     @Modifying
     void update(long authorId, long receiverId, String content);

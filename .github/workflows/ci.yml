@@ -1,0 +1,28 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "feature-pipeline-BJS2-65221" ]
+  pull_request:
+    branches: [ "dev" ]
+
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: action/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Grant execute permission for Gradle Wrapper
+      run: chmod +x gradlew
+
+    - name: Run Build
+      run: ./gradlew build

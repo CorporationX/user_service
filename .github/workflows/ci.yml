@@ -2,10 +2,14 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ "feature-pipeline-BJS2-65221" ]
-  pull_request:
-    branches: [ "dev" ]
+    branches:
+      - "feature-pipeline-BJS2-65221"
+      - "feature/pipeline-test-BC-65221"
 
+  pull_request:
+    branches:
+      - "feature/pipline-BC-65221"
+      - "dev"
 
 jobs:
   build-and-test:

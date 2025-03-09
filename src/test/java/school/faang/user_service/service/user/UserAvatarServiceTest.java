@@ -87,9 +87,9 @@ class UserAvatarServiceTest {
         when(multipartFile.getSize()).thenReturn(1024L);
         when(multipartFile.getContentType()).thenReturn("application/pdf");
 
-        FileSizeException thrown =
+        InvalidFileTypeException thrown =
                 assertThrows(
-                        FileSizeException.class,
+                        InvalidFileTypeException.class,
                         () -> {
                             userAvatarService.uploadAvatar(1L, multipartFile);
                         });

@@ -89,21 +89,25 @@ public class UserAvatarService {
             throw new FileSizeException("File size exceeds the limit");
         }
         if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
-            throw new FileSizeException("Only images are allowed");
+            throw new InvalidFileTypeException("Only images are allowed");
         }
     }
 
     private String processAndUploadImage(MultipartFile file, int size) throws IOException {
-        BufferedImage image =
-                Thumbnails.of(file.getInputStream()).size(size, size).asBufferedImage();
-
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            BufferedImage image =
+                    Thumbnails.of(file.getInputStream())
+                            .size(size, size)
+                            .outputFormat("jpg")
+                            .asBufferedImage();
+
             ImageIO.write(image, "jpg", os);
-            String key = UUID.randomUUID().toString();
 
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType("image/jpeg");
             metadata.setContentLength(os.size());
+
+            String key = UUID.randomUUID().toString();
 
             s3Client.putObject(
                     new PutObjectRequest(

@@ -9,7 +9,9 @@ on:
   pull_request:
     branches:
       - "feature-pipeline-BJS2-65221"
+      - "feature-pipeline-test-BJS2-65221"
       - "dev"
+
 
 jobs:
   build-and-test:

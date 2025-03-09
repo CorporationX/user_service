@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private static final int RECOMMENDATION_REQUEST_INTERVAL_MONTHS = 6;
-    private static final String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id:";
+    private static final String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id: ";
     private static final String NULL_MESSAGE = "Сообщение не может быть пустым";
     private static final String NULL_REJECT_REASON = "Причина отклонения не может быть null";
     private static final String REQUEST_ALREADY_PROCESSED = "Запрос уже обработан";

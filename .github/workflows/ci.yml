@@ -3,15 +3,11 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - "feature-pipeline-BJS2-65221"
-      - "feature-pipeline-test-BJS2-65221"
+    - minotaur-master-stream9
 
   pull_request:
     branches:
-      - "feature-pipeline-BJS2-65221"
-      - "feature-pipeline-test-BJS2-65221"
-      - "dev"
-
+    - minotaur-master-stream9
 
 jobs:
   build-and-test:
@@ -32,12 +28,6 @@ jobs:
 
     - name: Run Tests
       run: ./gradlew test
-
-    - name: Test Report
-      run: ./gradlew test --info
-
-    - name: Run specific test
-      run: ./gradlew test --tests "school.faang.user_service.service.pipeline.PipelineTest"
 
     - name: Run Build
       run: ./gradlew build

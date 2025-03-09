@@ -1,6 +1,7 @@
 package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
@@ -24,11 +25,15 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
-    private static int SIX_MONTHS = 6;
-    private static String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id:";
+    private static final int RECOMMENDATION_REQUEST_INTERVAL_MONTHS = 6;
+    private static final String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id:";
+    private static final String NULL_MESSAGE = "\"Сообщение не может быть пустым\"";
+    private static final String NULL_REJECT_REASON = "\"Причина отклонения не может быть null\"";
+    private static final String REQUEST_ALREADY_PROCESSED = "Запрос уже обработан";
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
@@ -36,14 +41,17 @@ public class RecommendationRequestService {
     private final RecommendationRequestMapper recommendationRequestMapper;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        if (recommendationRequestDto.getMessage().trim().isEmpty()) {
+            throw new IllegalArgumentException(NULL_MESSAGE);
+        }
+
         Optional<User> requester = userRepository.findById(recommendationRequestDto.getRequesterId());
         Optional<User> receiver = userRepository.findById(recommendationRequestDto.getReceiverId());
 
         if (
-                requester.isPresent() &&
-                receiver.isPresent() &&
-                canRequestRecommendation(requester.get(), receiver.get()) &&
-                allSkillsExist(recommendationRequestDto.getSkills())
+                requester.isPresent() && receiver.isPresent()
+                && canRequestRecommendation(requester.get(), receiver.get())
+                && allSkillsExist(recommendationRequestDto.getSkills())
         ) {
             RecommendationRequest requestToCreate =
                     recommendationRequestMapper.toRecommendationRequest(recommendationRequestDto);
@@ -80,8 +88,12 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto rejectRequest(long requestId, RejectionDto rejection) {
+        if (rejection.getReason() == null) {
+            log.info(NULL_REJECT_REASON);
+        }
+
         if (rejection.getReason().trim().isEmpty()) {
-            throw new IllegalArgumentException("Сообщение не может быть пустым");
+            throw new IllegalArgumentException(NULL_MESSAGE);
         }
 
         RecommendationRequest request = recommendationRequestRepository
@@ -91,7 +103,7 @@ public class RecommendationRequestService {
                 );
 
         if (request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStatus().equals(RequestStatus.REJECTED)) {
-            throw new IllegalArgumentException("Запрос уже обработан");
+            log.warn(REQUEST_ALREADY_PROCESSED);
         }
 
         request.setStatus(RequestStatus.REJECTED);
@@ -107,7 +119,7 @@ public class RecommendationRequestService {
             LocalDate lastRequestDate = request.get().getCreatedAt().toLocalDate();
             LocalDate currentDate = LocalDate.now();
             long months = ChronoUnit.MONTHS.between(lastRequestDate, currentDate);
-            return months >= SIX_MONTHS;
+            return months >= RECOMMENDATION_REQUEST_INTERVAL_MONTHS;
         } else {
             return true;
         }

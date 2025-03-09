@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - "feature-pipeline-BJS2-65221"
-      - "feature/pipeline-test-BJS2-65221"
+      - "feature-pipeline-test-BJS2-65221"
 
   pull_request:
     branches:
-      - "feature/pipeline-BJS2-65221"
+      - "feature-pipeline-BJS2-65221"
       - "dev"
 
 jobs:

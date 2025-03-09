@@ -8,5 +8,4 @@ public class PipelineTest {
     public void pipelineTest(){
         fail();
     }
-
 }

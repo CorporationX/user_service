@@ -33,6 +33,11 @@ jobs:
     - name: Run Tests
       run: ./gradlew test
 
+    - name: Test Report
+      run: ./gradlew test --info
+
+    - name: Run specific test
+      run: ./gradlew test --tests "school.faang.user_service.service.pipeline.PipelineTest"
 
     - name: Run Build
       run: ./gradlew build

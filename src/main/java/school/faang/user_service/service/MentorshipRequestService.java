@@ -10,8 +10,10 @@ import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -21,10 +23,11 @@ public class MentorshipRequestService {
     private static final int REQUEST_COOLDOWN_MONTHS = 3;
 
     private static final String ERROR_NULL_DTO = "MentorshipRequestDto can't be null.";
-    private static final String ERROR_SHORT_DESCRIPTION = String.format("Description should be at least %d characters long.%n",
+    private static final String ERROR_SHORT_DESCRIPTION = String.format("Description should be at least %d characters long.\n",
             MIN_DESCRIPTION_LENGTH);
     private static final String ERROR_SELF_REQUEST = "You cannot request mentorship from yourself.";
-    private static final String ERROR_TOO_FREQUENT_REQUESTS = String.format("You can only request mentorship once every %d months.%n",
+    private static final String ERROR_USER_NOT_FOUND = "User with the given ID: %d was not found.";
+    private static final String ERROR_TOO_FREQUENT_REQUESTS = String.format("You can only request mentorship once every %d months.\n",
             REQUEST_COOLDOWN_MONTHS);
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
@@ -36,6 +39,14 @@ public class MentorshipRequestService {
         if (mentorshipRequestDto.getDescription().length() < MIN_DESCRIPTION_LENGTH) {
             log.error(ERROR_SHORT_DESCRIPTION);
             throw new IllegalArgumentException(ERROR_SHORT_DESCRIPTION);
+        }
+
+        List<Long> missingUser = Stream.of(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
+                .filter(id -> !mentorshipRequestRepository.existsById(id))
+                .toList();
+        if(!missingUser.isEmpty()){
+            log.info(ERROR_USER_NOT_FOUND, missingUser);
+            throw new IllegalArgumentException(String.format(ERROR_USER_NOT_FOUND, missingUser));
         }
 
         if (mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {

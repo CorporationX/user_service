@@ -1,5 +1,7 @@
 package school.faang.user_service.controller;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,38 +20,47 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/skills")
+@Slf4j
+@RequiredArgsConstructor
 public class SkillController {
     private final SkillService skillService;
 
-    @Autowired
-    public SkillController(SkillService skillService) {
-        this.skillService = skillService;
-    }
-
     @PostMapping
     public SkillDto create(@RequestBody SkillDto skill) {
+        log.info("Starting skill creation...");
         validateSkill(skill);
-        return skillService.create(skill);
+        SkillDto createdSkill = skillService.create(skill);
+        log.info("Skill creation completed!");
+        return createdSkill;
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<SkillDto> getUserSkills(@PathVariable long userId) {
+        log.info("Getting skills for the user {}", userId);
+        List<SkillDto> skills = skillService.getUserSkills(userId);
+        log.info("Get {} skills for the user {}", skills.size(), userId);
+        return skills;
+    }
+
+    @GetMapping("/offered{userId}")
+    public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
+        log.info("Getting offered skills for the user {}", userId);
+        List<SkillCandidateDto> offeredSkills = skillService.getOfferedSkills(userId);
+        log.info("Get {} offered skills for the user {}", offeredSkills.size(), userId);
+        return offeredSkills;
+    }
+
+    @PutMapping("/acquire")
+    public SkillDto acquireSkillFromOffers(@RequestParam long skillId, @RequestParam long userId) {
+        log.info("Acquiring skill {} for the user {}", skillId, userId);
+        SkillDto acquiredSkills = skillService.acquireSkillFromOffers(skillId, userId);
+        log.info("Skill {} acquired for user {}", skillId, userId);
+        return acquiredSkills;
     }
 
     private void validateSkill(SkillDto skill) {
         if (skill.getTitle() == null || skill.getTitle().isEmpty()) {
             throw new DataValidationException("Skill title is empty.");
         }
-    }
-
-    @GetMapping("/user/{userId}")
-    public List<SkillDto> getUserSkills(@PathVariable long userId) {
-        return skillService.getUserSkills(userId);
-    }
-
-    @GetMapping("/offered{userId}")
-    public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
-        return skillService.getOfferedSkills(userId);
-    }
-
-    @PutMapping("/acquire")
-    public SkillDto acquireSkillFromOffers(@RequestParam long skillId, @RequestParam long userId) {
-        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

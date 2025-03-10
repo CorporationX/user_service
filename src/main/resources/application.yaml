@@ -41,4 +41,4 @@ payment-service:
 
 app:
   mentorship-request:
-  min-request-interval-in-months: 3 # Минимальный интервал между запросами (в месяцах)
+   min-request-interval-in-months: 3 # Минимальный интервал между запросами (в месяцах)

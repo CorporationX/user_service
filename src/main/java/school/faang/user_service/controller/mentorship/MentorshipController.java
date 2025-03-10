@@ -3,8 +3,6 @@ package school.faang.user_service.controller.mentorship;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.dto.mentorship.MenteeDto;
-import school.faang.user_service.dto.mentorship.MentorDto;
 import school.faang.user_service.exception.mentorship.InvalidIdException;
 import school.faang.user_service.message.mentorship.MentorshipMessage;
 import school.faang.user_service.service.MentorshipService;
@@ -19,16 +17,32 @@ public class MentorshipController {
 
     private final MentorshipService mentorshipService;
 
-    public List<MenteeDto> getMentees(long userId) {
+    public List<Long> getMentees(long userId) {
         if (isIdValid(userId)) {
             return mentorshipService.getMentees(userId);
         }
         throw new InvalidIdException(INVALID_ID_MESSAGE);
     }
 
-    public List<MentorDto> getMentors(long userId) {
+    public List<Long> getMentors(long userId) {
         if (isIdValid(userId)) {
             return mentorshipService.getMentors(userId);
+        }
+        throw new InvalidIdException(INVALID_ID_MESSAGE);
+    }
+
+    public void deleteMentee(long menteeId, long mentorId) {
+        if (isIdValid(menteeId) && isIdValid(mentorId)) {
+            mentorshipService.deleteMentee(menteeId, mentorId);
+            return;
+        }
+        throw new InvalidIdException(INVALID_ID_MESSAGE);
+    }
+
+    public void deleteMentor(long menteeId, long mentorId) {
+        if (isIdValid(menteeId) && isIdValid(mentorId)) {
+            mentorshipService.deleteMentor(menteeId, mentorId);
+            return;
         }
         throw new InvalidIdException(INVALID_ID_MESSAGE);
     }

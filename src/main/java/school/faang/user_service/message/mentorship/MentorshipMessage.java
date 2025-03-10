@@ -1,12 +1,10 @@
 package school.faang.user_service.message.mentorship;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
-@Component
 public enum MentorshipMessage {
     INVALID_ID("ID \"{}\" is less than 1"),
     GET_MENTEES_START("Get mentees for the user \"{}\" has been started"),
@@ -14,7 +12,11 @@ public enum MentorshipMessage {
     EMPTY_MENTEES("The user \"{}\" has not mentees"),
     GET_MENTORS_START("Get mentors for the user \"{}\" has been started"),
     GET_MENTORS_FINISH("Get mentors for the user \"{}\" has been finished"),
-    EMPTY_MENTORS("The user \"{}\" has not mentors");
+    EMPTY_MENTORS("The user \"{}\" has not mentors"),
+    DELETE_MENTEE("User \"{}\" is no longer a mentee of user \"{}\""),
+    DELETE_MENTOR("User \"{}\" is no longer a mentor of user \"{}\""),
+    NO_MENTEE("User \"{}\" does not have a mentee \"{}\""),
+    NO_MENTOR("User \"{}\" does not have a mentor \"{}\"");
 
     private final String message;
 }

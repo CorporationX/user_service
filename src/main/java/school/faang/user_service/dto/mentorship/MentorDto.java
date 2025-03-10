@@ -8,5 +8,5 @@ import java.util.List;
 public class MentorDto {
     private long id;
     private String username;
-    private List<MenteeDto> mentees;
+    private List<Long> mentees;
 }

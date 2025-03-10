@@ -18,34 +18,33 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 public class SubscriptionService {
-    public static final String USER_ALREADY_FOLLOWING_ERROR = "User with ID %d is already following user with ID %d.";
-    public static final String USER_CANNOT_UNSUBSCRIBE_FROM_HIMSELF = "User cannot unsubscribe from himself";
-    public static final String USER_NOT_SUBSCRIBED_MESSAGE = "User with ID %d is not subscribed to user with ID %d.";
     private static final String USER_FILTER_DTO_CANNOT_BE_NULL = "UserFilterDto can't be null";
+    private static final String USER_ALREADY_FOLLOWING_ERROR = "User with ID %d is already following user with ID %d.";
+    private static final String USER_CANNOT_UNSUBSCRIBE_FROM_HIMSELF = "User cannot unsubscribe from himself";
+    private static final String USER_NOT_SUBSCRIBED_MESSAGE = "User with ID %d is not subscribed to user with ID %d.";
 
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFilter> filters;
     private final UserMapper userMapper;
 
-    public List<UserDto> getFollowing(long followerId, UserFilterDto userFilterDto) {
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto userFilterDto) {
         if (userFilterDto == null) {
             log.error(USER_FILTER_DTO_CANNOT_BE_NULL);
             throw new DataValidationException(USER_FILTER_DTO_CANNOT_BE_NULL);
         }
-        Stream<User> followees = subscriptionRepository.findByFollowerId(followerId);
-        log.debug("Initial stream of following users fetched for followerId: {}", followerId);
-
+        Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);
+        log.debug("Initial stream of users fetched for followeeId: {}", followeeId);
         for (UserFilter filter : filters) {
             if (filter.isApplicable(userFilterDto)) {
-                log.debug("Applying filter: {} for followerId: {}", filter.getClass().getSimpleName(), followerId);
-                followees = filter.apply(followees, userFilterDto);
+                log.debug("Applying filter: {}", filter.getClass().getSimpleName());
+                followers = filter.apply(followers, userFilterDto);
             }
         }
-        return userMapper.toDtoList(followees.toList());
+        return userMapper.toDtoList(followers.toList());
     }
 
-    public int getFollowingCount(long followerId) {
-        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    public int getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
     public void followUser(long followerId, long followeeId) {
@@ -72,5 +71,26 @@ public class SubscriptionService {
             throw new DataValidationException(errorMessage);
         }
         subscriptionRepository.unfollowUser(followerId, followeeId);
+    }
+
+    public List<UserDto> getFollowing(long followerId, UserFilterDto userFilterDto) {
+        if (userFilterDto == null) {
+            log.error(USER_FILTER_DTO_CANNOT_BE_NULL);
+            throw new DataValidationException(USER_FILTER_DTO_CANNOT_BE_NULL);
+        }
+        Stream<User> followees = subscriptionRepository.findByFollowerId(followerId);
+        log.debug("Initial stream of following users fetched for followerId: {}", followerId);
+
+        for (UserFilter filter : filters) {
+            if (filter.isApplicable(userFilterDto)) {
+                log.debug("Applying filter: {} for followerId: {}", filter.getClass().getSimpleName(), followerId);
+                followees = filter.apply(followees, userFilterDto);
+            }
+        }
+        return userMapper.toDtoList(followees.toList());
+    }
+
+    public int getFollowingCount(long followerId) {
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 }

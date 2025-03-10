@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -26,12 +27,13 @@ public class MentorshipRequestService {
     private static final String ERROR_SHORT_DESCRIPTION = String.format("Description should be at least %d characters long.\n",
             MIN_DESCRIPTION_LENGTH);
     private static final String ERROR_SELF_REQUEST = "You cannot request mentorship from yourself.";
-    private static final String ERROR_USER_NOT_FOUND = "User with the given ID: %d was not found.";
+    private static final String ERROR_USER_NOT_FOUND = "User with the given ID(s): %s was not found.";
     private static final String ERROR_TOO_FREQUENT_REQUESTS = String.format("You can only request mentorship once every %d months.\n",
             REQUEST_COOLDOWN_MONTHS);
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final UserService userService;
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         Objects.requireNonNull(mentorshipRequestDto,
@@ -44,9 +46,12 @@ public class MentorshipRequestService {
         List<Long> missingUser = Stream.of(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
                 .filter(id -> !mentorshipRequestRepository.existsById(id))
                 .toList();
-        if(!missingUser.isEmpty()){
-            log.info(ERROR_USER_NOT_FOUND, missingUser);
-            throw new IllegalArgumentException(String.format(ERROR_USER_NOT_FOUND, missingUser));
+        if (!missingUser.isEmpty()) {
+            String missingIds = missingUser.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            log.info(String.format(ERROR_USER_NOT_FOUND, missingIds));
+            throw new IllegalArgumentException(String.format(ERROR_USER_NOT_FOUND, missingIds));
         }
 
         if (mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
@@ -63,7 +68,10 @@ public class MentorshipRequestService {
                 throw new IllegalArgumentException(ERROR_TOO_FREQUENT_REQUESTS);
             }
         }
+
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
+        mentorshipRequest.setRequester(userService.findById(mentorshipRequestDto.getRequesterId()));
+        mentorshipRequest.setReceiver(userService.findById(mentorshipRequestDto.getReceiverId()));
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
     }

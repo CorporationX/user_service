@@ -56,6 +56,7 @@ public class EventServiceTest {
 
     @Captor
     private ArgumentCaptor<EventDto> eventCaptor;
+    @Captor ArgumentCaptor<List<Long>> eventIdCaptor;
 
     @BeforeEach
     public void setUp() {
@@ -144,5 +145,21 @@ public class EventServiceTest {
         assertThrows(BusinessException.class, () -> {
             Whitebox.invokeMethod(service, "validateEventRelatedSkills", relatedSkills, ownerSkillsIds);
         });
+    }
+
+    @Test
+    public void testClearPastEvents(){
+        Event compleatedEvent = Event.builder()
+                .id(1L)
+                .status(EventStatus.COMPLETED)
+                .build();
+
+        when(eventRepository.findEventsByStatuses(any())).thenReturn(List.of(compleatedEvent));
+
+        getService().clearPastEvents();
+
+        verify(eventRepository, atLeastOnce()).deleteAllByIdInBatch(eventIdCaptor.capture());
+        assertEquals(List.of(compleatedEvent.getId()), eventIdCaptor.getValue());
+
     }
 }

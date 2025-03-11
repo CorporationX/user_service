@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,22 +24,23 @@ public class MentorshipRequestController {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    public List<MentorshipRequestDto> getRequests(@NonNull @Valid RequestFilterDto requestFilterDto) {
+    public List<MentorshipRequestDto> getRequests(@NonNull RequestFilterDto requestFilterDto) {
         return mentorshipRequestService.getRequests(requestFilterDto);
     }
 
-    public void acceptRequest(@NonNull @Min(value = 1, message = "ID должен быть больше 0") Long id) {
+    public void acceptRequest(@NonNull @Min(value = 1) Long id) {
         mentorshipRequestService.acceptRequest(id);
     }
 
-    public void rejectRequest(@NonNull @Min(value = 1, message = "ID должен быть больше 0") Long id,
-                              @NonNull RejectionDto rejection) {
-        mentorshipRequestService.rejectRequest(id, rejection);
+    public void rejectRequest(@NonNull @Min(value = 1) Long id,
+                              @NonNull RejectionDto rejectionDto) {
+        mentorshipRequestService.rejectRequest(id, rejectionDto);
     }
 
-    private static void validateMentorshipRequestDescription(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription() == null) {
-            throw new NullPointerException("description is null");
+    private void validateMentorshipRequestDescription(MentorshipRequestDto mentorshipRequestDto) {
+        if (mentorshipRequestDto.getDescription() == null
+                || mentorshipRequestDto.getDescription().isBlank()) {
+            throw new NullPointerException("The description cannot be empty or consist only of spaces.");
         }
     }
 }

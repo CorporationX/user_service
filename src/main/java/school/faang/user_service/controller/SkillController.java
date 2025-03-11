@@ -2,7 +2,6 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +41,7 @@ public class SkillController {
         return skills;
     }
 
-    @GetMapping("/offered{userId}")
+    @GetMapping("/offered/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
         log.info("Getting offered skills for the user {}", userId);
         List<SkillCandidateDto> offeredSkills = skillService.getOfferedSkills(userId);
@@ -56,11 +55,5 @@ public class SkillController {
         SkillDto acquiredSkills = skillService.acquireSkillFromOffers(skillId, userId);
         log.info("Skill {} acquired for user {}", skillId, userId);
         return acquiredSkills;
-    }
-
-    private void validateSkill(SkillDto skill) {
-        if (skill.getTitle() == null || skill.getTitle().isEmpty()) {
-            throw new DataValidationException("Skill title is empty.");
-        }
     }
 }

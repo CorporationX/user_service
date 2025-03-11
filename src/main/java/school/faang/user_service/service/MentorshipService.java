@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MenteeDto;
 import school.faang.user_service.dto.mentorship.MentorDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.mentorship.InvalidIdException;
 import school.faang.user_service.exception.mentorship.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MenteeMapper;
 import school.faang.user_service.mapper.mentorship.MentorMapper;
@@ -28,8 +29,10 @@ public class MentorshipService {
         log.debug(MentorshipMessage.GET_MENTEES_START.getMessage(), userId);
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
         MentorDto mentorDto = mentorMapper.toDto(user);
         log.debug(MentorshipMessage.GET_MENTEES_FINISH.getMessage(), userId);
+
         return mentorDto.getMentees();
     }
 
@@ -37,36 +40,52 @@ public class MentorshipService {
         log.debug(MentorshipMessage.GET_MENTORS_START.getMessage(), userId);
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
         MenteeDto menteeDto = menteeMapper.toDto(user);
         log.debug(MentorshipMessage.GET_MENTORS_FINISH.getMessage(), userId);
+
         return menteeDto.getMentors();
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
+        validateIdsEqual(menteeId, mentorId);
+
         User mentor = mentorshipRepository.findById(mentorId)
                 .orElseThrow(() -> new UserNotFoundException("Mentor not found"));
         User mentee = mentorshipRepository.findById(menteeId)
                 .orElseThrow(() -> new UserNotFoundException("Mentee not found"));
+
         if (mentor.getMentees().remove(mentee)) {
             mentee.getMentors().remove(mentor);
             mentorshipRepository.saveAll(List.of(mentor, mentee));
             log.info(MentorshipMessage.DELETE_MENTEE.getMessage(), menteeId, mentorId);
             return;
         }
+
         log.info(MentorshipMessage.NO_MENTEE.getMessage(), mentorId, menteeId);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
+        validateIdsEqual(menteeId, mentorId);
+
         User mentor = mentorshipRepository.findById(mentorId)
                 .orElseThrow(() -> new UserNotFoundException("Mentor not found"));
         User mentee = mentorshipRepository.findById(menteeId)
                 .orElseThrow(() -> new UserNotFoundException("Mentee not found"));
+
         if (mentee.getMentors().remove(mentor)) {
             mentor.getMentees().remove(mentee);
             mentorshipRepository.saveAll(List.of(mentor, mentee));
             log.info(MentorshipMessage.DELETE_MENTOR.getMessage(), mentorId, menteeId);
             return;
         }
+
         log.info(MentorshipMessage.NO_MENTOR.getMessage(), menteeId, mentorId);
+    }
+
+    private void validateIdsEqual(long firstId, long secondId) {
+        if (firstId == secondId) {
+            throw new InvalidIdException("The transmitted user IDs are equal");
+        }
     }
 }

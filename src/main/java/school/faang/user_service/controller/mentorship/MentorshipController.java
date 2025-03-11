@@ -21,6 +21,7 @@ public class MentorshipController {
         if (isIdValid(userId)) {
             return mentorshipService.getMentees(userId);
         }
+
         throw new InvalidIdException(INVALID_ID_MESSAGE);
     }
 
@@ -28,6 +29,7 @@ public class MentorshipController {
         if (isIdValid(userId)) {
             return mentorshipService.getMentors(userId);
         }
+
         throw new InvalidIdException(INVALID_ID_MESSAGE);
     }
 
@@ -36,6 +38,7 @@ public class MentorshipController {
             mentorshipService.deleteMentee(menteeId, mentorId);
             return;
         }
+
         throw new InvalidIdException(INVALID_ID_MESSAGE);
     }
 
@@ -44,6 +47,7 @@ public class MentorshipController {
             mentorshipService.deleteMentor(menteeId, mentorId);
             return;
         }
+
         throw new InvalidIdException(INVALID_ID_MESSAGE);
     }
 
@@ -52,6 +56,7 @@ public class MentorshipController {
             log.error(MentorshipMessage.INVALID_ID.getMessage(), id);
             return false;
         }
+
         return true;
     }
 }

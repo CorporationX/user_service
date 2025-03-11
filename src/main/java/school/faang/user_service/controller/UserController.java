@@ -1,16 +1,11 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.BooleanResponse;
@@ -24,44 +19,56 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@Validated
+@Tag(name = "Пользователи", description = "API для управления пользователями")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/profile/{userId}")
-    public void viewProfile(@PathVariable long userId) {
-        //код просмотра профиля
-        userService.viewProfile(userId);
-    }
-
     @DeleteMapping("/{userId}")
-    public void deactivateUser(@RequestParam @NotNull Long userId) {
+    @Operation(summary = "Деактивировать пользователя", description = "Отключает пользователя по его ID")
+    public void deactivateUser(
+            @Parameter(description = "ID пользователя для деактивировации", example = "1", required = true)
+            @RequestParam @NotNull Long userId) {
         userService.deactivateUser(userId);
     }
 
     @GetMapping("/is-user-exist/{userId}")
-    public BooleanResponse isUserExist(@RequestParam(name = "user_id") Long userId) {
+    @Operation(summary = "Проверить существование пользователя", description = "Возвращает true, если пользователь существует")
+    public BooleanResponse isUserExist(
+            @Parameter(description = "ID пользователя", example = "1", required = true)
+            @RequestParam(name = "user_id") Long userId) {
         return new BooleanResponse(userService.isUserExist(userId));
     }
 
     @GetMapping("/premium")
-    public List<UserDto> getPremiumUsers(@Validated @RequestBody(required = false) UserFilterDto userFilterDto) {
+    @Operation(summary = "Получить премиум-пользователей", description = "Возвращает список премиум-пользователей с возможностью фильтрации")
+    public List<UserDto> getPremiumUsers(
+            @Parameter(description = "Фильтр для поиска премиум-пользователей")
+            @RequestBody(required = false) UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
     }
 
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserDto createUser(@Valid @ModelAttribute UserCreateDto userCreateDto) {
+    @Operation(summary = "Создать пользователя", description = "Создаёт нового пользователя на основе переданных данных")
+    public UserDto createUser(
+            @Parameter(description = "Данные для создания пользователя", required = true)
+            @Valid @ModelAttribute UserCreateDto userCreateDto) {
         return userService.createUser(userCreateDto);
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable long userId) {
+    @Operation(summary = "Получить пользователя по ID")
+    public UserDto getUser(
+            @Parameter(description = "ID пользователя", example = "1", required = true)
+            @PathVariable long userId) {
         return userService.getUser(userId);
     }
 
     @GetMapping
-    public List<UserDto> getUsersByIds(@RequestParam List<Long> ids) {
+    @Operation(summary = "Получить пользователей по списку ID", description = "Возвращает список пользователей по их ID")
+    public List<UserDto> getUsersByIds(
+            @Parameter(description = "Список ID пользователей")
+            @RequestParam List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 }

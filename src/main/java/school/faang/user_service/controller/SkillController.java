@@ -27,7 +27,6 @@ public class SkillController {
     @PostMapping
     public SkillDto create(@RequestBody SkillDto skill) {
         log.info("Starting skill creation...");
-        validateSkill(skill);
         SkillDto createdSkill = skillService.create(skill);
         log.info("Skill creation completed!");
         return createdSkill;

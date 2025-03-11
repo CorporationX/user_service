@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN preference_contact VARCHAR(20);

@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V008__add_banned_column.sql
   - include:
       file: db/changelog/changeset/user_V009__add_chat_id_column.sql
+  - include:
+      file: db/changelog/changeset/user_V010__add_locale_column.sql

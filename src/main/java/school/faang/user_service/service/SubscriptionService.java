@@ -13,6 +13,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
@@ -47,11 +48,9 @@ public class SubscriptionService {
     public List<FollowerResponse> getFollowing(Long followeeId, UserFilterRequest filter) {
         Stream<User> userStream = subscriptionRepository.findByFollowerId(followeeId);
 
-        if (filter != null) {
-            for (UserFilter userFilter : userFilters) {
-                if (userFilter.isApplicable(filter)) {
-                    userStream = userFilter.apply(userStream, filter);
-                }
+        for (UserFilter userFilter : userFilters) {
+            if (userFilter.isApplicable(filter)) {
+                userStream = userFilter.apply(userStream, filter);
             }
         }
 
@@ -83,7 +82,7 @@ public class SubscriptionService {
     }
 
     private void validateIds(Long followerId, Long followeeId) {
-        if (followerId == null || followeeId == null) {
+        if (Objects.equals(followerId, followeeId)) {
             throw new DataValidationException("Нельзя произвести действие над самим собой.");
         }
     }

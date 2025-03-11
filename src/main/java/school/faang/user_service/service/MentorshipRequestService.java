@@ -36,8 +36,7 @@ public class MentorshipRequestService {
     private final UserService userService;
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        Objects.requireNonNull(mentorshipRequestDto,
-                ERROR_NULL_DTO);
+        validateMentorshipRequestDto(mentorshipRequestDto);
         if (mentorshipRequestDto.getDescription().length() < MIN_DESCRIPTION_LENGTH) {
             log.error(ERROR_SHORT_DESCRIPTION);
             throw new IllegalArgumentException(ERROR_SHORT_DESCRIPTION);
@@ -74,5 +73,9 @@ public class MentorshipRequestService {
         mentorshipRequest.setReceiver(userService.findById(mentorshipRequestDto.getReceiverId()));
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
+    }
+
+    private void validateMentorshipRequestDto(MentorshipRequestDto mentorshipRequestDto) {
+        Objects.requireNonNull(mentorshipRequestDto, ERROR_NULL_DTO);
     }
 }

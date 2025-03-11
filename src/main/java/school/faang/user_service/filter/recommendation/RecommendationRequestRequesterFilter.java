@@ -1,11 +1,13 @@
 package school.faang.user_service.filter.recommendation;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 import java.util.stream.Stream;
 
+@Component
 public class RecommendationRequestRequesterFilter implements RecommendationRequestFilter {
 
     @Override

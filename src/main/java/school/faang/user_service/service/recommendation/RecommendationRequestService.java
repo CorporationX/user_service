@@ -10,7 +10,7 @@ import school.faang.user_service.dto.SkillRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.NotFoundRequestException;
+import school.faang.user_service.exception.IllegalRequestException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterProcessor;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -22,14 +22,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private static final int RECOMMENDATION_REQUEST_INTERVAL_MONTHS = 6;
-    private static final String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id: ";
+    private static final String NOT_FOUND_REQUEST_MESSAGE = "Запрос не найден c id: %d";
     private static final String NULL_MESSAGE = "Сообщение не может быть пустым";
     private static final String NULL_REJECT_REASON = "Причина отклонения не может быть null";
     private static final String REQUEST_ALREADY_PROCESSED = "Запрос уже обработан";
@@ -38,36 +37,25 @@ public class RecommendationRequestService {
     private final SkillRepository skillRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+    private final RecommendationRequestFilterProcessor recommendationRequestFilterProcessor;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto.getMessage().trim().isEmpty()) {
-            throw new IllegalArgumentException(NULL_MESSAGE);
+        if (!validateRecommendationRequest(recommendationRequestDto)) {
+            return null;
         }
 
-        Optional<User> requester = userRepository.findById(recommendationRequestDto.getRequesterId());
-        Optional<User> receiver = userRepository.findById(recommendationRequestDto.getReceiverId());
-
-        if (
-                requester.isPresent() && receiver.isPresent()
-                && canRequestRecommendation(requester.get(), receiver.get())
-                && allSkillsExist(recommendationRequestDto.getSkills())
-        ) {
-            RecommendationRequest requestToCreate =
-                    recommendationRequestMapper.toRecommendationRequest(recommendationRequestDto);
-            recommendationRequestRepository.save(requestToCreate);
-            requestToCreate
-                    .getSkills()
-                    .forEach(skill ->
-                            skillRequestRepository.create(requestToCreate.getId(), skill.getId()));
-            return recommendationRequestMapper.toRecommendationRequestDto(requestToCreate);
-        }
-
-        return null;
+        RecommendationRequest requestToCreate =
+                recommendationRequestMapper.toRecommendationRequest(recommendationRequestDto);
+        requestToCreate
+                .getSkills()
+                .forEach(skill ->
+                        skillRequestRepository.create(requestToCreate.getId(), skill.getId()));
+        recommendationRequestRepository.save(requestToCreate);
+        return recommendationRequestMapper.toRecommendationRequestDto(requestToCreate);
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filterDto) {
-        List<RecommendationRequest> requests = StreamSupport
-                .stream(recommendationRequestRepository.findAll().spliterator(), false)
+        List<RecommendationRequest> requests = recommendationRequestRepository.findAll().stream()
                 .filter(request -> filterByCondition(request, filterDto))
                 .toList();
         return recommendationRequestMapper.toRecommendationRequestDtoList(requests);
@@ -79,13 +67,14 @@ public class RecommendationRequestService {
         if (request.isPresent()) {
             return recommendationRequestMapper.toRecommendationRequestDto(request.get());
         } else {
-            throw new NotFoundRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId));
+            throw new IllegalRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId));
         }
     }
 
     public RecommendationRequestDto rejectRequest(long requestId, RejectionDto rejection) {
         if (rejection.getReason() == null) {
-            log.info(NULL_REJECT_REASON);
+            log.error(NULL_REJECT_REASON);
+            throw new IllegalArgumentException(NULL_REJECT_REASON);
         }
 
         if (rejection.getReason().trim().isEmpty()) {
@@ -95,11 +84,12 @@ public class RecommendationRequestService {
         RecommendationRequest request = recommendationRequestRepository
                 .findById(requestId)
                 .orElseThrow(
-                        () -> new NotFoundRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId))
+                        () -> new IllegalRequestException(String.format(NOT_FOUND_REQUEST_MESSAGE, requestId))
                 );
 
         if (request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStatus().equals(RequestStatus.REJECTED)) {
-            log.warn(REQUEST_ALREADY_PROCESSED);
+            log.error(REQUEST_ALREADY_PROCESSED);
+            throw new IllegalArgumentException(REQUEST_ALREADY_PROCESSED);
         }
 
         request.setStatus(RequestStatus.REJECTED);
@@ -127,7 +117,19 @@ public class RecommendationRequestService {
     }
 
     private boolean filterByCondition(RecommendationRequest request, RequestFilterDto filter) {
-        RecommendationRequestFilterProcessor processor = new RecommendationRequestFilterProcessor();
-        return processor.filter(Stream.of(request), filter).findAny().isPresent();
+        return recommendationRequestFilterProcessor.filter(Stream.of(request), filter).findAny().isPresent();
+    }
+
+    private boolean validateRecommendationRequest(RecommendationRequestDto dto) {
+        if (dto.getMessage().trim().isEmpty()) {
+            throw new IllegalArgumentException(NULL_MESSAGE);
+        }
+
+        Optional<User> requester = userRepository.findById(dto.getRequesterId());
+        Optional<User> receiver = userRepository.findById(dto.getReceiverId());
+
+        return requester.isPresent() && receiver.isPresent()
+                && canRequestRecommendation(requester.get(), receiver.get())
+                && allSkillsExist(dto.getSkills());
     }
 }

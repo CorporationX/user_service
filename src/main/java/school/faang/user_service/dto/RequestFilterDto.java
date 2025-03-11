@@ -13,7 +13,7 @@ public class RequestFilterDto {
     private User requester;
     private User receiver;
     private RequestStatus status;
-    private List<SkillRequest> skills;
+    private List<SkillRequestDto> skills;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

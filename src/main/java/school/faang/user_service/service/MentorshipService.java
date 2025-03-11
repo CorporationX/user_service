@@ -11,6 +11,7 @@ import school.faang.user_service.exception.mentorship.InvalidIdException;
 import school.faang.user_service.exception.mentorship.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MenteeMapper;
 import school.faang.user_service.mapper.mentorship.MentorMapper;
+import school.faang.user_service.message.mentorship.ExceptionMessage;
 import school.faang.user_service.message.mentorship.MentorshipMessage;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -28,7 +29,7 @@ public class MentorshipService {
     public List<Long> getMentees(long userId) {
         log.debug(MentorshipMessage.GET_MENTEES_START.getMessage(), userId);
         User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
 
         MentorDto mentorDto = mentorMapper.toDto(user);
         log.debug(MentorshipMessage.GET_MENTEES_FINISH.getMessage(), userId);
@@ -39,7 +40,7 @@ public class MentorshipService {
     public List<Long> getMentors(long userId) {
         log.debug(MentorshipMessage.GET_MENTORS_START.getMessage(), userId);
         User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
 
         MenteeDto menteeDto = menteeMapper.toDto(user);
         log.debug(MentorshipMessage.GET_MENTORS_FINISH.getMessage(), userId);
@@ -51,9 +52,9 @@ public class MentorshipService {
         validateIdsEqual(menteeId, mentorId);
 
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new UserNotFoundException("Mentor not found"));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
         User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new UserNotFoundException("Mentee not found"));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
 
         if (mentor.getMentees().remove(mentee)) {
             mentee.getMentors().remove(mentor);
@@ -69,9 +70,9 @@ public class MentorshipService {
         validateIdsEqual(menteeId, mentorId);
 
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new UserNotFoundException("Mentor not found"));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
         User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new UserNotFoundException("Mentee not found"));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
 
         if (mentee.getMentors().remove(mentor)) {
             mentor.getMentees().remove(mentee);
@@ -85,7 +86,7 @@ public class MentorshipService {
 
     private void validateIdsEqual(long firstId, long secondId) {
         if (firstId == secondId) {
-            throw new InvalidIdException("The transmitted user IDs are equal");
+            throw new InvalidIdException(ExceptionMessage.EQUAL_IDS.getMessage());
         }
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.exception.mentorship.InvalidIdException;
+import school.faang.user_service.message.mentorship.ExceptionMessage;
 import school.faang.user_service.message.mentorship.MentorshipMessage;
 import school.faang.user_service.service.MentorshipService;
 
@@ -13,8 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MentorshipController {
-    private static final String INVALID_ID_MESSAGE = "Invalid ID: ID not be less than 1";
-
     private final MentorshipService mentorshipService;
 
     public List<Long> getMentees(long userId) {
@@ -22,7 +21,7 @@ public class MentorshipController {
             return mentorshipService.getMentees(userId);
         }
 
-        throw new InvalidIdException(INVALID_ID_MESSAGE);
+        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
     }
 
     public List<Long> getMentors(long userId) {
@@ -30,7 +29,7 @@ public class MentorshipController {
             return mentorshipService.getMentors(userId);
         }
 
-        throw new InvalidIdException(INVALID_ID_MESSAGE);
+        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
@@ -39,7 +38,7 @@ public class MentorshipController {
             return;
         }
 
-        throw new InvalidIdException(INVALID_ID_MESSAGE);
+        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
@@ -48,7 +47,7 @@ public class MentorshipController {
             return;
         }
 
-        throw new InvalidIdException(INVALID_ID_MESSAGE);
+        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
     }
 
     private boolean isIdValid(long id) {

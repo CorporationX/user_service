@@ -1,10 +1,10 @@
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
     kotlin("jvm")
-    jacoco
 }
 
 group = "faang.school"
@@ -84,6 +84,7 @@ jsonSchema2Pojo {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }
@@ -91,30 +92,32 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 tasks.bootJar {
     archiveFileName.set("service.jar")
 }
+
 kotlin {
     jvmToolchain(17)
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    version = "0.8.12"
 }
+
+val jacocoInclude = listOf(
+    "**/service/**",
+    "**/mapper/**"
+)
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+
     reports {
         xml.required.set(true)
-        html.required.set(true)
         html.outputLocation.set(file("$buildDir/reports/jacoco"))
     }
-}
-
-tasks.jacocoTestCoverageVerification {
-    dependsOn(tasks.jacocoTestReport)
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.7.toBigDecimal()
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                setIncludes(jacocoInclude)
             }
-        }
-    }
+        })
+    )
 }

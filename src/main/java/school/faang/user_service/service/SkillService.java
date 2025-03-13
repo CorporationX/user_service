@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
@@ -19,10 +18,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class SkillService {
-    private final SkillRepository skillRepository;
-    private final SkillMapper skillMapper;
-    private final SkillOfferRepository skillOfferRepository;
-
     private static final int MIN_SKILL_OFFERS = 3;
     private static final String ERROR_SKILL_EXIST = "That skill is already there.";
     private static final String ERROR_USER_HAS_SKILL = "User already has this skill.";
@@ -30,13 +25,13 @@ public class SkillService {
     private static final String ERROR_NOT_ENOUGH_OFFERS = "Not enough offers to acquire this skill.";
     private static final String ERROR_SKILL_EMPTY = "Skill title is empty";
 
+    private final SkillRepository skillRepository;
+    private final SkillMapper skillMapper;
+    private final SkillOfferRepository skillOfferRepository;
 
     public SkillDto create(SkillDto skill) {
         log.info("Creating skill {} ...", skill.getTitle());
-        if (skill.getTitle() == null || skill.getTitle().isEmpty()) {
-            log.error(ERROR_SKILL_EMPTY);
-            throw new DataValidationException(ERROR_SKILL_EMPTY);
-        }
+        validateSkill(skill);
         if (skillRepository.existsByTitle(skill.getTitle())) {
             log.error(ERROR_SKILL_EXIST);
             throw new DataValidationException(ERROR_SKILL_EXIST);
@@ -81,5 +76,12 @@ public class SkillService {
                     log.error(ERROR_SKILL_NOT_FOUND);
                     return new DataValidationException(ERROR_SKILL_NOT_FOUND);
                 });
+    }
+
+    private void validateSkill(SkillDto skill) {
+        if (skill.getTitle() == null || skill.getTitle().isEmpty()) {
+            log.error(ERROR_SKILL_EMPTY);
+            throw new DataValidationException(ERROR_SKILL_EMPTY);
+        }
     }
 }

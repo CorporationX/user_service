@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -20,7 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -34,6 +32,8 @@ public class EventParticipationServiceTest {
 
     public static final String USER_NOT_FOUND = "User not found";
     public static final String EVENT_NOT_FOUND = "Event not found";
+    public static final Long EVENT_ID = 2L;
+    public static final Long USER_ID = 1L;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -61,34 +61,33 @@ public class EventParticipationServiceTest {
     @Test
     @DisplayName("Registration error - User already for event")
     public void testRegisterParticipantAlreadyRegisteredForEvent() {
-        Long eventId = 2L;
-        Long userId = 1L;
         String errorMessage = "User is already registered for the event";
         User user = new User();
-        user.setId(userId);
+        user.setId(USER_ID);
 
-        validationSkip(eventId, userId);
-        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+        validationSkip();
+        when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID))
                 .thenReturn(List.of(user));
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> eventParticipationService.registerParticipant(eventId, userId));
 
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> eventParticipationService.registerParticipant(EVENT_ID, USER_ID));
+        verify(eventValidator, times(1)).checkEventExistsById(EVENT_ID);
+        verify(userValidator, times(1)).checkUserExistsById(USER_ID);
         assertEquals(errorMessage, exception.getMessage());
-        verify(eventParticipationRepository, never()).register(eventId, userId);
+        verify(eventParticipationRepository, never()).register(EVENT_ID, USER_ID);
     }
 
     @Test
     @DisplayName("Successful registration")
     public void testRegisterParticipantSuccessful() {
-        Long eventId = 2L;
-        Long userId = 1L;
-
-        validationSkip(eventId, userId);
-        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+        validationSkip();
+        when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID))
                 .thenReturn(List.of());
-        eventParticipationService.registerParticipant(eventId, userId);
+        eventParticipationService.registerParticipant(EVENT_ID, USER_ID);
 
-        verify(eventParticipationRepository, times(1)).register(eventId, userId);
+        verify(eventValidator, times(1)).checkEventExistsById(EVENT_ID);
+        verify(userValidator, times(1)).checkUserExistsById(USER_ID);
+        verify(eventParticipationRepository, times(1)).register(EVENT_ID, USER_ID);
     }
 
     @Test
@@ -106,34 +105,35 @@ public class EventParticipationServiceTest {
     @Test
     @DisplayName("Unregister error - User already for event")
     public void testUnregisterParticipantNotRegisteredForEvent() {
-        Long eventId = 2L;
-        Long userId = 1L;
         String errorMessage = "User is not registered for the event";
 
-        validationSkip(eventId, userId);
-        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+        validationSkip();
+        when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID))
                 .thenReturn(List.of());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> eventParticipationService.unregisterParticipant(eventId, userId));
 
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> eventParticipationService.unregisterParticipant(EVENT_ID, USER_ID));
+        verify(eventValidator, times(1)).checkEventExistsById(EVENT_ID);
+        verify(userValidator, times(1)).checkUserExistsById(USER_ID);
         assertEquals(errorMessage, exception.getMessage());
-        verify(eventParticipationRepository, never()).register(eventId, userId);
+        verify(eventParticipationRepository, never()).register(EVENT_ID, USER_ID);
     }
 
     @Test
     @DisplayName("Successful unregister")
     public void testUnregisterSuccessful() {
-        Long eventId = 2L;
-        Long userId = 1L;
         User user = new User();
-        user.setId(userId);
+        user.setId(USER_ID);
 
-        validationSkip(eventId, userId);
-        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+        validationSkip();
+        when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID))
                 .thenReturn(List.of(user));
-        eventParticipationService.unregisterParticipant(eventId, userId);
+        eventParticipationService.unregisterParticipant(EVENT_ID, USER_ID);
 
-        verify(eventParticipationRepository, times(1)).unregister(eventId, userId);
+        verify(eventValidator, times(1)).checkEventExistsById(EVENT_ID);
+        verify(userValidator, times(1)).checkUserExistsById(USER_ID);
+        verify(eventParticipationRepository, times(1))
+                .unregister(EVENT_ID, USER_ID);
     }
 
     @Test
@@ -145,19 +145,18 @@ public class EventParticipationServiceTest {
     @Test
     @DisplayName("Get participant successful")
     public void testGetParticipantSuccessful() {
-        Long eventId = 1L;
         List<User> users = createListUser();
         List<UserDto> userDtos = createListUserDto();
 
-        doNothing().when(eventValidator).checkEventExistsById(eventId);
-        when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+        doNothing().when(eventValidator).checkEventExistsById(EVENT_ID);
+        when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID))
                 .thenReturn(users);
-        List<UserDto> participants = eventParticipationService.getParticipant(eventId);
+        List<UserDto> participants = eventParticipationService.getParticipant(EVENT_ID);
 
         verify(userMapper, times(1)).toListUserDto(users);
-        verify(eventValidator, times(1)).checkEventExistsById(eventId);
+        verify(eventValidator, times(1)).checkEventExistsById(EVENT_ID);
         verify(eventParticipationRepository, times(1))
-                .findAllParticipantsByEventId(eventId);
+                .findAllParticipantsByEventId(EVENT_ID);
 
         assertEquals(userDtos.get(0).getUsername(), participants.get(0).getUsername());
         assertEquals(userDtos.get(0).getEmail(), participants.get(0).getEmail());
@@ -174,22 +173,22 @@ public class EventParticipationServiceTest {
     @Test
     @DisplayName("Get participant count successful")
     public void testGetParticipantCountSuccessful() {
-        Long eventId = 1L;
         Integer expectedCount = 1;
 
-        doNothing().when(eventValidator).checkEventExistsById(eventId);
-        when(eventParticipationRepository.countParticipants(eventId)).thenReturn(expectedCount);
-        Integer participantCount = eventParticipationService.getParticipantCount(eventId);
+        doNothing().when(eventValidator).checkEventExistsById(EVENT_ID);
+        when(eventParticipationRepository.countParticipants(EVENT_ID)).thenReturn(expectedCount);
+        Integer participantCount = eventParticipationService.getParticipantCount(EVENT_ID);
 
-        verify(eventParticipationRepository, times(1)).countParticipants(eventId);
-        verify(eventValidator, times(1)).checkEventExistsById(eventId);
+        verify(eventParticipationRepository, times(1))
+                .countParticipants(EVENT_ID);
+        verify(eventValidator, times(1)).checkEventExistsById(EVENT_ID);
         assertEquals(expectedCount, participantCount);
 
     }
 
     private List<UserDto> createListUserDto() {
         UserDto alexDto = UserDto.builder()
-                .id(2L)
+                .id(USER_ID)
                 .username("Alex")
                 .email("alex@mail.ru")
                 .build();
@@ -199,7 +198,7 @@ public class EventParticipationServiceTest {
 
     private List<User> createListUser() {
         User alex = User.builder()
-                .id(2L)
+                .id(USER_ID)
                 .username("Alex")
                 .email("alex@mail.ru")
                 .build();
@@ -207,9 +206,9 @@ public class EventParticipationServiceTest {
         return List.of(alex);
     }
 
-    private void validationSkip(Long eventId, Long userId) {
-        doNothing().when(eventValidator).checkEventExistsById(eventId);
-        doNothing().when(userValidator).checkUserExistsById(userId);
+    private void validationSkip() {
+        doNothing().when(eventValidator).checkEventExistsById(EventParticipationServiceTest.EVENT_ID);
+        doNothing().when(userValidator).checkUserExistsById(EventParticipationServiceTest.USER_ID);
     }
 
     private void validationData(String errorMessage) {

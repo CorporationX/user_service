@@ -24,6 +24,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationControllerTest {
 
+    private static final Long EVENT_ID = 2L;
+    private static final Long USER_ID = 1L;
+
     @Mock
     private EventParticipationService eventParticipationService;
     @InjectMocks
@@ -32,12 +35,10 @@ public class EventParticipationControllerTest {
     @Test
     @DisplayName("Register participant for event")
     public void testRegisterParticipant() {
-        Long eventId = 1L;
-        Long userId = 2L;
-        String expectedMessage = "User with id 2 registered for event with id 1";
+        String expectedMessage = "User with id 1 registered for event with id 2";
 
-        doNothing().when(eventParticipationService).registerParticipant(eventId, userId);
-        ResponseEntity<String> responseEntity = eventParticipationController.registerParticipant(eventId, userId);
+        doNothing().when(eventParticipationService).registerParticipant(EVENT_ID, USER_ID);
+        ResponseEntity<String> responseEntity = eventParticipationController.registerParticipant(EVENT_ID, USER_ID);
 
         verify(eventParticipationService, times(1))
                 .registerParticipant(anyLong(), anyLong());
@@ -48,15 +49,13 @@ public class EventParticipationControllerTest {
     @Test
     @DisplayName("Unregister participant for event")
     public void testUnregisterParticipant() {
-        Long eventId = 1L;
-        Long userId = 2L;
-        String expectedMessage = "User with id 2 unregistered for event with id 1";
+        String expectedMessage = "User with id 1 unregistered for event with id 2";
 
-        doNothing().when(eventParticipationService).unregisterParticipant(eventId, userId);
-        ResponseEntity<String> responseEntity = eventParticipationController.unregisterParticipant(eventId, userId);
+        doNothing().when(eventParticipationService).unregisterParticipant(EVENT_ID, USER_ID);
+        ResponseEntity<String> responseEntity = eventParticipationController.unregisterParticipant(EVENT_ID, USER_ID);
 
         verify(eventParticipationService, times(1))
-                .unregisterParticipant(eventId, userId);
+                .unregisterParticipant(EVENT_ID, USER_ID);
         assertEquals(expectedMessage, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
@@ -64,18 +63,17 @@ public class EventParticipationControllerTest {
     @Test
     @DisplayName("Get all participants for event")
     public void testGetParticipant() {
-        Long eventId = 2L;
         UserDto alexDto = UserDto.builder()
-                .id(1L)
+                .id(USER_ID)
                 .username("Alex")
                 .email("alex@mail.ru")
                 .build();
         List<UserDto> userDtos = List.of(alexDto);
 
-        when(eventParticipationService.getParticipant(eventId)).thenReturn(userDtos);
-        ResponseEntity<List<UserDto>> responseEntity = eventParticipationController.getParticipant(eventId);
+        when(eventParticipationService.getParticipant(EVENT_ID)).thenReturn(userDtos);
+        ResponseEntity<List<UserDto>> responseEntity = eventParticipationController.getParticipant(EVENT_ID);
 
-        verify(eventParticipationService, times(1)).getParticipant(eventId);
+        verify(eventParticipationService, times(1)).getParticipant(EVENT_ID);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(userDtos, responseEntity.getBody());
     }
@@ -83,13 +81,12 @@ public class EventParticipationControllerTest {
     @Test
     @DisplayName("Get empty list of participants for event")
     public void testGetParticipantEmpty() {
-        Long eventId = 2L;
         List<UserDto> emptyList = Collections.emptyList();
 
-        when(eventParticipationService.getParticipant(eventId)).thenReturn(emptyList);
-        ResponseEntity<List<UserDto>> responseEntity = eventParticipationController.getParticipant(eventId);
+        when(eventParticipationService.getParticipant(EVENT_ID)).thenReturn(emptyList);
+        ResponseEntity<List<UserDto>> responseEntity = eventParticipationController.getParticipant(EVENT_ID);
 
-        verify(eventParticipationService, times(1)).getParticipant(eventId);
+        verify(eventParticipationService, times(1)).getParticipant(EVENT_ID);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(emptyList, responseEntity.getBody());
     }
@@ -97,13 +94,12 @@ public class EventParticipationControllerTest {
     @Test
     @DisplayName("Get count participants for event")
     public void testGetParticipantCount() {
-        Long eventId = 1L;
         int expectedCount = 1;
 
-        when(eventParticipationService.getParticipantCount(eventId)).thenReturn(expectedCount);
-        ResponseEntity<Integer> responseEntity = eventParticipationController.getParticipantsCount(eventId);
+        when(eventParticipationService.getParticipantCount(EVENT_ID)).thenReturn(expectedCount);
+        ResponseEntity<Integer> responseEntity = eventParticipationController.getParticipantsCount(EVENT_ID);
 
-        verify(eventParticipationService, times(1)).getParticipantCount(eventId);
+        verify(eventParticipationService, times(1)).getParticipantCount(EVENT_ID);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(expectedCount, responseEntity.getBody());
     }

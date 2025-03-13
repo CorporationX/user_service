@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -152,9 +153,8 @@ public class EventParticipationServiceTest {
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
         List<UserDto> participants = eventParticipationService.getParticipant(eventId);
-        ArgumentCaptor<List<User>> captor = ArgumentCaptor.forClass(List.class);
 
-        verify(userMapper, times(1)).toListUserDto(captor.capture());
+        verify(userMapper, times(1)).toListUserDto(users);
         verify(eventValidator, times(1)).checkEventExistsById(eventId);
         verify(eventParticipationRepository, times(1))
                 .findAllParticipantsByEventId(eventId);
@@ -163,7 +163,6 @@ public class EventParticipationServiceTest {
         assertEquals(userDtos.get(0).getEmail(), participants.get(0).getEmail());
         assertEquals(userDtos.size(), participants.size());
         assertEquals(userDtos.get(0).getId(), participants.get(0).getId());
-        assertEquals(users.get(0).getEmail(), captor.getValue().get(0).getEmail());
     }
 
     @Test

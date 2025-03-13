@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.PaymentRequest;
 import school.faang.user_service.dto.PaymentResponse;
@@ -29,14 +30,15 @@ public class PremiumService {
     private final PaymentService paymentService;
     private final PremiumMapper premiumMapper;
 
-    public PremiumActivated getPremiumForUserId(Long userId) {
+    public ResponseEntity<PremiumActivated> getPremiumForUserId(Long userId) {
         return premiumRepository.findByUserId(userId)
                 .filter(premium -> premium.getEndDate().isAfter(LocalDateTime.now()))
                 .map(premiumMapper::premiumToPremiumActivated)
-                .orElse(null);
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    public PremiumActivated subscribeToPremium(PremiumRequest premiumRequest) {
+    public ResponseEntity<PremiumActivated> subscribeToPremium(PremiumRequest premiumRequest) {
         validatePremium(premiumRequest);
 
         payPremium(premiumRequest);
@@ -57,7 +59,7 @@ public class PremiumService {
         log.debug("Premium for user {} with start date {} and end date {} created",
                 user.getUsername(), premiumStartDate, premiumEndDate);
 
-        return premiumMapper.premiumToPremiumActivated(premium);
+        return ResponseEntity.ok(premiumMapper.premiumToPremiumActivated(premium));
     }
 
     private User getUserById(long userId) {

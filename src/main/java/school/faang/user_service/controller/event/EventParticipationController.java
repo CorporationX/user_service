@@ -25,13 +25,15 @@ public class EventParticipationController {
     @PostMapping("/{eventId}/register/{userId}")
     public ResponseEntity<String> registerParticipant(@PathVariable Long eventId, @PathVariable Long userId) {
         eventParticipationService.registerParticipant(eventId, userId);
-        return ResponseEntity.ok("User with id %s registered for event with id %s".formatted(userId, eventId));
+        return ResponseEntity.ok("User with id %s registered for event with id %s"
+                .formatted(userId, eventId));
     }
 
     @DeleteMapping("/{eventId}/unregister/{userId}")
     public ResponseEntity<String> unregisterParticipant(@PathVariable Long eventId, @PathVariable Long userId) {
         eventParticipationService.unregisterParticipant(eventId, userId);
-        return ResponseEntity.ok("User with id %s unregistered for event with id %s".formatted(userId, eventId));
+        return ResponseEntity.ok("User with id %s unregistered for event with id %s"
+                .formatted(userId, eventId));
     }
 
     @GetMapping("/{eventId}/participants")

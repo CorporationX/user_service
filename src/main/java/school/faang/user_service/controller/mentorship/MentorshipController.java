@@ -17,45 +17,35 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
 
     public List<Long> getMentees(long userId) {
-        if (isIdValid(userId)) {
-            return mentorshipService.getMentees(userId);
-        }
+        validateId(userId);
 
-        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
+        return mentorshipService.getMentees(userId);
     }
 
     public List<Long> getMentors(long userId) {
-        if (isIdValid(userId)) {
-            return mentorshipService.getMentors(userId);
-        }
+        validateId(userId);
 
-        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
+        return mentorshipService.getMentors(userId);
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
-        if (isIdValid(menteeId) && isIdValid(mentorId)) {
-            mentorshipService.deleteMentee(menteeId, mentorId);
-            return;
-        }
+        validateId(menteeId);
+        validateId(mentorId);
 
-        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
+        mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
-        if (isIdValid(menteeId) && isIdValid(mentorId)) {
-            mentorshipService.deleteMentor(menteeId, mentorId);
-            return;
-        }
+        validateId(menteeId);
+        validateId(mentorId);
 
-        throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
+        mentorshipService.deleteMentor(menteeId, mentorId);
     }
 
-    private boolean isIdValid(long id) {
+    private void validateId(long id) {
         if (id < 1) {
             log.error(MentorshipMessage.INVALID_ID.getMessage(), id);
-            return false;
+            throw new InvalidIdException(ExceptionMessage.INVALID_ID.getMessage());
         }
-
-        return true;
     }
 }

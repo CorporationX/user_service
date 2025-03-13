@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.leaderboard.UserActivityDto;
+import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
+import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
 import school.faang.user_service.enums.UserAction;
 import school.faang.user_service.service.leaderboard.UserActivityService;
 
@@ -22,7 +23,7 @@ public class UserActivityController {
     private final UserActivityService userActivityService;
 
     @PostMapping("record-action")
-    public void recordUserAction(@RequestBody UserActivityDto userDto,
+    public void recordUserAction(@RequestBody UserActivityRequestDto userDto,
                                  @RequestParam("userAction") UserAction userAction) {
         log.info("{}", userDto);
         log.info("Received request to record {} for user with id {}", userAction, userDto.userId());
@@ -31,9 +32,9 @@ public class UserActivityController {
     }
 
     @GetMapping("/top-active-users")//использовать pageable | фильтры
-    public List<UserActivityDto> getTopActiveUsers(@RequestParam("topN") int topN) {
+    public List<UserActivityResponseDto> getTopActiveUsers(@RequestParam("topN") int topN) {
         log.info("Received request to get top {} active users", topN);
-        List<UserActivityDto> topActiveUsers = userActivityService.getTopActiveUsers(topN);
+        List<UserActivityResponseDto> topActiveUsers = userActivityService.getTopActiveUsers(topN);
         log.info("Top {} active users successfully obtained", topN);
         return topActiveUsers;
     }

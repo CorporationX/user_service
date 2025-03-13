@@ -1,6 +1,6 @@
 package school.faang.user_service.dto.leaderboard;
 
-public record UserActivityDto(
+public record UserActivityRequestDto(
         Long id,
         Long userId,
         String username,

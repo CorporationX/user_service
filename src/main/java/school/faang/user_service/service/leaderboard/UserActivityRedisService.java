@@ -7,7 +7,8 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.leaderboard.UserActivityDto;
+import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
+import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.leaderboard.UserActivity;
 
@@ -35,48 +36,50 @@ public class UserActivityRedisService {
     @Value("${app.leaderboard.max-cached-size}")
     private int maxCachedLeaderboardSize;
 
-    public void recordUserAction(UserActivity userActivity, UserActivityDto userDto) {
+    public void recordUserAction(UserActivity userActivity, UserActivityRequestDto userDto) {
         userActivity.setLastUpdated(LocalDateTime.now());
         String userIdStr = String.valueOf(userDto.userId());
-        hashOps.put(USER_HASH_PREFIX + userIdStr, ID_HASH_KEY, String.valueOf(userActivity.getId()));
+        hashOps.put(USER_HASH_PREFIX + userIdStr, ID_HASH_KEY, String.valueOf(userDto.id()));
         hashOps.put(USER_HASH_PREFIX + userIdStr, USERNAME_HASH_KEY, userDto.username());
         hashOps.put(USER_HASH_PREFIX + userIdStr, COUNTRY_HASH_KEY, userDto.country());
         hashOps.put(USER_HASH_PREFIX + userIdStr, RATING_HASH_KEY, String.valueOf(userActivity.getRating()));
         hashOps.put(USER_HASH_PREFIX + userIdStr, LAST_UPDATED_HASH_KEY, String.valueOf(userActivity.getLastUpdated()));
+        zSetOps.add(LEADERBOARD_KEY, userIdStr, userActivity.getRating());
 
         Long size = zSetOps.size(LEADERBOARD_KEY);
         if (size != null && size > maxCachedLeaderboardSize) {
             zSetOps.removeRange(LEADERBOARD_KEY, 0, size - maxCachedLeaderboardSize - 1);
         }
-
-        log.info("Updated rating in redis cache for user with id {} is {}",
-                userDto.userId(), zSetOps.score(LEADERBOARD_KEY, userIdStr));
     }
 
-    public List<UserActivityDto> getTopActiveUsers(int topN) {
+    public List<UserActivityResponseDto> getTopActiveUsers(int topN) {
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, 0, topN - 1);
-        System.out.println(topUserIds);
         return getUserActivities(topUserIds);
     }
 
-    public List<UserActivityDto> getTopActiveUsers(int start, int end) {
+    public List<UserActivityResponseDto> getTopActiveUsers(int start, int end) {
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, start - 1, end - 1);
         return getUserActivities(topUserIds);
     }
 
-    private List<UserActivityDto> getUserActivities(Set<String> topUserIds) {
-        List<UserActivityDto> result = new ArrayList<>();
+    private List<UserActivityResponseDto> getUserActivities(Set<String> topUserIds) {
+        List<UserActivityResponseDto> result = new ArrayList<>();
         if (topUserIds != null) {
             for (String userIdStr : topUserIds) {
-                Double score = zSetOps.score(LEADERBOARD_KEY, userIdStr);
                 String idStr = hashOps.get(USER_HASH_PREFIX + userIdStr, ID_HASH_KEY);
                 String username = hashOps.get(USER_HASH_PREFIX + userIdStr, USERNAME_HASH_KEY);
                 String country = hashOps.get(USER_HASH_PREFIX + userIdStr, COUNTRY_HASH_KEY);
                 String lastUpdatedStr = hashOps.get(USER_HASH_PREFIX + userIdStr, LAST_UPDATED_HASH_KEY);
-                LocalDateTime lastUpdated = lastUpdatedStr != null ? LocalDateTime.parse(lastUpdatedStr) : null;
-                Long id = (idStr != null && !idStr.equals("null")) ? Long.valueOf(idStr) : null;
+                Double scoreDouble = zSetOps.score(LEADERBOARD_KEY, userIdStr);
 
-                User user;
+                LocalDateTime lastUpdated = (lastUpdatedStr != null) ? LocalDateTime.parse(lastUpdatedStr) : null;
+                Long id = (idStr != null && !idStr.equals("null")) ? Long.valueOf(idStr) : null;
+                Long userId = Long.valueOf(userIdStr);
+                Long score = (scoreDouble != null) ? scoreDouble.longValue() : 0L;
+
+                UserActivityResponseDto responseDto = new UserActivityResponseDto(
+                        id, userId, username, country, score);
+                result.add(responseDto);
             }
         }
         return result;

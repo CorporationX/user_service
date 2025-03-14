@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,8 @@ public class GoalInvitationService {
     private final GoalInvitationMapper goalInvitationMapper;
     private final List<GoalInvitationFilter> filters;
 
-    public void createInvitation(@NotNull GoalInvitationDto invitationDto) {
-        GoalInvitationValidation.validateGoalInvitationDtoForCreation(invitationDto, goalInvitationRepository);
+    public void createInvitation(GoalInvitationDto invitationDto) {
+        GoalInvitationValidation.validateGoalInvitationDto(invitationDto);
         goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
         log.info("Goal invitation created successfully for: {}", invitationDto);
     }
@@ -47,15 +46,12 @@ public class GoalInvitationService {
             log.warn("User with ID {} is already working on this goal", goalInvitation.getId());
             return;
         }
-        GoalInvitationValidation.validateGoalInvitationForAcceptance(goalInvitation, goalInvitationRepository);
-        goalInvitation.getInvited().getReceivedGoalInvitations().add(goalInvitation);
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
         log.info("Goal invitation with ID: {} accepted successfully", id);
     }
 
     public void rejectGoalInvitation(long id) {
         GoalInvitation goalInvitation = goalInvitationRepository.getReferenceById(id);
-        GoalInvitationValidation.validateGoalInvitationForRejection(goalInvitation, goalInvitationRepository);
         goalInvitation.getInvited().getReceivedGoalInvitations().remove(goalInvitation);
         goalInvitation.setStatus(RequestStatus.REJECTED);
         log.info("Goal invitation with ID: {} rejected successfully", id);

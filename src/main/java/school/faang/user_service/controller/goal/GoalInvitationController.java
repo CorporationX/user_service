@@ -15,22 +15,30 @@ import java.util.List;
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
-    public void createInvitation(GoalInvitationDto invitationDto) {
+    public Long createInvitation(GoalInvitationDto invitationDto) {
         log.info("Creating goal invitation for: {}", invitationDto);
         goalInvitationService.createInvitation(invitationDto);
+        log.info("Goal invitation for: {} created successfully", invitationDto);
+        return invitationDto.id();
     }
 
     public void acceptGoalInvitation(long id) {
         log.info("Accepting goal invitation with ID: {}", id);
         goalInvitationService.acceptGoalInvitation(id);
+        log.info("Goal invitation with ID: {} accepted successfully", id);
+
     }
 
     public void rejectGoalInvitation(long id) {
         log.info("Rejecting goal invitation with ID: {}", id);
         goalInvitationService.rejectGoalInvitation(id);
+        log.info("Goal invitation with ID: {} rejected successfully", id);
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filterDto) {
-        return goalInvitationService.getInvitations(filterDto);
+        log.info("Getting goal invitations with filter {}", filterDto);
+        var goalInvitations = goalInvitationService.getInvitations(filterDto);
+        log.info("Goal invitations with filter {} received successfully", filterDto);
+        return goalInvitations;
     }
 }

@@ -1,81 +1,41 @@
 package school.faang.user_service.utils.validationUtils;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.goal.GoalInvitationRepository;
-
-import java.util.Objects;
 
 @Slf4j
 public class GoalInvitationValidation {
-    private static final String GOAL_INVITATION_VALIDATION_LOG = "Validating GoalInvitation with ID: {}";
-    private static final String GOAL_INVITATION_VALIDATION_SUCCESS_LOG = "GoalInvitation validation passed successfully";
-    private static final String ERROR_INVITER_ID_NULL = "Inviter ID and Invited User ID cannot be null";
-    private static final String ERROR_SAME_IDS = "Inviter ID and Invited User ID must be different";
-    private static final String ERROR_INVITED_NOT_FOUND = "Invited User doesn't exist in DB";
-    private static final String ERROR_INVITER_NOT_FOUND = "Inviter User doesn't exist in DB";
-    private static final String GOAL_INVITATION_DOES_NOT_EXIST = "Goal invitation with id %d doesn't exist in DB";
-    private static final String INVITED_USER_CANNOT_BE_NULL = "Invited user can't be null";
-    private static final String RECEIVED_GOAL_INVITATIONS_CANNOT_BE_NULL = "Received goal invitations for the invited user cannot be null.";
+    private static final String GOAL_INVITATION_DTO_CANT_BE_NULL = "goalInvitationDto can't be null";
+    private static final String GOAL_INVITATION_ID_CANT_BE_NULL = "Goal invitation id can't be null";
+    private static final String INVITER_ID_IN_CANT_BE_NULL = "Inviter id in goal invitation can't be null";
+    private static final String INVITED_USER_ID_CANT_BE_NULL = "Invited user id in goal invitation can't be null";
+    private static final String GOAL_ID_CANT_BE_NULL = "Goal id in goal invitation can't be null";
+    private static final String REQUEST_STATUS_CANT_BE_NULL = "Request status in goal invitation can't be null";
 
-    public static void validateInvitedUser(GoalInvitation goalInvitation) {
-        if (goalInvitation.getInvited() == null) {
-            log.error(INVITED_USER_CANNOT_BE_NULL);
-            throw new DataValidationException(INVITED_USER_CANNOT_BE_NULL);
+    public static void validateGoalInvitationDto(GoalInvitationDto goalInvitationDto) {
+        if (goalInvitationDto == null) {
+            log.error(GOAL_INVITATION_DTO_CANT_BE_NULL);
+            throw new IllegalArgumentException(GOAL_INVITATION_DTO_CANT_BE_NULL);
         }
-    }
-
-    public static void validateReceivedInvitations(GoalInvitation goalInvitation) {
-        if (goalInvitation.getInvited().getReceivedGoalInvitations() == null) {
-            log.error(RECEIVED_GOAL_INVITATIONS_CANNOT_BE_NULL);
-            throw new DataValidationException(RECEIVED_GOAL_INVITATIONS_CANNOT_BE_NULL);
+        if (goalInvitationDto.id() == null) {
+            log.error(GOAL_INVITATION_ID_CANT_BE_NULL);
+            throw new IllegalArgumentException(GOAL_INVITATION_DTO_CANT_BE_NULL);
         }
-    }
-
-    public static void validateGoalInvitationDtoForCreation(GoalInvitationDto invitationDto, GoalInvitationRepository goalInvitationRepository) {
-        log.info("Validating GoalInvitationDto: {}", invitationDto);
-        if (invitationDto.inviterId() == null || invitationDto.invitedUserId() == null) {
-            log.error(ERROR_INVITER_ID_NULL);
-            throw new DataValidationException(ERROR_INVITER_ID_NULL);
+        if (goalInvitationDto.inviterId() == null) {
+            log.error(INVITER_ID_IN_CANT_BE_NULL);
+            throw new IllegalArgumentException(INVITER_ID_IN_CANT_BE_NULL);
         }
-        if (Objects.equals(invitationDto.inviterId(), invitationDto.invitedUserId())) {
-            log.error(ERROR_SAME_IDS);
-            throw new DataValidationException(ERROR_SAME_IDS);
+        if (goalInvitationDto.invitedUserId() == null) {
+            log.error(INVITED_USER_ID_CANT_BE_NULL);
+            throw new IllegalArgumentException(INVITED_USER_ID_CANT_BE_NULL);
         }
-        if (!goalInvitationRepository.existsByInvitedId(invitationDto.invitedUserId())) {
-            log.error(ERROR_INVITED_NOT_FOUND);
-            throw new DataValidationException(ERROR_INVITED_NOT_FOUND);
+        if (goalInvitationDto.goalId() == null) {
+            log.error(GOAL_ID_CANT_BE_NULL);
+            throw new IllegalArgumentException(GOAL_ID_CANT_BE_NULL);
         }
-        if (!goalInvitationRepository.existsByInviterId(invitationDto.inviterId())) {
-            log.error(ERROR_INVITER_NOT_FOUND);
-            throw new DataValidationException(ERROR_INVITER_NOT_FOUND);
+        if (goalInvitationDto.status() == null) {
+            log.error(REQUEST_STATUS_CANT_BE_NULL);
+            throw new IllegalArgumentException(REQUEST_STATUS_CANT_BE_NULL);
         }
-        log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
-    }
-
-    public static void validateGoalInvitationForAcceptance(GoalInvitation goalInvitation, GoalInvitationRepository goalInvitationRepository) {
-        log.info(GOAL_INVITATION_VALIDATION_LOG, goalInvitation.getId());
-        if (!goalInvitationRepository.existsById(goalInvitation.getId())) {
-            log.error(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
-            throw new DataValidationException(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
-        }
-        validateInvitedUser(goalInvitation);
-        validateReceivedInvitations(goalInvitation);
-        log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
-    }
-
-    public static void validateGoalInvitationForRejection(GoalInvitation goalInvitation, GoalInvitationRepository goalInvitationRepository) {
-        log.info(GOAL_INVITATION_VALIDATION_LOG, goalInvitation.getId());
-        if (!goalInvitationRepository.existsById(goalInvitation.getId())) {
-            log.error(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
-            throw new DataValidationException(String.format(GOAL_INVITATION_DOES_NOT_EXIST, goalInvitation.getId()));
-        }
-        validateInvitedUser(goalInvitation);
-        validateReceivedInvitations(goalInvitation);
-        log.info(GOAL_INVITATION_VALIDATION_SUCCESS_LOG);
     }
 }

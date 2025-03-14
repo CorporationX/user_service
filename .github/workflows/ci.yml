@@ -29,25 +29,25 @@ jobs:
       - name: Run tests
         id: tests
         run: ./gradlew test
-               - name: Comment on PR if tests fail
-               if: ${{ failure() && github.event_name == 'pull_request' }}
-               uses: actions/github-script@v6
-               with:
-                 github-token: ${{ secrets.GITHUB_TOKEN }}
-                 script: |
-                   const { data: comments } = await github.rest.issues.listComments({
-                     owner: context.repo.owner,
-                     repo: context.repo.repo,
-                     issue_number: context.issue.number,
-                   });
-                   
-                   const hasExistingComment = comments.some(comment => comment.body.includes("Один ил несколько тестов были неудачны"));
-                   
-                   if (!hasExistingComment) {
-                     await github.rest.issues.createComment({
-                       owner: context.repo.owner,
-                       repo: context.repo.repo,
-                       issue_number: context.issue.number,
-                       body: "Сборка не произведена из-за неудачных тестов. Проверьте логи и исправьте ошибки.",
-                     });
-                   }
+      - name: Comment on PR if tests fail
+        if: ${{ failure() && github.event_name == 'pull_request' }}
+        uses: actions/github-script@v6
+        with:
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+         script: |
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              
+              const hasExistingComment = comments.some(comment => comment.body.includes("Один или несколько тестов были неудачны"));
+              
+              if (!hasExistingComment) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: "Сборка не произведена из-за неудачных тестов. Проверьте логи и исправьте ошибки.",
+                });
+              }

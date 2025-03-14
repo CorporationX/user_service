@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.leaderboard.UserActivity;
 import school.faang.user_service.mapper.UserActivityMapper;
 import school.faang.user_service.repository.CountryRepository;
@@ -13,6 +16,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.leaderboard.UserActivityRepository;
 
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Component
@@ -36,13 +40,13 @@ public class FillDB {
                     userActivityMapper.toUserActivityRequestDto(userActivity));
         }
         log.info("Cache warm-up completed successfully");
-        return;
+
        /* Random random = new Random();
         Country country = Country.builder()
                 .title("country")
                 .build();
         countryRepository.save(country);
-        for (int i = 0; i < 10000; ++i) {
+        for (int i = 0; i < 50000; ++i) {
             User user = User.builder()
                     .username("username " + i)
                     .country(country)
@@ -51,8 +55,8 @@ public class FillDB {
                     .active(true)
                     .build();
             userRepository.save(user);
-            UserActivityDto dto = new UserActivityDto((long) i, user.getId(), "username " + i, country.getTitle());
-            userActivityService.recordUserAction(dto, random.nextInt(1000, 1000000000));
+            UserActivityRequestDto dto = new UserActivityRequestDto((long) i, user.getId(), "username " + i, country.getTitle());
+            userActivityService.recordUserAction(dto, random.nextInt(1000, 1_000_000_000));
         }
         log.info("COMPLETED");*/
     }

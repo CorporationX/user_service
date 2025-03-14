@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
 import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
@@ -14,6 +15,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.leaderboard.UserActivityRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,13 +29,15 @@ public class UserActivityService {
     private int maxCachedLeaderboardSize;
 
     public void recordUserAction(UserActivityRequestDto userActivityDto, int rating) {
-        UserActivity userActivity = userActivityRepository.findByUserId(userActivityDto.id());
-        if (userActivity == null) {
+        Optional<UserActivity> optionalUserActivity = userActivityRepository.findById(userActivityDto.id());
+        UserActivity userActivity;
+        if (optionalUserActivity.isEmpty()) {
             userActivity = new UserActivity();
             userActivity.setRating(rating);
             userActivity.setUser(userRepository.findById(userActivityDto.userId()).orElseThrow(
                     () -> new IllegalArgumentException("UserId doesn't exists in DB")));
         } else {
+            userActivity = optionalUserActivity.get();
             userActivity.setRating(userActivity.getRating() + rating);
         }
         userActivityRepository.save(userActivity);

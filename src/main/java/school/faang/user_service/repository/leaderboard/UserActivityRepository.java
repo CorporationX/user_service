@@ -8,8 +8,6 @@ import school.faang.user_service.entity.leaderboard.UserActivity;
 import java.util.List;
 
 public interface UserActivityRepository extends JpaRepository<UserActivity, Long> {
-    UserActivity findByUserId(Long userId);
-
     @Query("""
             SELECT u FROM UserActivity as u
             ORDER BY u.rating DESC

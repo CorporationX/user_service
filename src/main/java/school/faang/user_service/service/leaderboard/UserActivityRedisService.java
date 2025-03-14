@@ -1,17 +1,21 @@
 package school.faang.user_service.service.leaderboard;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
 import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.leaderboard.UserActivity;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +34,6 @@ public class UserActivityRedisService {
     private static final String USERNAME_HASH_KEY = "username:";
     private static final String COUNTRY_HASH_KEY = "country:";
     private static final String RATING_HASH_KEY = "rating:";
-    private static final String LAST_UPDATED_HASH_KEY = "lastUpdated:";
     private static final String ID_HASH_KEY = "id:";
 
     @Value("${app.leaderboard.max-cached-size}")
@@ -43,7 +46,6 @@ public class UserActivityRedisService {
         hashOps.put(USER_HASH_PREFIX + userIdStr, USERNAME_HASH_KEY, userDto.username());
         hashOps.put(USER_HASH_PREFIX + userIdStr, COUNTRY_HASH_KEY, userDto.country());
         hashOps.put(USER_HASH_PREFIX + userIdStr, RATING_HASH_KEY, String.valueOf(userActivity.getRating()));
-        hashOps.put(USER_HASH_PREFIX + userIdStr, LAST_UPDATED_HASH_KEY, String.valueOf(userActivity.getLastUpdated()));
         zSetOps.add(LEADERBOARD_KEY, userIdStr, userActivity.getRating());
 
         Long size = zSetOps.size(LEADERBOARD_KEY);
@@ -64,24 +66,50 @@ public class UserActivityRedisService {
 
     private List<UserActivityResponseDto> getUserActivities(Set<String> topUserIds) {
         List<UserActivityResponseDto> result = new ArrayList<>();
-        if (topUserIds != null) {
+        if (topUserIds == null || topUserIds.isEmpty()) {
+            return result;
+        }
+
+        List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            List<Object> results = new ArrayList<>();
             for (String userIdStr : topUserIds) {
-                String idStr = hashOps.get(USER_HASH_PREFIX + userIdStr, ID_HASH_KEY);
-                String username = hashOps.get(USER_HASH_PREFIX + userIdStr, USERNAME_HASH_KEY);
-                String country = hashOps.get(USER_HASH_PREFIX + userIdStr, COUNTRY_HASH_KEY);
-                String lastUpdatedStr = hashOps.get(USER_HASH_PREFIX + userIdStr, LAST_UPDATED_HASH_KEY);
-                Double scoreDouble = zSetOps.score(LEADERBOARD_KEY, userIdStr);
-
-                LocalDateTime lastUpdated = (lastUpdatedStr != null) ? LocalDateTime.parse(lastUpdatedStr) : null;
-                Long id = (idStr != null && !idStr.equals("null")) ? Long.valueOf(idStr) : null;
-                Long userId = Long.valueOf(userIdStr);
-                Long score = (scoreDouble != null) ? scoreDouble.longValue() : 0L;
-
-                UserActivityResponseDto responseDto = new UserActivityResponseDto(
-                        id, userId, username, country, score);
-                result.add(responseDto);
+                String key = USER_HASH_PREFIX + userIdStr;
+                results.add(connection.hashCommands().hGet(
+                        key.getBytes(StandardCharsets.UTF_8),
+                        ID_HASH_KEY.getBytes(StandardCharsets.UTF_8)
+                ));
+                results.add(connection.hashCommands().hGet(
+                        key.getBytes(StandardCharsets.UTF_8),
+                        USERNAME_HASH_KEY.getBytes(StandardCharsets.UTF_8)
+                ));
+                results.add(connection.hashCommands().hGet(
+                        key.getBytes(StandardCharsets.UTF_8),
+                        COUNTRY_HASH_KEY.getBytes(StandardCharsets.UTF_8)
+                ));
+                results.add(connection.zSetCommands().zScore(
+                        LEADERBOARD_KEY.getBytes(StandardCharsets.UTF_8),
+                        userIdStr.getBytes(StandardCharsets.UTF_8)
+                ));
             }
+            return null;
+        });
+
+        int index = 0;
+        for (String userIdStr : topUserIds) {
+            String idStr = (String) pipelineResults.get(index++);
+            String username = (String) pipelineResults.get(index++);
+            String country = (String) pipelineResults.get(index++);
+            Double scoreDouble = (Double) pipelineResults.get(index++);
+
+            Long id = (idStr != null && !idStr.equals("null")) ? Long.valueOf(idStr) : null;
+            Long userId = Long.valueOf(userIdStr);
+            Long score = (scoreDouble != null) ? scoreDouble.longValue() : 0L;
+
+            UserActivityResponseDto responseDto = new UserActivityResponseDto(
+                    id, userId, username, country, score);
+            result.add(responseDto);
         }
         return result;
     }
+
 }

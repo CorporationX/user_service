@@ -28,10 +28,12 @@ public class GoalInvitationService {
     private final GoalInvitationMapper goalInvitationMapper;
     private final List<GoalInvitationFilter> filters;
 
-    public void createInvitation(GoalInvitationDto invitationDto) {
+    public GoalInvitation createInvitation(GoalInvitationDto invitationDto) {
         GoalInvitationValidation.validateGoalInvitationDto(invitationDto);
-        goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
+        GoalInvitation createdInvitation = goalInvitationRepository.save(
+                goalInvitationMapper.toEntity(invitationDto));
         log.info("Goal invitation created successfully for: {}", invitationDto);
+        return createdInvitation;
     }
 
     public void acceptGoalInvitation(long id) {

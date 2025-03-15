@@ -16,24 +16,19 @@ public class GoalInvitationValidation {
         if (goalInvitationDto == null) {
             log.error(GOAL_INVITATION_DTO_CANT_BE_NULL);
             throw new IllegalArgumentException(GOAL_INVITATION_DTO_CANT_BE_NULL);
-        }
-        if (goalInvitationDto.id() == null) {
+        } else if (goalInvitationDto.id() == null) {
             log.error(GOAL_INVITATION_ID_CANT_BE_NULL);
             throw new IllegalArgumentException(GOAL_INVITATION_DTO_CANT_BE_NULL);
-        }
-        if (goalInvitationDto.inviterId() == null) {
+        } else if (goalInvitationDto.inviterId() == null) {
             log.error(INVITER_ID_IN_CANT_BE_NULL);
             throw new IllegalArgumentException(INVITER_ID_IN_CANT_BE_NULL);
-        }
-        if (goalInvitationDto.invitedUserId() == null) {
+        } else if (goalInvitationDto.invitedUserId() == null) {
             log.error(INVITED_USER_ID_CANT_BE_NULL);
             throw new IllegalArgumentException(INVITED_USER_ID_CANT_BE_NULL);
-        }
-        if (goalInvitationDto.goalId() == null) {
+        } else if (goalInvitationDto.goalId() == null) {
             log.error(GOAL_ID_CANT_BE_NULL);
             throw new IllegalArgumentException(GOAL_ID_CANT_BE_NULL);
-        }
-        if (goalInvitationDto.status() == null) {
+        } else if (goalInvitationDto.status() == null) {
             log.error(REQUEST_STATUS_CANT_BE_NULL);
             throw new IllegalArgumentException(REQUEST_STATUS_CANT_BE_NULL);
         }

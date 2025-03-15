@@ -17,9 +17,9 @@ public class GoalInvitationController {
 
     public Long createInvitation(GoalInvitationDto invitationDto) {
         log.info("Creating goal invitation for: {}", invitationDto);
-        goalInvitationService.createInvitation(invitationDto);
+        Long id = goalInvitationService.createInvitation(invitationDto).getId();
         log.info("Goal invitation for: {} created successfully", invitationDto);
-        return invitationDto.id();
+        return id;
     }
 
     public void acceptGoalInvitation(long id) {

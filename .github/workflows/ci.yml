@@ -1,0 +1,41 @@
+name: ci.yml
+on:
+  pull_request:
+    branches:
+      - murloc-master-stream9
+  push:
+    branches:
+      - murloc-master-stream9
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Получить код из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Установить Java (любой дистрибутив)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Шаг 3: Кэширование зависимостей Gradle
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/gradle.lockfile') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Шаг 4: Изменить права доступа для скриптов (chmod)
+      - name: Make script executable
+        run: chmod +x gradlew
+
+      # Шаг 5: Собрать проект и запустить тесты
+      - name: Build and test
+        run: ./

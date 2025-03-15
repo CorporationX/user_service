@@ -38,4 +38,4 @@ jobs:
 
       # Шаг 5: Собрать проект и запустить тесты
       - name: Build and test
-        run: ./
+        run: ./gradlew clean test

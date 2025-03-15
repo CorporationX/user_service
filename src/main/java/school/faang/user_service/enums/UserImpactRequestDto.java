@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserImpact {
+public enum UserImpactRequestDto {
     EVENT_INVITATION_RECEIVED(5),
     FRIEND_REQUEST_RECEIVED(3),
     MENTIONED_IN_COMMENT(4),

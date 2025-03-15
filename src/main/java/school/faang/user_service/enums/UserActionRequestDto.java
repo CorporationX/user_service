@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserAction {
+public enum UserActionRequestDto {
     EVENT_STARTED(10),
     EVENT_JOINED(5),
     DAILY_CHECK_IN(2),

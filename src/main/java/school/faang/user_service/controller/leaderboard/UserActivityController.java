@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
 import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
-import school.faang.user_service.enums.UserAction;
+import school.faang.user_service.enums.UserActionRequestDto;
 import school.faang.user_service.service.leaderboard.UserActivityService;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class UserActivityController {
 
     @PostMapping("record-action")
     public void recordUserAction(@RequestBody UserActivityRequestDto userDto,
-                                 @RequestParam("userAction") UserAction userAction) {
+                                 @RequestParam("userAction") UserActionRequestDto userAction) {
         log.info("{}", userDto);
         log.info("Received request to record {} for user with id {}", userAction, userDto.userId());
         userActivityService.recordUserAction(userDto, userAction.getRating());

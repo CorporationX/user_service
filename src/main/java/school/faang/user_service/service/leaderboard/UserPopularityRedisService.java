@@ -8,9 +8,9 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
-import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
-import school.faang.user_service.entity.leaderboard.UserActivity;
+import school.faang.user_service.dto.leaderboard.UserPopularityRequestDto;
+import school.faang.user_service.dto.leaderboard.UserPopularityResponseDto;
+import school.faang.user_service.entity.leaderboard.UserImpact;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -21,30 +21,29 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserActivityRedisService {
+public class UserPopularityRedisService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ZSetOperations<String, String> zSetOps;
     private final HashOperations<String, String, String> hashOps;
     private final ReentrantLock lock = new ReentrantLock();
 
-    private static final String LEADERBOARD_KEY = "activityLeaderboard";
-    private static final String USER_HASH_PREFIX = "activityUser:";
-    private static final String USERNAME_HASH_KEY = "activityUsername:";
-    private static final String COUNTRY_HASH_KEY = "activityCountry:";
-    private static final String RATING_HASH_KEY = "activityRating:";
-    private static final String ID_HASH_KEY = "activityId:";
-
+    private static final String LEADERBOARD_KEY = "popularityLeaderboard";
+    private static final String USER_HASH_PREFIX = "popularityUser:";
+    private static final String USERNAME_HASH_KEY = "popularityUsername:";
+    private static final String COUNTRY_HASH_KEY = "popularityCountry:";
+    private static final String RATING_HASH_KEY = "popularityRating:";
+    private static final String ID_HASH_KEY = "popularityId:";
     @Value("${app.leaderboard.max-cached-size}")
     private int maxCachedLeaderboardSize;
 
-    public void recordUserAction(UserActivity userActivity, UserActivityRequestDto userDto) {
+    public void recordUserImpact(UserImpact userImpact, UserPopularityRequestDto userDto) {
         String userIdStr = String.valueOf(userDto.userId());
         String userKey = USER_HASH_PREFIX + userIdStr;
         hashOps.put(userKey, ID_HASH_KEY, String.valueOf(userDto.id()));
         hashOps.put(userKey, USERNAME_HASH_KEY, userDto.username());
         hashOps.put(userKey, COUNTRY_HASH_KEY, userDto.country());
-        hashOps.put(userKey, RATING_HASH_KEY, String.valueOf(userActivity.getRating()));
-        zSetOps.add(LEADERBOARD_KEY, userIdStr, userActivity.getRating());
+        hashOps.put(userKey, RATING_HASH_KEY, String.valueOf(userImpact.getRating()));
+        zSetOps.add(LEADERBOARD_KEY, userIdStr, userImpact.getRating());
 
         lock.lock();
         Long size = zSetOps.size(LEADERBOARD_KEY);
@@ -59,21 +58,21 @@ public class UserActivityRedisService {
         lock.unlock();
     }
 
-    public List<UserActivityResponseDto> getTopActiveUsers(int topN) {
+    public List<UserPopularityResponseDto> getTopImpactUsers(int topN) {
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, 0, topN - 1);
-        return getUserActivities(topUserIds);
+        return getUserImpacts(topUserIds);
     }
 
-    public List<UserActivityResponseDto> getTopActiveUsers(int start, int end) {
+    public List<UserPopularityResponseDto> getTopImpactUsers(int start, int end) {
         if (end > start) {
             return new ArrayList<>();
         }
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, start - 1, end - 1);
-        return getUserActivities(topUserIds);
+        return getUserImpacts(topUserIds);
     }
 
-    private List<UserActivityResponseDto> getUserActivities(Set<String> topUserIds) {
-        List<UserActivityResponseDto> result = new ArrayList<>();
+    private List<UserPopularityResponseDto> getUserImpacts(Set<String> topUserIds) {
+        List<UserPopularityResponseDto> result = new ArrayList<>();
         if (topUserIds == null || topUserIds.isEmpty()) {
             return result;
         }
@@ -113,7 +112,7 @@ public class UserActivityRedisService {
             Long userId = Long.valueOf(userIdStr);
             Long score = (scoreDouble != null) ? scoreDouble.longValue() : 0L;
 
-            UserActivityResponseDto responseDto = new UserActivityResponseDto(
+            UserPopularityResponseDto responseDto = new UserPopularityResponseDto(
                     id, userId, username, country, score);
             result.add(responseDto);
         }

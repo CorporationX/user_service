@@ -8,13 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.client.RestTemplate;
-import school.faang.user_service.service.leaderboard.FillDB;
+import school.faang.user_service.service.leaderboard.RedisWarmUpService;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")
@@ -34,32 +29,5 @@ public class UserServiceApplication {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
-    }
-
-    @Bean
-    CommandLineRunner init(FillDB fillDB) {
-        return args -> fillDB.work();
-    }
-
-    @Bean
-    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
-    }
-
-    @Bean
-    public ZSetOperations<String, String> zSetOperations(RedisTemplate<String, String> redisTemplate) {
-        return redisTemplate.opsForZSet();
-    }
-
-    @Bean
-    public HashOperations<String, String, String> hashOperations(RedisTemplate<String, String> redisTemplate) {
-        return redisTemplate.opsForHash();
     }
 }

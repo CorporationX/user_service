@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Service
@@ -28,30 +29,38 @@ public class UserActivityRedisService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ZSetOperations<String, String> zSetOps;
     private final HashOperations<String, String, String> hashOps;
+    private final ReentrantLock lock = new ReentrantLock();
 
-    private static final String LEADERBOARD_KEY = "leaderboard";
-    private static final String USER_HASH_PREFIX = "user:";
-    private static final String USERNAME_HASH_KEY = "username:";
-    private static final String COUNTRY_HASH_KEY = "country:";
-    private static final String RATING_HASH_KEY = "rating:";
-    private static final String ID_HASH_KEY = "id:";
+    private static final String LEADERBOARD_KEY = "activityLeaderboard";
+    private static final String USER_HASH_PREFIX = "activityUser:";
+    private static final String USERNAME_HASH_KEY = "activityUsername:";
+    private static final String COUNTRY_HASH_KEY = "activityCountry:";
+    private static final String RATING_HASH_KEY = "activityRating:";
+    private static final String ID_HASH_KEY = "activityId:";
 
     @Value("${app.leaderboard.max-cached-size}")
     private int maxCachedLeaderboardSize;
 
     public void recordUserAction(UserActivity userActivity, UserActivityRequestDto userDto) {
-        userActivity.setLastUpdated(LocalDateTime.now());
         String userIdStr = String.valueOf(userDto.userId());
-        hashOps.put(USER_HASH_PREFIX + userIdStr, ID_HASH_KEY, String.valueOf(userDto.id()));
-        hashOps.put(USER_HASH_PREFIX + userIdStr, USERNAME_HASH_KEY, userDto.username());
-        hashOps.put(USER_HASH_PREFIX + userIdStr, COUNTRY_HASH_KEY, userDto.country());
-        hashOps.put(USER_HASH_PREFIX + userIdStr, RATING_HASH_KEY, String.valueOf(userActivity.getRating()));
+        String userKey = USER_HASH_PREFIX + userIdStr;
+        hashOps.put(userKey, ID_HASH_KEY, String.valueOf(userDto.id()));
+        hashOps.put(userKey, USERNAME_HASH_KEY, userDto.username());
+        hashOps.put(userKey, COUNTRY_HASH_KEY, userDto.country());
+        hashOps.put(userKey, RATING_HASH_KEY, String.valueOf(userActivity.getRating()));
         zSetOps.add(LEADERBOARD_KEY, userIdStr, userActivity.getRating());
 
+        lock.lock();
         Long size = zSetOps.size(LEADERBOARD_KEY);
         if (size != null && size > maxCachedLeaderboardSize) {
-            zSetOps.removeRange(LEADERBOARD_KEY, 0, size - maxCachedLeaderboardSize - 1);
+            Set<String> removedUserSet = zSetOps.range(LEADERBOARD_KEY, 0, 0);
+            if (removedUserSet != null && !removedUserSet.isEmpty()) {
+                String removedUserId = removedUserSet.iterator().next();
+                zSetOps.remove(LEADERBOARD_KEY, removedUserId);
+                redisTemplate.delete(USER_HASH_PREFIX + removedUserId);
+            }
         }
+        lock.unlock();
     }
 
     public List<UserActivityResponseDto> getTopActiveUsers(int topN) {

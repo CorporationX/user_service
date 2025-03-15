@@ -1,6 +1,7 @@
 package school.faang.user_service.service.leaderboard;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +42,7 @@ public class UserActivityService {
             userActivity.setRating(userActivity.getRating() + rating);
         }
         userActivityRepository.save(userActivity);
-        userActivityRedisService.recordUserAction(userActivity, userActivityDto);
+        //userActivityRedisService.recordUserAction(userActivity, userActivityDto);
         log.info("Updated rating for user with id {} is {}", userActivityDto.userId(), userActivity.getRating());
     }
 

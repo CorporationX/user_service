@@ -1,6 +1,6 @@
 app:
   leaderboard:
-    max-cached-size: 1000
+    max-cached-size: 100
 
 spring:
   datasource:
@@ -11,7 +11,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: false
     properties:
       hibernate:

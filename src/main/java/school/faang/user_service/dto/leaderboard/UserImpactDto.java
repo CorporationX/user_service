@@ -1,11 +1,11 @@
-package school.faang.user_service.enums;
+package school.faang.user_service.dto.leaderboard;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserImpactRequestDto {
+public enum UserImpactDto {
     EVENT_INVITATION_RECEIVED(5),
     FRIEND_REQUEST_RECEIVED(3),
     MENTIONED_IN_COMMENT(4),

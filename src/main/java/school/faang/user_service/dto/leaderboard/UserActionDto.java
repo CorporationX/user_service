@@ -1,11 +1,11 @@
-package school.faang.user_service.enums;
+package school.faang.user_service.dto.leaderboard;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserActionRequestDto {
+public enum UserActionDto {
     EVENT_STARTED(10),
     EVENT_JOINED(5),
     DAILY_CHECK_IN(2),

@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @Table(name = "user_popularity")
-public class UserImpact {
+public class UserPopularity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +36,6 @@ public class UserImpact {
     @Column(name = "last_updated", nullable = false)
     private LocalDateTime lastUpdated;
 
-    @Column(name = "rating", nullable = false)
-    private long rating;
+    @Column(name = "impact", nullable = false)
+    private long impact;
 }

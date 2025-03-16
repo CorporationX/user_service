@@ -37,12 +37,12 @@ public class UserActivityRedisService {
     @Value("${app.leaderboard.max-cached-size}")
     private int maxCachedLeaderboardSize;
 
-    public void recordUserAction(UserActivity userActivity, UserActivityRequestDto userDto) {
-        String userIdStr = String.valueOf(userDto.userId());
+    public void recordUserAction(UserActivity userActivity, UserActivityRequestDto activityDto) {
+        String userIdStr = String.valueOf(activityDto.userId());
         String userKey = USER_HASH_PREFIX + userIdStr;
-        hashOps.put(userKey, ID_HASH_KEY, String.valueOf(userDto.id()));
-        hashOps.put(userKey, USERNAME_HASH_KEY, userDto.username());
-        hashOps.put(userKey, COUNTRY_HASH_KEY, userDto.country());
+        hashOps.put(userKey, ID_HASH_KEY, String.valueOf(activityDto.id()));
+        hashOps.put(userKey, USERNAME_HASH_KEY, activityDto.username());
+        hashOps.put(userKey, COUNTRY_HASH_KEY, activityDto.country());
         hashOps.put(userKey, RATING_HASH_KEY, String.valueOf(userActivity.getRating()));
         zSetOps.add(LEADERBOARD_KEY, userIdStr, userActivity.getRating());
 
@@ -65,9 +65,6 @@ public class UserActivityRedisService {
     }
 
     public List<UserActivityResponseDto> getTopActiveUsers(int start, int end) {
-        if (end > start) {
-            return new ArrayList<>();
-        }
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, start - 1, end - 1);
         return getUserActivities(topUserIds);
     }
@@ -113,8 +110,7 @@ public class UserActivityRedisService {
             Long userId = Long.valueOf(userIdStr);
             Long score = (scoreDouble != null) ? scoreDouble.longValue() : 0L;
 
-            UserActivityResponseDto responseDto = new UserActivityResponseDto(
-                    id, userId, username, country, score);
+            UserActivityResponseDto responseDto = new UserActivityResponseDto(id, userId, username, country, score);
             result.add(responseDto);
         }
         return result;

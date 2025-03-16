@@ -5,6 +5,6 @@ public record UserPopularityResponseDto(
         Long userId,
         String username,
         String country,
-        Long rating
+        Long impact
 ) {
 }

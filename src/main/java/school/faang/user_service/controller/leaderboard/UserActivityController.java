@@ -3,6 +3,7 @@ package school.faang.user_service.controller.leaderboard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
 import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
-import school.faang.user_service.enums.UserActionRequestDto;
 import school.faang.user_service.service.leaderboard.UserActivityService;
 
 import java.util.List;
@@ -22,20 +22,30 @@ import java.util.List;
 public class UserActivityController {
     private final UserActivityService userActivityService;
 
-    @PostMapping("record-action")
-    public void recordUserAction(@RequestBody UserActivityRequestDto userDto,
-                                 @RequestParam("userAction") UserActionRequestDto userAction) {
-        log.info("{}", userDto);
-        log.info("Received request to record {} for user with id {}", userAction, userDto.userId());
-        userActivityService.recordUserAction(userDto, userAction.getRating());
-        log.info("{} successfully recorded for user with id {}", userAction, userDto.userId());
+    @PostMapping("/action")
+    public void recordUserAction(@RequestBody UserActivityRequestDto userActivityRequestDto) {
+        log.info("{}", userActivityRequestDto);
+        log.info("Received request to record {} for user with id {}",
+                userActivityRequestDto.userAction(), userActivityRequestDto.userId());
+        userActivityService.recordUserAction(userActivityRequestDto, userActivityRequestDto.userAction());
+        log.info("{} successfully recorded for user with id {}",
+                userActivityRequestDto.userAction(), userActivityRequestDto.userId());
     }
 
-    @GetMapping("/top-active-users")//использовать pageable | фильтры
-    public List<UserActivityResponseDto> getTopActiveUsers(@RequestParam("topN") int topN) {
+    @GetMapping("/top/{topN}")
+    public List<UserActivityResponseDto> getTopActiveUsers(@PathVariable("topN") int topN) {
         log.info("Received request to get top {} active users", topN);
         List<UserActivityResponseDto> topActiveUsers = userActivityService.getTopActiveUsers(topN);
         log.info("Top {} active users successfully obtained", topN);
+        return topActiveUsers;
+    }
+
+    @GetMapping("/top/range")
+    public List<UserActivityResponseDto> getTopActiveUsers(@RequestParam("start") int start,
+                                                           @RequestParam("end") int end) {
+        log.info("Received request to get top active users in range [{}, {}]", start, end);
+        List<UserActivityResponseDto> topActiveUsers = userActivityService.getTopActiveUsers(start, end);
+        log.info("Top [{}, {}] active users successfully obtained", start, end);
         return topActiveUsers;
     }
 }

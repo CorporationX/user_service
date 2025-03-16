@@ -4,6 +4,7 @@ public record UserPopularityRequestDto(
         Long id,
         Long userId,
         String username,
-        String country
+        String country,
+        UserImpactDto userImpact
 ) {
 }

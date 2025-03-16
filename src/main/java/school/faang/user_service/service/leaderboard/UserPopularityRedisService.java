@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.leaderboard.UserPopularityRequestDto;
 import school.faang.user_service.dto.leaderboard.UserPopularityResponseDto;
-import school.faang.user_service.entity.leaderboard.UserImpact;
+import school.faang.user_service.entity.leaderboard.UserPopularity;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -31,19 +31,19 @@ public class UserPopularityRedisService {
     private static final String USER_HASH_PREFIX = "popularityUser:";
     private static final String USERNAME_HASH_KEY = "popularityUsername:";
     private static final String COUNTRY_HASH_KEY = "popularityCountry:";
-    private static final String RATING_HASH_KEY = "popularityRating:";
+    private static final String RATING_HASH_KEY = "popularityImpact:";
     private static final String ID_HASH_KEY = "popularityId:";
     @Value("${app.leaderboard.max-cached-size}")
     private int maxCachedLeaderboardSize;
 
-    public void recordUserImpact(UserImpact userImpact, UserPopularityRequestDto userDto) {
-        String userIdStr = String.valueOf(userDto.userId());
+    public void recordUserImpact(UserPopularity userImpact, UserPopularityRequestDto popularityDto) {
+        String userIdStr = String.valueOf(popularityDto.userId());
         String userKey = USER_HASH_PREFIX + userIdStr;
-        hashOps.put(userKey, ID_HASH_KEY, String.valueOf(userDto.id()));
-        hashOps.put(userKey, USERNAME_HASH_KEY, userDto.username());
-        hashOps.put(userKey, COUNTRY_HASH_KEY, userDto.country());
-        hashOps.put(userKey, RATING_HASH_KEY, String.valueOf(userImpact.getRating()));
-        zSetOps.add(LEADERBOARD_KEY, userIdStr, userImpact.getRating());
+        hashOps.put(userKey, ID_HASH_KEY, String.valueOf(popularityDto.id()));
+        hashOps.put(userKey, USERNAME_HASH_KEY, popularityDto.username());
+        hashOps.put(userKey, COUNTRY_HASH_KEY, popularityDto.country());
+        hashOps.put(userKey, RATING_HASH_KEY, String.valueOf(userImpact.getImpact()));
+        zSetOps.add(LEADERBOARD_KEY, userIdStr, userImpact.getImpact());
 
         lock.lock();
         Long size = zSetOps.size(LEADERBOARD_KEY);
@@ -58,20 +58,17 @@ public class UserPopularityRedisService {
         lock.unlock();
     }
 
-    public List<UserPopularityResponseDto> getTopImpactUsers(int topN) {
+    public List<UserPopularityResponseDto> getTopPopularUsers(int topN) {
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, 0, topN - 1);
-        return getUserImpacts(topUserIds);
+        return getUsers(topUserIds);
     }
 
-    public List<UserPopularityResponseDto> getTopImpactUsers(int start, int end) {
-        if (end > start) {
-            return new ArrayList<>();
-        }
+    public List<UserPopularityResponseDto> getTopPopularUsers(int start, int end) {
         Set<String> topUserIds = zSetOps.reverseRange(LEADERBOARD_KEY, start - 1, end - 1);
-        return getUserImpacts(topUserIds);
+        return getUsers(topUserIds);
     }
 
-    private List<UserPopularityResponseDto> getUserImpacts(Set<String> topUserIds) {
+    private List<UserPopularityResponseDto> getUsers(Set<String> topUserIds) {
         List<UserPopularityResponseDto> result = new ArrayList<>();
         if (topUserIds == null || topUserIds.isEmpty()) {
             return result;
@@ -106,14 +103,13 @@ public class UserPopularityRedisService {
             String idStr = (String) pipelineResults.get(index++);
             String username = (String) pipelineResults.get(index++);
             String country = (String) pipelineResults.get(index++);
-            Double scoreDouble = (Double) pipelineResults.get(index++);
+            Double impactDouble = (Double) pipelineResults.get(index++);
 
             Long id = (idStr != null && !idStr.equals("null")) ? Long.valueOf(idStr) : null;
             Long userId = Long.valueOf(userIdStr);
-            Long score = (scoreDouble != null) ? scoreDouble.longValue() : 0L;
+            Long score = (impactDouble != null) ? impactDouble.longValue() : 0L;
 
-            UserPopularityResponseDto responseDto = new UserPopularityResponseDto(
-                    id, userId, username, country, score);
+            UserPopularityResponseDto responseDto = new UserPopularityResponseDto(id, userId, username, country, score);
             result.add(responseDto);
         }
         return result;

@@ -1,6 +1,6 @@
 app:
   leaderboard:
-    max-cached-size: 100
+    max-cached-size: 1000
 
 spring:
   datasource:

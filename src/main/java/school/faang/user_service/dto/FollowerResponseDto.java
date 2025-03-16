@@ -1,6 +1,6 @@
 package school.faang.user_service.dto;
 
-public record FollowerResponse(
+public record FollowerResponseDto(
         Long id,
         String username,
         String email

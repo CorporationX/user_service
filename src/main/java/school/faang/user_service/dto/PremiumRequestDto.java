@@ -5,15 +5,16 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record PaymentRequest(
+public record PremiumRequestDto(
+        @Min(value = 1)
         @NotNull
-        long paymentNumber,
-
-        @Min(1)
+        Long userId,
+        @Min(value = 1)
+        @NotNull
+        Long daysCount,
+        @Min(value = 1)
         @NotNull
         BigDecimal amount,
-
         @NotNull
-        Currency currency
-) {
+        Currency currency) {
 }

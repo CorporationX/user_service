@@ -30,7 +30,6 @@ public class PremiumExpiredScheduleTask {
         }
     }
 
-
     private void deleteExpiredPremiums() {
         premiumRepository.findAllByEndDateBefore(LocalDateTime.now())
                 .forEach(premium -> {

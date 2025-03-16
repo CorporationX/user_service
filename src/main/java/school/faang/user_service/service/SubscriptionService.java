@@ -4,8 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.FollowerResponse;
-import school.faang.user_service.dto.UserFilterRequest;
+import school.faang.user_service.dto.FollowerResponseDto;
+import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
@@ -44,7 +44,7 @@ public class SubscriptionService {
         log.debug("Пользователь: {} успешно отписался от: {}", followerId, followeeId);
     }
 
-    public List<FollowerResponse> getFollowing(Long followeeId, UserFilterRequest filter) {
+    public List<FollowerResponseDto> getFollowing(Long followeeId, UserFilterRequestDto filter) {
         Stream<User> userStream = subscriptionRepository.findByFollowerId(followeeId);
 
         if (filter != null) {
@@ -64,7 +64,7 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
-    public List<FollowerResponse> getFollowers(Long followeeId, UserFilterRequest filter) {
+    public List<FollowerResponseDto> getFollowers(Long followeeId, UserFilterRequestDto filter) {
         Stream<User> userStream = subscriptionRepository.findByFolloweeId(followeeId);
 
         for (UserFilter userFilter : userFilters) {

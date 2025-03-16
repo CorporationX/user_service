@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.PaymentRequest;
-import school.faang.user_service.dto.PaymentResponse;
+import school.faang.user_service.dto.PaymentRequestDto;
+import school.faang.user_service.dto.PaymentResponseDto;
 import school.faang.user_service.dto.PaymentStatus;
-import school.faang.user_service.dto.PremiumActivated;
-import school.faang.user_service.dto.PremiumRequest;
+import school.faang.user_service.dto.PremiumActivatedDto;
+import school.faang.user_service.dto.PremiumRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
@@ -30,7 +30,7 @@ public class PremiumService {
     private final PaymentService paymentService;
     private final PremiumMapper premiumMapper;
 
-    public ResponseEntity<PremiumActivated> getPremiumForUserId(Long userId) {
+    public ResponseEntity<PremiumActivatedDto> getPremiumForUserId(Long userId) {
         return premiumRepository.findByUserId(userId)
                 .filter(premium -> premium.getEndDate().isAfter(LocalDateTime.now()))
                 .map(premiumMapper::premiumToPremiumActivated)
@@ -38,17 +38,15 @@ public class PremiumService {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<PremiumActivated> subscribeToPremium(PremiumRequest premiumRequest) {
-        validatePremium(premiumRequest);
+    public ResponseEntity<PremiumActivatedDto> subscribeToPremium(PremiumRequestDto premiumRequestDto) {
+        validatePremium(premiumRequestDto);
 
-        payPremium(premiumRequest);
+        User user = getUserById(premiumRequestDto.userId());
 
-        Long userId = premiumRequest.userId();
-        Long days = premiumRequest.daysCount();
+        payPremium(premiumRequestDto);
 
-        User user = getUserById(userId);
         LocalDateTime premiumStartDate = LocalDateTime.now();
-        LocalDateTime premiumEndDate = premiumStartDate.plusDays(days);
+        LocalDateTime premiumEndDate = premiumStartDate.plusDays(premiumRequestDto.daysCount());
 
         Premium premium = new Premium();
         premium.setUser(user);
@@ -64,30 +62,30 @@ public class PremiumService {
 
     private User getUserById(long userId) {
         return userService.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID: " + userId + " не найден."));
+                .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
     }
 
-    private void validatePremium(PremiumRequest premiumRequest) {
-        Long userId = premiumRequest.userId();
+    private void validatePremium(PremiumRequestDto premiumRequestDto) {
+        Long userId = premiumRequestDto.userId();
 
         if (premiumRepository.existsByUserIdAndEndDateAfter(userId, LocalDateTime.now())) {
-            throw new DataValidationException("Премиум для текущего пользователя уже имеется.");
+            throw new DataValidationException("Premium already exists");
         }
     }
 
-    private void payPremium(PremiumRequest premiumRequest) {
-        PaymentRequest paymentRequest = new PaymentRequest(
+    private void payPremium(PremiumRequestDto premiumRequestDto) {
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto(
                 paymentService.getNextPaymentId(),
-                premiumRequest.amount(),
-                premiumRequest.currency()
+                premiumRequestDto.amount(),
+                premiumRequestDto.currency()
         );
 
-        PaymentResponse paymentResponse = paymentService.initPayment(paymentRequest);
+        PaymentResponseDto paymentResponseDto = paymentService.initPayment(paymentRequestDto);
 
-        if (!paymentResponse.status().equals(PaymentStatus.SUCCESS)) {
-            throw new PaymentProceedException("Ошибка платежа: " + paymentResponse.message());
+        if (!paymentResponseDto.status().equals(PaymentStatus.SUCCESS)) {
+            throw new PaymentProceedException("Payment failed: " + paymentResponseDto.message());
         }
 
-        log.debug("Подписка оплачена успешно. Код верификации: {}", paymentResponse.verificationCode());
+        log.debug("Subscription paid successfully. Verification code: {}", paymentResponseDto.verificationCode());
     }
 }

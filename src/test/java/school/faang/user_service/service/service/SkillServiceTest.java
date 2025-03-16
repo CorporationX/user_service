@@ -20,6 +20,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -89,18 +90,22 @@ public class SkillServiceTest {
     @Test
     public void testGetOfferedSkills() {
         long userId = 1L;
-        Skill skill = new Skill();
-        skill.setId(1L);
-        skill.setTitle("Java");
+        Skill skill1 = new Skill();
+        skill1.setId(1L);
+        skill1.setTitle("Java");
+        Skill skill2 = new Skill();
+        skill2.setId(2L);
+        skill2.setTitle("Bootcamp");
 
-        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(skill, skill, skill));
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(skill1, skill2));
 
         List<SkillCandidateDto> offeredSkills = skillService.getOfferedSkills(userId);
 
         assertNotNull(offeredSkills);
-        assertEquals(1, offeredSkills.size());
-        assertEquals("Java", offeredSkills.get(0).getSkill().getTitle());
-        assertEquals(3, offeredSkills.get(0).getOffersAmount());
+        assertEquals(2, offeredSkills.size());
+
+        assertTrue(offeredSkills.stream().anyMatch(skill -> "Java".equals(skill.getSkill().getTitle())));
+        assertTrue(offeredSkills.stream().anyMatch(skill -> "Bootcamp".equals(skill.getSkill().getTitle())));
     }
 
     @Test

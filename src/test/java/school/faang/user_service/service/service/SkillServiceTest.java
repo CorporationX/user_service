@@ -6,14 +6,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.SkillService;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -23,6 +28,9 @@ public class SkillServiceTest {
 
     @Mock
     private SkillRepository skillRepository;
+
+    @Mock
+    private SkillOfferRepository skillOfferRepository;
 
     @Spy
     private SkillMapperImpl skillMapper;
@@ -54,7 +62,9 @@ public class SkillServiceTest {
 
         when(skillRepository.existsByTitle("Java")).thenReturn(true);
 
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> skillService.create(skillDto));
+        assertEquals("That skill is already there.", exception.getMessage());
     }
 
     @Test
@@ -62,22 +72,46 @@ public class SkillServiceTest {
         SkillDto skillDto = new SkillDto();
         skillDto.setTitle("");
 
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> skillService.create(skillDto));
+        assertEquals("Skill title is empty", exception.getMessage());
     }
 
     @Test
     public void testCreateWithNullTitle() {
         SkillDto skillDto = new SkillDto();
 
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> skillService.create(skillDto));
+        assertEquals("Skill title is empty", exception.getMessage());
     }
 
     @Test
-    public void testCreateExistedSkill() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setTitle("Java");
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+    public void testGetOfferedSkills() {
+        long userId = 1L;
+        Skill skill = new Skill();
+        skill.setId(1L);
+        skill.setTitle("Java");
 
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(skill, skill, skill));
+
+        List<SkillCandidateDto> offeredSkills = skillService.getOfferedSkills(userId);
+
+        assertNotNull(offeredSkills);
+        assertEquals(1, offeredSkills.size());
+        assertEquals("Java", offeredSkills.get(0).getSkill().getTitle());
+        assertEquals(3, offeredSkills.get(0).getOffersAmount());
+    }
+
+    @Test
+    public void testAcquireSkillFromOffers() {
+        long userId = 1L;
+        long skillId = 1L;
+
+        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(List.of());
+
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> skillService.acquireSkillFromOffers(skillId, userId));
+        assertEquals("Not enough offers to acquire this skill.", exception.getMessage());
     }
 }

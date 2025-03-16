@@ -27,7 +27,7 @@ public class SkillControllerTest {
     private SkillController skillController;
 
     @Test
-    public void testReturnOfCreatedSkill() {
+    public void testReturnCreatedSkill() {
         SkillDto skillDto = new SkillDto();
 
         when(skillService.create(any())).thenReturn(skillDto);
@@ -41,7 +41,11 @@ public class SkillControllerTest {
     @Test
     public void testReturnUserSkillsList() {
         long userId = 1L;
-        List<SkillDto> skills = List.of(new SkillDto(), new SkillDto());
+        SkillDto skillDto1 = new SkillDto();
+        skillDto1.setTitle("Java");
+        SkillDto skillDto2 = new SkillDto();
+        skillDto2.setTitle("Bootcamp");
+        List<SkillDto> skills = List.of(skillDto1, skillDto2);
 
         when(skillService.getUserSkills(userId)).thenReturn(skills);
 
@@ -49,6 +53,8 @@ public class SkillControllerTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
+        assertEquals("Java", result.get(0).getTitle());
+        assertEquals("Bootcamp", result.get(1).getTitle());
     }
 
     @Test

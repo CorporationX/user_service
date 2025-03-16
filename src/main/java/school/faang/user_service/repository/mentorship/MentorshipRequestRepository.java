@@ -23,6 +23,4 @@ public interface MentorshipRequestRepository extends CrudRepository<MentorshipRe
             LIMIT 1
             """)
     Optional<MentorshipRequest> findLatestRequest(long requesterId, long receiverId);
-
-    List<MentorshipRequest> getMentorshipRequestById(long id);
 }

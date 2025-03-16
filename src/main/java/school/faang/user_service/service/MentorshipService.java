@@ -4,13 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.mentorship.MenteeDto;
-import school.faang.user_service.dto.mentorship.MentorDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.mentorship.InvalidIdException;
 import school.faang.user_service.exception.mentorship.UserNotFoundException;
-import school.faang.user_service.mapper.mentorship.MenteeMapper;
-import school.faang.user_service.mapper.mentorship.MentorMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.message.mentorship.ExceptionMessage;
 import school.faang.user_service.message.mentorship.MentorshipMessage;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -23,29 +20,24 @@ import java.util.List;
 @Transactional
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
-    private final MentorMapper mentorMapper;
-    private final MenteeMapper menteeMapper;
+    private final MentorshipMapper mentorshipMapper;
 
     public List<Long> getMentees(long userId) {
         log.debug(MentorshipMessage.GET_MENTEES_START.getMessage(), userId);
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
-
-        MentorDto mentorDto = mentorMapper.toDto(user);
         log.debug(MentorshipMessage.GET_MENTEES_FINISH.getMessage(), userId);
 
-        return mentorDto.getMentees();
+        return mentorshipMapper.toDtoList(user.getMentees());
     }
 
     public List<Long> getMentors(long userId) {
         log.debug(MentorshipMessage.GET_MENTORS_START.getMessage(), userId);
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND.getMessage()));
-
-        MenteeDto menteeDto = menteeMapper.toDto(user);
         log.debug(MentorshipMessage.GET_MENTORS_FINISH.getMessage(), userId);
 
-        return menteeDto.getMentors();
+        return mentorshipMapper.toDtoList(user.getMentors());
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
@@ -84,8 +76,9 @@ public class MentorshipService {
         log.info(MentorshipMessage.NO_MENTOR.getMessage(), menteeId, mentorId);
     }
 
-    private void validateIdsEqual(long firstId, long secondId) {
-        if (firstId == secondId) {
+    private void validateIdsEqual(long menteeId, long mentorId) {
+        if (menteeId == mentorId) {
+            log.error(MentorshipMessage.EQUALS_IDS.getMessage(), menteeId, mentorId);
             throw new InvalidIdException(ExceptionMessage.EQUAL_IDS.getMessage());
         }
     }

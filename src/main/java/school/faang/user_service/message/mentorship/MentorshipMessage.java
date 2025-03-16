@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum MentorshipMessage {
     INVALID_ID("ID \"{}\" is less than 1"),
+    EQUALS_IDS("Mentee ID \"{}\" and mentor ID \"{}\" are equal"),
     GET_MENTEES_START("Get mentees for the user \"{}\" has been started"),
     GET_MENTEES_FINISH("Get mentees for the user \"{}\" has been finished"),
     GET_MENTORS_START("Get mentors for the user \"{}\" has been started"),

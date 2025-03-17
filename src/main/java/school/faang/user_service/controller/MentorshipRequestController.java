@@ -1,9 +1,9 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
@@ -12,7 +12,6 @@ import school.faang.user_service.service.MentorshipRequestService;
 
 import java.util.List;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MentorshipRequestController {
@@ -33,7 +32,7 @@ public class MentorshipRequestController {
     }
 
     public void rejectRequest(@NonNull @Min(value = 1) Long id,
-                              @NonNull RejectionDto rejectionDto) {
+                              @NonNull @Valid RejectionDto rejectionDto) {
         mentorshipRequestService.rejectRequest(id, rejectionDto);
     }
 

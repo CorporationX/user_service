@@ -48,7 +48,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                                     .getCreatedAt()
                                     .plusMonths(minRequestIntervalInMonths)
                                     .isAfter(LocalDateTime.now())) {
-                                validateRequestInterval();
+                                throwIfRequestIntervalTooShort();
                             }
                         })
                 );
@@ -136,7 +136,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         }
     }
 
-    private void validateRequestInterval() {
+    private void throwIfRequestIntervalTooShort() {
         log.warn("The last request was less {} months ago.", minRequestIntervalInMonths);
         throw new DataValidationException(String.format(
                 "The last request was less than %d months ago.", minRequestIntervalInMonths));

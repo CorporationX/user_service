@@ -3,7 +3,6 @@ package school.faang.user_service.dto;
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -6,7 +6,7 @@ import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
-import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.GoalDataException;

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.implementation;
+package school.faang.user_service.service.skill.implementation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.interfaces.SkillService;
 
 import java.util.List;
 import java.util.Map;

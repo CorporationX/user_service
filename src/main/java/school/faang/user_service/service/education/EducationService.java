@@ -3,7 +3,7 @@ package school.faang.user_service.service.education;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.EducationDto;
+import school.faang.user_service.entity.dto.education.EducationDto;
 import school.faang.user_service.entity.Education;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;

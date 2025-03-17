@@ -2,7 +2,7 @@ package school.faang.user_service.validator.goalvalidator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.GoalDataException;
 

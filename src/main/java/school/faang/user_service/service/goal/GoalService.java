@@ -1,7 +1,7 @@
 package school.faang.user_service.service.goal;
 
-import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.SearchGoalDto;
+import school.faang.user_service.entity.dto.goal.GoalDto;
+import school.faang.user_service.entity.dto.goal.SearchGoalDto;
 
 import java.util.List;
 

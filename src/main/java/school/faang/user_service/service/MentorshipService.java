@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.MentorshipDto;
+import school.faang.user_service.entity.dto.mentorship.MentorshipDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.repository.UserRepository;

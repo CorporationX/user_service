@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorship.RejectionDto;
-import school.faang.user_service.dto.mentorship.RequestFilterDto;
+import school.faang.user_service.entity.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.entity.dto.mentorship.RejectionDto;
+import school.faang.user_service.entity.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.exception.MentorshipAlreadyExistsException;
 import school.faang.user_service.service.MentorshipRequestService;
 

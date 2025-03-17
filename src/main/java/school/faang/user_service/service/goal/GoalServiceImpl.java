@@ -4,20 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.SearchGoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.dto.goal.GoalDto;
+import school.faang.user_service.entity.dto.goal.SearchGoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.GoalDataException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapperDecorator;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.interfaces.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goalvalidator.GoalValidator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -150,6 +151,13 @@ public class GoalServiceImpl implements GoalService {
 
     private void saveUserWithNewGoalAndSkills(Long userId, GoalDto goal, List<Skill> newSkills) {
         User userFromBase = userService.findUserById(userId);
+        if (userFromBase.getGoals() == null) {
+            userFromBase.setGoals(new ArrayList<>());
+        }
+
+        if (userFromBase.getSkills() == null) {
+            userFromBase.setSkills(new ArrayList<>());
+        }
         Goal newGoal = goalMapper.toEntity(goal);
         userFromBase.getGoals().add(newGoal);
         userFromBase.getSkills().addAll(new HashSet<>(newSkills));

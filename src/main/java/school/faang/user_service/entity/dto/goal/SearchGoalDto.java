@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.goal;
+package school.faang.user_service.entity.dto.goal;
 
 import school.faang.user_service.entity.goal.GoalStatus;
 

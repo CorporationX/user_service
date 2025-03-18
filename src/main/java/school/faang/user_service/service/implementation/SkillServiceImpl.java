@@ -1,4 +1,4 @@
-package school.faang.user_service.service.skill.implementation;
+package school.faang.user_service.service.implementation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

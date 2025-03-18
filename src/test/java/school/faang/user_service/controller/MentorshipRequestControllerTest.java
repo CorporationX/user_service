@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
@@ -14,7 +13,11 @@ import school.faang.user_service.service.MentorshipRequestService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestControllerTest {
@@ -29,9 +32,13 @@ class MentorshipRequestControllerTest {
     void testNullDescription() {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
 
-        assertThrows(
-                RuntimeException.class,
+        Exception exception = assertThrows(
+                NullPointerException.class,
                 () -> mentorshipRequestController.requestMentorship(mentorshipRequestDto));
+
+        assertEquals(
+                "The description cannot be empty or consist only of spaces.",
+                exception.getMessage());
     }
 
     @Test
@@ -43,7 +50,7 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
 
-        Mockito.verify(mentorshipRequestService, Mockito.times(1))
+        verify(mentorshipRequestService, times(1))
                 .requestMentorship(mentorshipRequestDto);
     }
 
@@ -51,12 +58,12 @@ class MentorshipRequestControllerTest {
     void testGetRequests() {
         RequestFilterDto requestFilterDto = new RequestFilterDto();
         List<MentorshipRequestDto> mentorshipRequestDtos = new ArrayList<>();
-        Mockito.when(mentorshipRequestService.getRequests(requestFilterDto))
+        when(mentorshipRequestService.getRequests(requestFilterDto))
                 .thenReturn(mentorshipRequestDtos);
 
         mentorshipRequestController.getRequests(requestFilterDto);
 
-        Mockito.verify(mentorshipRequestService, Mockito.times(1))
+        verify(mentorshipRequestService, times(1))
                 .getRequests(requestFilterDto);
     }
 
@@ -66,7 +73,7 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.acceptRequest(testId);
 
-        Mockito.verify(mentorshipRequestService, Mockito.times(1))
+        verify(mentorshipRequestService, times(1))
                 .acceptRequest(testId);
     }
 
@@ -77,7 +84,7 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.rejectRequest(testId, rejectionDto);
 
-        Mockito.verify(mentorshipRequestService, Mockito.times(1))
+        verify(mentorshipRequestService, times(1))
                 .rejectRequest(testId, rejectionDto);
     }
 }

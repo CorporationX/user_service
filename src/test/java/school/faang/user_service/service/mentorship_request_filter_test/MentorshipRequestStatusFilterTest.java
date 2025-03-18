@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship_request_filter_test;
 
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -7,7 +7,7 @@ import school.faang.user_service.filter.MentorshipRequestFilter;
 
 import java.util.stream.Stream;
 
-public class TestMentorshipMentorshipRequestStatusFilter implements MentorshipRequestFilter {
+public class MentorshipRequestStatusFilterTest implements MentorshipRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto requestFilterDto) {
         return true;

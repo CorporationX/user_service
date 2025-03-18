@@ -52,7 +52,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                             }
                         })
                 );
-        ensureRequesterIsNotReceiver(requesterId, receiverId);
+        checkingForDifferentIDs(requesterId, receiverId);
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
     }
 
@@ -105,7 +105,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                         () -> throwIfRequestNotFound(id));
     }
 
-    private void ensureRequesterIsNotReceiver(Long requesterId, Long receiverId) {
+    private void checkingForDifferentIDs(Long requesterId, Long receiverId) {
         if (requesterId.equals(receiverId)) {
             log.warn("ID {} The one who requests mentor and ID {} of the one whom they are requested equal.",
                     requesterId, receiverId);

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.entity.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.dto.skill.SkillDto;
-import school.faang.user_service.service.skill.interfaces.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
 

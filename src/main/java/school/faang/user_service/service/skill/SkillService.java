@@ -1,4 +1,4 @@
-package school.faang.user_service.service.skill.interfaces;
+package school.faang.user_service.service.skill;
 
 import school.faang.user_service.entity.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.dto.skill.SkillDto;

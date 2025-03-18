@@ -14,7 +14,7 @@ import school.faang.user_service.exception.GoalDataException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapperDecorator;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.skill.interfaces.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goalvalidator.GoalValidator;
 

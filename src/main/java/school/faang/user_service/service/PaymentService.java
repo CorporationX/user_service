@@ -8,7 +8,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.PaymentRequestDto;
 import school.faang.user_service.dto.PaymentResponseDto;
-import school.faang.user_service.dto.PaymentStatus;
 
 import java.util.UUID;
 
@@ -29,19 +28,7 @@ public class PaymentService {
                     paymentRequestDto,
                     PaymentResponseDto.class);
         } catch (RestClientException e) {
-            String message = e.getMessage();
-            long paymentNumber = paymentRequestDto.paymentNumber();
-
-            log.error("Failed to init payment for {}: {}", paymentNumber, message);
-
-            return new PaymentResponseDto(
-                    PaymentStatus.FALSE,
-                    -1,
-                    paymentNumber,
-                    paymentRequestDto.amount(),
-                    paymentRequestDto.currency(),
-                    message
-            );
+            throw new RuntimeException("Payment: " + paymentRequestDto.paymentNumber() + " failed", e);
         }
     }
 

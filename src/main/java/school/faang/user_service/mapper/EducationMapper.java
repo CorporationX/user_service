@@ -9,6 +9,7 @@ import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface EducationMapper {
+
     @Mapping(target = "user", ignore = true)
     Education toEducation(EducationDto educationDto);
 

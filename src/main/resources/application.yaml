@@ -2,6 +2,10 @@ app:
   leaderboard:
     max-cached-size: 1000
 
+payment:
+  api:
+    url: http://localhost:9081/api/payment
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver

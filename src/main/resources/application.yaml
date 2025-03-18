@@ -35,3 +35,7 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+  goal:
+    invitation:
+      max-active-goals: 3

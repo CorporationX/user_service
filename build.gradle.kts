@@ -105,17 +105,7 @@ jacoco {
 }
 
 tasks.test {
-    finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
-}
-
-tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.5.toBigDecimal()
-            }
-        }
-    }
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {

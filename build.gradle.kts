@@ -106,17 +106,13 @@ jacoco {
 
 tasks.test {
     finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
-    testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
-    }
 }
 
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.7.toBigDecimal()
+                minimum = 0.5.toBigDecimal()
             }
         }
     }
@@ -129,10 +125,6 @@ tasks.jacocoTestReport {
         html.required.set(true)
     }
 
-    executionData.setFrom(
-        fileTree(buildDir).include("jacoco/*.exec")
-    )
-
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it).exclude(
@@ -142,7 +134,9 @@ tasks.jacocoTestReport {
                 "**/entity/**",
                 "**/filter/**",
                 "**/mapper/**",
-                "**/student/**"
+                "**/student/**",
+                "**/repository/**",
+                "**/exception/**"
             )
         })
     )

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterIdFilter;
 
 import java.util.stream.Stream;
 

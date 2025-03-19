@@ -1,7 +1,6 @@
 package school.faang.user_service.dto;
 
 import lombok.Data;
-import school.faang.user_service.entity.RequestStatus;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +10,7 @@ public class MentorshipRequestDto {
     private String description;
     private Long requesterId;
     private Long receiverId;
-    private RequestStatus status;
+    private RequestStatusDto status;
     private String rejectionReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

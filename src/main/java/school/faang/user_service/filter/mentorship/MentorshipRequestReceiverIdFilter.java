@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.mentorship;
 
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

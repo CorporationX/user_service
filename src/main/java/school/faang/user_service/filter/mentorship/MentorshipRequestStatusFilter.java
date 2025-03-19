@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.mentorship;
 
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -8,18 +8,17 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.stream.Stream;
 
 @Component
-public class MentorshipRequestRequesterIdFilter implements MentorshipRequestFilter {
+public class MentorshipRequestStatusFilter implements MentorshipRequestFilter {
     @Override
     public boolean isApplicable(@NonNull RequestFilterDto requestFilterDto) {
-        return requestFilterDto.getRequesterId() != null
-                && requestFilterDto.getRequesterId() > 0;
+        return requestFilterDto.getStatus() != null;
     }
 
     @Override
     public Stream<MentorshipRequest> apply(
             Stream<MentorshipRequest> mentorshipRequests, RequestFilterDto requestFilterDto) {
         return mentorshipRequests
-                .filter(mentorshipRequest -> requestFilterDto.getRequesterId()
-                        .equals(mentorshipRequest.getRequester().getId()));
+                .filter(mentorshipRequest
+                        -> requestFilterDto.getStatus().equals(mentorshipRequest.getStatus()));
     }
 }

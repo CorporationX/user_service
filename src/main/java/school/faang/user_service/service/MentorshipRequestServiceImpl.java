@@ -11,15 +11,15 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -41,10 +41,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         ensureUserExistsById(requesterId);
         ensureUserExistsById(receiverId);
 
+        checkingForDifferentIDs(requesterId, receiverId);
+
         mentorshipRequestRepository
                 .findLatestRequest(requesterId, receiverId)
                 .ifPresent((mentorshipRequest -> {
-                            if (mentorshipRequest
+                    if (mentorshipRequest
                                     .getCreatedAt()
                                     .plusMonths(minRequestIntervalInMonths)
                                     .isAfter(LocalDateTime.now())) {
@@ -52,15 +54,13 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                             }
                         })
                 );
-        checkingForDifferentIDs(requesterId, receiverId);
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
     }
 
     @Override
     public List<MentorshipRequestDto> getRequests(RequestFilterDto requestFilterDto) {
-        Iterable<MentorshipRequest> allRequests = mentorshipRequestRepository.findAll();
         Stream<MentorshipRequest> filteredMentorshipRequests =
-                ((Collection<MentorshipRequest>) allRequests).stream();
+                StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false);
 
         for (MentorshipRequestFilter mentorshipRequestFilter : mentorshipRequestFilters) {
             if (mentorshipRequestFilter.isApplicable(requestFilterDto)) {

@@ -1,7 +1,10 @@
 package school.faang.user_service.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.json.student.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,7 @@ import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.publisher.ProfileViewEvent;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
@@ -19,6 +23,7 @@ import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.adapter.EventParticipationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
@@ -42,6 +47,7 @@ public class UserService {
     private final GoalRepositoryAdapter goalRepositoryAdapter;
     private final EventRepositoryAdapter eventRepositoryAdapter;
     private final EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    private final CountryRepository countryRepository;
 
     private final MentorshipService mentorshipService;
 
@@ -117,5 +123,23 @@ public class UserService {
         }
         log.info("All user events with ID {} have been deleted", user.getId());
         eventRepositoryAdapter.deleteAll(userEvents);
+    }
+
+    public void uploadFile(List<Person> people) {
+        List<User> users = new ArrayList<>();
+        for (Person person : people) {
+            User user = userMapper.toUser(person);
+            String country = person.getContactInfo().getAddress().getCountry();
+            Country countryEntity = new Country();
+            countryEntity.setTitle(country);
+            if (!countryRepository.findByName(country).isPresent()) {
+                Country savedCountry = countryRepository.save(countryEntity);
+                log.info("Country saved: {}", savedCountry.getTitle());
+            }
+            user.setCountry(countryEntity);
+            users.add(user);
+        }
+        userRepository.saveAll(users);
+        log.info("Users saved");
     }
 }

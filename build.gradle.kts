@@ -87,6 +87,15 @@ jsonSchema2Pojo {
     setSourceType("jsonschema")
 }
 
+tasks.register("generatePojoClasses") {
+    group = "json"
+    description = "Generates POJO classes from JSON schema"
+    dependsOn("generateJsonSchema2Pojo")
+    doLast {
+        println("POJO classes generated successfully!")
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }

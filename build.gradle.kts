@@ -104,14 +104,34 @@ jacoco {
     reportsDirectory.set(layout.buildDirectory.dir("jacocoReports"))
 }
 
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
+}
 
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.7.toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         csv.required.set(false)
         html.required.set(true)
     }
+
+    executionData.setFrom(
+        fileTree(buildDir).include("jacoco/*.exec")
+    )
 
     classDirectories.setFrom(
         files(classDirectories.files.map {
@@ -122,7 +142,7 @@ tasks.jacocoTestReport {
                 "**/entity/**",
                 "**/filter/**",
                 "**/mapper/**",
-                "**/student/**",
+                "**/student/**"
             )
         })
     )

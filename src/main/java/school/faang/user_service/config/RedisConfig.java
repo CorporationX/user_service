@@ -1,4 +1,4 @@
-package school.faang.user_service.config.leaderboard;
+package school.faang.user_service.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

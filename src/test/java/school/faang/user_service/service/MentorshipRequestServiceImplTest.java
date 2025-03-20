@@ -43,12 +43,6 @@ class MentorshipRequestServiceImplTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
 
-    /*@Spy
-    private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
-
-    @Spy
-    private RequestStatusMapper requestStatusMapper = Mappers.getMapper(RequestStatusMapper.class);*/
-
     @Mock
     private RequestStatusMapper requestStatusMapper;
 
@@ -83,11 +77,9 @@ class MentorshipRequestServiceImplTest {
     @Test
     @DisplayName("The exception is thrown away if the user does not exist")
     void testRequestMentorshipTheUserIsAbsent() {
-        when(userRepository.existsById(mentorshipRequestDto.getRequesterId()))
-                .thenReturn(false);
+        when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(false);
 
-        assertThrowsExactly(IllegalArgumentException.class,
-                () -> service.requestMentorship(mentorshipRequestDto));
+        assertThrowsExactly(IllegalArgumentException.class, () -> service.requestMentorship(mentorshipRequestDto));
     }
 
     @Test
@@ -100,12 +92,9 @@ class MentorshipRequestServiceImplTest {
 
         mockRepositoriesForExistingUsersWithPreviousRequest(Optional.of(mentorshipRequest));
 
-        assertThrowsExactly(DataValidationException.class,
-                () -> service.requestMentorship(mentorshipRequestDto));
+        assertThrowsExactly(DataValidationException.class, () -> service.requestMentorship(mentorshipRequestDto));
         verify(mentorshipRequestRepository, times(1))
-                .findLatestRequest(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId());
+                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
     }
 
     @Test
@@ -121,9 +110,7 @@ class MentorshipRequestServiceImplTest {
         assertDoesNotThrow(() -> service.requestMentorship(mentorshipRequestDto));
 
         verify(mentorshipRequestRepository, times(1))
-                .findLatestRequest(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId());
+                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
     }
 
     @Test
@@ -137,8 +124,7 @@ class MentorshipRequestServiceImplTest {
         assertDoesNotThrow(() -> service.requestMentorship(mentorshipRequestDto));
 
         verify(mentorshipRequestRepository, times(1))
-                .findLatestRequest(mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId());
+                .findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId());
     }
 
     @Test
@@ -147,7 +133,10 @@ class MentorshipRequestServiceImplTest {
         mentorshipRequestDto.setRequesterId(1L);
         mentorshipRequestDto.setReceiverId(1L);
 
-        mockRepositoriesForExistingUsersWithPreviousRequest(Optional.empty());
+        when(userRepository.existsById(mentorshipRequestDto.getRequesterId()))
+                .thenReturn(true);
+        when(userRepository.existsById(mentorshipRequestDto.getReceiverId()))
+                .thenReturn(true);
 
         assertThrows(DataValidationException.class, () -> service.requestMentorship(mentorshipRequestDto));
     }
@@ -163,10 +152,10 @@ class MentorshipRequestServiceImplTest {
 
         service.requestMentorship(mentorshipRequestDto);
 
-        verify(mentorshipRequestRepository, times(1))
-                .create(mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId(),
-                        mentorshipRequestDto.getDescription());
+        verify(mentorshipRequestRepository, times(1)).create(
+                mentorshipRequestDto.getRequesterId(),
+                mentorshipRequestDto.getReceiverId(),
+                mentorshipRequestDto.getDescription());
     }
 
     @Test
@@ -253,8 +242,7 @@ class MentorshipRequestServiceImplTest {
 
         service.acceptRequest(0L);
 
-        verify(mentorshipRequestRepository, times(1))
-                .findById(0L);
+        verify(mentorshipRequestRepository, times(1)).findById(0L);
     }
 
     @Test
@@ -330,14 +318,12 @@ class MentorshipRequestServiceImplTest {
     }
 
     private void mockRepositoriesForExistingUsersWithPreviousRequest(Optional<MentorshipRequest> mentorshipRequest) {
-        when(userRepository.existsById(mentorshipRequestDto.getRequesterId()))
-                .thenReturn(true);
-        when(userRepository.existsById(mentorshipRequestDto.getReceiverId()))
-                .thenReturn(true);
+        when(userRepository.existsById(mentorshipRequestDto.getRequesterId())).thenReturn(true);
+        when(userRepository.existsById(mentorshipRequestDto.getReceiverId())).thenReturn(true);
         when(mentorshipRequestRepository.findLatestRequest(
                 mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId()))
-                .thenReturn(mentorshipRequest);
+                mentorshipRequestDto.getReceiverId()
+        )).thenReturn(mentorshipRequest);
     }
 
     private void mockMentorshipRequestRepository(

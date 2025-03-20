@@ -2,10 +2,13 @@ package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import org.mockito.Spy;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
+import school.faang.user_service.mapper.RequestStatusMapper;
 
 import java.util.stream.Stream;
 
@@ -17,15 +20,18 @@ class MentorshipRequestStatusFilterTest {
     private MentorshipRequestStatusFilter filter;
     private RequestFilterDto requestFilterDto;
 
+    @Spy
+    private RequestStatusMapper requestStatusMapper = Mappers.getMapper(RequestStatusMapper.class);
+
     @BeforeEach
     void setUp() {
-        filter = new MentorshipRequestStatusFilter();
+        filter = new MentorshipRequestStatusFilter(requestStatusMapper);
         requestFilterDto = new RequestFilterDto();
     }
 
     @Test
     void testIsApplicableTrue() {
-        requestFilterDto.setStatus(RequestStatus.ACCEPTED);
+        requestFilterDto.setStatus(requestStatusMapper.requestStatusToRequestStatusDto(RequestStatus.ACCEPTED));
 
         assertTrue(filter.isApplicable(requestFilterDto));
     }
@@ -37,7 +43,7 @@ class MentorshipRequestStatusFilterTest {
 
     @Test
     void testApplyReturnsOnlyAcceptedRequestsWhenFilteredByStatus() {
-        requestFilterDto.setStatus(RequestStatus.ACCEPTED);
+        requestFilterDto.setStatus(requestStatusMapper.requestStatusToRequestStatusDto(RequestStatus.ACCEPTED));
 
         MentorshipRequest mentorshipRequestFirst = new MentorshipRequest();
         mentorshipRequestFirst.setStatus(RequestStatus.ACCEPTED);

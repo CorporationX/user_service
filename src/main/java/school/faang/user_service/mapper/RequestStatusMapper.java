@@ -8,7 +8,7 @@ import school.faang.user_service.entity.RequestStatus;
 @Mapper(componentModel = "spring")
 public interface RequestStatusMapper {
 
-    @Mapping(target = "status", source = "requestStatus.name")
+    @Mapping(target = "status", expression = "java(requestStatus.name())")
     RequestStatusDto requestStatusToRequestStatusDto(RequestStatus requestStatus);
 
     default RequestStatus requestStatusDtoToRequestStatus(RequestStatusDto requestStatusDto) {

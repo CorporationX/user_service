@@ -4,9 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
@@ -18,7 +17,8 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.mapper.RequestStatusMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship_request_filter_test.MentorshipRequestDescriptionFilterTest;
@@ -43,8 +43,17 @@ class MentorshipRequestServiceImplTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
 
-    @Spy
+    /*@Spy
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
+
+    @Spy
+    private RequestStatusMapper requestStatusMapper = Mappers.getMapper(RequestStatusMapper.class);*/
+
+    @Mock
+    private RequestStatusMapper requestStatusMapper;
+
+    @InjectMocks
+    private MentorshipRequestMapperImpl mentorshipRequestMapper;
 
     @Mock
     private UserRepository userRepository;
@@ -174,7 +183,7 @@ class MentorshipRequestServiceImplTest {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
         mentorshipRequestDto.setId(0L);
         mentorshipRequestDto.setDescription("test");
-        mentorshipRequestDto.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestDto.setStatus(requestStatusMapper.requestStatusToRequestStatusDto(RequestStatus.ACCEPTED));
 
         mockMentorshipRequestRepository(mentorshipRequestFirst, mentorshipRequestSecond);
 
@@ -198,7 +207,7 @@ class MentorshipRequestServiceImplTest {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
         mentorshipRequestDto.setId(0L);
         mentorshipRequestDto.setDescription("test");
-        mentorshipRequestDto.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestDto.setStatus(requestStatusMapper.requestStatusToRequestStatusDto(RequestStatus.ACCEPTED));
 
         mockMentorshipRequestRepository(mentorshipRequestFirst, mentorshipRequestSecond);
 
@@ -326,8 +335,8 @@ class MentorshipRequestServiceImplTest {
         when(userRepository.existsById(mentorshipRequestDto.getReceiverId()))
                 .thenReturn(true);
         when(mentorshipRequestRepository.findLatestRequest(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId()))
+                mentorshipRequestDto.getRequesterId(),
+                mentorshipRequestDto.getReceiverId()))
                 .thenReturn(mentorshipRequest);
     }
 

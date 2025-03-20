@@ -294,7 +294,8 @@ class MentorshipRequestServiceImplTest {
     @Test
     @DisplayName("We check that the deviation was successful")
     void testRejectRequestSuccessfulDeviation() {
-        RejectionDto rejectionDto = new RejectionDto("test");
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setReason("test");
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         Optional<MentorshipRequest> mentorshipRequestOptional = Optional.of(mentorshipRequest);
 
@@ -310,7 +311,8 @@ class MentorshipRequestServiceImplTest {
     @Test
     @DisplayName("Exception is the exception if Optional is empty")
     void testRejectRequestOptionalIsEmpty() {
-        RejectionDto rejectionDto = new RejectionDto("test");
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setReason("test");
 
         when(mentorshipRequestRepository.findById(0L)).thenReturn(Optional.empty());
 

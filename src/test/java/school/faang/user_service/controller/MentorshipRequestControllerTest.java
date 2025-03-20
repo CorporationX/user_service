@@ -80,7 +80,8 @@ class MentorshipRequestControllerTest {
     @Test
     void rejectRequest() {
         Long testId = 1L;
-        RejectionDto rejectionDto = new RejectionDto("test");
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setReason("test");
 
         mentorshipRequestController.rejectRequest(testId, rejectionDto);
 

@@ -100,7 +100,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                 .findById(id)
                 .ifPresentOrElse((mentorshipRequest -> {
                             mentorshipRequest.setStatus(RequestStatus.REJECTED);
-                            mentorshipRequest.setRejectionReason(rejection.reason());
+                            mentorshipRequest.setRejectionReason(rejection.getReason());
                         }),
                         () -> throwIfRequestNotFound(id));
     }

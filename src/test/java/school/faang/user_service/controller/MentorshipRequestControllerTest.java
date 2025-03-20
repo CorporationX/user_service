@@ -33,12 +33,10 @@ class MentorshipRequestControllerTest {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
 
         Exception exception = assertThrows(
-                NullPointerException.class,
-                () -> mentorshipRequestController.requestMentorship(mentorshipRequestDto));
+                NullPointerException.class, () -> mentorshipRequestController.requestMentorship(mentorshipRequestDto));
 
         assertEquals(
-                "The description cannot be empty or consist only of spaces.",
-                exception.getMessage());
+                "The description cannot be empty or consist only of spaces.", exception.getMessage());
     }
 
     @Test
@@ -50,21 +48,18 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
 
-        verify(mentorshipRequestService, times(1))
-                .requestMentorship(mentorshipRequestDto);
+        verify(mentorshipRequestService, times(1)).requestMentorship(mentorshipRequestDto);
     }
 
     @Test
     void testGetRequests() {
         RequestFilterDto requestFilterDto = new RequestFilterDto();
         List<MentorshipRequestDto> mentorshipRequestDtos = new ArrayList<>();
-        when(mentorshipRequestService.getRequests(requestFilterDto))
-                .thenReturn(mentorshipRequestDtos);
+        when(mentorshipRequestService.getRequests(requestFilterDto)).thenReturn(mentorshipRequestDtos);
 
         mentorshipRequestController.getRequests(requestFilterDto);
 
-        verify(mentorshipRequestService, times(1))
-                .getRequests(requestFilterDto);
+        verify(mentorshipRequestService, times(1)).getRequests(requestFilterDto);
     }
 
     @Test
@@ -73,8 +68,7 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.acceptRequest(testId);
 
-        verify(mentorshipRequestService, times(1))
-                .acceptRequest(testId);
+        verify(mentorshipRequestService, times(1)).acceptRequest(testId);
     }
 
     @Test
@@ -85,7 +79,6 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.rejectRequest(testId, rejectionDto);
 
-        verify(mentorshipRequestService, times(1))
-                .rejectRequest(testId, rejectionDto);
+        verify(mentorshipRequestService, times(1)).rejectRequest(testId, rejectionDto);
     }
 }

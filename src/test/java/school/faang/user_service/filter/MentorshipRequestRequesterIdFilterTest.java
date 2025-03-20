@@ -56,15 +56,10 @@ class MentorshipRequestRequesterIdFilterTest {
         MentorshipRequest mentorshipRequestSecond = new MentorshipRequest();
         mentorshipRequestSecond.setRequester(requesterSecond);
 
-        Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(
-                mentorshipRequestFirst,
-                mentorshipRequestSecond
-        );
+        Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(mentorshipRequestFirst, mentorshipRequestSecond);
 
-        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter.apply(
-                mentorshipRequestStream,
-                requestFilterDto
-        );
+        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter
+                .apply(mentorshipRequestStream, requestFilterDto);
 
         assertEquals(
                 requesterFirst.getId(),

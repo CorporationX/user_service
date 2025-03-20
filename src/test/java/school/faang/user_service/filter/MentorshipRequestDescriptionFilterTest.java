@@ -60,13 +60,10 @@ class MentorshipRequestDescriptionFilterTest {
         MentorshipRequest mentorshipRequestSecond = new MentorshipRequest();
         mentorshipRequestSecond.setDescription("testDescription");
 
-        Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(
-                mentorshipRequestFirst,
-                mentorshipRequestSecond
-        );
+        Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(mentorshipRequestFirst, mentorshipRequestSecond);
 
-        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter.apply(
-                mentorshipRequestStream, requestFilterDto);
+        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter
+                .apply(mentorshipRequestStream, requestFilterDto);
 
         assertEquals(
                 mentorshipRequestFirst.getDescription(),
@@ -82,8 +79,8 @@ class MentorshipRequestDescriptionFilterTest {
 
         Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(mentorshipRequestFirst);
 
-        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter.apply(
-                mentorshipRequestStream, requestFilterDto);
+        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter
+                .apply(mentorshipRequestStream, requestFilterDto);
 
         assertEquals(
                 mentorshipRequestFirst.getDescription(),

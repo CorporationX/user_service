@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.RequestStatusMapper;
 
 import java.util.stream.Stream;
@@ -25,11 +24,9 @@ public class MentorshipRequestStatusFilter implements MentorshipRequestFilter {
     public Stream<MentorshipRequest> apply(
             Stream<MentorshipRequest> mentorshipRequests,
             RequestFilterDto requestFilterDto) {
-        RequestStatus status = requestStatusMapper.requestStatusDtoToRequestStatus(requestFilterDto.getStatus());
-        return mentorshipRequests
-                .filter(mentorshipRequest
-                        -> requestStatusMapper.requestStatusDtoToRequestStatus(requestFilterDto.getStatus())
-                        .equals(mentorshipRequest.getStatus()));
+        return mentorshipRequests.filter(mentorshipRequest
+                -> requestStatusMapper.requestStatusDtoToRequestStatus(requestFilterDto.getStatus())
+                .equals(mentorshipRequest.getStatus()));
     }
 
 }

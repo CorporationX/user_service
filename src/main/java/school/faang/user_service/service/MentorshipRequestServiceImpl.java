@@ -45,15 +45,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         mentorshipRequestRepository
                 .findLatestRequest(requesterId, receiverId)
-                .ifPresent((mentorshipRequest -> {
-                    if (mentorshipRequest
-                                    .getCreatedAt()
-                                    .plusMonths(minRequestIntervalInMonths)
-                                    .isAfter(LocalDateTime.now())) {
-                                throwIfRequestIntervalTooShort();
-                            }
-                        })
-                );
+                .ifPresent((this::validateRequestInterval));
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
     }
 
@@ -64,8 +56,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         for (MentorshipRequestFilter mentorshipRequestFilter : mentorshipRequestFilters) {
             if (mentorshipRequestFilter.isApplicable(requestFilterDto)) {
-                filteredMentorshipRequests = mentorshipRequestFilter.apply(
-                        filteredMentorshipRequests, requestFilterDto);
+                filteredMentorshipRequests = mentorshipRequestFilter
+                        .apply(filteredMentorshipRequests, requestFilterDto);
             }
         }
         return filteredMentorshipRequests.map(mentorshipRequestMapper::toDto).toList();
@@ -79,11 +71,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                             User requester = mentorshipRequest.getRequester();
                             User receiver = mentorshipRequest.getReceiver();
 
-                            throwIfUserAlreadyInList(requester.getMentors(),
-                                    receiver, requester);
-
-                            throwIfUserAlreadyInList(receiver.getMentees(),
-                                    requester, receiver);
+                            validateUserNotInList(requester.getMentors(), receiver);
+                            validateUserNotInList(receiver.getMentees(), requester);
 
                             requester.getMentors().add(receiver);
                             receiver.getMentees().add(requester);
@@ -96,8 +85,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public void rejectRequest(Long id, RejectionDto rejection) {
-        mentorshipRequestRepository
-                .findById(id)
+        mentorshipRequestRepository.findById(id)
                 .ifPresentOrElse((mentorshipRequest -> {
                             mentorshipRequest.setStatus(RequestStatus.REJECTED);
                             mentorshipRequest.setRejectionReason(rejection.getReason());
@@ -120,12 +108,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         throw new DataValidationException(String.format("Request with id %d is not in the database", id));
     }
 
-    private void throwIfUserAlreadyInList(
-            List<User> users, User userFirst, User userSecond) {
+    private void validateUserNotInList(
+            List<User> users, User userFirst) {
         if (users.contains(userFirst)) {
-            log.error("{} Already in the list {} user {}", userFirst, users, userSecond);
+            log.error("{} Already in the list {}", userFirst, users);
             throw new DataValidationException(
-                    String.format("%s already has a %s list of %s", userFirst, users, userSecond));
+                    String.format("%s already has a %s list", userFirst, users));
         }
     }
 
@@ -136,9 +124,14 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         }
     }
 
-    private void throwIfRequestIntervalTooShort() {
-        log.warn("The last request was less {} months ago.", minRequestIntervalInMonths);
-        throw new DataValidationException(String.format(
-                "The last request was less than %d months ago.", minRequestIntervalInMonths));
+    private void validateRequestInterval(MentorshipRequest mentorshipRequest) {
+        if (mentorshipRequest
+                .getCreatedAt()
+                .plusMonths(minRequestIntervalInMonths)
+                .isAfter(LocalDateTime.now())) {
+            log.warn("The last request was less {} months ago.", minRequestIntervalInMonths);
+            throw new DataValidationException(String.format(
+                    "The last request was less than %d months ago.", minRequestIntervalInMonths));
+        }
     }
 }

@@ -51,14 +51,10 @@ class MentorshipRequestStatusFilterTest {
         MentorshipRequest mentorshipRequestSecond = new MentorshipRequest();
         mentorshipRequestSecond.setStatus(RequestStatus.REJECTED);
 
-        Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(
-                mentorshipRequestFirst,
-                mentorshipRequestSecond
-        );
+        Stream<MentorshipRequest> mentorshipRequestStream = Stream.of(mentorshipRequestFirst, mentorshipRequestSecond);
 
-        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter.apply(
-                mentorshipRequestStream,
-                requestFilterDto);
+        Stream<MentorshipRequest> mentorshipRequestStreamResult = filter
+                .apply(mentorshipRequestStream, requestFilterDto);
 
         assertEquals(
                 mentorshipRequestFirst.getStatus(),

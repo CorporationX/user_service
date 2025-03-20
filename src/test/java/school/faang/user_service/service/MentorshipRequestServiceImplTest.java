@@ -329,7 +329,8 @@ class MentorshipRequestServiceImplTest {
     }
 
     private void mockMentorshipRequestRepository(
-            MentorshipRequest mentorshipRequestFirst, MentorshipRequest mentorshipRequestSecond) {
+            MentorshipRequest mentorshipRequestFirst,
+            MentorshipRequest mentorshipRequestSecond) {
         Iterable<MentorshipRequest> mentorshipRequests = ImmutableList.of(
                 mentorshipRequestFirst,
                 mentorshipRequestSecond);

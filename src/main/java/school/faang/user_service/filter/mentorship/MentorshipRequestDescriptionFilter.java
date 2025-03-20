@@ -11,14 +11,13 @@ import java.util.stream.Stream;
 public class MentorshipRequestDescriptionFilter implements MentorshipRequestFilter {
     @Override
     public boolean isApplicable(@NonNull RequestFilterDto requestFilterDto) {
-        return requestFilterDto.getDescription() != null
-                && !requestFilterDto.getDescription().isBlank();
+        return requestFilterDto.getDescription() != null && !requestFilterDto.getDescription().isBlank();
     }
 
     @Override
     public Stream<MentorshipRequest> apply(
             Stream<MentorshipRequest> mentorshipRequests, RequestFilterDto requestFilterDto) {
-        return mentorshipRequests.filter(mentorshipRequest
-                -> requestFilterDto.getDescription().equalsIgnoreCase(mentorshipRequest.getDescription()));
+        return mentorshipRequests.filter(mentorshipRequest ->
+                requestFilterDto.getDescription().equalsIgnoreCase(mentorshipRequest.getDescription()));
     }
 }

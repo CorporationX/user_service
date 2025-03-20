@@ -31,14 +31,12 @@ public class MentorshipRequestController {
         mentorshipRequestService.acceptRequest(id);
     }
 
-    public void rejectRequest(@NonNull @Min(value = 1) Long id,
-                              @NonNull @Valid RejectionDto rejectionDto) {
+    public void rejectRequest(@NonNull @Min(value = 1) Long id, @NonNull @Valid RejectionDto rejectionDto) {
         mentorshipRequestService.rejectRequest(id, rejectionDto);
     }
 
     private void validateMentorshipRequestDescription(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription() == null
-                || mentorshipRequestDto.getDescription().isBlank()) {
+        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isBlank()) {
             throw new NullPointerException("The description cannot be empty or consist only of spaces.");
         }
     }

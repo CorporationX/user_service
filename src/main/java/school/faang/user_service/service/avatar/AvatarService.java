@@ -45,7 +45,8 @@ public class AvatarService {
     private final RestTemplate restTemplate;
 
     public String generateAndUploadAvatar(String userId) {
-        String dicebearUrl = generateDicebearUrl(userId);
+        String dicebearUrl = AVATAR_API_URL + DICEBEAR_PNG_ENDPOINT + userId;
+        log.info(GENERATED_DICEBEAR_URL_LOG, dicebearUrl);
         byte[] avatarData = fetchAvatarData(dicebearUrl);
         String objectName = generateObjectName(userId);
         uploadAvatarToMinio(avatarData, objectName);
@@ -74,12 +75,6 @@ public class AvatarService {
             log.error(e.getMessage(), e);
             throw new RuntimeException(BUCKET_INIT_EXCEPTION_MSG, e);
         }
-    }
-
-    private String generateDicebearUrl(String userId) {
-        String url = AVATAR_API_URL + DICEBEAR_PNG_ENDPOINT + userId;
-        log.info(GENERATED_DICEBEAR_URL_LOG, url);
-        return url;
     }
 
     private byte[] fetchAvatarData(String url) {

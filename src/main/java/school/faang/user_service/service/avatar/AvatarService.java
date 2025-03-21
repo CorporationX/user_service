@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import school.faang.user_service.exception.AvatarFetchException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -37,7 +38,6 @@ public class AvatarService {
     private static final String BUCKET_ALREADY_EXISTS_LOG = "Bucket '{}' already exists.";
     private static final String BUCKET_CREATED_LOG = "Bucket '{}' created successfully.";
 
-    private static final String AVATAR_FETCH_EXCEPTION_MSG = "Failed to fetch avatar from Dicebear API at URL ";
     private static final String MINIO_UPLOAD_EXCEPTION_MSG = "Error while uploading avatar to MinIO";
     private static final String BUCKET_INIT_EXCEPTION_MSG = "Error initializing bucket in MinIO";
 
@@ -82,7 +82,7 @@ public class AvatarService {
         ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             log.error(AVATAR_FETCH_ERROR_LOG, url);
-            throw new RuntimeException(AVATAR_FETCH_EXCEPTION_MSG + url);
+            throw new AvatarFetchException(url);
         }
         log.info(AVATAR_FETCH_SUCCESS_LOG);
         return response.getBody();

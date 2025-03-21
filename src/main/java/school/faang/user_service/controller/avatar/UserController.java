@@ -23,7 +23,7 @@ public class UserController {
 
     private final AvatarService avatarService;
 
-    @PostMapping("/register")
+    @PostMapping()
     public ResponseEntity<?> registerUser(@RequestParam(required = false) String username) {
         if (username != null) {
             log.info(String.format(RECEIVED_REQUEST_LOG, " for username: " + username));

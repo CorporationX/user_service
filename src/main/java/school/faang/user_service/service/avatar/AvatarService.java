@@ -55,6 +55,30 @@ public class AvatarService {
         return formulateAvatarUrl(objectName);
     }
 
+    @PostConstruct
+    public void initializeBucket() {
+        try {
+            boolean found = minioClient.bucketExists(
+                    BucketExistsArgs.builder()
+                            .bucket(BUCKET_NAME)
+                            .build()
+            );
+            if (!found) {
+                log.info(INITIALIZING_BUCKET_LOG, BUCKET_NAME);
+                minioClient.makeBucket(
+                        MakeBucketArgs.builder()
+                                .bucket(BUCKET_NAME)
+                                .build());
+                log.info(BUCKET_CREATED_LOG, BUCKET_NAME);
+            } else {
+                log.info(BUCKET_ALREADY_EXISTS_LOG, BUCKET_NAME);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(BUCKET_INIT_EXCEPTION_MSG, e);
+        }
+    }
+
     private String generateDicebearUrl(String userId) {
         String url = AVATAR_API_URL + DICEBEAR_PNG_ENDPOINT + userId;
         log.info(GENERATED_DICEBEAR_URL_LOG, url);
@@ -98,29 +122,5 @@ public class AvatarService {
         String avatarUrl = LOCALHOST_URL_PREFIX + BUCKET_NAME + "/" + objectName;
         log.info(FORMULATED_AVATAR_URL_LOG, avatarUrl);
         return avatarUrl;
-    }
-
-    @PostConstruct
-    public void initializeBucket() {
-        try {
-            boolean found = minioClient.bucketExists(
-                    BucketExistsArgs.builder()
-                            .bucket(BUCKET_NAME)
-                            .build()
-            );
-            if (!found) {
-                log.info(INITIALIZING_BUCKET_LOG, BUCKET_NAME);
-                minioClient.makeBucket(
-                        MakeBucketArgs.builder()
-                                .bucket(BUCKET_NAME)
-                                .build());
-                log.info(BUCKET_CREATED_LOG, BUCKET_NAME);
-            } else {
-                log.info(BUCKET_ALREADY_EXISTS_LOG, BUCKET_NAME);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(BUCKET_INIT_EXCEPTION_MSG, e);
-        }
     }
 }

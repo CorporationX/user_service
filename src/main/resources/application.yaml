@@ -35,3 +35,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+app:
+  minio:
+    avatars:
+      endpoint: http://localhost:9000
+      access-key: HZykibzYtPG1ABN2J073
+      secret-key: qjGfUbiitoZyWPNYS24G4EQKDsxCba9rK28DoqEj

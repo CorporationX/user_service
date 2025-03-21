@@ -63,7 +63,8 @@ public class UserActivityService {
         if (end <= maxCachedLeaderboardSize) {
             return userActivityRedisService.getTopActiveUsers(start, end);
         }
-        Pageable pageable = PageRequest.of(start, end - start + 1);
+        int size = end - start + 1;
+        Pageable pageable = PageRequest.of(start / size, size);
         return userActivityMapper.toUserActivityResponseDtoList(userActivityRepository.getTopActive(pageable));
     }
 }

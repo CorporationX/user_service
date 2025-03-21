@@ -62,7 +62,8 @@ public class UserPopularityService {
         if (end <= maxCachedLeaderboardSize) {
             return userPopularityRedisService.getTopPopularUsers(start, end);
         }
-        Pageable pageable = PageRequest.of(start, end - start + 1);
+        int size = end - start + 1;
+        Pageable pageable = PageRequest.of(start / size, size);
         return userPopularityMapper.toUserPopularityResponseDtoList(userPopularityRepository.getTopPopular(pageable));
     }
 }

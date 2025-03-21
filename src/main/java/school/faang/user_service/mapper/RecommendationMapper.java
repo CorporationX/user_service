@@ -1,15 +1,16 @@
 package school.faang.user_service.mapper;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.util.List;
+
+import static school.faang.user_service.service.RecommendationService.ID_NULL_EXCEPTION;
 
 @Mapper(componentModel = "spring", uses = SkillOfferMapper.class)
 public interface RecommendationMapper {
@@ -30,7 +31,7 @@ public interface RecommendationMapper {
 
     default User mapIdToUser(Long id) {
         if (id == null) {
-            return null;
+            throw new DataValidationException(ID_NULL_EXCEPTION);
         }
         User user = new User();
         user.setId(id);

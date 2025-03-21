@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
@@ -17,12 +19,12 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestController("/recommendation")
+@RestController
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PostMapping("/recommendation")
-    public RecommendationDto giveRecommendation(RecommendationDto recommendationDto) {
+    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
         log.info("The process of transmitting the recommendation to the user begins");
         RecommendationDto returnedRecommendation = recommendationService.create(recommendationDto);
         log.info("The recommendation has been passed");
@@ -30,7 +32,7 @@ public class RecommendationController {
     }
 
     @PutMapping("/recommendation")
-    public RecommendationDto updateRecommendation(RecommendationDto recommendationDto) {
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto recommendationDto) {
         log.info("Starting update of recommendation");
         RecommendationDto updatedRecommendationDto = recommendationService.update(recommendationDto);
         log.info("The update is finished");
@@ -38,19 +40,19 @@ public class RecommendationController {
     }
 
     @DeleteMapping("/recommendation/{id}")
-    public void deleteRecommendation(Long id) {
+    public void deleteRecommendation(@PathVariable Long id) {
         log.info("Starting to delete the recommendation");
         recommendationService.delete(id);
         log.info("The recommendation has been removed");
     }
 
-    @GetMapping("/recommendation/{id}")
+    @GetMapping("/recommendation/{authorId}")
     public List<RecommendationDto> getAllGivenRecommendation(@PathVariable Long authorId) {
         outputOfRecommendations(recommendationService.getAllGivenRecommendation(authorId));
         return recommendationService.getAllGivenRecommendation(authorId);
     }
 
-    @GetMapping("/recommendation/{id}")
+    @GetMapping("/recommendation/{receiverId}")
     public List<RecommendationDto> getAllUserRecommendations(@PathVariable Long receiverId) {
         outputOfRecommendations(recommendationService.getAllUserRecommendations(receiverId));
         return recommendationService.getAllGivenRecommendation(receiverId);

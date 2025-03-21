@@ -27,6 +27,7 @@ import static school.faang.user_service.service.RecommendationService.ID_NULL_EX
 @ExtendWith(MockitoExtension.class)
 public class RecommendationMapperTest {
     private static final String CONTENT = "Content";
+    private Recommendation recommendation;
 
     @Spy
     private SkillOfferMapperImpl skillOfferMapper = new SkillOfferMapperImpl();
@@ -37,6 +38,18 @@ public class RecommendationMapperTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(recommendationMapper, "skillOfferMapper", skillOfferMapper);
+
+        Skill skill = Skill.builder().id(1L).build();
+        SkillOffer skillOffer = SkillOffer.builder().id(1L).skill(skill).build();
+        List<SkillOffer> skillOfferList = List.of(skillOffer);
+        recommendation = Recommendation.builder()
+                .id(1L)
+                .author(User.builder().id(1L).build())
+                .receiver(User.builder().id(1L).build())
+                .content(CONTENT)
+                .skillOffers(skillOfferList)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     @Test
@@ -70,18 +83,6 @@ public class RecommendationMapperTest {
 
     @Test
     public void testToRecommendationDto() {
-        Skill skill = Skill.builder().id(1L).build();
-        SkillOffer skillOffer = SkillOffer.builder().id(1L).skill(skill).build();
-        List<SkillOffer> skillOfferList = List.of(skillOffer);
-        Recommendation recommendation = Recommendation.builder()
-                .id(1L)
-                .author(User.builder().id(1L).build())
-                .receiver(User.builder().id(1L).build())
-                .content(CONTENT)
-                .skillOffers(skillOfferList)
-                .createdAt(LocalDateTime.now())
-                .build();
-
         RecommendationDto result = recommendationMapper.toRecommendationDto(recommendation);
 
         assertNotNull(result);
@@ -97,17 +98,6 @@ public class RecommendationMapperTest {
 
     @Test
     public void testToRecommendationDtoList() {
-        Skill skill = Skill.builder().id(1L).build();
-        SkillOffer skillOffer = SkillOffer.builder().id(1L).skill(skill).build();
-        List<SkillOffer> skillOfferList = List.of(skillOffer);
-        Recommendation recommendation = Recommendation.builder()
-                .id(1L)
-                .author(User.builder().id(1L).build())
-                .receiver(User.builder().id(1L).build())
-                .content(CONTENT)
-                .skillOffers(skillOfferList)
-                .createdAt(LocalDateTime.now())
-                .build();
         List<Recommendation> recommendations = List.of(recommendation);
 
         List<RecommendationDto> resultList = recommendationMapper.toRecommendationDtoList(recommendations);
@@ -127,20 +117,17 @@ public class RecommendationMapperTest {
 
     @Test
     public void testMapIdToUserWithIdNull() {
-        Long id = null;
-
         DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> recommendationMapper.mapIdToUser(id));
+                () -> recommendationMapper.mapIdToUser(null));
 
         assertEquals(ID_NULL_EXCEPTION, exception.getMessage());
     }
 
     @Test
     public void testMapIdToUser() {
-        Long id = 1L;
         User expetedUser = User.builder().id(1L).build();
 
-        User result = recommendationMapper.mapIdToUser(id);
+        User result = recommendationMapper.mapIdToUser(1L);
 
         assertNotNull(result);
         assertEquals(expetedUser, result);

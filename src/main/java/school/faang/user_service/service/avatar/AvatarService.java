@@ -48,7 +48,7 @@ public class AvatarService {
         String dicebearUrl = AVATAR_API_URL + DICEBEAR_PNG_ENDPOINT + userId;
         log.info(GENERATED_DICEBEAR_URL_LOG, dicebearUrl);
         byte[] avatarData = fetchAvatarData(dicebearUrl);
-        String objectName = generateObjectName(userId);
+        String objectName = userId + FILE_EXTENSION;
         uploadAvatarToMinio(avatarData, objectName);
         return formulateAvatarUrl(objectName);
     }
@@ -86,10 +86,6 @@ public class AvatarService {
         }
         log.info(AVATAR_FETCH_SUCCESS_LOG);
         return response.getBody();
-    }
-
-    private String generateObjectName(String userId) {
-        return userId + FILE_EXTENSION;
     }
 
     private void uploadAvatarToMinio(byte[] avatarData, String objectName) {

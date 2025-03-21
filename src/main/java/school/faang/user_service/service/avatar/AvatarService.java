@@ -18,7 +18,6 @@ import java.io.InputStream;
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
-    // API and Bucket constants
     private static final String AVATAR_API_URL = "https://api.dicebear.com/5.x/avataaars";
     private static final String DICEBEAR_PNG_ENDPOINT = "/png?seed=";
     private static final String BUCKET_NAME = "corpbucket";
@@ -26,7 +25,6 @@ public class AvatarService {
     private static final String FILE_EXTENSION = ".png";
     private static final String CONTENT_TYPE_PNG = "image/png";
 
-    // Logging message constants
     private static final String GENERATED_DICEBEAR_URL_LOG = "Generated Dicebear URL {}";
     private static final String FETCHING_AVATAR_LOG = "Fetching avatar data from Dicebear URL {}";
     private static final String AVATAR_FETCH_SUCCESS_LOG = "Successfully fetched avatar data from Dicebear.";
@@ -39,7 +37,6 @@ public class AvatarService {
     private static final String BUCKET_ALREADY_EXISTS_LOG = "Bucket '{}' already exists.";
     private static final String BUCKET_CREATED_LOG = "Bucket '{}' created successfully.";
 
-    // Exception message constants
     private static final String AVATAR_FETCH_EXCEPTION_MSG = "Failed to fetch avatar from Dicebear API at URL ";
     private static final String MINIO_UPLOAD_EXCEPTION_MSG = "Error while uploading avatar to MinIO";
     private static final String BUCKET_INIT_EXCEPTION_MSG = "Error initializing bucket in MinIO";

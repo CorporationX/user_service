@@ -11,7 +11,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.education.EducationMapper;
 import school.faang.user_service.repository.EducationRepository;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.UserServiceImpl;
 
 import java.time.Year;
 import java.util.Optional;
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.when;
 class EducationServiceTest {
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private EducationRepository educationRepository;
@@ -90,7 +91,7 @@ class EducationServiceTest {
     @Test
     void addEducation_ValidData_ReturnsEducationDto() {
         when(userService.existsById(1L)).thenReturn(true);
-        when(userService.findById(1L)).thenReturn(user);
+        when(userService.getUserById(1L)).thenReturn(user);
         when(educationRepository.save(any(Education.class))).thenAnswer(invocation
                 -> invocation.getArgument(0));
 
@@ -98,7 +99,7 @@ class EducationServiceTest {
 
         assertNotNull(result);
         assertEquals(validEducationDto.institution(), result.institution());
-        verify(userService, times(1)).findById(1L);
+        verify(userService, times(1)).getUserById(1L);
         verify(educationRepository, times(1)).save(any(Education.class));
     }
 
@@ -107,18 +108,18 @@ class EducationServiceTest {
     void addEducation_InvalidYearFrom_ThrowsException() {
         assertThrows(DataValidationException.class, ()
                 -> educationService.addEducation(1L, invalidYearFromEducationDto));
-        verify(userService, never()).findById(anyLong());
+        verify(userService, never()).getUserById(anyLong());
         verify(educationRepository, never()).save(any(Education.class));
     }
 
     @Test
     void addEducation_UserNotFound_ThrowsException() {
-        when(userService.existsById(1L)).thenReturn(false);
+        doThrow(new DataValidationException("User does not exist."))
+                .when(userService).validateUserExists(1L);
 
         assertThrows(DataValidationException.class, () -> educationService.addEducation(1L, validEducationDto));
 
-        verify(userService, times(1)).existsById(1L);
-        verify(userService, never()).findById(anyLong());
+        verify(userService, never()).getUserById(anyLong());
         verify(educationRepository, never()).save(any(Education.class));
     }
 

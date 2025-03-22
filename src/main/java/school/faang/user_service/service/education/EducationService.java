@@ -34,12 +34,9 @@ public class EducationService {
             throw new DataValidationException("YearFrom cannot be in the future");
         }
 
-        if (!userService.existsById(userId)) {
-            log.error("User not found with id: {}", userId);
-            throw new DataValidationException("User not found");
-        }
+        userService.validateUserExists(userId);
 
-        User user = userService.findById(userId);
+        User user = userService.getUserById(userId);
         log.info("User found with id: {}", userId);
 
         Education education = educationMapper.toEducation(educationDto);

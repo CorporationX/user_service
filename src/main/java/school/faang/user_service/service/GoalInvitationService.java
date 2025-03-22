@@ -107,8 +107,8 @@ public class GoalInvitationService {
             throw new InvalidInvitationException("Inviter and invited user cannot be the same.");
         }
 
-        userService.checkUserExists(invitation.getInviter().getId());
-        userService.checkUserExists(invitation.getInvited().getId());
+        userService.validateUserExists(invitation.getInviter().getId());
+        userService.validateUserExists(invitation.getInvited().getId());
 
         if (!goalService.existsById(invitation.getGoal().getId())) {
             throw new InvalidInvitationException("Goal does not exist.");

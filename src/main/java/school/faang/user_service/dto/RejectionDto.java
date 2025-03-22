@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class RejectionDto {
+
     @NotBlank
     private String reason;
 }

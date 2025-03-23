@@ -17,4 +17,8 @@ public interface UserService {
     void checkUserExists(Long userId);
 
     boolean existsById(long userId);
+
+    UserDto findUserAndReturnDto(Long userId);
+
+
 }

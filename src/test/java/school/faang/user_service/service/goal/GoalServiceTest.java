@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.ValidationException;
@@ -26,7 +28,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
@@ -41,71 +43,150 @@ public class GoalServiceTest {
     private GoalMapperImpl goalMapper;
     private GoalService goalService;
 
+    private static Skill firstSkill;
+    private static Skill secondSkill;
+    private static GoalDto goalDto;
+    private static Goal goalForSkills;
+    private static User firstUser;
+    private static User secondUser;
+
     @BeforeEach
     public void setUp() {
         goalService = new GoalService(goalRepository, skillRepository, goalMapper,
                 List.of(goalStatusFilter, goalTitleFilter));
     }
 
+    @BeforeAll
+    public static void init() {
+        firstSkill = Skill.builder().id(1L).build();
+        secondSkill = Skill.builder().id(2L).build();
+        goalDto = GoalDto.builder().id(1L).title("Title")
+                .description("description").parentId(1L)
+                .skillIds(List.of(1L, 2L)).build();
+        goalForSkills = Goal.builder().id(1L).title("Goal Title")
+                .skillsToAchieve(new ArrayList<>()).build();
+        firstUser = User.builder().id(1L).build();
+        secondUser = User.builder().id(2L).build();
+    }
+
     @Test
     public void testNullTitleIsInvalid() {
-        GoalDto goalDto = GoalDto.builder().title(null).build();
+        GoalDto goalDtoWithNullTitle = GoalDto.builder().title(null).build();
+
         Assert.assertThrows(ValidationException.class,
-                () -> goalService.createGoal(1L, goalDto));
+                () -> goalService.createGoal(1L, goalDtoWithNullTitle));
     }
 
     @Test
     public void testNullTitleIsEmpty() {
-        GoalDto goalDto = GoalDto.builder().title("").build();
+        GoalDto goalDtoWithEmptyTitle = GoalDto.builder().title("").build();
+
         Assert.assertThrows(ValidationException.class,
-                () -> goalService.createGoal(1L, goalDto));
+                () -> goalService.createGoal(1L, goalDtoWithEmptyTitle));
     }
 
     @Test
     public void testMoreThanMaxActiveGoals() {
-        GoalDto goalDto = GoalDto.builder().title("Title").build();
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(4);
+
         Assert.assertThrows(ValidationException.class,
                 () -> goalService.createGoal(1L, goalDto));
     }
 
     @Test
     public void testNonExistingSkills() {
-        GoalDto goalDto = GoalDto.builder().title("Title").skillIds(List.of(1L, 2L, 4L)).build();
-        Skill skill1 = Skill.builder().id(1L).build();
-        Skill skill2 = Skill.builder().id(2L).build();
+        GoalDto goalDtoWithNoSkillId = GoalDto.builder().title("Title").skillIds(List.of(1L, 2L, 4L)).build();
+
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(2);
-        when(skillRepository.findAllById(List.of(1L, 2L, 4L))).thenReturn(List.of(skill1, skill2));
+        when(skillRepository.findAllById(List.of(1L, 2L, 4L))).thenReturn(List.of(firstSkill, secondSkill));
+
         Assert.assertThrows(ValidationException.class,
-                () -> goalService.createGoal(1L, goalDto));
+                () -> goalService.createGoal(1L, goalDtoWithNoSkillId));
     }
 
     @Test
-    public void addSkillsToGoal() {
-        GoalDto goalDto = GoalDto.builder().title("Title").description("description")
-                .parentId(1L).skillIds(List.of(1L, 2L)).build();
-        Skill skill1 = Skill.builder().id(1L).build();
-        Skill skill2 = Skill.builder().id(2L).build();
+    public void testAddSkillsToGoal() {
         Goal createdGoal = Goal.builder().id(1L).title("Title").description("description")
-                .parent(null).skillsToAchieve(List.of(skill1, skill2)).build();
+                .parent(null).skillsToAchieve(List.of(firstSkill, secondSkill)).build();
 
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(2);
-        when(skillRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(skill1, skill2));
+        when(skillRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(firstSkill, secondSkill));
         when(goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId()))
                 .thenReturn(createdGoal);
-
-        Goal goalForSkills = Goal.builder()
-                .id(1L)
-                .title("Goal Title")
-                .skillsToAchieve(new ArrayList<>()) // Начально пустой набор навыков
-                .build();
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goalForSkills));
-
         when(skillRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(
                 Skill.builder().id(1L).build(), Skill.builder().id(2L).build()));
-
         GoalDto result = goalService.createGoal(1L, goalDto);
+
         assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("Title", result.getTitle());
+        assertEquals("description", result.getDescription());
+    }
+
+    @Test
+    public void testUpdateGoalWithEmptySkills() {
+        Goal goal = Goal.builder().id(1L).status(GoalStatus.ACTIVE).skillsToAchieve(List.of()).build();
+
+        when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(2);
+        when(skillRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(firstSkill, secondSkill));
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        GoalDto result = goalService.updateGoal(1L, goalDto);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testUpdateGoal() {
+        Goal goal = Goal.builder().id(1L).status(GoalStatus.COMPLETED)
+                .skillsToAchieve(new ArrayList<>(List.of(firstSkill)))
+                .users(List.of(firstUser, secondUser)).build();
+
+        when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(2);
+        when(skillRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(firstSkill, secondSkill));
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        doAnswer(ans -> {
+                    long id = ans.getArgument(0);
+                    goal.getSkillsToAchieve().removeIf(s -> firstSkill.getId() == id);
+                    return null;
+                }).when(goalRepository).removeSkillsFromGoal(anyLong());
+        GoalDto result = goalService.updateGoal(1L, goalDto);
+
+        assertNotNull(result);
+        assertEquals(2, goal.getSkillsToAchieve().size());
+        assertTrue(goal.getSkillsToAchieve().contains(firstSkill));
+        assertTrue(goal.getSkillsToAchieve().contains(secondSkill));
+    }
+
+    @Test
+    public void testDeleteGoal() {
+        Goal goal = Goal.builder().id(1L).title("Test Goal").build();
+
+        goalRepository.save(goal);
+        goalService.deleteGoal(1L);
+        Optional<Goal> deletedGoal = goalRepository.findById(1L);
+
+        assertFalse(deletedGoal.isPresent());
+    }
+
+    @Test
+    public void testFindSubtasks() {
+        Goal subtask1 = Goal.builder().id(2L).title("Subtask 1").build();
+        Goal subtask2 = Goal.builder().id(3L).title("Subtask 2").build();
+        List<Goal> subtasks = List.of(subtask1, subtask2);
+        GoalDto subtaskDto1 = GoalDto.builder().id(2L).title("Subtask 1").build();
+        GoalDto subtaskDto2 = GoalDto.builder().id(3L).title("Subtask 2").build();
+        List<GoalDto> expectedDtos = List.of(subtaskDto1, subtaskDto2);
+
+        when(goalRepository.findByParent(1L)).thenReturn(subtasks.stream());
+        doReturn(subtaskDto1).when(goalMapper).toDto(subtask1);
+        doReturn(subtaskDto2).when(goalMapper).toDto(subtask2);
+        List<GoalDto> result = goalService.findSubtasksByGoalId(1L);
+
+        assertEquals(expectedDtos, result);
+        verify(goalRepository, times(1)).findByParent(1L);
+        verify(goalMapper, times(1)).toDto(subtask1);
+        verify(goalMapper, times(1)).toDto(subtask2);
     }
 
     @Test

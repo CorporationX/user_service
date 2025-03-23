@@ -19,4 +19,5 @@ public interface UserService {
     boolean existsById(long userId);
 
     UserDto findUserAndReturnDto(Long userId);
+
 }

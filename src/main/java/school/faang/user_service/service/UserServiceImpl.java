@@ -68,4 +68,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsById(userId);
 
     }
+
+    @Override
+    public UserDto findUserAndReturnDto(Long userId) {
+        User user = getUserById(userId);
+        return userMapper.toDto(user);
+    }
 }

@@ -10,7 +10,7 @@ import school.faang.user_service.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/v1")
 public class UserController {
 
     private final UserService userService;
@@ -19,8 +19,8 @@ public class UserController {
         return userService.deactivateUser(userId);
     }
 
-    @GetMapping("/{userId}")
-    public UserDto findUserAndReturnDto(@PathVariable Long userId) {
-        return userService.findUserAndReturnDto(userId);
+    @GetMapping("/user/{id}")
+    public UserDto findUserAndReturnDto(@PathVariable Long id) {
+        return userService.findUserAndReturnDto(id);
     }
 }

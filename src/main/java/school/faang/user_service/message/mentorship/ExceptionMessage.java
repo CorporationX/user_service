@@ -10,7 +10,8 @@ public enum ExceptionMessage {
     USER_NOT_FOUND("User with ID %d not found"),
     EQUAL_IDS("The transmitted user IDs are equal"),
     NO_USER_MENTEE("User does not have such a mentee"),
-    NO_USER_MENTOR("User does not have such a mentor");
+    NO_USER_MENTOR("User does not have such a mentor"),
+    REGISTER_EXCEPTION("Request URI: {}\nHTTP Status: {}\nException: {} - {}");
 
     private final String message;
 }

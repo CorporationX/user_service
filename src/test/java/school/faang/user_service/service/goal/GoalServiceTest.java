@@ -1,7 +1,5 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +12,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.ErrorCode;
 import school.faang.user_service.exception.ValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.TestGoalActiveStatusFilter;
@@ -32,6 +31,13 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
+    private static Skill firstSkill;
+    private static Skill secondSkill;
+    private static GoalDto goalDto;
+    private static Goal goalForSkills;
+    private static User firstUser;
+    private static User secondUser;
+
     private final GoalFilter goalStatusFilter = new TestGoalActiveStatusFilter();
     private final GoalFilter goalTitleFilter = new TestGoalTitleFilter();
 
@@ -43,21 +49,10 @@ public class GoalServiceTest {
     private GoalMapperImpl goalMapper;
     private GoalService goalService;
 
-    private static Skill firstSkill;
-    private static Skill secondSkill;
-    private static GoalDto goalDto;
-    private static Goal goalForSkills;
-    private static User firstUser;
-    private static User secondUser;
-
     @BeforeEach
     public void setUp() {
         goalService = new GoalService(goalRepository, skillRepository, goalMapper,
                 List.of(goalStatusFilter, goalTitleFilter));
-    }
-
-    @BeforeAll
-    public static void init() {
         firstSkill = Skill.builder().id(1L).build();
         secondSkill = Skill.builder().id(2L).build();
         goalDto = GoalDto.builder().id(1L).title("Title")
@@ -73,24 +68,33 @@ public class GoalServiceTest {
     public void testNullTitleIsInvalid() {
         GoalDto goalDtoWithNullTitle = GoalDto.builder().title(null).build();
 
-        Assert.assertThrows(ValidationException.class,
+        ValidationException exception = assertThrows(ValidationException.class,
                 () -> goalService.createGoal(1L, goalDtoWithNullTitle));
+
+        assertEquals(ErrorCode.GOAL_EMPTY_TITLE, exception.getErrorCode());
+        assertEquals(ErrorCode.GOAL_EMPTY_TITLE.getDescription(), exception.getErrorCode().getDescription());
+
     }
 
     @Test
     public void testNullTitleIsEmpty() {
         GoalDto goalDtoWithEmptyTitle = GoalDto.builder().title("").build();
 
-        Assert.assertThrows(ValidationException.class,
+        ValidationException exception = assertThrows(ValidationException.class,
                 () -> goalService.createGoal(1L, goalDtoWithEmptyTitle));
+
+        assertEquals(ErrorCode.GOAL_EMPTY_TITLE, exception.getErrorCode());
+        assertEquals(ErrorCode.GOAL_EMPTY_TITLE.getDescription(), exception.getErrorCode().getDescription());
     }
 
     @Test
     public void testMoreThanMaxActiveGoals() {
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(4);
 
-        Assert.assertThrows(ValidationException.class,
+        ValidationException exception = assertThrows(ValidationException.class,
                 () -> goalService.createGoal(1L, goalDto));
+        assertEquals(ErrorCode.MAX_ACTIVE_GOALS, exception.getErrorCode());
+        assertEquals(ErrorCode.MAX_ACTIVE_GOALS.getDescription(), exception.getErrorCode().getDescription());
     }
 
     @Test
@@ -100,8 +104,10 @@ public class GoalServiceTest {
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(2);
         when(skillRepository.findAllById(List.of(1L, 2L, 4L))).thenReturn(List.of(firstSkill, secondSkill));
 
-        Assert.assertThrows(ValidationException.class,
+        ValidationException exception = assertThrows(ValidationException.class,
                 () -> goalService.createGoal(1L, goalDtoWithNoSkillId));
+        assertEquals(ErrorCode.GOAL_NON_EXISTING_SKILLS, exception.getErrorCode());
+        assertEquals(ErrorCode.GOAL_NON_EXISTING_SKILLS.getDescription(), exception.getErrorCode().getDescription());
     }
 
     @Test

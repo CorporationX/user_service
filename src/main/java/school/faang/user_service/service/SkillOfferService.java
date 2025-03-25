@@ -17,7 +17,7 @@ public class SkillOfferService {
         return skillOfferRepository.findAllByRecommendationId(recommendationId);
     }
 
-    public void deleteSkillOfferssByRecommendationId(long recommendationId) {
+    public void deleteSkillOffersByRecommendationId(long recommendationId) {
         skillOfferRepository.deleteAllByRecommendationId(recommendationId);
     }
 

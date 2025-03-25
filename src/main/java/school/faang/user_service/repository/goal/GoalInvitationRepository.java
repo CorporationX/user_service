@@ -14,8 +14,8 @@ public interface GoalInvitationRepository extends JpaRepository<GoalInvitation, 
 
     boolean existsByInvitedAndGoal(User invited, Goal goal);
 
-    @Query("SELECT gi FROM GoalInvitation gi WHERE gi.inviter.id = :inviterId " +
-            "AND gi.invited.id = :invitedId AND gi.status = :status")
+    @Query("SELECT gi FROM GoalInvitation gi WHERE gi.inviter.id = :inviterId "
+            + "AND gi.invited.id = :invitedId AND gi.status = :status")
     List<GoalInvitation> findByInviterIdAndInvitedIdAndStatus(
             @Param("inviterId") Long inviterId,
             @Param("invitedId") Long invitedId,

@@ -35,3 +35,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+user_service:
+  mentorship:
+    # allowedRequestFrequency - the number of months that must pass before user A can
+    # send another mentorship request to the same user B
+    allowedRequestFrequency: 3

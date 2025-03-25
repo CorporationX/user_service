@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("checkstyle")
     kotlin("jvm")
     jacoco
 }
@@ -76,6 +77,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
+configure<CheckstyleExtension> {
+    toolVersion = "10.21.4"
+    config = resources.text.fromFile(file("config/checkstyle/google_checks.xml"))
+}
+
 jsonSchema2Pojo {
     setSource(files("src/main/resources/json"))
     targetDirectory = file("${project.buildDir}/generated-sources/js2p")
@@ -94,6 +100,33 @@ tasks.bootJar {
 }
 kotlin {
     jvmToolchain(17)
+}
+
+tasks {
+    withType<Checkstyle>().configureEach {
+        ignoreFailures = false
+        maxErrors = 0
+        maxWarnings = 0
+        reports {
+            xml.required.set(false)
+            html.required.set(true)
+        }
+    }
+
+    named<Checkstyle>("checkstyleMain") {
+        source = fileTree("src/main/java") {
+            include("**/*.java")
+            exclude("**/resources/**")
+        }
+        classpath = files()
+    }
+
+    named<Checkstyle>("checkstyleTest") {
+        source = fileTree("src/test/java") {
+            include("**/*.java")
+        }
+        classpath = files()
+    }
 }
 
 jacoco {

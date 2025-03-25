@@ -29,10 +29,12 @@ public class SubscriptionService {
     }
 
     private void ensureSubscriptionStateValidation(long followerId, long targetId, boolean shouldExist) {
-        if (followerId == targetId)
+        if (followerId == targetId) {
             throw new DataValidationException("A user cannot follow themselves. UserId: " + targetId);
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, targetId) != shouldExist)
+        }
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, targetId) != shouldExist) {
             throw new DataValidationException("The subscription has already been issued");
+        }
     }
 
     public List<UserDto> getFollowers(long id, UserFilterDto filterDto) {

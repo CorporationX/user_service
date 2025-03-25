@@ -25,4 +25,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Stream<User> findPremiumUsers();
 
     List<User> findByUsernameLike(String username);
+
+    @Query(nativeQuery = true, value = """
+            SELECT id FROM users
+            WHERE username = ?1
+            """)
+    List<Long> findIdByUsername(String username);
 }

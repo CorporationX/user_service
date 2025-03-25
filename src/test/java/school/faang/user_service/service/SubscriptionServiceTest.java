@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.FollowerResponse;
-import school.faang.user_service.dto.UserFilterRequest;
+import school.faang.user_service.dto.FollowerResponseDto;
+import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
@@ -112,8 +112,8 @@ public class SubscriptionServiceTest {
         when(subscriptionRepository.findByFollowerId(1L))
                 .thenReturn(Stream.of(appliedForFilter, notAppliedForFilter));
 
-        List<FollowerResponse> actualFollowings = subscriptionService.getFollowing(1L,
-                new UserFilterRequest(
+        List<FollowerResponseDto> actualFollowings = subscriptionService.getFollowing(1L,
+                new UserFilterRequestDto(
                         "Takewqa",
                         "+79999999999",
                         2,
@@ -141,8 +141,8 @@ public class SubscriptionServiceTest {
         when(subscriptionRepository.findByFolloweeId(1L))
                 .thenReturn(Stream.of(appliedForFilter, notAppliedForFilter));
 
-        List<FollowerResponse> actualFollowers = subscriptionService.getFollowers(1L,
-                new UserFilterRequest(
+        List<FollowerResponseDto> actualFollowers = subscriptionService.getFollowers(1L,
+                new UserFilterRequestDto(
                         "Takewqa",
                         "+79999999999",
                         2,

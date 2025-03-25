@@ -20,4 +20,5 @@ public record GoalInvitationDto(
         Long goalId,
 
         RequestStatus status
-) {}
+) {
+}

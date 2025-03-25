@@ -22,7 +22,7 @@ public class StatusFilterTest {
     private StatusFilter statusFilter;
 
     @Test
-    public void testIsApplicable_StatusNull_ReturnsFalse() {
+    public void testIsApplicableStatusNullReturnsFalse() {
         var filterDto = new RequestFilterDto();
 
         var result = statusFilter.isApplicable(filterDto);
@@ -31,7 +31,7 @@ public class StatusFilterTest {
     }
 
     @Test
-    public void testIsApplicable_StatusPresent_ReturnsTrue() {
+    public void testIsApplicableStatusPresentReturnsTrue() {
         var filterDto = new RequestFilterDto();
         filterDto.setStatus(RequestStatus.ACCEPTED);
 
@@ -41,7 +41,7 @@ public class StatusFilterTest {
     }
 
     @Test
-    public void testApply_HasMatchedRecommendationRequests_ReturnsNonEmptyStream() {
+    public void testApplyHasMatchedRecommendationRequestsReturnsNonEmptyStream() {
         var filterDto = new RequestFilterDto();
         filterDto.setStatus(RequestStatus.PENDING);
         var expectedItems = generateExpectedItems();

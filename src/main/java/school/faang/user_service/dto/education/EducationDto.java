@@ -7,4 +7,5 @@ public record EducationDto(
         String institution,
         String educationLevel,
         String specialization
-) {}
+) {
+}

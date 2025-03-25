@@ -21,7 +21,7 @@ public class MessageFilterTest {
     private MessageFilter messageFilter;
 
     @Test
-    public void testIsApplicable_MessageNull_ReturnsFalse() {
+    public void testIsApplicableMessageNullReturnsFalse() {
         var filterDto = new RequestFilterDto();
 
         var result = messageFilter.isApplicable(filterDto);
@@ -30,7 +30,7 @@ public class MessageFilterTest {
     }
 
     @Test
-    public void testIsApplicable_MessageEmpty_ReturnsFalse() {
+    public void testIsApplicableMessageEmptyReturnsFalse() {
         var filterDto = new RequestFilterDto();
         filterDto.setMessagePattern("");
 
@@ -40,7 +40,7 @@ public class MessageFilterTest {
     }
 
     @Test
-    public void testIsApplicable_MessageBlank_ReturnsFalse() {
+    public void testIsApplicableMessageBlankReturnsFalse() {
         var filterDto = new RequestFilterDto();
         filterDto.setMessagePattern("   ");
 
@@ -50,7 +50,7 @@ public class MessageFilterTest {
     }
 
     @Test
-    public void testIsApplicable_MessageNonEmpty_ReturnsTrue() {
+    public void testIsApplicableMessageNonEmptyReturnsTrue() {
         var filterDto = new RequestFilterDto();
         filterDto.setMessagePattern("Test");
 
@@ -60,7 +60,7 @@ public class MessageFilterTest {
     }
 
     @Test
-    public void testApply_HasMatchedRecommendationRequests_ReturnsNonEmptyStream() {
+    public void testApplyHasMatchedRecommendationRequestsReturnsNonEmptyStream() {
         var filterDto = new RequestFilterDto();
         filterDto.setMessagePattern("[a-z ]+");
         var expectedItems = generateExpectedItems();

@@ -20,7 +20,9 @@ public class UserFilterByNamePhoneExperience implements Predicate<User> {
 
     @Override
     public boolean test(User user) {
-        if (user == null) return false;
+        if (user == null) {
+            return false;
+        }
 
         boolean matchesName = (namePattern == null) || namePattern.matcher(user.getUsername()).matches();
         boolean matchesPhone = (phonePattern == null) || phonePattern.matcher(user.getPhone()).matches();

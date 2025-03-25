@@ -87,7 +87,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void addEducation_ValidData_ReturnsEducationDto() {
+    void addEducationValidDataReturnsEducationDto() {
         when(userService.existsById(1L)).thenReturn(true);
         when(userService.findById(1L)).thenReturn(user);
         when(educationRepository.save(any(Education.class))).thenAnswer(invocation
@@ -102,7 +102,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void addEducation_InvalidYearFrom_ThrowsException() {
+    void addEducationInvalidYearFromThrowsException() {
         assertThrows(DataValidationException.class, ()
                 -> educationService.addEducation(1L, invalidYearFromEducationDto));
         verify(userService, never()).findById(anyLong());
@@ -110,7 +110,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void addEducation_UserNotFound_ThrowsException() {
+    void addEducationUserNotFoundThrowsException() {
         when(userService.existsById(1L)).thenReturn(false);
 
         assertThrows(DataValidationException.class, () -> educationService.addEducation(1L, validEducationDto));
@@ -121,7 +121,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void updateEducation_ValidData_ReturnsEducationDto() {
+    void updateEducationValidDataReturnsEducationDto() {
         when(educationRepository.findById(1L)).thenReturn(Optional.of(existingEducation));
         when(educationRepository.save(any(Education.class))).thenAnswer(invocation
                 -> invocation.getArgument(0));
@@ -135,7 +135,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void updateEducation_InvalidYearFrom_ThrowsException() {
+    void updateEducationInvalidYearFromThrowsException() {
         assertThrows(DataValidationException.class, ()
                 -> educationService.updateEducation(1L, invalidYearFromEducationDto));
         verify(educationRepository, never()).findById(anyLong());
@@ -143,7 +143,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void updateEducation_EducationNotFound_ThrowsException() {
+    void updateEducationEducationNotFoundThrowsException() {
         when(educationRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(DataValidationException.class, ()
@@ -153,7 +153,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void updateEducation_UserMismatch_ThrowsException() {
+    void updateEducationUserMismatchThrowsException() {
         User anotherUser = new User();
         anotherUser.setId(2L);
         existingEducation.setUser(anotherUser);
@@ -167,7 +167,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void getById_ValidId_ReturnsEducationDto() {
+    void getByIdValidIdReturnsEducationDto() {
         when(educationRepository.findById(1L)).thenReturn(Optional.of(existingEducation));
 
         EducationDto result = educationService.getById(1L);
@@ -178,7 +178,7 @@ class EducationServiceTest {
     }
 
     @Test
-    void getById_EducationNotFound_ThrowsException() {
+    void getByIdEducationNotFoundThrowsException() {
         when(educationRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(DataValidationException.class, ()

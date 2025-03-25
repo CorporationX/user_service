@@ -94,7 +94,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testCreate_RequestEarlierRequiredMonths_Throws() {
+    public void testCreateRequestEarlierRequiredMonthsThrows() {
         var recommendationRequest = createRecommendationRequestDto();
         var latestRequest = RecommendationRequest.builder()
                 .createdAt(LocalDateTime.now())
@@ -107,7 +107,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testCreate_NullSkills_Throws() {
+    public void testCreateNullSkillsThrows() {
         var recommendationRequest = createRecommendationRequestDto();
         setLatestRequest(recommendationRequest, Optional.empty());
 
@@ -117,7 +117,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testCreate_EmptySkills_Throws() {
+    public void testCreateEmptySkillsThrows() {
         var recommendationRequest = createRecommendationRequestDto();
         recommendationRequest.setSkills(List.of());
         setLatestRequest(recommendationRequest, Optional.empty());
@@ -128,7 +128,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testCreate_HasMissingSkills_Throws() {
+    public void testCreateHasMissingSkillsThrows() {
         // Arrange
         var recommendationRequest = createRecommendationRequestDto();
 
@@ -146,11 +146,9 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testCreate_RequestElderRequiredMonths_CallDataSavingMethod() {
+    public void testCreateRequestElderRequiredMonthsCallDataSavingMethod() {
         // Arrange
         var recommendationRequest = createRecommendationRequestDto();
-        var requester = prepareRequester(recommendationRequest);
-        var receiver = prepareReceiver(recommendationRequest);
 
         var skillId = 3L;
         var skillRequest = new SkillRequestDto(skillId);
@@ -162,6 +160,9 @@ public class RecommendationRequestServiceTest {
                 .build();
         setLatestRequest(recommendationRequest, Optional.of(latestRequest));
         when(skillService.doesSkillExists(skillId)).thenReturn(true);
+
+        var requester = prepareRequester(recommendationRequest);
+        var receiver = prepareReceiver(recommendationRequest);
 
         var expectedResult = RecommendationRequest.builder()
                 .id(5L)
@@ -185,7 +186,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testGetRequests_AllFiltersAreNotApplicable_ReturnsOriginalRequests() {
+    public void testGetRequestsAllFiltersAreNotApplicableReturnsOriginalRequests() {
         // Arrange
         var filterDto = new RequestFilterDto();
 
@@ -211,7 +212,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testGetRequests_AllRequestsAreNotMatched_ReturnsEmptyList() {
+    public void testGetRequestsAllRequestsAreNotMatchedReturnsEmptyList() {
         // Arrange
         var filterDto = new RequestFilterDto();
         filterDto.setMessagePattern("Test");
@@ -237,7 +238,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testGetRequests_SomeRequestsAreMatched_ReturnsNotEmptyList() {
+    public void testGetRequestsSomeRequestsAreMatchedReturnsNotEmptyList() {
         // Arrange
         var messagePatternToSearch = "Java";
         var statusToSearch = RequestStatus.PENDING;
@@ -293,7 +294,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testGetRequest_RequestNotFound_Throws() {
+    public void testGetRequestRequestNotFoundThrows() {
         var requestId = 1L;
         when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
@@ -303,7 +304,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testGetRequest_RequestFound_ReturnsRecommendationRequest() {
+    public void testGetRequestRequestFoundReturnsRecommendationRequest() {
         // Arrange
         var requestId = 1L;
         var recommendationRequest = RecommendationRequest.builder()
@@ -338,7 +339,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testRejectRequest_RequestNotFound_Throws() {
+    public void testRejectRequestRequestNotFoundThrows() {
         var rejection = createRejectionDto();
         var requestId = 1L;
         when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
@@ -350,7 +351,7 @@ public class RecommendationRequestServiceTest {
 
     @ParameterizedTest
     @MethodSource("testRejectionProhibitedSource")
-    public void testRejectRequest_InvalidStatus_ReturnsFalse(RequestStatus requestStatus) {
+    public void testRejectRequestInvalidStatusReturnsFalse(RequestStatus requestStatus) {
         var rejection = createRejectionDto();
         var requestId = 1L;
         prepareRecommendationRequestForRejectionTest(requestStatus, requestId);
@@ -365,7 +366,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testRejectRequest_ValidStatus_ReturnsTrue() {
+    public void testRejectRequestValidStatusReturnsTrue() {
         var rejection = createRejectionDto();
         var requestId = 1L;
         var recommendationRequest = prepareRecommendationRequestForRejectionTest(RequestStatus.PENDING, requestId);
@@ -398,7 +399,7 @@ public class RecommendationRequestServiceTest {
                 .id(recommendationRequest.getRequesterId())
                 .username("Requester")
                 .build();
-        when(userService.getUserById(requester.getId())).thenReturn(requester);
+        when(userService.findUserById(requester.getId())).thenReturn(requester);
 
         return requester;
     }
@@ -408,7 +409,7 @@ public class RecommendationRequestServiceTest {
                 .id(recommendationRequest.getReceiverId())
                 .username("Receiver")
                 .build();
-        when(userService.getUserById(receiver.getId())).thenReturn(receiver);
+        when(userService.findUserById(receiver.getId())).thenReturn(receiver);
         return receiver;
     }
 

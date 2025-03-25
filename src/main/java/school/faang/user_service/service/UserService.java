@@ -1,42 +1,18 @@
 package school.faang.user_service.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.UserRepository;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
+public interface UserService {
+    User getReferenceById(long userId);
 
-    public boolean doesUserExist(long userId) {
-        return userRepository.existsById(userId);
-    }
+    long getUniqueIdByUsername(String username);
 
-    public User getUserById(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new DataRetrievalFailureException(
-                        "User with id %d is not found".formatted(userId)));
-    }
+    User findUserById(long userId);
 
-    public User findById(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("User not found"));
-    }
+    void checkUserExists(Long userId);
 
-    public void checkUserExists(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            log.error("User with ID {} does not exist", userId);
-            throw new DataValidationException("User does not exist.");
-        }
-    }
+    boolean existsById(long userId);
 
-    public boolean existsById(long userId) {
-        return userRepository.existsById(userId);
-    }
+    User findById(long userId);
+
 }

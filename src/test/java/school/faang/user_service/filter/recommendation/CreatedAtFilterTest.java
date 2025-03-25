@@ -24,7 +24,7 @@ public class CreatedAtFilterTest {
     private CreatedAtFilter createdAtFilter;
 
     @Test
-    public void testIsApplicable_CreatedAtFromAndToAreNull_ReturnsFalse() {
+    public void testIsApplicableCreatedAtFromAndToAreNullReturnsFalse() {
         var filterDto = new RequestFilterDto();
 
         var result = createdAtFilter.isApplicable(filterDto);
@@ -33,7 +33,7 @@ public class CreatedAtFilterTest {
     }
 
     @Test
-    public void testIsApplicable_CreatedAtFromIsSet_ReturnsTrue() {
+    public void testIsApplicableCreatedAtFromIsSetReturnsTrue() {
         var filterDto = new RequestFilterDto();
         filterDto.setCreatedAtFrom(LocalDateTime.now());
 
@@ -43,7 +43,7 @@ public class CreatedAtFilterTest {
     }
 
     @Test
-    public void testIsApplicable_CreatedAtToIsSet_ReturnsTrue() {
+    public void testIsApplicableCreatedAtToIsSetReturnsTrue() {
         var filterDto = new RequestFilterDto();
         filterDto.setCreatedAtTo(LocalDateTime.now());
 
@@ -53,7 +53,7 @@ public class CreatedAtFilterTest {
     }
 
     @Test
-    public void testIsApplicable_CreatedAtFromAndToAreSet_ReturnsTrue() {
+    public void testIsApplicableCreatedAtFromAndToAreSetReturnsTrue() {
         var filterDto = new RequestFilterDto();
         filterDto.setCreatedAtFrom(LocalDateTime.now());
         filterDto.setCreatedAtTo(LocalDateTime.now());
@@ -64,7 +64,7 @@ public class CreatedAtFilterTest {
     }
 
     @Test
-    public void testApply_FromIsSetAndHasMatchedRequests_ReturnsNonEmptyStream() {
+    public void testApplyFromIsSetAndHasMatchedRequestsReturnsNonEmptyStream() {
         // Arrange
         var from = LocalDateTime.now().minusHours(10);
 
@@ -82,7 +82,7 @@ public class CreatedAtFilterTest {
     }
 
     @Test
-    public void testApply_ToIsSetAndHasMatchedRequests_ReturnsNonEmptyStream() {
+    public void testApplyToIsSetAndHasMatchedRequestsReturnsNonEmptyStream() {
         // Arrange
         var to = LocalDateTime.now();
 
@@ -100,7 +100,7 @@ public class CreatedAtFilterTest {
     }
 
     @Test
-    public void testApply_FromAndToAreSetAndHasMatchedRequests_ReturnsNonEmptyStream() {
+    public void testApplyFromAndToAreSetAndHasMatchedRequestsReturnsNonEmptyStream() {
         // Arrange
         var from = LocalDateTime.now().minusHours(1);
         var to = LocalDateTime.now();

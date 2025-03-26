@@ -1,6 +1,7 @@
 package school.faang.user_service.mapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.json.student.Education;
@@ -30,16 +31,20 @@ public interface UserMapper {
 
     default String buildAboutMe(Person person) {
         Education education = person.getEducation();
-        String state = "Not specified";
-        String employer = "Not specified";
-        if (!person.getContactInfo().getAddress().getState().isEmpty()) {
-            state = person.getContactInfo().getAddress().getState();
-        }
-        if (!person.getEmployer().isEmpty()) {
-            employer = person.getEmployer();
-        }
-        return "State: " + state + "\n Faculty: " + education.getFaculty() + "\n Major: " + education.getMajor() +
-                "\n Employer: " + employer + "\n Year of Study: " + education.getYearOfStudy();
+
+        String state = Optional.ofNullable(person.getContactInfo().getAddress().getState())
+                .filter(s -> !s.isEmpty()).orElse("Not specified");
+        String employer = Optional.ofNullable(person.getEmployer())
+                .filter(e -> !e.isEmpty()).orElse("Not specified");
+
+        return String.format(
+                "State: %s%nFaculty: %s%nMajor: %s%nEmployer: %s%nYear of Study: %d",
+                state,
+                education.getFaculty(),
+                education.getMajor(),
+                employer,
+                education.getYearOfStudy()
+        );
     }
 
     default String generatedPassword() {

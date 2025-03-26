@@ -27,6 +27,7 @@ import school.faang.user_service.service.UserService;
 public class UserController {
     private final UserService userService;
     private final CsvMapper csvMapper;
+    private final String typeFile = "text/scv";
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
@@ -53,7 +54,7 @@ public class UserController {
 
     @PostMapping("/upload-file")
     public ResponseEntity<String> uploadFile(@RequestParam("file") @NotNull MultipartFile file) {
-        if (!"text/scv".equals(file.getContentType()) || file.isEmpty()) {
+        if (!typeFile.equals(file.getContentType()) || file.isEmpty()) {
             return ResponseEntity.badRequest().body("The file must be in CSV format!");
         }
         try (InputStream inputStream = file.getInputStream()) {
@@ -63,7 +64,7 @@ public class UserController {
                     .readValues(inputStream);
             List<Person> people = iterator.readAll();
 
-            userService.uploadFile(people);
+            userService.saveUsers(people);
             log.info("File uploaded");
 
             return ResponseEntity.ok("File uploaded and processed successfully.");

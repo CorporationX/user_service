@@ -125,14 +125,14 @@ public class UserService {
         eventRepositoryAdapter.deleteAll(userEvents);
     }
 
-    public void uploadFile(List<Person> people) {
+    public void saveUsers(List<Person> people) {
         List<User> users = new ArrayList<>();
         for (Person person : people) {
             User user = userMapper.toUser(person);
             String country = person.getContactInfo().getAddress().getCountry();
             Country countryEntity = new Country();
             countryEntity.setTitle(country);
-            if (!countryRepository.findByName(country).isPresent()) {
+            if (countryRepository.findByName(country).isEmpty()) {
                 Country savedCountry = countryRepository.save(countryEntity);
                 log.info("Country saved: {}", savedCountry.getTitle());
             }

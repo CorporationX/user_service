@@ -310,7 +310,7 @@ class UserServiceTest {
         when(countryRepository.findByName("Germany")).thenReturn(Optional.empty());
         when(countryRepository.save(country)).thenReturn(country);
 
-        userService.uploadFile(people);
+        userService.saveUsers(people);
 
         verify(userMapper, times(1)).toUser(person);
 

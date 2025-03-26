@@ -37,8 +37,16 @@ payment-service:
   port: 9080
 
 app:
+  avatar:
+    apiUrl: "https://api.dicebear.com/5.x/avataaars"
+    dicebearPngEndpoint: "/png?seed="
+    localhostUrlPrefix: "http://localhost:9000"
+    fileExtension: ".png"
+    contentType: "image/png"
   minio:
     avatars:
       endpoint: http://localhost:9000
       access-key: HZykibzYtPG1ABN2J073
       secret-key: qjGfUbiitoZyWPNYS24G4EQKDsxCba9rK28DoqEj
+    bucket:
+      name: "corpbucket"

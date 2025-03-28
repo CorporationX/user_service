@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterRequest;
+import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class UserMinExperienceFilterTest {
     @Test
     public void testIsApplicable() {
         boolean actualResult = userMinExperienceFilter.isApplicable(
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         null,
                         12,
@@ -30,7 +30,7 @@ public class UserMinExperienceFilterTest {
     @Test
     public void testIsNotApplicable() {
         boolean actualResult = userMinExperienceFilter.isApplicable(
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         null,
                         null,
@@ -48,7 +48,7 @@ public class UserMinExperienceFilterTest {
 
         List<User> actualResult = userMinExperienceFilter.apply(
                 users,
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         null,
                         222,

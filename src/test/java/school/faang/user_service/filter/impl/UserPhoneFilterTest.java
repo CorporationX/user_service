@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterRequest;
+import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class UserPhoneFilterTest {
     @Test
     public void testIsApplicable() {
         boolean actualResult = userPhoneFilter.isApplicable(
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         "+79999999999",
                         null,
@@ -30,7 +30,7 @@ public class UserPhoneFilterTest {
     @Test
     public void testIsNotApplicable() {
         boolean actualResult = userPhoneFilter.isApplicable(
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         null,
                         null,
@@ -48,7 +48,7 @@ public class UserPhoneFilterTest {
 
         List<User> actualResult = userPhoneFilter.apply(
                 users,
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         "+79999999999",
                         null,

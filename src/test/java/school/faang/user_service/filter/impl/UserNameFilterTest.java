@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterRequest;
+import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class UserNameFilterTest {
     @Test
     public void testIsApplicable() {
         boolean actualResult = userNameFilter.isApplicable(
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         "Takewqa",
                         null,
                         null,
@@ -30,7 +30,7 @@ public class UserNameFilterTest {
     @Test
     public void testIsNotApplicable() {
         boolean actualResult = userNameFilter.isApplicable(
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         null,
                         null,
                         null,
@@ -48,7 +48,7 @@ public class UserNameFilterTest {
 
         List<User> actualResult = userNameFilter.apply(
                 users,
-                new UserFilterRequest(
+                new UserFilterRequestDto(
                         "Aqwekat",
                         null,
                         null,

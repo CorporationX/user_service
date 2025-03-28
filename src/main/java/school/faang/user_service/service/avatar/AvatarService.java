@@ -5,10 +5,8 @@ import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import school.faang.user_service.exception.AvatarFetchException;
+import school.faang.user_service.client.AvatarClient;
 import school.faang.user_service.exception.MinioUploadException;
 
 import java.io.ByteArrayInputStream;
@@ -18,10 +16,8 @@ import java.io.InputStream;
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
+
     private static final String GENERATED_DICEBEAR_URL_LOG = "Generated Dicebear URL {}";
-    private static final String FETCHING_AVATAR_LOG = "Fetching avatar data from Dicebear URL {}";
-    private static final String AVATAR_FETCH_SUCCESS_LOG = "Successfully fetched avatar data from Dicebear.";
-    private static final String AVATAR_FETCH_ERROR_LOG = "Failed to fetch avatar from Dicebear API at URL {}";
     private static final String UPLOAD_AVATAR_LOG = "Uploading avatar to MinIO with object name {}";
     private static final String AVATAR_UPLOAD_SUCCESS_LOG = "Avatar successfully uploaded to MinIO.";
     private static final String MINIO_UPLOAD_ERROR_LOG = "Error while uploading avatar to MinIO";
@@ -46,26 +42,15 @@ public class AvatarService {
     private String contentTypePng;
 
     private final MinioClient minioClient;
-    private final RestTemplate restTemplate;
+    private final AvatarClient avatarClient;
 
     public String generateAndUploadAvatar(String userId) {
         String dicebearUrl = avatarApiUrl + dicebearPngEndpoint + userId;
         log.info(GENERATED_DICEBEAR_URL_LOG, dicebearUrl);
-        byte[] avatarData = fetchAvatarData(dicebearUrl);
+        byte[] avatarData = avatarClient.fetchAvatarData(dicebearUrl);
         String objectName = userId + fileExtension;
         uploadAvatarToMinio(avatarData, objectName);
         return formulateAvatarUrl(objectName);
-    }
-
-    private byte[] fetchAvatarData(String url) {
-        log.info(FETCHING_AVATAR_LOG, url);
-        ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            log.error(AVATAR_FETCH_ERROR_LOG, url);
-            throw new AvatarFetchException(url);
-        }
-        log.info(AVATAR_FETCH_SUCCESS_LOG);
-        return response.getBody();
     }
 
     private void uploadAvatarToMinio(byte[] avatarData, String objectName) {

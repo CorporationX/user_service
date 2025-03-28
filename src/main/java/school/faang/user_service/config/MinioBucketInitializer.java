@@ -4,12 +4,14 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class MinioBucketInitializer {
 
     private static final String INITIALIZING_BUCKET_LOG = "Initializing bucket {}";
@@ -21,10 +23,6 @@ public class MinioBucketInitializer {
     private String bucketName;
 
     private final MinioClient minioClient;
-
-    public MinioBucketInitializer(MinioClient minioClient) {
-        this.minioClient = minioClient;
-    }
 
     @PostConstruct
     public void initializeBucket() {

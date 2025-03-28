@@ -32,7 +32,6 @@ class AvatarServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Инициализация полей, которые обычно задаются через @Value
         ReflectionTestUtils.setField(avatarService, "avatarApiUrl", "http://avatar-api");
         ReflectionTestUtils.setField(avatarService, "dicebearPngEndpoint", "/png/");
         ReflectionTestUtils.setField(avatarService, "bucketName", "avatars");

@@ -55,7 +55,7 @@ public class SubscriptionServiceTest {
                 .thenReturn(true);
 
         assertThrows(DataValidationException.class,
-                () -> subscriptionService.followUser(1L, 1L));
+                () -> subscriptionService.followUser(1L, 2L));
     }
 
     @Test

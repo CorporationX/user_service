@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface RecommendationRepository extends CrudRepository<Recommendation, Long> {
@@ -23,6 +24,22 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
             """)
     @Modifying
     void update(long authorId, long receiverId, String content);
+
+    @Query(nativeQuery = true, value = """
+            SELECT receiver_id, COUNT(author_id)
+            FROM recommendation
+            GROUP BY receiver_id
+            HAVING COUNT(author_id) > 0
+            """)
+    Map<Long, Integer> countReceivedRecommendationsPerUser();
+
+    @Query(nativeQuery = true, value = """
+            SELECT author_id, COUNT(receiver_id)
+            FROM recommendation
+            GROUP BY author_id
+            HAVING COUNT(receiver_id) > 0
+            """)
+    Map<Long, Integer> countGivenRecommendationsPerUser();
 
     Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);
 

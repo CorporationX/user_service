@@ -22,6 +22,7 @@ import school.faang.user_service.dto.avatar.AvatarType;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.service.rating.RatingService;
 import school.faang.user_service.service.user.UserAvatarService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validation.image.ValidImage;
@@ -34,6 +35,7 @@ import java.util.List;
 @RestController
 public class UserController {
     private final UserService userService;
+    private final RatingService ratingService;
     private final UserMapper userMapper;
     private final UserAvatarService userAvatarService;
     private final UserContext userContext;
@@ -122,5 +124,11 @@ public class UserController {
     @PostMapping("/page")
     public Page<UserDto> getUsersByIds(@RequestParam("ids") List<Long> ids, Pageable pageable) {
         return userService.getUsersByIds(ids, pageable);
+    }
+
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<UserDto>> getTopUsers(@RequestParam("limit") @Positive Integer limit) {
+        List<UserDto> topUsers = ratingService.getTopUsers(limit);
+        return ResponseEntity.ok(topUsers);
     }
 }

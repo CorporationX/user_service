@@ -7,6 +7,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public interface GoalRepository extends JpaRepository<Goal, Long> {
@@ -23,6 +24,21 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning *
             """)
     Goal create(String title, String description, Long parent);
+
+    @Query(nativeQuery = true, value = """
+            INSERT INTO user_goal (user_id, goal_id)
+            VALUES (?1, ?2)
+            """)
+    void addGoalToUser(long userId, long goalId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT ug.user_id, COUNT(ug.goal_id)
+            FROM user_goal ug JOIN goal g ON g.id = ug.goal_id
+            WHERE g.status = 0
+            GROUP BY ug.user_id
+            HAVING COUNT(ug.goal_id) > 0
+            """)
+    Map<Long, Integer> countActiveGoalsPerEachUser();
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(ug.goal_id) FROM user_goal ug

@@ -171,4 +171,7 @@ public class User {
     @Enumerated(EnumType.ORDINAL)
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Column(name = "rating_score")
+    private Double ratingScore;
 }

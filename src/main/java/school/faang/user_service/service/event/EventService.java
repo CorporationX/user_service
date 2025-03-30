@@ -1,19 +1,21 @@
 package school.faang.user_service.service.event;
 
-import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.enums.RatingType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.rating.annotation.RatingChanging;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -25,6 +27,7 @@ public class EventService {
     private final UserRepository userRepository;
     private final List<EventFilter> eventFilters;
 
+    @RatingChanging(ratingType = RatingType.EVENT_RATING)
     public Event create(Event event) {
         if (event.getRelatedSkills().isEmpty()) {
             throw new DataValidationException("Event must have at least one related skill");
@@ -60,6 +63,7 @@ public class EventService {
         return eventRepository.deleteAllEndedInPast();
     }
 
+    @RatingChanging(ratingType = RatingType.EVENT_RATING, positiveAction = false)
     public void deleteEvent(Long id) {
         eventRepository.deleteById(id);
     }
@@ -87,6 +91,10 @@ public class EventService {
 
     public List<Event> getParticipatedEvents(long userId) {
         return eventRepository.findParticipatedEventsByUserId(userId);
+    }
+
+    public Map<Long, Integer> getNumberOfOwnedEventsPerUser() {
+        return eventRepository.countOwnedEventsPerUser();
     }
 
     private boolean userHasRequiredSkills(Long ownerId, List<Long> requiredSkills) {

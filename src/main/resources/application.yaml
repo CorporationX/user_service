@@ -55,7 +55,7 @@ swagger:
     tags-sorter: alpha
 
 s3:
-  endpoint: http://localhost:9000
+  endpoint: http://localhost:9002
   region: us-east-1
   accessKey: user
   secretKey: password
@@ -73,6 +73,9 @@ avatar:
 
 goal:
   max-active-goals-per-user: 3
+
+rating:
+  top-users-limit: 100
 
 premium:
   removal:

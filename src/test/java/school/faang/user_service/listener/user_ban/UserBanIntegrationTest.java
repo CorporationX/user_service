@@ -2,6 +2,7 @@ package school.faang.user_service.listener.user_ban;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redis.testcontainers.RedisContainer;
 import faang.school.event.UserBanEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,10 @@ public class UserBanIntegrationTest {
             .withUsername("user")
             .withPassword("password");
 
+    @Container
+    private static final RedisContainer REDIS_CONTAINER = new RedisContainer(
+            DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.username", postgres::getUsername);
@@ -69,6 +74,9 @@ public class UserBanIntegrationTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
 
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+
+        registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
+        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
     }
 
     @Test

@@ -29,6 +29,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByUsernameLike(String username);
 
+    @Query(value = """
+            SELECT u FROM User u
+            WHERE u.ratingScore IS NOT NULL
+            """)
+    List<User> findAllUsersWithRatingScores(Pageable pageable);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            WITH to_reset AS (
+                SELECT id FROM users
+                WHERE rating_score IS NOT NULL
+                FOR UPDATE
+            )
+            UPDATE users
+            SET rating_score = NULL
+            WHERE id IN (SELECT id FROM to_reset)
+            """)
+    void resetAllRatingScores();
+
     @Modifying
     @Query(nativeQuery = true, value = """
             UPDATE users

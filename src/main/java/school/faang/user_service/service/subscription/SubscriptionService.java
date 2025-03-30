@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.enums.RatingType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.service.rating.annotation.RatingChanging;
 import school.faang.user_service.validation.subscription.SubscriptionValidator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -22,6 +25,7 @@ public class SubscriptionService {
     private final SubscriptionValidator subscriptionValidator;
     private final List<UserFilter> userFilters;
 
+    @RatingChanging(ratingType = RatingType.SUBSCRIPTION_RATING)
     @Transactional
     public void followUser(long followerId, long followeeId) {
         subscriptionValidator.validateNotSelfSubscription(
@@ -34,6 +38,7 @@ public class SubscriptionService {
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
+    @RatingChanging(ratingType = RatingType.SUBSCRIPTION_RATING, positiveAction = false)
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionValidator.validateNotSelfSubscription(
@@ -66,6 +71,10 @@ public class SubscriptionService {
     @Transactional(readOnly = true)
     public int getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    public Map<Long, Integer> getNumberOfFollowersPerUser() {
+        return subscriptionRepository.countFollowersPerUser();
     }
 
     private Stream<User> filterUsers(Stream<User> users, UserFilterDto filters) {

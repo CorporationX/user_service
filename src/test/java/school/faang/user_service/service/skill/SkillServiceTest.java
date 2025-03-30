@@ -107,6 +107,7 @@ class SkillServiceTest {
         user.setId(1L);
         List<User> users = List.of(user);
 
+        when(skillRepository.findSkillsByGoalId(anyLong())).thenReturn(List.of(skill));
         doNothing().when(skillRepository).assignSkillToUser(anyLong(), anyLong());
 
         skillService.assignSkillsFromGoalToUsers(1L, users);

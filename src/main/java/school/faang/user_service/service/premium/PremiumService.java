@@ -13,9 +13,11 @@ import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.enums.RatingType;
 import school.faang.user_service.exception.PaymentFailedException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.rating.annotation.RatingChanging;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ public class PremiumService {
     private final UserRepository userRepository;
     private final PaymentServiceClient paymentServiceClient;
 
+    @RatingChanging(ratingType = RatingType.PREMIUM_RATING)
     @Transactional
     public Premium buyPremium(long userId, PremiumPeriod premiumPeriod) {
         User user = userRepository.findById(userId).orElseThrow();

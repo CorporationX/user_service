@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.Skill;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface SkillRepository extends JpaRepository<Skill, Long> {
@@ -39,6 +40,14 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     @Query(nativeQuery = true, value = "INSERT INTO user_skill (skill_id, user_id) VALUES (:skillId, :userId)")
     @Modifying
     void assignSkillToUser(long skillId, long userId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT us.user_id, count(us.skill_id)
+            FROM user_skill us
+            GROUP BY us.user_id
+            HAVING count(us.skill_id) > 0
+            """)
+    Map<Long, Integer> countAssignedSkillsPerUser();
 
     @Query(nativeQuery = true, value = """
             SELECT s.* FROM skill s

@@ -8,12 +8,15 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.enums.RatingType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.rating.annotation.RatingChanging;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static school.faang.user_service.utils.skill.SkillErrorMessage.NOT_ENOUGH_SKILL_OFFERS;
@@ -38,7 +41,14 @@ public class SkillService {
         if (userIds == null) {
             return;
         }
-        userIds.forEach(user -> skillRepository.assignSkillToUser(goalId, user.getId()));
+        skillRepository.findSkillsByGoalId(goalId).forEach(
+                skill -> userIds.forEach(user -> assignSkillToUser(user.getId(), goalId))
+        );
+    }
+
+    @RatingChanging(ratingType = RatingType.SKILL_RATING)
+    private void assignSkillToUser(Long userId, Long skillId) {
+        skillRepository.assignSkillToUser(skillId, userId);
     }
 
     @Transactional
@@ -60,6 +70,7 @@ public class SkillService {
         return skillRepository.findSkillsOfferedToUser(userId);
     }
 
+    @RatingChanging(ratingType = RatingType.SKILL_RATING)
     @Transactional
     public Skill acquireSkillFromOffers(long userId, long skillId) {
         skillRepository.findUserSkill(skillId, userId)
@@ -84,5 +95,9 @@ public class SkillService {
             throw new DataValidationException(NOT_ENOUGH_SKILL_OFFERS);
         }
         return skillRepository.findUserSkill(skillId, userId).get();
+    }
+
+    public Map<Long, Integer> getNumberOfSkillsPerUser() {
+        return skillRepository.countAssignedSkillsPerUser();
     }
 }

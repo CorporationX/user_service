@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
@@ -26,9 +27,12 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.s3.AvatarS3Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -286,5 +292,68 @@ public class UserServiceTest {
 
         assertEquals(0, result.getTotalElements());
         assertEquals(userDtos, result.getContent());
+    }
+
+    @Test
+    void addUserRatingScore_EmptyRating() {
+        Double scoreToAdd = 10.0;
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+
+        userService.addUserRatingScore(1L, scoreToAdd);
+
+        verify(userRepository, times(1)).save(user);
+        assertEquals(scoreToAdd, user.getRatingScore());
+    }
+
+    @Test
+    void addUserRatingScore_NotEmptyRating() {
+        user.setRatingScore(5.0);
+        Double scoreToAdd = 10.0;
+        Double expectedScore = user.getRatingScore() + scoreToAdd;
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+
+        userService.addUserRatingScore(1L, scoreToAdd);
+
+        verify(userRepository, times(1)).save(user);
+        assertEquals(expectedScore, user.getRatingScore());
+    }
+
+    @Test
+    void addUserRatingScore_NegativeRating() {
+        Double scoreToAdd = -10.0;
+        Double expectedScore = 0.0;
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+
+        userService.addUserRatingScore(1L, scoreToAdd);
+
+        verify(userRepository, times(1)).save(user);
+        assertEquals(expectedScore, user.getRatingScore());
+    }
+
+    @Test
+    void findAllUsersWithRatingScores() {
+        int topUsersLimit = 10;
+        Pageable pageable = PageRequest.ofSize(topUsersLimit)
+                .withSort(Sort.by("ratingScore").descending());
+        user.setRatingScore(10.0);
+        List<User> users = new ArrayList<>();
+        users.add(user);
+
+        Map<UserDto, Double> expectedUsersWithRatingScores = users.stream().collect(Collectors.toMap(userMapperImpl::toDto, User::getRatingScore));
+        when(userRepository.findAllUsersWithRatingScores(any(Pageable.class))).thenReturn(users);
+
+        Map<UserDto, Double> usersWithRatingScores = userService.findAllUsersWithRatingScores(topUsersLimit);
+
+        verify(userRepository, times(1)).findAllUsersWithRatingScores(pageable);
+        assertEquals(expectedUsersWithRatingScores, usersWithRatingScores);
+    }
+
+    @Test
+    void resetAllRatingScores() {
+        doNothing().when(userRepository).resetAllRatingScores();
+
+        userService.resetAllRatingScores();
+
+        verify(userRepository, times(1)).resetAllRatingScores();
     }
 }

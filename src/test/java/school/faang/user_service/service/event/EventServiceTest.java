@@ -23,6 +23,7 @@ import school.faang.user_service.validation.event.EventValidator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -215,5 +216,14 @@ public class EventServiceTest {
 
         assertEquals(1, deletedEvents);
         verify(eventRepository, times(1)).deleteAllEndedInPast();
+    }
+
+    @Test
+    void getNumberOfOwnedEventsPerUser() {
+        Map<Long, Integer> numOfOwnedEventsPerUser = Map.ofEntries(Map.entry(1L, 1));
+        when(eventRepository.countOwnedEventsPerUser()).thenReturn(numOfOwnedEventsPerUser);
+
+        assertEquals(numOfOwnedEventsPerUser, eventService.getNumberOfOwnedEventsPerUser());
+        verify(eventRepository, times(1)).countOwnedEventsPerUser();
     }
 }

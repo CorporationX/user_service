@@ -11,13 +11,16 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.enums.RatingType;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.rating.annotation.RatingChanging;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -32,10 +35,10 @@ public class GoalService {
     private final UserService userService;
     private final List<GoalFilter> goalFilters;
     private final GoalMapper goalMapper;
-
     @Value("${goal.max-active-goals-per-user}")
     private Integer maxActiveGoalsPerUser;
 
+    @RatingChanging(ratingType = RatingType.GOAL_RATING)
     @Transactional
     public Goal createGoal(Long userId, String title, String description, Long parentId, List<Long> skillIds) {
         //validation
@@ -56,6 +59,7 @@ public class GoalService {
         //perform goal creation
         Goal createdGoal = goalRepository.create(title, description, parentId);
         assignSkillsToGoal(createdGoal.getId(), skillIds);
+        goalRepository.addGoalToUser(userId, createdGoal.getId());
 
         log.info("Goal with id {} and title {} has been created successfully and skills {} have been assigned", createdGoal.getId(), createdGoal.getTitle(), skillIds);
         return createdGoal;
@@ -116,6 +120,7 @@ public class GoalService {
         return updateGoal(goalId, goalDto);
     }
 
+    @RatingChanging(ratingType = RatingType.GOAL_RATING, positiveAction = false)
     public void deleteGoal(Long goalId) {
         goalRepository.deleteById(goalId);
     }
@@ -154,6 +159,10 @@ public class GoalService {
         return subGoals.filter(goal -> applicableFilters.stream()
                 .allMatch(filter -> filter.apply(filterDto, goal))
         ).toList();
+    }
+
+    public Map<Long, Integer> findNumOfGoalsPerUser() {
+        return goalRepository.countActiveGoalsPerEachUser();
     }
 
     private void assignSkillsToGoal(Long goalId, @NotNull(message = "list of skills can't be null") List<Long> skillsId) {

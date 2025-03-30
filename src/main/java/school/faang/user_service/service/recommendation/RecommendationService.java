@@ -9,15 +9,18 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.enums.RatingType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.rating.annotation.RatingChanging;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static school.faang.user_service.utils.RecommendationErrorMessage.RECOMMENDATION_NOT_FOUND;
@@ -34,6 +37,7 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final int monthsAllowedAfterRecommendationCreation = 6;
 
+    @RatingChanging(ratingType = RatingType.RECOMMENDATION_RATING)
     @Transactional
     public Recommendation create(Recommendation recommendation) {
         validateRecommendation(recommendation);
@@ -84,10 +88,23 @@ public class RecommendationService {
                     return new DataValidationException(message);
                 });
 
+        deleteRecommendation(recommendationToDelete);
+    }
+
+    @RatingChanging(ratingType = RatingType.RECOMMENDATION_RATING, positiveAction = false)
+    private void deleteRecommendation(Recommendation recommendation) {
         userSkillGuaranteeRepository.deleteAllByGuarantorId(
-                recommendationToDelete.getAuthor().getId());
-        skillOfferRepository.deleteAllByRecommendationId(id);
-        recommendationRepository.deleteById(id);
+                recommendation.getAuthor().getId());
+        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        recommendationRepository.deleteById(recommendation.getId());
+    }
+
+    public Map<Long, Integer> getNumberOfReceivedRecommendationsPerUser() {
+        return recommendationRepository.countReceivedRecommendationsPerUser();
+    }
+
+    public Map<Long, Integer> getNumberOfGivenRecommendationsPerUser() {
+        return recommendationRepository.countGivenRecommendationsPerUser();
     }
 
     public List<Recommendation> getAllUserRecommendations(long receiverId) {

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.User;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 public interface SubscriptionRepository extends JpaRepository<User, Long> {
@@ -39,4 +40,12 @@ public interface SubscriptionRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery = true, value = "select count(id) from subscription where follower_id = :followerId")
     int findFolloweesAmountByFollowerId(long followerId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT subs.followee_id, COUNT(subs.follower_id)
+            FROM subscription as subs
+            GROUP BY subs.followee_id
+            HAVING COUNT(subs.follower_id) > 0
+            """)
+    Map<Long, Integer> countFollowersPerUser();
 }

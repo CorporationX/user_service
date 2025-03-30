@@ -1,6 +1,7 @@
 package school.faang.user_service.publisher.ProfileView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,6 +60,10 @@ public class AnalyticsProfileViewPublisherIT {
     private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
             DockerImageName.parse("confluentinc/cp-kafka:7.3.5"));
 
+    @Container
+    private static final RedisContainer REDIS_CONTAINER = new RedisContainer(
+            DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRESQL_CONTAINER::getJdbcUrl);
@@ -67,6 +72,9 @@ public class AnalyticsProfileViewPublisherIT {
 
         registry.add("spring.kafka.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
         registry.add("spring.kafka.topics.test-topic.name", () -> "analytics_user_view_profile_topic");
+
+        registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
+        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
     }
 
     @AfterEach

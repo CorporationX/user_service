@@ -3,7 +3,9 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,6 @@ import school.faang.user_service.event.AnalyticsProfileViewEvent;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.MentorshipService;
@@ -32,7 +33,10 @@ import school.faang.user_service.service.s3.AvatarS3Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static school.faang.user_service.utils.user.UserErrorMessage.USERS_NOT_FOUND;
 import static school.faang.user_service.utils.user.UserErrorMessage.USER_NOT_FOUND;
@@ -78,6 +82,7 @@ public class UserService {
         return users;
     }
 
+    @Transactional
     public void updateUser(User user) {
         userRepository.save(user);
     }
@@ -237,5 +242,35 @@ public class UserService {
                 () -> new IllegalArgumentException(String.format(USER_NOT_FOUND, telegramChatId)));
         user.setTelegramChatId(telegramChatId);
         return userRepository.save(user);
+    }
+
+    private Double getUserRatingScore(Long userId) {
+        return getUser(userId).getRatingScore();
+    }
+
+    public Double addUserRatingScore(Long userId, Double score) {
+        Optional<Double> userRating = Optional.ofNullable(getUserRatingScore(userId));
+        double newScore = userRating.orElse(0.0) + score;
+
+        if (newScore < 0) {
+            newScore = 0.0;
+        }
+
+        User user = getUser(userId);
+        user.setRatingScore(newScore);
+        updateUser(user);
+
+        return newScore;
+    }
+
+    public Map<UserDto, Double> findAllUsersWithRatingScores(int topUsersLimit) {
+        return userRepository.findAllUsersWithRatingScores(PageRequest.ofSize(topUsersLimit)
+                        .withSort(Sort.by("ratingScore").descending()))
+                .stream().collect(Collectors.toMap(userMapper::toDto, User::getRatingScore));
+    }
+
+    @Transactional
+    public void resetAllRatingScores() {
+        userRepository.resetAllRatingScores();
     }
 }

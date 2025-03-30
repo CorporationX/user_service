@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
@@ -18,6 +19,7 @@ import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -272,5 +274,14 @@ class GoalServiceTest {
 
         assertEquals(List.of(goal), result);
         verify(goalRepository, times(1)).findGoalsByUserId(1L);
+    }
+
+    @Test
+    void findNumOfGoalsPerUser() {
+        Map<Long, Integer> numOfGoalsPerUser = Map.ofEntries(Map.entry(1L, 1));
+        when(goalRepository.countActiveGoalsPerEachUser()).thenReturn(numOfGoalsPerUser);
+
+        assertEquals(numOfGoalsPerUser, goalService.findNumOfGoalsPerUser());
+        verify(goalRepository, times(1)).countActiveGoalsPerEachUser();
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface EventParticipationRepository extends CrudRepository<User, Long> {
@@ -18,6 +19,14 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM user_event WHERE event_id = :eventId and user_id = :userId")
     void unregister(long eventId, long userId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT ue.user_id, COUNT(ue.event_id)
+            FROM user_event ue
+            GROUP BY ue.user_id
+            HAVING COUNT(ue.event_id) > 0
+            """)
+    Map<Long, Integer> countVisitedEventsPerUser();
 
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM users u

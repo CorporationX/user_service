@@ -45,7 +45,7 @@ class GoalControllerTest {
     void createGoal_ShouldReturnCreatedGoal() {
         GoalDto goalDto = new GoalDto();
         Goal goal = new Goal();
-        when(goalService.createGoal(anyLong(), anyString(), anyString(), anyLong(), anyList())).thenReturn(goal);
+        when(goalService.createGoal(any(), any(), any(), any(), any())).thenReturn(goal);
         when(goalMapper.toDto(any())).thenReturn(goalDto);
 
         ResponseEntity<GoalDto> response = goalController.createGoal(1L, goalDto);

@@ -1,2 +1,5 @@
 goal:
   max-active-goals-per-user: 3
+
+rating:
+  top-users-limit: 100

@@ -1,5 +1,6 @@
 package school.faang.user_service.scheduler;
 
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -38,6 +40,10 @@ public class EventSchedulerTest {
             .withUsername("sa")
             .withPassword("sa");
 
+    @Container
+    private static final RedisContainer REDIS_CONTAINER = new RedisContainer(
+            DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(6379);
+
     private static final int SECONDS_TO_WAIT = 10;
     @DynamicPropertySource
     private static void setDatasourceProperties(DynamicPropertyRegistry properties) {
@@ -45,6 +51,9 @@ public class EventSchedulerTest {
         properties.add("spring.datasource.username", postgreSQLContainer::getUsername);
         properties.add("spring.datasource.password", postgreSQLContainer::getPassword);
         properties.add("event.removal.cron", () -> String.format("*/%d * * * * *", SECONDS_TO_WAIT));
+
+        properties.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
+        properties.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
     }
 
     @Autowired

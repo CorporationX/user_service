@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.event.Event;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -35,4 +36,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             SELECT count(*) FROM deleted
             """)
     int deleteAllEndedInPast();
+
+    @Query(nativeQuery = true, value = """
+            SELECT user_id, COUNT(*)
+            FROM event
+            GROUP BY user_id
+            HAVING COUNT(*) > 0
+            """)
+    Map<Long, Integer> countOwnedEventsPerUser();
 }

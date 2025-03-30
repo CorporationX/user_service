@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -34,7 +34,7 @@ public class UserServiceTest {
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     long userId;
 

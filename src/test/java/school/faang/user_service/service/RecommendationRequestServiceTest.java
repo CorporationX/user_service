@@ -55,7 +55,7 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestRepository recommendationRequestRepository;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
     @Mock
     private SkillRequestService skillRequestService;
     @Mock

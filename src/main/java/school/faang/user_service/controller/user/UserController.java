@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.promotion.PromoUserDto;
 import school.faang.user_service.dto.user.UserResponseDto;
 import school.faang.user_service.service.user.UserService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -21,6 +24,11 @@ import school.faang.user_service.service.user.UserService;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping()
+    List<PromoUserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return userService.getUsersByIds(ids);
+    }
 
     @GetMapping("/{userId}")
     public UserResponseDto getUser(@PathVariable Long userId) {

@@ -3,6 +3,7 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.promotion.PromoUserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserResponseDto;
 import school.faang.user_service.entity.Country;
@@ -30,4 +31,9 @@ public interface UserMapper {
     default Country getCountry(Person person) {
         return Country.builder().title(person.getCountry()).build();
     }
+
+    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "country", source = "country.title")
+    PromoUserDto toPromoUserDto(User user);
 }

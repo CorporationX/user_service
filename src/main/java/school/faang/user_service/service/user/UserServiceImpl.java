@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.promotion.PromoUserDto;
 import school.faang.user_service.dto.user.UserResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.events.UserProfileViewEvent;
@@ -57,6 +58,12 @@ public class UserServiceImpl implements UserService {
         }
         log.info("Profile of user {} was viewed", userDto.getUsername());
         return userDto;
+    }
+
+    @Override
+    public List<PromoUserDto> getUsersByIds(List<Long> ids) {
+        final List<User> users = userRepository.findAllById(ids);
+        return users.stream().map(userMapper::toPromoUserDto).toList();
     }
 
     @Override

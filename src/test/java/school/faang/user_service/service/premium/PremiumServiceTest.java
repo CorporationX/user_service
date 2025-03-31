@@ -19,6 +19,7 @@ import school.faang.user_service.enums.PremiumPeriod;
 import school.faang.user_service.exception.PaymentPayException;
 import school.faang.user_service.exception.PaymentServiceException;
 import school.faang.user_service.exception.PremiumAlreadyExistsException;
+import school.faang.user_service.kafka.producer.PremiumBoughtEventProducer;
 import school.faang.user_service.mapper.PremiumMapperImpl;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PremiumService;
@@ -47,6 +48,8 @@ class PremiumServiceTest {
     private PremiumMapperImpl premiumMapper;
     @Mock
     private UserService userService;
+    @Mock
+    private PremiumBoughtEventProducer premiumBoughtEventProducer;
 
     @InjectMocks
     private PremiumService premiumService;

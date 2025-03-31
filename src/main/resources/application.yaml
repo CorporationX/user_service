@@ -48,9 +48,11 @@ spring:
       recommendation-requested: recommendation-requested
       follower: follower_topic
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    topics:
+      premium-bought: premium-bought-topic
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.JsonSerializer
       acks: all
       retries: 3
       enable-idempotence: true

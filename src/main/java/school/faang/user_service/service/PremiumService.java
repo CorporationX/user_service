@@ -18,6 +18,8 @@ import school.faang.user_service.enums.PremiumPeriod;
 import school.faang.user_service.exception.PaymentPayException;
 import school.faang.user_service.exception.PaymentServiceException;
 import school.faang.user_service.exception.PremiumAlreadyExistsException;
+import school.faang.user_service.kafka.events.PremiumBoughtEvent;
+import school.faang.user_service.kafka.producer.PremiumBoughtEventProducer;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
@@ -38,6 +40,7 @@ public class PremiumService {
     private final PaymentServiceClient paymentServiceClient;
     private final UserService userService;
     private final PremiumMapper premiumMapper;
+    private final PremiumBoughtEventProducer premiumBoughtEventProducer;
 
     @Value("${app.config.max_data_group_size}")
     private int removerBatchSize;
@@ -74,6 +77,16 @@ public class PremiumService {
 
             premiumRepository.save(premium);
             log.info("Premium bought. {} | {} | {}", user, paymentResponse, premiumPeriod);
+
+            PremiumBoughtEvent premiumBoughtEvent = PremiumBoughtEvent.builder()
+                    .userId(user.getId())
+                    .amount(paymentRequest.amount().doubleValue())
+                    .duration(premiumPeriod.getDays())
+                    .boughtAt(LocalDateTime.now())
+                    .build();
+
+            premiumBoughtEventProducer.sendEvent(premiumBoughtEvent);
+
             return premiumMapper.toDto(premium);
         } catch (PaymentServiceException e) {
             log.error("Payment service not working. {}", e.getMessage());

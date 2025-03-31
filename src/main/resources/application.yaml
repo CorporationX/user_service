@@ -11,6 +11,11 @@ app:
     max_data_group_size: 1000
     clear_events_sheduled_cron: "0 0 0 * * 1"
 
+security:
+  oauth2:
+    resource:
+      jwk-set-uri: "http://localhost:9090/realms/Oauth/protocol/openid-connect/certs"
+
 spring:
   mvc:
     servlet:

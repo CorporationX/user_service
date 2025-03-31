@@ -166,4 +166,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Column(name = "is_banned")
+    private boolean isBanned;
 }

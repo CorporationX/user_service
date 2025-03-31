@@ -8,11 +8,14 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.client.PromotionServiceClient;
+import school.faang.user_service.config.kafka.KafkaTopics;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.UserNotificationDto;
@@ -52,7 +55,7 @@ import java.util.stream.Collectors;
 import static school.faang.user_service.config.KafkaConstants.PAYMENT_PROMOTION_TOPIC;
 import static school.faang.user_service.config.KafkaConstants.USER_KEY;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -258,5 +261,17 @@ public class UserService {
         User user = getUserById(userId);
 
         return userMapper.toUserNotificationDto(user);
+    }
+
+    @Transactional
+    public void banUser(Long userId) {
+        userRepository.banUserById(userId);
+        log.info("User {} has been banned", userId);
+    }
+
+    @KafkaListener(topics = KafkaTopics.USER_BAN_TOPIC)
+    @Transactional
+    public void listenUserBan(String userId) {
+        banUser(Long.parseLong(userId));
     }
 }

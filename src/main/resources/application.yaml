@@ -41,6 +41,8 @@ spring:
     redis:
       port: ${REDIS_PORT:6379}
       host: ${REDIS_HOST:localhost}
+      topic:
+        user-ban: user_ban
 
   kafka:
     topics:

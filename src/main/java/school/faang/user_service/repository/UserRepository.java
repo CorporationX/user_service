@@ -1,6 +1,7 @@
 package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.User;
@@ -48,4 +49,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
+
+    @Modifying
+    @Query("UPDATE User u SET u.isBanned = true WHERE u.id = :userId")
+    void banUserById(@Param("userId") Long userId);
+
 }

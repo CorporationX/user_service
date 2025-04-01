@@ -3,6 +3,7 @@ package school.faang.user_service.controller.avatar;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,15 +24,8 @@ public class UserController {
 
     private final AvatarService avatarService;
 
-    @PostMapping()
-    public ResponseEntity<?> registerUser(@RequestParam(required = false) String username) {
-        if (username != null) {
-            log.info(String.format(RECEIVED_REQUEST_LOG, " for username: " + username));
-        } else {
-            log.info(String.format(RECEIVED_REQUEST_LOG, ""));
-        }
-
-        String userId = UUID.randomUUID().toString();
+    @PostMapping("/{userId}")
+    public ResponseEntity<?> registerUser(@PathVariable Long userId) {
         log.info(GENERATED_USERID_LOG, userId);
 
         String avatarUrl = avatarService.generateAndUploadAvatar(userId);

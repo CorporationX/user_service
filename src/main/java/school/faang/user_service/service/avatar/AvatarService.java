@@ -27,7 +27,7 @@ public class AvatarService {
     private String avatarApiUrl;
 
     @Value("${app.avatar.dicebearPngEndpoint}")
-    private String dicebearPngEndpoint;
+    private String pngEndpoint;
 
     @Value("${app.minio.bucket.name}")
     private String bucketName;
@@ -45,7 +45,7 @@ public class AvatarService {
     private final AvatarClient avatarClient;
 
     public String generateAndUploadAvatar(String userId) {
-        String dicebearUrl = avatarApiUrl + dicebearPngEndpoint + userId;
+        String dicebearUrl = avatarApiUrl + pngEndpoint + userId;
         log.info(GENERATED_DICEBEAR_URL_LOG, dicebearUrl);
         byte[] avatarData = avatarClient.fetchAvatarData(dicebearUrl);
         String objectName = userId + fileExtension;

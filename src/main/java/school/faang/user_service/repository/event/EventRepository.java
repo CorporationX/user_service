@@ -2,8 +2,10 @@ package school.faang.user_service.repository.event;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.event.Event;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
@@ -20,4 +22,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             WHERE ue.user_id = :userId
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
+
+    @Query("SELECT e FROM Event e WHERE e.endDate < :currentDate")
+    List<Event> findPastEventsByDateEnd(@Param("currentDate") LocalDateTime currentDate);
 }

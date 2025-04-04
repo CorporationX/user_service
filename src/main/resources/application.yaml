@@ -54,3 +54,9 @@ springdoc:
     doc-expansion: none
   api-docs:
     path: /v3/api-docs
+
+thread-pool:
+  delete-events-max-threads: 3
+
+cron:
+  delete-events: 0 30 18 * * THU

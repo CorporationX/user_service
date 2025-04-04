@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;

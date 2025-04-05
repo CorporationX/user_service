@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 
 import java.util.List;
@@ -22,7 +21,7 @@ class EventTypeFilterTest {
     @BeforeEach
     void setUp() {
         eventTypeFilter = EventTypeFilter.TYPE;
-        filter = new EventFilterDto();
+        filter = EventFilterDto.builder().build();
         firstEvent = new Event();
         secondEvent = new Event();
     }

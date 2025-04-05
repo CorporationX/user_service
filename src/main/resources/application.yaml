@@ -37,3 +37,11 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+events:
+  delete:
+    cron: "0 0 0 * * SUN"
+    count: 1000
+
+user-service:
+    thread-pool-size: 8

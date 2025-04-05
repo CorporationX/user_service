@@ -1,12 +1,14 @@
 package school.faang.user_service.filter.event;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
 import java.util.stream.Stream;
 
-public enum EventStatusFilter implements EventFilter {
-    STATUS;
+@Component
+public class EventStatusFilter implements EventFilter {
+    //STATUS;
 
     @Override
     public boolean isApplicable(EventFilterDto filter) {

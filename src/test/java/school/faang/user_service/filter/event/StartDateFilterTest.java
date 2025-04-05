@@ -21,7 +21,7 @@ class StartDateFilterTest {
     @BeforeEach
     void setUp() {
         startDateFilter = new StartDateFilter();
-        filter = new EventFilterDto();
+        filter = EventFilterDto.builder().build();
         firstEvent = new Event();
         secondEvent = new Event();
     }

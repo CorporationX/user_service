@@ -20,7 +20,7 @@ class LocationFilterTest {
     @BeforeEach
     void setUp() {
         locationFilter = new LocationFilter();
-        filter = new EventFilterDto();
+        filter = EventFilterDto.builder().build();
         firstEvent = new Event();
         secondEvent = new Event();
     }

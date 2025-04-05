@@ -73,7 +73,7 @@ class EventServiceTest {
 
     @Test
     void testGetEventsByFilter() {
-        EventFilterDto filters = new EventFilterDto();
+        EventFilterDto filters = EventFilterDto.builder().build();
         when(eventRepository.findAll()).thenReturn(List.of(event));
         when(eventMapper.toDto(event)).thenReturn(eventDto);
 

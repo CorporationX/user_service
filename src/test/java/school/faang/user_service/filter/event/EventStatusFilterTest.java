@@ -20,8 +20,8 @@ class EventStatusFilterTest {
 
     @BeforeEach
     void setUp() {
-        eventStatusFilter = EventStatusFilter.STATUS;
-        filter = new EventFilterDto();
+        eventStatusFilter = new EventStatusFilter();
+        filter = EventFilterDto.builder().build();
         firstEvent = new Event();
         secondEvent = new Event();
     }

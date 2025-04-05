@@ -2,8 +2,6 @@ package school.faang.user_service.filter.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
@@ -22,7 +20,7 @@ class TitleFilterTest {
     @BeforeEach
     void setUp() {
         titleFilter = new TitleFilter();
-        filter = new EventFilterDto();
+        filter = EventFilterDto.builder().build();
         firstEvent = new Event();
         secondEvent = new Event();
     }

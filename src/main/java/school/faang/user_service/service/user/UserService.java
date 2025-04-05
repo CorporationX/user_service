@@ -79,12 +79,22 @@ public class UserService {
     }
 
     public void updateUser(User user) {
+
         userRepository.save(user);
     }
 
     public User getUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("There is no user with id = " + userId));
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAllByActiveTrue();
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getUsersByIdList(List<Long> ids) {
+        return userRepository.findAllById(ids);
     }
 
     @Transactional
@@ -99,10 +109,11 @@ public class UserService {
                 .country(country)
                 .telegramUsername(telegramUsername)
                 .active(true)
+                .banned(false)
                 .experience(0)
                 .build();
 
-        userAvatarService.generateAvatarForNewUser(newUser, AvatarType.JPEG);
+        //userAvatarService.generateAvatarForNewUser(newUser, AvatarType.JPEG);
 
         return userRepository.save(newUser);
     }

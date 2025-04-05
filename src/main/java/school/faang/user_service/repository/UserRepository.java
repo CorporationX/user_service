@@ -39,6 +39,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByIdIn(List<Long> ids, Pageable pageable);
 
+    List<User> findAllByActiveTrue();
+
     long countByIdIn(List<Long> ids);
 
     Optional<User> findByTelegramUsername(String username);

@@ -45,6 +45,12 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userMapper.toUserDtoList(userService.getAllUsers());
+        return ResponseEntity.ok(users);
+    }
+
     @PutMapping("/updateTelegramUserId")
     UserDto updateTelegramUserId(@RequestParam String telegramUsername,
                                  @RequestParam String telegramChatId) {
@@ -60,6 +66,12 @@ public class UserController {
         return ResponseEntity.ok(userDtoList);
     }
 
+    @PostMapping("/list-by-ids")
+    public ResponseEntity<List<UserDto>> getUsersByIdsByIdList(@RequestBody List<Long> ids) {
+        List<User> users = userService.getUsersByIdList(ids);
+        return ResponseEntity.ok(userMapper.toUserDtoList(users));
+    }
+
     @DeleteMapping("/deactivate")
     public ResponseEntity<Void> deactivateUser(@RequestParam("userId") Long userId) {
         userService.deactivateUser(userId);
@@ -68,7 +80,6 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserRegistrationDto> registerUser(@RequestBody @Validated UserRegistrationDto userRegistrationDto) {
-        User user = userMapper.toEntity(userRegistrationDto);
 
         User registeredUser = userService.registerUser(
                 userRegistrationDto.getUsername(),

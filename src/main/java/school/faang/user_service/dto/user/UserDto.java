@@ -15,4 +15,10 @@ public class UserDto {
     private String username;
     @Email(message = "Please provide a valid email address")
     private String email;
+    private String phone;
+    private PreferredContact preference;
+
+    public enum PreferredContact {
+        EMAIL, SMS, TELEGRAM
+    }
 }

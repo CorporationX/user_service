@@ -63,6 +63,7 @@ public class UserController {
         }
     }
 
+
     private boolean idIsValid(Long id) {
         return id >= 0;
     }

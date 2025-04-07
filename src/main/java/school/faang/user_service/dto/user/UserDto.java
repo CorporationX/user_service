@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +17,7 @@ public class UserDto {
     private String username;
     @Email(message = "Please provide a valid email address")
     private String email;
+    private String phone;
+    private PreferredContact preference;
+
 }

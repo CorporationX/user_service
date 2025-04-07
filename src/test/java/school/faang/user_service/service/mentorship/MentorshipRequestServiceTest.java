@@ -6,15 +6,20 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
+
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestEventDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
@@ -37,6 +42,9 @@ public class MentorshipRequestServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private EventPublisher publisher;
 
     private MentorshipRequest requestEntity;
     private MentorshipRequestDto requestDto;
@@ -78,6 +86,15 @@ public class MentorshipRequestServiceTest {
         assertEquals(requestEntity, result);
         Mockito.verify(userRepository, times(1)).save(requester);
         Mockito.verify(requestRepository, times(1)).save(requestEntity);
+
+        ArgumentCaptor<MentorshipRequestEventDto> eventCaptor = ArgumentCaptor.forClass(MentorshipRequestEventDto.class);
+        Mockito.verify(publisher, times(1))
+                .publishEvent(eq("mentorship_request"), eventCaptor.capture());
+
+        MentorshipRequestEventDto capturedEvent = eventCaptor.getValue();
+        assertEquals(requesterId, capturedEvent.getRequesterId());
+        assertEquals(receiverId, capturedEvent.getMentorId());
+        assertEquals(requestEntity.getId(), capturedEvent.getRequestId());
     }
 
     @Test

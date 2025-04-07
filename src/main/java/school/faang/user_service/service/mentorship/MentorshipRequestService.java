@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestEventDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -11,6 +12,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.EventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filters.RequestFilter;
@@ -30,6 +32,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestValidator requestValidator;
     private final UserRepository userRepository;
     private final List<RequestFilter> requestFilters;
+    private final EventPublisher publisher;
 
     public MentorshipRequest requestMentorship(MentorshipRequest requestEntity) {
         long requesterId = requestEntity.getRequester().getId();
@@ -55,7 +58,15 @@ public class MentorshipRequestService {
             requester.setSentMentorshipRequests(requests);
 
             userRepository.save(requester);
-            return requestRepository.save(requestEntity);
+            MentorshipRequest savedRequest = requestRepository.save(requestEntity);
+
+            MentorshipRequestEventDto eventM = new MentorshipRequestEventDto();
+            eventM.setRequesterId(requesterId);
+            eventM.setMentorId(receiverId);
+            eventM.setRequestId(savedRequest.getId());
+            publisher.publishEvent("mentorship_request", eventM);
+
+            return savedRequest;
         }
     }
 

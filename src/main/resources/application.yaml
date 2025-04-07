@@ -18,8 +18,11 @@ spring:
 
   data:
     redis:
-      port: 6379
       host: localhost
+      port: 6379
+      topics:
+        - mentorship_request
+        - mentorship_accepted
 
   servlet:
     multipart:

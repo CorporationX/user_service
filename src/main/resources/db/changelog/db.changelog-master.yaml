@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
       file: db/changelog/changeset/user_V008__add_personal_info_tables.sql
+  - include:
+     file: db/changelog/changeset/user_V009__add_banned_to_user.sql

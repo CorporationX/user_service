@@ -28,11 +28,12 @@ public class UserService {
 
     @Transactional
     public void banUser(Long userId) {
-        userRepository.findById(userId).ifPresent(user -> {
-            user.setBanned(true);
-            userRepository.save(user);
-        });
-      
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_ERROR, userId)));
+        user.setBanned(true);
+        userRepository.save(user);
+    }
+
     public UserDto getUser(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {

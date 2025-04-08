@@ -10,7 +10,7 @@ public interface RecommendationRequestRepository extends JpaRepository<Recommend
 
     @Query(nativeQuery = true, value = """
             SELECT * FROM recommendation_request
-            WHERE requester_id = ?1 AND receiver_id = ?2 AND status = 1
+            WHERE requester_id = ?1 AND receiver_id = ?2
             ORDER BY created_at DESC
             LIMIT 1
             """)

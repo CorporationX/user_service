@@ -1,0 +1,19 @@
+package school.faang.user_service.filter.goal;
+
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+
+import java.util.stream.Stream;
+
+public class TestGoalActiveStatusFilter implements GoalFilter {
+    @Override
+    public boolean isApplicable(GoalFilterDto goalFilterDto) {
+        return true;
+    }
+
+    @Override
+    public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto goalFilterDto) {
+        return goals.filter(goal -> goal.getStatus().equals(GoalStatus.ACTIVE));
+    }
+}

@@ -1,0 +1,29 @@
+name: checkTests
+on:
+  pull_request:
+    branches:
+      - centaur-master-stream9
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup jdk17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build java app
+        run: |
+          ./gradlew clean build
+
+      - name: Run tests
+        run: |
+          ./gradlew test

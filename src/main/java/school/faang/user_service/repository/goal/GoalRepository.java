@@ -1,6 +1,7 @@
 package school.faang.user_service.repository.goal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -47,4 +48,12 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Query(nativeQuery = true, value = "INSERT INTO goal_skill (skill_id, goal_id) VALUES (:skillId, :goalId)")
+    @Modifying
+    void addSkillToGoal(long skillId, long goalId);
+
+    @Query(nativeQuery = true, value = "DELETE FROM goal_skill WHERE goal_id = :goalId")
+    @Modifying
+    void removeSkillsFromGoal(long goalId);
 }

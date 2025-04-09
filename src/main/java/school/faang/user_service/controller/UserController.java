@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.UserServiceImpl;
+import school.faang.user_service.service.UserService;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 @Validated
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUser(@PathVariable @Positive long userId) {

@@ -105,4 +105,29 @@ public class MentorshipService {
             throw new InvalidIdException(ExceptionMessage.EQUAL_IDS.getMessage());
         }
     }
+
+    public void stopMentoringIfMentor(User user) {
+        List<MentorshipUserDto> mentees = getMentees(user.getId());
+
+        for (MentorshipUserDto mentee : mentees) {
+            try {
+                deleteMentor(mentee.getId(), user.getId());
+            } catch (Exception e) {
+                log.warn("Failed to delete mentorship between mentor {} and mentee {}",
+                        user.getId(), mentee.getId(), e);
+            }
+        }
+
+        List<MentorshipUserDto> mentors = getMentors(user.getId());
+
+        for (MentorshipUserDto mentor : mentors) {
+            try {
+                deleteMentee(mentor.getId(), user.getId());
+            } catch (Exception e) {
+                log.warn("Failed to delete mentorship between mentee {} and mentor {}",
+                        user.getId(), mentor.getId(), e);
+            }
+        }
+    }
+
 }

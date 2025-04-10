@@ -12,13 +12,16 @@ public class KafkaProducerService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void sendMessage(String topic, String message) {
-        kafkaTemplate.send(topic, message)
-                .whenComplete((result, ex) -> {
-                    if (ex == null) {
-                        log.info("The message was sent to the topic {}: {}", topic, message);
-                    } else {
-                        log.error("An error occurred while sending message", ex);
-                    }
-                });
+        kafkaTemplate
+                .send(topic, message)
+                .whenComplete(
+                        (result, ex) -> {
+                            if (ex == null) {
+                                log.info(
+                                        "The message was sent to the topic {}: {}", topic, message);
+                            } else {
+                                log.error("An error occurred while sending message", ex);
+                            }
+                        });
     }
 }

@@ -40,7 +40,9 @@ public class RecommendationValidationExceptionTest {
 
     @Test
     public void testValidateOfSkillsWithNullSkills() {
-        assertThrows(SkillNotFoundException.class, () -> recommendationValidation.validateOfSkills(null));
+        assertThrows(
+                SkillNotFoundException.class,
+                () -> recommendationValidation.validateOfSkills(null));
     }
 
     @Test
@@ -54,7 +56,9 @@ public class RecommendationValidationExceptionTest {
                         List.of(firstSkill.getSkillId(), secondSkill.getSkillId())))
                 .thenReturn(1);
 
-        assertThrows(SkillNotFoundException.class, () -> recommendationValidation.validateOfSkills(skills));
+        assertThrows(
+                SkillNotFoundException.class,
+                () -> recommendationValidation.validateOfSkills(skills));
     }
 
     @Test

@@ -2,11 +2,9 @@ package school.faang.user_service.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
-
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,8 +28,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
-            @NonNull WebRequest request
-    ) {
+            @NonNull WebRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult()
                 .getAllErrors()
@@ -51,14 +48,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex,
             @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
-            @NonNull WebRequest request
-    ) {
+            @NonNull WebRequest request) {
         log.error("Malformed JSON request: {}", ex.getMessage());
         return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, "Malformed JSON request");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<Object> handleConstraintViolationException(
+            ConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getConstraintViolations()
                 .forEach(
@@ -99,14 +96,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EventSerializationException.class)
-    public ResponseEntity<Object> handleEventSerializationException(EventSerializationException ex) {
+    public ResponseEntity<Object> handleEventSerializationException(
+            EventSerializationException ex) {
         String message = ex.getMessage();
         log.error("Event serialization: {}", message, ex);
         return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     }
 
     @ExceptionHandler(RecommendationAlreadyGivenException.class)
-    public ResponseEntity<Object> handleRecommendationAlreadyGivenException(RecommendationAlreadyGivenException ex) {
+    public ResponseEntity<Object> handleRecommendationAlreadyGivenException(
+            RecommendationAlreadyGivenException ex) {
         String message = ex.getMessage();
         log.error("Recommendation already given: {}", message, ex);
         return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, message);

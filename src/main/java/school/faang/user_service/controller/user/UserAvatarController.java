@@ -17,7 +17,8 @@ public class UserAvatarController {
     private final UserAvatarService avatarService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<String> uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadAvatar(
+            @PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }

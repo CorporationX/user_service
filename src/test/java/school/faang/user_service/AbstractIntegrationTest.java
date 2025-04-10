@@ -23,11 +23,9 @@ import org.testcontainers.utility.DockerImageName;
 @ActiveProfiles("test")
 public abstract class AbstractIntegrationTest {
 
-    @Autowired
-    protected MockMvc mockMvc;
+    @Autowired protected MockMvc mockMvc;
 
-    @Autowired
-    protected ObjectMapper objectMapper;
+    @Autowired protected ObjectMapper objectMapper;
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =

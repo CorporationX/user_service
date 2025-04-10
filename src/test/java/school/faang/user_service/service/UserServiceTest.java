@@ -1,12 +1,13 @@
 package school.faang.user_service.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static org.mockito.Mockito.*;
 
 import com.json.student.Address;
 import com.json.student.ContactInfo;
 import com.json.student.Person;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,8 +40,6 @@ import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
 import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -48,44 +47,31 @@ class UserServiceTest {
 
     private List<UserFilter> userFilters;
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private UserMapper userMapper;
+    @Mock private UserMapper userMapper;
 
-    @Mock
-    private UserContext userContext;
+    @Mock private UserContext userContext;
 
-    @Mock
-    private ProfileViewEventPublisher profileViewEventPublisher;
+    @Mock private ProfileViewEventPublisher profileViewEventPublisher;
 
-    @Mock
-    private DeactivatedUserMapper deactivatedUserMapper;
+    @Mock private DeactivatedUserMapper deactivatedUserMapper;
 
-    @Mock
-    private UserRepositoryAdapter userRepositoryAdapter;
+    @Mock private UserRepositoryAdapter userRepositoryAdapter;
 
-    @Mock
-    private GoalRepositoryAdapter goalRepositoryAdapter;
+    @Mock private GoalRepositoryAdapter goalRepositoryAdapter;
 
-    @Mock
-    private EventRepositoryAdapter eventRepositoryAdapter;
+    @Mock private EventRepositoryAdapter eventRepositoryAdapter;
 
-    @Mock
-    private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    @Mock private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
 
-    @Mock
-    private MentorshipService mentorshipService;
+    @Mock private MentorshipService mentorshipService;
 
-    @Mock
-    private CountryRepository countryRepository;
+    @Mock private CountryRepository countryRepository;
 
-    @Captor
-    private ArgumentCaptor<List<User>> listUsers;
+    @Captor private ArgumentCaptor<List<User>> listUsers;
 
-    @Captor
-    private ArgumentCaptor<ProfileViewEvent> profileViewEvent;
+    @Captor private ArgumentCaptor<ProfileViewEvent> profileViewEvent;
 
     private final UserDto dto = new UserDto();
 
@@ -135,10 +121,7 @@ class UserServiceTest {
 
         List<User> users = List.of(user1, user2);
 
-        when(
-                userFilters
-                        .get(0)
-                        .apply(userRepository.findPremiumUsers().toList(), userFilterDto))
+        when(userFilters.get(0).apply(userRepository.findPremiumUsers().toList(), userFilterDto))
                 .thenReturn(users);
         when(userFilters.get(0).isApplicable(userFilterDto)).thenReturn(true);
         when(userMapper.toDto(user1)).thenReturn(firstUserDto);
@@ -146,8 +129,7 @@ class UserServiceTest {
         userService.getPremiumUsers(userFilterDto);
 
         verify(userFilters.get(0), times(1)).isApplicable(userFilterDto);
-        verify(userFilters.get(0), times(1))
-                .apply(listUsers.capture(), Mockito.eq(userFilterDto));
+        verify(userFilters.get(0), times(1)).apply(listUsers.capture(), Mockito.eq(userFilterDto));
     }
 
     @Test
@@ -171,8 +153,7 @@ class UserServiceTest {
 
         userService.getUser(1L);
 
-        verify(profileViewEventPublisher, times(1))
-                .publish(profileViewEvent.capture());
+        verify(profileViewEventPublisher, times(1)).publish(profileViewEvent.capture());
 
         ProfileViewEvent resultEvent = profileViewEvent.getValue();
         Assertions.assertEquals(1, resultEvent.profileId());
@@ -273,10 +254,8 @@ class UserServiceTest {
 
         verify(goalRepositoryAdapter, times(1)).delete(userGoal);
         verify(goalRepositoryAdapter, times(1)).removeUserGoals(user.getId());
-        verify(eventParticipationRepositoryAdapter, times(1))
-                .unregisterAll(event1Id);
-        verify(eventParticipationRepositoryAdapter, times(1))
-                .unregisterAll(event1Id);
+        verify(eventParticipationRepositoryAdapter, times(1)).unregisterAll(event1Id);
+        verify(eventParticipationRepositoryAdapter, times(1)).unregisterAll(event1Id);
         verify(eventRepositoryAdapter, times(1)).deleteAll(user.getOwnedEvents());
 
         Assertions.assertFalse(user.isActive());
@@ -318,6 +297,5 @@ class UserServiceTest {
         verify(countryRepository, times(1)).save(any(Country.class));
 
         verify(userRepository, times(1)).saveAll(anyList());
-
     }
 }

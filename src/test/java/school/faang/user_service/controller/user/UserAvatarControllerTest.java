@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.ByteArrayInputStream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,9 @@ public class UserAvatarControllerTest {
 
     private MockMvc mockMvc;
 
-    @InjectMocks
-    private UserAvatarController userAvatarController;
+    @InjectMocks private UserAvatarController userAvatarController;
 
-    @Mock
-    private UserAvatarService userAvatarService;
+    @Mock private UserAvatarService userAvatarService;
 
     @BeforeEach
     void setUp() {

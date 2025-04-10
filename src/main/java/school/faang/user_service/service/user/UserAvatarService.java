@@ -50,10 +50,8 @@ public class UserAvatarService {
 
             userRepository.save(user);
 
-            profilePicEventPublisher.publish(ProfilePicEvent.builder()
-                    .userId(userId)
-                    .profilePicKey(largeAvatarKey)
-                    .build());
+            profilePicEventPublisher.publish(
+                    ProfilePicEvent.builder().userId(userId).profilePicKey(largeAvatarKey).build());
         } catch (IOException e) {
             log.error("Error processing avatar for user {}", userId, e);
             throw new AvatarProcessingException("Error processing image", e);

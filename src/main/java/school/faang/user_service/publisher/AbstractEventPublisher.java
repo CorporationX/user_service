@@ -3,8 +3,8 @@ package school.faang.user_service.publisher;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import school.faang.user_service.exception.EventSerializationException;
 import school.faang.user_service.config.kafka.KafkaProducerService;
+import school.faang.user_service.exception.EventSerializationException;
 
 @RequiredArgsConstructor
 public abstract class AbstractEventPublisher<E> {

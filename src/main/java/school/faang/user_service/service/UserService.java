@@ -1,10 +1,9 @@
 package school.faang.user_service.service;
 
+import com.json.student.Person;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.json.student.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

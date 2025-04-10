@@ -48,6 +48,7 @@ dependencies {
      * Amazon S3
      */
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+    implementation("net.coobird:thumbnailator:0.4.19")
 
     /**
      * Kafka
@@ -92,6 +93,15 @@ jsonSchema2Pojo {
     targetDirectory = file("${project.buildDir}/generated-sources/js2p")
     targetPackage = "com.json.student"
     setSourceType("jsonschema")
+}
+
+tasks.register("generatePojoClasses") {
+    group = "json"
+    description = "Generates POJO classes from JSON schema"
+    dependsOn("generateJsonSchema2Pojo")
+    doLast {
+        println("POJO classes generated successfully!")
+    }
 }
 
 tasks.withType<Test> {

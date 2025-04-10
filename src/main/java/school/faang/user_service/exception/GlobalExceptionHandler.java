@@ -119,6 +119,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, message);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
+        log.error("User not found: {}", ex.getMessage());
+        return buildResponseEntity(HttpStatus.NOT_FOUND, ex.getMessage(), null);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         log.error("Internal server error: {}", ex.getMessage(), ex);

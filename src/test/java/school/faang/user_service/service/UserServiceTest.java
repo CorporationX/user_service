@@ -2,17 +2,26 @@ package school.faang.user_service.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import com.json.student.Address;
+import com.json.student.ContactInfo;
+import com.json.student.Person;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.publisher.ProfileViewEvent;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
@@ -21,12 +30,16 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.adapter.EventParticipationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
 import school.faang.user_service.repository.adapter.GoalRepositoryAdapter;
 import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 import school.faang.user_service.service.mentorship.MentorshipService;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -35,21 +48,44 @@ class UserServiceTest {
 
     private List<UserFilter> userFilters;
 
-    @Mock private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-    @Mock private UserMapper userMapper;
+    @Mock
+    private UserMapper userMapper;
 
-    @Mock private DeactivatedUserMapper deactivatedUserMapper;
+    @Mock
+    private UserContext userContext;
 
-    @Mock private UserRepositoryAdapter userRepositoryAdapter;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
-    @Mock private GoalRepositoryAdapter goalRepositoryAdapter;
+    @Mock
+    private DeactivatedUserMapper deactivatedUserMapper;
 
-    @Mock private EventRepositoryAdapter eventRepositoryAdapter;
+    @Mock
+    private UserRepositoryAdapter userRepositoryAdapter;
 
-    @Mock private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    @Mock
+    private GoalRepositoryAdapter goalRepositoryAdapter;
 
-    @Mock private MentorshipService mentorshipService;
+    @Mock
+    private EventRepositoryAdapter eventRepositoryAdapter;
+
+    @Mock
+    private EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+
+    @Mock
+    private MentorshipService mentorshipService;
+
+    @Mock
+    private CountryRepository countryRepository;
+
+    @Captor
+    private ArgumentCaptor<List<User>> listUsers;
+
+    @Captor
+    private ArgumentCaptor<ProfileViewEvent> profileViewEvent;
 
     private final UserDto dto = new UserDto();
 
@@ -73,12 +109,15 @@ class UserServiceTest {
                 new UserService(
                         userRepository,
                         userFilters,
+                        profileViewEventPublisher,
+                        userContext,
                         userMapper,
                         deactivatedUserMapper,
                         userRepositoryAdapter,
                         goalRepositoryAdapter,
                         eventRepositoryAdapter,
                         eventParticipationRepositoryAdapter,
+                        countryRepository,
                         mentorshipService);
     }
 
@@ -96,27 +135,25 @@ class UserServiceTest {
 
         List<User> users = List.of(user1, user2);
 
-        Mockito.when(
-                        userFilters
-                                .get(0)
-                                .apply(userRepository.findPremiumUsers().toList(), userFilterDto))
+        when(
+                userFilters
+                        .get(0)
+                        .apply(userRepository.findPremiumUsers().toList(), userFilterDto))
                 .thenReturn(users);
-        Mockito.when(userFilters.get(0).isApplicable(userFilterDto)).thenReturn(true);
-        Mockito.when(userMapper.toDto(user1)).thenReturn(firstUserDto);
+        when(userFilters.get(0).isApplicable(userFilterDto)).thenReturn(true);
+        when(userMapper.toDto(user1)).thenReturn(firstUserDto);
 
         userService.getPremiumUsers(userFilterDto);
 
-        Mockito.verify(userFilters.get(0), Mockito.times(1)).isApplicable(userFilterDto);
-        ArgumentCaptor<List<User>> listUsers = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(userFilters.get(0), Mockito.times(1))
+        verify(userFilters.get(0), times(1)).isApplicable(userFilterDto);
+        verify(userFilters.get(0), times(1))
                 .apply(listUsers.capture(), Mockito.eq(userFilterDto));
     }
 
     @Test
     @DisplayName("Test must return user when id is exist")
     void testGetUserByIdSuccess() {
-        Mockito.when(userRepositoryAdapter.getById(1L)).thenReturn(user);
-        Mockito.when(userMapper.toDto(user)).thenReturn(dto);
+        mockUserRepositoryAdapterAndMapper();
 
         UserDto result = userService.getUser(1L);
 
@@ -125,10 +162,28 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName(
+            "The test successfully publishes an event about viewing the user's profile to redis")
+    void testSuccessfullyPublishedEventAboutProfileViewing() {
+        mockUserRepositoryAdapterAndMapper();
+
+        when(userContext.getUserId()).thenReturn(2L);
+
+        userService.getUser(1L);
+
+        verify(profileViewEventPublisher, times(1))
+                .publish(profileViewEvent.capture());
+
+        ProfileViewEvent resultEvent = profileViewEvent.getValue();
+        Assertions.assertEquals(1, resultEvent.profileId());
+        Assertions.assertEquals(2, resultEvent.viewId());
+    }
+
+    @Test
     @DisplayName("Test must return exception when user not exist data base")
     void testGetUserByIdFailed() {
         Long userId = 1L;
-        Mockito.when(userRepositoryAdapter.getById(userId))
+        when(userRepositoryAdapter.getById(userId))
                 .thenThrow(new EntityNotFoundException("User not found with id: " + userId));
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUser(userId));
@@ -145,8 +200,8 @@ class UserServiceTest {
 
         List<User> userList = List.of(user);
 
-        Mockito.when(userRepositoryAdapter.getAllById(userIds)).thenReturn(userList);
-        Mockito.when(userMapper.toDtoList(userList)).thenReturn(dtoList);
+        when(userRepositoryAdapter.getAllById(userIds)).thenReturn(userList);
+        when(userMapper.toDtoList(userList)).thenReturn(dtoList);
 
         List<UserDto> result = userService.getUsersByIds(userIds);
 
@@ -165,7 +220,7 @@ class UserServiceTest {
         deactivatedUser.setId(deactivatedUserId);
         deactivatedUser.setActive(false);
 
-        Mockito.when(userRepositoryAdapter.getById(deactivatedUserId)).thenReturn(deactivatedUser);
+        when(userRepositoryAdapter.getById(deactivatedUserId)).thenReturn(deactivatedUser);
         Assertions.assertThrows(
                 BadRequestException.class, () -> userService.deactivateUser(deactivatedUserId));
     }
@@ -205,7 +260,7 @@ class UserServiceTest {
 
         user.setOwnedEvents(eventList);
 
-        Mockito.when(userRepositoryAdapter.getById(userId)).thenReturn(user);
+        when(userRepositoryAdapter.getById(userId)).thenReturn(user);
 
         Mockito.doNothing().when(goalRepositoryAdapter).delete(userGoal);
         Mockito.doNothing().when(goalRepositoryAdapter).removeUserGoals(user.getId());
@@ -216,17 +271,53 @@ class UserServiceTest {
 
         userService.deactivateUser(userId);
 
-        Mockito.verify(goalRepositoryAdapter, Mockito.times(1)).delete(userGoal);
-        Mockito.verify(goalRepositoryAdapter, Mockito.times(1)).removeUserGoals(user.getId());
-        Mockito.verify(eventParticipationRepositoryAdapter, Mockito.times(1))
+        verify(goalRepositoryAdapter, times(1)).delete(userGoal);
+        verify(goalRepositoryAdapter, times(1)).removeUserGoals(user.getId());
+        verify(eventParticipationRepositoryAdapter, times(1))
                 .unregisterAll(event1Id);
-        Mockito.verify(eventParticipationRepositoryAdapter, Mockito.times(1))
+        verify(eventParticipationRepositoryAdapter, times(1))
                 .unregisterAll(event1Id);
-        Mockito.verify(eventRepositoryAdapter, Mockito.times(1)).deleteAll(user.getOwnedEvents());
+        verify(eventRepositoryAdapter, times(1)).deleteAll(user.getOwnedEvents());
 
         Assertions.assertFalse(user.isActive());
 
-        Mockito.verify(mentorshipService, Mockito.times(1)).stopMentorship(user);
-        Mockito.verify(deactivatedUserMapper, Mockito.times(1)).toDto(user);
+        verify(mentorshipService, times(1)).stopMentorship(user);
+        verify(deactivatedUserMapper, times(1)).toDto(user);
+    }
+
+    private void mockUserRepositoryAdapterAndMapper() {
+        when(userRepositoryAdapter.getById(1L)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(dto);
+    }
+
+    @Test
+    public void testUploadFile() {
+
+        Person person = new Person();
+        ContactInfo contactInfo = new ContactInfo();
+        Address address = new Address();
+        address.setCountry("Germany");
+        contactInfo.setAddress(address);
+        person.setContactInfo(contactInfo);
+
+        List<Person> people = List.of(person);
+
+        User user = new User();
+        Country country = new Country();
+        country.setTitle("Germany");
+
+        when(userMapper.toUser(person)).thenReturn(user);
+        when(countryRepository.findByName("Germany")).thenReturn(Optional.empty());
+        when(countryRepository.save(country)).thenReturn(country);
+
+        userService.saveUsers(people);
+
+        verify(userMapper, times(1)).toUser(person);
+
+        verify(countryRepository, times(1)).findByName("Germany");
+        verify(countryRepository, times(1)).save(any(Country.class));
+
+        verify(userRepository, times(1)).saveAll(anyList());
+
     }
 }

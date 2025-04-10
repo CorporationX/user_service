@@ -1,13 +1,20 @@
 package school.faang.user_service.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.json.student.Person;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.DeactivatedUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.publisher.ProfileViewEvent;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
@@ -15,6 +22,8 @@ import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.filters.user.UserFilter;
 import school.faang.user_service.mapper.DeactivatedUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.adapter.EventParticipationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.EventRepositoryAdapter;
@@ -28,6 +37,8 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
+    private final UserContext userContext;
 
     private final UserMapper userMapper;
     private final DeactivatedUserMapper deactivatedUserMapper;
@@ -36,6 +47,7 @@ public class UserService {
     private final GoalRepositoryAdapter goalRepositoryAdapter;
     private final EventRepositoryAdapter eventRepositoryAdapter;
     private final EventParticipationRepositoryAdapter eventParticipationRepositoryAdapter;
+    private final CountryRepository countryRepository;
 
     private final MentorshipService mentorshipService;
 
@@ -55,7 +67,18 @@ public class UserService {
     }
 
     public UserDto getUser(Long userId) {
-        return userMapper.toDto(userRepositoryAdapter.getById(userId));
+        UserDto userDto = userMapper.toDto(userRepositoryAdapter.getById(userId));
+
+        ProfileViewEvent profileViewEvent =
+                ProfileViewEvent.builder()
+                        .profileId(userDto.getId())
+                        .viewId(userContext.getUserId())
+                        .timestamp(LocalDateTime.now())
+                        .build();
+
+        profileViewEventPublisher.publish(profileViewEvent);
+        log.info("The profile view event was successfully published to redis");
+        return userDto;
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
@@ -100,5 +123,23 @@ public class UserService {
         }
         log.info("All user events with ID {} have been deleted", user.getId());
         eventRepositoryAdapter.deleteAll(userEvents);
+    }
+
+    public void saveUsers(List<Person> people) {
+        List<User> users = new ArrayList<>();
+        for (Person person : people) {
+            User user = userMapper.toUser(person);
+            String country = person.getContactInfo().getAddress().getCountry();
+            Country countryEntity = new Country();
+            countryEntity.setTitle(country);
+            if (countryRepository.findByName(country).isEmpty()) {
+                Country savedCountry = countryRepository.save(countryEntity);
+                log.info("Country saved: {}", savedCountry.getTitle());
+            }
+            user.setCountry(countryEntity);
+            users.add(user);
+        }
+        userRepository.saveAll(users);
+        log.info("Users saved");
     }
 }

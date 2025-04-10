@@ -20,6 +20,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+      channel:
+        profile-view: profile_view_channel
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -31,8 +33,19 @@ spring:
         name: profile-pic-topic
         partition-count: 4
 
-user-profile-pic:
+profile-pic:
+  maxSize: 5242880
+  largePhotoSize: 1080
+  smallPhotoSize: 170
   folder-name: user_profile_photos
+
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    region: bucket_region
+    bucketName: user-avatar
 
 server:
   port: 8080

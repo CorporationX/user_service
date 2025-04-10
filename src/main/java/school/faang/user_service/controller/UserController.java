@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.UserServiceImpl;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 

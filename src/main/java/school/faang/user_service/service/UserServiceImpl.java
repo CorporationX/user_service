@@ -3,7 +3,6 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
@@ -37,19 +36,21 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public Optional<User> findUserById(long userId) {
+        return userRepository.findById(userId);
+    }
+
     private void stopUserGoals(User user) {
         List<Goal> userGoals = goalRepository.findGoalsByUserId(user.getId()).toList();
 
         for (Goal goal : userGoals) {
             List<User> participants = goalRepository.findUsersByGoalId(goal.getId());
 
-            boolean isOnlyParticipant = participants.size() == SINGLE_USER
-                    && participants.get(0).getId().equals(user.getId());
-
-            if (isOnlyParticipant) {
+            if (participants.size() == SINGLE_USER && participants.get(0).getId().equals(user.getId())) {
                 goalRepository.delete(goal);
             } else {
-                participants.removeIf(u -> u.getId().equals(user.getId()));
+                participants.removeIf(participant -> participant.getId().equals(user.getId()));
                 goal.setUsers(participants);
 
                 if (goal.getMentor() != null && goal.getMentor().getId().equals(user.getId())) {
@@ -61,17 +62,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+
     private void stopUserEvents(User user) {
-        List<Event> events = eventRepository.findAllByUserId(user.getId());
-
-        for (Event event : events) {
-            event.setStatus(EventStatus.CANCELED);
-            eventRepository.save(event);
-        }
+        eventRepository.findAllByUserId(user.getId())
+                .forEach(event -> {
+                    event.setStatus(EventStatus.CANCELED);
+                    eventRepository.save(event);
+                });
     }
 
-    @Override
-    public Optional<User> findUserById(long userId) {
-        return userRepository.findById(userId);
-    }
 }

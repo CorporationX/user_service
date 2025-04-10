@@ -132,7 +132,7 @@ public class UserService {
             String country = person.getContactInfo().getAddress().getCountry();
             Country countryEntity = new Country();
             countryEntity.setTitle(country);
-            if (countryRepository.findByName(country).isEmpty()) {
+            if (countryRepository.findByTitle(country).isEmpty()) {
                 Country savedCountry = countryRepository.save(countryEntity);
                 log.info("Country saved: {}", savedCountry.getTitle());
             }

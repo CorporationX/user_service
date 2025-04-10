@@ -18,7 +18,9 @@ import school.faang.user_service.config.properties.ProfilePicProperties;
 import school.faang.user_service.config.properties.S3Properties;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.event.ProfilePicEvent;
 import school.faang.user_service.exception.*;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 
 @Slf4j
@@ -30,6 +32,7 @@ public class UserAvatarService {
     private final AmazonS3 s3Client;
     private final S3Properties s3Properties;
     private final ProfilePicProperties profilePicProperties;
+    private final ProfilePicEventPublisher profilePicEventPublisher;
 
     @Transactional
     public void uploadAvatar(Long userId, MultipartFile file) {
@@ -44,7 +47,13 @@ public class UserAvatarService {
                     processAndUploadImage(file, profilePicProperties.getSmallPhotoSize());
 
             user.setUserProfilePic(new UserProfilePic(largeAvatarKey, smallAvatarKey));
+
             userRepository.save(user);
+
+            profilePicEventPublisher.publish(ProfilePicEvent.builder()
+                    .userId(userId)
+                    .profilePicKey(largeAvatarKey)
+                    .build());
         } catch (IOException e) {
             log.error("Error processing avatar for user {}", userId, e);
             throw new AvatarProcessingException("Error processing image", e);

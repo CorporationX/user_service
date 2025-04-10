@@ -307,14 +307,14 @@ class UserServiceTest {
         country.setTitle("Germany");
 
         when(userMapper.toUser(person)).thenReturn(user);
-        when(countryRepository.findByName("Germany")).thenReturn(Optional.empty());
+        when(countryRepository.findByTitle("Germany")).thenReturn(Optional.empty());
         when(countryRepository.save(country)).thenReturn(country);
 
         userService.saveUsers(people);
 
         verify(userMapper, times(1)).toUser(person);
 
-        verify(countryRepository, times(1)).findByName("Germany");
+        verify(countryRepository, times(1)).findByTitle("Germany");
         verify(countryRepository, times(1)).save(any(Country.class));
 
         verify(userRepository, times(1)).saveAll(anyList());

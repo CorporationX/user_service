@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.ByteArrayInputStream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,11 @@ public class UserAvatarControllerTest {
 
     private MockMvc mockMvc;
 
-    @InjectMocks private UserAvatarController userAvatarController;
+    @InjectMocks
+    private UserAvatarController userAvatarController;
 
-    @Mock private UserAvatarService userAvatarService;
+    @Mock
+    private UserAvatarService userAvatarService;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +44,7 @@ public class UserAvatarControllerTest {
 
         doNothing().when(userAvatarService).uploadAvatar(anyLong(), any());
 
-        mockMvc.perform(multipart("/api/v1/users/avatar/1").file(file))
+        mockMvc.perform(multipart("/api/v1/users/avatars/1").file(file))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Avatar uploaded successfully"));
 
@@ -55,7 +58,7 @@ public class UserAvatarControllerTest {
                 .thenReturn(
                         new InputStreamResource(new ByteArrayInputStream("test image".getBytes())));
 
-        mockMvc.perform(get("/api/v1/users/avatar/1"))
+        mockMvc.perform(get("/api/v1/users/avatars/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_JPEG))
                 .andExpect(header().string("Content-Disposition", "inline"))
@@ -72,7 +75,7 @@ public class UserAvatarControllerTest {
                         new InputStreamResource(
                                 new ByteArrayInputStream("test small image".getBytes())));
 
-        mockMvc.perform(get("/api/v1/users/avatar/1/compressed"))
+        mockMvc.perform(get("/api/v1/users/avatars/1/compressed"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_JPEG))
                 .andExpect(header().string("Content-Disposition", "inline"))
@@ -86,7 +89,7 @@ public class UserAvatarControllerTest {
     void deleteAvatar_shouldReturnSuccessMessage() throws Exception {
         doNothing().when(userAvatarService).deleteAvatar(1L);
 
-        mockMvc.perform(delete("/api/v1/users/avatar/1"))
+        mockMvc.perform(delete("/api/v1/users/avatars/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Avatar deleted successfully"));
 
@@ -99,7 +102,7 @@ public class UserAvatarControllerTest {
         MockMultipartFile file =
                 new MockMultipartFile("file", "avatar.jpg", "image/jpeg", new byte[0]);
 
-        mockMvc.perform(multipart("/api/v1/users/avatar/1").file(file))
+        mockMvc.perform(multipart("/api/v1/users/avatars/1").file(file))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("File is empty"));
 

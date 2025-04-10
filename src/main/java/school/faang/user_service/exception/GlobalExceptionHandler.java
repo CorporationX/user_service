@@ -2,12 +2,12 @@ package school.faang.user_service.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+
 import java.nio.file.AccessDeniedException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,12 +26,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
-            HttpHeaders headers,
+            @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
-            WebRequest request) {
-
+            @NonNull WebRequest request
+    ) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult()
                 .getAllErrors()
@@ -42,24 +42,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                             errors.put(fieldName, errorMessage);
                         });
 
-        log.warn("Validation failed: {}", errors);
-
-        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Validation failed", errors);
+        log.error("Validation failed: {}", errors);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, "Validation failed", errors);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
-            @NotNull HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
-
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
+    ) {
         log.error("Malformed JSON request: {}", ex.getMessage());
-        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Malformed JSON request", null);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, "Malformed JSON request");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getConstraintViolations()
                 .forEach(
@@ -68,38 +67,72 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                         violation.getPropertyPath().toString(),
                                         violation.getMessage()));
 
-        log.warn("Constraint violation: {}", errors);
-        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Constraint violation", errors);
+        log.error("Constraint violation: {}", errors);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, "Constraint violation", errors);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
-        log.warn("Access denied: {}", ex.getMessage());
-        return buildResponseEntity(HttpStatus.FORBIDDEN, "Access is denied", null);
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        log.error("Access denied: {}", ex.getMessage(), ex);
+        return buildErrorResponseEntity(HttpStatus.FORBIDDEN, "Access is denied");
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(BadRequestException ex) {
+        String message = ex.getMessage();
+        log.error("Bad request: {}", message, ex);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(DataValidationException.class)
     public ResponseEntity<Object> handleDataValidationException(DataValidationException ex) {
-        log.warn("Data validation error: {}", ex.getMessage());
-        return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+        String message = ex.getMessage();
+        log.error("Data validation error: {}", message, ex);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.error("Entity not found: {}", ex.getMessage());
-        return buildResponseEntity(HttpStatus.NOT_FOUND, ex.getMessage(), null);
+        String message = ex.getMessage();
+        log.error("Entity not found: {}", message, ex);
+        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, message);
+    }
+
+    @ExceptionHandler(EventSerializationException.class)
+    public ResponseEntity<Object> handleEventSerializationException(EventSerializationException ex) {
+        String message = ex.getMessage();
+        log.error("Event serialization: {}", message, ex);
+        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+    }
+
+    @ExceptionHandler(RecommendationAlreadyGivenException.class)
+    public ResponseEntity<Object> handleRecommendationAlreadyGivenException(RecommendationAlreadyGivenException ex) {
+        String message = ex.getMessage();
+        log.error("Recommendation already given: {}", message, ex);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler(SkillNotFoundException.class)
+    public ResponseEntity<Object> handleSkillNotFoundException(SkillNotFoundException ex) {
+        String message = ex.getMessage();
+        log.error("Skill not found: {}", message, ex);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(Exception.class)
-    public Object handleGlobalException(Exception ex) {
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
-        return buildResponseEntity(
-                HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred", null);
+    public ResponseEntity<Object> handleException(Exception ex) {
+        log.error("Internal server error: {}", ex.getMessage(), ex);
+        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     }
 
-    private ResponseEntity<Object> buildResponseEntity(
+    private ResponseEntity<Object> buildErrorResponseEntity(HttpStatus status, String message) {
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), message);
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    private ResponseEntity<Object> buildErrorResponseEntity(
             HttpStatus status, String message, Map<String, String> errors) {
-        ApiError apiError = new ApiError(status, message, errors, LocalDateTime.now());
-        return ResponseEntity.status(status).body(apiError);
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), message, errors);
+        return ResponseEntity.status(status).body(errorResponse);
     }
 }

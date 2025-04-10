@@ -16,8 +16,8 @@ import org.mockito.MockitoAnnotations;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exception.RecommendationException;
-import school.faang.user_service.exception.SkillException;
+import school.faang.user_service.exception.RecommendationAlreadyGivenException;
+import school.faang.user_service.exception.SkillNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -40,7 +40,7 @@ public class RecommendationValidationExceptionTest {
 
     @Test
     public void testValidateOfSkillsWithNullSkills() {
-        assertThrows(SkillException.class, () -> recommendationValidation.validateOfSkills(null));
+        assertThrows(SkillNotFoundException.class, () -> recommendationValidation.validateOfSkills(null));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class RecommendationValidationExceptionTest {
                         List.of(firstSkill.getSkillId(), secondSkill.getSkillId())))
                 .thenReturn(1);
 
-        assertThrows(SkillException.class, () -> recommendationValidation.validateOfSkills(skills));
+        assertThrows(SkillNotFoundException.class, () -> recommendationValidation.validateOfSkills(skills));
     }
 
     @Test
@@ -76,7 +76,7 @@ public class RecommendationValidationExceptionTest {
     public void testLastRecommendationIsPresentAndRecommendationException() {
         RecommendationDto recommendation = new RecommendationDto();
         recommendation.setAuthorId(1L);
-        recommendation.setReceiverId(1l);
+        recommendation.setReceiverId(1L);
         recommendation.setCreatedAt(LocalDateTime.now());
 
         Recommendation lastRecommendation = new Recommendation();
@@ -87,7 +87,7 @@ public class RecommendationValidationExceptionTest {
                 .thenReturn(Optional.of(lastRecommendation));
 
         assertThrows(
-                RecommendationException.class,
+                RecommendationAlreadyGivenException.class,
                 () -> recommendationValidation.validateOfLatestRecommendation(recommendation));
     }
 
@@ -95,7 +95,7 @@ public class RecommendationValidationExceptionTest {
     public void testLastRecommendationIsPresentWithoutRecommendationException() {
         RecommendationDto recommendation = new RecommendationDto();
         recommendation.setAuthorId(1L);
-        recommendation.setReceiverId(1l);
+        recommendation.setReceiverId(1L);
         recommendation.setCreatedAt(LocalDateTime.now());
 
         Recommendation lastRecommendation = new Recommendation();

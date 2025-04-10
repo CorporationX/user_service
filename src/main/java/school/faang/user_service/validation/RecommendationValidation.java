@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exception.RecommendationException;
-import school.faang.user_service.exception.SkillException;
+import school.faang.user_service.exception.RecommendationAlreadyGivenException;
+import school.faang.user_service.exception.SkillNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -25,11 +25,11 @@ public class RecommendationValidation {
 
     public void validateOfSkills(List<SkillOfferDto> skills) {
         if (skills == null || skills.isEmpty()) {
-            throw new SkillException("You didn't specify skills");
+            throw new SkillNotFoundException("You didn't specify skills");
         }
         List<Long> skillIds = skills.stream().map(SkillOfferDto::getSkillId).toList();
         if (skills.size() != skillRepository.countExisting(skillIds)) {
-            throw new SkillException("Some skills are not found in the systems");
+            throw new SkillNotFoundException("Some skills are not found in the systems");
         }
     }
 
@@ -42,7 +42,7 @@ public class RecommendationValidation {
 
             if (ChronoUnit.MONTHS.between(recommendation.getCreatedAt(), lastRecommendationDate)
                     > DATE_LAST_RECOMMENDATION) {
-                throw new RecommendationException(
+                throw new RecommendationAlreadyGivenException(
                         "You have already given a recommendation to this "
                                 + "user within the last 6 months");
             }

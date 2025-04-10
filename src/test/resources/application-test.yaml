@@ -1,0 +1,20 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      group-id:
+        profile-pic: profile-pic-group
+    topic:
+      profile-pic:
+        name: profile-pic-topic
+        partition-count: 1
+    admin:
+      properties:
+        auto:
+          create:
+            topics:
+              enable: true
+
+liquibase:
+  contexts: test

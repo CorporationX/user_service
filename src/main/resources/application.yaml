@@ -18,8 +18,21 @@ spring:
 
   data:
     redis:
-      port: 6379
       host: localhost
+      port: 6379
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id:
+        profile-pic: profile-pic-group
+    topic:
+      profile-pic:
+        name: profile-pic-topic
+        partition-count: 4
+
+user-profile-pic:
+  folder-name: user_profile_photos
 
 server:
   port: 8080

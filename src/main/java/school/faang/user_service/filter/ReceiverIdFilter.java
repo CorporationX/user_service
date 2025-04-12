@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class ReceiverIdFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getReceiverId() != null;
+        return filter.getReceiverId() != null && filter.getReceiverId() > 0;
     }
 
     @Override

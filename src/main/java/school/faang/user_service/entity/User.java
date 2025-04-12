@@ -166,4 +166,10 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private WorkSchedule workSchedule;
+
+    @Column(name = "unverified_comments")
+    private Integer unverifiedComments;
+
+    @Column(name = "banned")
+    private boolean banned;
 }

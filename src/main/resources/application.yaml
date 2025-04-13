@@ -23,6 +23,10 @@ spring:
     redis:
       port: 6379
       host: localhost
+      settings:
+        user_ban:
+          topic: user_ban
+          listener: onMessage
 
 server:
   port: 8080

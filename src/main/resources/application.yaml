@@ -56,3 +56,13 @@ dicebear:
 
 avatar:
   bucketName: user-avatars
+
+scheduler:
+  premium-remover: "@weekly"
+
+premium:
+  expired:
+    delete-batch: 100
+
+thread-pool:
+  thread-count: 5

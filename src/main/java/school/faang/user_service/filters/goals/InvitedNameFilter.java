@@ -1,0 +1,23 @@
+package school.faang.user_service.filters.goals;
+
+import school.faang.user_service.dto.InvitationFilterIDto;
+import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.filters.interfaces.GoalsFilter;
+
+import java.util.stream.Stream;
+
+public class InvitedNameFilter implements GoalsFilter {
+    @Override
+    public boolean isAcceptable(InvitationFilterIDto invitationFilterIDto) {
+        return invitationFilterIDto.invitedNamePattern() != null;
+    }
+
+    @Override
+    public Stream<GoalInvitation> accept(Stream<GoalInvitation> invitations, InvitationFilterIDto invitationFilterIDto) {
+        return invitations.filter(invitation -> matchesPattern(invitationFilterIDto.invitedNamePattern(), invitation.getInvited().getUsername()));
+    }
+
+    private boolean matchesPattern(String pattern, String value) {
+        return pattern == null || value.matches(pattern);
+    }
+}

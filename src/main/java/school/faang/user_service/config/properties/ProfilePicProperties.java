@@ -13,4 +13,5 @@ public class ProfilePicProperties {
     private long maxSize;
     private int largePhotoSize;
     private int smallPhotoSize;
+    private String folderName;
 }

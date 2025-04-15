@@ -114,7 +114,7 @@ public class UserAvatarService {
             metadata.setContentType("image/jpeg");
             metadata.setContentLength(os.size());
 
-            String key = UUID.randomUUID().toString();
+            String key = String.format("%s/%s-%s", profilePicProperties.getFolderName(), UUID.randomUUID(), file.getOriginalFilename());
 
             s3Client.putObject(
                     new PutObjectRequest(

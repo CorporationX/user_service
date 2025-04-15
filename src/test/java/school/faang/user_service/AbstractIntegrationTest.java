@@ -45,15 +45,22 @@ public abstract class AbstractIntegrationTest {
             new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"));
 
     @Container
-    private static final GenericContainer<?> S3_CONTAINER
-            = new GenericContainer<>(DockerImageName.parse(S3_DOCKER_IMAGE))
-            .withExposedPorts(S3_EXPOSED_PORT)
-            .withEnv("MINIO_ROOT_USER", S3_USER)
-            .withEnv("MINIO_ROOT_PASSWORD", S3_PASSWORD)
-            .withCommand("server", "/data")
-            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
-                    new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(S3_EXPOSED_PORT),
-                            new ExposedPort(S3_EXPOSED_PORT)))));
+    private static final GenericContainer<?> S3_CONTAINER =
+            new GenericContainer<>(DockerImageName.parse(S3_DOCKER_IMAGE))
+                    .withExposedPorts(S3_EXPOSED_PORT)
+                    .withEnv("MINIO_ROOT_USER", S3_USER)
+                    .withEnv("MINIO_ROOT_PASSWORD", S3_PASSWORD)
+                    .withCommand("server", "/data")
+                    .withCreateContainerCmdModifier(
+                            cmd ->
+                                    cmd.withHostConfig(
+                                            new HostConfig()
+                                                    .withPortBindings(
+                                                            new PortBinding(
+                                                                    Ports.Binding.bindPort(
+                                                                            S3_EXPOSED_PORT),
+                                                                    new ExposedPort(
+                                                                            S3_EXPOSED_PORT)))));
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {

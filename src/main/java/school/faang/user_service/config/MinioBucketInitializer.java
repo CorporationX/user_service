@@ -32,6 +32,7 @@ public class MinioBucketInitializer {
                             .bucket(bucketName)
                             .build()
             );
+            System.out.println("ava " + found);
             if (!found) {
                 log.info(INITIALIZING_BUCKET_LOG, bucketName);
                 minioClient.makeBucket(

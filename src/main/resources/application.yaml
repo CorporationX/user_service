@@ -53,8 +53,9 @@ spring:
       host: localhost
 
   kafka:
+    bootstrap-servers: ${spring.kafka.bootstrap-servers}
+
     producer:
-      bootstrap-servers: "localhost:9092"
       acks: all
       enable.idempotence: true
       isolation.level: "read_committed"

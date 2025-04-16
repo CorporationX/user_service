@@ -2,19 +2,15 @@ package integration.kafka;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import school.faang.user_service.dto.payment.CurrencyDto;
 import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.dto.payment.PaymentStatus;
@@ -28,16 +24,14 @@ import java.nio.charset.StandardCharsets;
 @Component
 @Slf4j
 @ActiveProfiles("test")
-@SpringBootTest
-@Testcontainers
 public class FakePremiumListener {
     private static final String RECEIVED_MESSAGE_FROM_KAFKA = "Received message from kafka: {}";
     public static final String FAILED_TO_ACKNOWLEDGE_KAFKA_MESSAGE = "Failed to acknowledge Kafka message";
 
-    @Value("${spring.kafka.consumer.topics.premium.price-request-topic}")
+    @Value("${spring.kafka.consumer.topics.premium.payment-request-topic}")
     String aaa;
 
-    @Value("${spring.kafka.consumer.correlation.premium-price}")
+    @Value("${spring.kafka.consumer.correlation.premium-payment}")
     private String premiumPaymentCorrelationId;
 
     @Value("${spring.kafka.producer.topics.premium.payment.payment-response-topic}")

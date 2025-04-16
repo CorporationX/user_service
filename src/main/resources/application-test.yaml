@@ -1,7 +1,9 @@
 spring:
-  kafka:
-    bootstrap-servers: ${spring.embedded.kafka.brokers}
+  main:
+    allow-bean-definition-overriding: true
 
+  kafka:
+    bootstrap-servers: ${spring.kafka.bootstrap-servers}
     producer:
       acks: all
       enable.idempotence: true
@@ -18,8 +20,8 @@ spring:
     consumer:
       enable-auto-commit: false
       isolation-level: "read_committed"
-      auto.offset.reset: "latest"
       timeout-seconds: 10
+      auto-offset-reset: "earliest"
 
       topics:
         premium:
@@ -34,7 +36,6 @@ spring:
       correlation:
         premium-price: "premium-price-correlation-id"
         premium-payment: "premium-payment-correlation-id"
-
 
 logging:
   level:

@@ -2,59 +2,71 @@ package school.faang.user_service.service.controller;
 
 import integration.kafka.FakePremiumListener;
 import integration.kafka.TestKafkaPublisher;
+import integration.kafka.TestKafkaTopicsConfig;
 import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.context.annotation.Import;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import school.faang.user_service.UserServiceApplication;
 import school.faang.user_service.controller.PremiumController;
 import school.faang.user_service.dto.payment.CurrencyDto;
 import school.faang.user_service.dto.premium.PremiumRequestDto;
 import school.faang.user_service.enums.premium.PremiumType;
-import school.faang.user_service.service.premium.PremiumServiceImpl;
 import school.faang.user_service.utils.JsonUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-@Slf4j
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = {
-                FakePremiumListener.class,
+                KafkaAutoConfiguration.class,
                 UserServiceApplication.class,
-                TestKafkaPublisher.class
+                FakePremiumListener.class,
+                TestKafkaPublisher.class,
+                KafkaListenerEndpointRegistry.class
         }
-        //properties = "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"
 )
+@Import(TestKafkaTopicsConfig.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@EmbeddedKafka(partitions = 1,
-        brokerProperties = {
-                "transaction.state.log.replication.factor=1",
-                "transaction.state.log.min.isr=1",
-                "listeners=PLAINTEXT://localhost:9092",
-                "port=9092"
-        }
-)
+@Testcontainers
+@EnableKafka
+@Slf4j
 public class PremiumControllerIT {
 
+    @Container
+    static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"))
+            .withExposedPorts(9093);
     @Autowired
     private MockMvc mockMvc;
 
@@ -67,10 +79,54 @@ public class PremiumControllerIT {
     @Autowired
     private RestTemplate restTemplate;
 
+    @DynamicPropertySource
+    static void overrideKafkaProps(DynamicPropertyRegistry registry) {
+        String kafkaAddress = String.format("localhost:%d", kafka.getMappedPort(9093));
+        registry.add("spring.kafka.bootstrap-servers", () -> kafkaAddress);
+    }
+
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
+    @Autowired
+    private FakePremiumListener fakePremiumListener;
+
+    @Autowired
+    private TestKafkaPublisher testKafkaPublisher;
+
+    @BeforeEach
+    void awaitListenerContainer() {
+        kafkaListenerEndpointRegistry.getListenerContainers().forEach(container -> {
+            ContainerTestUtils.waitForAssignment(container, kafka.getBootstrapServers().split(",").length);
+        });
+
+        await().atMost(10, TimeUnit.SECONDS).until(() ->
+                kafkaAdminClient().listTopics().names().get()
+                        .containsAll(List.of(
+                                "premium-payment-request-topic",
+                                "premium-payment-response-topic"
+                        ))
+        );
+
+        kafkaListenerEndpointRegistry.getListenerContainers()
+                .forEach(container -> await()
+                        .atMost(10, TimeUnit.SECONDS)
+                        .until(container::isRunning));
+
+    }
+
+    private AdminClient kafkaAdminClient() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        return AdminClient.create(config);
+    }
+
     @SneakyThrows
     @Test
     @Transactional
     public void testBuyPremium_success() {
+        log.info("Kafka bootstrap server: " + kafka.getBootstrapServers());
+        Thread.sleep(5000);
         PremiumRequestDto premiumRequest = new PremiumRequestDto(PremiumType.ONE_MONTH,
                 1L, CurrencyDto.USD, true);
 

@@ -147,6 +147,7 @@ public class PremiumServiceImpl implements PremiumService {
 
         try {
             var replyFuture = premiumPaymentReplyingKafkaTemplate.sendAndReceive(producerRecord);
+            log.info("Sent {} to topic {}", jsonRequest, premiumPaymentRequestTopic);
             PremiumPaymentResponseDto premiumPaymentResponse =
                     replyFuture.thenApply((ConsumerRecord<String, String> responseRecord) ->
                                     jsonUtils.deserialize(responseRecord.value(), PremiumPaymentResponseDto.class))

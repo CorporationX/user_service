@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    @Override
     public Optional<User> findUserById(long userId) {
         return userRepository.findById(userId);
     }

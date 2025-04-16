@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -61,7 +61,10 @@ public class RecommendationRequestService {
 
         recommendationRequest = recommendationRequestRepository.save(recommendationRequest);
 
-        recommendationRequest.getSkills().addAll(saveSkills(recommendationRequestDto.getSkillIds(), recommendationRequest));
+        List<SkillRequest> skillRequests = saveSkills(recommendationRequestDto.getSkillIds(), recommendationRequest);
+        if (skillRequests != null) {
+            recommendationRequest.getSkills().addAll(skillRequests);
+        }
 
         return recommendationRequestMapper.toDto(recommendationRequest);
     }

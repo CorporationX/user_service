@@ -33,7 +33,7 @@ class AvatarServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(avatarService, "avatarApiUrl", "http://avatar-api");
-        ReflectionTestUtils.setField(avatarService, "dicebearPngEndpoint", "/png/");
+        ReflectionTestUtils.setField(avatarService, "pngEndpoint", "/png/");
         ReflectionTestUtils.setField(avatarService, "bucketName", "avatars");
         ReflectionTestUtils.setField(avatarService, "localhostUrlPrefix", "http://localhost/");
         ReflectionTestUtils.setField(avatarService, "fileExtension", ".png");

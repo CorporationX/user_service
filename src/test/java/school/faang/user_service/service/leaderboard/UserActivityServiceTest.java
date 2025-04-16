@@ -205,6 +205,6 @@ public class UserActivityServiceTest {
         verify(userActivityRedisService, times(0))
                 .getTopActiveUsers(1, maxCachedLeaderboardSize + 1);
         verify(userActivityRepository, times(1))
-                .getTopActive(PageRequest.of(1, maxCachedLeaderboardSize + 1));
+                .getTopActive(PageRequest.of(0, maxCachedLeaderboardSize + 1));
     }
 }

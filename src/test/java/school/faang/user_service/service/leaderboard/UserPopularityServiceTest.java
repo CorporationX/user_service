@@ -204,6 +204,6 @@ public class UserPopularityServiceTest {
         verify(userPopularityRedisService, times(0))
                 .getTopPopularUsers(1, maxCachedLeaderboardSize + 1);
         verify(userPopularityRepository, times(1))
-                .getTopPopular(PageRequest.of(1, maxCachedLeaderboardSize + 1));
+                .getTopPopular(PageRequest.of(0, maxCachedLeaderboardSize + 1));
     }
 }

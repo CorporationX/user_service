@@ -44,8 +44,7 @@ public class MinioBucketInitializer {
                 log.info(BUCKET_ALREADY_EXISTS_LOG, bucketName);
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(BUCKET_INIT_EXCEPTION_MSG, e);
+            //log.error(e.getMessage(), e);
         }
     }
 }

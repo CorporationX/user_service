@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship_request;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.publisher.MentorshipEventDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -25,10 +27,12 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
+
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final UserRepository userRepository;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipEventPublisher mentorshipEventPublisher;
 
     @Value("${app.mentorship-request.min-request-interval-in-months}")
     private int minRequestIntervalInMonths;
@@ -78,6 +82,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                             receiver.getMentees().add(requester);
 
                             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+
+                            mentorshipEventPublisher.publish(new MentorshipEventDto(
+                                    receiver.getId(),
+                                    requester.getId(),
+                                    LocalDateTime.now()));
                         },
                         () -> throwIfRequestNotFound(id)
                 );

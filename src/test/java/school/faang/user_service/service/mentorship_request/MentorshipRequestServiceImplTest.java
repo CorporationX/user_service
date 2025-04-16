@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship_request;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +12,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.publisher.MentorshipEventDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -19,6 +20,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.mapper.RequestStatusMapper;
+import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship_request_filter_test.MentorshipRequestDescriptionFilterTest;
@@ -33,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,6 +55,9 @@ class MentorshipRequestServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MentorshipEventPublisher mentorshipEventPublisher;
+
     private final List<MentorshipRequestFilter> mentorshipRequestFilters = List.of(
             new MentorshipRequestStatusFilterTest(),
             new MentorshipRequestDescriptionFilterTest()
@@ -67,7 +73,8 @@ class MentorshipRequestServiceImplTest {
                 mentorshipRequestRepository,
                 mentorshipRequestMapper,
                 userRepository,
-                mentorshipRequestFilters);
+                mentorshipRequestFilters,
+                mentorshipEventPublisher);
 
         ReflectionTestUtils.setField(service, "minRequestIntervalInMonths", 3);
 
@@ -231,6 +238,11 @@ class MentorshipRequestServiceImplTest {
         User receiver = new User();
         requester.setMentors(new ArrayList<>());
         receiver.setMentees(new ArrayList<>());
+        requester.setId(2L);
+        receiver.setId(1L);
+        LocalDateTime time = LocalDateTime.of(1998, 1, 1, 2, 3, 1);
+        MentorshipEventDto mentorshipEventDto = new MentorshipEventDto(
+                1L, 2L, time);
 
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
         mentorshipRequest.setRequester(requester);
@@ -242,6 +254,7 @@ class MentorshipRequestServiceImplTest {
 
         service.acceptRequest(0L);
 
+        verify(mentorshipEventPublisher).publish(any(MentorshipEventDto.class));
         verify(mentorshipRequestRepository, times(1)).findById(0L);
     }
 

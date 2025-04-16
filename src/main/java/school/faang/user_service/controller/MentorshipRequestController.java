@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.service.MentorshipRequestService;
+import school.faang.user_service.service.mentorship_request.MentorshipRequestService;
 
 import java.util.List;
 

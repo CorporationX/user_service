@@ -3,8 +3,10 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -26,10 +28,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deactivateUser(Long userId) {
         User user = findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
 
         stopUserGoals(user);
         stopUserEvents(user);
+        deleteUserEvents(user);
         mentorshipService.stopMentoringIfMentor(user);
 
         user.setActive(false);
@@ -62,14 +65,17 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
-
     private void stopUserEvents(User user) {
         eventRepository.findAllByUserId(user.getId())
                 .forEach(event -> {
                     event.setStatus(EventStatus.CANCELED);
                     eventRepository.save(event);
                 });
+    }
+
+    private void deleteUserEvents(User user) {
+        List<Event> userEvents = eventRepository.findAllByUserId(user.getId());
+        eventRepository.deleteAll(userEvents);
     }
 
 }

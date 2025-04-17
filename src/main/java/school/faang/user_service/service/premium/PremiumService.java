@@ -17,7 +17,7 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PaymentService;
-import school.faang.user_service.service.UserServiceImpl;
+import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class PremiumService {
     private final PremiumRepository premiumRepository;
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     private final PaymentService paymentService;
     private final PremiumMapper premiumMapper;
 
@@ -61,7 +61,7 @@ public class PremiumService {
     }
 
     private User getUserById(long userId) {
-        return userServiceImpl.findUserById(userId)
+        return userService.findUserById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
     }
 

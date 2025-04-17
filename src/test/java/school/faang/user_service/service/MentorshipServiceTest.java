@@ -26,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -316,4 +320,42 @@ public class MentorshipServiceTest {
 
         verify(mentorshipRepository, times(1)).saveAll(List.of(mentor, mentee));
     }
+
+    @Test
+    @DisplayName("stopMentoringIfMentor - should delete all mentor and mentee relationships")
+    public void testStopMentoringIfMentor() {
+        User user = new User();
+        user.setId(10L);
+
+        MentorshipUserDto mentee1 = new MentorshipUserDto();
+        mentee1.setId(20L);
+        MentorshipUserDto mentee2 = new MentorshipUserDto();
+        mentee2.setId(21L);
+
+        MentorshipUserDto mentor1 = new MentorshipUserDto();
+        mentor1.setId(30L);
+        MentorshipUserDto mentor2 = new MentorshipUserDto();
+        mentor2.setId(31L);
+
+        List<MentorshipUserDto> mentees = List.of(mentee1, mentee2);
+        List<MentorshipUserDto> mentors = List.of(mentor1, mentor2);
+
+        MentorshipService spyService = spy(mentorshipService);
+
+        doReturn(mentees).when(spyService).getMentees(user.getId());
+        doReturn(mentors).when(spyService).getMentors(user.getId());
+        doNothing().when(spyService).deleteMentor(anyLong(), anyLong());
+        doNothing().when(spyService).deleteMentee(anyLong(), anyLong());
+
+        spyService.stopMentoringIfMentor(user);
+
+        verify(spyService).getMentees(user.getId());
+        verify(spyService).getMentors(user.getId());
+
+        verify(spyService).deleteMentor(mentee1.getId(), user.getId());
+        verify(spyService).deleteMentor(mentee2.getId(), user.getId());
+        verify(spyService).deleteMentee(mentor1.getId(), user.getId());
+        verify(spyService).deleteMentee(mentor2.getId(), user.getId());
+    }
+
 }

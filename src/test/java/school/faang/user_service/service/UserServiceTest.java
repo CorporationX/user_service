@@ -133,7 +133,9 @@ public class UserServiceTest {
 
         userServiceImpl.deactivateUser(userId);
 
-        verify(eventRepository).findAllByUserId(userId);
+        verify(eventRepository, times(2)).findAllByUserId(userId);
+        verify(eventRepository, never()).save(any());
+        verify(eventRepository).deleteAll(Collections.emptyList());
         verifyNoMoreInteractions(eventRepository);
     }
 

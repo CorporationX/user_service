@@ -27,8 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deactivateUser(Long userId) {
-        User user = findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+        User user = findUserById(userId).orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
 
         stopUserGoals(user);
         stopUserEvents(user);
@@ -66,11 +65,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void stopUserEvents(User user) {
-        eventRepository.findAllByUserId(user.getId())
-                .forEach(event -> {
-                    event.setStatus(EventStatus.CANCELED);
-                    eventRepository.save(event);
-                });
+        eventRepository.findAllByUserId(user.getId()).forEach(event -> {
+            event.setStatus(EventStatus.CANCELED);
+            eventRepository.save(event);
+        });
     }
 
     private void deleteUserEvents(User user) {

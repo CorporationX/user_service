@@ -1,10 +1,12 @@
 package school.faang.user_service.dto.recommendation;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,11 +17,12 @@ import java.util.List;
 public class RecommendationDto {
     @Nullable
     private Long id;
-    @NonNull
+    @NotNull
+    @Positive(message = "Id author in recommendation can't be negative")
     private Long authorId;
-    @NonNull
+    @Positive(message = "Id receiver in recommendation can't be negative")
     private Long receiverId;
-    @NonNull
+    @NotNull
     private String content;
     @Nullable
     private List<SkillOfferDto> skillOffers;

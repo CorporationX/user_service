@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.education;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +21,13 @@ public class EducationController {
     private final EducationService educationService;
 
     @PostMapping("/{userId}")
-    public EducationDto addEducation(@PathVariable long userId, @RequestBody EducationDto educationDto) {
+    public EducationDto addEducation(@PathVariable long userId, @Valid @RequestBody EducationDto educationDto) {
         log.info("Received request to add education for user with id: {}", userId);
         return educationService.addEducation(userId, educationDto);
     }
 
     @PutMapping("/{userId}")
-    public EducationDto updateEducation(@PathVariable long userId, @RequestBody EducationDto educationDto) {
+    public EducationDto updateEducation(@PathVariable long userId, @Valid @RequestBody EducationDto educationDto) {
         log.info("Received request to update education with id: {} for user with id: {}", educationDto.id(), userId);
         return educationService.updateEducation(userId, educationDto);
     }

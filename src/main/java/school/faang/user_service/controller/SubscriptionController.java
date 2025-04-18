@@ -1,15 +1,21 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/subscriptions")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
@@ -20,12 +26,12 @@ public class SubscriptionController {
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
-
-    public List<UserDto> getFollowers(long id, UserFilterDto filter) {
+    @GetMapping("/users/{id}/followers")
+    public List<UserDto> getFollowers(@PathVariable long id, @Valid @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowers(id, filter);
     }
-
-    public List<UserDto> getFollowing(long id, UserFilterDto filter) {
+    @GetMapping("/users/{id}/followings")
+    public List<UserDto> getFollowing(@PathVariable long id, @Valid @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowing(id, filter);
     }
 

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -13,6 +14,11 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotEnoughOffersException;
 import school.faang.user_service.exception.SkillNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 
 import java.util.List;
@@ -25,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
@@ -41,17 +48,107 @@ public class SkillServiceTest {
     private SkillRepository skillRepository;
 
     @Mock
-    private SkillMapper skillMapper;
+    private SkillOfferServiceImpl skillOfferService;
 
     @Mock
-    private SkillOfferService skillOfferService;
+    private UserSkillGuaranteeServiceImpl userSkillGuaranteeService;
 
-    @Mock
-    private UserSkillGuaranteeService userSkillGuaranteeService;
+    @Spy
+    private SkillMapperImpl skillMapper;
 
     @InjectMocks
     private SkillServiceImpl skillService;
 
+
+    @Test
+    public void testCreateWithExistingTitle() {
+        SkillDto skillDto = new SkillDto(null,"Java");
+        when(skillRepository.existsByTitle(skillDto.title())).thenReturn(true);
+        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+    }
+
+    @Test
+    public void testCreate() {
+        SkillDto skillDto = new SkillDto(null,"Java");
+        when(skillRepository.existsByTitle(skillDto.title())).thenReturn(false);
+        SkillDto result = skillService.create(skillDto);
+        verify(skillMapper, times(1)).toEntity(skillDto);
+        verify(skillRepository, times(1)).save(any(Skill.class));
+        assertEquals("Java", result.title());
+    }
+
+    @Test
+    public void testGetUserSkills() {
+        long userId = 1L;
+        Skill skill1 = Skill.builder().id(1).title("Java").build();
+        Skill skill2 = Skill.builder().id(2).title("Python").build();
+        Skill skill3 = Skill.builder().id(3).title("JavaScript").build();
+        List<Skill> skills = List.of(skill1, skill2, skill3);
+        when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
+        List<SkillDto> result = skillService.getUserSkills(1L);
+        verify(skillRepository, times(1)).findAllByUserId(userId);
+        assertEquals(3, result.size());
+
+    }
+
+    @Test
+    public void testGetOfferedSkills() {
+        long userId = 1L;
+        Skill skill1 = Skill.builder().id(1L).title("Java").build();
+        Skill skill2 = Skill.builder().id(2L).title("Python").build();
+        Skill skill3 = Skill.builder().id(1L).title("Java").build();
+
+        List<Skill> offeredSkills = List.of(skill1, skill2, skill3);
+
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(offeredSkills);
+
+        List<SkillCandidateDto> result = skillService.getOfferedSkills(userId);
+
+        assertEquals(2, result.size());
+
+        Map<Long, Long> expectedCounts = Map.of(1L, 2L, 2L, 1L);
+
+        for (SkillCandidateDto dto : result) {
+            assertTrue(expectedCounts.containsKey(dto.skill().id()));
+            assertEquals(expectedCounts.get(dto.skill().id()), dto.offersAmount());
+        }
+
+        verify(skillRepository, times(1)).findSkillsOfferedToUser(userId);
+
+        verify(skillMapper, times(2)).toDto(any(Skill.class));
+    }
+
+    @Test
+    public void testAcquireSkillFromOffersWithExistingSkill() {
+        long userId = 1L;
+        long skillId = 2L;
+        Skill existingSkill = new Skill();
+        existingSkill.setTitle("Java");
+        existingSkill.setId(1L);
+
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(existingSkill));
+        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
+    }
+
+    @Test
+    public void testAcquireSkillFromOffersWithNonExistingSkill() {
+
+        long userId = 1L;
+        long skillId = 2L;
+        Skill newSkill = Skill.builder().id(skillId).title("Java").build();
+        when(skillRepository.findUserSkill(skillId, userId))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(newSkill));
+        doNothing().when(skillOfferService).isEnoughAmountOffersToSkill(skillId, userId);
+        doNothing().when(skillRepository).assignSkillToUser(skillId, userId);
+        doNothing().when(userSkillGuaranteeService).addUserSkillGuarantee(skillId, userId);
+        SkillDto skillDto = skillService.acquireSkillFromOffers(skillId, userId);
+        verify(skillOfferService, times(1)).isEnoughAmountOffersToSkill(skillId, userId);
+        verify(skillRepository, times(1)).assignSkillToUser(skillId, userId);
+        verify(userSkillGuaranteeService, times(1)).addUserSkillGuarantee(skillId, userId);
+        verify(skillMapper, times(1)).toDto(newSkill);
+        assertEquals("Java", skillDto.title());
+    }
     @Nested
     class DoesSkillExistTests {
 

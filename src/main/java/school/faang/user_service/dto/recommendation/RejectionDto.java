@@ -1,4 +1,9 @@
 package school.faang.user_service.dto.recommendation;
 
-public record RejectionDto(String reason) {
+import jakarta.validation.constraints.Size;
+
+public record RejectionDto(
+        @Size(max = 255)
+        String reason
+) {
 }

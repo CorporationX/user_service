@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -38,10 +42,14 @@ public class UserServiceTest {
     @Mock
     private MentorshipService mentorshipService;
 
+    @Spy
+    private UserMapperImpl userMapper;
+
     @InjectMocks
-    private UserServiceImpl userServiceImpl;
+    private UserServiceImpl userService;
 
     private User user;
+    private UserDto userDto;
     private final long userId = 1L;
 
     @BeforeEach
@@ -50,13 +58,16 @@ public class UserServiceTest {
                 .id(userId)
                 .active(true)
                 .build();
+        
+        userDto = new UserDto();
+        userDto.setId(userId);
     }
 
     @Test
     public void testUserNotFoundThrows() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> userServiceImpl.deactivateUser(userId));
+        assertThrows(RuntimeException.class, () -> userService.deactivateUser(userId));
 
         verify(userRepository).findById(userId);
         verifyNoMoreInteractions(userRepository, goalRepository, eventRepository, mentorshipService);
@@ -66,7 +77,7 @@ public class UserServiceTest {
     public void testDeactivateDeactivatesUser() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         assertFalse(user.isActive());
         verify(userRepository).save(user);
@@ -76,7 +87,7 @@ public class UserServiceTest {
     public void testDeactivateStopsMentoring() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         verify(mentorshipService).stopMentoringIfMentor(user);
     }
@@ -86,7 +97,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.empty());
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         verify(goalRepository).findGoalsByUserId(userId);
         verifyNoMoreInteractions(goalRepository);
@@ -100,7 +111,7 @@ public class UserServiceTest {
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal));
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user));
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         verify(goalRepository).delete(goal);
         verify(goalRepository, never()).save(goal);
@@ -117,7 +128,7 @@ public class UserServiceTest {
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal));
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(new ArrayList<>(List.of(user, otherUser)));
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         assertEquals(1, goal.getUsers().size());
         assertFalse(goal.getUsers().contains(user));
@@ -131,7 +142,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(eventRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         verify(eventRepository, times(2)).findAllByUserId(userId);
         verify(eventRepository, never()).save(any());
@@ -148,7 +159,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(eventRepository.findAllByUserId(userId)).thenReturn(List.of(event1, event2));
 
-        userServiceImpl.deactivateUser(userId);
+        userService.deactivateUser(userId);
 
         assertEquals(EventStatus.CANCELED, event1.getStatus());
         assertEquals(EventStatus.CANCELED, event2.getStatus());
@@ -160,7 +171,7 @@ public class UserServiceTest {
     public void testFindUserExists() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        Optional<User> result = userServiceImpl.findUserById(userId);
+        Optional<User> result = userService.findUserById(userId);
 
         assertTrue(result.isPresent());
         assertEquals(user, result.get());
@@ -170,8 +181,45 @@ public class UserServiceTest {
     public void testFindUserNotExists() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        Optional<User> result = userServiceImpl.findUserById(userId);
+        Optional<User> result = userService.findUserById(userId);
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetUserByIdSuccessfully() {
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
+
+        UserDto result = userService.getUserById(1L);
+
+        verify(userRepository, times(1)).findById(1L);
+        assertEquals(result, userDto);
+    }
+
+    @Test
+    public void testGetUserByIdWithNoResult() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+    }
+
+    @Test
+    public void testBanUserSuccessfully() {
+        when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
+
+        userService.banUser("1");
+
+        assertTrue(user.isBanned());
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    public void testBanUserWithWrongUserId() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        userService.banUser("1");
+
+        assertFalse(user.isBanned());
+        verify(userRepository, times(0)).save(user);
     }
 }

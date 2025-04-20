@@ -61,6 +61,7 @@ public class UserServiceTest {
         
         userDto = new UserDto();
         userDto.setId(userId);
+        userDto.setActive(true);
     }
 
     @Test

@@ -3,21 +3,27 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.FollowerResponseDto;
 import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,13 +40,20 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
     @Spy
     private UserMapperImpl userMapper = new UserMapperImpl();
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
+    @Captor
+    private ArgumentCaptor<FollowerEvent> followerEventCaptor;
     private SubscriptionService subscriptionService;
 
     @BeforeEach
     public void setUp() {
-        this.subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, List.of(
-                phoneFilter, nameFilter, minExperienceFilter, maxExperienceFilter
-        ));
+        this.subscriptionService = new SubscriptionService(
+                subscriptionRepository,
+                userMapper,
+                List.of(phoneFilter, nameFilter, minExperienceFilter, maxExperienceFilter),
+                followerEventPublisher
+        );
     }
 
     @Test
@@ -76,6 +89,25 @@ public class SubscriptionServiceTest {
 
         verify(subscriptionRepository, times(1))
                 .followUser(1L, 2L);
+    }
+
+    @Test
+    void testPublishFollowerEvent() {
+        Long followerId = 1L;
+        Long followeeId = 2L;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+                .thenReturn(false);
+
+        subscriptionService.followUser(followerId, followeeId);
+
+        verify(followerEventPublisher).publish(followerEventCaptor.capture());
+        FollowerEvent capturedEvent = followerEventCaptor.getValue();
+        assertAll (
+                () -> assertEquals(followerId, capturedEvent.getFollowerId()),
+                () -> assertEquals(followeeId, capturedEvent.getFolloweeId()),
+                () -> assertNotNull(capturedEvent.getTimestamp())
+        );
     }
 
     @Test

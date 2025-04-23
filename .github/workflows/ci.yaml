@@ -61,4 +61,4 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f k8s-all.yaml \
-            --namespace user-service-namespace  # или kubectl set image … для патчинга :contentReference[oaicite:4]{index=4}
+            --namespace user-service-namespace

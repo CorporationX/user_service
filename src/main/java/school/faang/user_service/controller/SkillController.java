@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;

@@ -13,7 +13,7 @@ import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.user.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
@@ -28,6 +28,23 @@ public class UserController {
     UserDto getUser(@PathVariable long userId) {
         log.info("Received request to get user with ID {}", userId);
         return userService.getUser(userId);
+    }
+
+
+    @PostMapping("/{userId}")
+    public ResponseEntity<?> registerUser(@PathVariable Long userId) {
+        log.info(GENERATED_USERID_LOG, userId);
+
+        String avatarUrl = avatarService.generateAndUploadAvatar(String.valueOf(userId));
+        log.info(GENERATED_AVATAR_LOG, userId, avatarUrl);
+
+        String jsonResponse = String.format(JSON_RESPONSE_TEMPLATE, userId, avatarUrl);
+        return ResponseEntity.ok().body(jsonResponse);
+    }
+
+    @GetMapping("/{userId}/exists")
+    public boolean isExists(@PathVariable long userId) {
+        return userService.isExists(userId);
     }
 
 

@@ -15,7 +15,7 @@ import java.util.List;
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto requestRecommendation (@NonNull RecommendationRequestDto requestDto) {
+    public RecommendationRequestDto requestRecommendation(@NonNull RecommendationRequestDto requestDto) {
         return recommendationRequestService.create(requestDto);
     }
 

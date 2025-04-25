@@ -1,6 +1,5 @@
 package school.faang.user_service.mapper;
 
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.recommendation.RecommendationDto;

@@ -12,7 +12,7 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
 
-import static school.faang.user_service.messages.ErrorMessages.*;
+import static school.faang.user_service.messages.ErrorMessages.USER_NOT_FOUND_ERROR;
 
 @Service
 @Slf4j

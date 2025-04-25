@@ -1,6 +1,5 @@
 package school.faang.user_service.repository.recommendation;
 
-import lombok.NonNull;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import school.faang.user_service.entity.recommendation.SkillOffer;

@@ -2,7 +2,6 @@ package school.faang.user_service.service.leaderboard;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.leaderboard.UserActivityRequestDto;
 import school.faang.user_service.dto.leaderboard.UserActivityResponseDto;
 import school.faang.user_service.entity.Country;
@@ -15,7 +14,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 public class UserActivityMapperTest {
     private final UserActivityMapper mapper = Mappers.getMapper(UserActivityMapper.class);
     private final Country country = Country.builder().title("country").build();

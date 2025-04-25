@@ -12,7 +12,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.client.AvatarClient;
 import school.faang.user_service.exception.MinioUploadException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;

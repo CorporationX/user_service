@@ -74,7 +74,6 @@ public class PremiumServiceTest {
     private PremiumRequestDto premiumRequestDto;
     private User user;
     private ExchangeResponseDto exchangeResponse;
-    private PaymentResponseDto paymentResponseDto;
     private ConsumerRecord<String, String> consumerRecord;
 
     private final String jsonRequest = "jsonRequest";
@@ -85,8 +84,6 @@ public class PremiumServiceTest {
 
     @BeforeEach
     public void setUp() {
-        paymentResponseDto = new PaymentResponseDto(PaymentStatus.SUCCESS, 1, 1L,
-                BigDecimal.TEN, CurrencyDto.USD, "message");
         premiumRequestDto = new PremiumRequestDto(PremiumType.ONE_MONTH, 1L, CurrencyDto.USD, true);
         user = User.builder().id(1L).username("name").country(country).build();
         consumerRecord = new ConsumerRecord<>("topic", 0, 0L, "key", jsonResponse);

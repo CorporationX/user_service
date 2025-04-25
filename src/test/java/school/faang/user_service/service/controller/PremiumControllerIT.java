@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,17 +50,18 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
         classes = {
                 KafkaAutoConfiguration.class,
                 UserServiceApplication.class,
-                FakePremiumListener.class,
-                TestKafkaPublisher.class,
                 KafkaListenerEndpointRegistry.class
         }
 )
-@Import(TestKafkaTopicsConfig.class)
+@Import({
+        TestKafkaTopicsConfig.class,
+        FakePremiumListener.class,
+        TestKafkaPublisher.class
+})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Testcontainers
-@EnableKafka
 @Slf4j
 public class PremiumControllerIT {
 
@@ -80,8 +82,7 @@ public class PremiumControllerIT {
 
     @DynamicPropertySource
     static void overrideKafkaProps(DynamicPropertyRegistry registry) {
-        String kafkaAddress = String.format("localhost:%d", kafka.getMappedPort(9093));
-        registry.add("spring.kafka.bootstrap-servers", () -> kafkaAddress);
+        registry.add("TEST_KAFKA_BOOTSTRAP_SERVERS", kafka::getBootstrapServers);
     }
 
     @Autowired
@@ -109,7 +110,6 @@ public class PremiumControllerIT {
 
         kafkaListenerEndpointRegistry.getListenerContainers()
                 .forEach(container -> await()
-                        .atMost(10, TimeUnit.SECONDS)
                         .until(container::isRunning));
 
     }
@@ -121,11 +121,9 @@ public class PremiumControllerIT {
     }
 
     @SneakyThrows
-    //@Test
-    @Transactional
+    @Test
     public void testBuyPremium_success() {
         log.info("Kafka bootstrap server: " + kafka.getBootstrapServers());
-        Thread.sleep(5000);
         PremiumRequestDto premiumRequest = new PremiumRequestDto(PremiumType.ONE_MONTH,
                 1L, CurrencyDto.USD, true);
 

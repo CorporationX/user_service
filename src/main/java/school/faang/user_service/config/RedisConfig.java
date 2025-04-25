@@ -4,9 +4,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.service.leaderboard.RedisWarmUpService;
 
@@ -37,6 +39,18 @@ public class RedisConfig {
     @Bean
     CommandLineRunner warmUp(RedisWarmUpService redisWarmUpService) {
         return args -> redisWarmUpService.warmUpCache();
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
+    }
+
+    @Bean
+    public ChannelTopic mentorshipChannel() {
+        return new ChannelTopic("mentorship_channel");
     }
 }
 

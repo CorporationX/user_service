@@ -18,7 +18,7 @@ app:
       name: "corpbucket"
 
   premium:
-    cron: "0 9 * * * *"
+    cron: "0 0 0 * * *"
     renew-batch-size: 25000
     thread-pool-size: 16
     timeout-hours: 2
@@ -53,12 +53,11 @@ spring:
       host: localhost
 
   kafka:
-    bootstrap-servers: ${spring.kafka.bootstrap-servers}
+    bootstrap-servers: localhost:9092
 
     producer:
       acks: all
       enable.idempotence: true
-      isolation.level: "read_committed"
       max-in-flight-per-connection: 1
       transaction-id-prefix: "user-service-"
 

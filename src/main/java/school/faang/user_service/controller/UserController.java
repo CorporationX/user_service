@@ -30,18 +30,6 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-
-    @PostMapping("/{userId}")
-    public ResponseEntity<?> registerUser(@PathVariable Long userId) {
-        log.info(GENERATED_USERID_LOG, userId);
-
-        String avatarUrl = avatarService.generateAndUploadAvatar(String.valueOf(userId));
-        log.info(GENERATED_AVATAR_LOG, userId, avatarUrl);
-
-        String jsonResponse = String.format(JSON_RESPONSE_TEMPLATE, userId, avatarUrl);
-        return ResponseEntity.ok().body(jsonResponse);
-    }
-
     @GetMapping("/{userId}/exists")
     public boolean isExists(@PathVariable long userId) {
         return userService.isExists(userId);

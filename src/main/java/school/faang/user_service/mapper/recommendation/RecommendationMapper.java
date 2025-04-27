@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.recommendation;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -6,6 +6,7 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.skill.SkillOfferMapper;
 
 import java.util.List;
 

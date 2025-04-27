@@ -12,7 +12,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.IllegalRequestException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterProcessor;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;

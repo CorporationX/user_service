@@ -3,14 +3,14 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.promotion.user.UserPromotionDto;
+import school.faang.user_service.dto.promotion.user.UserToPromotionDto;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.user.UserService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -30,9 +30,14 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @GetMapping("/{userId}/exists")
+    @GetMapping("/exists/{userId}")
     public boolean isExists(@PathVariable long userId) {
         return userService.isExists(userId);
+    }
+
+    @GetMapping
+    public List<UserToPromotionDto> getAllUsers() {
+        return userService.findAll();
     }
 
 

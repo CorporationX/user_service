@@ -1,10 +1,11 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.recommendation;
 
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.mapper.skill.SkillRequestMapper;
 
 import java.util.List;
 

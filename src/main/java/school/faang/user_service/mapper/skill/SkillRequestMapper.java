@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.skill;
 
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

@@ -38,7 +38,6 @@ public class UserController {
         return contact;
     }
 
-
     @PostMapping("/{userId}")
     public ResponseEntity<?> registerUser(@PathVariable Long userId) {
         log.info(GENERATED_USERID_LOG, userId);

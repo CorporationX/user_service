@@ -14,7 +14,7 @@ import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.user.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
@@ -36,6 +36,11 @@ public class UserController {
         PreferredContact contact = userService.getPreferredContact(userId);
         log.info("Returning preferred contact {} for userId={}", contact, userId);
         return contact;
+    }
+  
+    @GetMapping("/{userId}/exists")
+    public boolean isExists(@PathVariable long userId) {
+        return userService.isExists(userId);
     }
 
     @PostMapping("/{userId}")

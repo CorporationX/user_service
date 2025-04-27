@@ -1,4 +1,4 @@
-package school.faang.user_service.service.contactPreference;
+package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ContactPreferenceServiceTest {
+class UserServiceTest {
 
     @Mock
     private ContactPreferenceRepository contactPreferenceRepository;
 
     @InjectMocks
-    private ContactPreferenceService contactPreferenceService;
+    private UserService userService;
 
     private ContactPreference contactPreference;
     private Long userId;
@@ -44,7 +44,7 @@ class ContactPreferenceServiceTest {
     void testGetPreferredContact_Success() {
         when(contactPreferenceRepository.findByUserId(userId)).thenReturn(Optional.of(contactPreference));
 
-        PreferredContact result = contactPreferenceService.getPreferredContact(userId);
+        PreferredContact result = userService.getPreferredContact(userId);
 
         assertEquals(PreferredContact.EMAIL, result);
         verify(contactPreferenceRepository, times(1)).findByUserId(userId);
@@ -55,7 +55,7 @@ class ContactPreferenceServiceTest {
         when(contactPreferenceRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> contactPreferenceService.getPreferredContact(userId));
+                () -> userService.getPreferredContact(userId));
 
         assertEquals(ErrorMessages.getErrorNotFoundContact(userId), exception.getMessage());
         verify(contactPreferenceRepository, times(1)).findByUserId(userId);

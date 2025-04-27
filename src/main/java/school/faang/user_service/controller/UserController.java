@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.user.UserService;
 
@@ -28,6 +29,13 @@ public class UserController {
     UserDto getUser(@PathVariable long userId) {
         log.info("Received request to get user with ID {}", userId);
         return userService.getUser(userId);
+    }
+
+    @GetMapping("/contactPreference/{userId}")
+    PreferredContact getPreferredContact(@PathVariable long userId) {
+        PreferredContact contact = userService.getPreferredContact(userId);
+        log.info("Returning preferred contact {} for userId={}", contact, userId);
+        return contact;
     }
 
 

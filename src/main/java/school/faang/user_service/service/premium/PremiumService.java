@@ -17,7 +17,7 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PaymentService;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class PremiumService {
     private final PremiumRepository premiumRepository;
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final PaymentService paymentService;
     private final PremiumMapper premiumMapper;
 

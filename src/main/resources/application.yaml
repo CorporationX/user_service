@@ -25,6 +25,7 @@ spring:
       host: localhost
       channel:
         mentorship: mentorship_channel
+        follower: follower_channel
 
 server:
   port: 8080

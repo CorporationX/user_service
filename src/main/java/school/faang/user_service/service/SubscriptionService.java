@@ -4,14 +4,17 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.FollowerResponseDto;
 import school.faang.user_service.dto.UserFilterRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -21,28 +24,37 @@ import java.util.stream.Stream;
 @Transactional
 @Slf4j
 public class SubscriptionService {
+
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final FollowerEventPublisher followerEventPublisher;
 
     public void followUser(Long followerId, Long followeeId) {
         validateIds(followerId, followeeId);
 
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Подписка на данного пользователя уже имеется.");
+            throw new DataValidationException("Subscription to this user already exists.");
         }
         subscriptionRepository.followUser(followerId, followeeId);
-        log.debug("Пользователь: {} успешно подписался на: {}", followerId, followeeId);
+        log.debug("User {} successfully followed user {}", followerId, followeeId);
+
+        followerEventPublisher.publish(FollowerEvent.builder()
+                .followerId(followerId)
+                .followeeId(followeeId)
+                .timestamp(LocalDateTime.now())
+                .build());
+        log.debug("FollowerEvent for user {} following user {} has been published to Redis", followerId, followeeId);
     }
 
     public void unfollowUser(Long followerId, Long followeeId) {
         validateIds(followerId, followeeId);
 
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Нет активной подписки на пользователя.");
+            throw new DataValidationException("No active subscription to this user.");
         }
         subscriptionRepository.unfollowUser(followerId, followeeId);
-        log.debug("Пользователь: {} успешно отписался от: {}", followerId, followeeId);
+        log.debug("User {} successfully unfollowed user {}", followerId, followeeId);
     }
 
     public List<FollowerResponseDto> getFollowing(Long followeeId, UserFilterRequestDto filter) {
@@ -83,7 +95,8 @@ public class SubscriptionService {
 
     private void validateIds(Long followerId, Long followeeId) {
         if (Objects.equals(followerId, followeeId)) {
-            throw new DataValidationException("Нельзя произвести действие над самим собой.");
+            throw new DataValidationException("Cannot perform action on oneself.");
         }
     }
 }
+

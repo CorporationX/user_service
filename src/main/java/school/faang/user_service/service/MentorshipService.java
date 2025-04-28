@@ -27,11 +27,7 @@ public class MentorshipService {
 
     public List<MentorshipUserDto> getMentees(long userId) {
         log.info(MentorshipMessage.GET_MENTEES_START.getMessage(), userId);
-        User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), userId)
-                        )
-                );
+        User user = mentorshipRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), userId)));
         log.info(MentorshipMessage.GET_MENTEES_FINISH.getMessage(), userId);
 
         return mentorshipMapper.toDtoList(user.getMentees());
@@ -39,11 +35,7 @@ public class MentorshipService {
 
     public List<MentorshipUserDto> getMentors(long userId) {
         log.info(MentorshipMessage.GET_MENTORS_START.getMessage(), userId);
-        User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), userId)
-                        )
-                );
+        User user = mentorshipRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), userId)));
         log.info(MentorshipMessage.GET_MENTORS_FINISH.getMessage(), userId);
 
         return mentorshipMapper.toDtoList(user.getMentors());
@@ -52,16 +44,8 @@ public class MentorshipService {
     public void deleteMentee(long menteeId, long mentorId) {
         validateIdsEqual(menteeId, mentorId);
 
-        User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), mentorId)
-                        )
-                );
-        User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), menteeId)
-                        )
-                );
+        User mentor = mentorshipRepository.findById(mentorId).orElseThrow(() -> new UserNotFoundException(String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), mentorId)));
+        User mentee = mentorshipRepository.findById(menteeId).orElseThrow(() -> new UserNotFoundException(String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), menteeId)));
 
         if (mentor.getMentees().remove(mentee)) {
             mentee.getMentors().remove(mentor);
@@ -77,16 +61,8 @@ public class MentorshipService {
     public void deleteMentor(long menteeId, long mentorId) {
         validateIdsEqual(menteeId, mentorId);
 
-        User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), mentorId)
-                        )
-                );
-        User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), menteeId)
-                        )
-                );
+        User mentor = mentorshipRepository.findById(mentorId).orElseThrow(() -> new UserNotFoundException(String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), mentorId)));
+        User mentee = mentorshipRepository.findById(menteeId).orElseThrow(() -> new UserNotFoundException(String.format(ExceptionMessage.USER_NOT_FOUND.getMessage(), menteeId)));
 
         if (mentee.getMentors().remove(mentor)) {
             mentor.getMentees().remove(mentee);
@@ -105,4 +81,27 @@ public class MentorshipService {
             throw new InvalidIdException(ExceptionMessage.EQUAL_IDS.getMessage());
         }
     }
+
+    public void stopMentoringIfMentor(User user) {
+        List<MentorshipUserDto> mentees = getMentees(user.getId());
+
+        for (MentorshipUserDto mentee : mentees) {
+            try {
+                deleteMentor(mentee.getId(), user.getId());
+            } catch (Exception e) {
+                log.warn("Failed to delete mentorship between mentor {} and mentee {}", user.getId(), mentee.getId(), e);
+            }
+        }
+
+        List<MentorshipUserDto> mentors = getMentors(user.getId());
+
+        for (MentorshipUserDto mentor : mentors) {
+            try {
+                deleteMentee(mentor.getId(), user.getId());
+            } catch (Exception e) {
+                log.warn("Failed to delete mentorship between mentee {} and mentor {}", user.getId(), mentor.getId(), e);
+            }
+        }
+    }
+
 }

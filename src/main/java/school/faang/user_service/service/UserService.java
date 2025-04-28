@@ -1,18 +1,21 @@
 package school.faang.user_service.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
+public interface UserService {
 
-    public Optional<User> findUserById(long userId) {
-        return userRepository.findById(userId);
-    }
+    void deactivateUser(Long userId);
+
+    Optional<User> findUserById(long userId);
+
+    UserDto getUserById(long userId);
+
+    List<UserDto> getUsersByIds(List<Long> ids);
+
+    void banUser(String userIdStr);
+  
 }

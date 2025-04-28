@@ -3,7 +3,7 @@ name: CI pipeline
 on:
   pull_request:
     branches:
-      - medusa-master-stream-9
+      - medusa-master-stream9
 jobs:
   test:
     runs-on: ubuntu-latest

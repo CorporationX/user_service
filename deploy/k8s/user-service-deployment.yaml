@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: xellow/user_service-user-service:latest
+          image: user_service-user-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

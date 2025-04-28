@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim-buster
+FROM amazoncorretto:17
 WORKDIR /app
 
 COPY /build/libs/service.jar build/

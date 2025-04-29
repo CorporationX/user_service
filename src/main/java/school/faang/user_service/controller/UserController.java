@@ -1,5 +1,10 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +17,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.user.UserService;
 
+@Tag(name = "user_methods")
 @RestController
 @RequestMapping("/api/v1/users")
 @Slf4j
@@ -24,18 +30,29 @@ public class UserController {
     private final UserService userService;
     private final AvatarService avatarService;
 
+    @Operation(
+            summary = "Получаем существующего пользователя",
+            description = "Получает DTO пользователя из базы данных"
+    )
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         log.info("Received request to get user with ID {}", userId);
         return userService.getUser(userId);
     }
 
+    @Operation(
+            summary = "Проверка существования пользователя",
+            description = "Проверяет, существует ли пользователь по его идентификатору (userId). Возвращает true, если существует, иначе false."
+    )
     @GetMapping("/{userId}/exists")
     public boolean isExists(@PathVariable long userId) {
         return userService.isExists(userId);
     }
 
-
+    @Operation(
+            summary = "Создает нового пользователя",
+            description = "Создает нового пользователя из DTO и сохраняет в базу данных"
+    )
     @PostMapping("/{userId}")
     public ResponseEntity<?> registerUser(@PathVariable Long userId) {
         log.info(GENERATED_USERID_LOG, userId);

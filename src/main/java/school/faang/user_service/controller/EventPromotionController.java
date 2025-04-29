@@ -1,5 +1,7 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import school.faang.user_service.dto.payment.CurrencyDto;
 import school.faang.user_service.dto.promotion.event.EventPromotionRequestDto;
 import school.faang.user_service.service.EventPromotionService;
 
+@Tag(name = "eventPromotion_methods")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -21,6 +24,10 @@ import school.faang.user_service.service.EventPromotionService;
 public class EventPromotionController {
     private final EventPromotionService eventPromotionService;
 
+    @Operation(
+            summary = "Запуск продвижения события",
+            description = "Запускает продвижение указанного события на основе переданных данных о событии, параметрах продвижения и валюте."
+    )
     @PostMapping("/start")
     public ResponseEntity<String> startEventPromotion(@RequestBody EventPromotionRequestDto eventPromotionRequestDto,
                                                       @RequestParam("CurrencyDto") CurrencyDto currencyDto) {
@@ -33,6 +40,10 @@ public class EventPromotionController {
         return response;
     }
 
+    @Operation(
+            summary = "Завершение продвижения события",
+            description = "Завершает продвижение указанного события на основе переданных данных."
+    )
     @DeleteMapping("/end")
     public ResponseEntity<String> endEventPromotion(
             @RequestBody EventPromotionRequestDto eventPromotionRequestDto) {
@@ -45,6 +56,10 @@ public class EventPromotionController {
         return response;
     }
 
+    @Operation(
+            summary = "Обновление приоритета продвижения события",
+            description = "Обновляет приоритет указанного продвижения события на основе новых параметров и валюты."
+    )
     @PutMapping("/update/priority")
     public ResponseEntity<String> updateEventPromotionPriority(
             @RequestBody EventPromotionRequestDto eventPromotionRequestDto,
@@ -60,6 +75,10 @@ public class EventPromotionController {
         return response;
     }
 
+    @Operation(
+            summary = "Обновление типа продвижения события",
+            description = "Обновляет тип указанного продвижения события на основе новых параметров и валюты."
+    )
     @PutMapping("/update/type")
     public ResponseEntity<String> updateEventPromotionType(
             @RequestBody EventPromotionRequestDto eventPromotionRequestDto,

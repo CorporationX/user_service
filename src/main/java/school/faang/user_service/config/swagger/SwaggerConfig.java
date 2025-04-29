@@ -22,14 +22,7 @@ public class SwaggerConfig {
                         new Info()
                                 .title("Our user API")
                                 .version("v1")
-                                .description("API для управления пользователями")
-                                .contact(new io.swagger.v3.oas.models.info.Contact()
-                                        .name("Support Team")
-                                        .url("http://localhost:8080/support")
-                                        .email("support@example.com"))
-                                .license(new io.swagger.v3.oas.models.info.License()
-                                        .name("Apache 2.0")
-                                        .url("http://www.apache.org/licenses/LICENSE-2.0"))
+                                .description("API для управления user_service")
                 );
     }
 }

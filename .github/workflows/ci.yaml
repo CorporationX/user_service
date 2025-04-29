@@ -44,7 +44,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: xellow/user_service-user-service:latest
+          tags: user_service-user-service:latest
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4

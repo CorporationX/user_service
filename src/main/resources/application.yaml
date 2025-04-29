@@ -65,3 +65,10 @@ payment-service:
 application:
   goals:
     max-active: 3
+
+scheduler:
+  premium:
+    remover:
+      cron: "0 0 0 * * MON"
+      batch-size: 100
+      thread-pool-size: 4

@@ -1,3 +1,19 @@
+app:
+  leaderboard:
+    max-cached-size: 1000
+  avatar:
+    apiUrl: "https://api.dicebear.com/5.x/avataaars"
+    dicebearPngEndpoint: "/png?seed="
+    localhostUrlPrefix: "http://localhost:9000"
+    fileExtension: ".png"
+    contentType: "image/png"
+  minio:
+    avatars:
+      endpoint: http://localhost:9000
+      access-key: HZykibzYtPG1ABN2J073
+      secret-key: qjGfUbiitoZyWPNYS24G4EQKDsxCba9rK28DoqEj
+    bucket:
+      name: "corpbucket"
 payment:
   api:
     url: http://localhost:9081/api/payment
@@ -40,23 +56,3 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
-
-app:
-  avatar:
-    apiUrl: "https://api.dicebear.com/5.x/avataaars"
-    dicebearPngEndpoint: "/png?seed="
-    localhostUrlPrefix: "http://localhost:9000"
-    fileExtension: ".png"
-    contentType: "image/png"
-
-  minio:
-    avatars:
-      endpoint: http://localhost:9000
-      access-key: HZykibzYtPG1ABN2J073
-      secret-key: qjGfUbiitoZyWPNYS24G4EQKDsxCba9rK28DoqEj
-
-    bucket:
-      name: "corpbucket"
-
-  leaderboard:
-    max-cached-size: 1000

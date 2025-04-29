@@ -10,11 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.userprofile.ProfilePicEvent;
 
 import java.time.LocalDateTime;
@@ -29,26 +27,23 @@ import static org.mockito.Mockito.when;
 @DisplayName("Test cases of ProfilePicEventPublisherTest")
 public class ProfilePicEventPublisherTest {
 
+    private static final String PROFILE_PIC_TOPIC = "profile_pic_channel";
+
     @Mock
     private StringRedisTemplate stringRedisTemplate;
 
     @Mock
     private ObjectMapper objectMapper;
 
-    @Mock
-    @Qualifier("profilePicChannel")
-    private ChannelTopic channelTopic;
-
     @InjectMocks
     private ProfilePicEventPublisher publisher;
-
-    @Value("${spring.data.redis.channel.profile-pic}")
-    private String channelTitle;
 
     private ProfilePicEvent event;
 
     @BeforeEach
     public void setUp() {
+        ReflectionTestUtils.setField(publisher, "profilePicTopic", PROFILE_PIC_TOPIC);
+
         event = ProfilePicEvent.builder()
                 .userId(1L)
                 .picLink("http://example.com/pic.jpg")
@@ -71,10 +66,9 @@ public class ProfilePicEventPublisherTest {
     public void testPublishSuccessfully() throws JsonProcessingException {
         String json = "json";
         when(objectMapper.writeValueAsString(event)).thenReturn(json);
-        when(channelTopic.getTopic()).thenReturn(channelTitle);
 
         publisher.publish(event);
 
-        verify(stringRedisTemplate, times(1)).convertAndSend(channelTitle, json);
+        verify(stringRedisTemplate, times(1)).convertAndSend(PROFILE_PIC_TOPIC, json);
     }
 }

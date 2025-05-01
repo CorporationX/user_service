@@ -41,6 +41,9 @@ payment-service:
   host: localhost
   port: 9080
 
+analytics-service:
+  redis-topic: "faang.school.analytics.topic"
+
 services:
   s3:
     endpoint: http://127.0.0.1:9000

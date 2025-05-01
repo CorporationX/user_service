@@ -7,4 +7,5 @@ import lombok.Data;
 public class SkillOfferDto {
     private long id;
     private long skillId;
+    private long recommendationId;
 }

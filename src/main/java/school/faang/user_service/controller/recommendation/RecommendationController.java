@@ -1,11 +1,11 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.recommendation.RecommendationService;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class RecommendationController {
 
     private void validateRecommendation(RecommendationDto recommendation) {
         if (recommendation == null || recommendation.getContent() == null || recommendation.getContent().isBlank()) {
-            log.info("Recommendation Is Not Valid");
+            log.error("Recommendation Is Not Valid");
             throw new DataValidationException("recommendation is not valid");
         }
     }

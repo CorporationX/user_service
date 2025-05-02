@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.serializer.support.SerializationFailedException;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.userprofile.ProfilePicEvent;
 
@@ -30,7 +30,7 @@ public class ProfilePicEventPublisherTest {
     private static final String PROFILE_PIC_TOPIC = "profile_pic_channel";
 
     @Mock
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -69,6 +69,6 @@ public class ProfilePicEventPublisherTest {
 
         publisher.publish(event);
 
-        verify(stringRedisTemplate, times(1)).convertAndSend(PROFILE_PIC_TOPIC, json);
+        verify(redisTemplate, times(1)).convertAndSend(PROFILE_PIC_TOPIC, json);
     }
 }

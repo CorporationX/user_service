@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.userprofile.ProfilePicEvent;
 
@@ -15,7 +15,7 @@ import school.faang.user_service.dto.userprofile.ProfilePicEvent;
 @RequiredArgsConstructor
 public class ProfilePicEventPublisher{
 
-    private final StringRedisTemplate stringRedisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.channel.profile-pic}")
@@ -24,7 +24,7 @@ public class ProfilePicEventPublisher{
     public void publish(ProfilePicEvent event) {
         try {
             String json = objectMapper.writeValueAsString(event);
-            stringRedisTemplate.convertAndSend(profilePicTopic, json);
+            redisTemplate.convertAndSend(profilePicTopic, json);
             log.info("Published ProfilePicEvent: {} to \"{}\"", json, profilePicTopic);
         } catch (JsonProcessingException exception) {
             log.error("Failed to serialize ProfilePicEvent for user {}: {}", event.getUserId(), exception.getMessage());

@@ -26,7 +26,7 @@ app:
 
 payment:
   api:
-    url: http://localhost:9081/api/payment
+    url: http://localhost:9080/api/payment
 
 spring:
   datasource:

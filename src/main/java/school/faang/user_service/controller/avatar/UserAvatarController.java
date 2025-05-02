@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.avatar;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.avatar.AvatarService;
 
+@Tag(name = "user_avatar_methods")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +24,10 @@ public class UserAvatarController {
 
     private final AvatarService avatarService;
 
+    @Operation(
+            summary = "Регистрация пользователя с аватаром",
+            description = "Генерирует и загружает аватар для пользователя, используя его ID."
+    )
     @PostMapping("/{userId}")
     public ResponseEntity<?> registerUser(@PathVariable Long userId) {
         log.info(GENERATED_USERID_LOG, userId);

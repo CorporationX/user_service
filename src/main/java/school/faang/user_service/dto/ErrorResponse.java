@@ -1,8 +1,10 @@
 package school.faang.user_service.dto;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
-@AllArgsConstructor
-public class ErrorResponse {
-    private String message;
+public record ErrorResponse(
+        String message,
+        int statusCode,
+        LocalDateTime timestamp
+) {
 }

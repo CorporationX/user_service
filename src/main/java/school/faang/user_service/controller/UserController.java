@@ -1,9 +1,6 @@
 package school.faang.user_service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +42,7 @@ public class UserController {
             summary = "Проверка существования пользователя",
             description = "Проверяет, существует ли пользователь по его идентификатору (userId). Возвращает true, если существует, иначе false."
     )
-    @GetMapping("/contactPreference/{userId}")
+    @GetMapping("{userId}/contactPreference")
     PreferredContact getPreferredContact(@PathVariable long userId) {
         PreferredContact contact = userService.getPreferredContact(userId);
         log.info("Returning preferred contact {} for userId={}", contact, userId);

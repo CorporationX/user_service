@@ -1,5 +1,7 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +16,17 @@ import school.faang.user_service.dto.payment.CurrencyDto;
 import school.faang.user_service.dto.promotion.user.UserPromotionRequestDto;
 import school.faang.user_service.service.UserPromotionService;
 
+@Tag(name = "userPromotion_methods")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/promotion/users")
 public class UserPromotionController {
     private final UserPromotionService userPromotionService;
-
+    @Operation(
+            summary = "Запустить продвижение пользователя",
+            description = "Запускает процесс продвижения пользователя на основе предоставленных данных пользователя, информации о продвижении и валюты."
+    )
     @PostMapping("/start")
     public ResponseEntity<String> startUserPromotion(
             @RequestBody UserPromotionRequestDto userPromotionRequestDto,
@@ -36,6 +42,10 @@ public class UserPromotionController {
         return response;
     }
 
+    @Operation(
+            summary = "Завершить продвижение пользователя",
+            description = "Завершает активное продвижение пользователя на основе предоставленных данных пользователя и информации о продвижении."
+    )
     @DeleteMapping("/end")
     public ResponseEntity<String> endUserPromotion(
             @RequestBody UserPromotionRequestDto userPromotionRequestDto) {
@@ -50,6 +60,10 @@ public class UserPromotionController {
         return response;
     }
 
+    @Operation(
+            summary = "Обновить приоритет продвижения пользователя",
+            description = "Изменяет приоритет текущего продвижения пользователя на основе новых данных и указанной валюты."
+    )
     @PutMapping("/update/priority")
     public ResponseEntity<String> updateUserPromotionPriority(
             @RequestBody UserPromotionRequestDto userPromotionRequestDto,
@@ -66,6 +80,10 @@ public class UserPromotionController {
         return response;
     }
 
+    @Operation(
+            summary = "Обновить тип продвижения пользователя",
+            description = "Меняет тип текущего продвижения пользователя на новый, используя предоставленные данные и валюту."
+    )
     @PutMapping("/update/type")
     public ResponseEntity<String> updateUserPromotionType(
             @RequestBody UserPromotionRequestDto userPromotionRequestDto,

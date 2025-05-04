@@ -170,6 +170,10 @@ public class User {
     @OneToOne(mappedBy = "user")
     private WorkSchedule workSchedule;
 
+    @Column(name = "banned", nullable = false)
+    @Builder.Default
+    private boolean banned = false;
+
     @Column(name = "locale", length = 16)
     @Convert(converter = LocaleConverter.class)
     private Locale locale;

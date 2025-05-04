@@ -13,7 +13,7 @@ import school.faang.user_service.service.subscription.SubscriptionService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/subscriptions")
+@RequestMapping("api/v1/subscriptions")
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
@@ -73,5 +73,10 @@ public class SubscriptionController {
     public ResponseEntity<Integer> getFollowingCount(@RequestParam @NotNull long followerId) {
         int followingCount = subscriptionService.getFollowingCount(followerId);
         return ResponseEntity.ok(followingCount);
+    }
+
+    @GetMapping("/followee/{followeeId}/followers/ids")
+    public List<Long> getFollowersIds(@PathVariable long followeeId) {
+        return subscriptionService.getFollowersIds(followeeId);
     }
 }

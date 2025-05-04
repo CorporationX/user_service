@@ -67,6 +67,10 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
+    public List<Long> getFollowersIds(long followeeId) {
+        return subscriptionRepository.findFollowersIdsByFolloweeId(followeeId);
+    }
+
     private void validateIds(long followerId, long followeeId) throws DataValidationException {
         if (followerId == followeeId) {
             throw new DataValidationException("Нельзя подписаться или отписаться от самого себя");

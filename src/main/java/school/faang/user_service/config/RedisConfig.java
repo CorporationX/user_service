@@ -9,7 +9,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -27,6 +26,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    @Value("${spring.data.redis.channel.user-ban}")
+    private String userBanChannelName;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
@@ -38,10 +40,10 @@ public class RedisConfig {
             RedisConnectionFactory factory,
             MessageListenerAdapter adapter
     ) {
-        log.info("Creating RedisMessageListenerContainer for topic 'user_ban'");
+        log.info("Creating RedisMessageListenerContainer for topic '{}'", userBanChannelName);
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
-        container.addMessageListener(adapter, new ChannelTopic("user_ban"));
+        container.addMessageListener(adapter, new ChannelTopic(userBanChannelName));
         return container;
     }
 

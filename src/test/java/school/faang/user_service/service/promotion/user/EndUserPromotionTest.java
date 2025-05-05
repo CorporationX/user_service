@@ -15,8 +15,8 @@ import school.faang.user_service.dto.promotion.user.UserDto;
 import school.faang.user_service.dto.promotion.user.UserPromotionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.user.UserPromotion;
-import school.faang.user_service.model.promotion.PromotionPriority;
-import school.faang.user_service.model.promotion.user.UserPromotionType;
+import school.faang.user_service.enums.promotion.PromotionPriority;
+import school.faang.user_service.enums.promotion.user.UserPromotionType;
 import school.faang.user_service.repository.promotion.UserPromotionRepository;
 import school.faang.user_service.service.UserPromotionService;
 
@@ -32,11 +32,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.service.UserPromotionService.USER_DTO_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.DATE_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.PROMOTION_PRIORITY_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.START_DATE_CANNOT_BE_AFTER_END_DATE;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.USER_ID_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.USER_PROMOTION_TYPE_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.DATE_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.PROMOTION_PRIORITY_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.START_DATE_CANNOT_BE_AFTER_END_DATE;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.USER_ID_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.USER_PROMOTION_TYPE_CANNOT_BE_NULL;
 
 @ExtendWith(MockitoExtension.class)
 public class EndUserPromotionTest {

@@ -1,7 +1,7 @@
 package school.faang.user_service.dto.promotion.event;
 
-import school.faang.user_service.model.promotion.PromotionPriority;
-import school.faang.user_service.model.promotion.event.EventPromotionType;
+import school.faang.user_service.enums.promotion.PromotionPriority;
+import school.faang.user_service.enums.promotion.event.EventPromotionType;
 
 import java.time.LocalDateTime;
 

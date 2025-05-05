@@ -1,12 +1,14 @@
 app:
   leaderboard:
     max-cached-size: 1000
+
   avatar:
     apiUrl: "https://api.dicebear.com/5.x/avataaars"
     dicebearPngEndpoint: "/png?seed="
     localhostUrlPrefix: "http://localhost:9000"
     fileExtension: ".png"
     contentType: "image/png"
+
   minio:
     avatars:
       endpoint: http://localhost:9000
@@ -14,6 +16,14 @@ app:
       secret-key: qjGfUbiitoZyWPNYS24G4EQKDsxCba9rK28DoqEj
     bucket:
       name: "corpbucket"
+
+  premium:
+    cron: "0 0 0 * * *"
+    renew-batch-size: 25000
+    thread-pool-size: 16
+    timeout-hours: 2
+    expiry-notification-days: 2
+
 payment:
   api:
     url: http://localhost:9080/api/payment
@@ -42,6 +52,54 @@ spring:
       port: 6379
       host: localhost
 
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      acks: all
+      enable.idempotence: true
+      max-in-flight-per-connection: 1
+      transaction-id-prefix: "user-service-"
+
+      topics:
+        premium:
+          notifications:
+            bought-topic: "premium-bought-topic"
+            expired-topic: "premium-expired-topic"
+            expire-soon-topic: "premium-expire-soon-topic"
+            auto-renew-failed-topic: "premium-auto-renew-failed-topic"
+            updated-topic: "premium-updated-topic"
+            payment-failed-topic: "premium-payment-failed-topic"
+
+          analytics:
+            premium-analytics-topic: "premium-analytics-topic"
+
+          payment:
+            payment-request-topic: "premium-payment-request-topic"
+            price-request-topic: "premium-price-request-topic"
+
+    consumer:
+      enable-auto-commit: false
+      isolation-level: "read-committed"
+      auto.offset.reset: "latest"
+      timeout-seconds: 10
+
+      topics:
+        premium:
+          payment:
+            payment-response-topic: "premium-payment-response-topic"
+            price-response-topic: "premium-price-response-topic"
+
+      groups:
+        premium:
+          payment:
+            payment-group: "premium-payment-response-group"
+            price-group: "premium-price-response-group"
+
+      correlation:
+        premium-price: "premium-price-correlation-id"
+        premium-payment: "premium-payment-correlation-id"
+
 server:
   port: 8080
 
@@ -49,10 +107,11 @@ logging:
   level:
     root: info
 
-project-service:
-  host: localhost
-  port: 8082
+services:
+  project-service:
+    host: localhost
+    port: 8082
 
-payment-service:
-  host: localhost
-  port: 9080
+  payment-service:
+    host: localhost
+    port: 9080

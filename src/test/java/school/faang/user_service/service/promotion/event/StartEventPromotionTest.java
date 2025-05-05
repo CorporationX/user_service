@@ -19,8 +19,8 @@ import school.faang.user_service.dto.promotion.event.EventDto;
 import school.faang.user_service.dto.promotion.event.EventPromotionDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.event.EventPromotion;
-import school.faang.user_service.model.promotion.PromotionPriority;
-import school.faang.user_service.model.promotion.event.EventPromotionType;
+import school.faang.user_service.enums.promotion.PromotionPriority;
+import school.faang.user_service.enums.promotion.event.EventPromotionType;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.promotion.EventPromotionCountRepository;
 import school.faang.user_service.repository.promotion.EventPromotionRepository;
@@ -40,11 +40,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.service.EventPromotionService.EVENT_DTO_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.DATE_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.EVENT_ID_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.EVENT_PROMOTION_TYPE_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.PROMOTION_PRIORITY_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.START_DATE_CANNOT_BE_AFTER_END_DATE;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.DATE_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.EVENT_ID_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.EVENT_PROMOTION_TYPE_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.PROMOTION_PRIORITY_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.START_DATE_CANNOT_BE_AFTER_END_DATE;
 
 @TestPropertySource(properties = "payment.api.url=http://localhost:9081/api/payment")
 @ExtendWith(MockitoExtension.class)

@@ -1,0 +1,5 @@
+ALTER TABLE user_premium
+    ADD COLUMN IF NOT EXISTS auto_renew BOOLEAN DEFAULT false;
+
+ALTER TABLE user_premium
+    ADD COLUMN IF NOT EXISTS currency VARCHAR(10);

@@ -2,6 +2,9 @@ package school.faang.user_service.entity.premium;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.dto.payment.CurrencyDto;
 import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
@@ -30,7 +34,7 @@ public class Premium {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -41,4 +45,11 @@ public class Premium {
     @Column(name = "end_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endDate;
+
+    @Column(name = "auto_renew")
+    private boolean autoRenew;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency")
+    private CurrencyDto currency;
 }

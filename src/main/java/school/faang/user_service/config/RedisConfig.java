@@ -65,7 +65,7 @@ public class RedisConfig {
 
     @Bean
     CommandLineRunner warmUp(RedisWarmUpService redisWarmUpService) {
-        return args -> redisWarmUpService.warmUpCache();
+        return args -> redisWarmUpService.leaderboardWarmUpCache();
     }
 }
 

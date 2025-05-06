@@ -26,9 +26,32 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    @Value("${spring.data.redis.channel.user-ban}")
+    private String userBanChannelName;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
+        return new JedisConnectionFactory(config);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer listenerContainer(
+            RedisConnectionFactory factory,
+            MessageListenerAdapter adapter
+    ) {
+        log.info("Creating RedisMessageListenerContainer for topic '{}'", userBanChannelName);
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(factory);
+        container.addMessageListener(adapter, new ChannelTopic(userBanChannelName));
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter messageListener(UserService userService) {
+        MessageListenerAdapter adapter = new MessageListenerAdapter(userService, "banUser");
+        adapter.setSerializer(new StringRedisSerializer());
+        return adapter;
     }
 
     @Bean

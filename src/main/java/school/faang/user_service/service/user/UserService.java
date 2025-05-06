@@ -1,14 +1,19 @@
 package school.faang.user_service.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.messages.ErrorMessages;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 
 import java.util.Optional;
 
@@ -18,7 +23,7 @@ import static school.faang.user_service.messages.ErrorMessages.USER_NOT_FOUND_ER
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
-
+    private final ContactPreferenceRepository contactPreferenceRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -42,6 +47,11 @@ public class UserService {
             throw new UserNotFoundException(message);
         }
         return userMapper.toDto(userOptional.get());
+    }
+    public PreferredContact getPreferredContact(Long userId) {
+        ContactPreference preference = contactPreferenceRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.getErrorNotFoundContact(userId)));
+        return preference.getPreference();
     }
 }
 

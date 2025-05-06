@@ -3,6 +3,7 @@ package school.faang.user_service.entity;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import school.faang.user_service.converter.LocaleConverter;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.event.Event;
@@ -34,6 +36,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Data
 @Builder
@@ -170,4 +173,9 @@ public class User {
     @Column(name = "banned", nullable = false)
     @Builder.Default
     private boolean banned = false;
+
+    @Column(name = "locale", length = 16)
+    @Convert(converter = LocaleConverter.class)
+    private Locale locale;
+
 }

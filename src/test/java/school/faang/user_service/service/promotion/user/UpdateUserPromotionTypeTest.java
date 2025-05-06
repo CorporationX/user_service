@@ -15,9 +15,9 @@ import school.faang.user_service.dto.payment.PaymentResponseDto;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.dto.promotion.user.UserDto;
 import school.faang.user_service.dto.promotion.user.UserPromotionDto;
-import school.faang.user_service.exception.PromotionNotFoundException;
-import school.faang.user_service.model.promotion.PromotionPriority;
-import school.faang.user_service.model.promotion.user.UserPromotionType;
+import school.faang.user_service.enums.promotion.PromotionPriority;
+import school.faang.user_service.enums.promotion.user.UserPromotionType;
+import school.faang.user_service.exception.promotion.PromotionNotFoundException;
 import school.faang.user_service.repository.promotion.UserPromotionCountRepository;
 import school.faang.user_service.repository.promotion.UserPromotionRepository;
 import school.faang.user_service.service.UserPromotionService;
@@ -38,11 +38,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.service.UserPromotionService.CANT_UPDATE_USER_PROMOTION_TYPE;
 import static school.faang.user_service.service.UserPromotionService.USER_DTO_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.DATE_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.PROMOTION_PRIORITY_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.START_DATE_CANNOT_BE_AFTER_END_DATE;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.USER_ID_CANNOT_BE_NULL;
-import static school.faang.user_service.utils.validatonUtils.PromotionValidation.USER_PROMOTION_TYPE_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.DATE_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.PROMOTION_PRIORITY_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.START_DATE_CANNOT_BE_AFTER_END_DATE;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.USER_ID_CANNOT_BE_NULL;
+import static school.faang.user_service.utils.validationUtils.PromotionValidation.USER_PROMOTION_TYPE_CANNOT_BE_NULL;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateUserPromotionTypeTest {

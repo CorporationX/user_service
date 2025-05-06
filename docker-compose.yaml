@@ -1,0 +1,30 @@
+version: '3.8'
+
+networks:
+  main-net:
+    external: true
+
+services:
+  user-service:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATA_REDIS_HOST=host.docker.internal
+      - SPRING_DATA_REDIS_PORT=6379
+      - APP_MINIO_AVATARS_ENDPOINT=http://host.docker.internal:9000
+      - APP_MINIO_AVATARS_ACCESS_KEY=HZykibzYtPG1ABN2J073
+      - APP_MINIO_AVATARS_SECRET_KEY=qjGfUbiitoZyWPNYS24G4EQKDsxCba9rK28DoqEj
+      - APP_MINIO_BUCKET_NAME=corpbucket
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:19092
+    networks:
+      - main-net

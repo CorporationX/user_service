@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.leaderboard;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import school.faang.user_service.service.leaderboard.UserPopularityService;
 
 import java.util.List;
 
+@Tag(name = " user_popularity_methods")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +25,10 @@ import java.util.List;
 public class UserPopularityController {
     private final UserPopularityService userPopularityService;
 
+    @Operation(
+            summary = "Запись влияния пользователя",
+            description = "Записывает влияние (impact) на популярность пользователя."
+    )
     @PostMapping("/impact")
     public void recordUserImpact(@RequestBody UserPopularityRequestDto userPopularityRequestDto) {
         log.info("{}", userPopularityRequestDto);
@@ -32,6 +39,10 @@ public class UserPopularityController {
                 userPopularityRequestDto.userImpact(), userPopularityRequestDto.userId());
     }
 
+    @Operation(
+            summary = "Получить топ N популярных пользователей",
+            description = "Возвращает список из N самых популярных пользователей."
+    )
     @GetMapping("/top/{topN}")
     public List<UserPopularityResponseDto> getTopPopularUsers(@PathVariable("topN") int topN) {
         log.info("Received request to get top {} popular users", topN);
@@ -40,6 +51,10 @@ public class UserPopularityController {
         return topPopularUsers;
     }
 
+    @Operation(
+            summary = "Получить популярных пользователей в диапазоне",
+            description = "Возвращает список популярных пользователей от start до end."
+    )
     @GetMapping("/top/range")
     public List<UserPopularityResponseDto> getTopPopularUsers(@RequestParam("start") int start,
                                                               @RequestParam("end") int end) {

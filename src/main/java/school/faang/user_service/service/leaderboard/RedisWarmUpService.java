@@ -31,7 +31,7 @@ public class RedisWarmUpService {
     @Value("${app.leaderboard.max-cached-size}")
     private int maxCachedLeaderboardSize;
 
-    public void warmUpCache() {
+    public void leaderboardWarmUpCache() {
         redisTemplate.execute((RedisCallback<Object>) connection -> {
             connection.serverCommands().flushAll();
             return null;
@@ -43,6 +43,7 @@ public class RedisWarmUpService {
             userActivityRedisService.recordUserAction(userActivity,
                     userActivityMapper.toUserActivityRequestDto(userActivity));
         }
+
         List<UserPopularity> topPopularUsers = userPopularityRepository.getTopPopular(pageable);
         for (UserPopularity userImpact : topPopularUsers) {
             userPopularityRedisService.recordUserImpact(userImpact,

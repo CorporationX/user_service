@@ -62,23 +62,4 @@ public class RedisConfig {
         template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
-
-    @Bean
-    public RedisMessageListenerContainer listenerContainer(
-            RedisConnectionFactory factory,
-            MessageListenerAdapter adapter
-    ) {
-        log.info("Creating RedisMessageListenerContainer for topic 'user_ban'");
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(factory);
-        container.addMessageListener(adapter, new ChannelTopic("user_ban"));
-        return container;
-    }
-
-    @Bean
-    public MessageListenerAdapter messageListener(UserService userService) {
-        MessageListenerAdapter adapter = new MessageListenerAdapter(userService, "banUser");
-        adapter.setSerializer(new StringRedisSerializer());
-        return adapter;
-    }
 }

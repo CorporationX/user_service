@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +9,6 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -77,8 +77,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic mentorshipChannel() {
-        return new ChannelTopic("mentorship_channel");
+    public ChannelTopic mentorshipChannel(@Value("${redis.mentorship-topic}") String topicName) {
+        return new ChannelTopic(topicName);
     }
 }
 

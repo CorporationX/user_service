@@ -6,6 +6,7 @@ public record UserDto(
         Long id,
         String username,
         String email,
+        PreferredContact preference,
         Locale locale
 ) {
 }

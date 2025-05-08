@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import school.faang.user_service.entity.Skill;
 
 @Data
@@ -32,4 +33,11 @@ public class SkillOffer {
     @ManyToOne
     @JoinColumn(name = "recommendation_id", nullable = false)
     private Recommendation recommendation;
+    @Setter
+    private Long skillId;
+
+    public void setRecommendationId(Long id) {
+        this.recommendation = new Recommendation();
+        this.recommendation.setId(id);
+    }
 }

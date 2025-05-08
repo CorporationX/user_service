@@ -1,0 +1,26 @@
+package school.faang.user_service.mapper.recommendation;
+
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = {SkillRequestMapper.class})
+public interface RecommendationRequestMapper {
+
+    @Mapping(source = "requesterId", target = "requester.id")
+    @Mapping(source = "receiverId", target = "receiver.id")
+    @Mapping(target = "skills", ignore = true)
+    RecommendationRequest toRecommendationRequest(RecommendationRequestDto recommendationRequestDto);
+
+    @InheritInverseConfiguration
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    @Mapping(target = "skills", ignore = true)
+    RecommendationRequestDto toRecommendationRequestDto(RecommendationRequest recommendationRequest);
+
+    List<RecommendationRequestDto> toRecommendationRequestDtoList(List<RecommendationRequest> recommendationRequestList);
+}

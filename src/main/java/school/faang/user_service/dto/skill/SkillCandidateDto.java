@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class SkillCandidateDto {
     private SkillDto skill;
-    private long offersAmount;
+    private Long offersAmount;
 }

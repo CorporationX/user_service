@@ -30,6 +30,10 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
+    }
+
     private void validateSkill(SkillDto skill) {
         if (Objects.isNull(skill)) {
             log.error("The SkillDto submitted in method validateSkill is null!");

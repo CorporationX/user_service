@@ -6,9 +6,14 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
 import java.util.function.Function;
@@ -20,6 +25,10 @@ import java.util.stream.Collectors;
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
+    private final SkillOfferRepository offerRepository;
+    private final UserSkillGuaranteeRepository guaranteeRepository;
+    private final UserRepository userRepository;
+    private static final int MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
         if (!skillRepository.existsByTitle(skill.getTitle())) {
@@ -36,6 +45,25 @@ public class SkillService {
                 .entrySet().stream()
                 .map(entry -> skillMapper.toSkillCandidateDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        if (skillRepository.findUserSkill(skillId, userId).isEmpty()) {
+            return null;
+        }
+        if (offerRepository.findAllOffersOfSkill(skillId, userId).size() >= MIN_SKILL_OFFERS) {
+            return null;
+        }
+        skillRepository.assignSkillToUser(skillId, userId);
+        for (SkillOffer offer : offerRepository.findAllOffersOfSkill(skillId, userId)) {
+            UserSkillGuarantee skillGuarantor = UserSkillGuarantee.builder()
+                    .user(userRepository.getReferenceById(userId))
+                    .skill(offer.getSkill())
+                    .guarantor(offer.getRecommendation().getAuthor())
+                    .build();
+            guaranteeRepository.save(skillGuarantor);
+        }
+        return skillMapper.toDto(skillRepository.getReferenceById(skillId));
     }
 
     public List<SkillDto> getUserSkills(long userId) {

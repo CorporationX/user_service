@@ -3,6 +3,8 @@ package school.faang.user_service.controller.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.service.GoalInvitationService;
 
 @Controller
@@ -11,11 +13,10 @@ public class GoalInvitationController {
 
     private final GoalInvitationService goalInvitationService;
 
-    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
-        return goalInvitationService.createInvitation(invitation);
-    }
+    private final GoalInvitationMapper goalInvitationMapper;
 
-    public void acceptGoalInvitation(long id){//todo change to ResponseBody<Void> noContent().build();
-        goalInvitationService.acceptGoalInvitation(id);
+    public GoalInvitationDto createInvitation(GoalInvitationDto invitation){
+        GoalInvitation createdInvitation = goalInvitationService.createInvitation(invitation);
+        return goalInvitationMapper.gInvitationToGIDTO(createdInvitation);
     }
 }

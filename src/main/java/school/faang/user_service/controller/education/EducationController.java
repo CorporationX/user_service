@@ -21,7 +21,6 @@ public class EducationController {
     @PostMapping("/{userId}")
     public EducationDto addEducation(@PathVariable long userId, @RequestBody EducationDto educationDto) {
         Integer currentYear = LocalDate.now().getYear();
-
         if (educationDto.getYearFrom() >= currentYear) {
             throw new DataValidationException("Year must be less than current year");
         }
@@ -31,7 +30,6 @@ public class EducationController {
     @PutMapping("/{userId}")
     public EducationDto updateEducation(long userId, EducationDto educationDto) {
         Integer currentYear = LocalDate.now().getYear();
-
         if (educationDto.getYearFrom() >= currentYear) {
             throw new DataValidationException("Year must be less than current year");
         }

@@ -11,8 +11,6 @@ import school.faang.user_service.mapper.EducationMapper;
 import school.faang.user_service.repository.EducationRepository;
 import school.faang.user_service.repository.UserRepository;
 
-import java.time.LocalDate;
-
 @Service
 @RequiredArgsConstructor
 public class EducationService {
@@ -21,10 +19,8 @@ public class EducationService {
     private final EducationMapper educationMapper;
 
     public EducationDto addEducation(long userId, EducationDto educationDto) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
         Education education = educationMapper.toEducation(educationDto)
                 .toBuilder()
                 .user(user)
@@ -35,7 +31,6 @@ public class EducationService {
     }
 
     public EducationDto updateEducation(long userId, EducationDto educationDto) {
-
         Education education = educationRepository.findById(educationDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 

@@ -91,21 +91,6 @@ public class EducationServiceTest {
         verify(educationMapper, times(1)).toEducationDto(savedEducation);
     }
 
-    @Test
-    public void addEducation_invalidYearFrom_throwsDataValidationException() {
-        long userId = 1L;
-        EducationDto educationDto = new EducationDto();
-        educationDto.setYearFrom(LocalDate.now().getYear());
-        educationDto.setInstitution("University");
-        educationDto.setEducationLevel("Bachelor");
-        educationDto.setSpecialization("Computer Science");
-
-        assertThrows(DataValidationException.class, () -> educationService.addEducation(userId, educationDto));
-        verify(userRepository, never()).findById(anyLong());
-        verify(educationMapper, never()).toEducation(any());
-        verify(educationRepository, never()).save(any());
-        verify(educationMapper, never()).toEducationDto(any());
-    }
 
     @Test
     public void addEducation_userNotFound_throwsEntityNotFoundException() {
@@ -185,25 +170,6 @@ public class EducationServiceTest {
         verify(educationMapper, times(1)).toEducation(educationDto);
         verify(educationRepository, times(1)).save(any(Education.class));
         verify(educationMapper, times(1)).toEducationDto(savedEducation);
-    }
-
-    @Test
-    public void updateEducation_invalidYearFrom_throwsDataValidationException() {
-        long userId = 1L;
-        EducationDto educationDto = new EducationDto();
-        educationDto.setId(1L);
-        educationDto.setYearFrom(LocalDate.now().getYear());
-        educationDto.setInstitution("University");
-        educationDto.setEducationLevel("Bachelor");
-        educationDto.setSpecialization("Computer Science");
-
-        assertThrows(DataValidationException.class,
-                () -> educationService.updateEducation(userId, educationDto));
-
-        verify(educationRepository, never()).findById(anyLong());
-        verify(educationMapper, never()).toEducation(any());
-        verify(educationRepository, never()).save(any());
-        verify(educationMapper, never()).toEducationDto(any());
     }
 
     @Test

@@ -21,11 +21,6 @@ public class EducationService {
     private final EducationMapper educationMapper;
 
     public EducationDto addEducation(long userId, EducationDto educationDto) {
-        Integer currentYear = LocalDate.now().getYear();
-
-        if (educationDto.getYearFrom() >= currentYear) {
-            throw new DataValidationException("Year must be less than current year");
-        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -40,11 +35,6 @@ public class EducationService {
     }
 
     public EducationDto updateEducation(long userId, EducationDto educationDto) {
-        Integer currentYear = LocalDate.now().getYear();
-
-        if (educationDto.getYearFrom() >= currentYear) {
-            throw new DataValidationException("Year must be less than current year");
-        }
 
         Education education = educationRepository.findById(educationDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));

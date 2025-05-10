@@ -48,19 +48,16 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        if (skillRepository.findUserSkill(skillId, userId).isEmpty()) {
-            return null;
+        if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
+            throw new DataValidationException("User already have this skill!");
         }
-        if (offerRepository.findAllOffersOfSkill(skillId, userId).size() >= MIN_SKILL_OFFERS) {
-            return null;
+        if (offerRepository.findAllOffersOfSkill(skillId, userId).size() < MIN_SKILL_OFFERS) {
+            throw new DataValidationException("Not enough skill offers!");
         }
         skillRepository.assignSkillToUser(skillId, userId);
         for (SkillOffer offer : offerRepository.findAllOffersOfSkill(skillId, userId)) {
-            UserSkillGuarantee skillGuarantor = UserSkillGuarantee.builder()
-                    .user(userRepository.getReferenceById(userId))
-                    .skill(offer.getSkill())
-                    .guarantor(offer.getRecommendation().getAuthor())
-                    .build();
+            UserSkillGuarantee skillGuarantor =
+                    skillMapper.toUserSkillGuarantee(userRepository, offer, userId);
             guaranteeRepository.save(skillGuarantor);
         }
         return skillMapper.toDto(skillRepository.getReferenceById(skillId));
@@ -69,7 +66,7 @@ public class SkillService {
     public List<SkillDto> getUserSkills(long userId) {
         return skillRepository.findAllByUserId(userId)
                 .stream()
-                .map(skill -> skillMapper.toDto(skill))
+                .map(skillMapper::toDto)
                 .toList();
     }
 }

@@ -90,4 +90,31 @@ public class MentorshipServiceTest {
 
         Mockito.verify(mentorshipRepository, never()).deleteByMentorIdAndMenteeId(anyLong(), anyLong());
     }
+
+    @Test
+    public void testDeleteMentorIfExists() {
+        long mentorId = 1L;
+        long menteeId = 2L;
+
+        Mockito.when(mentorshipRepository.existsByMentorIdAndMenteeId(mentorId, menteeId))
+                .thenReturn(true);
+
+        mentorshipService.deleteMentor(menteeId, mentorId);
+
+        Mockito.verify(mentorshipRepository).deleteByMenteeIdAndMentorId(menteeId, mentorId);
+    }
+
+    @Test
+    public void testDeleteMentorIfDoesNotExist() {
+        long mentorId = 2L;
+        long menteeId = 3L;
+
+        Mockito.when(mentorshipRepository.existsByMentorIdAndMenteeId(mentorId, menteeId))
+                .thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.deleteMentor(menteeId, mentorId));
+
+        Mockito.verify(mentorshipRepository, never()).deleteByMenteeIdAndMentorId(anyLong(), anyLong());
+    }
 }

@@ -19,20 +19,18 @@ public class EducationService {
     private final EducationMapper educationMapper;
 
     public EducationDto addEducation(long userId, EducationDto educationDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User user = fetchUser(userId);
+
         Education education = educationMapper.toEducation(educationDto)
                 .toBuilder()
                 .user(user)
                 .build();
 
-        Education savedEducation = educationRepository.save(education);
-        return educationMapper.toEducationDto(savedEducation);
+        return educationMapper.toEducationDto(educationRepository.save(education));
     }
 
     public EducationDto updateEducation(long userId, EducationDto educationDto) {
-        Education education = educationRepository.findById(educationDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        Education education = fetchEducation(educationDto.getId());
 
         if (!education.getUser().getId().equals(userId)) {
             throw new DataValidationException("You can only update your own education");
@@ -43,14 +41,24 @@ public class EducationService {
                 .user(education.getUser())
                 .build();
 
-        Education savedEducation = educationRepository.save(updatedEducation);
-        return educationMapper.toEducationDto(savedEducation);
+        return educationMapper.toEducationDto(educationRepository.save(updatedEducation));
     }
 
     public EducationDto getById(long educationId) {
-        Education education = educationRepository.findById(educationId)
-                .orElseThrow(() -> new EntityNotFoundException("Education not found"));
+        Education education = fetchEducation(educationId);
 
         return educationMapper.toEducationDto(education);
+    }
+
+    private User fetchUser(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("User not found with id=" + userId));
+    }
+
+    private Education fetchEducation(long educationId) {
+        return educationRepository.findById(educationId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Education not found with id=" + educationId));
     }
 }

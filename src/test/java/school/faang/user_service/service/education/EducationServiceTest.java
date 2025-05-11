@@ -101,7 +101,8 @@ public class EducationServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> educationService.addEducation(userId, educationDto));
+        assertThrows(EntityNotFoundException.class,
+                () -> educationService.addEducation(userId, educationDto));
         verify(userRepository, times(1)).findById(userId);
         verify(educationMapper, never()).toEducation(any());
         verify(educationRepository, never()).save(any());

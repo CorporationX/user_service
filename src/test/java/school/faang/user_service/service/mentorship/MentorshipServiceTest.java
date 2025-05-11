@@ -16,6 +16,9 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipServiceTest {
@@ -59,5 +62,32 @@ public class MentorshipServiceTest {
         List<MentorDto> result = mentorshipService.getMentors(userId);
 
         assertEquals(1L, result.get(0).getId());
+    }
+
+    @Test
+    public void testDeleteMenteeIfExists() {
+        long mentorId = 1L;
+        long menteeId = 2L;
+
+        Mockito.when(mentorshipRepository.existsByMentorIdAndMenteeId(mentorId, menteeId))
+                .thenReturn(true);
+
+        mentorshipService.deleteMentee(mentorId, menteeId);
+
+        Mockito.verify(mentorshipRepository).deleteByMentorIdAndMenteeId(mentorId, menteeId);
+    }
+
+    @Test
+    public void testDeleteMenteeIfDoesNotExist() {
+        long mentorId = 2L;
+        long menteeId = 3L;
+
+        Mockito.when(mentorshipRepository.existsByMentorIdAndMenteeId(mentorId, menteeId))
+                .thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.deleteMentee(mentorId, menteeId));
+
+        Mockito.verify(mentorshipRepository, never()).deleteByMentorIdAndMenteeId(anyLong(), anyLong());
     }
 }

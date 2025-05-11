@@ -5,11 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MenteeDto;
 import school.faang.user_service.dto.MentorDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MentorshipMapper;
+import school.faang.user_service.mapper.MentorshipMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public class MentorshipServiceTest {
     @Mock
     private MentorshipRepository mentorshipRepository;
 
-    @Mock
-    private MentorshipMapper mentorshipMapper;
+    @Spy
+    private MentorshipMapperImpl mentorshipMapper;
 
     @InjectMocks
     private MentorshipService mentorshipService;
@@ -36,18 +37,12 @@ public class MentorshipServiceTest {
         mentee.setId(2L);
         List<User> mentees = List.of(mentee);
 
-        MenteeDto menteeDto = new MenteeDto();
-        menteeDto.setId(2L);
-        List<MenteeDto> menteeDtos = List.of(menteeDto);
-
         Mockito.when(mentorshipRepository.findMenteesByMentorId(userId))
                 .thenReturn(mentees);
-        Mockito.when(mentorshipMapper.menteesToMenteesDtos(mentees))
-                .thenReturn(menteeDtos);
 
         List<MenteeDto> result = mentorshipService.getMentees(userId);
 
-        assertEquals(menteeDtos, result);
+        assertEquals(2L, result.get(0).getId());
     }
 
     @Test
@@ -58,17 +53,11 @@ public class MentorshipServiceTest {
         mentor.setId(1L);
         List<User> mentors = List.of(mentor);
 
-        MentorDto mentorDto = new MentorDto();
-        mentorDto.setId(1L);
-        List<MentorDto> mentorDtos = List.of(mentorDto);
-
         Mockito.when(mentorshipRepository.findMentorsByMenteeId(userId))
                 .thenReturn(mentors);
-        Mockito.when(mentorshipMapper.mentorsToMentorsDtos(mentors))
-                .thenReturn(mentorDtos);
 
         List<MentorDto> result = mentorshipService.getMentors(userId);
 
-        assertEquals(mentorDtos, result);
+        assertEquals(1L, result.get(0).getId());
     }
 }

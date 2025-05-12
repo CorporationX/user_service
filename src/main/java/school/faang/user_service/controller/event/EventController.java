@@ -30,7 +30,7 @@ public class EventController {
 
     @PostMapping()
     public EventDto create(@Valid @RequestBody EventDto event) {
-        isValidDataRange(event);
+        isValidDateRange(event);
         return eventService.create(event);
     }
 
@@ -52,7 +52,7 @@ public class EventController {
 
     @PutMapping()
     public EventDto updateEvent(@Valid @RequestBody EventDto eventDto) {
-        isValidDataRange(eventDto);
+        isValidDateRange(eventDto);
         return eventService.updateEvent(eventDto);
     }
 
@@ -66,9 +66,9 @@ public class EventController {
         return eventService.getParticipatedEvents(userId);
     }
 
-    private void isValidDataRange(EventDto event) {
+    private void isValidDateRange(EventDto event) {
         if (event.getEndDate() != null) {
-            if (event.getStartDate().isBefore(event.getEndDate())) {
+            if (!event.getStartDate().isBefore(event.getEndDate())) {
                 throw new DataValidationException("The end date must be after the start date");
             }
         }

@@ -9,6 +9,7 @@ import java.lang.annotation.*;
         DataRequiredStringValidator.class,
         DataRequiredLongValidator.class,
         DataRequiredLocalDateTimeValidator.class,
+        DataRequiredListValidator.class
 })
 
 @Target({ElementType.FIELD, ElementType.PARAMETER})

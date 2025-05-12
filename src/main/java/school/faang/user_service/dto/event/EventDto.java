@@ -17,6 +17,7 @@ public class EventDto {
     @Required
     private Long ownerId;
     private String description;
+    @Required
     private List<Long> relatedSkillsIds;
     private String location;
     private Integer maxAttendees;

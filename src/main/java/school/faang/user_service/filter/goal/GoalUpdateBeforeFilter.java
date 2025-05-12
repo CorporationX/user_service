@@ -1,12 +1,22 @@
 package school.faang.user_service.filter.goal;
 
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
-import java.time.LocalDateTime;
+@Component
+public class GoalUpdateBeforeFilter implements GoalFilter {
+    @Setter
+    private GoalFilterDto criteria;
 
-public record GoalUpdateBeforeFilter(LocalDateTime updateBefore) implements GoalFilter {
     @Override
     public boolean doFilter(Goal goal) {
-        return goal.getUpdatedAt().isBefore(updateBefore);
+        return goal.getUpdatedAt().isBefore(criteria.getUpdatedBefore());
+    }
+
+    @Override
+    public boolean isApplicable() {
+        return criteria.getUpdatedBefore() != null;
     }
 }

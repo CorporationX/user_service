@@ -1,10 +1,22 @@
 package school.faang.user_service.filter.goal;
 
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
-public record GoalTitleFilter(String title) implements GoalFilter {
+@Component
+public class GoalTitleFilter implements GoalFilter {
+    @Setter
+    private GoalFilterDto criteria;
+
     @Override
     public boolean doFilter(Goal goal) {
-        return goal.getTitle().equals(title);
+        return goal.getTitle().equals(criteria.getTitle());
+    }
+
+    @Override
+    public boolean isApplicable() {
+        return criteria.getTitle() != null;
     }
 }

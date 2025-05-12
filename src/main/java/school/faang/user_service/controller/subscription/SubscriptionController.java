@@ -74,4 +74,12 @@ public class SubscriptionController {
         int followingCount = subscriptionService.getFollowingCount(followerId);
         return ResponseEntity.ok(followingCount);
     }
+
+    @GetMapping("/{followeeId}")
+    public List<Long> getFollowerIdsBatch(@PathVariable Long followeeId,
+                                          @RequestParam Long lastId,
+                                          @RequestParam int limit
+                                     ) {
+        return subscriptionService.getFollowerIdsBatch(followeeId, lastId, limit);
+    }
 }

@@ -2,6 +2,8 @@ package school.faang.user_service.service.subscription;
 
 import java.util.List;
 import java.util.stream.Stream;
+
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,10 @@ public class SubscriptionService {
         try (Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId)) {
             return filterUsers(users, filter);
         }
+    }
+
+    public List<Long> getFollowerIdsBatch(long followeeId, long lastId, int limit) {
+        return subscriptionRepository.getFollowerIdsBatch(followeeId, lastId, limit);
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {

@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -16,6 +17,7 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,7 @@ public class SkillService {
     private static final int MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
+        validateSkill(skill);
         if (!skillRepository.existsByTitle(skill.getTitle())) {
             Skill newSkill = skillRepository.save(skillMapper.toEntity(skill));
             return skillMapper.toDto(newSkill);
@@ -47,6 +50,7 @@ public class SkillService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
             throw new DataValidationException("User already have this skill!");
@@ -68,5 +72,16 @@ public class SkillService {
                 .stream()
                 .map(skillMapper::toDto)
                 .toList();
+    }
+
+    private void validateSkill(SkillDto skill) {
+        if (Objects.isNull(skill)) {
+            log.error("The SkillDto submitted in method validateSkill is null!");
+            throw new DataValidationException("SkillDto from argument is null!");
+        }
+        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
+            log.error("The SkillDto submitted to method validateSkill doesn't have a name!");
+            throw new DataValidationException("SkillDto has no name!");
+        }
     }
 }

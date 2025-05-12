@@ -16,11 +16,11 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/education")
+@RequestMapping("/users/{userId}/education")
 public class EducationController {
     private final EducationService educationService;
 
-    @PostMapping("/{userId}")
+    @PostMapping
     public EducationDto addEducation(
             @PathVariable long userId,
             @RequestBody EducationDto educationDto) {
@@ -29,7 +29,7 @@ public class EducationController {
         return educationService.addEducation(userId, educationDto);
     }
 
-    @PutMapping("/update/{userId}")
+    @PutMapping
     public EducationDto updateEducation(
             @PathVariable long userId,
             @RequestBody EducationDto educationDto) {
@@ -40,7 +40,7 @@ public class EducationController {
     }
 
     @GetMapping("/{educationId}")
-    public EducationDto getById(@PathVariable long educationId) {
+    public EducationDto getById(@PathVariable long userId, @PathVariable long educationId) {
         return educationService.getById(educationId);
     }
 

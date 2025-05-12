@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.EducationDto;
 import school.faang.user_service.entity.Education;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.EducationMapper;
-import school.faang.user_service.repository.EducationRepository;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.mapper.EducationMapperImpl;
+import school.faang.user_service.repository.adapter.EducationRepositoryAdapter;
+import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
 
 import java.util.Optional;
 
@@ -24,17 +24,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class EducationServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserRepositoryAdapter userRepositoryAdapter;
 
     @Mock
-    private EducationRepository educationRepository;
+    private EducationRepositoryAdapter educationRepositoryAdapter;
 
     @Mock
-    private EducationMapper educationMapper;
+    private EducationMapperImpl educationMapper;
 
     @InjectMocks
     private EducationService educationService;
@@ -75,17 +75,17 @@ public class EducationServiceTest {
         expectedDto.setEducationLevel("Bachelor");
         expectedDto.setSpecialization("Computer Science");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepositoryAdapter.getById(userId)).thenReturn(user);
         when(educationMapper.toEducation(educationDto)).thenReturn(educationBeforeSave);
-        when(educationRepository.save(any(Education.class))).thenReturn(savedEducation);
+        when(educationRepositoryAdapter.save(any(Education.class))).thenReturn(savedEducation);
         when(educationMapper.toEducationDto(savedEducation)).thenReturn(expectedDto);
 
         EducationDto actualDto = educationService.addEducation(userId, educationDto);
 
         assertEquals(expectedDto, actualDto);
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepositoryAdapter, times(1)).getById(userId);
         verify(educationMapper, times(1)).toEducation(educationDto);
-        verify(educationRepository, times(1)).save(any(Education.class));
+        verify(educationRepositoryAdapter, times(1)).save(any(Education.class));
         verify(educationMapper, times(1)).toEducationDto(savedEducation);
     }
 
@@ -99,13 +99,14 @@ public class EducationServiceTest {
         educationDto.setEducationLevel("Bachelor");
         educationDto.setSpecialization("Computer Science");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepositoryAdapter.getById(userId))
+                .thenThrow(new EntityNotFoundException("User not found with id:" + userId));
 
         assertThrows(EntityNotFoundException.class,
                 () -> educationService.addEducation(userId, educationDto));
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepositoryAdapter, times(1)).getById(userId);
         verify(educationMapper, never()).toEducation(any());
-        verify(educationRepository, never()).save(any());
+        verify(educationRepositoryAdapter, never()).save(any());
         verify(educationMapper, never()).toEducationDto(any());
     }
 
@@ -157,17 +158,17 @@ public class EducationServiceTest {
         expectedDto.setEducationLevel("Master");
         expectedDto.setSpecialization("Software Engineering");
 
-        when(educationRepository.findById(educationDto.getId())).thenReturn(Optional.of(existingEducation));
+        when(educationRepositoryAdapter.getById(educationDto.getId())).thenReturn(existingEducation);
         when(educationMapper.toEducation(educationDto)).thenReturn(updatedEducationEntity);
-        when(educationRepository.save(any(Education.class))).thenReturn(savedEducation);
+        when(educationRepositoryAdapter.save(any(Education.class))).thenReturn(savedEducation);
         when(educationMapper.toEducationDto(savedEducation)).thenReturn(expectedDto);
 
         EducationDto actualDto = educationService.updateEducation(userId, educationDto);
 
         assertEquals(expectedDto, actualDto);
-        verify(educationRepository, times(1)).findById(educationDto.getId());
+        verify(educationRepositoryAdapter, times(1)).getById(educationDto.getId());
         verify(educationMapper, times(1)).toEducation(educationDto);
-        verify(educationRepository, times(1)).save(any(Education.class));
+        verify(educationRepositoryAdapter, times(1)).save(any(Education.class));
         verify(educationMapper, times(1)).toEducationDto(savedEducation);
     }
 
@@ -181,14 +182,15 @@ public class EducationServiceTest {
         educationDto.setEducationLevel("Bachelor");
         educationDto.setSpecialization("Computer Science");
 
-        when(educationRepository.findById(educationDto.getId())).thenReturn(Optional.empty());
+        when(educationRepositoryAdapter.getById(educationDto.getId()))
+                .thenThrow(new EntityNotFoundException("Education not found with id:" + educationDto.getId()));
 
         assertThrows(EntityNotFoundException.class,
                 () -> educationService.updateEducation(userId, educationDto));
 
-        verify(educationRepository, times(1)).findById(educationDto.getId());
+        verify(educationRepositoryAdapter, times(1)).getById(educationDto.getId());
         verify(educationMapper, never()).toEducation(any());
-        verify(educationRepository, never()).save(any());
+        verify(educationRepositoryAdapter, never()).save(any());
         verify(educationMapper, never()).toEducationDto(any());
     }
 
@@ -213,14 +215,15 @@ public class EducationServiceTest {
                 .specialization("Computer Science")
                 .user(owner).build();
 
-        when(educationRepository.findById(educationDto.getId())).thenReturn(Optional.of(existingEducation));
+        when(educationRepositoryAdapter.getById(educationDto.getId()))
+                .thenThrow(new DataValidationException("Education not owned by user with id:" + userId));
 
         assertThrows(DataValidationException.class,
                 () -> educationService.updateEducation(userId, educationDto));
 
-        verify(educationRepository, times(1)).findById(educationDto.getId());
+        verify(educationRepositoryAdapter, times(1)).getById(educationDto.getId());
         verify(educationMapper, never()).toEducation(any());
-        verify(educationRepository, never()).save(any());
+        verify(educationRepositoryAdapter, never()).save(any());
         verify(educationMapper, never()).toEducationDto(any());
     }
 
@@ -246,13 +249,13 @@ public class EducationServiceTest {
         expectedDto.setEducationLevel("Bachelor");
         expectedDto.setSpecialization("Computer Science");
 
-        when(educationRepository.findById(educationId)).thenReturn(Optional.of(education));
+        when(educationRepositoryAdapter.getById(educationId)).thenReturn(education);
         when(educationMapper.toEducationDto(education)).thenReturn(expectedDto);
 
         EducationDto actualDto = educationService.getById(educationId);
 
         assertEquals(expectedDto, actualDto);
-        verify(educationRepository, times(1)).findById(educationId);
+        verify(educationRepositoryAdapter, times(1)).getById(educationId);
         verify(educationMapper, times(1)).toEducationDto(education);
     }
 
@@ -260,10 +263,11 @@ public class EducationServiceTest {
     public void getById_invalidId_throwsEntityNotFoundException() {
         long educationId = 1L;
 
-        when(educationRepository.findById(educationId)).thenReturn(Optional.empty());
+        when(educationRepositoryAdapter.getById(educationId))
+                .thenThrow(new EntityNotFoundException("Education not found with id:" + educationId));
 
         assertThrows(EntityNotFoundException.class, () -> educationService.getById(educationId));
-        verify(educationRepository, times(1)).findById(educationId);
+        verify(educationRepositoryAdapter, times(1)).getById(educationId);
         verify(educationMapper, never()).toEducationDto(any());
     }
 }

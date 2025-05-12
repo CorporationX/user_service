@@ -14,33 +14,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService goalService;
-    private final GoalMapper goalMapper;
 
     public GoalDto createGoal(Long userId, Goal goal) {
-        if (!goal.getTitle().isBlank()) throw new IllegalArgumentException("Goal has no title");
-        Goal createdGoal = goalService.createGoal(userId, goal);
-        return goalMapper.goalToGoalDTO(createdGoal);
+        if (goal.getTitle().isBlank()) throw new IllegalArgumentException("Goal has no title");
+        return goalService.createGoal(userId, goal);
     }
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
-        if (!goalDto.getTitle().isBlank()) throw new IllegalArgumentException("Goal has no title");
-        Goal updatedGoal = goalService.updateGoal(goalId, goalDto);
-
-        return goalMapper.goalToGoalDTO(updatedGoal);
+        if (goalDto.getTitle().isBlank()) throw new IllegalArgumentException("Goal has no title");
+        return goalService.updateGoal(goalId, goalDto);
     }
 
     public GoalDto deleteGoal(long goalId) {
-        Goal deletedGoal = goalService.deleteGoal(goalId);
-        return goalMapper.goalToGoalDTO(deletedGoal);
+        return goalService.deleteGoal(goalId);
     }
 
     public List<GoalDto> findSubtasksByGoalId(long goalId) {
-        List<Goal> subtasksByGoalId = goalService.findSubtasksByGoalId(goalId);
-        return goalMapper.mapGoalsToDTOs(subtasksByGoalId);
+        return goalService.findSubtasksByGoalId(goalId);
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        List<Goal> filteredUsersGoals = goalService.findGoalsByUserId(userId, filter);
-        return goalMapper.mapGoalsToDTOs(filteredUsersGoals);
+        return goalService.findGoalsByUserId(userId, filter);
     }
 }

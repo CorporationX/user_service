@@ -20,11 +20,9 @@ public interface GoalMapper {
 
     @Mapping(source = "parentId", target = "parent", qualifiedByName = "mapParent")
     @Mapping(source = "skillIds", target = "skillsToAchieve", qualifiedByName = "mapSkills")
-    Goal goalDtoToGoal(GoalDto goalDto, @Context GoalService goalService, @Context SkillService skillService);
+    Goal toToGoal(GoalDto goalDto, @Context GoalService goalService, @Context SkillService skillService);
 
     List<GoalDto> mapGoalsToDTOs(List<Goal> goals);
-
-    List<Goal> mapGoalsDTOsToGoals(List<GoalDto> dtos);
 
     default List<Long> goalSkillsToSkillIDs(Goal goal) {
         return goal.getSkillsToAchieve().stream()

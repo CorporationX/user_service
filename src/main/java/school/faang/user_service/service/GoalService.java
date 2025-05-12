@@ -9,17 +9,17 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import java.util.List;
 
 public interface GoalService {
-    Goal createGoal(Long userId, Goal goal);
+    GoalDto createGoal(Long userId, Goal goal);
 
-    Goal updateGoal(Long goalId, GoalDto goalDto);
+    GoalDto updateGoal(Long goalId, GoalDto goalDto);
 
-    Goal deleteGoal(long goalId);
+    GoalDto deleteGoal(long goalId);
 
-    List<Goal> findSubtasksByGoalId(long goalId);
+    List<GoalDto> findSubtasksByGoalId(long goalId);
 
-    List<Goal> findSubtasksByGoalId(long goalId, GoalFilterDto filter);
+    List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter);
 
-    List<Goal> findGoalsByUserId(Long userId, GoalFilterDto filter);
+    List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter);
 
     Goal findById(Long id);
 

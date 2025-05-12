@@ -33,7 +33,7 @@ public class MentorshipServiceTest {
     private MentorshipService mentorshipService;
 
     @Test
-    public void testGetMentees() {
+     void testGetMentees() {
         long userId = 1L;
 
         User mentee = new User();
@@ -49,7 +49,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentors() {
+     void testGetMentors() {
         long userId = 2L;
 
         User mentor = new User();
@@ -65,7 +65,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testDeleteMenteeIfExists() {
+     void testDeleteMenteeIfExists() {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -78,7 +78,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testDeleteMenteeIfDoesNotExist() {
+     void testDeleteMenteeIfDoesNotExist() {
         long mentorId = 2L;
         long menteeId = 3L;
 
@@ -92,7 +92,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testDeleteMentorIfExists() {
+     void testDeleteMentorIfExists() {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -105,7 +105,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testDeleteMentorIfDoesNotExist() {
+     void testDeleteMentorIfDoesNotExist() {
         long mentorId = 2L;
         long menteeId = 3L;
 

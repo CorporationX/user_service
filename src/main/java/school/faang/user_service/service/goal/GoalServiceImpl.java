@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -11,7 +12,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
@@ -29,7 +30,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class GoalServiceImpl implements GoalService {
 
-    public static int MAXIMUM_ALLOWED_ACTIVE_GOALS = 3;//todo вынести в конфигурацию компонента
+    @Value("${logic.constants.max_active_goals}")
+    public static int MAXIMUM_ALLOWED_ACTIVE_GOALS;
     private final GoalMapper goalMapper;
     private final GoalRepository goalRepository;
     private final SkillService skillService;
@@ -40,7 +42,7 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public GoalDto createGoal(Long userId, Goal goal) {
         long usersActiveGoals = goalRepository.findGoalsByUserId(userId)
-                .filter(GoalService::goalIsActive)
+                .filter(GoalUtil::isGoalActive)
                 .count();
 
         if (usersActiveGoals >= MAXIMUM_ALLOWED_ACTIVE_GOALS) {
@@ -65,7 +67,7 @@ public class GoalServiceImpl implements GoalService {
         addGoalToUser(userId, createdGoal);
         addGoalToSkills(createdGoal);
 
-        return goalMapper.goalToGoalDTO(createdGoal);
+        return goalMapper.toGoalDTO(createdGoal);
     }
 
     @Override
@@ -95,7 +97,7 @@ public class GoalServiceImpl implements GoalService {
             updateUsersWithSkills(goalToUpdate);
         }
 
-        return goalMapper.goalToGoalDTO(goalToUpdate);
+        return goalMapper.toGoalDTO(goalToUpdate);
     }
 
     @Transactional
@@ -123,7 +125,7 @@ public class GoalServiceImpl implements GoalService {
         goalRepository.delete(goalToDelete);
         deleteGoalCascade(goalToDelete);
 
-        return goalMapper.goalToGoalDTO(goalToDelete);
+        return goalMapper.toGoalDTO(goalToDelete);
     }
 
     private void deleteGoalCascade(Goal goalToDelete) {
@@ -149,14 +151,14 @@ public class GoalServiceImpl implements GoalService {
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         Stream<Goal> goalsByParent = goalRepository.findByParent(goalId);
         List<Goal> goals = filterGoals(goalsByParent, filter);
-        return goalMapper.mapGoalsToDTOs(goals);
+        return goalMapper.toGoalDTOs(goals);
     }
 
     @Override
     public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter) {
         Stream<Goal> goalsByUserId = goalRepository.findGoalsByUserId(userId);
         List<Goal> goals = filterGoals(goalsByUserId, filter);
-        return goalMapper.mapGoalsToDTOs(goals);
+        return goalMapper.toGoalDTOs(goals);
     }
 
     private List<Goal> filterGoals(Stream<Goal> goalStream, GoalFilterDto filterDto) {

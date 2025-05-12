@@ -1,11 +1,9 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.goal;
 
 import org.mapstruct.*;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.service.GoalService;
-import school.faang.user_service.service.SkillService;
 
 import java.util.List;
 
@@ -16,15 +14,15 @@ public interface GoalMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(target = "skillIds", expression = "java(goalSkillsToSkillIDs(goal))")
-    GoalDto goalToGoalDTO(Goal goal);
+    GoalDto toGoalDTO(Goal goal);
 
     @Mapping(source = "parentId", target = "parent", qualifiedByName = "mapParent")
     @Mapping(source = "skillIds", target = "skillsToAchieve", qualifiedByName = "mapSkills")
-    Goal toToGoal(GoalDto goalDto, @Context GoalService goalService, @Context SkillService skillService);
+    Goal toGoal(GoalDto goalDto, @Context GoalMapperContext context);
 
-    List<GoalDto> mapGoalsToDTOs(List<Goal> goals);
+    List<GoalDto> toGoalDTOs(List<Goal> goals);
 
-    default List<Long> goalSkillsToSkillIDs(Goal goal) {
+    default List<Long> toSkillIds(Goal goal) {
         return goal.getSkillsToAchieve().stream()
                 .map(Skill::getId)
                 .toList();
@@ -33,14 +31,12 @@ public interface GoalMapper {
     void updateGoalFromDto(GoalDto dto, @MappingTarget Goal goal);
 
     @Named("mapParent")
-    default Goal mapParent(Long id, @Context GoalService goalService) {
-        return id != null ? goalService.findById(id) : null;
+    default Goal mapParent(Long id, @Context GoalMapperContext context) {
+        return id != null ? context.toGoal(id) : null;
     }
 
     @Named("mapSkills")
-    default List<Skill> mapSkills(List<Long> ids, @Context SkillService skillService) {
-        return ids == null ? List.of() : ids.stream()
-                .map(skillService::findById)
-                .toList();
+    default List<Skill> mapSkills(List<Long> ids, @Context GoalMapperContext context) {
+        return ids == null ? List.of() : context.toListSkills(ids);
     }
 }

@@ -6,15 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.EducationDto;
+import school.faang.user_service.dto.education.EducationDto;
 import school.faang.user_service.entity.Education;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EducationMapperImpl;
 import school.faang.user_service.repository.adapter.EducationRepositoryAdapter;
 import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

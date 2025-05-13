@@ -10,7 +10,7 @@ class RecommendationRequestServiceImplTest {
     @DisplayName("Проверка создания запроса рекомендации.")
     @Test
     void create() {
-        assertTrue(true);
+        assertTrue(false);
     }
 
     @DisplayName("Проверка создания запроса рекомендации.")

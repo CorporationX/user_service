@@ -4,10 +4,8 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
 public interface GoalFilter {
-    boolean doFilter(Goal goal);
+    boolean doFilter(Goal goal, GoalFilterDto filterDto);
 
-    boolean isApplicable();
-
-    void setCriteria(GoalFilterDto criteria);
+    boolean isApplicable(GoalFilterDto criteria);
 
 }

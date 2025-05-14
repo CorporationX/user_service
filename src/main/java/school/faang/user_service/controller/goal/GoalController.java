@@ -28,8 +28,8 @@ public class GoalController {
         return goalService.deleteGoal(goalId);
     }
 
-    public List<GoalDto> findSubtasksByGoalId(long goalId) {
-        return goalService.findSubtasksByGoalId(goalId);
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
+        return goalService.findSubtasksByGoalId(goalId, filter);
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {

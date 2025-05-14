@@ -3,7 +3,6 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -13,11 +12,10 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.service.UserService;
-import school.faang.user_service.util.goal.GoalUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,18 +29,17 @@ import java.util.stream.Stream;
 public class GoalServiceImpl implements GoalService {
 
     @Value("${logic.constants.max_active_goals}")
-    public static int MAXIMUM_ALLOWED_ACTIVE_GOALS;
+    private final int MAXIMUM_ALLOWED_ACTIVE_GOALS;
     private final GoalMapper goalMapper;
     private final GoalRepository goalRepository;
-    private final SkillService skillService;
-    private final UserService userService;
+    private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
     private final List<GoalFilter> goalFilters;
-
 
     @Override
     public GoalDto createGoal(Long userId, Goal goal) {
         long usersActiveGoals = goalRepository.findGoalsByUserId(userId)
-                .filter(GoalUtil::isGoalActive)
+                .filter(g -> GoalStatus.ACTIVE == g.getStatus())
                 .count();
 
         if (usersActiveGoals >= MAXIMUM_ALLOWED_ACTIVE_GOALS) {
@@ -50,7 +47,7 @@ public class GoalServiceImpl implements GoalService {
                     + usersActiveGoals);
         }
 
-        List<Skill> skillsOfUser = skillService.findAllByUserId(userId);
+        List<Skill> skillsOfUser = skillRepository.findAllByUserId(userId);
         List<Skill> missingSkills = goal.getSkillsToAchieve().stream()
                 .filter(skillsOfUser::contains)
                 .toList();
@@ -80,17 +77,17 @@ public class GoalServiceImpl implements GoalService {
         if (goalSetCompleted && goalWasCompleted)
             throw new IllegalStateException("Goal was already completed");
 
-        List<Long> copyOfUpdatesSkillIds = new ArrayList<>(goalDto.getSkillIds());
-        copyOfUpdatesSkillIds.removeAll(
-                skillService.findAllByIds(copyOfUpdatesSkillIds).stream()
-                        .map(Skill::getId)
-                        .toList()
-        );
-        if (!copyOfUpdatesSkillIds.isEmpty())
-            throw new IllegalArgumentException("Skill ids not exists: ".formatted(copyOfUpdatesSkillIds.toArray()));
+        List<Long> existingSkillIds = skillRepository.findAllById(goalDto.getSkillIds()).stream()
+                .map(Skill::getId)
+                .toList();
+        List<Long> missingSkillIds = goalDto.getSkillIds().stream()
+                .filter(skillId -> !existingSkillIds.contains(skillId))
+                .toList();
+        if (!missingSkillIds.isEmpty())
+            throw new IllegalArgumentException("Skill ids not exists: ".formatted(missingSkillIds.toArray()));
 
         goalMapper.updateGoalFromDto(goalDto, goalToUpdate);
-        GoalUtil.updateTime(goalToUpdate, LocalDateTime.now());
+        goalToUpdate.setUpdatedAt(LocalDateTime.now());
         goalRepository.save(goalToUpdate);
 
         if (GoalStatus.COMPLETED == goalDto.getStatus()) {
@@ -100,22 +97,22 @@ public class GoalServiceImpl implements GoalService {
         return goalMapper.toGoalDTO(goalToUpdate);
     }
 
-    @Transactional
-    void updateUsersWithSkills(Goal completedGoal) {
+
+    private void updateUsersWithSkills(Goal completedGoal) {
         List<User> users = completedGoal.getUsers();
         List<Skill> skills = completedGoal.getSkillsToAchieve();
         users.forEach(user -> {
-            var merged = new HashSet<>(skills);
+            HashSet<Skill> merged = new HashSet<>(skills);
             merged.addAll(user.getSkills());
             user.setSkills(new ArrayList<>(merged));
         });
         skills.forEach(skill -> {
-            var merged = new HashSet<>(users);
+            HashSet<User> merged = new HashSet<>(users);
             merged.addAll(skill.getUsers());
             skill.setUsers(new ArrayList<>(merged));
         });
-        skillService.updateAll(skills);
-        userService.updateAll(users);
+        skillRepository.saveAllAndFlush(skills);
+        userRepository.saveAllAndFlush(users);
     }
 
     @Override
@@ -131,20 +128,14 @@ public class GoalServiceImpl implements GoalService {
     private void deleteGoalCascade(Goal goalToDelete) {
         List<User> users = goalToDelete.getUsers();
         users.forEach(user -> user.getGoals().remove(goalToDelete));
-        userService.updateAll(users);
+        userRepository.saveAllAndFlush(users);
 
         List<Skill> skills = goalToDelete.getSkillsToAchieve();
         skills.forEach(skill -> skill.getGoals().remove(goalToDelete));
-        skillService.updateAll(skills);
+        skillRepository.saveAllAndFlush(skills);
 
         List<GoalInvitation> invitations = goalToDelete.getInvitations();
         //todo on next task with invitations
-    }
-
-    @Override
-    public List<GoalDto> findSubtasksByGoalId(long goalId) {
-        GoalFilterDto blankFilter = new GoalFilterDto();
-        return findSubtasksByGoalId(goalId, blankFilter);
     }
 
     @Override
@@ -162,26 +153,17 @@ public class GoalServiceImpl implements GoalService {
     }
 
     private List<Goal> filterGoals(Stream<Goal> goalStream, GoalFilterDto filterDto) {
-        goalFilters.forEach(goalFilter -> goalFilter.setCriteria(filterDto));
-        List<GoalFilter> applicableFilters = this.goalFilters.stream()
-                .filter(GoalFilter::isApplicable)
+        List<GoalFilter> applicableFilters = goalFilters.stream()
+                .filter(goalFilter -> goalFilter.isApplicable(filterDto))
                 .toList();
         return goalStream
-                .filter(goal ->
-                        applicableFilters.stream()
-                                .allMatch(goalFilter -> goalFilter.doFilter(goal))
-                )
+                .filter(goal -> applicableFilters.stream().allMatch(goalFilter -> goalFilter.doFilter(goal, filterDto)))
                 .toList();
-    }
-
-    @Override
-    public Goal findById(Long id) {
-        return goalRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
     }
 
     private User addGoalToUser(Long userId, Goal createdGoal) {
-        User userById = userService.findById(userId);
+        User userById = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User id: " + userId));
         return addGoalToUser(userById, createdGoal);
     }
 
@@ -189,7 +171,7 @@ public class GoalServiceImpl implements GoalService {
         List<Goal> goals = user.getGoals();
         goals.add(createdGoal);
         user.setGoals(goals);
-        return userService.updateUser(user);
+        return userRepository.saveAndFlush(user);
     }
 
     private void addGoalToSkills(Goal createdGoal) {
@@ -199,7 +181,7 @@ public class GoalServiceImpl implements GoalService {
             skillGoals.add(createdGoal);
             skill.setGoals(skillGoals);
         });
-        skillService.updateAll(skillsToUpdateWithNewGoal);
+        skillRepository.saveAllAndFlush(skillsToUpdateWithNewGoal);
     }
 
 }

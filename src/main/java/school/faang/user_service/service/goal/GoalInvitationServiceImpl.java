@@ -24,9 +24,11 @@ import java.util.NoSuchElementException;
 public class GoalInvitationServiceImpl implements GoalInvitationService {
 
     @Value("${logic.constants.max_active_goals}")
-    private final int MAX_ACTIVE_GOALS;
+    private int maximumAllowedActiveGoals;
     private final ApplicationContext context;
     private final GoalInvitationRepository goalInvitationRepository;
+    private final GoalRepository goalRepository;
+    private final UserRepository userRepository;
     private final GoalInvitationMapper goalInvitationMapper;
 
     @Override
@@ -37,7 +39,14 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
             throw new IllegalArgumentException("Inviter and Invited IDs are the same ");
 
         GoalInvitation goalInvitation = goalInvitationMapper.gIDTOToGoalInvitation(goalInvitationDto);
-        //fullfill with goal, inviter, invited.
+
+        Long goalId = goalInvitationDto.getGoalId();
+        goalInvitation.setGoal(goalRepository.findById(goalId)
+                .orElseThrow(() -> new NoSuchElementException("Goal id: " + goalId)));
+        goalInvitation.setInviter(userRepository.findById(inviterId)
+                .orElseThrow(() -> new NoSuchElementException("User id: " + inviterId)));
+        goalInvitation.setInvited(userRepository.findById(invitedUserId)
+                .orElseThrow(() -> new NoSuchElementException("User id: " + invitedUserId)));
 
         GoalInvitation created = goalInvitationRepository.saveAndFlush(goalInvitation);
         return goalInvitationMapper.gInvitationToGIDTO(created);
@@ -57,11 +66,11 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
             throw new IllegalStateException("No existing goal in invitation");
         }
 
-        if (checkUserAlreadyWorksOnGoal(goal, invited)) {
+        if (isUserAlreadyWorksOnGoal(goal, invited)) {
             throw new UnsupportedOperationException("Invited user already works on goal");
         }
 
-        if (checkMaximumAllowedActiveGoalsReachedForUser(invited)) {
+        if (isMaximumAllowedActiveGoalsReachedForUser(invited)) {
             throw new DataValidationException("User has Maximum allowed active goals");
         }
 
@@ -73,15 +82,15 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         userRepository.saveAndFlush(invited);
     }
 
-    private boolean checkMaximumAllowedActiveGoalsReachedForUser(User invited) {
+    private boolean isMaximumAllowedActiveGoalsReachedForUser(User invited) {
         long activeGoalsOfInvited = invited
                 .getGoals().stream()
                 .filter(goal -> GoalStatus.ACTIVE == goal.getStatus())
                 .count();
-        return activeGoalsOfInvited >= MAX_ACTIVE_GOALS;
+        return activeGoalsOfInvited >= maximumAllowedActiveGoals;
     }
 
-    private boolean checkUserAlreadyWorksOnGoal(Goal goal, User invited) {
+    private boolean isUserAlreadyWorksOnGoal(Goal goal, User invited) {
         return invited
                 .getGoals().stream()
                 .anyMatch(goal::equals);

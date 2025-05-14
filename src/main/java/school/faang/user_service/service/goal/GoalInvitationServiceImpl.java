@@ -5,18 +5,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterIDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.GoalInvitationMapper;
+import school.faang.user_service.filter.invitation.InvitationFilter;
+import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalInvitationService;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -30,6 +33,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final GoalInvitationMapper goalInvitationMapper;
+    private final List<InvitationFilter> invitationFilters;
 
     @Override
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
@@ -38,7 +42,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         if (invitedUserId.equals(inviterId))
             throw new IllegalArgumentException("Inviter and Invited IDs are the same ");
 
-        GoalInvitation goalInvitation = goalInvitationMapper.gIDTOToGoalInvitation(goalInvitationDto);
+        GoalInvitation goalInvitation = goalInvitationMapper.toGoalInvitation(goalInvitationDto);
 
         Long goalId = goalInvitationDto.getGoalId();
         goalInvitation.setGoal(goalRepository.findById(goalId)
@@ -51,7 +55,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         goalInvitation.setStatus(RequestStatus.PENDING);
 
         GoalInvitation created = goalInvitationRepository.saveAndFlush(goalInvitation);
-        return goalInvitationMapper.gInvitationToGIDTO(created);
+        return goalInvitationMapper.toGoalInvitationDTO(created);
     }
 
     @Override
@@ -94,6 +98,20 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
             goalInvitation.setStatus(RequestStatus.REJECTED);
             goalInvitationRepository.saveAndFlush(goalInvitation);
         }
+    }
+
+    @Override
+    public List<GoalInvitationDto> getInvitations(InvitationFilterIDto filter) {
+        List<InvitationFilter> applicableFilters = invitationFilters.stream()
+                .filter(invitationFilter -> invitationFilter.isApplicable(filter))
+                .toList();
+
+        List<GoalInvitation> filteredGoalInvitations = goalInvitationRepository.findAll().stream()
+                .filter(goalInvitation -> applicableFilters.stream()
+                        .allMatch(invitationFilter -> invitationFilter.doFilter(goalInvitation, filter)))
+                .toList();
+
+        return goalInvitationMapper.toDTOs(filteredGoalInvitations);
     }
 
     private boolean isMaximumAllowedActiveGoalsReachedForUser(User invited) {

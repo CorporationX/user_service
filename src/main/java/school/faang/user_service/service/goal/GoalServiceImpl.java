@@ -14,6 +14,7 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
 
@@ -34,6 +35,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final GoalInvitationRepository goalInvitationRepository;
     private final List<GoalFilter> goalFilters;
 
     @Override
@@ -135,7 +137,8 @@ public class GoalServiceImpl implements GoalService {
         skillRepository.saveAllAndFlush(skills);
 
         List<GoalInvitation> invitations = goalToDelete.getInvitations();
-        //todo on next task with invitations
+        invitations.forEach(invitation -> invitation.setGoal(null));
+        goalInvitationRepository.saveAllAndFlush(invitations);
     }
 
     @Override

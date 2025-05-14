@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Component
@@ -17,6 +18,9 @@ public class EvenTypeFilter implements EventFilter {
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventFilterDto) {
         return events.filter(event ->
-                event.getType().getMessage().equalsIgnoreCase(eventFilterDto.getEventType()));
+                Optional.ofNullable((event.getType()))
+                                .map(type ->
+                                        type.getMessage().equalsIgnoreCase(eventFilterDto.getEventType()))
+                        .orElse(false));
     }
 }

@@ -14,5 +14,5 @@ public boolean isValid(List<?> value, ConstraintValidatorContext context) {
         throw new DataValidationException("The list cannot be empty");
     }
     return true;
-}
+    }
 }

@@ -27,20 +27,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final EventControllerUtils eventControllerUtils;
 
     @PostMapping()
     public EventDto create(@Valid @RequestBody EventDto event) {
-        isValidDateRange(event);
+        eventControllerUtils.isValidDateRange(event);
         return eventService.create(event);
     }
 
     @GetMapping(value = "/{id}")
-    public EventDto getEvent(@PathVariable  @Required Long id) {
+    public EventDto getEvent(@PathVariable @Required Long id) {
         return eventService.getEvent(id);
     }
 
     @PostMapping(value = "/filter")
     public List<EventDto> getEventsByFilter(@Valid @RequestBody EventFilterDto filter) {
+        eventControllerUtils.isValidDateRange(filter);
         return eventService.getEventsByFilter(filter);
     }
 
@@ -52,7 +54,7 @@ public class EventController {
 
     @PutMapping()
     public EventDto updateEvent(@Valid @RequestBody EventDto eventDto) {
-        isValidDateRange(eventDto);
+        eventControllerUtils.isValidDateRange(eventDto);
         return eventService.updateEvent(eventDto);
     }
 
@@ -64,13 +66,5 @@ public class EventController {
     @GetMapping(value = "/participated/{id}")
     public List<EventDto> getParticipatedEvents(@PathVariable("id") @Required Long userId) {
         return eventService.getParticipatedEvents(userId);
-    }
-
-    private void isValidDateRange(EventDto event) {
-        if (event.getEndDate() != null) {
-            if (!event.getStartDate().isBefore(event.getEndDate())) {
-                throw new DataValidationException("The end date must be after the start date");
-            }
-        }
     }
 }

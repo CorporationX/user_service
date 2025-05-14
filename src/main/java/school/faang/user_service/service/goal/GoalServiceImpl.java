@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 public class GoalServiceImpl implements GoalService {
 
     @Value("${logic.constants.max_active_goals}")
-    private final int MAXIMUM_ALLOWED_ACTIVE_GOALS;
+    private int maximumAllowedActiveGoals;
     private final GoalMapper goalMapper;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
@@ -42,7 +42,7 @@ public class GoalServiceImpl implements GoalService {
                 .filter(g -> GoalStatus.ACTIVE == g.getStatus())
                 .count();
 
-        if (usersActiveGoals >= MAXIMUM_ALLOWED_ACTIVE_GOALS) {
+        if (usersActiveGoals >= maximumAllowedActiveGoals) {
             throw new IllegalArgumentException("User exceeded maximum allowed number or active goals "
                     + usersActiveGoals);
         }

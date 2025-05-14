@@ -40,7 +40,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         Long inviterId = goalInvitationDto.getInviterId();
         Long invitedUserId = goalInvitationDto.getInvitedUserId();
         if (invitedUserId.equals(inviterId))
-            throw new IllegalArgumentException("Inviter and Invited IDs are the same ");
+            throw new IllegalArgumentException("Inviter and Invited IDs are the same");
 
         GoalInvitation goalInvitation = goalInvitationMapper.toGoalInvitation(goalInvitationDto);
 

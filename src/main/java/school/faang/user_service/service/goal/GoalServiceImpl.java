@@ -10,6 +10,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -45,8 +46,7 @@ public class GoalServiceImpl implements GoalService {
                 .count();
 
         if (usersActiveGoals >= maximumAllowedActiveGoals) {
-            throw new IllegalArgumentException("User exceeded maximum allowed number or active goals "
-                    + usersActiveGoals);
+            throw new DataValidationException("User has Maximum allowed active goals");
         }
 
         List<Skill> skillsOfUser = skillRepository.findAllByUserId(userId);

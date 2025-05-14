@@ -1,15 +1,13 @@
 package school.faang.user_service.dto.goal;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import school.faang.user_service.entity.RequestStatus;
 
-@Builder
-@RequiredArgsConstructor
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class InvitationFilterIDto {
-    private final Long inviterId;
-    private final Long invitedId;
-    private final RequestStatus status;
+    private Long inviterId;
+    private Long invitedId;
+    private RequestStatus status;
 }

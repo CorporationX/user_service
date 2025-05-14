@@ -18,4 +18,8 @@ public class GoalInvitationController {
     public void acceptGoalInvitation(long id){//todo change to ResponseBody<Void> noContent().build();
         goalInvitationService.acceptGoalInvitation(id);
     }
+
+    public void rejectGoalInvitation(long id){//todo change to ResponseBody<Void> noContent().build();
+        goalInvitationService.rejectGoalInvitation(id);
+    }
 }

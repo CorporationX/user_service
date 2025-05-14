@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -48,12 +48,13 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         goalInvitation.setInvited(userRepository.findById(invitedUserId)
                 .orElseThrow(() -> new NoSuchElementException("User id: " + invitedUserId)));
 
+        goalInvitation.setStatus(RequestStatus.PENDING);
+
         GoalInvitation created = goalInvitationRepository.saveAndFlush(goalInvitation);
         return goalInvitationMapper.gInvitationToGIDTO(created);
     }
 
     @Override
-    @Transactional
     public void acceptGoalInvitation(long id) {
         GoalInvitation goalInvitation = goalInvitationRepository
                 .findById(id)
@@ -74,12 +75,25 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
             throw new DataValidationException("User has Maximum allowed active goals");
         }
 
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+        goalInvitationRepository.saveAndFlush(goalInvitation);
         goal.getUsers().add(invited);
         invited.getGoals().add(goal);
         GoalRepository goalRepository = context.getBean(GoalRepository.class);
         UserRepository userRepository = context.getBean(UserRepository.class);
         goalRepository.saveAndFlush(goal);
         userRepository.saveAndFlush(invited);
+    }
+
+    @Override
+    public void rejectGoalInvitation(long id) {
+        GoalInvitation goalInvitation = goalInvitationRepository
+                .findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Invitation ID: " + id));
+        if (goalInvitation.getGoal() != null) {
+            goalInvitation.setStatus(RequestStatus.REJECTED);
+            goalInvitationRepository.saveAndFlush(goalInvitation);
+        }
     }
 
     private boolean isMaximumAllowedActiveGoalsReachedForUser(User invited) {

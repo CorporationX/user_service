@@ -6,4 +6,6 @@ public interface GoalInvitationService {
     GoalInvitationDto createInvitation(GoalInvitationDto invitation);
 
     void acceptGoalInvitation(long id);
+
+    void rejectGoalInvitation(long id);
 }

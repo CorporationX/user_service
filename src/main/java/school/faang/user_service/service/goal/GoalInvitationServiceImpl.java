@@ -9,14 +9,13 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalInvitationService;
-import school.faang.user_service.service.GoalService;
-import school.faang.user_service.service.UserService;
 
 import java.util.NoSuchElementException;
 
@@ -24,14 +23,11 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class GoalInvitationServiceImpl implements GoalInvitationService {
 
-    private final ApplicationContext context;
-
-    private final GoalInvitationRepository goalInvitationRepository;
-
-    private final GoalInvitationMapper goalInvitationMapper;
-
     @Value("${logic.constants.max_active_goals}")
     private final int MAX_ACTIVE_GOALS;
+    private final ApplicationContext context;
+    private final GoalInvitationRepository goalInvitationRepository;
+    private final GoalInvitationMapper goalInvitationMapper;
 
     @Override
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
@@ -40,13 +36,8 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         if (invitedUserId.equals(inviterId))
             throw new IllegalArgumentException("Inviter and Invited IDs are the same ");
 
-        //коммент для ревьювера: проверка на наличие юзеров в бд
-        // происходит в user service, который вызывается используется в маппинге.
-        GoalInvitation goalInvitation = goalInvitationMapper.gIDTOToGoalInvitation(
-                goalInvitationDto,
-                context.getBean(GoalService.class),
-                context.getBean(UserService.class)
-        );
+        GoalInvitation goalInvitation = goalInvitationMapper.gIDTOToGoalInvitation(goalInvitationDto);
+        //fullfill with goal, inviter, invited.
 
         GoalInvitation created = goalInvitationRepository.saveAndFlush(goalInvitation);
         return goalInvitationMapper.gInvitationToGIDTO(created);
@@ -85,7 +76,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     private boolean checkMaximumAllowedActiveGoalsReachedForUser(User invited) {
         long activeGoalsOfInvited = invited
                 .getGoals().stream()
-                .filter(GoalService::goalIsActive)
+                .filter(goal -> GoalStatus.ACTIVE == goal.getStatus())
                 .count();
         return activeGoalsOfInvited >= MAX_ACTIVE_GOALS;
     }

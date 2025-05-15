@@ -15,6 +15,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.service.user.UserService;
@@ -27,7 +28,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class GoalInvitationServiceImpl implements GoalInvitationService {
     private final GoalInvitationMapper goalInvitationMapper;
     private final GoalInvitationRepository goalInvitationRepository;
@@ -79,6 +79,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GoalInvitationDto> getAllInvitations(InvitationFilterDto invitationFilterDto) {
         log.debug("Execution of the method getAllInvitations, parameters: invitationFilterDto={}", invitationFilterDto);
         Objects.requireNonNull(invitationFilterDto, "passed invitationFilterDto cannot be null");
@@ -97,7 +98,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     private GoalInvitation getGoalInvitationById(long id) {
         log.debug("Execution of the method getGoalInvitationById, parameters: id={}", id);
         return goalInvitationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("No goal invitation found with с id=%d ", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("No goal invitation found with с id=%d ", id)));
     }
 
     private void compareIfDifferentUsers(User user1, User user2) {

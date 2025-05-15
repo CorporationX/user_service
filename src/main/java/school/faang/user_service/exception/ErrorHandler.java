@@ -18,7 +18,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(IllegalArgumentException e) {
         log.error("Exception thrown: {}", e.getMessage());
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), e.getMessage(),
-                LocalDateTime.now().format(TIME_PATTERN));
+        return new ErrorResponse(e.getMessage(), LocalDateTime.now().format(TIME_PATTERN));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(NotFoundException e) {
+        log.error("Exception thrown: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage(), LocalDateTime.now().format(TIME_PATTERN));
     }
 }

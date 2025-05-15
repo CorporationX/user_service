@@ -16,27 +16,27 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/events/{eventId}")
 @RequiredArgsConstructor
 public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
-    @PostMapping("/{eventId}/participants/{userId}")
+    @PostMapping("/participants/{userId}")
     public void registerParticipant(@PathVariable @Positive long eventId, @PathVariable @Positive long userId) {
         eventParticipationService.registerParticipant(eventId,userId);
     }
 
-    @DeleteMapping("/{eventId}/participants/{userId}")
+    @DeleteMapping("/participants/{userId}")
     public void unregisterParticipant(@PathVariable @Positive long eventId, @PathVariable @Positive long userId) {
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
-    @GetMapping("{eventId}/participants")
+    @GetMapping("/participants")
     public List<UserDto> getParticipants(@PathVariable @Positive long eventId) {
         return eventParticipationService.getParticipants(eventId);
     }
 
-    @GetMapping("{eventId}/participants/count")
+    @GetMapping("/participants/count")
     public Integer getParticipantsCount(@PathVariable @Positive long eventId) {
         return eventParticipationService.getParticipantsCount(eventId);
     }

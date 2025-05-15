@@ -10,7 +10,7 @@ import lombok.Data;
 public class UserDto {
     @NotNull(message = "ID is required")
     @Positive(message = "ID must be positive")
-    private long id;
+    private Long id;
     @NotEmpty(message = "Username is required")
     private String username;
     @Email(message = "Email must be valid")

@@ -9,7 +9,6 @@ import school.faang.user_service.mapper.ParticipantMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class EventParticipationService {
                 .findAllParticipantsByEventId(eventId)
                 .stream()
                 .map(participantMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Integer getParticipantsCount(long eventId) {

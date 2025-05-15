@@ -112,7 +112,9 @@ public class UserService {
         profileViewEventPublisher.publish(new ProfileViewEvent(
                 id, userContext.getUserId(), LocalDateTime.now()));
 
-        return userMapper.toDto(user);
+        UserDto dto = userMapper.toDto(user);
+        log.info("Returning UserDto: {}", dto);
+        return dto;
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {

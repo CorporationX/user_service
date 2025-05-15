@@ -33,6 +33,7 @@ public class RecommendationRequestController {
     public List<RecommendationRequestDto> getRecommendationRequests(@NonNull RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
+
     @Operation(
             summary = "Получение запроса рекомендации по ID",
             description = "Возвращает запрос рекомендации по его уникальному идентификатору."

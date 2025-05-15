@@ -1,9 +1,6 @@
 package school.faang.user_service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.avatar.AvatarService;
 import school.faang.user_service.service.user.UserService;
+
+import java.util.List;
 
 @Tag(name = "user_methods")
 @RestController
@@ -62,5 +62,17 @@ public class UserController {
 
         String jsonResponse = String.format(JSON_RESPONSE_TEMPLATE, userId, avatarUrl);
         return ResponseEntity.ok().body(jsonResponse);
+    }
+
+    @GetMapping("/{userId}/followees")
+    List<Long> getFollowees(@PathVariable Long userId) {
+        log.info("Received request to get followees for user {}", userId);
+        return userService.getFollowees(userId);
+    }
+
+    @GetMapping("/page")
+    List<Long> getUserIdsByPage(@RequestParam int page, @RequestParam int size) {
+        log.info("Received request to get users by page: page = {}, size = {}", page, size);
+        return userService.getUserIdsByPage(page, size);
     }
 }

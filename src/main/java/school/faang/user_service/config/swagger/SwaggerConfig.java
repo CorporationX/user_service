@@ -12,7 +12,7 @@ import java.util.List;
 public class SwaggerConfig {
     @Bean
     public OpenAPI api() {
-        return  new OpenAPI()
+        return new OpenAPI()
                 .servers(
                         List.of(
                                 new Server().url("http://localhost:8080").description("Local server")

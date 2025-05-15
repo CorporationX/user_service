@@ -16,7 +16,7 @@ public class UserBanSubscriber implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String userId = new String(message.getBody());
-        log.info("A user ban event has been received: {}",userId);
+        log.info("A user ban event has been received: {}", userId);
         userService.banUser(Long.parseLong(userId));
     }
 }

@@ -2,6 +2,8 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
@@ -10,6 +12,7 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static school.faang.user_service.messages.ErrorMessages.USER_NOT_FOUND_ERROR;
@@ -42,6 +45,14 @@ public class UserService {
             throw new UserNotFoundException(message);
         }
         return userMapper.toDto(userOptional.get());
+    }
+
+    public List<Long> getFollowees(Long userId) {
+        return userRepository.getFolloweesByUserId(userId);
+    }
+
+    public List<Long> getUserIdsByPage(int page, int size) {
+        return userRepository.findUserIds(PageRequest.of(page, size)).getContent();
     }
 }
 

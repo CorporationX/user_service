@@ -23,6 +23,7 @@ import school.faang.user_service.service.UserPromotionService;
 @RequestMapping("/promotion/users")
 public class UserPromotionController {
     private final UserPromotionService userPromotionService;
+
     @Operation(
             summary = "Запустить продвижение пользователя",
             description = "Запускает процесс продвижения пользователя на основе предоставленных данных пользователя, информации о продвижении и валюты."

@@ -22,14 +22,13 @@ import school.faang.user_service.mapper.recommendation.RecommendationRequestMapp
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.UserService;
+import school.faang.user_service.utils.Utils;
 import school.faang.user_service.validator.Validator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static school.faang.user_service.utils.Utils.format;
 
 @Slf4j
 @Service
@@ -53,6 +52,7 @@ public class RecommendationRequestService {
     //todo: Validator сделать возможность сортировки, задать порядок валидирования.
     private final List<Validator<RecommendationRequestDto>> requestValidators;
     private final List<Validator<RejectionDto>> rejectValidators;
+    private final Utils utils;
 
     @Transactional
     public RecommendationResponseDto create(RecommendationRequestDto dto) {
@@ -110,7 +110,7 @@ public class RecommendationRequestService {
         RecommendationRequest entity = requestRepository.findById(id)
                 .orElseThrow(() -> recommendationRequestNotFoundException(id));
         if (CHECK_STATUS_FOR_REJECT.contains(entity.getStatus())) {
-            String errorMessage = format(STATUS_HAS_NOT_BEEN_CHANGED, id, CHECK_STATUS_FOR_REJECT);
+            String errorMessage = utils.format(STATUS_HAS_NOT_BEEN_CHANGED, id, CHECK_STATUS_FOR_REJECT);
             log.error(errorMessage);
             throw recommendationRequestException(errorMessage);
         }
@@ -133,7 +133,7 @@ public class RecommendationRequestService {
     private void validateTimePeriod(RecommendationRequestDto dto) {
         int requestCount = requestRepository.countRepeatedRequest(dto.getRequesterId(), dto.getReceiverId());
         if (requestCount > 0) {
-            String errorMessage = format("requesterId={}, receiverId={}: {}",
+            String errorMessage = utils.format("requesterId={}, receiverId={}: {}",
                     dto.getRequesterId(), dto.getReceiverId(), SIX_MONTHS_PERIOD_ERROR);
             log.error(errorMessage);
             throw new RecommendationRequestValidationException(SIX_MONTHS_PERIOD_ERROR);
@@ -141,14 +141,14 @@ public class RecommendationRequestService {
     }
 
     @NotNull
-    private static RecommendationRequestNotFoundException recommendationRequestNotFoundException(Long id) {
-        String errorMessage = format(REQUEST_BY_ID_NOT_FOUND, id);
+    private RecommendationRequestNotFoundException recommendationRequestNotFoundException(Long id) {
+        String errorMessage = utils.format(REQUEST_BY_ID_NOT_FOUND, id);
         log.error(errorMessage, id);
         return new RecommendationRequestNotFoundException(errorMessage);
     }
 
     @NotNull
-    private static RecommendationRequestException recommendationRequestException(String message) {
+    private RecommendationRequestException recommendationRequestException(String message) {
         log.error(message);
         return new RecommendationRequestException(message);
     }

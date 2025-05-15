@@ -28,6 +28,7 @@ import school.faang.user_service.mapper.recommendation.RecommendationRequestMapp
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.UserService;
+import school.faang.user_service.utils.Utils;
 import school.faang.user_service.validator.Validator;
 import school.faang.user_service.validator.recommendation.MessageValidator;
 import school.faang.user_service.validator.recommendation.PersonValidator;
@@ -38,10 +39,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.LongStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static school.faang.user_service.utils.Utils.format;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
@@ -49,6 +55,8 @@ class RecommendationRequestServiceTest {
     private RecommendationRequestRepository requestRepository;
     @Spy
     private RecommendationRequestMapperImpl mapper;
+    @Spy
+    private Utils utils;
 
     private final List<Filter<RequestFilterDto, RecommendationRequest>> filters = List.of(
             new RecommendationRequestFilterByMessagePattern(),
@@ -75,7 +83,8 @@ class RecommendationRequestServiceTest {
     @BeforeEach
     public void setUpService() {
         requestService = new RecommendationRequestService(
-                userService, skillService, requestRepository, mapper, filters, requestValidators, rejectValidators
+                userService, skillService, requestRepository, mapper, filters,
+                requestValidators, rejectValidators, utils
         );
     }
 
@@ -194,7 +203,7 @@ class RecommendationRequestServiceTest {
     public void testGetEmptyRequest() {
         Long requestId = 10L;
         Optional<RecommendationRequest> resultMockEntity = Optional.empty();
-        String expected = format(RecommendationRequestService.REQUEST_BY_ID_NOT_FOUND, requestId);
+        String expected = utils.format(RecommendationRequestService.REQUEST_BY_ID_NOT_FOUND, requestId);
 
         when(requestRepository.findById(10L)).thenReturn(resultMockEntity);
 
@@ -237,7 +246,7 @@ class RecommendationRequestServiceTest {
         String reason = "simple reason";
         RejectionDto rejection = new RejectionDto(reason);
         Optional<RecommendationRequest> findEntity = Optional.empty();
-        String expected = format(RecommendationRequestService.REQUEST_BY_ID_NOT_FOUND, requestId);
+        String expected = utils.format(RecommendationRequestService.REQUEST_BY_ID_NOT_FOUND, requestId);
 
         when(requestRepository.findById(requestId)).thenReturn(findEntity);
 
@@ -258,7 +267,7 @@ class RecommendationRequestServiceTest {
         User receiver = getMockUser(receiverId);
         Optional<RecommendationRequest> findEntity = Optional.of(
                 getMockEntity(requestId, RequestStatus.REJECTED, requester, receiver));
-        String expected = format(
+        String expected = utils.format(
                 RecommendationRequestService.STATUS_HAS_NOT_BEEN_CHANGED,
                 requestId,
                 RecommendationRequestService.CHECK_STATUS_FOR_REJECT

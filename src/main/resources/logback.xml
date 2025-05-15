@@ -1,11 +1,21 @@
 <configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-<!--            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%blue(%thread)] %highlight(%-5level) %yellow(%logger): %msg%n%throwable</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%blue(%thread)] %highlight(%-5level) %green(%logger): %msg%n%throwable</pattern>
         </encoder>
     </appender>
+
+    <appender name="CONSOLE2" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%blue(%thread)] %highlight(%-5level) %green(%logger): %msg%n%throwable</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="school.faang" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE2"/>
+    </logger>
+
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

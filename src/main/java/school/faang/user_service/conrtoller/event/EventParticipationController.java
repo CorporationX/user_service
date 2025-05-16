@@ -2,13 +2,9 @@ package school.faang.user_service.conrtoller.event;
 
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.EventParticipationService;
 
@@ -21,11 +17,13 @@ import java.util.List;
 public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/participants/{userId}")
     public void registerParticipant(@PathVariable @Positive long eventId, @PathVariable @Positive long userId) {
-        eventParticipationService.registerParticipant(eventId,userId);
+        eventParticipationService.registerParticipant(eventId, userId);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/participants/{userId}")
     public void unregisterParticipant(@PathVariable @Positive long eventId, @PathVariable @Positive long userId) {
         eventParticipationService.unregisterParticipant(eventId, userId);

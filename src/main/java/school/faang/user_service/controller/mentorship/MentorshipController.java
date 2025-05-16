@@ -1,32 +1,41 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.GetMenteesResponse;
 import school.faang.user_service.dto.mentorship.GetMentorsResponse;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/mentorship")
 @RequiredArgsConstructor
     public class MentorshipController {
 
     private final MentorshipService mentorshipService;
 
-    public List<GetMenteesResponse> getMentees(long id) {
-        return mentorshipService.getMentees(id);
+    @GetMapping("/mentors/{mentorId}/mentees")
+    public List<GetMenteesResponse> getMentees(@PathVariable Long mentorId) {
+        return mentorshipService.getMentees(mentorId);
     }
 
-    public List<GetMentorsResponse> getMentors(long id) {
-        return mentorshipService.getMentors(id);
+    @GetMapping("/mentees/{menteeId}/mentors")
+    public List<GetMentorsResponse> getMentors(@PathVariable Long menteeId) {
+        return mentorshipService.getMentors(menteeId);
     }
 
-    public void deleteMentee(long menteeId, long mentorId) {
+    @DeleteMapping("/mentors/{mentorId}/mentees/{menteeId}")
+    public void deleteMentee(@PathVariable Long menteeId, @PathVariable Long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    public void deleteMentor(long menteeId, long mentorId) {
+    @DeleteMapping("/mentees/{menteeId}/mentors/{mentorId}")
+    public void deleteMentor(@PathVariable Long menteeId, @PathVariable Long mentorId) {
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
 }

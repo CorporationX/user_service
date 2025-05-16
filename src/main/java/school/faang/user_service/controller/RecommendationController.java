@@ -1,15 +1,13 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -27,10 +25,20 @@ public class RecommendationController {
         return recommendationService.create(recommendationDto);
     }
 
-    @PutMapping
+    @PutMapping()
     public RecommendationDto updateRecommendation(RecommendationDto recommendationDto) {
         validateRecommendation(recommendationDto);
         return recommendationService.update(recommendationDto);
+    }
+
+    @DeleteMapping()
+    public void deleteRecommendation(Long id) {
+        recommendationService.delete(id);
+    }
+
+    @GetMapping()
+    public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
+
     }
 
     private void validateRecommendation(RecommendationDto dto) {

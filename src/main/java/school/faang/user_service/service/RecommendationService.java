@@ -98,5 +98,13 @@ public class RecommendationService {
         return recommendationDto;
     }
 
+    public void delete(Long id) {
+        recommendationRepository.deleteById(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
+        return recommendationRepository.findAllByReceiverId(receiverId );
+    }
+
 
 }

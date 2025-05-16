@@ -1,5 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.GetMenteesResponse;
@@ -22,7 +24,7 @@ public class MentorshipService {
 
     public List<GetMenteesResponse> getMentees(long userId) {
         List<User> mentees = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentor not found")).getMentees();
+                .orElseThrow(() -> new EntityNotFoundException("Mentor not found")).getMentees();
         return mentees.stream()
                 .map(menteeMapper::toDto)
                 .toList();
@@ -30,7 +32,7 @@ public class MentorshipService {
 
     public List<GetMentorsResponse> getMentors(long userId) {
         List<User> mentors = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found")).getMentors();
+                .orElseThrow(() -> new EntityNotFoundException("User not found")).getMentors();
         return mentors.stream()
                 .map(mentorsMapper::toDto)
                 .toList();
@@ -38,17 +40,16 @@ public class MentorshipService {
 
     public void deleteMentee(long menteeId, long mentorId) {
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentor not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Mentor not found"));
         User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         mentor.getMentees().remove(mentee);
+        mentee.getMentors().remove(mentor);
+        mentorshipRepository.save(mentee);
     }
 
+    @Transactional
     public void deleteMentor(long menteeId, long mentorId) {
-        User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new IllegalArgumentException("Mentor not found"));
-        User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        mentee.getMentors().remove(mentor);
+        deleteMentee(menteeId, mentorId);
     }
 }

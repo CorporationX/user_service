@@ -18,4 +18,9 @@ public final class LogsConstants {
 
     // Сообщения об ошибках при работе с Event
     public static final String EVENT_NOT_FOUND = "Ивент с id %d не найден";
+    public static final String NOT_ENOUGH_SKILLS =
+            "Недостаточно навыков для создания данного мероприятия. Отсутствуют навыки: %s";
+
+    // Сообщения об ошибках при работе с User
+    public static final String USER_NOT_FOUND = "Пользователь с id %d не найден";
 }

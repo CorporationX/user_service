@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static school.faang.user_service.util.LogsConstants.NOT_ENOUGH_SKILLS;
+
 @Component
 public class EventValidation {
     public void validateUserHasAllEventSkills(List<Long> eventSkillsIds, User owner) {
@@ -25,8 +27,7 @@ public class EventValidation {
 
             if (!requiredSkillsIds.isEmpty()) {
                 throw new EventCreationNotAllowedException(
-                        String.format("Недостаточно навыков для создания данного мероприятия. Отсутствуют навыки: %s",
-                                requiredSkillsIds)
+                        String.format(NOT_ENOUGH_SKILLS, requiredSkillsIds)
                 );
             }
         }

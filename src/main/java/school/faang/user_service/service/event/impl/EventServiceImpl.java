@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static school.faang.user_service.util.LogsConstants.EVENT_NOT_FOUND;
+import static school.faang.user_service.util.LogsConstants.USER_NOT_FOUND;
 import static school.faang.user_service.validation.ValidationUtils.executeIfNotNull;
 
 @Slf4j
@@ -40,7 +41,7 @@ public class EventServiceImpl implements EventService {
         Long ownerId = userContext.getUserId();
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new RecordNotFoundException(
-                        String.format("Пользователь с id %d не найден", ownerId)));
+                        String.format(USER_NOT_FOUND, ownerId)));
 
         eventValidation.validateUserHasAllEventSkills(eventSkillsIds, owner);
 
@@ -57,7 +58,7 @@ public class EventServiceImpl implements EventService {
         long ownerId = userContext.getUserId();
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new RecordNotFoundException(
-                        String.format("Пользователь с id %d не найден", ownerId)));
+                        String.format(USER_NOT_FOUND, ownerId)));
 
         eventValidation.isUserEventOwner(ownerId, owner.getId());
 

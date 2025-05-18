@@ -15,6 +15,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -37,7 +38,7 @@ public class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapperImpl skillMapper;
     @Mock
     private SkillOfferRepository offerRepository;
     @Mock
@@ -134,6 +135,7 @@ public class SkillServiceTest {
         when(skillRepository.findUserSkill(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         SkillDto randomDto = createSkillDto("RandomDto");
+        Skill skill = skillMapper.toEntity(randomDto);
         UserSkillGuarantee mockSkillGuarantee = mock(UserSkillGuarantee.class);
         Recommendation recommendation = mock(Recommendation.class);
         when(recommendation.getAuthor()).thenReturn(mock(User.class));
@@ -148,8 +150,8 @@ public class SkillServiceTest {
         when(offerRepository.findAllOffersOfSkill(anyLong(), anyLong())).thenReturn(List.of(offer1, offer2, offer3));
         when(offerRepository.findAllOffersOfSkill(anyLong(), anyLong())).thenReturn(List.of(offer1, offer2, offer3));
         when(skillMapper.toUserSkillGuarantee(userRepository, offer1, 1L)).thenReturn(mockSkillGuarantee);
-        when(skillRepository.getReferenceById(1L)).thenReturn(mock(Skill.class));
-        when(skillMapper.toDto(any(Skill.class))).thenReturn(randomDto);
+        when(skillRepository.getReferenceById(1L)).thenReturn(skill);
+
 
         assertEquals(randomDto, skillService.acquireSkillFromOffers(1L, 1L));
         verify(skillRepository, times(1)).assignSkillToUser(anyLong(), anyLong());

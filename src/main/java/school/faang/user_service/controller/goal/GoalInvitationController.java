@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.dto.goal.SortOption;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.goal.GoalInvitationServiceImpl;
 
@@ -49,27 +50,27 @@ public class GoalInvitationController {
 
     @GetMapping
     public ResponseEntity<List<GoalInvitationDto>> getAllInvitations(@RequestParam(name = "inviter_id", required = false)
-                                                    @Min(value = 1, message = "invitedId value cannot be lower than 1")
-                                                    Long inviterId,
-                                                    @RequestParam(name = "invited_id", required = false)
-                                                    @Min(value = 1, message = "invitedId value cannot be lower than 1")
-                                                    Long invitedId,
-                                                    @RequestParam(name = "status", required = false)
-                                                    RequestStatus status,
-                                                    @RequestParam(name = "created_before", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm-ss")
-                                                    LocalDateTime createdBefore,
-                                                    @RequestParam(name = "created_after", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm-ss")
-                                                    LocalDateTime createdAfter,
-                                                    @RequestParam(name = "offset", defaultValue = "0")
-                                                    @Min(value = 0)
-                                                    Integer offset,
-                                                    @RequestParam(name = "size", defaultValue = "10")
-                                                    @Min(value = 1) @Max(value = 10)
-                                                    Integer size,
-                                                    @RequestParam(name = "sort", required = false)
-                                                    SortOption sort) {
+                                                                     @Min(value = 1, message = "invitedId value cannot be lower than 1")
+                                                                     Long inviterId,
+                                                                     @RequestParam(name = "invited_id", required = false)
+                                                                     @Min(value = 1, message = "invitedId value cannot be lower than 1")
+                                                                     Long invitedId,
+                                                                     @RequestParam(name = "status", required = false)
+                                                                     RequestStatus status,
+                                                                     @RequestParam(name = "created_before", required = false)
+                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm-ss")
+                                                                     LocalDateTime createdBefore,
+                                                                     @RequestParam(name = "created_after", required = false)
+                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm-ss")
+                                                                     LocalDateTime createdAfter,
+                                                                     @RequestParam(name = "offset", defaultValue = "0")
+                                                                     @Min(value = 0)
+                                                                     Integer offset,
+                                                                     @RequestParam(name = "size", defaultValue = "10")
+                                                                     @Min(value = 1) @Max(value = 10)
+                                                                     Integer size,
+                                                                     @RequestParam(name = "sort", required = false)
+                                                                     SortOption sort) {
         log.info("Request received: method=GET, URI=/goals/invitations. Параметры inviterId={}, invitedId={}, " +
                         "status={}, createdBefore={}, createdAfter={}, offset={}, size={}", inviterId, invitedId,
                 status, createdBefore, createdAfter, offset, size);

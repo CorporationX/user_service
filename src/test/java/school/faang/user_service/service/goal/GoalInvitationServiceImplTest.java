@@ -5,28 +5,31 @@ import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import school.faang.user_service.configuration.appconfig.AppConfigService;
-import school.faang.user_service.controller.goal.SortOption;
+import school.faang.user_service.configuration.goals.properties.GoalProperties;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.dto.goal.SortOption;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.entity.goal.QGoalInvitation;
 import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user.UserRepositoryAdapter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,19 +38,22 @@ import static org.mockito.Mockito.*;
 class GoalInvitationServiceImplTest {
 
     @Spy
-    private GoalInvitationMapperImpl mapper;
+    private GoalInvitationMapperImpl goalInvitationMapper;
     @Mock
-    private UserService userService;
+    private UserRepositoryAdapter userRepositoryAdapter;
     @Mock
-    private GoalService goalService;
+    private GoalRepositoryAdapter goalRepositoryAdapter;
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
     @Mock
-    private AppConfigService appConfigService;
+    private GoalProperties goalProperties;
     @Mock
     private BooleanBuilderConstructor booleanBuilderConstructor;
+    @Captor
+    private ArgumentCaptor<List<GoalInvitation>> goalInvitationsCaptor;
+
     @InjectMocks
-    private GoalInvitationServiceImpl service;
+    private GoalInvitationServiceImpl goalInvitationService;
 
     private GoalInvitationDto goalInvitationDto;
     private User user;
@@ -56,6 +62,7 @@ class GoalInvitationServiceImplTest {
     private GoalInvitation goalInvitation;
     private GoalInvitation completeGoalInvitation;
     private GoalInvitationDto completeGoalInvitationDto;
+    private final QGoalInvitation q = QGoalInvitation.goalInvitation;
 
     @BeforeEach
     void setUp() {
@@ -68,11 +75,15 @@ class GoalInvitationServiceImplTest {
         user = User.builder()
                 .id(goalInvitationDto.getInviterId())
                 .username("username")
+                .goals(new ArrayList<>())
+                .receivedGoalInvitations(new ArrayList<>())
                 .build();
 
         anotherUser = User.builder()
                 .id(goalInvitationDto.getInvitedId())
                 .username("username")
+                .goals(new ArrayList<>())
+                .receivedGoalInvitations(new ArrayList<>())
                 .build();
 
         goal = Goal.builder()
@@ -110,14 +121,14 @@ class GoalInvitationServiceImplTest {
 
     @Test
     void testCreateInvitation_whenValidDtoPassed_thenReturnGoalInvitation() {
-        when(userService.findById(goalInvitationDto.getInviterId())).thenReturn(user);
-        when(userService.findById(goalInvitationDto.getInvitedId())).thenReturn(anotherUser);
-        when(goalService.findById(goalInvitationDto.getGoalId())).thenReturn(goal);
-        when(mapper.toGoalInvitation(user, anotherUser, goal)).thenReturn(goalInvitation);
-        when(mapper.toGoalInvitationDto(completeGoalInvitation)).thenReturn(completeGoalInvitationDto);
+        when(userRepositoryAdapter.findById(goalInvitationDto.getInviterId())).thenReturn(user);
+        when(userRepositoryAdapter.findById(goalInvitationDto.getInvitedId())).thenReturn(anotherUser);
+        when(goalRepositoryAdapter.findById(goalInvitationDto.getGoalId())).thenReturn(goal);
+        when(goalInvitationMapper.toGoalInvitation(user, anotherUser, goal)).thenReturn(goalInvitation);
+        when(goalInvitationMapper.toGoalInvitationDto(completeGoalInvitation)).thenReturn(completeGoalInvitationDto);
         when(goalInvitationRepository.save(any())).thenReturn(completeGoalInvitation);
 
-        GoalInvitationDto savedInvitationDto = service.createInvitation(goalInvitationDto);
+        GoalInvitationDto savedInvitationDto = goalInvitationService.createInvitation(goalInvitationDto);
 
         assertTrue(goal.getInvitations().contains(goalInvitation));
         assertEquals(savedInvitationDto, completeGoalInvitationDto);
@@ -126,25 +137,25 @@ class GoalInvitationServiceImplTest {
 
     @Test
     void testCreateInvitation_whenGoalInvitationDtoIsNull_thenThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> service.createInvitation(null));
+        assertThrows(NullPointerException.class, () -> goalInvitationService.createInvitation(null));
     }
 
     @Test
     void testCreateInvitation_whenInviterAndInvitedAreTheSame_thenThrowIllegalArgumentException() {
-        when(userService.findById(goalInvitationDto.getInviterId())).thenReturn(user);
-        when(userService.findById(goalInvitationDto.getInvitedId())).thenReturn(user);
+        when(userRepositoryAdapter.findById(goalInvitationDto.getInviterId())).thenReturn(user);
+        when(userRepositoryAdapter.findById(goalInvitationDto.getInvitedId())).thenReturn(user);
 
-        assertThrows(IllegalArgumentException.class, () -> service.createInvitation(goalInvitationDto));
+        assertThrows(IllegalArgumentException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
         verify(goalInvitationRepository, times(0)).save(any());
     }
 
     @Test
     void testCreateInvitation_whenGoalIsNotFound_thenThrowIllegalArgumentException() {
-        when(userService.findById(goalInvitationDto.getInviterId())).thenReturn(user);
-        when(userService.findById(goalInvitationDto.getInvitedId())).thenReturn(anotherUser);
-        when(goalService.findById(goalInvitationDto.getGoalId())).thenThrow(IllegalArgumentException.class);
+        when(userRepositoryAdapter.findById(goalInvitationDto.getInviterId())).thenReturn(user);
+        when(userRepositoryAdapter.findById(goalInvitationDto.getInvitedId())).thenReturn(anotherUser);
+        when(goalRepositoryAdapter.findById(goalInvitationDto.getGoalId())).thenThrow(IllegalArgumentException.class);
 
-        assertThrows(IllegalArgumentException.class, () -> service.createInvitation(goalInvitationDto));
+        assertThrows(IllegalArgumentException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
         verify(goalInvitationRepository, times(0)).save(any());
     }
 
@@ -152,9 +163,9 @@ class GoalInvitationServiceImplTest {
     void testAcceptGoalInvitation() {
         anotherUser.setGoals(new ArrayList<>());
         when(goalInvitationRepository.findById(any(Long.class))).thenReturn(Optional.of(completeGoalInvitation));
-        when(appConfigService.getLongOrDefault("max_active_goals", 3)).thenReturn(3L);
+        when(goalProperties.getMaxActiveGoals()).thenReturn(3L);
 
-        service.acceptGoalInvitation(any(Long.class));
+        goalInvitationService.acceptGoalInvitation(any(Long.class));
         assertEquals(RequestStatus.ACCEPTED, completeGoalInvitation.getStatus());
         assertTrue(goal.getUsers().contains(anotherUser));
         assertTrue(anotherUser.getGoals().contains(goal));
@@ -164,45 +175,45 @@ class GoalInvitationServiceImplTest {
     void testAcceptGoalInvitation_whenGoalInvitationIsNotFound_thenThrowIllegalArgumentException() {
         when(goalInvitationRepository.findById(any(Long.class))).thenThrow(IllegalArgumentException.class);
 
-        assertThrows(IllegalArgumentException.class, () -> service.acceptGoalInvitation(any(Long.class)));
+        assertThrows(IllegalArgumentException.class, () -> goalInvitationService.acceptGoalInvitation(any(Long.class)));
     }
 
     @Test
     void testAcceptGoalInvitation_whenUserHasMoreThanMaxActiveGoals_thenThrowIllegalArgumentException() {
         anotherUser.setGoals(new ArrayList<>(List.of(goal, goal, goal, goal)));
         when(goalInvitationRepository.findById(any(Long.class))).thenReturn(Optional.of(completeGoalInvitation));
-        when(appConfigService.getLongOrDefault("max_active_goals", 3)).thenReturn(3L);
+        when(goalProperties.getMaxActiveGoals()).thenReturn(3L);
 
-        assertThrows(IllegalArgumentException.class, () -> service.acceptGoalInvitation(any(Long.class)));
+        assertThrows(IllegalArgumentException.class, () -> goalInvitationService.acceptGoalInvitation(any(Long.class)));
     }
 
     @Test
     void testAcceptGoalInvitation_whenUserAlreadyHasInvitedGoal_thenThrowIllegalArgumentException() {
         anotherUser.setGoals(List.of(goal));
         when(goalInvitationRepository.findById(any(Long.class))).thenReturn(Optional.of(completeGoalInvitation));
-        when(appConfigService.getLongOrDefault("max_active_goals", 3)).thenReturn(3L);
+        when(goalProperties.getMaxActiveGoals()).thenReturn(3L);
 
-        assertThrows(IllegalArgumentException.class, () -> service.acceptGoalInvitation(any(Long.class)));
+        assertThrows(IllegalArgumentException.class, () -> goalInvitationService.acceptGoalInvitation(any(Long.class)));
     }
 
     @Test
     void testRejectGoalInvitation_whenGoalInvitationIsNotFound_thenThrowIllegalArgumentException() {
         when(goalInvitationRepository.findById(any(Long.class))).thenThrow(IllegalArgumentException.class);
 
-        assertThrows(IllegalArgumentException.class, () -> service.acceptGoalInvitation(any(Long.class)));
+        assertThrows(IllegalArgumentException.class, () -> goalInvitationService.acceptGoalInvitation(any(Long.class)));
     }
 
     @Test
     void testRejectGoalInvitation() {
         when(goalInvitationRepository.findById(any(Long.class))).thenReturn(Optional.of(completeGoalInvitation));
 
-        service.rejectGoalInvitation(any(Long.class));
+        goalInvitationService.rejectGoalInvitation(any(Long.class));
         assertEquals(RequestStatus.REJECTED, completeGoalInvitation.getStatus());
     }
 
     @Test
     void testGetAllInvitations_whenNullPassed_thenThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> service.getAllInvitations(null));
+        assertThrows(NullPointerException.class, () -> goalInvitationService.getAllInvitations(null));
     }
 
     @Test
@@ -215,7 +226,7 @@ class GoalInvitationServiceImplTest {
         when(goalInvitationRepository.findAll(any(Predicate.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(completeGoalInvitation)));
 
-        List<GoalInvitationDto> goalInvitations = service.getAllInvitations(invitationFilterDto);
+        List<GoalInvitationDto> goalInvitations = goalInvitationService.getAllInvitations(invitationFilterDto);
 
         assertEquals(1, goalInvitations.size());
         assertEquals(completeGoalInvitation.getId(), goalInvitations.get(0).getId());
@@ -242,9 +253,109 @@ class GoalInvitationServiceImplTest {
         when(goalInvitationRepository.findAll(any(Predicate.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(completeGoalInvitation, acceptedInvitation)));
 
-        List<GoalInvitationDto> goalInvitations = service.getAllInvitations(invitationFilterDto);
+        List<GoalInvitationDto> goalInvitations = goalInvitationService.getAllInvitations(invitationFilterDto);
 
         assertEquals(2, goalInvitations.size());
         assertEquals(RequestStatus.PENDING, goalInvitations.get(0).getStatus());
+    }
+
+
+    @Test
+    void getAllInvitations_shouldApplyFiltersAndReturnMappedDtos() {
+        InvitationFilterDto filterDto = new InvitationFilterDto(
+                1L,
+                2L,
+                RequestStatus.PENDING,
+                LocalDateTime.of(2026, 5, 1, 0, 0),
+                LocalDateTime.of(2025, 1, 1, 0, 0),
+                0,
+                10,
+                null
+        );
+
+        GoalInvitation goalInvitationFiltered = GoalInvitation.builder()
+                .id(1L)
+                .inviter(user)
+                .invited(anotherUser)
+                .status(RequestStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .goal(goal)
+                .build();
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(q.inviter.id.eq(filterDto.getInviterId()));
+        builder.and(q.invited.id.eq(filterDto.getInvitedId()));
+        builder.and(q.status.eq(filterDto.getStatus()));
+        builder.and(q.createdAt.loe(filterDto.getCreatedBefore()));
+        builder.and(q.createdAt.goe(filterDto.getCreatedAfter()));
+
+        List<GoalInvitation> entities = List.of(goalInvitationFiltered);
+        List<GoalInvitationDto> expectedDtos = List.of(goalInvitationMapper.toGoalInvitationDto(goalInvitationFiltered));
+        Page<GoalInvitation> page = new PageImpl<>(entities);
+
+        when(booleanBuilderConstructor.getQueryBooleanBuilder(filterDto)).thenReturn(builder);
+        when(goalInvitationRepository.findAll(eq(builder), any(PageRequest.class))).thenReturn(page);
+
+        List<GoalInvitationDto> result = goalInvitationService.getAllInvitations(filterDto);
+
+        assertEquals(expectedDtos, result);
+        verify(booleanBuilderConstructor).getQueryBooleanBuilder(filterDto);
+        verify(goalInvitationRepository).findAll(eq(builder), eq(PageRequest.of(0, 10)));
+        verify(goalInvitationMapper, times(1)).toGoalInvitations(goalInvitationsCaptor.capture());
+        List<GoalInvitation> allInvitations = goalInvitationsCaptor.getValue();
+        assertEquals(entities.size(), allInvitations.size());
+    }
+
+    @Test
+    void getAllInvitations_withSort_shouldReturnSortedDtos() {
+        InvitationFilterDto filterDto = new InvitationFilterDto();
+        filterDto.setOffset(0);
+        filterDto.setSize(10);
+        filterDto.setCreatedAfter(LocalDateTime.of(2025, 1, 1, 0, 0));
+        filterDto.setCreatedBefore(LocalDateTime.of(2026, 1, 1, 0, 0));
+        filterDto.setSort(SortOption.STATUS);
+
+        GoalInvitation goalInvitationPendingStatus = GoalInvitation.builder()
+                .inviter(user)
+                .invited(anotherUser)
+                .status(RequestStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .goal(goal)
+                .build();
+
+        GoalInvitation goalInvitationAcceptedStatus = GoalInvitation.builder()
+                .inviter(user)
+                .invited(anotherUser)
+                .status(RequestStatus.ACCEPTED)
+                .createdAt(LocalDateTime.now())
+                .goal(goal)
+                .build();
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(q.createdAt.loe(filterDto.getCreatedBefore()));
+        builder.and(q.createdAt.goe(filterDto.getCreatedAfter()));
+
+        List<GoalInvitation> unsortedInvitations = List.of(goalInvitationAcceptedStatus, goalInvitationPendingStatus);
+        Page<GoalInvitation> page = new PageImpl<>(unsortedInvitations);
+
+        List<GoalInvitation> sortedInvitations = unsortedInvitations.stream()
+                .sorted(Comparator.comparing(GoalInvitation::getStatus))
+                .collect(Collectors.toList());
+
+        GoalInvitationDto dto1 = goalInvitationMapper.toGoalInvitationDto(sortedInvitations.get(0));
+        GoalInvitationDto dto2 = goalInvitationMapper.toGoalInvitationDto(sortedInvitations.get(1));
+
+        List<GoalInvitationDto> expectedDtos = List.of(dto1, dto2);
+        when(booleanBuilderConstructor.getQueryBooleanBuilder(filterDto)).thenReturn(builder);
+        when(goalInvitationRepository.findAll(eq(builder), any(PageRequest.class))).thenReturn(page);
+
+        List<GoalInvitationDto> result = goalInvitationService.getAllInvitations(filterDto);
+
+        assertEquals(expectedDtos, result);
+        verify(booleanBuilderConstructor).getQueryBooleanBuilder(filterDto);
+        verify(goalInvitationRepository).findAll(eq(builder), eq(PageRequest.of(0, 10)));
+        verify(goalInvitationMapper, times(1)).toGoalInvitations(goalInvitationsCaptor.capture());
+        List<GoalInvitation> allInvitations = goalInvitationsCaptor.getValue();
+        assertEquals(sortedInvitations.size(), allInvitations.size());
     }
 }

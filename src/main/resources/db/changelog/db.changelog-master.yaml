@@ -1,7 +1,5 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changeset/app_config_V001_initial.sql
-  - include:
       file: db/changelog/changeset/user_V001__initial.sql
   - include:
       file: db/changelog/changeset/user_V002__update_user_add_profile_pic.sql
@@ -17,5 +15,3 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
       file: db/changelog/changeset/user_V008__add_personal_info_tables.sql
-  - include:
-      file: db/changelog/changeset/app_config_V002_add_values.sql

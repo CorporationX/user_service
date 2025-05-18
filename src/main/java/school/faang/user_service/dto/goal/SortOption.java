@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.goal;
+package school.faang.user_service.dto.goal;
 
 public enum SortOption {
     INVITER_ID,

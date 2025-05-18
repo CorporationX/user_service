@@ -1,4 +1,17 @@
 spring:
+  config:
+    import: 'consul:'
+  application:
+    name: user-service
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        enabled: true
+        watch:
+          enabled: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -35,3 +48,15 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+
+  logging:
+    level:
+      org.springframework.cloud.consul: DEBUG
+      org.springframework.cloud.bootstrap.config: DEBUG
+

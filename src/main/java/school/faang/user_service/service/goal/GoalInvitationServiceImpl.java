@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.configuration.appconfig.AppConfigService;
-import school.faang.user_service.controller.goal.SortOption;
+import school.faang.user_service.configuration.goals.properties.GoalProperties;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.dto.goal.SortOption;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -18,7 +18,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user.UserRepositoryAdapter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,21 +31,25 @@ import java.util.stream.Collectors;
 public class GoalInvitationServiceImpl implements GoalInvitationService {
     private final GoalInvitationMapper goalInvitationMapper;
     private final GoalInvitationRepository goalInvitationRepository;
-    private final UserService userService;
-    private final GoalService goalService;
-    private final AppConfigService appConfigService;
+    private final UserRepositoryAdapter userRepositoryAdapter;
+    private final GoalRepositoryAdapter goalRepositoryAdapter;
     private final BooleanBuilderConstructor booleanBuilderConstructor;
+    private final GoalProperties goalProperties;
 
     @Override
     @Transactional
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         log.debug("Execution of the method createInvitation, parameters: goalInvitationDto = {}", goalInvitationDto);
         Objects.requireNonNull(goalInvitationDto, "passed goalInvitationDto cannot be null");
-        User inviter = userService.findById(goalInvitationDto.getInviterId());
-        User invited = userService.findById(goalInvitationDto.getInvitedId());
+        User inviter = userRepositoryAdapter.findById(goalInvitationDto.getInviterId());
+        User invited = userRepositoryAdapter.findById(goalInvitationDto.getInvitedId());
         compareIfDifferentUsers(inviter, invited);
-        Goal goal = goalService.findById(goalInvitationDto.getGoalId());
+        Goal goal = goalRepositoryAdapter.findById(goalInvitationDto.getGoalId());
 
+        if (!invited.getGoals().isEmpty()) {
+            checkIfHasAGoal(invited.getGoals(), goal);
+        }
+        checkIfWasInvited(invited.getReceivedGoalInvitations(), goal);
         GoalInvitation goalInvitation = goalInvitationMapper.toGoalInvitation(inviter, invited, goal);
         goal.getInvitations().add(goalInvitation);
         GoalInvitation savedGoalInvitation = goalInvitationRepository.save(goalInvitation);
@@ -95,6 +99,22 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
         return goalInvitationMapper.toGoalInvitations(goalInvitations);
     }
 
+    private void checkIfHasAGoal(List<Goal> goals, Goal goal) {
+        if (goals.contains(goal)) {
+            throw new IllegalArgumentException("goal already exists");
+        }
+    }
+
+    private void checkIfWasInvited(List<GoalInvitation> receivedGoalInvitations, Goal goal) {
+        receivedGoalInvitations.stream()
+                .filter(invitation -> invitation.getGoal().getId().equals(goal.getId()))
+                .findFirst()
+                .ifPresent(invitation -> {
+                    throw new IllegalArgumentException(String.format("This user has been already invited to a goal " +
+                            "with id %d", goal.getId()));
+                });
+    }
+
     private GoalInvitation getGoalInvitationById(long id) {
         log.debug("Execution of the method getGoalInvitationById, parameters: id={}", id);
         return goalInvitationRepository.findById(id)
@@ -116,8 +136,9 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
                 .filter(Objects::nonNull)
                 .filter(goal -> GoalStatus.ACTIVE == goal.getStatus())
                 .count();
-        long maxActiveGoals = appConfigService.getLongOrDefault("max_active_goals", 3);
-        if (numOfGoals > maxActiveGoals) {
+        long maxActiveGoals = goalProperties.getMaxActiveGoals();
+        log.info("Number of active goals = {}", maxActiveGoals);
+        if (numOfGoals >= maxActiveGoals) {
             throw new IllegalArgumentException(String.format("Number of active goals cannot be greater that %d",
                     maxActiveGoals));
         }

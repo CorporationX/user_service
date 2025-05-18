@@ -14,7 +14,6 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -99,13 +98,11 @@ public class SkillServiceTest {
     @Test
     public void testGetOfferedSkills() {
         Long userId = 777L;
-        Skill mockedSkill = mock(Skill.class);
         SkillDto dto = createSkillDto("Another Title");
+        Skill mockedSkill = skillMapper.toEntity(dto);
         SkillCandidateDto skillCandidateDto = new SkillCandidateDto(dto, 1L);
 
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(mockedSkill));
-        when(skillMapper.toDto(mockedSkill)).thenReturn(dto);
-        when(skillMapper.toSkillCandidateDto(dto, 1L)).thenReturn(skillCandidateDto);
 
         List<SkillCandidateDto> offeredSkills = skillService.getOfferedSkills(userId);
         assertEquals(1, offeredSkills.size());
@@ -161,8 +158,8 @@ public class SkillServiceTest {
     @Test
     public void testGetUserSkills() {
         SkillDto anotherDto = createSkillDto("Another Dto");
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(mock(Skill.class)));
-        when(skillMapper.toDto(any(Skill.class))).thenReturn(anotherDto);
+        Skill skill = skillMapper.toEntity(anotherDto);
+        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(skill));
 
         assertEquals(List.of(anotherDto), skillService.getUserSkills(1L));
     }

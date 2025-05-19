@@ -1,13 +1,15 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -18,10 +20,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
-
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
-
+    private final RecommendationMapper recommendationMapper;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         LocalDateTime sixMothsAgo = LocalDateTime.now().minusMonths(6);
@@ -54,7 +55,6 @@ public class RecommendationService {
                 }
             }
         }
-
 
         recommendationDto.setId(recommendationId);
         recommendationDto.setCreatedAt(LocalDateTime.now());
@@ -99,12 +99,19 @@ public class RecommendationService {
     }
 
     public void delete(Long id) {
+        if (!recommendationRepository.existsById(id)) {
+            throw new DataValidationException("Recommendation does not exist");
+        }
         recommendationRepository.deleteById(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
-        return recommendationRepository.findAllByReceiverId(receiverId );
+    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, Pageable pageable) {
+        return recommendationRepository.findAllByReceiverId(receiverId, pageable)
+                .map(recommendationMapper::toDto);
     }
 
-
+    public Page<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
+        return recommendationRepository.findAllByAuthorId(authorId, pageable)
+                .map(recommendationMapper::toDto);
+    }
 }

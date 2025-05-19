@@ -1,13 +1,16 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -16,29 +19,35 @@ import java.util.Objects;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @PostMapping()
-    public RecommendationDto giveRecommendation(RecommendationDto recommendationDto) {
-        if (recommendationDto.getContent() != null) {
-            throw new DataValidationException("There should be some text");
-        }
-
+    @PostMapping
+    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
+        validateRecommendation(recommendationDto);
         return recommendationService.create(recommendationDto);
     }
 
-    @PutMapping()
-    public RecommendationDto updateRecommendation(RecommendationDto recommendationDto) {
+    @PutMapping
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto recommendationDto) {
         validateRecommendation(recommendationDto);
         return recommendationService.update(recommendationDto);
     }
 
-    @DeleteMapping()
-    public void deleteRecommendation(Long id) {
+    @DeleteMapping("/{id}")
+    public void deleteRecommendation(@PathVariable Long id) {
         recommendationService.delete(id);
     }
 
-    @GetMapping()
-    public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
+    @GetMapping("/receiver/{receiverId}")
+    public Page<RecommendationDto> getAllUserRecommendations(
+            @PathVariable Long receiverId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return recommendationService.getAllUserRecommendations(receiverId, pageable);
+    }
 
+    @GetMapping("/author/{authorId}")
+    public Page<RecommendationDto> getAllGivenRecommendations(
+            @PathVariable Long authorId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return recommendationService.getAllGivenRecommendations(authorId, pageable);
     }
 
     private void validateRecommendation(RecommendationDto dto) {

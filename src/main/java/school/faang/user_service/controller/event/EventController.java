@@ -27,11 +27,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+
     private final EventControllerUtils eventControllerUtils;
 
     @PostMapping()
     public EventDto create(@Valid @RequestBody EventDto event) {
         eventControllerUtils.isValidDateRange(event);
+
         return eventService.create(event);
     }
 

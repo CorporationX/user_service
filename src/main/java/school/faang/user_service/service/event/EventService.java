@@ -39,7 +39,7 @@ public class EventService {
                 .map(eventMapper::toDto)
                 .toList();
     }
-
+  
     @Transactional
     public void deleteEvent(Long eventId) {
         eventRepository.deleteById(eventId);

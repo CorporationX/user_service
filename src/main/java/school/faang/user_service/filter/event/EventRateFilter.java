@@ -30,5 +30,4 @@ public class EventRateFilter implements EventFilter {
                 event.getRatings() != null && !event.getRatings().isEmpty()
         );
     }
-
 }

@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.controller.utils.EventControllerUtils;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validation.data.Required;
 
@@ -30,7 +30,7 @@ public class EventController {
 
     private final EventControllerUtils eventControllerUtils;
 
-    @PostMapping()
+    @PostMapping
     public EventDto create(@Valid @RequestBody EventDto event) {
         eventControllerUtils.isValidDateRange(event);
 
@@ -54,7 +54,7 @@ public class EventController {
         eventService.deleteEvent(id);
     }
 
-    @PutMapping()
+    @PutMapping
     public EventDto updateEvent(@Valid @RequestBody EventDto eventDto) {
         eventControllerUtils.isValidDateRange(eventDto);
         return eventService.updateEvent(eventDto);

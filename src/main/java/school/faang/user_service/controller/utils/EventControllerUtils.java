@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.event;
+package school.faang.user_service.controller.utils;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;

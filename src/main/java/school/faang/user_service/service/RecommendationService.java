@@ -23,9 +23,10 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final RecommendationMapper recommendationMapper;
+    private final int MIN_RANGE_FOR_RECOMMENDATION = 6; // in months
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        LocalDateTime sixMothsAgo = LocalDateTime.now().minusMonths(6);
+        LocalDateTime sixMothsAgo = LocalDateTime.now().minusMonths(MIN_RANGE_FOR_RECOMMENDATION);
         Optional<Recommendation> hasRecent = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc
                         (recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
@@ -62,7 +63,7 @@ public class RecommendationService {
     }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
-        LocalDateTime sixMothsAgo = LocalDateTime.now().minusMonths(6);
+        LocalDateTime sixMothsAgo = LocalDateTime.now().minusMonths(MIN_RANGE_FOR_RECOMMENDATION);
         Optional<Recommendation> existing = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc
                         (recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
@@ -98,12 +99,14 @@ public class RecommendationService {
         return recommendationDto;
     }
 
-    public void delete(Long id) {
-        if (!recommendationRepository.existsById(id)) {
-            throw new DataValidationException("Recommendation does not exist");
+    public boolean delete(Long id) {
+        if (recommendationRepository.existsById(id)) {
+            recommendationRepository.deleteById(id);
+            return true;
         }
-        recommendationRepository.deleteById(id);
+        return false;
     }
+
 
     public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, Pageable pageable) {
         return recommendationRepository.findAllByReceiverId(receiverId, pageable)

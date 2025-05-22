@@ -1,10 +1,13 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
@@ -20,32 +23,33 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PostMapping
-    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
+    public RecommendationDto giveRecommendation(@Valid @RequestBody RecommendationDto recommendationDto) {
         validateRecommendation(recommendationDto);
         return recommendationService.create(recommendationDto);
     }
 
     @PutMapping
-    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto recommendationDto) {
+    public RecommendationDto updateRecommendation(@Valid @RequestBody RecommendationDto recommendationDto) {
         validateRecommendation(recommendationDto);
         return recommendationService.update(recommendationDto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRecommendation(@PathVariable Long id) {
-        recommendationService.delete(id);
+    public ResponseEntity<Void> deleteRecommendation(@NotNull @PathVariable Long id) {
+        boolean deleted = recommendationService.delete(id);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/receiver/{receiverId}")
     public Page<RecommendationDto> getAllUserRecommendations(
-            @PathVariable Long receiverId,
+            @NotNull @PathVariable Long receiverId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return recommendationService.getAllUserRecommendations(receiverId, pageable);
     }
 
     @GetMapping("/author/{authorId}")
     public Page<RecommendationDto> getAllGivenRecommendations(
-            @PathVariable Long authorId,
+            @NotNull @PathVariable Long authorId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return recommendationService.getAllGivenRecommendations(authorId, pageable);
     }

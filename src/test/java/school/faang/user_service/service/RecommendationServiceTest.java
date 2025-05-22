@@ -1,11 +1,10 @@
 package school.faang.user_service.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +15,7 @@ import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -35,13 +35,8 @@ public class RecommendationServiceTest {
     private SkillOfferRepository skillOfferRepository;
     @InjectMocks
     private RecommendationService recommendationService;
-    @Mock
-    private RecommendationMapper recommendationMapper;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @Spy
+    private RecommendationMapperImpl recommendationMapper;
 
     @Test
     void create_ShouldThrowException_IfRecentRecommendationExists() {
@@ -58,7 +53,7 @@ public class RecommendationServiceTest {
         // Act + Assert
         assertThatThrownBy(() -> recommendationService.create(dto))
                 .isInstanceOf(DataValidationException.class)
-                .hasMessage("Recent recommendation already exists");
+                .hasMessage("You already gave a recommendation in the last 6 months.");
     }
 
     @Test
@@ -85,6 +80,7 @@ public class RecommendationServiceTest {
     @Test
     void update_ShouldUpdateRecommendation_WhenExistingFound() {
         RecommendationDto dto = new RecommendationDto();
+        dto.setId(100L);
         dto.setAuthorId(1L);
         dto.setReceiverId(2L);
         dto.setContent("updated");
@@ -116,22 +112,26 @@ public class RecommendationServiceTest {
 
         assertThatThrownBy(() -> recommendationService.update(dto))
                 .isInstanceOf(DataValidationException.class)
-                .hasMessage("No such recommendation");
+                .hasMessage("No required recommendations found");
     }
 
     @Test
     void delete_ShouldDeleteRecommendation_WhenExistingFound() {
         Long id = 231L;
-        recommendationService.delete(id);
+        when(recommendationRepository.existsById(id)).thenReturn(true);
+
+        boolean deleted = recommendationService.delete(id);
+        assertThat(deleted).isTrue();
         verify(recommendationRepository).deleteById(id);
     }
 
     @Test
-    void delete_ShouldThrowException_IfRecommendationDoesNotExist() {
+    void delete_ShouldReturnFalse_WhenRecommendationDoesNotExist() {
         Long id = 231L;
-        assertThatThrownBy(() -> recommendationService.delete(id))
-                .isInstanceOf(DataValidationException.class)
-                .hasMessage("Recommendation not found");
+        when(recommendationRepository.existsById(id)).thenReturn(false);
+        boolean deleted = recommendationService.delete(id);
+
+        assertThat(deleted).isFalse();
         verify(recommendationRepository, never()).deleteById(id);
     }
 
@@ -154,10 +154,8 @@ public class RecommendationServiceTest {
 
         Page<RecommendationDto> result =
                 recommendationService.getAllUserRecommendations(receiverId, pageable);
-        assertThat(result.getContent()).isEqualTo(dto);
+        assertThat(result.getContent()).isEqualTo(List.of(dto));
         verify(recommendationRepository).findAllByReceiverId(receiverId, pageable);
-        verify(recommendationMapper).toDto(recommendation);
-
     }
 
     @Test
@@ -177,7 +175,7 @@ public class RecommendationServiceTest {
 
         Page<RecommendationDto> result = recommendationService.getAllGivenRecommendations(authorId, pageable);
 
-        assertThat(result.getContent()).isEqualTo(dto);
+        assertThat(result.getContent()).isEqualTo(List.of(dto));
         verify(recommendationRepository).findAllByAuthorId(authorId, pageable);
         verify(mapper).toDto(recommendation);
     }

@@ -27,4 +27,18 @@ public class ErrorHandler {
         log.error("Exception thrown: {}", e.getMessage());
         return new ErrorResponse(e.getMessage(), LocalDateTime.now().format(TIME_PATTERN));
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handle(ConflictPlanException e) {
+        log.error("Exception thrown: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage(), LocalDateTime.now().format(TIME_PATTERN));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handle(RelatednessNotConfirmedException e) {
+        log.error("Exception thrown: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage(), LocalDateTime.now().format(TIME_PATTERN));
+    }
 }

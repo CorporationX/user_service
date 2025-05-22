@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -26,4 +27,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Stream<User> findPremiumUsers();
 
     List<User> findByUsernameLike(String username);
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users AS u
+            JOIN profile_promotion AS pp ON pp.profile_id = u.id
+            WHERE pp.active = true AND pp.plan = 'VIP';
+            """)
+    List<User> findAllPromotedVip();
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users AS u
+            JOIN profile_promotion AS pp ON pp.profile_id = u.id
+            WHERE pp.active = true AND pp.plan = 'GOLD';
+            """)
+    List<User> findAllPromotedGold();
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users AS u
+            JOIN profile_promotion AS pp ON pp.profile_id = u.id
+            WHERE pp.active = true AND pp.plan = 'PLUS';
+            """)
+    List<User> findAllPromotedPlus();
 }

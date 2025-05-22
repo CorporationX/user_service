@@ -6,7 +6,7 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.goal.QGoalInvitation;
 
 @Component
-public class BooleanBuilderConstructor {
+public class InvitationBoolBuilderConstructor {
     public BooleanBuilder getQueryBooleanBuilder(InvitationFilterDto invitationFilterDto) {
         QGoalInvitation qGoalInvitation = QGoalInvitation.goalInvitation;
         BooleanBuilder builder = new BooleanBuilder();

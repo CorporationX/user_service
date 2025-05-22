@@ -33,7 +33,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final UserRepositoryAdapter userRepositoryAdapter;
     private final GoalRepositoryAdapter goalRepositoryAdapter;
-    private final BooleanBuilderConstructor booleanBuilderConstructor;
+    private final InvitationBoolBuilderConstructor invitationBoolBuilderConstructor;
     private final GoalProperties goalProperties;
 
     @Override
@@ -87,7 +87,7 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
     public List<GoalInvitationDto> getAllInvitations(InvitationFilterDto invitationFilterDto) {
         log.debug("Execution of the method getAllInvitations, parameters: invitationFilterDto={}", invitationFilterDto);
         Objects.requireNonNull(invitationFilterDto, "passed invitationFilterDto cannot be null");
-        BooleanBuilder queryBooleanBuilder = booleanBuilderConstructor.getQueryBooleanBuilder(invitationFilterDto);
+        BooleanBuilder queryBooleanBuilder = invitationBoolBuilderConstructor.getQueryBooleanBuilder(invitationFilterDto);
         PageRequest pageRequest = PageRequest.of(invitationFilterDto.getOffset(), invitationFilterDto.getSize());
 
         List<GoalInvitation> goalInvitations = goalInvitationRepository.findAll(queryBooleanBuilder, pageRequest)

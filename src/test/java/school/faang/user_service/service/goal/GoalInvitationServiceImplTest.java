@@ -48,7 +48,7 @@ class GoalInvitationServiceImplTest {
     @Mock
     private GoalProperties goalProperties;
     @Mock
-    private BooleanBuilderConstructor booleanBuilderConstructor;
+    private InvitationBoolBuilderConstructor invitationBoolBuilderConstructor;
     @Captor
     private ArgumentCaptor<List<GoalInvitation>> goalInvitationsCaptor;
 
@@ -221,7 +221,7 @@ class GoalInvitationServiceImplTest {
         InvitationFilterDto invitationFilterDto = new InvitationFilterDto();
         invitationFilterDto.setSize(10);
         invitationFilterDto.setOffset(0);
-        when(booleanBuilderConstructor.getQueryBooleanBuilder(any(InvitationFilterDto.class)))
+        when(invitationBoolBuilderConstructor.getQueryBooleanBuilder(any(InvitationFilterDto.class)))
                 .thenReturn(new BooleanBuilder());
         when(goalInvitationRepository.findAll(any(Predicate.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(completeGoalInvitation)));
@@ -248,7 +248,7 @@ class GoalInvitationServiceImplTest {
         acceptedInvitation.setCreatedAt(LocalDateTime.now());
         acceptedInvitation.setUpdatedAt(LocalDateTime.now());
 
-        when(booleanBuilderConstructor.getQueryBooleanBuilder(any(InvitationFilterDto.class)))
+        when(invitationBoolBuilderConstructor.getQueryBooleanBuilder(any(InvitationFilterDto.class)))
                 .thenReturn(new BooleanBuilder());
         when(goalInvitationRepository.findAll(any(Predicate.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(completeGoalInvitation, acceptedInvitation)));
@@ -293,13 +293,13 @@ class GoalInvitationServiceImplTest {
         List<GoalInvitationDto> expectedDtos = List.of(goalInvitationMapper.toGoalInvitationDto(goalInvitationFiltered));
         Page<GoalInvitation> page = new PageImpl<>(entities);
 
-        when(booleanBuilderConstructor.getQueryBooleanBuilder(filterDto)).thenReturn(builder);
+        when(invitationBoolBuilderConstructor.getQueryBooleanBuilder(filterDto)).thenReturn(builder);
         when(goalInvitationRepository.findAll(eq(builder), any(PageRequest.class))).thenReturn(page);
 
         List<GoalInvitationDto> result = goalInvitationService.getAllInvitations(filterDto);
 
         assertEquals(expectedDtos, result);
-        verify(booleanBuilderConstructor).getQueryBooleanBuilder(filterDto);
+        verify(invitationBoolBuilderConstructor).getQueryBooleanBuilder(filterDto);
         verify(goalInvitationRepository).findAll(eq(builder), eq(PageRequest.of(0, 10)));
         verify(goalInvitationMapper, times(1)).toGoalInvitations(goalInvitationsCaptor.capture());
         List<GoalInvitation> allInvitations = goalInvitationsCaptor.getValue();
@@ -346,13 +346,13 @@ class GoalInvitationServiceImplTest {
         GoalInvitationDto dto2 = goalInvitationMapper.toGoalInvitationDto(sortedInvitations.get(1));
 
         List<GoalInvitationDto> expectedDtos = List.of(dto1, dto2);
-        when(booleanBuilderConstructor.getQueryBooleanBuilder(filterDto)).thenReturn(builder);
+        when(invitationBoolBuilderConstructor.getQueryBooleanBuilder(filterDto)).thenReturn(builder);
         when(goalInvitationRepository.findAll(eq(builder), any(PageRequest.class))).thenReturn(page);
 
         List<GoalInvitationDto> result = goalInvitationService.getAllInvitations(filterDto);
 
         assertEquals(expectedDtos, result);
-        verify(booleanBuilderConstructor).getQueryBooleanBuilder(filterDto);
+        verify(invitationBoolBuilderConstructor).getQueryBooleanBuilder(filterDto);
         verify(goalInvitationRepository).findAll(eq(builder), eq(PageRequest.of(0, 10)));
         verify(goalInvitationMapper, times(1)).toGoalInvitations(goalInvitationsCaptor.capture());
         List<GoalInvitation> allInvitations = goalInvitationsCaptor.getValue();

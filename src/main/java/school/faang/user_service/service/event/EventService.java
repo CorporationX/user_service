@@ -5,20 +5,28 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
+    private final SkillRepository skillRepository;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final EventServiceUtils eventServiceUtils;
+    private final List<EventFilter> eventFilters;
 
     @Transactional
     public EventDto create(EventDto eventDto) {
@@ -39,7 +47,7 @@ public class EventService {
                 .map(eventMapper::toDto)
                 .toList();
     }
-  
+
     @Transactional
     public void deleteEvent(Long eventId) {
         eventRepository.deleteById(eventId);
@@ -56,6 +64,16 @@ public class EventService {
         return eventRepository.findAllByUserId(userId).stream()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    private void checkOwnerHasRelatedSkills(EventDto eventDto) {
+        Optional.of(
+                        skillRepository.findAllByUserId(eventDto.getOwnerId()).stream()
+                                .map(Skill::getId)
+                                .collect(toSet())
+                )
+                .filter(ids -> ids.containsAll(eventDto.getRelatedSkillsIds()))
+                .orElseThrow(() -> new DataValidationException("Owner doesn't have all related skills"));
     }
 
     @Transactional

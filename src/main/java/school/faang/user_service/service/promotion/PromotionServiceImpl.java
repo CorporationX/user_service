@@ -59,14 +59,14 @@ public class PromotionServiceImpl implements PromotionService {
 
         SendResult<String, Object> send = kafkaTemplate.send(record).get();
 
-*/
+
         dataSender.send(kafkaTopics.getAnalyticsCreatedTopic(),
                 String.valueOf(promotionProduct.getId()),
                 new AnalyticsCreatedEvent(1L,
                         promotionProduct.getId(),
                         promotionProduct.getId(),
                         EventType.ACHIEVEMENT_RECEIVED)
-                );
+                );*/
     }
 
     private PromotionCreator getCreator(@NotNull(message = "Type of promotion cannot be null")

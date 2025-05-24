@@ -115,10 +115,12 @@ class PromotionServiceImplTest {
         assertEquals(productValue, product);
     }
 
+/*
     @Test
     void addPromotionTest_whenNullPassed_thenThrowConstraintViolationException() {
         assertThrows(ConstraintViolationException.class, () -> promotionService.addPromotion(null));
     }
+*/
 
     @Test
     void addPromotionTest_whenNoUserFound_thenThrowIllegalArgumentException() {

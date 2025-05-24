@@ -3,6 +3,7 @@ package school.faang.user_service.service.promotion;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.promotion.PromotionDto;
@@ -12,12 +13,15 @@ import school.faang.user_service.entity.promotion.Product;
 import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.entity.promotion.enums.Plan;
 import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.kafka.AnalyticsCreatedEvent;
+import school.faang.user_service.kafka.EventType;
+import school.faang.user_service.kafka.KafkaTopics;
+import school.faang.user_service.kafka.producer.DataSender;
 import school.faang.user_service.repository.promotion.ProductRepository;
 import school.faang.user_service.repository.promotion.PromotionPlanRepository;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -28,19 +32,45 @@ public class PromotionServiceImpl implements PromotionService {
     private final UserRepositoryAdapter userRepoAdapter;
     private final Map<String, PromotionCreator> promotionCreators;
 
+    private final DataSender dataSender;
+    private final KafkaTopics kafkaTopics;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
     @Override
     @Transactional
-    public void addPromotion(PromotionDto promotionDto) {
-        Objects.requireNonNull(promotionDto, "promotionDto cannot be null");
+    public void addPromotion(@NotNull(message = "promotionDto cannot be null") PromotionDto promotionDto) {
         PromotionCreator promotionCreator = getCreator(promotionDto.getPromotionType());
         PromotionPlan plan = findPromotionPlan(promotionDto.getPlan());
         User client = userRepoAdapter.findById(promotionDto.getClientId());
         Product promotionProduct = promotionCreator.create(promotionDto, client, plan);
         productRepo.save(promotionProduct);
         log.info("Added new promotion successfully with id = {}", promotionProduct.getId());
+/*
+        AnalyticsCreatedEvent analyticsCreatedEvent = new AnalyticsCreatedEvent(1L,
+                promotionProduct.getId(),
+                promotionProduct.getId(),
+                EventType.ACHIEVEMENT_RECEIVED);
+
+        ProducerRecord<String, Object> record = new ProducerRecord<>(
+                kafkaTopics.getAnalyticsCreatedTopic(),
+                promotionProduct.getId().toString(),
+                analyticsCreatedEvent);
+        record.headers().add("messageId", UUID.randomUUID().toString().getBytes());
+
+        SendResult<String, Object> send = kafkaTemplate.send(record).get();
+
+*/
+        dataSender.send(kafkaTopics.getAnalyticsCreatedTopic(),
+                String.valueOf(promotionProduct.getId()),
+                new AnalyticsCreatedEvent(1L,
+                        promotionProduct.getId(),
+                        promotionProduct.getId(),
+                        EventType.ACHIEVEMENT_RECEIVED)
+                );
     }
 
-    private PromotionCreator getCreator(@NotNull(message = "Type of promotion cannot be null") PromotionType promotionType) {
+    private PromotionCreator getCreator(@NotNull(message = "Type of promotion cannot be null")
+                                        PromotionType promotionType) {
         PromotionCreator promotionCreator = promotionCreators.get(promotionType.name());
         if (promotionCreator == null) {
             throw new IllegalArgumentException("Unsupported type: " + promotionType);

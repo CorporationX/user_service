@@ -1,7 +1,6 @@
 package school.faang.user_service.mapper.promotion;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.promotion.PromotionViewDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.Product;
@@ -17,6 +16,7 @@ public class PromotionMapper {
         profilePromotion.setPrice(plan.getPrice());
         profilePromotion.setCurrency(plan.getCurrency());
         profilePromotion.setClient(user);
+        profilePromotion.setPlan(plan.getPlan());
         profilePromotion.setProfile(user);
         profilePromotion.setNumPromotedViews(plan.getNumPromotedViews());
         profilePromotion.setViewWidth(plan.getViewWidth());
@@ -29,6 +29,7 @@ public class PromotionMapper {
         eventPromotion.setPrice(plan.getPrice());
         eventPromotion.setCurrency(plan.getCurrency());
         eventPromotion.setClient(client);
+        eventPromotion.setPlan(plan.getPlan());
         eventPromotion.setEvent(event);
         eventPromotion.setNumPromotedViews(plan.getNumPromotedViews());
         eventPromotion.setViewWidth(plan.getViewWidth());

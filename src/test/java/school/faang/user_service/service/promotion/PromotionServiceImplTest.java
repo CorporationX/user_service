@@ -1,5 +1,6 @@
 package school.faang.user_service.service.promotion;
 
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,8 +116,8 @@ class PromotionServiceImplTest {
     }
 
     @Test
-    void addPromotionTest_whenNullPassed_thenThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> promotionService.addPromotion(null));
+    void addPromotionTest_whenNullPassed_thenThrowConstraintViolationException() {
+        assertThrows(ConstraintViolationException.class, () -> promotionService.addPromotion(null));
     }
 
     @Test

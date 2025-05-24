@@ -12,6 +12,7 @@ spring:
         watch:
           enabled: true
 
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -33,6 +34,28 @@ spring:
     redis:
       port: 6379
       host: localhost
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092, localhost:9094
+      client-id: user-service
+      acks: all
+      properties:
+        linger:
+          ms: 0
+    consumer:
+      bootstrap-servers: localhost:9092, localhost:9094
+      group-id: analytics-created
+    topics:
+      analytics-created:
+        name: analytics-created-event-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.analytics-created.name}.DLT
+          partitions: 1
+          replication-factor: 3
+
+
 
 server:
   port: 8080

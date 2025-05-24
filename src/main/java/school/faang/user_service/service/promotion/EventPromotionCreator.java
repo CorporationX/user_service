@@ -1,5 +1,6 @@
 package school.faang.user_service.service.promotion;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.promotion.PromotionDto;
@@ -24,11 +25,11 @@ public class EventPromotionCreator implements PromotionCreator {
     private final EventPromotionRepository eventPromotionRepo;
 
     @Override
-    public Product create(PromotionDto promotionDto, User client, PromotionPlan plan) {
+    public Product create(@NotNull(message = "PromotionDto cannot be null") PromotionDto promotionDto,
+                          @NotNull(message = "Сlient cannot be null") User client,
+                          @NotNull(message = "Promotion Plan cannot be null") PromotionPlan plan) {
         Long eventId = promotionDto.getEventId();
         Objects.requireNonNull(eventId, "eventId cannot be null");
-        Objects.requireNonNull(plan, "plan cannot be null");
-        Objects.requireNonNull(client, "client cannot be null");
         checkIfEventPromoted(eventId);
         Event event = eventRepoAdapter.findById(eventId);
         checkIfCreator(event, client);

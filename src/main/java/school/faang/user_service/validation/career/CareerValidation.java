@@ -1,12 +1,14 @@
 package school.faang.user_service.validation.career;
 
+import lombok.experimental.UtilityClass;
 import school.faang.user_service.entity.Career;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.common.DataValidationException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
+@UtilityClass
 public class CareerValidation {
     public static void validateDateFrom(Career career) {
         if (!career.getDateFrom().isBefore(LocalDate.now())) {

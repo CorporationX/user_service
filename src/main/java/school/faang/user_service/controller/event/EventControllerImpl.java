@@ -61,7 +61,7 @@ public class EventControllerImpl {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<List<EventResponseDto>> getEventsByFilter(@RequestBody EventFilterDto filter) {
+    public ResponseEntity<List<EventResponseDto>> getEventsByFilter(@RequestBody @Valid EventFilterDto filter) {
         log.info("Получен запрос на поиск по фильтру: {}", filter);
         List<EventResponseDto> eventsResponse = eventMapper.toEventResponses(
                 eventService.getEventsByFilter(filter));

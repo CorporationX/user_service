@@ -14,7 +14,7 @@ import school.faang.user_service.dto.EducationDto.AddEducationDto;
 import school.faang.user_service.dto.EducationDto.EducationDto;
 import school.faang.user_service.dto.EducationDto.EducationUpdateDto;
 import school.faang.user_service.entity.Education;
-import school.faang.user_service.mappers.EducationMapper.EducationMapper;
+import school.faang.user_service.mapper.education.EducationMapper;
 import school.faang.user_service.service.education.EducationService;
 
 @RestController

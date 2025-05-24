@@ -6,15 +6,15 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.EducationDto.AddEducationDto;
 import school.faang.user_service.dto.EducationDto.EducationDto;
 import school.faang.user_service.entity.Education;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mappers.EducationMapper.EducationMapper;
+import school.faang.user_service.exception.common.DataValidationException;
+import school.faang.user_service.mapper.education.EducationMapper;
 import school.faang.user_service.repository.EducationRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.time.Year;
 import java.util.Objects;
 
-import static school.faang.user_service.validation.ValidationUtils.executeIfNotNull;
+import static school.faang.user_service.util.ValidationUtils.executeIfNotNull;
 
 @RequiredArgsConstructor
 @Service

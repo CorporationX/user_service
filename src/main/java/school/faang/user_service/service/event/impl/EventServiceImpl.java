@@ -21,7 +21,10 @@ import school.faang.user_service.validation.event.EventValidation;
 import java.util.ArrayList;
 import java.util.List;
 
+import static school.faang.user_service.util.LogsConstants.DELETED_EVENT_MESSAGE;
+import static school.faang.user_service.util.LogsConstants.EMPTY_FILTER;
 import static school.faang.user_service.util.LogsConstants.EVENT_NOT_FOUND;
+import static school.faang.user_service.util.LogsConstants.USER_NOT_FOUND;
 import static school.faang.user_service.util.ValidationUtils.executeIfNotNull;
 
 @Slf4j
@@ -40,7 +43,7 @@ public class EventServiceImpl implements EventService {
         Long ownerId = userContext.getUserId();
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new RecordNotFoundException(
-                        String.format("Пользователь с id %d не найден", ownerId)));
+                        String.format(USER_NOT_FOUND, ownerId)));
 
         eventValidation.validateUserHasAllEventSkills(eventSkillsIds, owner);
 
@@ -57,12 +60,11 @@ public class EventServiceImpl implements EventService {
         long ownerId = userContext.getUserId();
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new RecordNotFoundException(
-                        String.format("Пользователь с id %d не найден", ownerId)));
-
-        eventValidation.isUserEventOwner(ownerId, owner.getId());
-
+                        String.format(USER_NOT_FOUND, ownerId)));
         Event event = eventRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(
                 String.format(EVENT_NOT_FOUND, id)));
+
+        eventValidation.isUserEventOwner(ownerId, event.getOwner().getId());
 
         eventValidation.validateUserHasAllEventSkills(eventSkillsIds, owner);
 
@@ -95,6 +97,10 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     @Override
     public List<Event> getEventsByFilter(EventFilterDto filter) {
+        if ((filter.getTitle() == null || filter.getTitle().isBlank()) &&
+        filter.getOwnerId() == null && filter.getStartDate() == null) {
+            throw new IllegalArgumentException(EMPTY_FILTER);
+        }
         Specification<Event> spec = EventSpecification.withFilter(filter);
         return eventRepository.findAll(spec);
     }
@@ -127,6 +133,6 @@ public class EventServiceImpl implements EventService {
         eventValidation.isUserEventOwner(userId, ownerId);
 
         eventRepository.deleteById(eventId);
-        return String.format("Ивент с id %d удалён", eventId);
+        return String.format(DELETED_EVENT_MESSAGE, eventId);
     }
 }

@@ -7,31 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.skill.SkillService;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -43,19 +32,19 @@ class EventServiceTest {
     private EventRepository eventRepository;
 
     @Mock
-    private SkillService skillService;
+    EventServiceUtils eventServiceUtils;
 
     @Mock
-    private EventFilter eventFilter;
+    private SkillService skillService;
 
     @Spy
     private EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
 
-    /*@Test
+    @Test
     public void testCreateEventWhenOwnerHasAllRelatedSkills() {
         EventDto dto = createEventDto(1L, null, List.of(1L, 2L));
         List<Skill> skills = createSkills(1L, 2L);
-        when(skillService.findAllByUserId(dto.getOwnerId())).thenReturn(skills);
+        doNothing().when(eventServiceUtils).checkOwnerHasRelatedSkills(any());
         when(eventRepository.save(any(Event.class))).thenAnswer(inv -> {
             Event saved = inv.getArgument(0);
             saved.setId(1L);
@@ -67,16 +56,15 @@ class EventServiceTest {
         assertNotNull(result);
         assertEquals(dto.getOwnerId(), result.getOwnerId());
         verify(eventRepository).save(any(Event.class));
-    }*/
+    }
 
-/*    @Test
+    @Test
     public void testCreateEventOwnerHasNoRelatedSkills() {
-        EventDto dto = createEventDto(1L, null,List.of(1L, 2L, 99L));
+        EventDto dto = createEventDto(1L, null, List.of(1L, 2L, 99L));
         List<Skill> skills = createSkills(1L, 2L);
-        when(skillService.findAllByUserId(dto.getOwnerId())).thenReturn(skills);
-
+        doThrow(DataValidationException.class).when(eventServiceUtils).checkOwnerHasRelatedSkills(any());
         assertThrows(DataValidationException.class, () -> eventService.create(dto));
-    }*/
+    }
 
     @Test
     public void testGetEventByEventIdWithoutItInDatabase() {

@@ -65,16 +65,6 @@ public class EventService {
                 .toList();
     }
 
-    private void checkOwnerHasRelatedSkills(EventDto eventDto) {
-        Optional.of(
-                        skillRepository.findAllByUserId(eventDto.getOwnerId()).stream()
-                                .map(Skill::getId)
-                                .collect(toSet())
-                )
-                .filter(ids -> ids.containsAll(eventDto.getRelatedSkillsIds()))
-                .orElseThrow(() -> new DataValidationException("Owner doesn't have all related skills"));
-    }
-
     @Transactional
     public List<EventDto> getParticipatedEvents(long userId) {
         return eventRepository.findParticipatedEventsByUserId(userId).stream()

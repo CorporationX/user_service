@@ -2,6 +2,7 @@ package school.faang.user_service.entity.promotion;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -11,6 +12,7 @@ import java.util.Currency;
 @Getter
 @Setter
 @ToString
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

@@ -14,23 +14,20 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.entity.promotion.enums.Plan;
-import school.faang.user_service.entity.promotion.user.ProfilePromotion;
 import school.faang.user_service.exception.ConflictPlanException;
 import school.faang.user_service.mapper.promotion.PromotionMapper;
+import school.faang.user_service.mapper.promotion.PromotionMapperImpl;
 import school.faang.user_service.repository.promotion.ProfilePromotionRepository;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProfilePromotionCreatorTest {
     @Spy
-    private PromotionMapper promotionMapper;
+    private PromotionMapperImpl promotionMapperClass;
     @Mock
     private ProfilePromotionRepository userPromotionRepo;
     @InjectMocks
@@ -62,7 +59,7 @@ class ProfilePromotionCreatorTest {
         profilePromotionCreator.create(promotionDto, user, plan);
 
         verify(userPromotionRepo, times(1)).existsByProfileIdAndActiveTrue(anyLong());
-        verify(promotionMapper, times(1)).toProfilePromotionProduct(
+        verify(promotionMapperClass, times(1)).toProfilePromotion(
                 promotionPlanCaptor.capture(), userArgumentCaptor.capture());
 
         PromotionPlan promotionPlanCaptorValue = promotionPlanCaptor.getValue();

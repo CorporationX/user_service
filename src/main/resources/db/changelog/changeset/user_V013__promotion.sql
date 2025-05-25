@@ -53,11 +53,3 @@ CREATE TABLE transaction_product(
     product_id BIGINT NOT NULL,
     CONSTRAINT fk_transaction_product_to_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-
-
-
-
-
-
-

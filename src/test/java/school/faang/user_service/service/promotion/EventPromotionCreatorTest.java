@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.builders.EventTestData;
 import school.faang.user_service.builders.PromotionPlanTestData;
 import school.faang.user_service.builders.UserTestData;
 import school.faang.user_service.dto.promotion.PromotionDto;
@@ -14,13 +13,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.entity.promotion.enums.Plan;
-import school.faang.user_service.entity.promotion.event.EventPromotion;
 import school.faang.user_service.exception.ConflictPlanException;
 import school.faang.user_service.mapper.promotion.PromotionMapper;
+import school.faang.user_service.mapper.promotion.PromotionMapperImpl;
 import school.faang.user_service.repository.event.EventRepositoryAdapter;
 import school.faang.user_service.repository.promotion.EventPromotionRepository;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,7 +28,7 @@ class EventPromotionCreatorTest {
     @Mock
     private EventRepositoryAdapter eventRepoAdapter;
     @Spy
-    private PromotionMapper promotionMapper;
+    private PromotionMapperImpl promotionMapperClass;
     @Mock
     private EventPromotionRepository eventPromotionRepo;
     @InjectMocks

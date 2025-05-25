@@ -1,39 +1,44 @@
 package school.faang.user_service.mapper.promotion;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.promotion.Product;
 import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.entity.promotion.event.EventPromotion;
 import school.faang.user_service.entity.promotion.user.ProfilePromotion;
 
-@Component
-public class PromotionMapper {
+@Mapper(
+        componentModel = "spring"
+)
+public interface PromotionMapper {
 
-    public Product toProfilePromotionProduct(PromotionPlan plan, User user) {
-        ProfilePromotion profilePromotion = new ProfilePromotion();
-        profilePromotion.setPrice(plan.getPrice());
-        profilePromotion.setCurrency(plan.getCurrency());
-        profilePromotion.setClient(user);
-        profilePromotion.setPlan(plan.getPlan());
-        profilePromotion.setProfile(user);
-        profilePromotion.setNumPromotedViews(plan.getNumPromotedViews());
-        profilePromotion.setViewWidth(plan.getViewWidth());
-        //todo transactions
-        return profilePromotion;
-    }
+    @Mapping(target = "price", source = "plan.price")
+    @Mapping(target = "currency", source = "plan.currency")
+    @Mapping(target = "client", source = "user")
+    @Mapping(target = "plan", source = "plan.plan")
+    @Mapping(target = "profile", source = "user")
+    @Mapping(target = "numPromotedViews", source = "plan.numPromotedViews")
+    @Mapping(target = "viewWidth", source = "plan.viewWidth")
+    @Mapping(target = "id",               ignore = true)
+    @Mapping(target = "createdAt",        ignore = true)
+    @Mapping(target = "updatedAt",        ignore = true)
+    @Mapping(target = "active",           ignore = true)
+    @Mapping(target = "currentViews",     ignore = true)
+    @Mapping(target = "transactions",     ignore = true)
+    ProfilePromotion toProfilePromotion(PromotionPlan plan, User user);
 
-    public Product toEventPromotionProduct(PromotionPlan plan, User client, Event event) {
-        EventPromotion eventPromotion = new EventPromotion();
-        eventPromotion.setPrice(plan.getPrice());
-        eventPromotion.setCurrency(plan.getCurrency());
-        eventPromotion.setClient(client);
-        eventPromotion.setPlan(plan.getPlan());
-        eventPromotion.setEvent(event);
-        eventPromotion.setNumPromotedViews(plan.getNumPromotedViews());
-        eventPromotion.setViewWidth(plan.getViewWidth());
-        //todo transactions
-        return eventPromotion;
-    }
+    @Mapping(target = "price", source = "plan.price")
+    @Mapping(target = "currency", source = "plan.currency")
+    @Mapping(target = "client", source = "client")
+    @Mapping(target = "plan", source = "plan.plan")
+    @Mapping(target = "numPromotedViews", source = "plan.numPromotedViews")
+    @Mapping(target = "viewWidth", source = "plan.viewWidth")
+    @Mapping(target = "id",               ignore = true)
+    @Mapping(target = "createdAt",        ignore = true)
+    @Mapping(target = "updatedAt",        ignore = true)
+    @Mapping(target = "active",           ignore = true)
+    @Mapping(target = "currentViews",     ignore = true)
+    @Mapping(target = "transactions",     ignore = true)
+    EventPromotion toEventPromotion(PromotionPlan plan, User client, Event event);
 }

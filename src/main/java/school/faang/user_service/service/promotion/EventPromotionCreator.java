@@ -17,11 +17,11 @@ import school.faang.user_service.repository.promotion.EventPromotionRepository;
 
 import java.util.Objects;
 
-@Component("EVENT")
+@Component("eventCreator")
 @RequiredArgsConstructor
 public class EventPromotionCreator implements PromotionCreator {
     private final EventRepositoryAdapter eventRepoAdapter;
-    private final PromotionMapper promotionMapper;
+    private final PromotionMapper promotionMapperClass;
     private final EventPromotionRepository eventPromotionRepo;
 
     @Override
@@ -33,7 +33,7 @@ public class EventPromotionCreator implements PromotionCreator {
         checkIfEventPromoted(eventId);
         Event event = eventRepoAdapter.findById(eventId);
         checkIfCreator(event, client);
-        return promotionMapper.toEventPromotionProduct(plan, client, event);
+        return promotionMapperClass.toEventPromotion(plan, client, event);
     }
 
     private void checkIfCreator(Event event, User client) {

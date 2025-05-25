@@ -26,7 +26,6 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final EventServiceUtils eventServiceUtils;
-    private final List<EventFilter> eventFilters;
 
     @Transactional
     public EventDto create(EventDto eventDto) {

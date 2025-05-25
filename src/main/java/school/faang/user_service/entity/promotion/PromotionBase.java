@@ -1,8 +1,11 @@
 package school.faang.user_service.entity.promotion;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.User;
@@ -17,6 +20,9 @@ import java.util.List;
 @MappedSuperclass
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class PromotionBase extends Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
@@ -30,9 +36,7 @@ public abstract class PromotionBase extends Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(
-            cascade = CascadeType.ALL
-    ) //todo
+    @OneToMany
     @JoinTable(
             name = "transaction_product",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -44,7 +48,6 @@ public abstract class PromotionBase extends Product {
 
     @Column(name = "current_views")
     private long currentViews;
-
 
     @Column(name = "num_promoted_views")
     private Integer numPromotedViews;

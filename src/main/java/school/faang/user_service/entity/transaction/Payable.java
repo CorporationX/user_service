@@ -6,6 +6,6 @@ import java.util.Currency;
 public interface Payable {
     TransactionPurpose getPurpose();
     BigDecimal getPrice();
-    Currency getCurrency(); //todo
+    Currency getCurrency();
     String getName();
 }

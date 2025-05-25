@@ -12,10 +12,10 @@ import school.faang.user_service.exception.ConflictPlanException;
 import school.faang.user_service.mapper.promotion.PromotionMapper;
 import school.faang.user_service.repository.promotion.ProfilePromotionRepository;
 
-@Component("PROFILE")
+@Component("profileCreator")
 @RequiredArgsConstructor
 public class ProfilePromotionCreator implements PromotionCreator {
-    private final PromotionMapper promotionMapper;
+    private final PromotionMapper promotionMapperClass;
     private final ProfilePromotionRepository userPromotionRepo;
 
     @Override
@@ -23,7 +23,7 @@ public class ProfilePromotionCreator implements PromotionCreator {
                           @NotNull(message = "User cannot be null") User user,
                           @NotNull(message = "Promotion Plan cannot be null") PromotionPlan plan) {
         checkIfProfileHasPromoted(user.getId());
-        return promotionMapper.toProfilePromotionProduct(plan, user);
+        return promotionMapperClass.toProfilePromotion(plan, user);
     }
 
     @Override

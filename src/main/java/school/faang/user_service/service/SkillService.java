@@ -32,6 +32,10 @@ public class SkillService {
     private final UserRepository userRepository;
     private static final int MIN_SKILL_OFFERS = 3;
 
+    public List<Skill> findAllByUserId(long userId) {
+        return skillRepository.findAllByUserId(userId);
+    }
+
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         if (!skillRepository.existsByTitle(skill.getTitle())) {

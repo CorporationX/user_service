@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.SkillService;
 
 import java.util.List;
 import java.util.stream.Stream;

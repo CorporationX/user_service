@@ -17,7 +17,7 @@ import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.SkillService;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

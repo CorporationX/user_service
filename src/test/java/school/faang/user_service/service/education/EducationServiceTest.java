@@ -12,7 +12,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EducationMapperImpl;
 import school.faang.user_service.repository.adapter.EducationRepositoryAdapter;
-import school.faang.user_service.repository.adapter.UserRepositoryAdapter;
+import school.faang.user_service.repository.user.UserRepositoryAdapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -73,7 +73,7 @@ public class EducationServiceTest {
         expectedDto.setEducationLevel("Bachelor");
         expectedDto.setSpecialization("Computer Science");
 
-        when(userRepositoryAdapter.getById(userId)).thenReturn(user);
+        when(userRepositoryAdapter.findById(userId)).thenReturn(user);
         when(educationMapper.toEducation(educationDto)).thenReturn(educationBeforeSave);
         when(educationRepositoryAdapter.save(any(Education.class))).thenReturn(savedEducation);
         when(educationMapper.toEducationDto(savedEducation)).thenReturn(expectedDto);
@@ -81,7 +81,7 @@ public class EducationServiceTest {
         EducationDto actualDto = educationService.addEducation(userId, educationDto);
 
         assertEquals(expectedDto, actualDto);
-        verify(userRepositoryAdapter, times(1)).getById(userId);
+        verify(userRepositoryAdapter, times(1)).findById(userId);
         verify(educationMapper, times(1)).toEducation(educationDto);
         verify(educationRepositoryAdapter, times(1)).save(any(Education.class));
         verify(educationMapper, times(1)).toEducationDto(savedEducation);
@@ -97,12 +97,12 @@ public class EducationServiceTest {
         educationDto.setEducationLevel("Bachelor");
         educationDto.setSpecialization("Computer Science");
 
-        when(userRepositoryAdapter.getById(userId))
+        when(userRepositoryAdapter.findById(userId))
                 .thenThrow(new EntityNotFoundException("User not found with id:" + userId));
 
         assertThrows(EntityNotFoundException.class,
                 () -> educationService.addEducation(userId, educationDto));
-        verify(userRepositoryAdapter, times(1)).getById(userId);
+        verify(userRepositoryAdapter, times(1)).findById(userId);
         verify(educationMapper, never()).toEducation(any());
         verify(educationRepositoryAdapter, never()).save(any());
         verify(educationMapper, never()).toEducationDto(any());

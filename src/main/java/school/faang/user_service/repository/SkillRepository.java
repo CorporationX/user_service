@@ -48,6 +48,11 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             """)
     List<Skill> findSkillsByGoalId(long goalId);
 
+
     @Query("SELECT id FROM Skill WHERE id IN :skillIds")
     List<Long> findExistingSkillIds(@Param("skillIds") List<Long> skillIds);
 }
+
+    Optional<Skill> findByTitle(String title);
+}
+

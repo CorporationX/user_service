@@ -1,6 +1,7 @@
 package school.faang.user_service.repository.recommendation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import feign.Param;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,5 +15,6 @@ public interface SkillRequestRepository extends JpaRepository<SkillRequest, Long
             VALUES (:requestId, :skillId)
             """)
     @Modifying
-    int create(long requestId, long skillId);
+    void create(@Param("requestId") long requestId, @Param("skillId") long skillId);
+
 }

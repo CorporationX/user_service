@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -11,34 +12,59 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.RecommendationRejectDto;
+import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RecommendationResponseDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.RecommendationRequestService;
+
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Recommendation Request API", description = "API for managing recommendation requests")
-@RequestMapping("/api/user-service/recommendation-requests")
-@Validated
+@RequestMapping("/api/recommendation-requests")
 public class RecommendationRequestController {
+
     private final RecommendationRequestService recommendationRequestService;
 
-    @PostMapping("/create")
-    public RecommendationRequestDto requestRecommendation(@Valid @RequestBody RecommendationRequestDto recommendationRequestDto) {
-        return recommendationRequestService.create(recommendationRequestDto);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public RecommendationResponseDto create(
+            @Valid @RequestBody RecommendationRequestDto recommendationRequest) {
+        return recommendationRequestService.create(recommendationRequest);
     }
 
-    @PostMapping("/filter")
-    public List<RecommendationRequestDto> getRecommendationRequests(@Valid @RequestBody @NotNull RequestFilterDto filterDto) {
-        return recommendationRequestService.getRequests(filterDto);
+    @GetMapping
+    public List<RecommendationResponseDto> getFiltered(
+            @Valid RequestFilterDto filter) {
+        return recommendationRequestService.getRequests(filter);
     }
 
     @GetMapping("/{id}")
-    public RecommendationRequestDto getRecommendationRequest(@PathVariable("id") @NotNull @Min(1) Long id) {
+    public RecommendationResponseDto getById(@PathVariable long id) {
+
         return recommendationRequestService.getRequest(id);
     }
 
     @PostMapping("/{id}/reject")
-    public RejectionDto rejectRequest(@PathVariable @NotNull @Min(1) Long id, @Valid @RequestBody @NotNull RejectionDto rejectionDto) {
-        return recommendationRequestService.rejectRequest(id, rejectionDto);
+
+    public RecommendationResponseDto reject(
+            @PathVariable long id,
+            @Valid @RequestBody RecommendationRejectDto rejectDto) {
+        return recommendationRequestService.rejectRequest(id, rejectDto);
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class, DataValidationException.class})
+    public ResponseEntity<String> handleException(Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+

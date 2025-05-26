@@ -1,17 +1,20 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.RecommendationDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
@@ -38,9 +41,20 @@ public class RecommendationServiceTest {
     @Spy
     private RecommendationMapperImpl recommendationMapper;
 
+    @BeforeEach
+    void init() {
+        ReflectionTestUtils.setField(
+                recommendationService,
+                "rangeBetweenRecommendation",
+                6);
+    }
+
     @Test
     void create_ShouldThrowException_IfRecentRecommendationExists() {
         // Arrange
+        ReflectionTestUtils.setField(recommendationService,
+                "rangeBetweenRecommendation", 6);
+
         RecommendationDto dto = new RecommendationDto();
         dto.setAuthorId(1L);
         dto.setReceiverId(2L);
@@ -66,19 +80,36 @@ public class RecommendationServiceTest {
 
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L))
                 .thenReturn(Optional.empty());
-        when(recommendationRepository.create(1L, 2L, "test"))
-                .thenReturn(42L);
+        when(recommendationRepository.create(1L, 2L, "test")).thenReturn(42L);
+
+        Recommendation saved = new Recommendation();
+        saved.setId(42L);
+        saved.setContent("test");
+        saved.setCreatedAt(LocalDateTime.now());
+
+        RecommendationDto mappedDto = new RecommendationDto();
+        mappedDto.setId(42L);
+        mappedDto.setContent("test");
+
+        when(recommendationRepository.findById(42L)).thenReturn(Optional.of(saved));
 
         // Act
         RecommendationDto result = recommendationService.create(dto);
 
         // Assert
         assertThat(result.getId()).isEqualTo(42L);
+        assertThat(result.getContent()).isEqualTo("test");
+
         verify(recommendationRepository).create(1L, 2L, "test");
+        verify(recommendationRepository).findById(42L);
+        verify(recommendationMapper).toDto(saved);
     }
 
     @Test
     void update_ShouldUpdateRecommendation_WhenExistingFound() {
+        ReflectionTestUtils.setField(recommendationService,
+                "rangeBetweenRecommendation", 6);
+
         RecommendationDto dto = new RecommendationDto();
         dto.setId(100L);
         dto.setAuthorId(1L);
@@ -86,14 +117,27 @@ public class RecommendationServiceTest {
         dto.setContent("updated");
 
         Recommendation existing = new Recommendation();
-
+        existing.setId(100L);
         existing.setCreatedAt(LocalDateTime.now().minusMonths(7));
+
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L))
                 .thenReturn(Optional.of(existing));
 
+        when(recommendationRepository.findById(100L))
+                .thenReturn(Optional.of(existing));
+
+        RecommendationDto mappedDto = new RecommendationDto();
+        mappedDto.setId(100L);
+        mappedDto.setContent("updated");
+        doReturn(mappedDto).when(recommendationMapper).toDto(existing);
+
         RecommendationDto result = recommendationService.update(dto);
+
+        verify(recommendationRepository).update(1L, 2L, "updated");
         verify(skillOfferRepository).deleteAllByRecommendationId(100L);
-        assertThat(result).isEqualTo(dto);
+        verify(recommendationMapper).toDto(existing);
+
+        assertThat(result).isEqualTo(mappedDto);
     }
 
     @Test

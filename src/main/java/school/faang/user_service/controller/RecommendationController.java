@@ -35,21 +35,21 @@ public class RecommendationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRecommendation(@NotNull @PathVariable Long id) {
+    public ResponseEntity<Void> deleteRecommendation(@NotNull @PathVariable(required = true) Long id) {
         boolean deleted = recommendationService.delete(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/receiver/{receiverId}")
     public Page<RecommendationDto> getAllUserRecommendations(
-            @NotNull @PathVariable Long receiverId,
+            @NotNull @PathVariable(required = true) Long receiverId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return recommendationService.getAllUserRecommendations(receiverId, pageable);
     }
 
     @GetMapping("/author/{authorId}")
     public Page<RecommendationDto> getAllGivenRecommendations(
-            @NotNull @PathVariable Long authorId,
+            @NotNull @PathVariable(required = true) Long authorId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return recommendationService.getAllGivenRecommendations(authorId, pageable);
     }

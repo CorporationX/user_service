@@ -83,3 +83,6 @@ management:
       org.springframework.cloud.consul: DEBUG
       org.springframework.cloud.bootstrap.config: DEBUG
 
+recommendation:
+  range-between-recommendation: 6
+

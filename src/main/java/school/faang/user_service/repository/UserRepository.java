@@ -7,6 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery = true, value = """

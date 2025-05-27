@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.GetMenteesResponse;
 import school.faang.user_service.dto.mentorship.GetMentorsResponse;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.mentorship.MenteeMapper;
-import school.faang.user_service.mapper.mentorship.MentorsMapper;
+import school.faang.user_service.mapper.mentorship.MenteeMapperImpl;
+import school.faang.user_service.mapper.mentorship.MentorsMapperImpl;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 public class MentorshipControllerTest {
 
     @Spy
-    MenteeMapper menteeMapper;
+    MenteeMapperImpl menteeMapper;
 
     @Spy
-    MentorsMapper mentorsMapper;
+    MentorsMapperImpl mentorsMapper;
 
     @Mock
     MentorshipService mentorshipService;

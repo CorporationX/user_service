@@ -2,7 +2,7 @@ package school.faang.user_service.filter.mentorship_request;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestFilterDto;
-import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.mentorship.MentorshipRequest;
 
 import java.util.Objects;
 import java.util.stream.Stream;

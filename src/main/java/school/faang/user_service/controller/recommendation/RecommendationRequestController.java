@@ -1,29 +1,18 @@
 package school.faang.user_service.controller.recommendation;
 
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationRejectDto;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.dto.RecommendationResponseDto;
-import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.RecommendationRequestService;
 
 
 import java.util.List;
@@ -37,26 +26,26 @@ public class RecommendationRequestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RecommendationResponseDto create(
+    public RecommendationRequestDto create(
             @Valid @RequestBody RecommendationRequestDto recommendationRequest) {
         return recommendationRequestService.create(recommendationRequest);
     }
 
     @GetMapping
-    public List<RecommendationResponseDto> getFiltered(
+    public List<RecommendationRequestDto> getFiltered(
             @Valid RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 
     @GetMapping("/{id}")
-    public RecommendationResponseDto getById(@PathVariable long id) {
+    public RecommendationRequestDto getById(@PathVariable long id) {
 
         return recommendationRequestService.getRequest(id);
     }
 
     @PostMapping("/{id}/reject")
 
-    public RecommendationResponseDto reject(
+    public RejectionDto reject(
             @PathVariable long id,
             @Valid @RequestBody RecommendationRejectDto rejectDto) {
         return recommendationRequestService.rejectRequest(id, rejectDto);

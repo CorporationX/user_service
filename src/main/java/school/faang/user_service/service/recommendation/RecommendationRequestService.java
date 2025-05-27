@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import school.faang.user_service.dto.RecommendationRejectDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
@@ -88,11 +89,11 @@ public class RecommendationRequestService {
     }
 
     @Transactional
-    public RejectionDto rejectRequest(@NotNull @Min(1) Long id, @Valid @NotNull RejectionDto rejectionDto) {
+    public RejectionDto rejectRequest(@NotNull @Min(1) Long id, @NotNull @Valid RecommendationRejectDto rejectionDto) {
         RecommendationRequest requestDB = findRequestByID(id);
         validateRequestOnStatusPending(requestDB);
 
-        requestDB.setRejectionReason(rejectionDto.getReason());
+        requestDB.setRejectionReason(rejectionDto.reason());
         requestDB.setStatus(REJECTED);
         RecommendationRequest requestSaved = requestRepository.save(requestDB);
         return requestRejectionMapper.toDto(requestSaved);

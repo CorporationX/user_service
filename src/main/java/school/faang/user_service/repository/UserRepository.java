@@ -1,9 +1,12 @@
 package school.faang.user_service.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.User;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -25,4 +28,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Stream<User> findPremiumUsers();
 
     List<User> findByUsernameLike(String username);
+
+    Page<User> findByIdIn(Collection<Long> ids, Pageable pageable);
 }

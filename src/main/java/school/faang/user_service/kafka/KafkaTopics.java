@@ -12,4 +12,7 @@ public class KafkaTopics {
 
     @Value("${spring.kafka.topics.analytics-created.name}")
     private String analyticsCreatedTopic;
+
+    @Value("${spring.kafka.topics.analytics-profile-event-topic.name}")
+    private String analyticsProfileEventTopic;
 }

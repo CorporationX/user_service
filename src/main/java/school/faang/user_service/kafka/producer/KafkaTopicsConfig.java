@@ -50,4 +50,29 @@ public class KafkaTopicsConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic analyticsProfileEventTopic(
+            @Value("${spring.kafka.topics.analytics-profile-event-topic.name}") String name,
+            @Value("${spring.kafka.topics.analytics-created.partitions}") int partitions,
+            @Value("${spring.kafka.topics.analytics-created.replication-factor}") short replicas
+    ) {
+        return TopicBuilder
+                .name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic analyticsProfileEventDlt(
+            @Value("${spring.kafka.topics.analytics-profile-event-topic.dlt.name}") String name,
+            @Value("${spring.kafka.topics.analytics-created.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.analytics-created.dlt.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

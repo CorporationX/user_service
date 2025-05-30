@@ -35,20 +35,4 @@ public class RedisConfiguration {
         return template;
     }
 
-    @Bean
-    public DefaultRedisScript<Long> counterScript() {
-        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
-        script.setScriptText("""
-                local current = redis.call("INCR", KEYS[1])
-                local threshold = tonumber(ARGV[1])
-                if current >= threshold then
-                  redis.call("SET", KEYS[1], 0)
-                  return threshold
-                else
-                  return current
-                end
-                """);
-        script.setResultType(Long.class);
-        return script;
-    }
 }

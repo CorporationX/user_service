@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnalyticsCreatedEvent {
+public class AnalyticsEvent {
     private long id;
     private long receiverId;
     private long actorId;

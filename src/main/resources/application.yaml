@@ -45,6 +45,8 @@ spring:
     consumer:
       bootstrap-servers: localhost:9092, localhost:9094
       group-id: analytics-created
+      max-poll-records: 50
+      offset-reset-config: latest
     topics:
       analytics-created:
         name: analytics-created-event-topic
@@ -52,6 +54,14 @@ spring:
         replication-factor: 3
         dlt:
           name: ${spring.kafka.topics.analytics-created.name}.DLT
+          partitions: 1
+          replication-factor: 3
+      analytics-profile-event-topic:
+        name: analytics-profile-event-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.analytics-profile-event-topic.name}.DLT
           partitions: 1
           replication-factor: 3
 
@@ -82,4 +92,3 @@ management:
     level:
       org.springframework.cloud.consul: DEBUG
       org.springframework.cloud.bootstrap.config: DEBUG
-

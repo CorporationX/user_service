@@ -1,11 +1,10 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.repository.goal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
-import school.faang.user_service.repository.goal.GoalRepository;
 
 @Component
 @Slf4j

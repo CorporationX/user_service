@@ -17,12 +17,12 @@ import java.util.List;
 )
 @Slf4j
 @RequiredArgsConstructor
-public class AnalyticsEventHandler {
+public class AnalyticsEventProfileViewHandler {
     private final RedisAnalyticsService redisService;
 
     @KafkaHandler
     public void handle(List<AnalyticsEvent> events) {
         log.info("Received AnalyticsEvent: {}", events);
-        redisService.processEvent(events);
+        redisService.incrementEventsCounter(events);
     }
 }

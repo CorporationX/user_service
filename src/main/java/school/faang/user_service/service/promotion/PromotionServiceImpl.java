@@ -13,8 +13,6 @@ import school.faang.user_service.entity.promotion.Product;
 import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.entity.promotion.enums.Plan;
 import school.faang.user_service.exception.NotFoundException;
-import school.faang.user_service.kafka.AnalyticsCreatedEvent;
-import school.faang.user_service.kafka.EventType;
 import school.faang.user_service.kafka.KafkaTopics;
 import school.faang.user_service.kafka.producer.DataSender;
 import school.faang.user_service.repository.promotion.ProductRepository;
@@ -71,7 +69,7 @@ public class PromotionServiceImpl implements PromotionService {
 
     private PromotionCreator getCreator(@NotNull(message = "Type of promotion cannot be null")
                                         PromotionType promotionType) {
-        PromotionCreator promotionCreator = promotionCreators.get(promotionType.name());
+        PromotionCreator promotionCreator = promotionCreators.get(promotionType.getValue());
         if (promotionCreator == null) {
             throw new IllegalArgumentException("Unsupported type: " + promotionType);
         }

@@ -22,7 +22,6 @@ import static java.util.stream.Collectors.toSet;
 @Service
 @RequiredArgsConstructor
 public class EventService {
-    private final SkillRepository skillRepository;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final EventServiceUtils eventServiceUtils;

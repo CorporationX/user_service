@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
-import school.faang.user_service.kafka.KafkaTopics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +66,31 @@ public class KafkaTopicsConfig {
     @Bean
     public NewTopic analyticsProfileEventDlt(
             @Value("${spring.kafka.topics.analytics-profile-event-topic.dlt.name}") String name,
+            @Value("${spring.kafka.topics.analytics-created.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.analytics-created.dlt.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic redisRetryErrorTopic(
+            @Value("${spring.kafka.topics.redis-retry-error-topic.name}") String name,
+            @Value("${spring.kafka.topics.analytics-created.partitions}") int partitions,
+            @Value("${spring.kafka.topics.analytics-created.replication-factor}") short replicas
+    ) {
+        return TopicBuilder
+                .name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic redisRetryErrorTopicDlt(
+            @Value("${spring.kafka.topics.redis-retry-error-topic.dlt.name}") String name,
             @Value("${spring.kafka.topics.analytics-created.dlt.partitions}") int partitions,
             @Value("${spring.kafka.topics.analytics-created.dlt.replication-factor}") short replicas
     ) {

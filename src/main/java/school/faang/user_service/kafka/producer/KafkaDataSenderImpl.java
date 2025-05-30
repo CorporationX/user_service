@@ -6,6 +6,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.kafka.AnalyticsEvent;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +27,22 @@ public class KafkaDataSenderImpl implements DataSender {
                                 record.getRecordMetadata().offset());
                     } else {
                         log.warn("Analytics event with id {} has not been sent", analyticsEvent.getId(), ex);
+                    }
+                });
+    }
+
+    @Override
+    public void send(String topic, List<Long> ids) {
+        kafkaTemplate.send(topic, ids)
+                .whenComplete((record, ex) -> {
+                    if (ex == null) {
+                        log.info("Sent ids with topic {}, partition = {}, offset ={}, size ={}",
+                                topic,
+                                record.getRecordMetadata().partition(),
+                                record.getRecordMetadata().offset(),
+                                ids.size());
+                    } else {
+                        log.warn("RecordIds list with size {} has not been sent", ids.size(), ex);
                     }
                 });
     }

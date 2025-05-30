@@ -14,5 +14,6 @@ import java.util.Set;
 public class AnalyticsProperties {
     @Value("${redis.analytics.counter-threshold}")
     private Integer counterThreshold;
+
     private final Set<EventType> allowed = EnumSet.of(EventType.PROFILE_VIEW, EventType.EVENT_VIEW);
 }

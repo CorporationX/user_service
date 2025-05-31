@@ -1,6 +1,9 @@
 package school.faang.user_service.controller.event;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -61,7 +64,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/owned/{id}")
-    public List<EventDto> getOwnedEvents(@PathVariable("id") @Required Long userId) {
+    public List<EventDto> getOwnedEvents(@PathVariable(value = "id") @NotNull @Positive Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 

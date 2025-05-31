@@ -50,7 +50,7 @@ public class EventController {
                                             @PathVariable(name = "id") Long id) {
         log.info("getEventsByFilter called");
         eventControllerUtils.isValidDateRange(filter);
-        return eventService.getEventsByFilter(filter, PageRequest.of(page, size), id);
+        return eventService.getEventsByFilter(filter);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -66,7 +66,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/owned/{id}")
-    public List<EventDto> getOwnedEvents(@PathVariable("id") @Required Long userId) {
+    public List<EventDto> getOwnedEvents(@PathVariable(value = "id") @NotNull @Positive Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 

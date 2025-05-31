@@ -20,7 +20,7 @@ import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.repository.promotion.ProductRepository;
 import school.faang.user_service.repository.promotion.PromotionPlanRepository;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
-import school.faang.user_service.service.promotion.interfaces.PromotionCreator;
+import school.faang.user_service.service.promotion.interfaces.PromotionActionsService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -42,9 +42,9 @@ class PromotionServiceImplTest {
     @Mock
     private UserRepositoryAdapter userRepoAdapter;
     @Mock
-    private Map<String, PromotionCreator> promotionCreators;
+    private Map<String, PromotionActionsService> promotionCreators;
     @Mock
-    private PromotionCreator promotionCreator;
+    private PromotionActionsService promotionActionsService;
     @InjectMocks
     private PromotionServiceImpl promotionService;
     @Captor
@@ -97,12 +97,12 @@ class PromotionServiceImplTest {
 
         when(promotionPlanRepo.findByPlan(any())).thenReturn(Optional.of(promotionPlan));
         when(userRepoAdapter.findById(anyLong())).thenReturn(user);
-        when(promotionCreators.get(any())).thenReturn(promotionCreator);
-        when(promotionCreator.create(any(), any(), any())).thenReturn(product);
+        when(promotionCreators.get(any())).thenReturn(promotionActionsService);
+        when(promotionActionsService.create(any(), any(), any())).thenReturn(product);
         when(productRepo.save(any())).thenReturn(product);
 
         promotionService.addPromotion(promotionDto);
-        verify(promotionCreator).create(promotionDtoCaptor.capture(), userCaptor.capture(), promotionPlanCaptor.capture());
+        verify(promotionActionsService).create(promotionDtoCaptor.capture(), userCaptor.capture(), promotionPlanCaptor.capture());
         verify(productRepo).save(productArgumentCaptor.capture());
         PromotionDto promotionDtoValue = promotionDtoCaptor.getValue();
         User userValue = userCaptor.getValue();
@@ -115,17 +115,10 @@ class PromotionServiceImplTest {
         assertEquals(productValue, product);
     }
 
-/*
-    @Test
-    void addPromotionTest_whenNullPassed_thenThrowConstraintViolationException() {
-        assertThrows(ConstraintViolationException.class, () -> promotionService.addPromotion(null));
-    }
-*/
-
     @Test
     void addPromotionTest_whenNoUserFound_thenThrowIllegalArgumentException() {
         when(promotionPlanRepo.findByPlan(any())).thenReturn(Optional.of(promotionPlan));
-        when(promotionCreators.get(any())).thenReturn(promotionCreator);
+        when(promotionCreators.get(any())).thenReturn(promotionActionsService);
         when(userRepoAdapter.findById(anyLong())).thenThrow(IllegalArgumentException.class);
 
         assertThrows(IllegalArgumentException.class, () -> promotionService.addPromotion(promotionDto));
@@ -133,7 +126,7 @@ class PromotionServiceImplTest {
 
     @Test
     void addPromotionTest_whenNoPlanDetailsFound_thenThrowNotFoundException() {
-        when(promotionCreators.get(any())).thenReturn(promotionCreator);
+        when(promotionCreators.get(any())).thenReturn(promotionActionsService);
         when(promotionPlanRepo.findByPlan(any())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> promotionService.addPromotion(promotionDto));

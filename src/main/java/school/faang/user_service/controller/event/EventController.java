@@ -3,6 +3,8 @@ package school.faang.user_service.controller.event;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +52,7 @@ public class EventController {
                                             @PathVariable(name = "id") Long id) {
         log.info("getEventsByFilter called");
         eventControllerUtils.isValidDateRange(filter);
-        return eventService.getEventsByFilter(filter);
+        return eventService.getEventsByFilter(filter, PageRequest.of(page, size), id);
     }
 
     @DeleteMapping(value = "/{id}")

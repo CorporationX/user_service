@@ -1,4 +1,4 @@
-package school.faang.user_service.service.promotion;
+package school.faang.user_service.service.promotion.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,15 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class ProfilePromotionsViewCalculator extends PromotionsViewCalculatorBase {
-
-    @Value("${promotion.profile.vip-view-coefficient}")
+public class EventPromotionsViewCalculator extends PromotionsViewCalculatorBase {
+    @Value("${promotion.event.vip-view-coefficient}")
     private Double vipCoefficient;
 
-    @Value("${promotion.profile.gold-view-coefficient}")
+    @Value("${promotion.event.gold-view-coefficient}")
     private Double goldCoefficient;
 
-    @Value("${promotion.profile.plus-view-coefficient}")
+    @Value("${promotion.event.plus-view-coefficient}")
     private Double plusCoefficient;
 
     @Override

@@ -7,7 +7,7 @@ import java.util.Currency;
 
 @Data
 public class TransactionResultDto {
-    private Long TransactionNumber;
+    private Long transactionNumber;
     private String message;
     private String purpose;
     private String purchaseItem;

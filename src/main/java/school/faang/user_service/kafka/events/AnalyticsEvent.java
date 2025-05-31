@@ -11,5 +11,5 @@ public class AnalyticsEvent {
     private long id;
     private long receiverId;
     private long actorId;
-    private EventType eventType;
+    private AnalyticsEventType analyticsEventType;
 }

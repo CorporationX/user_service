@@ -4,7 +4,6 @@ CREATE INDEX idx_event_promotion_event_id
 CREATE INDEX idx_profile_promotion_profile_id
     ON profile_promotion (profile_id);
 
-
 CREATE INDEX idx_ep_plan_event_active_true
     ON event_promotion (plan, event_id)
     WHERE active = true;

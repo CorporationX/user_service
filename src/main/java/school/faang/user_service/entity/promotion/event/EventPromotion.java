@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import school.faang.user_service.entity.promotion.PromotionBase;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.transaction.Payable;
+import school.faang.user_service.entity.transaction.TransactionPurpose;
 
 @Entity
 @Table(name = "event_promotion")
@@ -13,13 +15,6 @@ import school.faang.user_service.entity.event.Event;
 @SuperBuilder
 @Getter
 @Setter
-@NamedEntityGraph(
-        name = "EventPromotion.withUserAndEvent", //todo
-        attributeNodes = {
-                @NamedAttributeNode("client"),
-                @NamedAttributeNode("event")
-        }
-)
 @DiscriminatorValue("EVENT_PROMOTION")
 @PrimaryKeyJoinColumn(name = "id")
 public class EventPromotion extends PromotionBase {

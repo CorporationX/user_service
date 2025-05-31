@@ -7,7 +7,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.events.EventType;
+import school.faang.user_service.kafka.events.AnalyticsEventType;
 
 import java.sql.BatchUpdateException;
 import java.sql.PreparedStatement;
@@ -80,14 +80,13 @@ public class EventPromotionDao extends AbstractPromotionDao {
         return successUpdates;
     }
 
-
     private void deactivateEventPromotionViews() {
         log.info("Deactivating ended events promotions");
         jdbcTemplate.update(DEACTIVATE_PROMOTIONS_SQL);
     }
 
     @Override
-    public EventType getEventType() {
-        return EventType.EVENT_VIEW;
+    public AnalyticsEventType getEventType() {
+        return AnalyticsEventType.EVENT_VIEW;
     }
 }

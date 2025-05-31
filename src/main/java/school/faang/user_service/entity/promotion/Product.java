@@ -3,6 +3,7 @@ package school.faang.user_service.entity.promotion;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import school.faang.user_service.entity.transaction.TransactionPurpose;
 
 import java.math.BigDecimal;
 import java.util.Currency;

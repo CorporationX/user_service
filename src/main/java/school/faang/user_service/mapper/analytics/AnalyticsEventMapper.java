@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
-import school.faang.user_service.kafka.events.EventType;
+import school.faang.user_service.kafka.events.AnalyticsEventType;
 
 @Component
 public class AnalyticsEventMapper {
@@ -13,7 +13,7 @@ public class AnalyticsEventMapper {
         AnalyticsEvent analyticsEvent = new AnalyticsEvent();
         analyticsEvent.setReceiverId(user.getId());
         analyticsEvent.setActorId(id);
-        analyticsEvent.setEventType(EventType.PROFILE_VIEW);
+        analyticsEvent.setAnalyticsEventType(AnalyticsEventType.PROFILE_VIEW);
         return analyticsEvent;
     }
 
@@ -21,7 +21,7 @@ public class AnalyticsEventMapper {
         AnalyticsEvent analyticsEvent = new AnalyticsEvent();
         analyticsEvent.setReceiverId(event.getId());
         analyticsEvent.setActorId(id);
-        analyticsEvent.setEventType(EventType.EVENT_VIEW);
+        analyticsEvent.setAnalyticsEventType(AnalyticsEventType.EVENT_VIEW);
         return analyticsEvent;
     }
 }

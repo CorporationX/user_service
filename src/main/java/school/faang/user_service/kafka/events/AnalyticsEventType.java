@@ -1,6 +1,6 @@
 package school.faang.user_service.kafka.events;
 
-public enum EventType {
+public enum AnalyticsEventType {
     PROFILE_VIEW,
     EVENT_VIEW,
     PROJECT_VIEW,
@@ -19,10 +19,10 @@ public enum EventType {
     PROFILE_APPEARED_IN_SEARCH,
     PROJECT_APPEARED_IN_SEARCH;
 
-    public static EventType of(int type) {
-        for (EventType eventType : EventType.values()) {
-            if (eventType.ordinal() == type) {
-                return eventType;
+    public static AnalyticsEventType of(int type) {
+        for (AnalyticsEventType analyticsEventType : AnalyticsEventType.values()) {
+            if (analyticsEventType.ordinal() == type) {
+                return analyticsEventType;
             }
         }
         throw new IllegalArgumentException("Unknown event type: " + type);

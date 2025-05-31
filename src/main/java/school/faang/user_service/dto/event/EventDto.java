@@ -19,7 +19,7 @@ public class EventDto {
     private Long ownerId;
     @Required
     private String description;
-    //@Required //todo
+    @Required
     private List<Long> relatedSkillsIds;
     @Required
     private String location;

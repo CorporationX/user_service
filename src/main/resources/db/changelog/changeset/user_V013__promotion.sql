@@ -25,6 +25,8 @@ CREATE TABLE profile_promotion(
     num_promoted_views INTEGER NOT NULL,
     plan VARCHAR(25) NOT NULL check (plan in ('VIP', 'GOLD', 'PLUS')),
     view_width VARCHAR(25) NOT NULL check (view_width in ('PUBLIC', 'FRIENDS')),
+    name VARCHAR(100) NOT NULL,
+    transaction_purpose VARCHAR(100) NOT NULL,
 
     CONSTRAINT fk_profile_promotion_to_product FOREIGN KEY (id) REFERENCES product(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_profile_promotion_client_to_users FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -42,6 +44,8 @@ CREATE TABLE event_promotion(
     num_promoted_views INTEGER NOT NULL,
     plan VARCHAR(25) NOT NULL check (plan in ('VIP', 'GOLD', 'PLUS')),
     view_width VARCHAR(25) NOT NULL check (view_width in ('PUBLIC', 'FRIENDS')),
+    name VARCHAR(100) NOT NULL,
+    transaction_purpose VARCHAR(100) NOT NULL,
 
     CONSTRAINT fk_event_promotion_to_product FOREIGN KEY (id) REFERENCES product(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_event_promotion_to_users FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -51,5 +55,6 @@ CREATE TABLE event_promotion(
 CREATE TABLE transaction_product(
     transaction_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
-    CONSTRAINT fk_transaction_product_to_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_transaction_product_to_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_transaction_product_to_transaction FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

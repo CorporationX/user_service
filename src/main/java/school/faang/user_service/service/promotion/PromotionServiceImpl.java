@@ -15,7 +15,7 @@ import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.repository.promotion.ProductRepository;
 import school.faang.user_service.repository.promotion.PromotionPlanRepository;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
-import school.faang.user_service.service.promotion.interfaces.PromotionCreator;
+import school.faang.user_service.service.promotion.interfaces.PromotionActionsService;
 import school.faang.user_service.service.promotion.interfaces.PromotionService;
 
 import java.util.Map;
@@ -27,26 +27,27 @@ public class PromotionServiceImpl implements PromotionService {
     private final PromotionPlanRepository promotionPlanRepo;
     private final ProductRepository productRepo;
     private final UserRepositoryAdapter userRepoAdapter;
-    private final Map<String, PromotionCreator> promotionCreators;
+    private final Map<String, PromotionActionsService> promotionCreators;
 
     @Override
     @Transactional
     public void addPromotion(@NotNull(message = "promotionDto cannot be null") PromotionDto promotionDto) {
-        PromotionCreator promotionCreator = getCreator(promotionDto.getPromotionType());
+        PromotionActionsService promotionActionsService = getCreator(promotionDto.getPromotionType());
         PromotionPlan plan = findPromotionPlan(promotionDto.getPlan());
         User client = userRepoAdapter.findById(promotionDto.getClientId());
-        Product promotionProduct = promotionCreator.create(promotionDto, client, plan);
-        productRepo.save(promotionProduct);
+        Product promotionProduct = promotionActionsService.create(promotionDto, client, plan);
+        Product savedProduct = productRepo.save(promotionProduct);
+        promotionActionsService.getItemPaid(savedProduct, client);
         log.info("Added new promotion successfully with id = {}", promotionProduct.getId());
     }
 
-    private PromotionCreator getCreator(@NotNull(message = "Type of promotion cannot be null")
-                                        PromotionType promotionType) {
-        PromotionCreator promotionCreator = promotionCreators.get(promotionType.getValue());
-        if (promotionCreator == null) {
+    private PromotionActionsService getCreator(@NotNull(message = "Type of promotion cannot be null")
+                                               PromotionType promotionType) {
+        PromotionActionsService promotionActionsService = promotionCreators.get(promotionType.getValue());
+        if (promotionActionsService == null) {
             throw new IllegalArgumentException("Unsupported type: " + promotionType);
         }
-        return promotionCreator;
+        return promotionActionsService;
     }
 
 

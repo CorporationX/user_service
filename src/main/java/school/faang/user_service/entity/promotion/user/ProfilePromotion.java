@@ -13,13 +13,6 @@ import school.faang.user_service.entity.User;
 @SuperBuilder
 @Getter
 @Setter
-@NamedEntityGraph(
-        name = "ProfilePromotion.withUserAndProfile",
-        attributeNodes = {
-                @NamedAttributeNode("client"),
-                @NamedAttributeNode("profile") //todo
-        }
-)
 @DiscriminatorValue("PROFILE_PROMOTION")
 
 @PrimaryKeyJoinColumn(name = "id")

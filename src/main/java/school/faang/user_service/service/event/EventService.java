@@ -17,7 +17,7 @@ import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.analytics.AnalyticsEventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.promotion.EventPromotionsViewCalculator;
+import school.faang.user_service.service.promotion.utils.EventPromotionsViewCalculator;
 
 import java.util.ArrayList;
 import java.util.List;

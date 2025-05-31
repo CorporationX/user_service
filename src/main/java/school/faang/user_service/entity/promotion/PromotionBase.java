@@ -11,7 +11,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.enums.Plan;
 import school.faang.user_service.entity.promotion.enums.ViewWidth;
+import school.faang.user_service.entity.transaction.Payable;
 import school.faang.user_service.entity.transaction.Transaction;
+import school.faang.user_service.entity.transaction.TransactionPurpose;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class PromotionBase extends Product {
+public abstract class PromotionBase extends Product implements Payable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
     private User client;
@@ -59,4 +61,16 @@ public abstract class PromotionBase extends Product {
     @Enumerated(EnumType.STRING)
     @Column(name = "plan")
     private Plan plan;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_purpose")
+    private TransactionPurpose transactionPurpose;
+
+    @Column(name = "name")
+    private String name;
+
+    @Override
+    public TransactionPurpose getPurpose() {
+        return TransactionPurpose.PROMOTION;
+    }
 }

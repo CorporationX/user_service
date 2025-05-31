@@ -25,7 +25,6 @@ public class TransactionService {
     private final TransactionServiceUtils transactionServiceUtils;
     private final PaymentService paymentService;
     private final TransactionMapper transactionMapper;
-    private final UserContext userContext;
 
     private Transaction createTransaction(Long userId, Payable item) {
         Transaction transaction = transactionServiceUtils.buildTransaction(userId, item);
@@ -33,7 +32,7 @@ public class TransactionService {
         return transaction;
     }
 
-    public TransactionResultDto buyItem(Long userId, Payable item) {
+    public Transaction buyItem(Long userId, Payable item) {
             return updateTransaction(
                     transactionMapper.toUpdateTransactionDto(
                             paymentService.buyItem(
@@ -42,7 +41,7 @@ public class TransactionService {
                     ));
     }
 
-    private TransactionResultDto updateTransaction(UpdateTransactionDto updateTransaction) {
+    private Transaction updateTransaction(UpdateTransactionDto updateTransaction) {
         Long transactionNumber = updateTransaction.getPaymentNumber();
         Transaction transaction = transactionRepository.findTransactionByTransactionNumber(transactionNumber)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -55,9 +54,6 @@ public class TransactionService {
             log.info("Transaction {} get status Failed successfully", transactionNumber);
         }
         transactionMapper.updateTransactionFromDto(updateTransaction, transaction);
-        TransactionResultDto transactionResultDto = transactionMapper.toDto(transaction);
-        transactionResultDto.setCurrency(transaction.getCurrencyCode());
-        return transactionResultDto;
+        return transaction;
     }
-
 }

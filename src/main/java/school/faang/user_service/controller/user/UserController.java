@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserViewDto;
 import school.faang.user_service.dto.user.UsersFilterDto;
 import school.faang.user_service.dto.user.UsersSortOption;

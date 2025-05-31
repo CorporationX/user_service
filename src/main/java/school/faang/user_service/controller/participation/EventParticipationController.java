@@ -1,4 +1,4 @@
-package school.faang.user_service.conrtoller.event;
+package school.faang.user_service.controller.participation;
 
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;

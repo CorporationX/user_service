@@ -14,7 +14,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
-import school.faang.user_service.kafka.events.EventType;
+import school.faang.user_service.kafka.events.AnalyticsEventType;
 import school.faang.user_service.kafka.producer.DataSender;
 import school.faang.user_service.kafka.producer.KafkaTopics;
 
@@ -34,9 +34,9 @@ public class PromotionAnalyticsCacheService {
         redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             StringRedisConnection stringConn = new DefaultStringRedisConnection(connection);
             for (AnalyticsEvent e : events) {
-                if (promotionProperties.getAllowed().contains(e.getEventType())) {
-                    String zsetName = e.getEventType().name();
-                    String member = String.format("%s:%d", e.getEventType().name(), e.getReceiverId());
+                if (promotionProperties.getAllowed().contains(e.getAnalyticsEventType())) {
+                    String zsetName = e.getAnalyticsEventType().name();
+                    String member = String.format("%s:%d", e.getAnalyticsEventType().name(), e.getReceiverId());
                     stringConn.zIncrBy(zsetName, 1.0, member);
                 }
             }
@@ -45,11 +45,11 @@ public class PromotionAnalyticsCacheService {
         log.info("incrementEventsCounter method has been completed");
     }
 
-    public Map<Long, Long> getIdsScoreAboveThreshold(EventType eventType) {
+    public Map<Long, Long> getIdsScoreAboveThreshold(AnalyticsEventType analyticsEventType) {
         log.info("Executing getIdsAboveThreshold method for Event type = {}, counter threshold = {}",
-                eventType, promotionProperties.getCounterThreshold());
+                analyticsEventType, promotionProperties.getCounterThreshold());
         Set<ZSetOperations.TypedTuple<String>> tuples = redisTemplate.opsForZSet()
-                .rangeByScoreWithScores(eventType.name(), promotionProperties.getCounterThreshold(), Double.MAX_VALUE);
+                .rangeByScoreWithScores(analyticsEventType.name(), promotionProperties.getCounterThreshold(), Double.MAX_VALUE);
 
         if (tuples == null || tuples.isEmpty()) {
             return Collections.emptyMap();
@@ -73,20 +73,20 @@ public class PromotionAnalyticsCacheService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000, multiplier = 2)
     )
-    public void removeProcessedKeys(EventType eventType, @NotNull List<Long> keys) {
-        log.info("removeProcessedKeys method is called for Event type = {}, keys size = {}", eventType, keys.size());
-        redisTemplate.opsForZSet().remove(eventType.name(),
+    public void removeProcessedKeys(AnalyticsEventType analyticsEventType, @NotNull List<Long> keys) {
+        log.info("removeProcessedKeys method is called for Event type = {}, keys size = {}", analyticsEventType, keys.size());
+        redisTemplate.opsForZSet().remove(analyticsEventType.name(),
                 keys.stream()
-                        .map(id -> String.format("%s:%d", eventType.name(), id))
+                        .map(id -> String.format("%s:%d", analyticsEventType.name(), id))
                         .toArray());
         log.info("removeProcessedKeys method removed keys successfully");
     }
 
     @Recover
     public void recover(RedisConnectionFailureException e,
-                        EventType eventType,
+                        AnalyticsEventType analyticsEventType,
                         Set<Long> keys) {
-        log.error("Failed to remove keys after retries: {}, {}", eventType, keys, e);
+        log.error("Failed to remove keys after retries: {}, {}", analyticsEventType, keys, e);
         dataSender.send(kafkaTopics.getRedisRetryErrorTopic(), keys.stream().toList());
     }
 }

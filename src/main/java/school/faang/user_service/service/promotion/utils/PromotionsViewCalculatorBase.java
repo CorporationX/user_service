@@ -1,4 +1,4 @@
-package school.faang.user_service.service.promotion;
+package school.faang.user_service.service.promotion.utils;
 
 import school.faang.user_service.entity.promotion.enums.Plan;
 

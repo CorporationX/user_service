@@ -1,14 +1,12 @@
 package school.faang.user_service.service.user;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.user.UserViewDto;
 import school.faang.user_service.dto.user.UsersFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,37 +14,33 @@ import school.faang.user_service.entity.promotion.enums.Plan;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
 import school.faang.user_service.kafka.producer.DataSender;
 import school.faang.user_service.kafka.producer.KafkaTopics;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.analytics.AnalyticsEventMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.user.UserRepositoryAdapter;
-import school.faang.user_service.service.promotion.ProfilePromotionsViewCalculator;
+import school.faang.user_service.service.promotion.utils.ProfilePromotionsViewCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import school.faang.user_service.repository.UserRepository;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserRepositoryAdapter userRepositoryAdapter;
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() ->  new EntityNotFoundException(
-                        String.format("User with id %d not found!", id)
-                ));
     private final DataSender dataSender;
     private final KafkaTopics kafkaTopics;
     private final AnalyticsEventMapper analyticsEventMapper;
     private final ProfilePromotionsViewCalculator viewCalculator;
 
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("User with id %d not found!", id)
+                ));
+    }
 
     public List<UserViewDto> getAllUsers(@NotNull(message = "User filter dto cannot be null")
                                          UsersFilterDto usersFilterDto,

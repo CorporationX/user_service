@@ -7,7 +7,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.events.EventType;
+import school.faang.user_service.kafka.events.AnalyticsEventType;
 
 import java.sql.BatchUpdateException;
 import java.sql.PreparedStatement;
@@ -85,7 +85,7 @@ public class ProfilePromotionDao extends AbstractPromotionDao {
     }
 
     @Override
-    public EventType getEventType() {
-        return EventType.PROFILE_VIEW;
+    public AnalyticsEventType getEventType() {
+        return AnalyticsEventType.PROFILE_VIEW;
     }
 }

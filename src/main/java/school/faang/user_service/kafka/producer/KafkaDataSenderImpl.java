@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.AnalyticsEvent;
+import school.faang.user_service.kafka.events.AnalyticsEvent;
 
 import java.util.List;
 
@@ -15,13 +15,12 @@ public class KafkaDataSenderImpl implements DataSender {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public void send(String topic, String key, AnalyticsEvent analyticsEvent) {
-        kafkaTemplate.send(topic, key, analyticsEvent)
+    public void send(String topic, AnalyticsEvent analyticsEvent) {
+        kafkaTemplate.send(topic , analyticsEvent)
                 .whenComplete((record, ex) -> {
                     if (ex == null) {
-                        log.info("Sent analytics event with id {}, key {},  topic {}, partition = {}, offset ={}",
+                        log.info("Sent analytics event with id {}, topic {}, partition = {}, offset ={}",
                                 analyticsEvent.getId(),
-                                key,
                                 topic,
                                 record.getRecordMetadata().partition(),
                                 record.getRecordMetadata().offset());

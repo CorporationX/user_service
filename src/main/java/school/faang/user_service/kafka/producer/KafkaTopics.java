@@ -1,4 +1,4 @@
-package school.faang.user_service.kafka;
+package school.faang.user_service.kafka.producer;
 
 import lombok.Getter;
 import lombok.Setter;

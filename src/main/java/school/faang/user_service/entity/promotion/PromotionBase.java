@@ -44,7 +44,7 @@ public abstract class PromotionBase extends Product {
     private List<Transaction> transactions = new ArrayList<>();
 
     @Column(name = "active")
-    private boolean active;
+    private Boolean active;
 
     @Column(name = "current_views")
     private long currentViews;

@@ -33,7 +33,7 @@ public class KafkaConsumerConfig {
     private int maxPollRecords;
 
     @Value("${spring.kafka.consumer.offset-reset-config}")
-    private int offsetResetConfig;
+    private String offsetResetConfig;
 
     @Bean
     ConsumerFactory<String, Object> consumerFactory() {

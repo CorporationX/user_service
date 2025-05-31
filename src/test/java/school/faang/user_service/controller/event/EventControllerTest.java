@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import school.faang.user_service.controller.utils.EventControllerUtils;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -16,10 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -80,13 +78,13 @@ class EventControllerTest {
         EventFilterDto filter = new EventFilterDto();
         EventDto expected = new EventDto();
         expected.setId(1L);
-        when(eventService.getEventsByFilter(filter)).thenReturn(List.of(expected));
+        when(eventService.getEventsByFilter(filter, PageRequest.of(0, 10), 1L)).thenReturn(List.of(expected));
 
-        List<EventDto> result = eventController.getEventsByFilter(filter);
+        List<EventDto> result = eventController.getEventsByFilter(filter, 0, 10, 1L);
 
         assertEquals(ONE, result.size());
         assertEquals(TEST_ID, result.get(0).getId());
-        verify(eventService).getEventsByFilter(filter);
+        verify(eventService).getEventsByFilter(filter, PageRequest.of(0, 10), 1L);
     }
 
     @Test
@@ -98,9 +96,9 @@ class EventControllerTest {
         filter.setEndDate(LocalDateTime.now().plusDays(ONE));
         EventDto expected = new EventDto();
         expected.setId(1L);
-        when(eventService.getEventsByFilter(filter)).thenReturn(List.of(expected));
+        when(eventService.getEventsByFilter(filter, PageRequest.of(0, 10), 1L)).thenReturn(List.of(expected));
 
-        assertEquals(List.of(expected), eventController.getEventsByFilter(filter));
+        assertEquals(List.of(expected), eventController.getEventsByFilter(filter, 0, 10, 1L));
     }
 
     @Test

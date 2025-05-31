@@ -23,13 +23,13 @@ public class EventServiceUtils {
     private final List<EventFilter> eventFilters;
 
     public void checkOwnerHasRelatedSkills(EventDto eventDto) {
-        Optional.of(
+       /* Optional.of( //todo
                         skillService.findAllByUserId(eventDto.getOwnerId()).stream()
                                 .map(Skill::getId)
                                 .collect(toSet())
                 )
                 .filter(ids -> ids.containsAll(eventDto.getRelatedSkillsIds()))
-                .orElseThrow(() -> new DataValidationException("Owner doesn't have all related skills"));
+                .orElseThrow(() -> new DataValidationException("Owner doesn't have all related skills"));*/
     }
 
     public Stream<Event> filterEvents(Stream<Event> events, EventFilterDto eventFilterDto) {

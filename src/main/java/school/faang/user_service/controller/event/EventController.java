@@ -1,18 +1,14 @@
 package school.faang.user_service.controller.event;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.controller.utils.EventControllerUtils;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -21,6 +17,7 @@ import school.faang.user_service.validation.data.Required;
 
 import java.util.List;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/events")
@@ -42,10 +39,18 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
-    @PostMapping(value = "/filter")
-    public List<EventDto> getEventsByFilter(@Valid @RequestBody EventFilterDto filter) {
+    @PostMapping(value = "/filter/{id}")
+    public List<EventDto> getEventsByFilter(@Valid @RequestBody EventFilterDto filter,
+                                            @RequestParam(name = "page", defaultValue = "0")
+                                            @Min(value = 0)
+                                            Integer page,
+                                            @RequestParam(name = "size", defaultValue = "10")
+                                            @Min(value = 4) @Max(value = 10)
+                                            Integer size,
+                                            @PathVariable(name = "id") Long id) {
+        log.info("getEventsByFilter called");
         eventControllerUtils.isValidDateRange(filter);
-        return eventService.getEventsByFilter(filter);
+        return eventService.getEventsByFilter(filter, PageRequest.of(page, size), id);
     }
 
     @DeleteMapping(value = "/{id}")

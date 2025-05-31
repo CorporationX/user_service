@@ -11,6 +11,7 @@ import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.exception.ConflictPlanException;
 import school.faang.user_service.mapper.promotion.PromotionMapper;
 import school.faang.user_service.repository.promotion.ProfilePromotionRepository;
+import school.faang.user_service.service.promotion.interfaces.PromotionCreator;
 
 @Component("profileCreator")
 @RequiredArgsConstructor

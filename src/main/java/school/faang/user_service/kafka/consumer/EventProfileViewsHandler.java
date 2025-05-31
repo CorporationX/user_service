@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
-import school.faang.user_service.kafka.AnalyticsEvent;
-import school.faang.user_service.redis.RedisAnalyticsService;
+import school.faang.user_service.kafka.events.AnalyticsEvent;
+import school.faang.user_service.redis.promotion.PromotionAnalyticsCacheService;
 
 import java.util.List;
 
@@ -17,8 +17,8 @@ import java.util.List;
 )
 @Slf4j
 @RequiredArgsConstructor
-public class AnalyticsEventProfileViewHandler {
-    private final RedisAnalyticsService redisService;
+public class EventProfileViewsHandler {
+    private final PromotionAnalyticsCacheService redisService;
 
     @KafkaHandler
     public void handle(List<AnalyticsEvent> events) {

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.promotion.PromotionDto;
-import school.faang.user_service.service.promotion.PromotionService;
+import school.faang.user_service.service.promotion.interfaces.PromotionService;
 
 @RestController
 @RequestMapping("/promotions")

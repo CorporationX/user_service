@@ -1,11 +1,11 @@
 package school.faang.user_service.repository.event;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.promotion.enums.Plan;
 
@@ -26,11 +26,26 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
 
-    @Query(nativeQuery = true, value = """
-            SELECT e.* FROM events AS e
-            JOIN events_promotion AS ep ON ep.event_id = e.id
+    @Query("""
+            SELECT e 
+            FROM Event e
+            JOIN EventPromotion ep ON ep.event = e
+            JOIN FETCH e.owner
             WHERE ep.active = true 
-            AND ep.plan = :plan
+            AND ep.plan = :plan 
             """)
-    Slice<Event> findAllActivePromotedByPlan(@Param("plan") Plan plan, Pageable pageable);
+    Slice<Event> findAllActivePromotionByPlan(@Param("plan") Plan plan, Pageable pageable);
+
+    @Query("""
+            SELECT e 
+            FROM Event e
+            JOIN FETCH e.owner
+             WHERE NOT EXISTS (
+               SELECT ep 
+                 FROM EventPromotion ep
+                WHERE ep.event = e
+                  AND ep.active  = true
+             )
+            """)
+    Slice<Event> findAllWithoutPromotion(Pageable pageable);
 }

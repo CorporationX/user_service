@@ -14,7 +14,7 @@ import school.faang.user_service.entity.event.Event;
 @Getter
 @Setter
 @NamedEntityGraph(
-        name = "EventPromotion.withUserAndEvent",
+        name = "EventPromotion.withUserAndEvent", //todo
         attributeNodes = {
                 @NamedAttributeNode("client"),
                 @NamedAttributeNode("event")

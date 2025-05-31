@@ -17,7 +17,7 @@ import school.faang.user_service.entity.User;
         name = "ProfilePromotion.withUserAndProfile",
         attributeNodes = {
                 @NamedAttributeNode("client"),
-                @NamedAttributeNode("profile")
+                @NamedAttributeNode("profile") //todo
         }
 )
 @DiscriminatorValue("PROFILE_PROMOTION")

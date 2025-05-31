@@ -14,6 +14,7 @@ import school.faang.user_service.exception.RelatednessNotConfirmedException;
 import school.faang.user_service.mapper.promotion.PromotionMapper;
 import school.faang.user_service.repository.event.EventRepositoryAdapter;
 import school.faang.user_service.repository.promotion.EventPromotionRepository;
+import school.faang.user_service.service.promotion.interfaces.PromotionCreator;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.kafka;
+package school.faang.user_service.kafka.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

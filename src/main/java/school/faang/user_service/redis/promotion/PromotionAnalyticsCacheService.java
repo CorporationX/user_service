@@ -1,8 +1,10 @@
-package school.faang.user_service.redis;
+package school.faang.user_service.redis.promotion;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.connection.DefaultStringRedisConnection;
 import org.springframework.data.redis.connection.StringRedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,27 +13,28 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.kafka.AnalyticsEvent;
-import school.faang.user_service.kafka.EventType;
-import school.faang.user_service.kafka.KafkaTopics;
+import school.faang.user_service.kafka.events.AnalyticsEvent;
+import school.faang.user_service.kafka.events.EventType;
 import school.faang.user_service.kafka.producer.DataSender;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 
 import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RedisAnalyticsService {
+public class PromotionAnalyticsCacheService {
     private final RedisTemplate<String, String> redisTemplate;
-    private final AnalyticsProperties analyticsProperties;
+    private final PromotionAnalyticsProperties promotionProperties;
     private final DataSender dataSender;
     private final KafkaTopics kafkaTopics;
 
     public void incrementEventsCounter(List<AnalyticsEvent> events) {
+        log.info("incrementEventsCounter method is called. events size = {}", events.size());
         redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-            StringRedisConnection stringConn = (StringRedisConnection) connection;
+            StringRedisConnection stringConn = new DefaultStringRedisConnection(connection);
             for (AnalyticsEvent e : events) {
-                if (analyticsProperties.getAllowed().contains(e.getEventType())) {
+                if (promotionProperties.getAllowed().contains(e.getEventType())) {
                     String zsetName = e.getEventType().name();
                     String member = String.format("%s:%d", e.getEventType().name(), e.getReceiverId());
                     stringConn.zIncrBy(zsetName, 1.0, member);
@@ -39,12 +42,14 @@ public class RedisAnalyticsService {
             }
             return null;
         });
+        log.info("incrementEventsCounter method has been completed");
     }
 
-    public Map<Long, Long> getIdsAboveThreshold(EventType eventType) {
-        log.info("getIdsAboveThreshold method is called. counterThreshold = {}", analyticsProperties.getCounterThreshold());
-        Set<ZSetOperations.TypedTuple<String>> tuples = redisTemplate.opsForZSet().rangeByScoreWithScores(eventType.name(),
-                analyticsProperties.getCounterThreshold(), Double.MAX_VALUE);
+    public Map<Long, Long> getIdsScoreAboveThreshold(EventType eventType) {
+        log.info("Executing getIdsAboveThreshold method for Event type = {}, counter threshold = {}",
+                eventType, promotionProperties.getCounterThreshold());
+        Set<ZSetOperations.TypedTuple<String>> tuples = redisTemplate.opsForZSet()
+                .rangeByScoreWithScores(eventType.name(), promotionProperties.getCounterThreshold(), Double.MAX_VALUE);
 
         if (tuples == null || tuples.isEmpty()) {
             return Collections.emptyMap();
@@ -54,12 +59,12 @@ public class RedisAnalyticsService {
         for (ZSetOperations.TypedTuple<String> t : tuples) {
             String member = t.getValue();
             Long score = t.getScore().longValue();
-            String[] parts = member.split(":", 2);
+            String[] parts = member.split(":");
             Long id = Long.valueOf(parts[1]);
 
             result.put(id, score);
         }
-
+        log.info("getIdsAboveThreshold method returns result size = {}", result.size());
         return result;
     }
 
@@ -68,12 +73,13 @@ public class RedisAnalyticsService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000, multiplier = 2)
     )
-    public void removeProcessedKeys(EventType eventType, Set<Long> keys) {
-        log.info("removeProcessedKeys method is called");
+    public void removeProcessedKeys(EventType eventType, @NotNull List<Long> keys) {
+        log.info("removeProcessedKeys method is called for Event type = {}, keys size = {}", eventType, keys.size());
         redisTemplate.opsForZSet().remove(eventType.name(),
                 keys.stream()
                         .map(id -> String.format("%s:%d", eventType.name(), id))
-                        .toList());
+                        .toArray());
+        log.info("removeProcessedKeys method removed keys successfully");
     }
 
     @Recover

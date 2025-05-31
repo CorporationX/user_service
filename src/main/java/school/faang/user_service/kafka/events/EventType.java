@@ -1,4 +1,4 @@
-package school.faang.user_service.kafka;
+package school.faang.user_service.kafka.events;
 
 public enum EventType {
     PROFILE_VIEW,

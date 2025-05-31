@@ -1,19 +1,24 @@
-package school.faang.user_service.redis;
+package school.faang.user_service.redis.promotion;
 
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.EventType;
+import school.faang.user_service.kafka.events.EventType;
 
 import java.util.EnumSet;
 import java.util.Set;
 
 @Component
-@Getter
-public class AnalyticsProperties {
+public class PromotionAnalyticsProperties {
+    @Getter
     @Value("${redis.analytics.counter-threshold}")
     private Integer counterThreshold;
 
     private final Set<EventType> allowed = EnumSet.of(EventType.PROFILE_VIEW, EventType.EVENT_VIEW);
+
+    public Set<EventType> getAllowed() {
+        return Set.of(allowed.toArray(new EventType[0]));
+    }
+
 }

@@ -23,7 +23,7 @@ public interface PromotionMapper {
     @Mapping(target = "id",               ignore = true)
     @Mapping(target = "createdAt",        ignore = true)
     @Mapping(target = "updatedAt",        ignore = true)
-    @Mapping(target = "active",           ignore = true)
+    @Mapping(target = "active",           defaultValue = "true")
     @Mapping(target = "currentViews",     ignore = true)
     @Mapping(target = "transactions",     ignore = true)
     ProfilePromotion toProfilePromotion(PromotionPlan plan, User user);
@@ -37,7 +37,7 @@ public interface PromotionMapper {
     @Mapping(target = "id",               ignore = true)
     @Mapping(target = "createdAt",        ignore = true)
     @Mapping(target = "updatedAt",        ignore = true)
-    @Mapping(target = "active",           ignore = true)
+    @Mapping(target = "active",           defaultValue = "true")
     @Mapping(target = "currentViews",     ignore = true)
     @Mapping(target = "transactions",     ignore = true)
     EventPromotion toEventPromotion(PromotionPlan plan, User client, Event event);

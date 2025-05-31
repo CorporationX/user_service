@@ -1,6 +1,5 @@
 package school.faang.user_service.repository;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,11 +30,32 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByUsernameLike(String username);
 
-    @Query(nativeQuery = true, value = """
-            SELECT u.* FROM users AS u
-            JOIN profile_promotion AS pp ON pp.profile_id = u.id
-            WHERE pp.active = true 
-            AND pp.plan = :plan
+    @Query("""
+    SELECT u 
+      FROM User u
+      JOIN ProfilePromotion pp ON pp.profile = u
+      JOIN FETCH u.country
+      LEFT JOIN FETCH u.contactPreference
+      LEFT JOIN FETCH u.premium
+      LEFT JOIN FETCH u.workSchedule
+     WHERE pp.active = true
+       AND pp.plan   = :plan
+    """)
+    Slice<User> findAllActivePromotionByPlan(@Param("plan") Plan plan, Pageable pageable);
+
+    @Query("""
+            SELECT u
+              FROM User u
+              JOIN FETCH u.country
+              LEFT JOIN FETCH u.contactPreference
+              LEFT JOIN FETCH u.premium
+              LEFT JOIN FETCH u.workSchedule
+             WHERE NOT EXISTS (
+               SELECT pp 
+                 FROM ProfilePromotion pp
+                WHERE pp.profile = u
+                  AND pp.active  = true
+             )
             """)
-    Slice<User> findAllActivePromotedByPlan(@Param("plan") Plan plan, Pageable pageable);
+    Slice<User> findAllWithoutPromotion(Pageable pageable);
 }

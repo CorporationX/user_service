@@ -16,6 +16,6 @@ public class EventRepositoryAdapter {
     public Event findById(long id) {
         log.debug("Execution of the method Event findById, parameters: id = {}", id);
         return eventRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("User with id - %d not found", id)));
+                new NotFoundException(String.format("Event with id - %d not found", id)));
     }
 }

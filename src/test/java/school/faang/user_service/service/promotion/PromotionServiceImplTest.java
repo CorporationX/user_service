@@ -1,6 +1,5 @@
 package school.faang.user_service.service.promotion;
 
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +20,7 @@ import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.repository.promotion.ProductRepository;
 import school.faang.user_service.repository.promotion.PromotionPlanRepository;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
+import school.faang.user_service.service.promotion.interfaces.PromotionCreator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -89,8 +89,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: health,info,metrics,loggers,env,refresh
 
+  endpoint:
+    health:
+      show-details: always
   logging:
     level:
       org.springframework.cloud.consul: DEBUG

@@ -14,7 +14,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 @FeignClient(
-        name = "${service.payment.name}",
+        name = "${services.payment-service.name}",
         configuration = FeignConfig.class
 )
 @Retryable(

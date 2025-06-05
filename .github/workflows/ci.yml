@@ -1,25 +1,24 @@
-name: User-service pipeline
+
+name: CI Pipeline
 
 on:
   pull_request:
-    branches: ["develop/pipeline-BC-BJS2-77818"]
+    branches:
+      - develop/pipline-BC-BJS2-77818
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout branch
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: 17
 
-      - name: Grant gradlew permissions
-        run: chmod +x gradlew
-
-      - name: Run Gradle Build
-        run: ./gradlew build
+      - name: Run Gradle Test
+        run: ./gradlew test --stacktrace

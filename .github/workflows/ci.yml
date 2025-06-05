@@ -1,0 +1,22 @@
+name: User-service pipeline
+
+on:
+  pull_requests:
+    branches: ["develop/piplene-BC-BJS2-77818"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      -name: Checkout branch
+       uses: actions/checkout@v4
+
+      -name: Set up JDK
+       uses: actions/setup-java@v4
+       with:
+        distribution: 'corretto'
+        java-version: 17
+
+      -name: Run Gradle Build
+       uses: ./gradlew build

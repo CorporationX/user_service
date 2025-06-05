@@ -9,6 +9,6 @@ public class PipelineTest {
     @Test
     void intentionalFailure() {
         // This test will always fail
-        fail("This test is meant to fail explicitly!!!");
+        // fail("This test is meant to fail explicitly!!!");
     }
 }

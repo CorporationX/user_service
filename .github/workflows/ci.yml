@@ -1,0 +1,25 @@
+name: User-service pipeline
+
+on:
+  pull_request:
+    branches: ["develop/pipeline-BC-BJS2-77818"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 17
+
+      - name: Grant gradlew permissions
+        run: chmod +x gradlew
+
+      - name: Run Gradle Build
+        run: ./gradlew build

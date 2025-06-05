@@ -40,3 +40,4 @@ out/
 .idx/
 docker-compose.yaml
 javabc-db.session.sql
+src/main/resources/application-dev.yaml

@@ -1,6 +1,5 @@
 package school.faang.user_service.service.event;
 
-import com.amazonaws.services.s3.model.Owner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

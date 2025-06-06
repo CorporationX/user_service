@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   config:
     import: 'optional:consul:'
@@ -7,11 +10,11 @@ spring:
     consul:
       host: localhost
       port: 8500
+      discovery: user-service-i1
       config:
         enabled: true
         watch:
           enabled: true
-
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -55,31 +58,42 @@ spring:
           partitions: 1
           replication-factor: 3
 
-
-
-server:
-  port: 8080
-
 logging:
   level:
     root: info
 
-project-service:
-  host: localhost
-  port: 8082
+services:
+  project-service:
+    name: project-service
+  payment-service:
+    name: payment-service
+  post-service:
+    name: post-service
+  notification-service:
+    name: notification-service
 
-payment-service:
-  host: localhost
-  port: 9080
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
 
 management:
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: health,info,metrics,loggers,env,refresh
 
+  endpoint:
+    health:
+      show-details: always
   logging:
     level:
       org.springframework.cloud.consul: DEBUG
       org.springframework.cloud.bootstrap.config: DEBUG
+
+recommendation:
+  range-between-recommendation: 6
+
 

@@ -12,7 +12,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EducationMapperImpl;
 import school.faang.user_service.repository.adapter.EducationRepositoryAdapter;
-import school.faang.user_service.repository.user.UserRepositoryAdapter;
+import school.faang.user_service.service.user.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 public class EducationServiceTest {
 
     @Mock
-    private UserRepositoryAdapter userRepositoryAdapter;
+    private UserService userService;
 
     @Mock
     private EducationRepositoryAdapter educationRepositoryAdapter;
@@ -73,7 +73,7 @@ public class EducationServiceTest {
         expectedDto.setEducationLevel("Bachelor");
         expectedDto.setSpecialization("Computer Science");
 
-        when(userRepositoryAdapter.findById(userId)).thenReturn(user);
+        when(userService.getUserById(userId)).thenReturn(user);
         when(educationMapper.toEducation(educationDto)).thenReturn(educationBeforeSave);
         when(educationRepositoryAdapter.save(any(Education.class))).thenReturn(savedEducation);
         when(educationMapper.toEducationDto(savedEducation)).thenReturn(expectedDto);
@@ -81,7 +81,7 @@ public class EducationServiceTest {
         EducationDto actualDto = educationService.addEducation(userId, educationDto);
 
         assertEquals(expectedDto, actualDto);
-        verify(userRepositoryAdapter, times(1)).findById(userId);
+        verify(userService, times(1)).getUserById(userId);
         verify(educationMapper, times(1)).toEducation(educationDto);
         verify(educationRepositoryAdapter, times(1)).save(any(Education.class));
         verify(educationMapper, times(1)).toEducationDto(savedEducation);
@@ -97,12 +97,12 @@ public class EducationServiceTest {
         educationDto.setEducationLevel("Bachelor");
         educationDto.setSpecialization("Computer Science");
 
-        when(userRepositoryAdapter.findById(userId))
+        when(userService.getUserById(userId))
                 .thenThrow(new EntityNotFoundException("User not found with id:" + userId));
 
         assertThrows(EntityNotFoundException.class,
                 () -> educationService.addEducation(userId, educationDto));
-        verify(userRepositoryAdapter, times(1)).findById(userId);
+        verify(userService, times(1)).getUserById(userId);
         verify(educationMapper, never()).toEducation(any());
         verify(educationRepositoryAdapter, never()).save(any());
         verify(educationMapper, never()).toEducationDto(any());
@@ -212,9 +212,9 @@ public class EducationServiceTest {
                 .educationLevel("Bachelor")
                 .specialization("Computer Science")
                 .user(owner).build();
-
         when(educationRepositoryAdapter.getById(educationDto.getId()))
-                .thenThrow(new DataValidationException("Education not owned by user with id:" + userId));
+                .thenReturn(existingEducation);
+
 
         assertThrows(DataValidationException.class,
                 () -> educationService.updateEducation(userId, educationDto));

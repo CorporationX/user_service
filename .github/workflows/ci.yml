@@ -4,7 +4,6 @@ name: CI Pipeline
 on:
   pull_request:
     branches:
-      # - develop/pipline-BC-BJS2-77818
       ["develop/pipeline-77818"]
 
 jobs:
@@ -18,7 +17,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          # distribution: 'temurin'
+          distribution: 'corretto'
           java-version: 17
 
       - name: Run Gradle Test

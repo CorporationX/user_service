@@ -1,5 +1,5 @@
 
-name: CI Pipeline
+name: CI Pipeline User Service Triton Stream 10
 
 on:
   pull_request:
@@ -17,9 +17,9 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          # distribution: 'temurin'
           distribution: 'corretto'
           java-version: 17
 
       - name: Run Gradle Test
-        run: ./gradlew test --stacktrace
+        # run: ./gradlew test --stacktrace
+        run: ./gradlew build --stacktrace

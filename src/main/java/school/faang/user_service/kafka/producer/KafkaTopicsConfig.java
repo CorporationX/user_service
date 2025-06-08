@@ -50,4 +50,29 @@ public class KafkaTopicsConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic logsUserServiceTopic(
+            @Value("${spring.kafka.topics.logs-user-service.name}") String name,
+            @Value("${spring.kafka.topics.logs-user-service.partitions}") int partitions,
+            @Value("${spring.kafka.topics.logs-user-service.replication-factor}") short replicas
+    ) {
+        return TopicBuilder
+                .name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic logsUserServiceDlt(
+            @Value("${spring.kafka.topics.logs-user-service.dlt.name}") String name,
+            @Value("${spring.kafka.topics.logs-user-service.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.logs-user-service.dlt.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

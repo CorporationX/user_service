@@ -45,6 +45,8 @@ spring:
     consumer:
       bootstrap-servers: localhost:9092, localhost:9094
       group-id: analytics-created
+      max-poll-records: 50
+      offset-reset-config: latest
     topics:
       analytics-created:
         name: analytics-created-event-topic
@@ -54,13 +56,38 @@ spring:
           name: ${spring.kafka.topics.analytics-created.name}.DLT
           partitions: 1
           replication-factor: 3
-
+      analytics-profile-event-topic:
+        name: analytics-profile-event-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.analytics-profile-event-topic.name}.DLT
+          partitions: 1
+          replication-factor: 3
+      redis-retry-error-topic:
+        name: redis-retry-error-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.redis-retry-error-topic.name}.DLT
+          partitions: 1
+          replication-factor: 3
+      logs-user-service:
+        name: logs-user-service-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.logs-user-service.name}.DLT
+          partitions: 1
+          replication-factor: 3
 
 
 server:
   port: 8080
 
 logging:
+  file:
+    name: logs/user-service.log
   level:
     root: info
 
@@ -85,10 +112,16 @@ feign:
       payment_service:
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: "*"
 
   logging:
     level:
@@ -97,5 +130,3 @@ management:
 
 recommendation:
   range-between-recommendation: 6
-
-

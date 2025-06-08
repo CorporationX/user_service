@@ -118,8 +118,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh
-
+        include: "*"
   endpoint:
     health:
       show-details: always

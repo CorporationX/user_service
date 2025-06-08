@@ -36,12 +36,12 @@ dependencies {
     implementation ("io.github.openfeign:feign-micrometer:13.5")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-consul-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-consul-discovery")
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
     implementation("io.micrometer:context-propagation")
     implementation("io.zipkin.brave:brave-instrumentation-spring-web")
-    implementation("org.springframework.cloud:spring-cloud-starter-consul-discovery")
     implementation("org.springframework.kafka:spring-kafka")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 

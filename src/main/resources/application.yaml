@@ -123,6 +123,8 @@ management:
     health:
       show-details: always
   logging:
+    file:
+      name: logs/user-service.log
     level:
       org.springframework.cloud.consul: DEBUG
       org.springframework.cloud.bootstrap.config: DEBUG

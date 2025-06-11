@@ -32,7 +32,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//@Data
 @Getter
 @Setter
 @EqualsAndHashCode(of = {"email"})

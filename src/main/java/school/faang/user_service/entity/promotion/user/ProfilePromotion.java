@@ -14,7 +14,6 @@ import school.faang.user_service.entity.User;
 @Getter
 @Setter
 @DiscriminatorValue("PROFILE_PROMOTION")
-
 @PrimaryKeyJoinColumn(name = "id")
 public class ProfilePromotion extends PromotionBase {
 

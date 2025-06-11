@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserViewDto;
 import school.faang.user_service.dto.user.UsersFilterDto;
@@ -42,10 +43,10 @@ public class UserService {
                 ));
     }
 
-    public List<UserViewDto> getAllUsers(@NotNull(message = "User filter dto cannot be null")
-                                         UsersFilterDto usersFilterDto,
-                                         @NotNull(message = "User id cannot be null")
-                                         Long userId) {
+    public Slice<UserViewDto> getAllUsers(@NotNull(message = "User filter dto cannot be null")
+                                          UsersFilterDto usersFilterDto,
+                                          @NotNull(message = "User id cannot be null")
+                                          Long userId) {
         Map<Plan, Integer> planIntegerMap = viewCalculator.calculatePromotedViews(usersFilterDto.getSize());
         Slice<User> userVipPromotion = userRepository.findAllActivePromotionByPlan(Plan.VIP,
                 PageRequest.of(usersFilterDto.getPage(), planIntegerMap.get(Plan.VIP)));
@@ -67,7 +68,20 @@ public class UserService {
         sendPromotedUsersAnalytics(promotedUsers, userId);
         sendAllUsersAnalytics(allUsers, userId);
 
-        return userMapper.toUserViewDtos(allUsers);
+        return mergeSlices(PageRequest.of(usersFilterDto.getPage(), usersFilterDto.getSize()),
+                List.of(userVipPromotion, usersGoldPromotion, usersPlusPromotion, usersNoPromotion));
+    }
+
+    private Slice<UserViewDto> mergeSlices(PageRequest pageRequest, List<Slice<User>> slices) {
+        List<UserViewDto> mergedUsers = new ArrayList<>();
+        boolean hasNext = false;
+        for (Slice<User> slice : slices) {
+            mergedUsers.addAll(userMapper.toUserViewDtos(slice.getContent()));
+            if (slice.hasNext()) {
+                hasNext = true;
+            }
+        }
+        return new SliceImpl<>(mergedUsers, pageRequest, hasNext);
     }
 
     private void sendAllUsersAnalytics(List<User> allUsers, @NotNull(message = "User id cannot be null") Long userId) {

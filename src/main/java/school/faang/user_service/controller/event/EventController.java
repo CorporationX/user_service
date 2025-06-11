@@ -50,7 +50,6 @@ public class EventController {
                                             @Min(value = 4) @Max(value = 10)
                                             Integer size,
                                             @PathVariable(name = "id") Long id) {
-        log.info("getEventsByFilter called");
         eventControllerUtils.isValidDateRange(filter);
         return eventService.getEventsByFilter(filter, PageRequest.of(page, size), id);
     }

@@ -109,8 +109,12 @@ management:
 
   logging:
     level:
-      org.springframework.cloud.consul: DEBUG
-      org.springframework.cloud.bootstrap.config: DEBUG
+      org:
+        springframework:
+          cloud:
+            consul: DEBUG
+            bootstrap:
+              config: DEBUG
 
 recommendation:
   range-between-recommendation: 6

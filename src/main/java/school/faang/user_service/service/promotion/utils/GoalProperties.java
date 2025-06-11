@@ -1,4 +1,4 @@
-package school.faang.user_service.configuration.goals.properties;
+package school.faang.user_service.service.promotion.utils;
 
 import lombok.Getter;
 import lombok.Setter;

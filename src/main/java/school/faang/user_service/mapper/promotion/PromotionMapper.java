@@ -8,9 +8,7 @@ import school.faang.user_service.entity.promotion.PromotionPlan;
 import school.faang.user_service.entity.promotion.event.EventPromotion;
 import school.faang.user_service.entity.promotion.user.ProfilePromotion;
 
-@Mapper(
-        componentModel = "spring"
-)
+@Mapper(componentModel = "spring")
 public interface PromotionMapper {
 
     @Mapping(target = "price", source = "plan.price")

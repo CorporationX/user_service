@@ -35,9 +35,6 @@ public class PromotionDto {
 
     @AssertTrue
     public boolean isValid() {
-        if (promotionType == PromotionType.EVENT && eventId == null) {
-            return false;
-        }
-        return true;
+        return promotionType == PromotionType.EVENT && eventId == null;
     }
 }

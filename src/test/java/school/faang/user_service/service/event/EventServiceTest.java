@@ -50,6 +50,7 @@ class EventServiceTest {
             saved.setId(1L);
             return saved;
         });
+        when(eventMapper.toDto(any(Event.class))).thenReturn(dto);
 
         EventDto result = eventService.create(dto);
 

@@ -1,5 +1,7 @@
 package school.faang.user_service.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.enums.Plan;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -58,4 +61,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
              )
             """)
     Slice<User> findAllWithoutPromotion(Pageable pageable);
+
+    Page<User> findByIdIn(Collection<Long> ids, Pageable pageable);
 }

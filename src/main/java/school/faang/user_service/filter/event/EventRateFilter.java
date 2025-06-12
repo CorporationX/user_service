@@ -5,7 +5,6 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.Rating;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Component
@@ -20,9 +19,9 @@ public class EventRateFilter implements EventFilter {
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventFilterDto) {
         return checkEventsHaveRatings(events).filter(event -> event.getRatings().stream()
-                        .mapToLong(Rating::getRate)
-                        .average()
-                        .orElse(DEFAULT_RATE) >= eventFilterDto.getAverageRate());
+                .mapToLong(Rating::getRate)
+                .average()
+                .orElse(DEFAULT_RATE) >= eventFilterDto.getAverageRate());
     }
 
     private Stream<Event> checkEventsHaveRatings(Stream<Event> events) {

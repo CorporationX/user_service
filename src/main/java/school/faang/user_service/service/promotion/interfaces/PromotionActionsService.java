@@ -8,6 +8,8 @@ import school.faang.user_service.entity.promotion.PromotionPlan;
 
 public interface PromotionActionsService {
     Product create(PromotionDto promotionDto, User client, PromotionPlan plan);
+
     void getItemPaid(Product product, User client);
+
     PromotionType getType();
 }

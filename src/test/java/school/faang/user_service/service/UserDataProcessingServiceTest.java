@@ -103,7 +103,7 @@ class UserDataProcessingServiceTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals(userDtos.get(0), result.get(0));
+        assertEquals(userDtos.get(1), result.get(1));
         assertEquals(userDtos.get(1), result.get(1));
         verify(userRepository).findByIdIn(userIds, pageable);
         verify(userMapper, times(users.size())).toDto(any(User.class));

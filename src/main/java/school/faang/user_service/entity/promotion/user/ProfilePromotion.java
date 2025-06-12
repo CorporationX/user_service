@@ -1,10 +1,13 @@
 package school.faang.user_service.entity.promotion.user;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import school.faang.user_service.entity.promotion.PromotionBase;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.promotion.PromotionBase;
 
 @Entity
 @Table(name = "profile_promotion")

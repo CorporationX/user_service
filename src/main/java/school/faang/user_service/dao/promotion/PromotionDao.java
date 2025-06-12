@@ -7,5 +7,6 @@ import java.util.Map;
 
 public interface PromotionDao {
     List<Long> batchUpdatePromotions(Map<Long, Long> idsScoresMap);
+
     AnalyticsEventType getEventType();
 }

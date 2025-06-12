@@ -2,7 +2,6 @@ package school.faang.user_service.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -34,16 +33,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByUsernameLike(String username);
 
     @Query("""
-    SELECT u 
-      FROM User u
-      JOIN ProfilePromotion pp ON pp.profile = u
-      JOIN FETCH u.country
-      LEFT JOIN FETCH u.contactPreference
-      LEFT JOIN FETCH u.premium
-      LEFT JOIN FETCH u.workSchedule
-     WHERE pp.active = true
-       AND pp.plan   = :plan
-    """)
+            SELECT u 
+              FROM User u
+              JOIN ProfilePromotion pp ON pp.profile = u
+              JOIN FETCH u.country
+              LEFT JOIN FETCH u.contactPreference
+              LEFT JOIN FETCH u.premium
+              LEFT JOIN FETCH u.workSchedule
+             WHERE pp.active = true
+               AND pp.plan   = :plan
+            """)
     Slice<User> findAllActivePromotionByPlan(@Param("plan") Plan plan, Pageable pageable);
 
     @Query("""

@@ -19,8 +19,8 @@ public class EvenTypeFilter implements EventFilter {
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventFilterDto) {
         return events.filter(event ->
                 Optional.ofNullable((event.getType()))
-                                .map(type ->
-                                        type.getMessage().equalsIgnoreCase(eventFilterDto.getEventType()))
+                        .map(type ->
+                                type.getMessage().equalsIgnoreCase(eventFilterDto.getEventType()))
                         .orElse(false));
     }
 }

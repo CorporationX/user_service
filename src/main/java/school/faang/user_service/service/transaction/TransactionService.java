@@ -4,11 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.transaction.TransactionResultDto;
 import school.faang.user_service.dto.transaction.UpdateTransactionDto;
-import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.Payable;
+import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.TransactionStatus;
 import school.faang.user_service.mapper.TransactionMapper;
 import school.faang.user_service.repository.TransactionRepository;
@@ -33,12 +31,12 @@ public class TransactionService {
     }
 
     public Transaction buyItem(Long userId, Payable item) {
-            return updateTransaction(
-                    transactionMapper.toUpdateTransactionDto(
-                            paymentService.buyItem(
-                                    transactionMapper.toPaymentRequestDto(
-                                            createTransaction(userId, item)))
-                    ));
+        return updateTransaction(
+                transactionMapper.toUpdateTransactionDto(
+                        paymentService.buyItem(
+                                transactionMapper.toPaymentRequestDto(
+                                        createTransaction(userId, item)))
+                ));
     }
 
     private Transaction updateTransaction(UpdateTransactionDto updateTransaction) {

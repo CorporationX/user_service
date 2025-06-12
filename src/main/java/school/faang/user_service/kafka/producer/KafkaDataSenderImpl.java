@@ -16,7 +16,7 @@ public class KafkaDataSenderImpl implements DataSender {
 
     @Override
     public void send(String topic, AnalyticsEvent analyticsEvent) {
-        kafkaTemplate.send(topic , analyticsEvent)
+        kafkaTemplate.send(topic, analyticsEvent)
                 .whenComplete((record, ex) -> {
                     if (ex == null) {
                         log.info("Sent analytics event with id {}, topic {}, partition = {}, offset ={}",

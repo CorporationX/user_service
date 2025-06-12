@@ -23,7 +23,7 @@ public class EventServiceUtils {
     private final List<EventFilter> eventFilters;
 
     public void checkOwnerHasRelatedSkills(EventDto eventDto) {
-       Optional.of(
+        Optional.of(
                         skillService.findAllByUserId(eventDto.getOwnerId()).stream()
                                 .map(Skill::getId)
                                 .collect(toSet())

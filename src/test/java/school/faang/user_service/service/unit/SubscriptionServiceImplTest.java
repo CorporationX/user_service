@@ -52,8 +52,8 @@ class SubscriptionServiceImplTest {
         user1 = User.builder().id(1L).username("user1").experience(10).phone("123").build();
         user2 = User.builder().id(2L).username("user2").experience(5).phone("456").build();
 
-        dto1 = new UserDto(1L, "user1", "user1@gmail.com");
-        dto2 = new UserDto(2L, "user2", "user2@gmail.com");
+        dto1 = new UserDto(1L, "user1", "user1@gmail.com", null);
+        dto2 = new UserDto(2L, "user2", "user2@gmail.com", null);
 
         subscriptionService = new SubscriptionServiceImpl(subscriptionRepository, List.of(mockFilter, secondMockFilter), userMapper);
     }

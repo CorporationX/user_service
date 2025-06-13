@@ -52,8 +52,8 @@ class EventParticipationServiceImplTest {
         );
 
         expectedDtoList = List.of(
-                new UserDto(1L, "user1", "user1@example.com"),
-                new UserDto(2L, "user2", "user2@example.com")
+                new UserDto(1L, "user1", "user1@example.com", null),
+                new UserDto(2L, "user2", "user2@example.com", null)
         );
     }
 

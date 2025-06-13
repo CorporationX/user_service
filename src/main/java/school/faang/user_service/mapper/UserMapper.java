@@ -12,7 +12,7 @@ import school.faang.user_service.entity.User;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
-    @Mapping(target = "contactPreference", expression= "java(user.getContactPreference().getPreference().toString())")
+    @Mapping(target = "preference", expression= "java(user.getContactPreference().getPreference().toString())")
     UserDto toUserDto(User user);
 
     @Mapping(target = "username", expression = "java(dto.getFirstName() + \" \" + dto.getLastName())")

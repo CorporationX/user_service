@@ -10,6 +10,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -52,8 +54,8 @@ class EventParticipationServiceImplTest {
         );
 
         expectedDtoList = List.of(
-                new UserDto(1L, "user1", "user1@example.com", null),
-                new UserDto(2L, "user2", "user2@example.com", null)
+                new UserDto(1L, "user1", "user1@example.com", "TELEGRAM"),
+                new UserDto(2L, "user2", "user2@example.com", "TELEGRAM")
         );
     }
 
@@ -149,6 +151,7 @@ class EventParticipationServiceImplTest {
                 .username(username)
                 .email(email)
                 .password("password")
+                .contactPreference(ContactPreference.builder().preference(PreferredContact.TELEGRAM).build())
                 .active(true)
                 .build();
     }

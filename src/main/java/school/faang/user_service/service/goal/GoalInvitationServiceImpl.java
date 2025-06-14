@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.configuration.goals.properties.GoalProperties;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.dto.goal.SortOption;
@@ -18,7 +17,9 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.repository.goal.GoalRepositoryAdapter;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
+import school.faang.user_service.service.promotion.utils.GoalProperties;
 
 import java.util.Comparator;
 import java.util.List;

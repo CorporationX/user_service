@@ -3,7 +3,6 @@ package school.faang.user_service.repository.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.NotFoundException;
 
@@ -16,6 +15,6 @@ public class EventRepositoryAdapter {
     public Event findById(long id) {
         log.debug("Execution of the method Event findById, parameters: id = {}", id);
         return eventRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("User with id - %d not found", id)));
+                new NotFoundException(String.format("Event with id - %d not found", id)));
     }
 }

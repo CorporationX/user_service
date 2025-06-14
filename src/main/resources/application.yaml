@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   config:
     import: 'optional:consul:'
@@ -12,7 +15,6 @@ spring:
         enabled: true
         watch:
           enabled: true
-
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -82,10 +84,6 @@ spring:
           partitions: 1
           replication-factor: 3
 
-
-server:
-  port: 8080
-
 logging:
   level:
     root: info
@@ -99,6 +97,13 @@ services:
     name: post-service
   notification-service:
     name: notification-service
+  s3:
+    enabled: true
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    max-file-size: 5242880
 
 feign:
   client:

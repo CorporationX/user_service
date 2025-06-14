@@ -2,7 +2,6 @@ package school.faang.user_service.service.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -20,7 +19,7 @@ public class PremiumServiceUtils {
     public void checkUserHasNoPremium(Long userId) {
         User user = userService.getUserById(userId);
         if (user.getPremium() != null
-        && LocalDateTime.now().isBefore(user.getPremium().getEndDate())) {
+                && LocalDateTime.now().isBefore(user.getPremium().getEndDate())) {
             throw new RuntimeException("User with id " + userId + " has premium");
         }
     }

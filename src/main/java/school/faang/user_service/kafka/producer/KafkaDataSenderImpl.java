@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.AnalyticsCreatedEvent;
+import school.faang.user_service.kafka.events.AnalyticsEvent;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -13,18 +15,33 @@ public class KafkaDataSenderImpl implements DataSender {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public void send(String topic, String key, AnalyticsCreatedEvent analyticsCreatedEvent) {
-        kafkaTemplate.send(topic, key, analyticsCreatedEvent)
+    public void send(String topic, AnalyticsEvent analyticsEvent) {
+        kafkaTemplate.send(topic, analyticsEvent)
                 .whenComplete((record, ex) -> {
                     if (ex == null) {
-                        log.info("Sent analytics event with id {}, key {},  topic {}, partition = {}, offset ={}",
-                                analyticsCreatedEvent.getId(),
-                                key,
+                        log.info("Sent analytics event with id {}, topic {}, partition = {}, offset ={}",
+                                analyticsEvent.getId(),
                                 topic,
                                 record.getRecordMetadata().partition(),
                                 record.getRecordMetadata().offset());
                     } else {
-                        log.warn("Analytics event with id {} has not been sent", analyticsCreatedEvent.getId(), ex);
+                        log.warn("Analytics event with id {} has not been sent", analyticsEvent.getId(), ex);
+                    }
+                });
+    }
+
+    @Override
+    public void send(String topic, List<Long> ids) {
+        kafkaTemplate.send(topic, ids)
+                .whenComplete((record, ex) -> {
+                    if (ex == null) {
+                        log.info("Sent ids with topic {}, partition = {}, offset ={}, size ={}",
+                                topic,
+                                record.getRecordMetadata().partition(),
+                                record.getRecordMetadata().offset(),
+                                ids.size());
+                    } else {
+                        log.warn("RecordIds list with size {} has not been sent", ids.size(), ex);
                     }
                 });
     }

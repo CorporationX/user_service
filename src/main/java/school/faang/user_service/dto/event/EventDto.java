@@ -13,13 +13,17 @@ public class EventDto {
     private String title;
     @Required
     private LocalDateTime startDate;
+    @Required
     private LocalDateTime endDate;
     @Required
     private Long ownerId;
+    @Required
     private String description;
     @Required
     private List<Long> relatedSkillsIds;
+    @Required
     private String location;
     private Integer maxAttendees;
-    private String eventType;
+    @Required
+    private String type;
 }

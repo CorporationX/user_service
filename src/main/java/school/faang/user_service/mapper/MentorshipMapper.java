@@ -10,5 +10,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface MentorshipMapper {
     List<MenteeDto> menteesToMenteesDtos(List<User> users);
+
     List<MentorDto> mentorsToMentorsDtos(List<User> users);
 }

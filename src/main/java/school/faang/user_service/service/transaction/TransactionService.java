@@ -4,11 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.transaction.TransactionResultDto;
 import school.faang.user_service.dto.transaction.UpdateTransactionDto;
-import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.Payable;
+import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.TransactionStatus;
 import school.faang.user_service.mapper.TransactionMapper;
 import school.faang.user_service.repository.TransactionRepository;
@@ -25,7 +23,6 @@ public class TransactionService {
     private final TransactionServiceUtils transactionServiceUtils;
     private final PaymentService paymentService;
     private final TransactionMapper transactionMapper;
-    private final UserContext userContext;
 
     private Transaction createTransaction(Long userId, Payable item) {
         Transaction transaction = transactionServiceUtils.buildTransaction(userId, item);
@@ -33,16 +30,16 @@ public class TransactionService {
         return transaction;
     }
 
-    public TransactionResultDto buyItem(Long userId, Payable item) {
-            return updateTransaction(
-                    transactionMapper.toUpdateTransactionDto(
-                            paymentService.buyItem(
-                                    transactionMapper.toPaymentRequestDto(
-                                            createTransaction(userId, item)))
-                    ));
+    public Transaction buyItem(Long userId, Payable item) {
+        return updateTransaction(
+                transactionMapper.toUpdateTransactionDto(
+                        paymentService.buyItem(
+                                transactionMapper.toPaymentRequestDto(
+                                        createTransaction(userId, item)))
+                ));
     }
 
-    private TransactionResultDto updateTransaction(UpdateTransactionDto updateTransaction) {
+    private Transaction updateTransaction(UpdateTransactionDto updateTransaction) {
         Long transactionNumber = updateTransaction.getPaymentNumber();
         Transaction transaction = transactionRepository.findTransactionByTransactionNumber(transactionNumber)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -55,9 +52,6 @@ public class TransactionService {
             log.info("Transaction {} get status Failed successfully", transactionNumber);
         }
         transactionMapper.updateTransactionFromDto(updateTransaction, transaction);
-        TransactionResultDto transactionResultDto = transactionMapper.toDto(transaction);
-        transactionResultDto.setCurrency(transaction.getCurrencyCode());
-        return transactionResultDto;
+        return transaction;
     }
-
 }

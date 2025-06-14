@@ -20,6 +20,7 @@
         </encoder>
     </appender>
 
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG"/>
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE"/>

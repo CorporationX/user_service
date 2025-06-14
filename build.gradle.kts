@@ -76,6 +76,7 @@ dependencies {
     annotationProcessor("com.querydsl:querydsl-apt:$querydslVersion:jakarta")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    implementation("net.coobird:thumbnailator:0.4.14")
 
     /**
      * Test containers

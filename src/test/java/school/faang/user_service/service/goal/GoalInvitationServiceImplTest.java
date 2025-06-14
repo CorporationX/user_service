@@ -11,7 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import school.faang.user_service.configuration.goals.properties.GoalProperties;
+import school.faang.user_service.service.promotion.utils.GoalProperties;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.dto.goal.SortOption;
@@ -22,6 +22,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.goal.QGoalInvitation;
 import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.repository.goal.GoalRepositoryAdapter;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
 
 import java.time.LocalDateTime;

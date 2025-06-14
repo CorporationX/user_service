@@ -15,13 +15,13 @@ public class EventStatusFilter implements EventFilter {
         return eventFilterDto.getStatus() != null;
     }
 
-        @Override
+    @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventFilterDto) {
-            return events.filter(event ->
-                    Optional.ofNullable(event.getStatus())
-                            .map(status ->
-                                    status.getMessage().equalsIgnoreCase(eventFilterDto.getStatus()))
-                            .orElse(false)
-            );
-        }
+        return events.filter(event ->
+                Optional.ofNullable(event.getStatus())
+                        .map(status ->
+                                status.getMessage().equalsIgnoreCase(eventFilterDto.getStatus()))
+                        .orElse(false)
+        );
+    }
 }

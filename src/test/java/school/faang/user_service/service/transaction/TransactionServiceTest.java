@@ -63,25 +63,21 @@ class TransactionServiceTest {
         updateTransactionDto.setPaymentNumber(transactionNumber);
         updateTransactionDto.setTransactionStatus("SUCCESS");
 
-        TransactionResultDto expectedResultDto = new TransactionResultDto();
-
         when(transactionServiceUtils.buildTransaction(userId, mockItem)).thenReturn(transaction);
         when(transactionRepository.save(transaction)).thenReturn(transaction);
 
         when(transactionMapper.toPaymentRequestDto(transaction)).thenReturn(paymentRequestDto);
         when(transactionMapper.toUpdateTransactionDto(paymentResponseDto)).thenReturn(updateTransactionDto);
-        when(transactionMapper.toDto(transaction)).thenReturn(expectedResultDto);
 
         when(paymentService.buyItem(paymentRequestDto)).thenReturn(paymentResponseDto);
 
         when(transactionRepository.findTransactionByTransactionNumber(transactionNumber))
                 .thenReturn(Optional.of(transaction));
 
-        TransactionResultDto actualResultDto = transactionService.buyItem(userId, mockItem);
+        Transaction transactionResult = transactionService.buyItem(userId, mockItem);
 
-        assertNotNull(actualResultDto, "Результат не должен быть null");
-        assertSame(expectedResultDto, actualResultDto, "Возвращенный DTO должен быть тем же объектом, что и настроенный в стабе маппера.");
-        assertEquals(currencyCode, actualResultDto.getCurrency(), "Код валюты должен быть установлен в финальном DTO.");
+        assertNotNull(transactionResult, "Результат не должен быть null");
+        assertEquals(currencyCode, transactionResult.getCurrencyCode(), "Код валюты должен быть установлен в финальном DTO.");
 
         verify(transactionServiceUtils).buildTransaction(userId, mockItem);
         verify(transactionRepository).save(transaction);
@@ -93,7 +89,5 @@ class TransactionServiceTest {
         assertEquals(TransactionStatus.SETTLED, transaction.getTransactionStatus(), "Статус транзакции должен быть SETTLED.");
 
         verify(transactionMapper).updateTransactionFromDto(updateTransactionDto, transaction);
-
-        verify(transactionMapper).toDto(transaction);
     }
 }

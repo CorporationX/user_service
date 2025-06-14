@@ -29,6 +29,12 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
+    @Value("${spring.kafka.consumer.max-poll-records}")
+    private int maxPollRecords;
+
+    @Value("${spring.kafka.consumer.offset-reset-config}")
+    private String offsetResetConfig;
+
     @Bean
     ConsumerFactory<String, Object> consumerFactory() {
         Map<String, Object> properties = new HashMap<>();
@@ -40,7 +46,8 @@ public class KafkaConsumerConfig {
         properties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         properties.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, true);
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetResetConfig);
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
 
         return new DefaultKafkaConsumerFactory<>(properties);
     }
@@ -55,7 +62,8 @@ public class KafkaConsumerConfig {
 
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.TIME);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
+        factory.setBatchListener(true);
         factory.setCommonErrorHandler(errorHandler);
 
         return factory;

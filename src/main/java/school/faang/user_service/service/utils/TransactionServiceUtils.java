@@ -2,8 +2,8 @@ package school.faang.user_service.service.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.Payable;
+import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.TransactionStatus;
 import school.faang.user_service.service.user.UserService;
 

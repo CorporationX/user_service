@@ -4,10 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.transaction.TransactionResultDto;
 import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.entity.transaction.Transaction;
 import school.faang.user_service.entity.transaction.TransactionStatus;
+import school.faang.user_service.mapper.TransactionMapper;
+import school.faang.user_service.mapper.TransactionMapperImpl;
 import school.faang.user_service.service.transaction.TransactionService;
 import school.faang.user_service.service.utils.PremiumServiceUtils;
 
@@ -26,16 +30,19 @@ class PremiumServiceTest {
     @Mock
     private PremiumServiceUtils premiumServiceUtils;
 
+    @Spy
+    private TransactionMapperImpl transactionMapper;
+
     @Test
     void shouldBuyPremiumSuccessfully() {
         Long userId = 1L;
         Integer premiumDuration = 30;
-        TransactionResultDto resultDto = new TransactionResultDto();
-        resultDto.setStatus(TransactionStatus.SETTLED);
+        Transaction transaction = new Transaction();
+        transaction.setTransactionStatus(TransactionStatus.SETTLED);
 
         doNothing().when(premiumServiceUtils).checkUserHasNoPremium(userId);
         doNothing().when(premiumServiceUtils).assignPremiumToUser(userId, premiumDuration);
-        when(transactionService.buyItem(userId, PremiumPeriod.MONTHLY)).thenReturn(resultDto);
+        when(transactionService.buyItem(userId, PremiumPeriod.MONTHLY)).thenReturn(transaction);
 
         TransactionResultDto actual = premiumService.buyPremium(userId, premiumDuration);
 
@@ -46,11 +53,11 @@ class PremiumServiceTest {
     void shouldNotAssignPremiumWhenTransactionFailed() {
         Long userId = 1L;
         Integer premiumDuration = 30;
-        TransactionResultDto resultDto = new TransactionResultDto();
-        resultDto.setStatus(TransactionStatus.FAILED);
+        Transaction transaction = new Transaction();
+        transaction.setTransactionStatus(TransactionStatus.FAILED);
 
         doNothing().when(premiumServiceUtils).checkUserHasNoPremium(userId);
-        when(transactionService.buyItem(userId, PremiumPeriod.MONTHLY)).thenReturn(resultDto);
+        when(transactionService.buyItem(userId, PremiumPeriod.MONTHLY)).thenReturn(transaction);
 
         TransactionResultDto actual = premiumService.buyPremium(userId, premiumDuration);
 

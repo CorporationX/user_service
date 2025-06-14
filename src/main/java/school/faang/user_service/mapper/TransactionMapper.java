@@ -25,4 +25,8 @@ public interface TransactionMapper {
 
     @Mapping(target = "status", source = "transactionStatus")
     TransactionResultDto toDto(Transaction transaction);
+
+    @Mapping(target = "status", source = "transactionStatus")
+    @Mapping(target = "currency", source = "currencyCode")
+    TransactionResultDto toTransactionResultDto(Transaction transaction);
 }

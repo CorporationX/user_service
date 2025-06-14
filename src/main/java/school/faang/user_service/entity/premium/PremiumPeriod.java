@@ -24,9 +24,9 @@ public enum PremiumPeriod implements Payable {
     private final TransactionPurpose purpose = TransactionPurpose.PREMIUM;
 
     public static PremiumPeriod fromDays(Integer days) {
-      return Arrays.stream(values())
-              .filter(period -> Objects.equals(period.getDays(), days))
-              .findFirst()
-              .orElseThrow(() -> new IllegalArgumentException("No such premium period for " + days + " days"));
+        return Arrays.stream(values())
+                .filter(period -> Objects.equals(period.getDays(), days))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No such premium period for " + days + " days"));
     }
 }

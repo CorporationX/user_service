@@ -3,6 +3,7 @@ package school.faang.user_service.kafka.producer;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +43,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, String> recommendationRequestProducerFactory() {
+    public ProducerFactory<String, String> producerFactoryStringSerializer() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         return new DefaultKafkaProducerFactory<>(
@@ -65,6 +66,13 @@ public class KafkaProducerConfig {
     @Bean(name = "mainKafkaTemplate")
     @Primary
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public KafkaTemplate<String, String> kafkaTemplateString(
+            @Qualifier("producerFactoryStringSerializer")
+            ProducerFactory<String, String> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

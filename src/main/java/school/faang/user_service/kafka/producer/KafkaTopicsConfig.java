@@ -124,4 +124,16 @@ public class KafkaTopicsConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic requestRecommendationTopic(
+            @Value("${spring.kafka.topics.recommendation-request.name}") String name,
+            @Value("${spring.kafka.topics.recommendation-request.partitions}") short partitions,
+            @Value("${spring.kafka.topics.recommendation-request.replication-factor}") short replicas) {
+        return TopicBuilder
+                .name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

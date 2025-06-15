@@ -8,12 +8,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserViewDto;
 import school.faang.user_service.dto.user.UsersFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.promotion.enums.Plan;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
+import school.faang.user_service.kafka.events.AnalyticsEventType;
+import school.faang.user_service.kafka.events.ProfileViewEvent;
 import school.faang.user_service.kafka.producer.DataSender;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
 import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.analytics.AnalyticsEventMapper;
@@ -30,17 +34,26 @@ import java.util.Map;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserContext userContext;
 
     private final DataSender dataSender;
     private final KafkaTopics kafkaTopics;
     private final AnalyticsEventMapper analyticsEventMapper;
     private final ProfilePromotionsViewCalculator viewCalculator;
+    private final KafkaDataSenderImpl kafkaDataSender;
 
     public User getUserById(Long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("User with id %d not found!", id)
-                ));
+                        String.format("User with id %d not found!", id)));
+
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent();
+        profileViewEvent.setViewedUserId(user.getId());
+        profileViewEvent.setViewerUserId(userContext.getUserId());
+        profileViewEvent.setEventType(AnalyticsEventType.PROFILE_VIEW.toString());
+        kafkaDataSender.send(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
+
+        return user;
     }
 
     public Slice<UserViewDto> getAllUsers(@NotNull(message = "User filter dto cannot be null")

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.kafka.Event;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
 
 import java.util.List;
@@ -13,6 +14,24 @@ import java.util.List;
 @Slf4j
 public class KafkaDataSenderImpl implements DataSender {
     private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Override
+    public void send(String topic, Event event) {
+        kafkaTemplate.send(topic, event)
+                .whenComplete((record, ex) -> {
+                    if (ex == null) {
+                        log.info("Successfully sent '{}' with id {}, topic {}, partition = {}, offset ={}",
+                                event.getClass().getSimpleName(),
+                                event.getId(),
+                                topic,
+                                record.getRecordMetadata().partition(),
+                                record.getRecordMetadata().offset());
+                    } else {
+                        log.warn("{} with id {} has not been sent",
+                                event.getClass().getSimpleName(), event.getId(), ex);
+                    }
+                });
+    }
 
     @Override
     public void send(String topic, AnalyticsEvent analyticsEvent) {

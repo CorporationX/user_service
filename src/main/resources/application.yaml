@@ -72,6 +72,14 @@ spring:
           name: ${spring.kafka.topics.redis-retry-error-topic.name}.DLT
           partitions: 1
           replication-factor: 3
+      profile-view-event-topic:
+        name: profile-view-event-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.profile-view-event-topic.name}.DLT
+          partitions: 1
+          replication-factor: 3
 
 
 server:

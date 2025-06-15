@@ -34,17 +34,32 @@ public class KafkaProducerConfig {
     @Primary
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> properties = new HashMap<>();
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        properties.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
+        return new DefaultKafkaProducerFactory<>(
+                getProducerFactory(properties)
+        );
+    }
+
+    @Bean
+    public ProducerFactory<String, String> recommendationRequestProducerFactory() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        return new DefaultKafkaProducerFactory<>(
+                getProducerFactory(properties)
+        );
+    }
+
+    private Map<String, Object> getProducerFactory(Map<String, Object> base) {
+        Map<String, Object> properties = new HashMap<>(base);
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        properties.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
         properties.put(ProducerConfig.ACKS_CONFIG, acks);
         properties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         properties.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
         properties.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
-
-        return new DefaultKafkaProducerFactory<>(properties);
+        return properties;
     }
 
     @Bean(name = "mainKafkaTemplate")

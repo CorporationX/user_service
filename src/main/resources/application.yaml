@@ -80,6 +80,14 @@ spring:
           name: ${spring.kafka.topics.profile-view-event-topic.name}.DLT
           partitions: 1
           replication-factor: 3
+      logs-user-service:
+        name: logs-user-service-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.logs-user-service.name}.DLT
+          partitions: 1
+          replication-factor: 3
 
 
 server:
@@ -113,21 +121,29 @@ feign:
       default:
         connectTimeout: 5000
         readTimeout: 10000
+      payment_service:
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: false
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers,env,refresh
-
+        include: "*"
   endpoint:
     health:
       show-details: always
   logging:
+    file:
+      name: logs/user-service.log
     level:
       org.springframework.cloud.consul: DEBUG
       org.springframework.cloud.bootstrap.config: DEBUG
 
 recommendation:
   range-between-recommendation: 6
-

@@ -124,4 +124,28 @@ public class KafkaTopicsConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic followerEventTopic(
+            @Value("${spring.kafka.topics.follower-events.name}") String name,
+            @Value("${spring.kafka.topics.follower-events.partitions}") int partitions,
+            @Value("${spring.kafka.topics.follower-events.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic followerEventDlt(
+            @Value("${spring.kafka.topics.follower-events.dlt.name}") String name,
+            @Value("${spring.kafka.topics.follower-events.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.follower-events.dlt.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

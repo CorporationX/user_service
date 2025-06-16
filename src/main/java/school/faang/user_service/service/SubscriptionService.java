@@ -9,9 +9,14 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFollowersFilter;
+import school.faang.user_service.kafka.events.FollowerEvent;
+import school.faang.user_service.kafka.events.publisher.FollowerEventPublisher;
+import school.faang.user_service.kafka.producer.DataSender;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -22,6 +27,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFollowersFilter> followersFilter;
     private final UserMapper userMapper;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Transactional
     public void followUser(Long followerId, Long followeeId) {
@@ -31,6 +37,17 @@ public class SubscriptionService {
         }
         subscriptionRepository.followUser(followerId, followeeId);
         log.info("User {} successfully followed user {}", followerId, followeeId);
+
+        FollowerEvent event = new FollowerEvent (
+          followerId.toString(),
+          FollowerEvent.TargetType.USER,
+          followeeId.toString()
+        );
+        followerEventPublisher.publish(event);
+    }
+
+    public void followProject(Long followerId, Long projectId) {
+
     }
 
     @Transactional

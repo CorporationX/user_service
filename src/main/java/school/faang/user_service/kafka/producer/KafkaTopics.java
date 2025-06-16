@@ -18,4 +18,10 @@ public class KafkaTopics {
 
     @Value("${spring.kafka.topics.redis-retry-error-topic.name}")
     private String redisRetryErrorTopic;
+
+    @Value("${spring.kafka.topics.follower-events.name}")
+    private String followerEventsTopic;
+
+    @Value("${spring.kafka.topics.follower-events.dlt.name}")
+    private String followerEventsDltTopic;
 }

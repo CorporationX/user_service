@@ -83,6 +83,14 @@ spring:
           name: ${spring.kafka.topics.logs-user-service.name}.DLT
           partitions: 1
           replication-factor: 3
+      follower-events:
+        name: follower_events
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.follower-events.name}.DLT
+          partitions: 1
+          replication-factor: 3
 
 logging:
   level:

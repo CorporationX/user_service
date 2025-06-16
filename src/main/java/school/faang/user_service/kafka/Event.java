@@ -10,7 +10,6 @@ public abstract class Event {
     private final UUID id = UUID.randomUUID();
     private final LocalDateTime occurredAt = LocalDateTime.now();
     private final String source = "user-service";
-    private String traceId;
     private String eventType;
     private Long authorId;
     private Long receiverId;

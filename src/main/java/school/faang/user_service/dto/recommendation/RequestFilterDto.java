@@ -1,19 +1,15 @@
 package school.faang.user_service.dto.recommendation;
 
-import lombok.Builder;
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
-@Builder
-public class RecommendationRequestDto {
-    private Long id;
+public class RequestFilterDto {
     private Long requesterId;
     private Long receiverId;
-    private String message;
     private RequestStatus status;
-    private List<Long> skillIds;
+    private Long skillId;
+    private LocalDateTime createdAt;
 }

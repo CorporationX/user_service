@@ -6,7 +6,7 @@ import school.faang.user_service.kafka.events.AnalyticsEvent;
 import java.util.List;
 
 public interface DataSender {
-    void send(String topic, Event event);
+    void sendStringSerializer(String topic, Event event);
 
     void send(String topic, AnalyticsEvent analyticsEvent);
 

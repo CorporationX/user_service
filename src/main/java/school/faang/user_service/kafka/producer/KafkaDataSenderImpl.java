@@ -20,7 +20,8 @@ public class KafkaDataSenderImpl implements DataSender {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void send(String topic, Event event) {
+    public void sendStringSerializer(String topic, Event event) {
+        log.info("KafkaDataSenderImpl: preparing for sending event: {}", event.toString());
         String payload;
         try {
             payload = objectMapper.writeValueAsString(event);
@@ -31,14 +32,15 @@ public class KafkaDataSenderImpl implements DataSender {
         kafkaTemplateString.send(topic, payload)
                 .whenComplete((record, ex) -> {
                     if (ex == null) {
-                        log.info("Successfully sent '{}' with id {}, topic {}, partition = {}, offset ={}",
+                        log.info("KafkaDataSenderImpl: successfully sent '{}' with id {}, topic {}, partition = {}, " +
+                                        "offset ={}",
                                 event.getClass().getSimpleName(),
                                 event.getId(),
                                 topic,
                                 record.getRecordMetadata().partition(),
                                 record.getRecordMetadata().offset());
                     } else {
-                        log.warn("{} with id {} has not been sent",
+                        log.warn("KafkaDataSenderImpl: {} with id {} has not been sent",
                                 event.getClass().getSimpleName(), event.getId(), ex);
                     }
                 });

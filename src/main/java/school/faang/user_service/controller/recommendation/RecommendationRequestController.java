@@ -1,7 +1,14 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
@@ -9,13 +16,16 @@ import school.faang.user_service.service.recommendation.RecommendationRequestSer
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("recommendation-request")
 public class RecommendationRequestController {
-
     private final RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
+    @PostMapping
+    public RecommendationRequestDto requestRecommendation(@RequestBody
+                                                          @Valid
+                                                          RecommendationRequestDto recommendationRequestDto) {
         if (recommendationRequestDto.getMessage().isEmpty()) {
             throw new IllegalArgumentException("Recommendation request has empty message.");
         }
@@ -23,15 +33,19 @@ public class RecommendationRequestController {
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+    @PostMapping("/{id}")
+    public RecommendationRequestDto rejectRequest(@PathVariable long id,
+                                                  @RequestBody @Valid RejectionDto rejection) {
+        return recommendationRequestService.rejectRequest(id, rejection);
+    }
+
+    @GetMapping
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestParam RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 
-    public RecommendationRequestDto getRecommendationRequest(long id) {
+    @GetMapping("/{id}")
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
         return recommendationRequestService.getRequest(id);
-    }
-
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

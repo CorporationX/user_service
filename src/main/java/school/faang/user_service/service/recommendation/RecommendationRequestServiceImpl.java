@@ -11,6 +11,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
@@ -82,27 +83,26 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
                     requester.getId(), receiver.getId());
             throw new IllegalArgumentException("Recommendation request has already been updated in the last 6 months.");
         }
-        boolean allSkillsFound =
-                recommendationRequestDto.getSkillIds().stream().allMatch(skillRepository::existsById);
-
-        if (!allSkillsFound) {
+        List<Skill> skills = recommendationRequestDto.getSkillIds()
+                .stream()
+                .map(skillRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+        if (skills.isEmpty()) {
             log.error("Not all required skills with ids {} exist in data base", recommendationRequestDto.getSkillIds());
             throw new EntityNotFoundException("Not all required skills exist in data base");
         }
         log.debug("Saving recommendation request from user {} to user {}", requester.getId(), receiver.getId());
         RecommendationRequest savedRecommendationRequest = recommendationRequestRepository.save(recommendationRequest);
         savedRecommendationRequest.setSkills(
-                recommendationRequestDto.getSkillIds()
-                        .stream()
-                        .map(skillRepository::findById)
-                        .filter(Optional::isPresent)
-                        .map(optionalSkill -> {
-                                    SkillRequest skillRequest = new SkillRequest();
-                                    skillRequest.setRequest(savedRecommendationRequest);
-                                    skillRequest.setSkill(optionalSkill.get());
-                                    return skillRequestRepository.save(skillRequest);
-                                }
-                        )
+                skills.stream()
+                        .map(skill -> {
+                            SkillRequest skillRequest = new SkillRequest();
+                            skillRequest.setRequest(savedRecommendationRequest);
+                            skillRequest.setSkill(skill);
+                            return skillRequestRepository.save(skillRequest);
+                        })
                         .toList());
         UserDtoNotification authorDto = userMapper.toDtoNotification(requester);
         UserDtoNotification receiverDto = userMapper.toDtoNotification(receiver);

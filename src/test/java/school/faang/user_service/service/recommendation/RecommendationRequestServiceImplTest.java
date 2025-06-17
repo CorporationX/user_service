@@ -38,9 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -112,27 +113,47 @@ class RecommendationRequestServiceImplTest {
         @Test
         @DisplayName("When create is called with valid DTO, then create and return DTO")
         void testCreate_Success() {
+            recommendationRequestDto = RecommendationRequestDto.builder()
+                    .receiverId(RECEIVER_ID)
+                    .skillIds(List.of(SKILL_ID))
+                    .build();
+
             when(userContext.getUserId()).thenReturn(REQUESTER_ID);
             when(userRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(requester));
             when(userRepository.findById(RECEIVER_ID)).thenReturn(Optional.of(receiver));
+
             when(recommendationRequestRepository.findLatestPendingRequest(REQUESTER_ID, RECEIVER_ID))
                     .thenReturn(Optional.empty());
-            when(recommendationRequestRepository.existsById(anyLong())).thenReturn(false);
-            when(skillRepository.existsById(SKILL_ID)).thenReturn(true);
-            when(recommendationRequestRepository.save(any(RecommendationRequest.class)))
-                    .thenReturn(recommendationRequest);
+
+            RecommendationRequest newRequest = new RecommendationRequest();
+            doReturn(newRequest).when(recommendationRequestMapper).toEntity(recommendationRequestDto);
+
+            when(recommendationRequestRepository.existsById(any())).thenReturn(false);
             when(skillRepository.findById(SKILL_ID)).thenReturn(Optional.of(skill));
+
+            RecommendationRequest savedRequest = new RecommendationRequest();
+            savedRequest.setId(REQUEST_ID);
+
+            when(recommendationRequestRepository.save(newRequest)).thenReturn(savedRequest);
             when(skillRequestRepository.save(any(SkillRequest.class))).thenReturn(new SkillRequest());
             when(userMapper.toDtoNotification(any(User.class))).thenReturn(new UserDtoNotification());
             when(kafkaTopics.getRecommendationRequestTopic()).thenReturn("recommendation_request_topic");
             doNothing().when(kafkaDataSender).sendStringSerializer(anyString(), any(RecommendationRequestEvent.class));
 
+            RecommendationRequestDto resultDto = RecommendationRequestDto.builder()
+                    .id(REQUEST_ID)
+                    .build();
+            doReturn(resultDto).when(recommendationRequestMapper).toDto(savedRequest);
+
             RecommendationRequestDto result = recommendationRequestService.create(recommendationRequestDto);
 
             assertNotNull(result);
             assertEquals(REQUEST_ID, result.getId());
-            verify(recommendationRequestRepository).save(any(RecommendationRequest.class));
-            verify(kafkaDataSender).sendStringSerializer(anyString(), any(RecommendationRequestEvent.class));
+
+            verify(recommendationRequestRepository).save(newRequest);
+            verify(skillRequestRepository).save(any(SkillRequest.class));
+            verify(kafkaDataSender).sendStringSerializer(eq("recommendation_request_topic"),
+                    any(RecommendationRequestEvent.class));
         }
 
         @Test
@@ -164,18 +185,25 @@ class RecommendationRequestServiceImplTest {
         }
 
         @Test
-        @DisplayName("When not all skills exist, then throw EntityNotFoundException")
+        @DisplayName("When no skills are found, then throw EntityNotFoundException")
         void testCreate_skillsNotFound_throwsException() {
+            recommendationRequestDto = RecommendationRequestDto.builder()
+                    .receiverId(RECEIVER_ID)
+                    .skillIds(List.of(SKILL_ID))
+                    .build();
             when(userContext.getUserId()).thenReturn(REQUESTER_ID);
             when(userRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(requester));
             when(userRepository.findById(RECEIVER_ID)).thenReturn(Optional.of(receiver));
             when(recommendationRequestRepository.findLatestPendingRequest(REQUESTER_ID, RECEIVER_ID))
                     .thenReturn(Optional.empty());
-            when(skillRepository.existsById(SKILL_ID)).thenReturn(false);
+            doReturn(new RecommendationRequest()).when(recommendationRequestMapper).toEntity(recommendationRequestDto);
+            when(skillRepository.findById(SKILL_ID)).thenReturn(Optional.empty());
 
             EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                     () -> recommendationRequestService.create(recommendationRequestDto));
             assertEquals("Not all required skills exist in data base", exception.getMessage());
+
+            verify(recommendationRequestRepository, never()).save(any());
         }
     }
 

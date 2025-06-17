@@ -3,6 +3,7 @@ package school.faang.user_service.controller.recommendation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,14 +27,10 @@ public class RecommendationRequestController {
     public RecommendationRequestDto requestRecommendation(@RequestBody
                                                           @Valid
                                                           RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto.getMessage().isEmpty()) {
-            throw new IllegalArgumentException("Recommendation request has empty message.");
-        }
-
         return recommendationRequestService.create(recommendationRequestDto);
     }
 
-    @PostMapping("/{id}")
+    @PatchMapping("/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable long id,
                                                   @RequestBody @Valid RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);

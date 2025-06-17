@@ -24,6 +24,7 @@ import school.faang.user_service.mapper.analytics.AnalyticsEventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.promotion.utils.ProfilePromotionsViewCalculator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +51,9 @@ public class UserService {
         ProfileViewEvent profileViewEvent = new ProfileViewEvent();
         profileViewEvent.setViewedUserId(user.getId());
         profileViewEvent.setViewerUserId(userContext.getUserId());
-        profileViewEvent.setEventType(AnalyticsEventType.PROFILE_VIEW.toString());
-        kafkaDataSender.send(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
+        profileViewEvent.setEventType(AnalyticsEventType.PROFILE_VIEW);
+        profileViewEvent.setLocalDateTime(LocalDateTime.now());
+        kafkaDataSender.sendProfileViewEvent(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
 
         return user;
     }

@@ -1,12 +1,12 @@
 package school.faang.user_service.kafka.producer;
 
-import school.faang.user_service.kafka.Event;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
+import school.faang.user_service.kafka.events.ProfileViewEvent;
 
 import java.util.List;
 
 public interface DataSender {
-    void send(String topic, Event event);
+    void sendProfileViewEvent(String topic, ProfileViewEvent event);
 
     void send(String topic, AnalyticsEvent analyticsEvent);
 

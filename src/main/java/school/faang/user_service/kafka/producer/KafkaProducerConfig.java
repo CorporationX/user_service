@@ -30,7 +30,6 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.producer.properties.linger.ms}")
     private String lingerMs;
 
-    @Bean(name = "mainProducerFactory")
     @Primary
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> properties = new HashMap<>();
@@ -65,6 +64,12 @@ public class KafkaProducerConfig {
     @Bean(name = "mainKafkaTemplate")
     @Primary
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public KafkaTemplate<String, String> kafkaTemplateString(
+            ProducerFactory<String, String> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

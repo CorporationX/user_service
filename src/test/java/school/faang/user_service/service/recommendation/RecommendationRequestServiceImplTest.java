@@ -129,7 +129,7 @@ class RecommendationRequestServiceImplTest {
             doReturn(newRequest).when(recommendationRequestMapper).toEntity(recommendationRequestDto);
 
             when(recommendationRequestRepository.existsById(any())).thenReturn(false);
-            when(skillRepository.findById(SKILL_ID)).thenReturn(Optional.of(skill));
+            when(skillRepository.findAllById(any())).thenReturn(List.of(skill));
 
             RecommendationRequest savedRequest = new RecommendationRequest();
             savedRequest.setId(REQUEST_ID);
@@ -197,7 +197,7 @@ class RecommendationRequestServiceImplTest {
             when(recommendationRequestRepository.findLatestPendingRequest(REQUESTER_ID, RECEIVER_ID))
                     .thenReturn(Optional.empty());
             doReturn(new RecommendationRequest()).when(recommendationRequestMapper).toEntity(recommendationRequestDto);
-            when(skillRepository.findById(SKILL_ID)).thenReturn(Optional.empty());
+            when(skillRepository.findAllById(any())).thenReturn(List.of());
 
             EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                     () -> recommendationRequestService.create(recommendationRequestDto));

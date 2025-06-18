@@ -29,7 +29,6 @@ import school.faang.user_service.repository.recommendation.SkillRequestRepositor
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -83,12 +82,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
                     requester.getId(), receiver.getId());
             throw new IllegalArgumentException("Recommendation request has already been updated in the last 6 months.");
         }
-        List<Skill> skills = recommendationRequestDto.getSkillIds()
-                .stream()
-                .map(skillRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+        List<Skill> skills = skillRepository.findAllById(recommendationRequestDto.getSkillIds());
         if (skills.isEmpty()) {
             log.error("Not all required skills with ids {} exist in data base", recommendationRequestDto.getSkillIds());
             throw new EntityNotFoundException("Not all required skills exist in data base");

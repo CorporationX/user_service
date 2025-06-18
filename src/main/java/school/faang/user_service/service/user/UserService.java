@@ -24,7 +24,6 @@ import school.faang.user_service.mapper.analytics.AnalyticsEventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.promotion.utils.ProfilePromotionsViewCalculator;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,12 +48,10 @@ public class UserService {
                         String.format("User with id %d not found!", id)));
 
         ProfileViewEvent profileViewEvent = new ProfileViewEvent();
-        profileViewEvent.setViewedUserId(user.getId());
-        profileViewEvent.setViewerUserId(userContext.getUserId());
-        profileViewEvent.setEventType(AnalyticsEventType.PROFILE_VIEW);
-        profileViewEvent.setLocalDateTime(LocalDateTime.now());
-        kafkaDataSender.sendProfileViewEvent(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
-
+        profileViewEvent.setReceiverId(user.getId());
+        profileViewEvent.setAuthorId(userContext.getUserId());
+        profileViewEvent.setEventTypeEnum(AnalyticsEventType.PROFILE_VIEW);
+        kafkaDataSender.sendStringSerializer(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
         return user;
     }
 

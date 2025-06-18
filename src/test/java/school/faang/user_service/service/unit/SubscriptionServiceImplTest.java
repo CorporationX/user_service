@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.dto.contact.ContactDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFilter;
@@ -47,17 +46,14 @@ class SubscriptionServiceImplTest {
     private User user2;
     private UserDto dto1;
     private UserDto dto2;
-    private List<ContactDto> contacts;
 
     @BeforeEach
     void setup() {
         user1 = User.builder().id(1L).username("user1").experience(10).phone("123").build();
         user2 = User.builder().id(2L).username("user2").experience(5).phone("456").build();
 
-        contacts = List.of(new ContactDto("123", "TELEGRAM"));
-
-        dto1 = new UserDto(1L, "user1", "user1@gmail.com", null, contacts);
-        dto2 = new UserDto(2L, "user2", "user2@gmail.com", null, contacts);
+        dto1 = new UserDto(1L, "user1", "user1@gmail.com");
+        dto2 = new UserDto(2L, "user2", "user2@gmail.com");
 
         subscriptionService = new SubscriptionServiceImpl(subscriptionRepository, List.of(mockFilter, secondMockFilter), userMapper);
     }

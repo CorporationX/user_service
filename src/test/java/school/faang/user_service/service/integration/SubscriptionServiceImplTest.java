@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.dto.contact.ContactDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
@@ -47,9 +46,6 @@ class SubscriptionServiceImplTest {
     private User user1;
     private User user2;
     
-    private ContactDto contactDto;
-    private List<ContactDto> contacts;
-
     @BeforeEach
     void setUp() {
         user1 = User.builder()
@@ -58,7 +54,6 @@ class SubscriptionServiceImplTest {
                 .phone(ALEX_PHONE)
                 .email(ALEX_EMAIL)
                 .experience(ALEX_EXPERIENCE)
-                .contactPreference(null)
                 .build();
 
         user2 = User.builder()
@@ -67,13 +62,8 @@ class SubscriptionServiceImplTest {
                 .phone(SAM_PHONE)
                 .email(SAM_EMAIL)
                 .experience(SAM_EXPERIENCE)
-                .contactPreference(null)
                 .build();
         
-        contactDto = new ContactDto("contact", "type");
-
-        contacts = List.of(contactDto);
-
         when(subscriptionRepository.findByFolloweeId(FOLLOWEE_ID))
                 .thenAnswer(inv -> Stream.of(user1, user2));
     }
@@ -88,7 +78,7 @@ class SubscriptionServiceImplTest {
 
         assertEquals(1, result.size());
         assertEquals(ALEX_NAME, result.get(0).getUsername());
-        assertEquals(new UserDto(ALEX_ID, ALEX_NAME, ALEX_EMAIL, null, contacts), result.get(0));
+        assertEquals(new UserDto(ALEX_ID, ALEX_NAME, ALEX_EMAIL), result.get(0));
     }
 
     @Test
@@ -125,6 +115,6 @@ class SubscriptionServiceImplTest {
 
         assertEquals(1, result.size());
         assertEquals(SAM_NAME, result.get(0).getUsername());
-        assertEquals(new UserDto(SAM_ID, SAM_NAME, SAM_EMAIL, null, contacts), result.get(0));
+        assertEquals(new UserDto(SAM_ID, SAM_NAME, SAM_EMAIL), result.get(0));
     }
 }

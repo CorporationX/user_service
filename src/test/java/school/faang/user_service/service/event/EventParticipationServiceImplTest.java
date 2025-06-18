@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.contact.ContactDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
@@ -25,10 +24,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +48,6 @@ class EventParticipationServiceImplTest {
     List<UserDto> expectedDtoList;
     private long eventId;
     private long userId;
-    private List<ContactDto> contacts;
 
     @BeforeEach
     void setup() {
@@ -61,11 +59,9 @@ class EventParticipationServiceImplTest {
                 createTestUser(2L, "user2", "user2@example.com")
         );
 
-        contacts = List.of(new ContactDto("contact1", "TELEGRAM"), new ContactDto("contact2", "TELEGRAM"));
-
         expectedDtoList = List.of(
-                new UserDto(1L, "user1", "user1@example.com", "TELEGRAM", contacts),
-                new UserDto(2L, "user2", "user2@example.com", "TELEGRAM", contacts)
+                new UserDto(1L, "user1", "user1@example.com"),
+                new UserDto(2L, "user2", "user2@example.com")
         );
     }
 
@@ -107,18 +103,18 @@ class EventParticipationServiceImplTest {
         verify(eventParticipationRepository, times(1)).unregister(eventId, userId);
     }
 
-    // @Test
-    // @DisplayName("Проверка на получение списка UserDto по eventId.")
-    // void testGetParticipant_WhenParticipantsExist_ShouldReturnListOfUserDtos() {
-    //     when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(userList);
+    @Test
+    @DisplayName("Проверка на получение списка UserDto по eventId.")
+    void testGetParticipant_WhenParticipantsExist_ShouldReturnListOfUserDtos() {
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(userList);
 
-    //     List<UserDto> userDtoList = eventParticipationService.getParticipant(eventId);
+        List<UserDto> userDtoList = eventParticipationService.getParticipant(eventId);
 
-    //     assertNotNull(userDtoList);
-    //     assertEquals(2, userDtoList.size());
-    //     assertEquals(expectedDtoList, userDtoList);
-    //     verify(userMapper, times(userDtoList.size())).toUserDto(any(User.class));
-    // }
+        assertNotNull(userDtoList);
+        assertEquals(2, userDtoList.size());
+        assertEquals(expectedDtoList, userDtoList);
+        verify(userMapper, times(userDtoList.size())).toUserDto(any(User.class));
+    }
 
     @Test
     @DisplayName("Проверка на пустой список участников")

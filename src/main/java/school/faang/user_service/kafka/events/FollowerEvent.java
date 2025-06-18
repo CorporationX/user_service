@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class FollowerEvent extends Event {
 
     public enum TargetType {USER, PROJECT}
-    private String followerId;
+    private Long followerId;
     private TargetType targetType;
-    private String targetId;
+    private Long targetId;
 }

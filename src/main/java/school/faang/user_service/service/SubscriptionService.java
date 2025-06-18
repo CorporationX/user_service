@@ -39,9 +39,9 @@ public class SubscriptionService {
         log.info("User {} successfully followed user {}", followerId, followeeId);
 
         FollowerEvent event = new FollowerEvent (
-          followerId.toString(),
+          followerId,
           FollowerEvent.TargetType.USER,
-          followeeId.toString()
+          followeeId
         );
         dataSender.send(kafkaTopics.getFollowerEventsTopic(), event);
     }

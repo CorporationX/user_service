@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
+import school.faang.user_service.kafka.events.FollowerEvent;
 
 import java.util.List;
 
@@ -42,6 +43,23 @@ public class KafkaDataSenderImpl implements DataSender {
                                 ids.size());
                     } else {
                         log.warn("RecordIds list with size {} has not been sent", ids.size(), ex);
+                    }
+                });
+    }
+
+    public void send(String topic, FollowerEvent followerEvent) {
+        kafkaTemplate.send(topic, followerEvent)
+                .whenComplete((record, ex) -> {
+                    if (ex == null) {
+                        log.info("Published FollowerEvent for follower={}, targetType={}, targetId={} → topic={}, partition={}, offset={}",
+                                followerEvent.getFollowerId(),
+                                followerEvent.getTargetType(),
+                                followerEvent.getTargetId(),
+                                topic,
+                                record.getRecordMetadata().partition(),
+                                record.getRecordMetadata().offset());
+                    } else {
+                        log.error("Failed to publish FollowerEvent {}, reason:", followerEvent, ex);
                     }
                 });
     }

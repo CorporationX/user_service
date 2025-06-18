@@ -10,7 +10,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFollowersFilter;
 import school.faang.user_service.kafka.events.FollowerEvent;
-import school.faang.user_service.kafka.events.publisher.FollowerEventPublisher;
 import school.faang.user_service.kafka.producer.DataSender;
 import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapper;
@@ -27,7 +26,8 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFollowersFilter> followersFilter;
     private final UserMapper userMapper;
-    private final FollowerEventPublisher followerEventPublisher;
+    private final DataSender dataSender;
+    private final KafkaTopics kafkaTopics;
 
     @Transactional
     public void followUser(Long followerId, Long followeeId) {
@@ -43,11 +43,7 @@ public class SubscriptionService {
           FollowerEvent.TargetType.USER,
           followeeId.toString()
         );
-        followerEventPublisher.publish(event);
-    }
-
-    public void followProject(Long followerId, Long projectId) {
-
+        dataSender.send(kafkaTopics.getFollowerEventsTopic(), event);
     }
 
     @Transactional

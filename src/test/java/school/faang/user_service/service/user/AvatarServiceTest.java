@@ -12,10 +12,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.user.UserRepositoryAdapter;
 import school.faang.user_service.service.image.ImageResizingService;
 import school.faang.user_service.service.s3.S3Service;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,6 +29,9 @@ public class AvatarServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserRepositoryAdapter userRepositoryAdapter;
 
     @Mock
     private ImageResizingService imageResizingService;
@@ -47,11 +49,11 @@ public class AvatarServiceTest {
 
     @Test
     void testGetAvatarWhenUserNotFound() {
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+        when(userRepositoryAdapter.findById(USER_ID)).thenThrow(new NotFoundException("User with id " + USER_ID + " not found"));
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> avatarService.getAvatar(USER_ID));
         assertEquals(String.format("User with id %s not found", USER_ID), e.getMessage());
-        verify(userRepository).findById(USER_ID);
+        verify(userRepositoryAdapter).findById(USER_ID);
         verifyNoInteractions(s3Service);
     }
 
@@ -59,11 +61,11 @@ public class AvatarServiceTest {
     void testGetAvatarWhenAvatarNotFound() {
         User user = new User();
         user.setUserProfilePic(null);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(userRepositoryAdapter.findById(USER_ID)).thenReturn(user);
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> avatarService.getAvatar(USER_ID));
         assertEquals("Avatar not found", e.getMessage());
-        verify(userRepository).findById(USER_ID);
+        verify(userRepositoryAdapter).findById(USER_ID);
         verifyNoInteractions(s3Service);
     }
 
@@ -74,7 +76,7 @@ public class AvatarServiceTest {
         avatar.setFileId("largeKey");
         avatar.setSmallFileId("smallKey");
         user.setUserProfilePic(avatar);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(userRepositoryAdapter.findById(USER_ID)).thenReturn(user);
         when(s3Service.getFileUrl("largeKey")).thenReturn("largeUrl");
         when(s3Service.getFileUrl("smallKey")).thenReturn("smallUrl");
 
@@ -88,18 +90,18 @@ public class AvatarServiceTest {
 
     @Test
     void testAddAvatarWhenUserNotFound() {
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+        when(userRepositoryAdapter.findById(USER_ID)).thenThrow(new NotFoundException("User with id " + USER_ID + " not found"));
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> avatarService.addAvatar(USER_ID, file));
         assertEquals(String.format("User with id %s not found", USER_ID), e.getMessage());
-        verify(userRepository).findById(USER_ID);
+        verify(userRepositoryAdapter).findById(USER_ID);
         verifyNoInteractions(imageResizingService, s3Service);
     }
 
     @Test
     void testAddAvatar() {
         User user = new User();
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(userRepositoryAdapter.findById(USER_ID)).thenReturn(user);
         when(file.getContentType()).thenReturn("image/png");
 
         byte[] largeBytes = {1, 2, 3};
@@ -123,11 +125,11 @@ public class AvatarServiceTest {
 
     @Test
     void testDeleteAvatarWhenUserNotFound() {
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+        when(userRepositoryAdapter.findById(USER_ID)).thenThrow(new NotFoundException("User with id " + USER_ID + " not found"));
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> avatarService.deleteAvatar(USER_ID));
         assertEquals(String.format("User with id %s not found", USER_ID), e.getMessage());
-        verify(userRepository).findById(USER_ID);
+        verify(userRepositoryAdapter).findById(USER_ID);
         verifyNoInteractions(s3Service);
     }
 
@@ -135,11 +137,11 @@ public class AvatarServiceTest {
     void testDeleteAvatarWhenAvatarNotFound() {
         User user = new User();
         user.setUserProfilePic(null);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(userRepositoryAdapter.findById(USER_ID)).thenReturn(user);
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> avatarService.deleteAvatar(USER_ID));
         assertEquals("Avatar not found", e.getMessage());
-        verify(userRepository).findById(USER_ID);
+        verify(userRepositoryAdapter).findById(USER_ID);
         verifyNoInteractions(s3Service);
     }
 
@@ -150,7 +152,7 @@ public class AvatarServiceTest {
         avatar.setFileId("largeKey");
         avatar.setSmallFileId("smallKey");
         user.setUserProfilePic(avatar);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(userRepositoryAdapter.findById(USER_ID)).thenReturn(user);
 
         avatarService.deleteAvatar(USER_ID);
 

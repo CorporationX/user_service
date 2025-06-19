@@ -31,6 +31,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation ("org.springframework.security:spring-security-crypto")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation ("io.github.openfeign:feign-micrometer:13.5")
@@ -77,6 +78,7 @@ dependencies {
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     implementation("net.coobird:thumbnailator:0.4.14")
+    implementation("commons-validator:commons-validator:1.7")
 
     /**
      * Test containers

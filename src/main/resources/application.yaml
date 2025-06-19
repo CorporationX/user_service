@@ -108,6 +108,9 @@ services:
     secretKey: password
     bucketName: corpbucket
     max-file-size: 5242880
+  dicebear:
+    endpoint: https://api.dicebear.com/9.x
+    style: pixel-art
 
 feign:
   client:

@@ -150,4 +150,14 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private WorkSchedule workSchedule;
+
+    public User(String username,
+                Country country,
+                String email,
+                String password) {
+        this.username = username;
+        this.country = country;
+        this.email = email;
+        this.password = password;
+    }
 }

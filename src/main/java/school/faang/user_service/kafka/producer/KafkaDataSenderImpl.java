@@ -21,7 +21,7 @@ public class KafkaDataSenderImpl implements DataSender {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void sendStringSerializer(String topic, Event event) {
+    public void send(String topic, Event event) {
         log.info("KafkaDataSenderImpl: preparing for sending event: {}", event.toString());
         String payload;
         try {

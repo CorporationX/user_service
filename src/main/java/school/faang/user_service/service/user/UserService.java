@@ -59,7 +59,7 @@ public class UserService {
         profileViewEvent.setReceiverId(user.getId());
         profileViewEvent.setAuthorId(userContext.getUserId());
         profileViewEvent.setEventTypeEnum(AnalyticsEventType.PROFILE_VIEW);
-        kafkaDataSender.sendStringSerializer(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
+        kafkaDataSender.send(kafkaTopics.getProfileViewedTopic(), profileViewEvent);
         return user;
     }
 

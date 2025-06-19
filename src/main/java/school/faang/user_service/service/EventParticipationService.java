@@ -4,7 +4,7 @@ import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.mapper.ParticipantMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 

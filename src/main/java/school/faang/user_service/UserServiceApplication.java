@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableRetry
-@EnableFeignClients("school.faang.user_service.client")
+@EnableFeignClients("school.faang.user_service")
 @EnableScheduling
 public class UserServiceApplication {
 

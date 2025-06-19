@@ -13,4 +13,4 @@ public interface SkillRequestRepository extends CrudRepository<SkillRequest, Lon
             """)
     @Modifying
     SkillRequest create(long requestId, long skillId);
- }
+}

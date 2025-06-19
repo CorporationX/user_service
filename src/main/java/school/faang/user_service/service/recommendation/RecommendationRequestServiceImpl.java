@@ -104,7 +104,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         event.setAuthor(authorDto);
         event.setReceiver(receiverDto);
         log.info("Sending recommendation request event for request id {}", savedRecommendationRequest.getId());
-        kafkaDataSender.sendStringSerializer(
+        kafkaDataSender.send(
                 kafkaTopics.getRecommendationRequestTopic(),
                 event
         );

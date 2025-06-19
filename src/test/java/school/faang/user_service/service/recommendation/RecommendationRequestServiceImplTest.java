@@ -138,7 +138,7 @@ class RecommendationRequestServiceImplTest {
             when(skillRequestRepository.save(any(SkillRequest.class))).thenReturn(new SkillRequest());
             when(userMapper.toDtoNotification(any(User.class))).thenReturn(new UserDtoNotification());
             when(kafkaTopics.getRecommendationRequestTopic()).thenReturn("recommendation_request_topic");
-            doNothing().when(kafkaDataSender).sendStringSerializer(anyString(), any(RecommendationRequestEvent.class));
+            doNothing().when(kafkaDataSender).send(anyString(), any(RecommendationRequestEvent.class));
 
             RecommendationRequestDto resultDto = RecommendationRequestDto.builder()
                     .id(REQUEST_ID)
@@ -152,7 +152,7 @@ class RecommendationRequestServiceImplTest {
 
             verify(recommendationRequestRepository).save(newRequest);
             verify(skillRequestRepository).save(any(SkillRequest.class));
-            verify(kafkaDataSender).sendStringSerializer(eq("recommendation_request_topic"),
+            verify(kafkaDataSender).send(eq("recommendation_request_topic"),
                     any(RecommendationRequestEvent.class));
         }
 

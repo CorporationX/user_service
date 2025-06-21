@@ -8,7 +8,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.kafka.Event;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
-import school.faang.user_service.kafka.events.ProfileViewEvent;
+import school.faang.user_service.kafka.events.RecommendationEvent;
 
 import java.util.List;
 
@@ -75,6 +75,22 @@ public class KafkaDataSenderImpl implements DataSender {
                                 ids.size());
                     } else {
                         log.warn("RecordIds list with size {} has not been sent", ids.size(), ex);
+                    }
+                });
+    }
+
+    @Override
+    public void send(String topic, RecommendationEvent recommendationEvent) {
+        kafkaTemplateJson.send(topic, recommendationEvent)
+                .whenComplete((record, ex) -> {
+                    if (ex == null) {
+                        log.info("Sent recommendation event with topic {}, partition = {}, offset ={}",
+                                topic,
+                                record.getRecordMetadata().partition(),
+                                record.getRecordMetadata().offset());
+                    } else {
+                        log.warn("Recommendation event with id {} has not been sent",
+                                recommendationEvent.getId(), ex);
                     }
                 });
     }

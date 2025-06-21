@@ -17,8 +17,11 @@ import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
+import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -40,6 +43,12 @@ public class RecommendationServiceTest {
     private RecommendationService recommendationService;
     @Spy
     private RecommendationMapperImpl recommendationMapper;
+    @Mock
+    private RecommendationEventMapper recommendationEventMapper;
+    @Mock
+    private KafkaTopics kafkaTopics;
+    @Mock
+    private KafkaDataSenderImpl dataSender;
 
     @BeforeEach
     void init() {

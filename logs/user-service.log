@@ -1,0 +1,2 @@
+2025-06-21 21:54:11.788 [Test worker] INFO  s.f.u.service.RecommendationService - RecommendationEvent = null sent to RecommendationEventTopic after create [trace=, span=]
+2025-06-21 21:54:11.813 [Test worker] INFO  s.f.u.service.RecommendationService - RecommendationEvent = null sent to RecommendationEventTopic after update [trace=, span=]

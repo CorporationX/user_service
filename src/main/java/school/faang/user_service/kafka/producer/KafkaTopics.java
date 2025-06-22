@@ -19,6 +19,9 @@ public class KafkaTopics {
     @Value("${spring.kafka.topics.redis-retry-error-topic.name}")
     private String redisRetryErrorTopic;
 
+    @Value("${spring.kafka.topics.profile-view-event-topic.name}")
+    private String profileViewedTopic;
+
     @Value("${spring.kafka.topics.recommendation-request.name}")
     private String recommendationRequestTopic;
 }

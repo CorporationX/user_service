@@ -126,6 +126,30 @@ public class KafkaTopicsConfig {
     }
 
     @Bean
+    public NewTopic profileViewTopic(
+            @Value("${spring.kafka.topics.profile-view-event-topic.name}") String name,
+            @Value("${spring.kafka.topics.profile-view-event-topic.partitions}") int partitions,
+            @Value("${spring.kafka.topics.profile-view-event-topic.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic profileViewTopicDlt(
+            @Value("${spring.kafka.topics.profile-view-event-topic.dlt.name}") String name,
+            @Value("${spring.kafka.topics.profile-view-event-topic.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.profile-view-event-topic.dlt.replication-factor}") short replicas
+    ) {
+        return TopicBuilder.name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
     public NewTopic requestRecommendationTopic(
             @Value("${spring.kafka.topics.recommendation-request.name}") String name,
             @Value("${spring.kafka.topics.recommendation-request.partitions}") short partitions,

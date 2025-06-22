@@ -8,10 +8,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -42,6 +45,15 @@ public class UserServiceTest {
 
     @Mock
     private AvatarService avatarService;
+
+    @Mock
+    private UserContext userContext;
+
+    @Mock
+    private KafkaDataSenderImpl kafkaDataSender;
+
+    @Mock
+    private KafkaTopics kafkaTopics;
 
     @InjectMocks
     private UserService userService;
@@ -141,7 +153,6 @@ public class UserServiceTest {
     @Test
     void testDeleteUser() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(savedEntity));
-
         userService.delete(2L);
 
         verify(userRepository).delete(savedEntity);

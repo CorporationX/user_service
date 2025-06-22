@@ -24,4 +24,7 @@ public class KafkaTopics {
 
     @Value("${spring.kafka.topics.follower-events.dlt.name}")
     private String followerEventsDltTopic;
+
+    @Value("${spring.kafka.topics.profile-view-event-topic.name}")
+    private String profileViewedTopic;
 }

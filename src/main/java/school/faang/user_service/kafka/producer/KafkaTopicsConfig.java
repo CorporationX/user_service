@@ -130,6 +130,10 @@ public class KafkaTopicsConfig {
             @Value("${spring.kafka.topics.follower-events.name}") String name,
             @Value("${spring.kafka.topics.follower-events.partitions}") int partitions,
             @Value("${spring.kafka.topics.follower-events.replication-factor}") short replicas
+    public NewTopic profileViewTopic(
+            @Value("${spring.kafka.topics.profile-view-event-topic.name}") String name,
+            @Value("${spring.kafka.topics.profile-view-event-topic.partitions}") int partitions,
+            @Value("${spring.kafka.topics.profile-view-event-topic.replication-factor}") short replicas
     ) {
         return TopicBuilder.name(name)
                 .partitions(partitions)
@@ -138,10 +142,15 @@ public class KafkaTopicsConfig {
     }
 
     @Bean
+
     public NewTopic followerEventDlt(
             @Value("${spring.kafka.topics.follower-events.dlt.name}") String name,
             @Value("${spring.kafka.topics.follower-events.dlt.partitions}") int partitions,
             @Value("${spring.kafka.topics.follower-events.dlt.replication-factor}") short replicas
+    public NewTopic profileViewTopicDlt(
+            @Value("${spring.kafka.topics.profile-view-event-topic.dlt.name}") String name,
+            @Value("${spring.kafka.topics.profile-view-event-topic.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.profile-view-event-topic.dlt.replication-factor}") short replica
     ) {
         return TopicBuilder.name(name)
                 .partitions(partitions)

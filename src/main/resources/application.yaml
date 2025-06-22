@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   config:
     import: 'optional:consul:'
@@ -75,6 +72,14 @@ spring:
           name: ${spring.kafka.topics.redis-retry-error-topic.name}.DLT
           partitions: 1
           replication-factor: 3
+      profile-view-event-topic:
+        name: profile-view-event-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.profile-view-event-topic.name}.DLT
+          partitions: 1
+          replication-factor: 3
       logs-user-service:
         name: logs-user-service-topic
         partitions: 1
@@ -91,6 +96,9 @@ spring:
           name: ${spring.kafka.topics.follower-events.name}.DLT
           partitions: 1
           replication-factor: 3
+
+server:
+  port: 8080
 
 logging:
   level:
@@ -112,6 +120,9 @@ services:
     secretKey: password
     bucketName: corpbucket
     max-file-size: 5242880
+  dicebear:
+    endpoint: https://api.dicebear.com/9.x
+    style: pixel-art
 
 feign:
   client:

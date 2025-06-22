@@ -32,6 +32,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByUsernameLike(String username);
 
+    boolean existsByEmail(String email);
+
     @Query("""
             SELECT u 
               FROM User u

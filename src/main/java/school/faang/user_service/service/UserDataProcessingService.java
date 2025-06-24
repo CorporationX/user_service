@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -8,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.kafka.UserDtoNotification;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
@@ -23,7 +24,7 @@ public class UserDataProcessingService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> fetchUsers(List<Long> ids, int offset, int limit) {
         if (ids == null || ids.isEmpty()) {
             log.warn("User IDs list is null or empty. Returning empty list.");
@@ -50,5 +51,15 @@ public class UserDataProcessingService {
         log.info("Successfully fetched {} user DTOs from a page of {} entities.",
                 userDtos.size(), userPage.getNumberOfElements());
         return userDtos;
+    }
+
+    @Transactional(readOnly = true)
+    public UserDtoNotification fetchUserById(long userId) {
+        log.info("Fetching user by ID: {}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        UserDtoNotification userDtoNotification = userMapper.toDtoNotification(user);
+        log.info("Successfully fetched user DTO for ID: {}", userId);
+        return userDtoNotification;
     }
 }

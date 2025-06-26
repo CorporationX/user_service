@@ -22,7 +22,7 @@ public class KafkaTopics {
     @Value("${spring.kafka.topics.profile-view-event-topic.name}")
     private String profileViewedTopic;
 
-    @Value("${spring.kafka.topics.recommendation-events-topic.name}")
+    @Value("${spring.kafka.topics.recommendation-events.name}")
     private String recommendationEventsTopic;
 
     @Value("${spring.kafka.topics.recommendation-request.name}")

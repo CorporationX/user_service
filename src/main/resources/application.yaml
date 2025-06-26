@@ -93,7 +93,7 @@ spring:
         partitions: 1
         replication-factor: 3
         dlt:
-          name: @{spring.kafka.topics.recommendation-events-topic.name}.DLT
+          name: ${spring.kafka.topics.recommendation-events-topic.name}.DLT
           partitions: 1
           replication-factor: 3
       recommendation-request:

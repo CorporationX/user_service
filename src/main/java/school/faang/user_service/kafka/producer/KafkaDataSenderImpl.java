@@ -1,7 +1,5 @@
 package school.faang.user_service.kafka.producer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -17,20 +15,11 @@ import java.util.List;
 @Slf4j
 public class KafkaDataSenderImpl implements DataSender {
     private final KafkaTemplate<String, Object> kafkaTemplateJson;
-    private final KafkaTemplate<String, String> kafkaTemplateString;
-    private final ObjectMapper objectMapper;
 
     @Override
     public void send(String topic, Event event) {
         log.info("KafkaDataSenderImpl: preparing for sending event: {}", event.toString());
-        String payload;
-        try {
-            payload = objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException e) {
-            log.error("Error to send {}", event.getClass().getSimpleName(), e);
-            throw new RuntimeException(e);
-        }
-        kafkaTemplateString.send(topic, payload)
+        kafkaTemplateJson.send(topic, event)
                 .whenComplete((record, ex) -> {
                     if (ex == null) {
                         log.info("KafkaDataSenderImpl: successfully sent '{}' with id {}, topic {}, partition = {}, " +

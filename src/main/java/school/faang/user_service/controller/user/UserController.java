@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.kafka.UserDtoNotification;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserViewDto;
 import school.faang.user_service.dto.user.UsersFilterDto;
@@ -90,5 +91,10 @@ public class UserController {
         }
         log.info("Received request to fetch users with IDs: {}", ids);
         return userDataProcessingService.fetchUsers(ids, 0, ids.size());
+    }
+
+    @GetMapping("/users/{id}")
+    public UserDtoNotification getUserDtoNotification(@PathVariable(name = "id") long userId) {
+        return userDataProcessingService.fetchUserById(userId);
     }
 }

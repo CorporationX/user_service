@@ -3,9 +3,10 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.kafka.UserDtoNotification;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.dto.user.UserViewDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -20,6 +21,9 @@ public interface UserMapper {
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", source = "password")
     User toEntity(String username, Country country, String email, String password);
+
+    @Mapping(source = "contactPreference.preference", target = "preference")
+    UserDtoNotification toDtoNotification(User user);
 
     UserViewDto toUserViewDto(User user);
 

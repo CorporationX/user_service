@@ -17,7 +17,8 @@ public enum AnalyticsEventType {
     GOAL_COMPLETED,
     ACHIEVEMENT_RECEIVED,
     PROFILE_APPEARED_IN_SEARCH,
-    PROJECT_APPEARED_IN_SEARCH;
+    PROJECT_APPEARED_IN_SEARCH,
+    PREMIUM_BOUGHT;
 
     public static AnalyticsEventType of(int type) {
         for (AnalyticsEventType analyticsEventType : AnalyticsEventType.values()) {

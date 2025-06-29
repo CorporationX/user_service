@@ -56,6 +56,14 @@ spring:
           name: ${spring.kafka.topics.analytics-created.name}.DLT
           partitions: 1
           replication-factor: 3
+      premium-bought-topic:
+        name: premium-bought-event-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.premium-bought-topic.name}.DLT
+          partitions: 1
+          replication-factor: 3
       analytics-profile-event-topic:
         name: analytics-profile-event-topic
         partitions: 1
@@ -92,6 +100,7 @@ spring:
         name: recommendation-request-topic
         partitions: 4
         replication-factor: 3
+
 
 server:
   port: 8080

@@ -160,4 +160,30 @@ public class KafkaTopicsConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic requestPremiumBoughtTopic(
+            @Value("${spring.kafka.topics.premium-bought-topic.name}") String name,
+            @Value("${spring.kafka.topics.premium-bought-topic.partitions}") int partitions,
+            @Value("${spring.kafka.topics.premium-bought-topic.replication-factor}") short replicas
+    ) {
+        return TopicBuilder
+                .name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic requestPremiumBoughtTopicDlt(
+            @Value("${spring.kafka.topics.premium-bought-topic.dlt.name}") String name,
+            @Value("${spring.kafka.topics.premium-bought-topic.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.premium-bought-topic.dlt.replication-factor}") short replicas
+    ) {
+        return TopicBuilder
+                .name(name)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

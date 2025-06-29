@@ -24,4 +24,7 @@ public class KafkaTopics {
 
     @Value("${spring.kafka.topics.recommendation-request.name}")
     private String recommendationRequestTopic;
+
+    @Value("${spring.kafka.topics.premium-bought-topic.name}")
+    private String premiumBoughtTopic;
 }

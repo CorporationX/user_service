@@ -70,7 +70,7 @@ public class KafkaDataSenderImpl implements DataSender {
     }
 
     public void send(String topic, FollowerEvent followerEvent) {
-        kafkaTemplate.send(topic, followerEvent)
+        kafkaTemplateJson.send(topic, followerEvent)
                 .whenComplete((record, ex) -> {
                     if (ex == null) {
                         log.info("Published FollowerEvent for follower={}, targetType={}, targetId={} → topic={}, partition={}, offset={}",

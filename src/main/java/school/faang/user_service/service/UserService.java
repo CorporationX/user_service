@@ -8,5 +8,7 @@ public interface UserService {
     UserDto getUserById(Long id);
 
     List<UserDto> getUsersByIds(List<Long> ids);
+
+    void notifyGoalCompleted(Long userId, Long goalId);
 }
 

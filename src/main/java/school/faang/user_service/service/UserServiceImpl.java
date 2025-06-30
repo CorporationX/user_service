@@ -3,8 +3,10 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.GoalCompletedEvent;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -15,6 +17,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     @Override
     public UserDto getUserById(Long id) {
@@ -31,5 +34,9 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-
+    @Override
+    public void notifyGoalCompleted(Long userId, Long goalId) {
+        GoalCompletedEvent event = new GoalCompletedEvent(userId, goalId);
+        goalCompletedEventPublisher.publishGoalCompletedEvent(event);
+    }
 }

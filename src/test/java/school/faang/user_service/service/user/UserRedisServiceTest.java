@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.redis.RedisTtlProperties;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.mapper.user.UserRedisMapperImpl;
-import school.faang.user_service.model.redis.user.UserRedisModel;
+import school.faang.user_service.model.user.UserRedisModel;
 import school.faang.user_service.repository.user.UserRedisRepository;
 import school.faang.user_service.utils.redis.RedisKeyUtil;
 

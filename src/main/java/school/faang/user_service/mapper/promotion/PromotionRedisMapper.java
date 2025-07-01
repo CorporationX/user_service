@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.promotion.Promotion;
-import school.faang.user_service.model.redis.promotion.PromotionRedisModel;
+import school.faang.user_service.model.promotion.PromotionRedisModel;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,

@@ -39,19 +39,19 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getCurrentUser() {
-        log.debug("User controller accepted request get current user");
+        log.info("User controller accepted request get current user");
 
         UserResponseDto response = userFacade.getCurrentUser();
-        log.debug("User controller return response get current user {}", response);
+        log.info("User controller return response get current user {}", response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable long userId) {
-        log.debug("User controller accepted request get user with id {}", userId);
+    public ResponseEntity<UserResponseDto> getUserByIdOrThrow(@PathVariable long userId) {
+        log.info("User controller accepted request get user with id {}", userId);
 
-        UserResponseDto response = userFacade.getUserById(userId);
-        log.debug("User controller return response get user {}", response);
+        UserResponseDto response = userFacade.getUserByIdOrThrow(userId);
+        log.info("User controller return response get user {}", response);
         return ResponseEntity.ok(response);
     }
 
@@ -66,10 +66,10 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getUsersByIds(@RequestParam List<Long> userIds) {
-        log.debug("User controller accepted request get users with ids {}", userIds);
+        log.info("User controller accepted request get users with ids {}", userIds);
 
         List<UserResponseDto> response = userFacade.getUsersByIds(userIds);
-        log.debug("User controller return response get users {}", response);
+        log.info("User controller return response get users {}", response);
         return ResponseEntity.ok(response);
     }
 

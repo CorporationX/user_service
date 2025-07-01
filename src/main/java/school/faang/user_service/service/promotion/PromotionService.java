@@ -75,7 +75,7 @@ public class PromotionService {
     public Promotion createPromotionForUser(long userId, long tariffId) {
         promotionValidator.checkActivePromotionForUser(userId);
 
-        User user = userService.getUserById(userId);
+        User user = userService.getUserByIdOrThrow(userId);
         PromotionTariff tariff = promotionTariffService.getPromotionTariffById(tariffId);
 
         Promotion promotion = createPromotion(tariff);

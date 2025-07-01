@@ -44,22 +44,22 @@ public class UserFacade {
         User user = userService.getCurrentUser();
 
         UserResponseDto userResponseDto = userEntityMapper.toUserLiteResponseDto(user);
-        log.debug("Mapping User entity to UserResponseDto. Entity content: {}. DTO content: {}.",
+        log.info("Mapping User entity to UserResponseDto. Entity content: {}. DTO content: {}.",
                 user, userResponseDto);
         return userResponseDto;
     }
 
-    public UserResponseDto getUserById(long userId) {
-        User user = userService.getUserById(userId);
+    public UserResponseDto getUserByIdOrThrow(long userId) {
+        User user = userService.getUserByIdOrThrow(userId);
 
         UserResponseDto userResponseDto = userEntityMapper.toUserLiteResponseDto(user);
-        log.debug("Mapping User entity to UserResponseDto. Entity content: {}. DTO content: {}.",
+        log.info("Mapping User entity to UserResponseDto. Entity content: {}. DTO content: {}.",
                 user, userResponseDto);
         return userResponseDto;
     }
 
     public UserNotificationResponseDto getNotificationUserById(long userId) {
-        User user = userService.getUserById(userId);
+        User user = userService.getUserByIdOrThrow(userId);
 
         UserNotificationResponseDto userResponseDto = userEntityMapper.toUserNotificationResponseDto(user);
         log.debug("Mapping User entity to UserNotificationResponseDto. Entity content: {}. DTO content: {}.",
@@ -71,7 +71,7 @@ public class UserFacade {
         List<User> users = userService.getUsersByIds(userIds);
 
         List<UserResponseDto> userResponseDtoList = userEntityMapper.toUserResponseDtoList(users);
-        log.debug("Mapping User entity list to UserResponseDto list. Entity content: {}. DTO content: {}.",
+        log.info("Mapping User entity list to UserResponseDto list. Entity content: {}. DTO content: {}.",
                 users, userResponseDtoList);
         return userResponseDtoList;
     }

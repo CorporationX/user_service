@@ -2,6 +2,7 @@ package school.faang.user_service.entity.user;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -36,6 +37,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.score.UserScore;
 import school.faang.user_service.entity.skill.Skill;
 
 import java.time.LocalDateTime;
@@ -176,6 +178,9 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private WorkSchedule workSchedule;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserScore score;
 
     @OneToMany(mappedBy = "user")
     private List<Promotion> promotions = new ArrayList<>();

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.config.redis.RedisTtlProperties;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.event.EventRedisMapper;
-import school.faang.user_service.model.redis.event.EventRedisModel;
+import school.faang.user_service.model.event.EventRedisModel;
 import school.faang.user_service.repository.event.EventRedisRepository;
 import school.faang.user_service.utils.redis.RedisKeyUtil;
 

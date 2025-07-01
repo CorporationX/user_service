@@ -4,7 +4,7 @@ import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.model.redis.event.EventRedisModel;
+import school.faang.user_service.model.event.EventRedisModel;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,

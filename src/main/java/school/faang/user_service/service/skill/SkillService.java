@@ -44,7 +44,7 @@ public class SkillService {
                 userIds.forEach(userId ->
                         skillRepository.findUserSkill(skillId, userId)
                                 .ifPresentOrElse(
-                                        skill -> log.debug(
+                                        skill -> log.info(
                                                 "User with id {} already has skill with id {}", userId, skillId),
                                         () -> {
                                             skillRepository.assignSkillToUser(skillId, userId);
@@ -100,7 +100,7 @@ public class SkillService {
 
     private List<UserSkillGuarantee> createGuaranteesFromOffers(List<SkillOffer> offers, Skill skill) {
         long userId = userContext.getUserId();
-        User user = userService.getUserById(userId);
+        User user = userService.getUserByIdOrThrow(userId);
         return offers.stream()
                 .map(offer -> UserSkillGuarantee.builder()
                         .user(user)

@@ -70,20 +70,20 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserById_successfully() {
+    public void testgetUserByIdOrThrow_successfully() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        User returnUser = userService.getUserById(user.getId());
+        User returnUser = userService.getUserByIdOrThrow(user.getId());
 
         verify(userRepository, times(1)).findById(user.getId());
         assertEquals(user.getId(), returnUser.getId());
     }
 
     @Test
-    public void testGetUserById_userNotFound() {
+    public void testgetUserByIdOrThrow_userNotFound() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(user.getId()));
+        assertThrows(UserNotFoundException.class, () -> userService.getUserByIdOrThrow(user.getId()));
         verify(userRepository, times(1)).findById(user.getId());
     }
 

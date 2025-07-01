@@ -1,4 +1,4 @@
-package school.faang.user_service.model.redis.user;
+package school.faang.user_service.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -26,7 +26,7 @@ public class ContactService {
 
     @Transactional
     public ContactPreference setPreferenceContactForUser(long userId, PreferredContact preference) {
-        User user = userService.getUserById(userId);
+        User user = userService.getUserByIdOrThrow(userId);
 
         ContactPreference contactPreference = new ContactPreference();
         contactPreference.setPreference(preference);

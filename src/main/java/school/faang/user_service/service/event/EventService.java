@@ -14,6 +14,8 @@ import school.faang.user_service.exception.event.ActivePromotionExistsException;
 import school.faang.user_service.exception.event.EventNotFoundException;
 import school.faang.user_service.exception.event.EventValidationException;
 import school.faang.user_service.model.event.EventFilter;
+import school.faang.user_service.aspect.score.ScoreActionType;
+import school.faang.user_service.aspect.score.TrackActionScore;
 import school.faang.user_service.repository.event.EventFilterRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.promotion.PromotionRedisService;
@@ -62,7 +64,7 @@ public class EventService {
     @Transactional
     public Event createEvent(Event event, List<Long> relatedSkillIds) {
         long userId = userContext.getUserId();
-        User owner = userService.getUserById(userId);
+        User owner = userService.getUserByIdOrThrow(userId);
         event.setOwner(owner);
         event.setStatus(EventStatus.PLANNED);
 
@@ -83,11 +85,6 @@ public class EventService {
                         eventId));
     }
 
-    @Transactional(readOnly = true)
-    public List<Event> getAllEvents(long eventId) {
-        return eventRepository.findAll();
-    }
-
     @Transactional
     public void deleteEventById(long eventId) {
         Event event = getEventById(eventId);
@@ -104,6 +101,7 @@ public class EventService {
     }
 
     @Transactional
+    @TrackActionScore(ScoreActionType.COMPLETE_EVENT)
     public Event updateEventData(Event event, List<Long> relatedSkillIds) {
         long userId = userContext.getUserId();
         if (!Objects.equals(userId, event.getOwner().getId())) {

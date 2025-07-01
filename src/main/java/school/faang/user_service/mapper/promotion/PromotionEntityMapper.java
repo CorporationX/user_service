@@ -7,7 +7,6 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.promotion.PromotionEventCreateRequestDto;
 import school.faang.user_service.dto.promotion.PromotionResponseDto;
 import school.faang.user_service.entity.promotion.Promotion;
-import school.faang.user_service.model.redis.promotion.PromotionRedisModel;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,

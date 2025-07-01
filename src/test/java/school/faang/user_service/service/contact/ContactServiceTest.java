@@ -66,7 +66,7 @@ public class ContactServiceTest {
 
     @Test
     void testSetPreferenceContactForUser_userNotFound() {
-        when(userService.getUserById(user.getId())).thenThrow(UserNotFoundException.class);
+        when(userService.getUserByIdOrThrow(user.getId())).thenThrow(UserNotFoundException.class);
 
         assertThrows(UserNotFoundException.class, () -> contactService.setPreferenceContactForUser(
                 user.getId(),
@@ -78,7 +78,7 @@ public class ContactServiceTest {
 
     @Test
     void testSetPreferenceContactForUser_saveAndReturnPreference() {
-        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(userService.getUserByIdOrThrow(user.getId())).thenReturn(user);
         when(contactPreferenceRepository.save(contactCaptor.capture())).thenReturn(contactPreference);
 
         ContactPreference result = contactService.setPreferenceContactForUser(
@@ -90,7 +90,7 @@ public class ContactServiceTest {
         assertEquals(contactPreference, result);
         assertEquals(captureContactPreference.getPreference(), result.getPreference());
         assertEquals(user, result.getUser());
-        verify(userService).getUserById(user.getId());
+        verify(userService).getUserByIdOrThrow(user.getId());
         verify(contactPreferenceRepository).save(captureContactPreference);
     }
 }

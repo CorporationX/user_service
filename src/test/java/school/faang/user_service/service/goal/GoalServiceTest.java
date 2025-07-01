@@ -108,7 +108,7 @@ public class GoalServiceTest {
 
         when(userContext.getUserId()).thenReturn(userId);
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(countActiveGoalsPerUser);
-        when(userService.getUserById(eq(userId)))
+        when(userService.getUserByIdOrThrow(eq(userId)))
                 .thenAnswer(invocation -> {
                     Long userId = invocation.getArgument(0);
                     User user = new User();
@@ -154,7 +154,7 @@ public class GoalServiceTest {
 
         when(userContext.getUserId()).thenReturn(userId);
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(countActiveGoalsPerUser);
-        when(userService.getUserById(eq(userId)))
+        when(userService.getUserByIdOrThrow(eq(userId)))
                 .thenAnswer(invocation -> {
                     Long userId = invocation.getArgument(0);
                     User user = new User();
@@ -215,7 +215,7 @@ public class GoalServiceTest {
     public void testCreateGoal_nonExistingOwner() {
         when(userContext.getUserId()).thenReturn(userId);
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(countActiveGoalsPerUser);
-        when(userService.getUserById(userId)).thenThrow(UserNotFoundException.class);
+        when(userService.getUserByIdOrThrow(userId)).thenThrow(UserNotFoundException.class);
 
         assertThrows(UserNotFoundException.class, () -> goalService.createGoal(goal, parentId, skillIds));
         verify(goalRepository, never()).save(goalCaptor.capture());
@@ -225,7 +225,7 @@ public class GoalServiceTest {
     public void testCreateGoal_nonExistingParentGoal() {
         when(userContext.getUserId()).thenReturn(userId);
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(countActiveGoalsPerUser);
-        when(userService.getUserById(userId)).thenReturn(mock(User.class));
+        when(userService.getUserByIdOrThrow(userId)).thenReturn(mock(User.class));
         when(goalRepository.findById(parentId)).thenReturn(Optional.empty());
 
         assertThrows(GoalNotFoundException.class, () -> goalService.createGoal(goal, parentId, skillIds));
@@ -237,7 +237,7 @@ public class GoalServiceTest {
     public void testCreateGoal_nonExistingSkill() {
         when(userContext.getUserId()).thenReturn(userId);
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(countActiveGoalsPerUser);
-        when(userService.getUserById(userId)).thenReturn(mock(User.class));
+        when(userService.getUserByIdOrThrow(userId)).thenReturn(mock(User.class));
         when(goalRepository.findById(parentId)).thenReturn(Optional.of(mock(Goal.class)));
         when(skillService.getSkillByIdOrThrow(longThat(skillId -> skillIds.contains(skillId))))
                 .thenThrow(SkillNotFoundException.class);

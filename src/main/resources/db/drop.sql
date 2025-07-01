@@ -22,5 +22,6 @@ DROP TABLE users;
 DROP TABLE country;
 DROP TABLE promotion_tariff;
 DROP TABLE promotion;
+DROP TABLE user_score;
 
 DELETE FROM databasechangelog;

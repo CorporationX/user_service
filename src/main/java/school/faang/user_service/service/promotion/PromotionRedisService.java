@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.promotion.Promotion;
 import school.faang.user_service.mapper.promotion.PromotionRedisMapper;
-import school.faang.user_service.model.redis.promotion.PromotionRedisModel;
+import school.faang.user_service.model.promotion.PromotionRedisModel;
 import school.faang.user_service.repository.promotion.PromotionRedisRepository;
 import school.faang.user_service.utils.redis.RedisKeyUtil;
 

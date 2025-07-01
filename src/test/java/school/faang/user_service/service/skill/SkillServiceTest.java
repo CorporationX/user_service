@@ -225,7 +225,7 @@ public class SkillServiceTest {
         when(userContext.getUserId()).thenReturn(USER_ID);
         when(skillRepository.findUserSkill(anyLong(), anyLong())).thenReturn(Optional.empty());
         when(skillOfferService.findAllOffersOfSkill(anyLong())).thenReturn(skillOffers);
-        when(userService.getUserById(anyLong())).thenThrow(
+        when(userService.getUserByIdOrThrow(anyLong())).thenThrow(
                 new UserNotFoundException(String.format("User with id = %d not found", USER_ID)));
 
         assertThrows(UserNotFoundException.class, () -> skillService.acquireSkillFromOffers(SKILL_ID));
@@ -240,7 +240,7 @@ public class SkillServiceTest {
         when(userContext.getUserId()).thenReturn(USER_ID);
         when(skillRepository.findUserSkill(anyLong(), anyLong())).thenReturn(Optional.empty());
         when(skillOfferService.findAllOffersOfSkill(anyLong())).thenReturn(skillOffers);
-        when(userService.getUserById(anyLong())).thenReturn(user);
+        when(userService.getUserByIdOrThrow(anyLong())).thenReturn(user);
 
         Skill acquiredSkill = skillService.acquireSkillFromOffers(SKILL_ID);
 

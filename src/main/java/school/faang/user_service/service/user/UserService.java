@@ -61,10 +61,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserById(long userId) {
+    public User getUserByIdOrThrow(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.error("User with id {} not found", userId);
+                    log.error("User not found");
                     return new UserNotFoundException(userId);
                 });
     }
@@ -74,7 +74,7 @@ public class UserService {
         long userId = userContext.getUserId();
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.error("User with id {} not found", userId);
+                    log.error("User from context not found");
                     return new UserNotFoundException(userId);
                 });
     }
@@ -82,6 +82,15 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> getUsersByIds(List<Long> userIds) {
         return userRepository.findAllById(userIds);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByIdOrThrow(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
+        return true;
     }
 
     @Transactional
@@ -102,7 +111,7 @@ public class UserService {
 
     @Async(value = "generateRandomAvatarUserExecutor")
     public void createAvatarUser(long userId) {
-        User user = getUserById(userId);
+        User user = getUserByIdOrThrow(userId);
 
         Resource file = imageService.generateRandomUserAvatar(userId);
         UserProfilePic userProfilePic = new UserProfilePic();
@@ -118,14 +127,14 @@ public class UserService {
         List<Long> filteredUserIds = userFilterRepository.findByFilter(filter);
 
         List<CompletableFuture<User>> futureUsers = filteredUserIds.stream()
-                .map(userId -> CompletableFuture.supplyAsync(() ->
-                        userRedisService.getUserFromRedisById(userId)
-                                .orElseGet(() -> {
-                                    User user = getUserById(userId);
-                                    userRedisService.addUserInRedis(user);
-                                    return user;
-                                }), executor))
-                .toList();
+            .map(userId -> CompletableFuture.supplyAsync(() ->
+                    userRedisService.getUserFromRedisById(userId)
+                            .orElseGet(() -> {
+                                User user = getUserByIdOrThrow(userId);
+                                userRedisService.addUserInRedis(user);
+                                return user;
+                            }), executor))
+            .toList();
 
         List<User> users = futureUsers.stream()
                 .map(CompletableFuture::join)

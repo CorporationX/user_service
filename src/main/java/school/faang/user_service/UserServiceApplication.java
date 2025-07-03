@@ -41,13 +41,13 @@ public class UserServiceApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        testRecommendationCreation();
-        testRecommendationUpdate();
-        testRecommendationDelete();
+        long createdRecId = testRecommendationCreation();
+        testRecommendationUpdate(createdRecId);
         testRecommendationFilter();
+        testRecommendationDelete(createdRecId);
     }
 
-    private void testRecommendationCreation() {
+    private long testRecommendationCreation() {
         long sessionUserId = 1;
         long recommendationRecipientUserId = 2;
         userContext.setUserId(sessionUserId);
@@ -57,11 +57,11 @@ public class UserServiceApplication implements CommandLineRunner {
         );
         RecommendationDto resultDto = recommendationController.create(recommendationDto);
         log.info("Result of creating recommendation: {}", resultDto);
+        return resultDto.id();
     }
 
-    private void testRecommendationUpdate() {
+    private void testRecommendationUpdate(long recommendationId) {
         long sessionUserId = 1;
-        long recommendationId = 3;
         userContext.setUserId(sessionUserId);
         UpdateRecommendationDto recommendationDto = new UpdateRecommendationDto(
                 "First ever recommendation updated"
@@ -70,9 +70,8 @@ public class UserServiceApplication implements CommandLineRunner {
         log.info("Result of updating recommendation: {}", resultDto);
     }
 
-    private void testRecommendationDelete() {
+    private void testRecommendationDelete(long recommendationId) {
         long sessionUserId = 1;
-        long recommendationId = 3;
         userContext.setUserId(sessionUserId);
         recommendationController.delete(recommendationId);
         log.info("Recommendation id: {} should be deleted now 🤷", recommendationId);

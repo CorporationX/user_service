@@ -10,12 +10,12 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFollowersFilter;
 import school.faang.user_service.kafka.events.FollowerEvent;
+import school.faang.user_service.kafka.events.TargetType;
 import school.faang.user_service.kafka.producer.DataSender;
 import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -38,9 +38,9 @@ public class SubscriptionService {
         subscriptionRepository.followUser(followerId, followeeId);
         log.info("User {} successfully followed user {}", followerId, followeeId);
 
-        FollowerEvent event = new FollowerEvent (
+        FollowerEvent event = new FollowerEvent(
           followerId,
-          FollowerEvent.TargetType.USER,
+          TargetType.USER,
           followeeId
         );
         dataSender.send(kafkaTopics.getFollowerEventsTopic(), event);

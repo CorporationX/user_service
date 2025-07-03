@@ -41,5 +41,10 @@ user:
     min:
       length: 6
 
+recommendation:
+  delay:
+    min:
+      months: 6
+
 skill:
   min-offers-required: 3

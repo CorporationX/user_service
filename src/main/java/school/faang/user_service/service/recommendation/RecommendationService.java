@@ -69,7 +69,7 @@ public interface RecommendationService {
      * Возвращает рекомендации соответствующие фильтрам, или все рекомендации если фильтры пустые
      *
      * @param filters объект содержащий фильтры для применения со значениями
-     * @return список {@link List<RecommendationDto>} рекомендаций, соответствующих фильтрам
+     * @return список {@link List} рекомендаций, соответствующих фильтрам
      */
     List<RecommendationDto> getByFilters(RecommendationFilterDto filters);
 }

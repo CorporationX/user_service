@@ -14,7 +14,11 @@ public class RecommendationContentContainsFilter implements RecommendationFilter
     }
 
     @Override
-    public Stream<Recommendation> apply(Stream<Recommendation> recommendations, RecommendationFilterDto recommendationFilterDto) {
-        return recommendations.filter(rec -> rec.getContent().contains(recommendationFilterDto.contentContains()));
+    public Stream<Recommendation> apply(
+            Stream<Recommendation> recommendations,
+            RecommendationFilterDto recommendationFilterDto
+    ) {
+        return recommendations
+                .filter(rec -> rec.getContent().contains(recommendationFilterDto.contentContains()));
     }
 }

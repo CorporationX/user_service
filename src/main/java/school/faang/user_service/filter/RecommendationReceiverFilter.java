@@ -14,7 +14,11 @@ public class RecommendationReceiverFilter implements RecommendationFilter {
     }
 
     @Override
-    public Stream<Recommendation> apply(Stream<Recommendation> recommendations, RecommendationFilterDto recommendationFilterDto) {
-        return recommendations.filter(rec -> rec.getReceiver().getId().equals(recommendationFilterDto.receiverId()));
+    public Stream<Recommendation> apply(
+            Stream<Recommendation> recommendations,
+            RecommendationFilterDto recommendationFilterDto
+    ) {
+        return recommendations
+                .filter(rec -> rec.getReceiver().getId().equals(recommendationFilterDto.receiverId()));
     }
 }

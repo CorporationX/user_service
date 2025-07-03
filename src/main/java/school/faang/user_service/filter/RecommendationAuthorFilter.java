@@ -7,14 +7,17 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import java.util.stream.Stream;
 
 @Component
-public class RecommendationAuthorFilter implements RecommendationFilter{
+public class RecommendationAuthorFilter implements RecommendationFilter {
     @Override
     public boolean isApplicable(RecommendationFilterDto recommendationFilterDto) {
         return recommendationFilterDto.authorId() != null;
     }
 
     @Override
-    public Stream<Recommendation> apply(Stream<Recommendation> recommendations, RecommendationFilterDto recommendationFilterDto) {
+    public Stream<Recommendation> apply(
+            Stream<Recommendation> recommendations,
+            RecommendationFilterDto recommendationFilterDto
+    ) {
         return recommendations.filter(rec -> rec.getAuthor().getId().equals(recommendationFilterDto.authorId()));
     }
 }

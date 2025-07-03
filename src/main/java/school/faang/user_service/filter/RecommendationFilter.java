@@ -8,5 +8,8 @@ import java.util.stream.Stream;
 public interface RecommendationFilter {
     boolean isApplicable(RecommendationFilterDto recommendationFilterDto);
 
-    Stream<Recommendation> apply(Stream<Recommendation> recommendations, RecommendationFilterDto recommendationFilterDto);
+    Stream<Recommendation> apply(
+            Stream<Recommendation> recommendations,
+            RecommendationFilterDto recommendationFilterDto
+    );
 }

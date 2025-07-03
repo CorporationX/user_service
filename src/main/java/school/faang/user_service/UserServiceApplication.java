@@ -42,8 +42,8 @@ public class UserServiceApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         testRecommendationCreation();
-//        testRecommendationUpdate();
-//        testRecommendationDelete();
+        testRecommendationUpdate();
+        testRecommendationDelete();
         testRecommendationFilter();
     }
 

@@ -7,7 +7,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import java.util.stream.Stream;
 
 @Component
-public class RecommendationContentContainsFilter implements RecommendationFilter{
+public class RecommendationContentContainsFilter implements RecommendationFilter {
     @Override
     public boolean isApplicable(RecommendationFilterDto recommendationFilterDto) {
         return recommendationFilterDto.contentContains() != null;

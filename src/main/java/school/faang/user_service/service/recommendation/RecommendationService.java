@@ -41,7 +41,7 @@ public interface RecommendationService {
      *         в этом случае выбрасывается {@code ForbiddenException}.</li>
      * </ul>
      *
-     * @param recommendationId идентификатор рекомендации, чьи данные необходимо обновить
+     * @param recommendationId  идентификатор рекомендации, чьи данные необходимо обновить
      * @param recommendationDto объект {@link UpdateRecommendationDto}, содержащий обновлённые данные рекомендации
      * @return объект {@link RecommendationDto}, представляющий обновлённую рекомендацию
      */
@@ -50,7 +50,7 @@ public interface RecommendationService {
     /**
      * Удаляет рекомендацию из системы по ее идентификатору.
      * <p>
-     Условия:
+     * Условия:
      * <ul>
      *     <li>Рекомендация с указанным {@code recommendationId} должна существовать —
      *         иначе выбрасывается {@code EntityNotFoundException}.</li>
@@ -67,6 +67,7 @@ public interface RecommendationService {
 
     /**
      * Возвращает рекомендации соответствующие фильтрам, или все рекомендации если фильтры пустые
+     *
      * @param filters объект содержащий фильтры для применения со значениями
      * @return список {@link List<RecommendationDto>} рекомендаций, соответствующих фильтрам
      */

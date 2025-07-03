@@ -79,7 +79,10 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Transactional
     public void delete(long recommendationId) {
         Recommendation recommendation = getRecommendationAndConfirmAuthorshipOrFail(recommendationId);
-        int deletedId = recommendationRepository.deleteByIdAndAuthor_id(recommendation.getId(), recommendation.getAuthor().getId());
+        int deletedId = recommendationRepository.deleteByIdAndAuthor_id(
+                recommendation.getId(),
+                recommendation.getAuthor().getId()
+        );
         log.info("Recommendation {} deleted", deletedId);
     }
 

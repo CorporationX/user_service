@@ -1,4 +1,4 @@
-package school.faang.user_service.service.userSkillGuarantee;
+package school.faang.user_service.service.user_skill_guarantee;
 
 import school.faang.user_service.entity.user.UserSkillGuarantee;
 

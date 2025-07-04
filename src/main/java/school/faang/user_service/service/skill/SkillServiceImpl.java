@@ -17,9 +17,9 @@ import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.user.SkillRepository;
-import school.faang.user_service.service.skillOffer.SkillOfferService;
+import school.faang.user_service.service.skill_offer.SkillOfferService;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.service.userSkillGuarantee.UserSkillGuaranteeService;
+import school.faang.user_service.service.user_skill_guarantee.UserSkillGuaranteeService;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.skillOffer;
+package school.faang.user_service.service.skill_offer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

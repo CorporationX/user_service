@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-//@Builder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PremiumBoughtEvent extends Event {

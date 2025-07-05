@@ -11,7 +11,7 @@ import school.faang.user_service.entity.transaction.TransactionStatus;
 import school.faang.user_service.kafka.events.AnalyticsEventType;
 import school.faang.user_service.kafka.events.PremiumBoughtEvent;
 import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
-import school.faang.user_service.kafka.producer.KafkaTopics;
+import school.faang.user_service.kafka.producer.KafkaTopicsProperties;
 import school.faang.user_service.mapper.TransactionMapper;
 import school.faang.user_service.service.transaction.TransactionService;
 import school.faang.user_service.service.utils.PremiumServiceUtils;
@@ -25,7 +25,7 @@ public class PremiumService {
     private final TransactionMapper transactionMapper;
     private final UserContext userContext;
     private final KafkaDataSenderImpl kafkaDataSender;
-    private final KafkaTopics kafkaTopics;
+    private final KafkaTopicsProperties kafkaTopics;
 
     public TransactionResultDto buyPremium(Long userId, Integer durationDays) {
         premiumServiceUtils.checkUserHasNoPremium(userId);
@@ -35,11 +35,7 @@ public class PremiumService {
                 .equals(TransactionStatus.SETTLED)) {
             premiumServiceUtils.assignPremiumToUser(userId, durationDays);
         }
-//        PremiumBoughtEvent premiumBoughtEvent = PremiumBoughtEvent.builder()
-//                .paymentAmount(transaction.getAmount())
-//                .subscriptionDuration(durationDays)
-//                .sentAt(transaction.getCreatedAt())
-//                .build();
+
         PremiumBoughtEvent premiumBoughtEvent = new PremiumBoughtEvent();
         premiumBoughtEvent.setPaymentAmount(transaction.getAmount());
         premiumBoughtEvent.setSubscriptionDuration(durationDays);

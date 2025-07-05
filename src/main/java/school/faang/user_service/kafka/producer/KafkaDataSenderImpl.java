@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.kafka.Event;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
 import school.faang.user_service.kafka.events.RecommendationEvent;
+import school.faang.user_service.kafka.events.FollowerEvent;
+import school.faang.user_service.kafka.events.ProfileViewEvent;
 
 import java.util.List;
 
@@ -80,6 +82,23 @@ public class KafkaDataSenderImpl implements DataSender {
                     } else {
                         log.warn("Recommendation event with id {} has not been sent",
                                 recommendationEvent.getId(), ex);
+                    }
+                });
+    }
+
+    public void send(String topic, FollowerEvent followerEvent) {
+        kafkaTemplateJson.send(topic, followerEvent)
+                .whenComplete((record, ex) -> {
+                    if (ex == null) {
+                        log.info("Published FollowerEvent for follower={}, targetType={}, targetId={} → topic={}, partition={}, offset={}",
+                                followerEvent.getFollowerId(),
+                                followerEvent.getTargetType(),
+                                followerEvent.getTargetId(),
+                                topic,
+                                record.getRecordMetadata().partition(),
+                                record.getRecordMetadata().offset());
+                    } else {
+                        log.error("Failed to publish FollowerEvent {}, reason:", followerEvent, ex);
                     }
                 });
     }

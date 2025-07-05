@@ -6,15 +6,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.kafka.events.FollowerEvent;
+import school.faang.user_service.kafka.producer.DataSender;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.filter.UserFollowersFilter;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,6 +27,8 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,6 +40,10 @@ class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
     @Mock
+    DataSender dataSender;
+    @Mock
+    KafkaTopics kafkaTopics;
+    @Mock
     private UserFollowersFilter filter1;
     @Spy
     private UserMapperImpl userMapper;
@@ -43,6 +54,7 @@ class SubscriptionServiceTest {
     private User userB;
     private UserDto userDtoA;
     private UserDto userDtoB;
+    private static final String TOPIC = "follower-events-topic";
 
     @BeforeEach
     void setup() {
@@ -52,7 +64,9 @@ class SubscriptionServiceTest {
         subscriptionService = new SubscriptionService(
                 subscriptionRepository,
                 List.of(filter1),
-                userMapper
+                userMapper,
+                dataSender,
+                kafkaTopics
         );
         userA.setUsername("User1");
         userA.setEmail("user1@email.com");
@@ -95,6 +109,8 @@ class SubscriptionServiceTest {
         );
         verify(subscriptionRepository, never())
                 .followUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(dataSender, never()).send(anyString(), any(FollowerEvent.class));
+
     }
 
     @Test

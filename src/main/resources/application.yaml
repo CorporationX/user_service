@@ -99,6 +99,15 @@ spring:
           name: recommendation-events-topic.DLT
           partitions: 1
           replication-factor: 3
+      follower-events:
+        name: follower_events
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.follower-events.name}.DLT
+          partitions: 1
+          replication-factor: 3
+
       recommendation-request:
         name: recommendation-request-topic
         partitions: 4

@@ -40,3 +40,7 @@ user:
   password:
     min:
       length: 6
+
+Mentorship:
+  min:
+    MonthsBetweenRequests: 3

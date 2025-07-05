@@ -6622,3 +6622,389 @@ org.postgresql.util.PSQLException: ERROR: insert or update on table "recommendat
 	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-07-05 21:25:02.010 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final [trace=, span=]
+2025-07-05 21:25:02.086 [main] INFO  s.f.u.UserServiceApplication - Starting UserServiceApplication using Java 17.0.14 with PID 14012 (D:\CorporationX\user_service\build\classes\java\main started by Home in D:\CorporationX\user_service) [trace=, span=]
+2025-07-05 21:25:02.087 [main] INFO  s.f.u.UserServiceApplication - No active profile set, falling back to 1 default profile: "default" [trace=, span=]
+2025-07-05 21:25:06.972 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode [trace=, span=]
+2025-07-05 21:25:06.975 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode. [trace=, span=]
+2025-07-05 21:25:07.042 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.CareerRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.043 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactPreferenceRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.044 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.046 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ContentDataRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.047 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.CountryRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.048 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.EducationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.091 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventParticipationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.092 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.092 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.FollowerRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.094 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalInvitationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.095 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.096 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.098 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.099 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.premium.PremiumRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.100 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ProjectSubscriptionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.104 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.EventPromotionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.105 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.ProductRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.108 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.ProfilePromotionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.109 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.PromotionPlanRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.110 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.PromotionPlanRepositoryAdapter; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.112 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.113 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.115 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillOfferRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.116 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.117 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SkillRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.118 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SubscriptionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.120 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.TransactionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.121 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.123 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserSkillGuaranteeRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.125 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.WorkScheduleRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table. [trace=, span=]
+2025-07-05 21:25:07.126 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 142 ms. Found 0 JDBC repository interfaces. [trace=, span=]
+2025-07-05 21:25:07.139 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode [trace=, span=]
+2025-07-05 21:25:07.141 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. [trace=, span=]
+2025-07-05 21:25:07.401 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 255 ms. Found 30 JPA repository interfaces. [trace=, span=]
+2025-07-05 21:25:07.432 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode [trace=, span=]
+2025-07-05 21:25:07.434 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode. [trace=, span=]
+2025-07-05 21:25:07.482 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.CareerRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.483 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactPreferenceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.483 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.contact.ContactRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.483 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ContentDataRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.484 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.CountryRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.484 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.EducationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.484 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventParticipationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.484 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.event.EventRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.485 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.FollowerRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.485 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalInvitationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.485 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.goal.GoalRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.485 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.486 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.mentorship.MentorshipRequestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.486 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.premium.PremiumRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.486 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.ProjectSubscriptionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.486 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.EventPromotionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.486 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.ProductRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.487 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.ProfilePromotionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.487 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.PromotionPlanRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.487 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.promotion.PromotionPlanRepositoryAdapter; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.487 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.488 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.RecommendationRequestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.488 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillOfferRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.488 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.recommendation.SkillRequestRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.488 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SkillRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.488 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.SubscriptionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.489 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.TransactionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.489 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.489 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.UserSkillGuaranteeRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.489 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface school.faang.user_service.repository.WorkScheduleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository [trace=, span=]
+2025-07-05 21:25:07.489 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 35 ms. Found 0 Redis repository interfaces. [trace=, span=]
+2025-07-05 21:25:08.045 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=e83b5484-645c-3cf8-9287-08daca54022f [trace=, span=]
+2025-07-05 21:25:08.242 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'school.faang.user_service.client.PaymentServiceClient' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) [trace=, span=]
+2025-07-05 21:25:08.245 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'school.faang.user_service.service.dicebear.DicebearClient' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) [trace=, span=]
+2025-07-05 21:25:08.922 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http) [trace=, span=]
+2025-07-05 21:25:08.946 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"] [trace=, span=]
+2025-07-05 21:25:08.948 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat] [trace=, span=]
+2025-07-05 21:25:08.948 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.8] [trace=, span=]
+2025-07-05 21:25:09.203 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext [trace=, span=]
+2025-07-05 21:25:09.205 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 7018 ms [trace=, span=]
+2025-07-05 21:25:09.486 [main] DEBUG o.s.w.f.CommonsRequestLoggingFilter - Filter 'commonsRequestLoggingFilter' configured for use [trace=, span=]
+2025-07-05 21:25:09.617 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... [trace=, span=]
+2025-07-05 21:25:14.828 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@27048db3 [trace=, span=]
+2025-07-05 21:25:14.829 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. [trace=, span=]
+2025-07-05 21:25:19.798 [main] INFO  liquibase.database - Set default schema name to public [trace=, span=]
+2025-07-05 21:25:24.750 [main] INFO  liquibase.lockservice - Changelog-Protokoll erfolgreich gesperrt. [trace=, span=]
+2025-07-05 21:25:27.804 [main] INFO  liquibase.changelog - Reading from public.databasechangelog [trace=, span=]
+2025-07-05 21:25:28.012 [main] INFO  liquibase.lockservice - Successfully released change log lock [trace=, span=]
+2025-07-05 21:25:28.136 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] [trace=, span=]
+2025-07-05 21:25:28.220 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.1.7.Final [trace=, span=]
+2025-07-05 21:25:28.631 [main] INFO  SQL dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect [trace=, span=]
+2025-07-05 21:25:29.001 [main] WARN  o.h.cfg.annotations.EntityBinder - HHH000457: Joined inheritance hierarchy [school.faang.user_service.entity.promotion.Product] defined explicit @DiscriminatorColumn.  Legacy Hibernate behavior was to ignore the @DiscriminatorColumn.  However, as part of issue HHH-6911 we now apply the explicit @DiscriminatorColumn.  If you would prefer the legacy behavior, enable the `hibernate.discriminator.ignore_explicit_for_joined` setting (hibernate.discriminator.ignore_explicit_for_joined=true) [trace=, span=]
+2025-07-05 21:25:30.160 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform] [trace=, span=]
+2025-07-05 21:25:30.172 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' [trace=, span=]
+2025-07-05 21:25:31.765 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning [trace=, span=]
+2025-07-05 21:25:33.065 [main] INFO  o.s.cloud.commons.util.InetUtils - Cannot determine local hostname [trace=, span=]
+2025-07-05 21:25:33.692 [main] INFO  o.s.c.o.FeignClientFactoryBean - For 'payment-service' URL not provided. Will try picking an instance via load-balancing. [trace=, span=]
+2025-07-05 21:25:39.380 [main] INFO  o.s.cloud.commons.util.InetUtils - Cannot determine local hostname [trace=, span=]
+2025-07-05 21:25:39.422 [main] WARN  o.s.c.l.c.LoadBalancerCacheAutoConfiguration$LoadBalancerCaffeineWarnLogger - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath. [trace=, span=]
+2025-07-05 21:25:39.437 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 18 endpoint(s) beneath base path '/actuator' [trace=, span=]
+2025-07-05 21:25:39.509 [main] INFO  o.a.k.c.admin.AdminClientConfig - AdminClientConfig values: 
+	bootstrap.servers = [localhost:9092, localhost:9094]
+	client.dns.lookup = use_all_dns_ips
+	client.id = 
+	connections.max.idle.ms = 300000
+	default.api.timeout.ms = 60000
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+ [trace=, span=]
+2025-07-05 21:25:39.644 [main] INFO  o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.3.2 [trace=, span=]
+2025-07-05 21:25:39.644 [main] INFO  o.a.kafka.common.utils.AppInfoParser - Kafka commitId: b66af662e61082cb [trace=, span=]
+2025-07-05 21:25:39.644 [main] INFO  o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1751743539642 [trace=, span=]
+2025-07-05 21:26:09.653 [main] ERROR o.s.kafka.core.KafkaAdmin - Could not configure topics [trace=, span=]
+java.util.concurrent.TimeoutException: null
+	at java.base/java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:1960)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2095)
+	at org.apache.kafka.common.internals.KafkaFutureImpl.get(KafkaFutureImpl.java:180)
+	at org.springframework.kafka.core.KafkaAdmin.initialize(KafkaAdmin.java:214)
+	at org.springframework.kafka.core.KafkaAdmin.afterSingletonsInstantiated(KafkaAdmin.java:183)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:984)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:917)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:584)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:732)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:310)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1304)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1293)
+	at school.faang.user_service.UserServiceApplication.main(UserServiceApplication.java:21)
+2025-07-05 21:26:14.374 [kafka-admin-client-thread | adminclient-1] INFO  o.a.kafka.common.utils.AppInfoParser - App info kafka.admin.client for adminclient-1 unregistered [trace=, span=]
+2025-07-05 21:26:14.378 [kafka-admin-client-thread | adminclient-1] INFO  o.a.kafka.common.metrics.Metrics - Metrics scheduler closed [trace=, span=]
+2025-07-05 21:26:14.378 [kafka-admin-client-thread | adminclient-1] INFO  o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter [trace=, span=]
+2025-07-05 21:26:14.378 [kafka-admin-client-thread | adminclient-1] INFO  o.a.kafka.common.metrics.Metrics - Metrics reporters closed [trace=, span=]
+2025-07-05 21:26:14.438 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"] [trace=, span=]
+2025-07-05 21:26:14.467 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path '' [trace=, span=]
+2025-07-05 21:26:14.482 [main] INFO  o.s.c.c.s.ConsulServiceRegistry - Registering service with consul: NewService{id='user-service-8080', name='user-service', tags=[], address='localhost', meta={secure=false}, port=8080, enableTagOverride=null, check=Check{script='null', dockerContainerID='null', shell='null', interval='10s', ttl='null', http='http://localhost:8080/actuator/health', method='null', header={}, tcp='null', timeout='null', deregisterCriticalServiceAfter='null', tlsSkipVerify=null, status='null', grpc='null', grpcUseTLS=null}, checks=null} [trace=, span=]
+2025-07-05 21:26:19.282 [main] INFO  o.s.cloud.commons.util.InetUtils - Cannot determine local hostname [trace=, span=]
+2025-07-05 21:26:19.322 [main] INFO  o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.offset.reset = latest
+	bootstrap.servers = [localhost:9092, localhost:9094]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-analytics-created-1
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = analytics-created
+	group.instance.id = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 50
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+ [trace=, span=]
+2025-07-05 21:26:19.376 [main] INFO  o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.3.2 [trace=, span=]
+2025-07-05 21:26:19.377 [main] INFO  o.a.kafka.common.utils.AppInfoParser - Kafka commitId: b66af662e61082cb [trace=, span=]
+2025-07-05 21:26:19.377 [main] INFO  o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1751743579376 [trace=, span=]
+2025-07-05 21:26:19.378 [main] INFO  o.a.k.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Subscribed to topic(s): analytics-profile-event-topic [trace=, span=]
+2025-07-05 21:26:19.401 [scheduling-1] INFO  s.f.u.runner.PromotionBatchRunner - Promotion Batch running [trace=, span=]
+2025-07-05 21:26:19.401 [main] INFO  s.f.u.UserServiceApplication - Started UserServiceApplication in 84.228 seconds (process running for 85.152) [trace=, span=]
+2025-07-05 21:26:19.402 [scheduling-1] INFO  s.f.u.r.p.PromotionAnalyticsCacheService - Executing getIdsAboveThreshold method for Event type = EVENT_VIEW, counter threshold = 1000 [trace=, span=]
+2025-07-05 21:26:21.519 [scheduling-1] ERROR o.s.s.s.TaskUtils$LoggingErrorHandler - Unexpected error occurred in scheduled task [trace=, span=]
+org.springframework.data.redis.RedisConnectionFailureException: java.net.SocketTimeoutException: Read timed out
+	at org.springframework.data.redis.connection.jedis.JedisExceptionConverter.convert(JedisExceptionConverter.java:67)
+	at org.springframework.data.redis.connection.jedis.JedisExceptionConverter.convert(JedisExceptionConverter.java:42)
+	at org.springframework.data.redis.PassThroughExceptionTranslationStrategy.translate(PassThroughExceptionTranslationStrategy.java:40)
+	at org.springframework.data.redis.FallbackExceptionTranslationStrategy.translate(FallbackExceptionTranslationStrategy.java:38)
+	at org.springframework.data.redis.connection.jedis.JedisConnection.convertJedisAccessException(JedisConnection.java:212)
+	at org.springframework.data.redis.connection.jedis.JedisConnection.doWithJedis(JedisConnection.java:696)
+	at org.springframework.data.redis.connection.jedis.JedisConnection.doInvoke(JedisConnection.java:185)
+	at org.springframework.data.redis.connection.jedis.JedisConnection.lambda$new$0(JedisConnection.java:86)
+	at org.springframework.data.redis.connection.jedis.JedisInvoker$Synchronizer.invoke(JedisInvoker.java:1032)
+	at org.springframework.data.redis.connection.jedis.JedisInvoker$DefaultManyInvocationSpec.toSet(JedisInvoker.java:997)
+	at org.springframework.data.redis.connection.jedis.JedisZSetCommands.zRangeByScoreWithScores(JedisZSetCommands.java:198)
+	at org.springframework.data.redis.connection.DefaultedRedisConnection.zRangeByScoreWithScores(DefaultedRedisConnection.java:1173)
+	at org.springframework.data.redis.connection.RedisZSetCommands.zRangeByScoreWithScores(RedisZSetCommands.java:574)
+	at org.springframework.data.redis.connection.RedisZSetCommands.zRangeByScoreWithScores(RedisZSetCommands.java:589)
+	at org.springframework.data.redis.core.DefaultZSetOperations.lambda$rangeByScoreWithScores$25(DefaultZSetOperations.java:298)
+	at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:406)
+	at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:373)
+	at org.springframework.data.redis.core.AbstractOperations.execute(AbstractOperations.java:97)
+	at org.springframework.data.redis.core.DefaultZSetOperations.rangeByScoreWithScores(DefaultZSetOperations.java:298)
+	at school.faang.user_service.redis.promotion.PromotionAnalyticsCacheService.getIdsScoreAboveThreshold(PromotionAnalyticsCacheService.java:52)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:750)
+	at org.springframework.retry.annotation.AnnotationAwareRetryOperationsInterceptor.invoke(AnnotationAwareRetryOperationsInterceptor.java:163)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:750)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:702)
+	at school.faang.user_service.redis.promotion.PromotionAnalyticsCacheService$$SpringCGLIB$$0.getIdsScoreAboveThreshold(<generated>)
+	at school.faang.user_service.service.promotion.PromotionBatchProcessor.process(PromotionBatchProcessor.java:32)
+	at school.faang.user_service.runner.PromotionBatchRunner.runBatch(PromotionBatchRunner.java:22)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:84)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:305)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: redis.clients.jedis.exceptions.JedisConnectionException: java.net.SocketTimeoutException: Read timed out
+	at redis.clients.jedis.util.RedisInputStream.ensureFill(RedisInputStream.java:208)
+	at redis.clients.jedis.util.RedisInputStream.readByte(RedisInputStream.java:46)
+	at redis.clients.jedis.Protocol.process(Protocol.java:126)
+	at redis.clients.jedis.Protocol.read(Protocol.java:192)
+	at redis.clients.jedis.Connection.readProtocolWithCheckingBroken(Connection.java:316)
+	at redis.clients.jedis.Connection.getOne(Connection.java:298)
+	at redis.clients.jedis.Connection.executeCommand(Connection.java:123)
+	at redis.clients.jedis.Jedis.zrangeByScoreWithScores(Jedis.java:2860)
+	at org.springframework.data.redis.connection.jedis.JedisInvoker.lambda$fromMany$33(JedisInvoker.java:454)
+	at org.springframework.data.redis.connection.jedis.JedisConnection.lambda$doInvoke$2(JedisConnection.java:201)
+	at org.springframework.data.redis.connection.jedis.JedisConnection.doWithJedis(JedisConnection.java:693)
+	... 41 common frames omitted
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.base/sun.nio.ch.NioSocketImpl.timedRead(NioSocketImpl.java:288)
+	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:314)
+	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:355)
+	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:808)
+	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:966)
+	at java.base/java.io.InputStream.read(InputStream.java:218)
+	at redis.clients.jedis.util.RedisInputStream.ensureFill(RedisInputStream.java:202)
+	... 51 common frames omitted
+2025-07-05 21:26:37.998 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Resetting the last seen epoch of partition analytics-profile-event-topic-0 to 3 since the associated topicId changed from null to W5BT9T6FReyHrEROlk-HQw [trace=, span=]
+2025-07-05 21:26:38.000 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Cluster ID: PVjHlx7ESeesq55jeB6Efg [trace=, span=]
+2025-07-05 21:26:57.458 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.apache.kafka.clients.NetworkClient - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Disconnecting from node -2 due to request timeout. [trace=, span=]
+2025-07-05 21:26:57.463 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.apache.kafka.clients.NetworkClient - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Cancelled in-flight FIND_COORDINATOR request with correlation id 0 due to node -2 being disconnected (elapsed time since creation: 38072ms, elapsed time since send: 30551ms, request timeout: 30000ms) [trace=, span=]
+2025-07-05 21:27:05.380 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Discovered group coordinator LAPTOP-TIT61AR0:9094 (id: 2147483645 rack: null) [trace=, span=]
+2025-07-05 21:27:05.405 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] (Re-)joining group [trace=, span=]
+2025-07-05 21:27:10.398 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Request joining group due to: need to re-join with the given member-id: consumer-analytics-created-1-792142bc-026d-42d6-8679-2eec9815a462 [trace=, span=]
+2025-07-05 21:27:10.399 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Request joining group due to: rebalance failed due to 'The group member needs to have a valid member id before actually entering a consumer group.' (MemberIdRequiredException) [trace=, span=]
+2025-07-05 21:27:10.399 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] (Re-)joining group [trace=, span=]
+2025-07-05 21:27:17.802 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Successfully joined group with generation Generation{generationId=11, memberId='consumer-analytics-created-1-792142bc-026d-42d6-8679-2eec9815a462', protocol='range'} [trace=, span=]
+2025-07-05 21:27:17.805 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Finished assignment for group at generation 11: {consumer-analytics-created-1-792142bc-026d-42d6-8679-2eec9815a462=Assignment(partitions=[analytics-profile-event-topic-0])} [trace=, span=]
+2025-07-05 21:27:26.735 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Successfully synced group in generation Generation{generationId=11, memberId='consumer-analytics-created-1-792142bc-026d-42d6-8679-2eec9815a462', protocol='range'} [trace=, span=]
+2025-07-05 21:27:26.735 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Notifying assignor about the new Assignment(partitions=[analytics-profile-event-topic-0]) [trace=, span=]
+2025-07-05 21:27:26.738 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Adding newly assigned partitions: analytics-profile-event-topic-0 [trace=, span=]
+2025-07-05 21:27:41.906 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-analytics-created-1, groupId=analytics-created] Setting offset for partition analytics-profile-event-topic-0 to the committed offset FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[LAPTOP-TIT61AR0:9092 (id: 1 rack: null)], epoch=3}} [trace=, span=]
+2025-07-05 21:27:41.984 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - analytics-created: partitions assigned: [analytics-profile-event-topic-0] [trace=, span=]

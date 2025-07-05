@@ -119,8 +119,6 @@ server:
 logging:
   level:
     root: INFO
-
-
 services:
   project-service:
     name: project-service

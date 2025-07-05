@@ -348,6 +348,4 @@ public class RecommendationServiceTest {
         verify(dataSender).send(topicName, event);
         assertThat(result).isSameAs(returnedDto);
     }
-
-
 }

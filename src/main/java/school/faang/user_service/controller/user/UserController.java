@@ -1,12 +1,13 @@
 package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.validator.RequestValidator;
 
 @Component
 @RequiredArgsConstructor
@@ -14,21 +15,33 @@ public class UserController {
     private final UserService userService;
 
     public UserDto create(CreateUserDto userDto) {
-        RequestValidator.validateStringNotEmpty(userDto.username(), "username");
-        RequestValidator.validateStringNotEmpty(userDto.email(), "email");
-        RequestValidator.validateStringNotEmpty(userDto.password(), "password");
-        RequestValidator.validateNotNull(userDto.countryId(), "country");
+        validateString(userDto.username(), "username");
+        validateString(userDto.email(), "email");
+        validateString(userDto.password(), "password");
+        validateNotNull(userDto.countryId(), "country");
         return userService.create(userDto);
     }
 
     public UserDto update(long userId, UpdateUserDto userDto) {
-        RequestValidator.validateStringNotEmpty(userDto.username(), "username");
-        RequestValidator.validateStringNotEmpty(userDto.email(), "email");
-        RequestValidator.validateNotNull(userDto.countryId(), "country");
+        validateString(userDto.username(), "username");
+        validateString(userDto.email(), "email");
+        validateNotNull(userDto.countryId(), "country");
         return userService.update(userId, userDto);
     }
 
     public UserDto getById(long userId) {
         return userService.getById(userId);
+    }
+
+    private void validateString(String value, String paramName) {
+        if (StringUtils.isNotBlank(value)) {
+            throw new DataValidationException(paramName + " should be present!");
+        }
+    }
+
+    private void validateNotNull(Object value, String paramName) {
+        if (value == null) {
+            throw new DataValidationException(paramName + " should be present!");
+        }
     }
 }

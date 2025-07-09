@@ -47,7 +47,6 @@ public class SkillServiceImpl implements SkillService {
         return skillMapper.toSkillDto(skill);
     }
 
-    @Transactional
     @Override
     public List<SkillDto> getByUserId(Long userId) {
         return skillRepository.findAllByUserId(userId).stream()
@@ -63,12 +62,11 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillRepository.findSkillsOfferedToUser(userId).stream()
-                .map(skill -> skillMapper.toSkillCandidateDto(
-                        skill,
-                        skillOfferService.countAllOffersOfSkill(skill.getId(), userId)
-                ))
-                .toList();
+        List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
+        return skillMapper.toSkillCandidateDtos(
+                skills,
+                skill -> skillOfferService.countAllOffersOfSkill(skill.getId(), userId)
+        );
     }
 
 
@@ -80,9 +78,7 @@ public class SkillServiceImpl implements SkillService {
         List<SkillOffer> offers = skillOfferService.getAllOffersOfSkill(skillId, userId);
         validateEnoughSkillOffers(offers);
         skillRepository.assignSkillToUser(skillId, userId);
-        List<UserSkillGuarantee> userSkillGuarantees = offers.stream()
-                        .map(userSkillGuaranteeMapper::toUserSkillGuarantee)
-                        .toList();
+        List<UserSkillGuarantee> userSkillGuarantees = userSkillGuaranteeMapper.toUserSkillGuarantees(offers);
         userSkillGuaranteeService.saveAll(userSkillGuarantees);
         log.info("Skill {} successfully assigned to user {}", skillId, userId);
     }

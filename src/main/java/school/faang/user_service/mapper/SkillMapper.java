@@ -8,6 +8,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.Skill;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface SkillMapper {
@@ -22,6 +23,16 @@ public interface SkillMapper {
         }
         SkillDto dto = toSkillDto(skill);
         return new SkillCandidateDto(dto, offersAmount);
+    }
+
+    default List<SkillCandidateDto> toSkillCandidateDtos(List<Skill> skills,
+                                                         Function<Skill, Integer> offersAmountProvider) {
+        if (skills == null) {
+            return List.of();
+        }
+        return skills.stream()
+                .map(skill -> toSkillCandidateDto(skill, offersAmountProvider.apply(skill)))
+                .toList();
     }
 
     default SkillDto toSkillDtoWithGuarantors(Skill skill, List<UserDto> guarantors) {

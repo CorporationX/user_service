@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.user.Skill;
 
 @Data
 @AllArgsConstructor

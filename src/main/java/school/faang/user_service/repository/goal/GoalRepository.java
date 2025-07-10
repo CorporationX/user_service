@@ -3,8 +3,9 @@ package school.faang.user_service.repository.goal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.user.User;
+import school.faang.user_service.exception.EntityNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,12 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             """)
     int countActiveGoalsPerUser(long userId);
 
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            DELETE FROM user_goal WHERE user_id = :userId AND goal_id = :goalId
+            """)
+    void deleteUserFromGoal(long userId, long goalId);
+
     @Query(nativeQuery = true, value = """
             WITH RECURSIVE subtasks AS (
             SELECT * FROM goal WHERE id = :goalId
@@ -56,9 +63,19 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             """)
     List<User> findUsersByGoalId(long goalId);
 
-    @Query(nativeQuery = true, value = "INSERT INTO goal_skill (skill_id, goal_id) VALUES (:skillId, :goalId)")
     @Modifying
+    @Query(nativeQuery = true, value = "DELETE FROM goal_skill gs WHERE gs.goal_id = ?1")
+    void removeSkillsFromGoal(long goalId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "INSERT INTO goal_skill (goal_id, skill_id) VALUES (?2, ?1)")
     void addSkillToGoal(long skillId, long goalId);
+
+    default Goal getByIdOrThrow(long goalId) {
+        return findById(goalId).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Goal %d not found", goalId))
+        );
+    }
 
     @Query(nativeQuery = true, value = "INSERT INTO user_goal (user_id, goal_id) VALUES (:userId, :goalId)")
     @Modifying

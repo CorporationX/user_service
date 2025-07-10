@@ -1,4 +1,4 @@
-package school.faang.user_service.entity;
+package school.faang.user_service.entity.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +34,7 @@ public class Skill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
@@ -52,7 +52,6 @@ public class Skill {
 
     @ManyToMany(mappedBy = "relatedSkills")
     private List<Event> events;
-
 
     @ManyToMany(mappedBy = "skillsToAchieve")
     private List<Goal> goals;

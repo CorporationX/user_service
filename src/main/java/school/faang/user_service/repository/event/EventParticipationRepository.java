@@ -1,13 +1,13 @@
 package school.faang.user_service.repository.event;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 
 import java.util.List;
 
-public interface EventParticipationRepository extends CrudRepository<User, Long> {
+public interface EventParticipationRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)")

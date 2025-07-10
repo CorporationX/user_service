@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 
 import java.time.LocalDateTime;
 
@@ -30,8 +30,8 @@ import java.time.LocalDateTime;
 @Table(name = "rating")
 public class Rating {
 
-    private final static int RATE_MIN_VALUE = 0;
-    private final static int RATE_MAX_VALUE = 5;
+    private static final int RATE_MIN_VALUE = 0;
+    private static final int RATE_MAX_VALUE = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

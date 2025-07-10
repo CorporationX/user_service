@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.user.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

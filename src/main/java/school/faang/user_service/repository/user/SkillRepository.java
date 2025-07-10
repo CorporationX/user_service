@@ -1,9 +1,9 @@
-package school.faang.user_service.repository;
+package school.faang.user_service.repository.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.user.Skill;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     List<Skill> findAllByUserId(long userId);
 
     @Query(nativeQuery = true, value = """
-            SELECT s.* FROM skill s
+            SELECT DISTINCT s.* FROM skill s
             JOIN skill_offer so ON so.skill_id = s.id
             JOIN recommendation r ON r.id = so.recommendation_id
             WHERE r.receiver_id = :userId

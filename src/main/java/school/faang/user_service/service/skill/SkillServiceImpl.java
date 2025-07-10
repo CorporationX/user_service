@@ -13,6 +13,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
@@ -91,7 +92,7 @@ public class SkillServiceImpl implements SkillService {
 
     private void ensureSkillExists(long skillId) {
         if (!skillRepository.existsById(skillId)) {
-            throw new DataValidationException("Skill with id " + skillId + " does not exist");
+            throw new EntityNotFoundException("Skill with id " + skillId + " does not exist");
         }
     }
 

@@ -6,6 +6,7 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -26,6 +27,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Stream<User> findPremiumUsers();
 
     List<User> findByUsernameLike(String username);
+
+    Optional<User> findByUsername(String username);
 
     User findByEmailIgnoreCase(String email);
 

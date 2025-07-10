@@ -1,4 +1,11 @@
 package school.faang.user_service.dto.auth;
 
-public class AuthResponse {
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
+
+@Builder
+public record AuthResponse(
+        @NotBlank
+        String token
+) {
 }

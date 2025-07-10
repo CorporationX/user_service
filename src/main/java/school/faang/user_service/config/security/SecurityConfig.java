@@ -1,6 +1,5 @@
-package school.faang.user_service.security;
+package school.faang.user_service.config.security;
 
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,26 +39,21 @@ class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            SecurityFilterChainFilter jwtFilter,
+            JwtFilter jwtFilter,
             AuthenticationProvider authenticationProvider
     ) throws Exception {
         return http
                 .csrf().disable()
                 .authorizeHttpRequests(
                         authorizeHttp -> {
-                            authorizeHttp.requestMatchers("/").permitAll();
-                            authorizeHttp.requestMatchers("/favicon.svg").permitAll();
-                            authorizeHttp.requestMatchers("/css/*").permitAll();
                             authorizeHttp.requestMatchers(
-                                    "/api/auth/**"
-                            ).permitAll();
-                            authorizeHttp.requestMatchers(
+                                    "/api/auth/**",
                                     "/v3/api-docs/**",
                                     "/swagger-ui/**",
                                     "/swagger-ui.html",
                                     "/v3/api-docs/swagger-config"
                             ).permitAll();
-                            authorizeHttp.anyRequest().permitAll();
+                            authorizeHttp.anyRequest().authenticated();
                         }
                 )
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> {

@@ -1,47 +1,37 @@
 package school.faang.user_service.controller.user;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.auth.AuthRequest;
+import school.faang.user_service.dto.auth.AuthResponse;
 import school.faang.user_service.dto.user.CreateUserDto;
-import school.faang.user_service.dto.user.UpdateUserDto;
-import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.auth.AuthService;
 
-@Component
+@RestController
 @RequiredArgsConstructor
-public class UserController {
-    private final UserService userService;
+@RequestMapping("/api/auth")
+@Tag(name = "Аутентификация", description = "Аутентификация пользователей")
+public class AuthController {
+    private final AuthService authService;
 
-    public UserDto create(CreateUserDto userDto) {
-        validateString(userDto.username(), "username");
-        validateString(userDto.email(), "email");
-        validateString(userDto.password(), "password");
-        validateNotNull(userDto.countryId(), "country");
-        return userService.create(userDto);
+    @PostMapping("register")
+    public ResponseEntity<AuthResponse> register(
+            @RequestBody
+            CreateUserDto dto
+    ) {
+        return ResponseEntity.ok(authService.register(dto));
     }
 
-    public UserDto update(long userId, UpdateUserDto userDto) {
-        validateString(userDto.username(), "username");
-        validateString(userDto.email(), "email");
-        validateNotNull(userDto.countryId(), "country");
-        return userService.update(userId, userDto);
-    }
-
-    public UserDto getById(long userId) {
-        return userService.getById(userId);
-    }
-
-    private void validateString(String value, String paramName) {
-        if (StringUtils.isNotBlank(value)) {
-            throw new DataValidationException(paramName + " should be present!");
-        }
-    }
-
-    private void validateNotNull(Object value, String paramName) {
-        if (value == null) {
-            throw new DataValidationException(paramName + " should be present!");
-        }
+    @PostMapping("authentication")
+    public ResponseEntity<AuthResponse> register(
+            @RequestBody
+            AuthRequest dto
+    ) {
+        return ResponseEntity.ok(authService.authenticate(dto));
     }
 }

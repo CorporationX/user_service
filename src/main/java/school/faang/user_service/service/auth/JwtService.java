@@ -1,10 +1,10 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +14,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JWTService {
-    //todo вынести в конфигурацию
-    private static final String SECRET_KEY = "fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a";
+public class JwtService {
+    @Value("${jwt.access.secret}")
+    private String secret;
+    @Value("${jwt.access.expiration}")
+    private int expiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -39,21 +41,21 @@ public class JWTService {
         return claimResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(Map.of(), userDetails);
-    }
-
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String extractedUsername = extractUsername(token);
         return extractedUsername.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiredAt(token).after(new Date());
+        return extractExpiredAt(token).before(new Date());
+    }
+
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(Map.of(), userDetails);
     }
 
     public String generateToken(
-            @Nullable Map<String, Object> extraClaims,
+            Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
         return Jwts.builder()
@@ -61,12 +63,12 @@ public class JWTService {
                 .claims().add(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .and().compact();
     }
 
     private SecretKey getSecretKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

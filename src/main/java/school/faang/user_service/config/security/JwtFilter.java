@@ -12,14 +12,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import school.faang.user_service.service.user.JWTService;
+import school.faang.user_service.service.auth.JwtService;
 
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JWTFilter extends OncePerRequestFilter {
-    private final JWTService jwtService;
+public class JwtFilter extends OncePerRequestFilter {
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override

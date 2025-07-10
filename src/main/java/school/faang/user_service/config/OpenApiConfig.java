@@ -14,6 +14,6 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("User Service API")
                         .description("Документация для сервиса пользователей")
-                        .version("v1.0.0"));
+                        .version("v1.0.1"));
     }
 }

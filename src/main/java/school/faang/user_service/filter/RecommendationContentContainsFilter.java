@@ -19,6 +19,10 @@ public class RecommendationContentContainsFilter implements RecommendationFilter
             RecommendationFilterDto recommendationFilterDto
     ) {
         return recommendations
-                .filter(rec -> rec.getContent().contains(recommendationFilterDto.contentContains()));
+                .filter(
+                        rec -> rec.getContent()
+                                .toLowerCase()
+                                .contains(recommendationFilterDto.contentContains().toLowerCase())
+                );
     }
 }

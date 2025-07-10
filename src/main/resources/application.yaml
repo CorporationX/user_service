@@ -59,3 +59,14 @@ dicebear:
   api-url: https://api.dicebear.com/9.x
   style: pixel-art
   default-seed: defaultUserSeed
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tryItOutEnabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    filter: true
+  packages-to-scan: school.faang.user_service.controller

@@ -20,22 +20,7 @@ public class EducationService {
     private final EducationRepository educationRepository;
     private final EducationMapper educationMapper;
 
-    @Transactional
-    public EducationDto addEducation(long userId, EducationDto educationDto) {
-        if (educationDto.getYearFrom() >= Year.now().getValue()) {
-            throw new DataValidationException("Год должен быть меньше текущего.");
-        }
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь не найден."));
-
-        Education education = educationMapper.toEducationWithUser(educationDto,user);
-        education = educationRepository.save(education);
-        return educationMapper.toEducationDto(education);
-    }
-
-    @Transactional
-    public EducationDto updateEducation(long userId, EducationDto educationDto) {
-
+    private void checkData(EducationDto educationDto) {
         if (educationDto == null) {
             throw new DataValidationException("Данные об образовании не могут быть пустыми.");
         }
@@ -43,7 +28,22 @@ public class EducationService {
         if (educationDto.getYearFrom() >= Year.now().getValue()) {
             throw new DataValidationException("Год должен быть меньше текущего.");
         }
+    }
 
+    @Transactional
+    public EducationDto addEducation(long userId, EducationDto educationDto) {
+        checkData(educationDto);
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new DataValidationException("Пользователь не найден."));
+
+        Education education = educationMapper.toEducationWithUser(educationDto, user);
+        education = educationRepository.save(education);
+        return educationMapper.toEducationDto(education);
+    }
+
+    @Transactional
+    public EducationDto updateEducation(long userId, EducationDto educationDto) {
+        checkData(educationDto);
         Education education = educationRepository.findById(educationDto.getId())
                 .orElseThrow(() -> new DataValidationException("Образование не найдено."));
 

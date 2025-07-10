@@ -10,7 +10,7 @@ import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EducationMapper {
-
+    @Mapping(target = "user", ignore = true)
     Education toEducation(EducationDto educationDto);
 
     EducationDto toEducationDto(Education education);
@@ -18,7 +18,7 @@ public interface EducationMapper {
     @Mapping(target = "user", ignore = true)
     void updateEducationFromDto(EducationDto dto, @MappingTarget Education entity);
 
-    @Mapping(source = "educationDto.id", target = "id")
+    @Mapping(target = "id", source = "educationDto.id")
+    @Mapping(target = "user", source = "user")
     Education toEducationWithUser(EducationDto educationDto, User user);
 }
-

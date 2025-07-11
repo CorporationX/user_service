@@ -1,6 +1,7 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import school.faang.user_service.dto.skill.CreateSkillDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -35,10 +36,6 @@ public interface SkillMapper {
                 .toList();
     }
 
-    default SkillDto toSkillDtoWithGuarantors(Skill skill, List<UserDto> guarantors) {
-        if (skill == null) {
-            return null;
-        }
-        return new SkillDto(skill.getId(), skill.getTitle(), guarantors);
-    }
+    @Mapping(target = "guarantors", source = "guarantors")
+    SkillDto toSkillDtoWithGuarantors(Skill skill, List<UserDto> guarantors);
 }

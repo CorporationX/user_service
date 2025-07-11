@@ -46,4 +46,11 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             WHERE gs.goal_id = ?1)
             """)
     List<Skill> findSkillsByGoalId(long goalId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(*) > 0
+            FROM user_skill
+            WHERE skill_id = :skillId AND user_id = :userId
+            """)
+    boolean existsUserSkill(long skillId, long userId);
 }

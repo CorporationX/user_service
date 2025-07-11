@@ -29,8 +29,8 @@ public class SkillValidator {
 
     public void validateUserDoesNotHaveSkill(boolean userHasSkill, long skillId, long userId) {
         if (userHasSkill) {
-            throw new ForbiddenException("User with id " + userId +
-                    " already has skill with id " + skillId);
+            throw new ForbiddenException("User with id " + userId
+                    + " already has skill with id " + skillId);
         }
     }
 

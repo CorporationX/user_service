@@ -54,6 +54,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceImplTest {
+    public static final Long MENTOR_ID = 1L;
+    public static final Long USER_ID = 2L;
+    public static final Long GOAL_ID = 1L;
+
     @InjectMocks
     private GoalServiceImpl goalService;
 
@@ -103,61 +107,53 @@ public class GoalServiceImplTest {
 
     @Test
     public void testDeleteGoalsByMentor() {
-        long id = 1L;
-        long mentorId = 2L;
-        long goalId = 2L;
-        Goal findedGoal = createGoal(goalId, mentorId, 1, 0);
+        long id = GOAL_ID + 1L;
+        Goal findedGoal = createGoal(GOAL_ID, MENTOR_ID, 1, 0);
         when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userContext.getUserId()).thenReturn(mentorId);
+        when(userContext.getUserId()).thenReturn(MENTOR_ID);
 
         goalService.delete(id);
 
         verify(goalRepository, times(1)).deleteById(id);
         verify(goalDeletePolicy, times(1)).validate(findedGoal);
-        verify(goalRepository, times(0)).deleteUserFromGoal(mentorId, findedGoal.getId());
+        verify(goalRepository, times(0)).deleteUserFromGoal(MENTOR_ID, findedGoal.getId());
     }
 
     @Test
     public void testDeleteGoalsWhenOnlyOneParticipant() {
-        long id = 1L;
-        long userId = 2L;
-        long goalId = 2L;
-        Goal findedGoal = createGoal(goalId, userId, 1, 0);
+        long id = GOAL_ID + 1L;
+        Goal findedGoal = createGoal(GOAL_ID, USER_ID, 1, 0);
         when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userContext.getUserId()).thenReturn(userId);
+        when(userContext.getUserId()).thenReturn(USER_ID);
 
         goalService.delete(id);
 
         verify(goalRepository, times(1)).deleteById(id);
         verify(goalDeletePolicy, times(1)).validate(findedGoal);
-        verify(goalRepository, times(0)).deleteUserFromGoal(userId, findedGoal.getId());
+        verify(goalRepository, times(0)).deleteUserFromGoal(USER_ID, findedGoal.getId());
     }
 
     @Test
     public void testDeleteGoalsWhenMoreThenOneParticipant() {
-        long id = 1L;
-        long userId = 2L;
-        Goal findedGoal = createGoal(id, 1L, 2, 0);
-        when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userContext.getUserId()).thenReturn(userId);
+        Goal findedGoal = createGoal(GOAL_ID, 1L, 2, 0);
+        when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
+        when(userContext.getUserId()).thenReturn(USER_ID);
 
-        goalService.delete(id);
+        goalService.delete(GOAL_ID);
 
-        verify(goalRepository, times(0)).deleteById(id);
+        verify(goalRepository, times(0)).deleteById(GOAL_ID);
         verify(goalDeletePolicy, times(1)).validate(findedGoal);
-        verify(goalRepository, times(1)).deleteUserFromGoal(userId, findedGoal.getId());
+        verify(goalRepository, times(1)).deleteUserFromGoal(USER_ID, findedGoal.getId());
     }
 
     @Test
     public void testUpdateIncompleteGoalWithValidData() {
-        long id = 1L;
-        long mentorId = 1L;
-        Goal findedGoal = createGoal(id, mentorId, 2, 0);
+        Goal findedGoal = createGoal(GOAL_ID, MENTOR_ID, 2, 0);
         UpdateGoalDto dto = new UpdateGoalDto(
                 "title",
                 "description",
                 LocalDateTime.now().plusDays(1),
-                mentorId,
+                MENTOR_ID,
                 GoalStatus.ACTIVE,
                 List.of(1L, 2L)
         );
@@ -166,17 +162,17 @@ public class GoalServiceImplTest {
             skill.setId(skillId);
             return skill;
         }).toList();
-        when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userRepository.getByIdOrThrow(mentorId)).thenReturn(findedGoal.getMentor());
+        when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
+        when(userRepository.getByIdOrThrow(MENTOR_ID)).thenReturn(findedGoal.getMentor());
         when(skillRepository.findAllById(dto.skillIds())).thenReturn(skills);
 
-        goalService.update(id, dto);
+        goalService.update(GOAL_ID, dto);
 
-        verify(goalRepository, times(1)).getByIdOrThrow(id);
+        verify(goalRepository, times(1)).getByIdOrThrow(GOAL_ID);
         verify(goalUpdatePolicy, times(1)).validate(dto, findedGoal);
         verify(skillRepository, times(1)).findAllById(dto.skillIds());
         verify(userRepository, times(1)).getByIdOrThrow(dto.mentorId());
-        assertEquals(mentorId, findedGoal.getMentor().getId());
+        assertEquals(MENTOR_ID, findedGoal.getMentor().getId());
         assertEquals(findedGoal.getSkillsToAchieve(), skills);
         verify(goalMapperImpl, times(1)).update(findedGoal, dto);
         verify(goalRepository, times(1)).save(findedGoal);
@@ -184,18 +180,17 @@ public class GoalServiceImplTest {
 
     @Test
     public void testUpdateIncompleteGoalWithEmptyData() {
-        long id = 1L;
-        Goal findedGoal = createGoal(id, null, 0, 0);
+        Goal findedGoal = createGoal(GOAL_ID, null, 0, 0);
         UpdateGoalDto dto = new UpdateGoalDto(
                 null, null,
                 null, null,
                 null, null
         );
-        when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
+        when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
 
-        goalService.update(id, dto);
+        goalService.update(GOAL_ID, dto);
 
-        verify(goalRepository, times(1)).getByIdOrThrow(id);
+        verify(goalRepository, times(1)).getByIdOrThrow(GOAL_ID);
         verify(goalUpdatePolicy, times(1)).validate(dto, findedGoal);
         verify(skillRepository, times(0)).findAllById(anyList());
         verify(userRepository, times(0)).getByIdOrThrow(anyLong());
@@ -207,14 +202,12 @@ public class GoalServiceImplTest {
 
     @Test
     public void testUpdateCompleteGoalWithUsersAndSkills() {
-        long id = 1L;
-        long mentorId = 1L;
-        Goal findedGoal = createGoal(id, mentorId, 2, 2);
+        Goal findedGoal = createGoal(GOAL_ID, MENTOR_ID, 2, 2);
         UpdateGoalDto dto = new UpdateGoalDto(
                 "title",
                 "description",
                 LocalDateTime.now().plusDays(1),
-                mentorId,
+                MENTOR_ID,
                 GoalStatus.COMPLETED,
                 List.of(1L, 2L)
         );
@@ -223,11 +216,11 @@ public class GoalServiceImplTest {
             skill.setId(skillId);
             return skill;
         }).toList();
-        when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userRepository.getByIdOrThrow(mentorId)).thenReturn(findedGoal.getMentor());
+        when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
+        when(userRepository.getByIdOrThrow(MENTOR_ID)).thenReturn(findedGoal.getMentor());
         when(skillRepository.findAllById(dto.skillIds())).thenReturn(skills);
 
-        goalService.update(id, dto);
+        goalService.update(GOAL_ID, dto);
 
         findedGoal.getSkillsToAchieve().forEach(skill -> {
             findedGoal.getUsers().forEach(user -> {
@@ -238,14 +231,12 @@ public class GoalServiceImplTest {
 
     @Test
     public void testUpdateCompleteGoalWithoutUsersAndSkills() {
-        long id = 1L;
-        long mentorId = 1L;
-        Goal findedGoal = createGoal(id, mentorId, 0, 0);
+        Goal findedGoal = createGoal(GOAL_ID, MENTOR_ID, 0, 0);
         UpdateGoalDto dto = new UpdateGoalDto(
                 "title",
                 "description",
                 LocalDateTime.now().plusDays(1),
-                mentorId,
+                MENTOR_ID,
                 GoalStatus.COMPLETED,
                 List.of(1L, 2L)
         );
@@ -254,23 +245,22 @@ public class GoalServiceImplTest {
             skill.setId(skillId);
             return skill;
         }).toList();
-        when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userRepository.getByIdOrThrow(mentorId)).thenReturn(findedGoal.getMentor());
+        when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
+        when(userRepository.getByIdOrThrow(MENTOR_ID)).thenReturn(findedGoal.getMentor());
         when(skillRepository.findAllById(dto.skillIds())).thenReturn(skills);
 
-        goalService.update(id, dto);
+        goalService.update(GOAL_ID, dto);
 
         verify(skillRepository, times(0)).assignSkillToUser(anyLong(), anyLong());
     }
 
     @Test
     public void testCreateGoalWithFullData() {
-        long mentorId = 1L;
         User mentor = new User();
-        mentor.setId(mentorId);
+        mentor.setId(MENTOR_ID);
         List<Long> userIds = List.of(1L, 2L);
         List<Long> skillIds = List.of(3L, 4L);
-        when(userRepository.findById(mentorId)).thenReturn(Optional.of(mentor));
+        when(userRepository.findById(MENTOR_ID)).thenReturn(Optional.of(mentor));
         when(skillRepository.findAllById(skillIds)).thenReturn(skillIds.stream()
                 .map(skillId -> {
                     Skill skill = new Skill();
@@ -291,7 +281,7 @@ public class GoalServiceImplTest {
                 "title",
                 "description",
                 LocalDateTime.now().plusDays(1),
-                mentorId,
+                MENTOR_ID,
                 userIds,
                 skillIds
         );
@@ -301,11 +291,11 @@ public class GoalServiceImplTest {
         verify(goalCreatePolicy, times(1)).validate(dto);
         verify(userRepository, times(1)).findAllById(dto.userIds());
         verify(skillRepository, times(1)).findAllById(dto.skillIds());
-        verify(userRepository, times(1)).findById(mentorId);
+        verify(userRepository, times(1)).findById(MENTOR_ID);
         verify(userSkillGuaranteeRepository, times(1)).saveAll(guaranteesCaptor.capture());
         verify(goalRepository, times(1)).save(goalCaptor.capture());
         Goal createdGoal = goalCaptor.getValue();
-        assertEquals(mentorId, createdGoal.getMentor().getId());
+        assertEquals(MENTOR_ID, createdGoal.getMentor().getId());
         assertEquals(skillIds, createdGoal.getSkillsToAchieve().stream().mapToLong(Skill::getId).boxed().toList());
         assertEquals(skillIds.size(), createdGoal.getUsers().size());
     }
@@ -335,7 +325,6 @@ public class GoalServiceImplTest {
         assertEquals(Collections.emptyList(), createdGoal.getUsers());
     }
 
-    //todo создать фабрику
     private Goal createGoal(Long goalId, Long mentorId, int participantCount, int skillsCount) {
         Goal goal = new Goal();
         goal.setId(goalId);

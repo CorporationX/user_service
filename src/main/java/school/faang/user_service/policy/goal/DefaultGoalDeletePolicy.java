@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.user.User;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.exception.DataValidationException;
 
 @Slf4j
 @Component
@@ -14,27 +13,24 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 public class DefaultGoalDeletePolicy implements GoalDeletePolicy {
 
     private final UserContext userContext;
-    private final MentorshipRepository mentorshipRepository;
+    private final GoalPolicyUtils goalPolicyUtils;
 
     @Override
     public void validate(Goal goal) {
-        Long currentUserId = userContext.getUserId();
-        boolean isMentor = goal.getMentor() != null
-                && goal.getMentor().getId().equals(currentUserId);
-        boolean isParticipant = goal.getUsers() != null
-                && goal.getUsers().stream().map(User::getId).anyMatch(val -> val.equals(currentUserId));
-        if (!isMentor && !isParticipant) {
-            deny(goal, currentUserId);
-        }
+        long currentUserId = userContext.getUserId();
+        goalPolicyUtils.denyIfNotMentorAndParticipant(
+                currentUserId,
+                goal,
+                () -> deny("Cannot update goal", goal, currentUserId)
+        );
     }
 
-    private void deny(Goal goal, long currentUserId) {
-        String msg = String.format(
-                "Cannot update goal. Goal ID: %d, Status: %s, CurrentUserId: %d",
+    private void deny(String msg, Goal goal, long currentUserId) {
+        String msgDetail = String.format(
+                "Goal ID: %d, Status: %s, CurrentUserId: %d",
                 goal.getId(), goal.getStatus(), currentUserId
         );
-        log.error("AccessDenied: {}", msg);
-        throw new IllegalArgumentException(msg);
+        throw DataValidationException.withCustomDebug(msg, msg + ", " + msgDetail);
     }
 }
 

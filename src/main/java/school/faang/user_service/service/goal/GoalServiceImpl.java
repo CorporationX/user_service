@@ -36,7 +36,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GoalServiceImpl implements GoalService {
-    public static final int MIN_USERS_TO_DELETE_GOAL = 1;
+    private static final int MIN_USERS_TO_DELETE_GOAL = 1;
 
     private final UserContext userContext;
     private final GoalRepository goalRepository;
@@ -71,21 +71,24 @@ public class GoalServiceImpl implements GoalService {
     private void setGuaranteeAndSkills(CreateGoalDto createGoalDto, List<User> users, Goal goal) {
         if (createGoalDto.skillIds() != null && !createGoalDto.skillIds().isEmpty()) {
             List<Skill> skills = skillRepository.findAllById(createGoalDto.skillIds());
-            userRepository.findById(createGoalDto.mentorId())
-                    .ifPresent(mentor -> {
-                        List<UserSkillGuarantee> guarantees = new ArrayList<>();
-                        users.forEach(user -> {
-                            skills.forEach(skill -> {
-                                UserSkillGuarantee userSkillGuarantee = new UserSkillGuarantee();
-                                userSkillGuarantee.setUser(user);
-                                userSkillGuarantee.setSkill(skill);
-                                userSkillGuarantee.setGuarantor(mentor);
-                                guarantees.add(userSkillGuarantee);
+            if (createGoalDto.mentorId() != null) {
+                userRepository.findById(createGoalDto.mentorId())
+                        .ifPresent(mentor -> {
+                            List<UserSkillGuarantee> guarantees = new ArrayList<>();
+                            users.forEach(user -> {
+                                skills.forEach(skill -> {
+                                    UserSkillGuarantee userSkillGuarantee = UserSkillGuarantee.builder()
+                                            .user(user)
+                                            .skill(skill)
+                                            .guarantor(mentor)
+                                            .build();
+                                    guarantees.add(userSkillGuarantee);
+                                });
                             });
+                            userSkillGuaranteeRepository.saveAll(guarantees);
+                            goal.setMentor(mentor);
                         });
-                        userSkillGuaranteeRepository.saveAll(guarantees);
-                        goal.setMentor(mentor);
-                    });
+            }
             goal.setSkillsToAchieve(skills);
         }
     }
@@ -136,7 +139,7 @@ public class GoalServiceImpl implements GoalService {
         long usersSize = goal.getUsers().size();
         long currentUserId = userContext.getUserId();
         boolean isMentor = goal.getMentor() != null
-                && goal.getMentor().getId().equals(currentUserId);
+                           && goal.getMentor().getId().equals(currentUserId);
         if (isMentor || usersSize <= MIN_USERS_TO_DELETE_GOAL) {
             goalRepository.deleteById(id);
         } else {

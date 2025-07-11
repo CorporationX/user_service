@@ -33,7 +33,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     default Event getByIdOrThrow(long eventId) {
         return findById(eventId)
                 .orElseThrow(
-                        () -> new EntityNotFoundException(String.format("Event %d not found", eventId))
+                        () -> EntityNotFoundException.of(String.format("Event %d not found", eventId))
                 );
     }
 }

@@ -8,7 +8,7 @@ public interface EducationRepository extends JpaRepository<Education, Long> {
 
     default Education getByIdOrThrow(long educationId) {
         return findById(educationId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Education %d not found", educationId))
+                () -> EntityNotFoundException.of(String.format("Education %d not found", educationId))
         );
     }
 

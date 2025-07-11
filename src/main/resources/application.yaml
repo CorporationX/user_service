@@ -37,6 +37,8 @@ payment-service:
   port: 9080
 
 user:
+  goal:
+    limit-active: 2
   password:
     min:
       length: 6

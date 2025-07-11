@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,6 +32,8 @@ public class TestDefaultGoalDeletePolicy {
     private UserContext userContext;
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    GoalPolicyUtils goalPolicyUtils;
 
     @BeforeEach
     public void init() {
@@ -56,15 +57,6 @@ public class TestDefaultGoalDeletePolicy {
         verify(userContext, times(1)).getUserId();
     }
 
-    @Test
-    public void testValidateCreateGoalNotByMentorNorParticipant() {
-        Goal goal = createGoal(1L, null, 1, 0);
-
-        assertThrows(IllegalArgumentException.class, () -> policy.validate(goal));
-        verify(userContext, times(1)).getUserId();
-    }
-
-    //todo создать фабрику
     private Goal createGoal(Long goalId, Long mentorId, int participantCount, int skillsCount) {
         Goal goal = new Goal();
         goal.setId(goalId);

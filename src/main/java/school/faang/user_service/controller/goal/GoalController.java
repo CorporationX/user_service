@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.goal;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,25 +28,23 @@ import school.faang.user_service.service.goal.GoalService;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/goals")
-
+@RequestMapping("/api/v1/goals")
 @Tag(name = "Цели", description = "Взаимодействие с целями")
 public class GoalController {
     private final GoalService goalService;
 
     @Operation(
             summary = "Список целей",
-            description = "Позволяет позволяет получить список отфильтрованных целей"
+            description = "Позволяет получить список отфильтрованных целей"
     )
     @GetMapping
-    public ResponseEntity<Page<GoalDto>> index(
+    public ResponseEntity<Page<GoalDto>> getGoals(
             @ParameterObject FilterGoalDto dto,
             @ParameterObject Pageable pageable
     ) {
-        Page<GoalDto> result = goalService.get(dto, pageable);
         return ResponseEntity
                 .ok()
-                .body(result);
+                .body(goalService.get(dto, pageable));
     }
 
     @Operation(
@@ -64,10 +63,15 @@ public class GoalController {
     }
 
     @Operation(
-            summary = "Изменить цель",
-            description = "Позволяет изменить цель"
+            summary = "Обновить существующую цель",
+            description = "Обновляет данные цели по идентификатору",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Цель успешно обновлена"),
+                    @ApiResponse(responseCode = "400", description = "Невалидные данные цели"),
+                    @ApiResponse(responseCode = "404", description = "Цель не найдена")
+            }
     )
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<GoalDto> update(
             @PathVariable("id") Long id,
             @RequestBody @Valid UpdateGoalDto updateGoalDto
@@ -82,12 +86,13 @@ public class GoalController {
             summary = "Удалить цель",
             description = "Позволяет удалить цель"
     )
-    @DeleteMapping("{id}")
-    public ResponseEntity<Object> delete(
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
             @PathVariable("id") Long id
     ) {
         goalService.delete(id);
         return ResponseEntity
-                .ok().build();
+                .ok()
+                .build();
     }
 }

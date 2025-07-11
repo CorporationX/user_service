@@ -13,6 +13,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class TestDefaultGoalUpdatePolicy {
     private UserContext userContext;
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    GoalPolicyUtils goalPolicyUtils;
 
     @BeforeEach
     void init() {
@@ -48,7 +51,7 @@ public class TestDefaultGoalUpdatePolicy {
         Goal goal = createGoal(1L, null, 0, 0);
         goal.setStatus(GoalStatus.COMPLETED);
 
-        assertThrows(IllegalArgumentException.class, () -> policy.validate(dto, goal));
+        assertThrows(DataValidationException.class, () -> policy.validate(dto, goal));
         verify(userContext, times(1)).getUserId();
     }
 
@@ -78,7 +81,6 @@ public class TestDefaultGoalUpdatePolicy {
         verify(userContext, times(1)).getUserId();
     }
 
-    //todo создать фабрику
     private Goal createGoal(Long goalId, Long mentorId, int participantCount, int skillsCount) {
         Goal goal = new Goal();
         goal.setId(goalId);

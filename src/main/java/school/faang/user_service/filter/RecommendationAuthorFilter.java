@@ -18,6 +18,11 @@ public class RecommendationAuthorFilter implements RecommendationFilter {
             Stream<Recommendation> recommendations,
             RecommendationFilterDto recommendationFilterDto
     ) {
-        return recommendations.filter(rec -> rec.getAuthor().getId().equals(recommendationFilterDto.authorId()));
+        return recommendations.filter(
+                recommendation -> recommendation
+                        .getAuthor()
+                        .getId()
+                        .equals(recommendationFilterDto.authorId())
+        );
     }
 }

@@ -20,7 +20,8 @@ public class RecommendationContentContainsFilter implements RecommendationFilter
     ) {
         return recommendations
                 .filter(
-                        rec -> rec.getContent()
+                        recommendation -> recommendation
+                                .getContent()
                                 .toLowerCase()
                                 .contains(recommendationFilterDto.contentContains().toLowerCase())
                 );

@@ -19,6 +19,11 @@ public class RecommendationReceiverFilter implements RecommendationFilter {
             RecommendationFilterDto recommendationFilterDto
     ) {
         return recommendations
-                .filter(rec -> rec.getReceiver().getId().equals(recommendationFilterDto.receiverId()));
+                .filter(
+                        recommendation -> recommendation
+                                .getReceiver()
+                                .getId()
+                                .equals(recommendationFilterDto.receiverId())
+                );
     }
 }

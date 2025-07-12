@@ -45,7 +45,7 @@ public class RecommendationValidator {
 
     private void validateNotCreatingForSelf(CreateRecommendationDto createRecommendationDto) {
         if (createRecommendationDto.receiverId().equals(userContext.getUserId())) {
-            throw new SelfRecommendationException("User cannot leave recommendation for himself!");
+            throw new SelfRecommendationException();
         }
     }
 

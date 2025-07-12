@@ -2,12 +2,19 @@ package school.faang.user_service.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import school.faang.user_service.dto.error.ValidationErrorDetail;
+import school.faang.user_service.dto.error.ValidationErrorResponse;
 import school.faang.user_service.exception.ApiException;
 
 import java.util.HashMap;
@@ -53,6 +60,38 @@ public class ApiExceptionHandler {
                 ? UNKNOWN_FIELD
                 : path.get(path.size() - 1).getFieldName();
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationErrorResponse handleConstraintViolation(ConstraintViolationException ex) {
+        log.error("Constraint violation", ex);
+        List<ValidationErrorDetail> details = ex.getConstraintViolations().stream()
+                .map(this::mapToValidationErrorDetail)
+                .toList();
+        return new ValidationErrorResponse(
+                "Constraint violation",
+                "Validation failed for one or more fields.",
+                details
+        );
+    }
+
+    private ValidationErrorDetail mapToValidationErrorDetail(ConstraintViolation<?> violation) {
+        String fieldName = extractFieldName(violation.getPropertyPath());
+        return new ValidationErrorDetail(
+                fieldName,
+                violation.getMessage(),
+                violation.getInvalidValue()
+        );
+    }
+
+    private String extractFieldName(Path propertyPath) {
+        String fieldName = null;
+        for (Path.Node node : propertyPath) {
+            fieldName = node.getName();
+        }
+        return fieldName;
+    }
+
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Map<String, String>> handleApiException(ApiException ex) {

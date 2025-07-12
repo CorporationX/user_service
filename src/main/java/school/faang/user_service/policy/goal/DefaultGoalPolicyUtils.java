@@ -33,7 +33,7 @@ public class DefaultGoalPolicyUtils implements GoalPolicyUtils {
                                 && goal.getUsers().stream()
                                         .map(User::getId)
                                         .anyMatch(
-                                                val -> val.equals(currentUserId)
+                                                userId -> userId.equals(currentUserId)
                                         );
         if (!isMentor && !isParticipant) {
             deny.run();

@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +29,8 @@ import school.faang.user_service.entity.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
 @Builder
@@ -40,6 +42,8 @@ public class Goal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "id")
     private Long id;
 
@@ -47,37 +51,46 @@ public class Goal {
     @JoinColumn(name = "parent_goal_id")
     private Goal parent;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "description", length = 128, nullable = false, unique = true)
     private String description;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private GoalStatus status;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "deadline")
     private LocalDateTime deadline;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "mentor_id")
     private User mentor;
 
-    @ToString.Exclude
     @OneToMany(mappedBy = "goal")
     private List<GoalInvitation> invitations;
 
-    @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "user_goal",
@@ -86,7 +99,6 @@ public class Goal {
     )
     private List<User> users;
 
-    @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "goal_skill",

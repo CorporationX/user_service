@@ -17,20 +17,20 @@ public class SkillValidator {
 
     public void validateSkillTitleIsUnique(boolean exists, String title) {
         if (exists) {
-            throw new DataValidationException("Skill with title: " + title + " already exists.");
+            throw DataValidationException.of("Skill with title: " + title + " already exists.");
         }
     }
 
     public void ensureSkillExists(boolean exists, long skillId) {
         if (!exists) {
-            throw new EntityNotFoundException("Skill with id " + skillId + " does not exist.");
+            throw EntityNotFoundException.of("Skill with id " + skillId + " does not exist.");
         }
     }
 
     public void validateUserDoesNotHaveSkill(boolean userHasSkill, long skillId, long userId) {
         if (userHasSkill) {
-            throw new ForbiddenException("User with id " + userId
-                    + " already has skill with id " + skillId);
+            throw ForbiddenException.of("User with id " + userId
+                                        + " already has skill with id " + skillId);
         }
     }
 
@@ -40,8 +40,8 @@ public class SkillValidator {
                 .distinct()
                 .count();
         if (uniqueAuthorsCount < minOffersRequired) {
-            throw new ForbiddenException("Skill cannot be acquired. At least "
-                    + minOffersRequired + " unique users must offer this skill.");
+            throw ForbiddenException.of("Skill cannot be acquired. At least "
+                                        + minOffersRequired + " unique users must offer this skill.");
         }
     }
 }

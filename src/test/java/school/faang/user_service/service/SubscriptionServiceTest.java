@@ -54,7 +54,6 @@ class SubscriptionServiceTest {
     private User userB;
     private UserDto userDtoA;
     private UserDto userDtoB;
-    private static final String TOPIC = "follower-events-topic";
 
     @BeforeEach
     void setup() {
@@ -93,6 +92,12 @@ class SubscriptionServiceTest {
     @Test
     @DisplayName("Follow user when already following")
     void followUser_whenAlreadyFollowing() {
+            KafkaTopics.Topic recommendationRequestTopic = new KafkaTopics.Topic(
+                    "recommendation_request_topic",
+                    0,
+                    0,
+                    null
+            );
         // Given
         when(subscriptionRepository
                 .existsByFollowerIdAndFolloweeId(FOLLOWER_ID, FOLLOWEE_ID))
@@ -109,7 +114,7 @@ class SubscriptionServiceTest {
         );
         verify(subscriptionRepository, never())
                 .followUser(FOLLOWER_ID, FOLLOWEE_ID);
-        verify(dataSender, never()).send(anyString(), any(FollowerEvent.class));
+        verify(dataSender, never()).send(recommendationRequestTopic, any(FollowerEvent.class));
 
     }
 

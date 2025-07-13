@@ -238,6 +238,12 @@ public class RecommendationServiceTest {
 
     @Test
     void create_shouldMapEventSendAndLog() {
+        KafkaTopics.Topic Topic = new KafkaTopics.Topic(
+                "recommendation_request_topic",
+                0,
+                0,
+                null
+        );
         RecommendationDto dto = new RecommendationDto();
         dto.setAuthorId(1L);
         dto.setReceiverId(2L);
@@ -259,7 +265,7 @@ public class RecommendationServiceTest {
         when(recommendationEventMapper.fromRecommendation(saved)).thenReturn(event);
 
         String topicName = "recommendation-events-topic";
-        when(kafkaTopics.getRecommendationEventsTopic()).thenReturn(topicName);
+        when(kafkaTopics.getRecommendationEventsTopic()).thenReturn(Topic);
 
         RecommendationDto returnedDto = new RecommendationDto();
         when(recommendationMapper.toDto(saved)).thenReturn(returnedDto);
@@ -267,7 +273,7 @@ public class RecommendationServiceTest {
         RecommendationDto result = recommendationService.create(dto);
 
         verify(recommendationEventMapper).fromRecommendation(saved);
-        verify(dataSender).send(topicName, event);
+        verify(dataSender).send(Topic, event);
         assertThat(result).isSameAs(returnedDto);
     }
 
@@ -290,6 +296,12 @@ public class RecommendationServiceTest {
 
     @Test
     void update_successful_shouldSendEventAndLog() {
+        KafkaTopics.Topic topic = new KafkaTopics.Topic(
+                "recommendation_request_topic",
+                0,
+                0,
+                null
+        );
         RecommendationDto dto = new RecommendationDto();
         dto.setId(50L);
         dto.setAuthorId(1L);
@@ -331,8 +343,7 @@ public class RecommendationServiceTest {
         event.setTimestamp(LocalDateTime.now());
         when(recommendationEventMapper.fromRecommendation(updated)).thenReturn(event);
 
-        String topicName = "recommendation-events-topic";
-        when(kafkaTopics.getRecommendationEventsTopic()).thenReturn(topicName);
+        when(kafkaTopics.getRecommendationEventsTopic()).thenReturn(topic);
         RecommendationDto returnedDto = new RecommendationDto();
         when(recommendationMapper.toDto(updated)).thenReturn(returnedDto);
 
@@ -345,7 +356,7 @@ public class RecommendationServiceTest {
         verify(skillOfferRepository).create(100L, existing.getId());
         verify(recommendationRepository).findById(existing.getId());
         verify(recommendationEventMapper).fromRecommendation(updated);
-        verify(dataSender).send(topicName, event);
+        verify(dataSender).send(topic, event);
         assertThat(result).isSameAs(returnedDto);
     }
 }

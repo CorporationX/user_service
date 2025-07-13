@@ -16,7 +16,7 @@ public class KafkaTopics {
     private Topic profileViewEventTopic;
     private Topic recommendationRequestTopic;
     private Topic premiumBoughtTopic;
-    private Topic recommendation;
+    private Topic recommendationEventsTopic;
     private Topic followerEvents;
 
 

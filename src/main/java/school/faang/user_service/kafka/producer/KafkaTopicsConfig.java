@@ -214,9 +214,9 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic recommendationEventsTopic(
-            @Value("${spring.kafka.topics.recommendation.name}") String name,
-            @Value("${spring.kafka.topics.recommendation.partitions}") int partitions,
-            @Value("${spring.kafka.topics.recommendation.replication-factor}") short replicas
+            @Value("${spring.kafka.topics.recommendation-events-topic.name}") String name,
+            @Value("${spring.kafka.topics.recommendation-events-topic.partitions}") int partitions,
+            @Value("${spring.kafka.topics.recommendation-events-topic.replication-factor}") short replicas
     ) {
         return TopicBuilder.name(name)
                 .partitions(partitions)
@@ -226,9 +226,9 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic recommendationEventsTopicDlt(
-            @Value("${spring.kafka.topics.recommendation.dlt.name}") String name,
-            @Value("${spring.kafka.topics.recommendation.dlt.partitions}") int partitions,
-            @Value("${spring.kafka.topics.recommendation.dlt.replication-factor}") short replicas
+            @Value("${spring.kafka.topics.recommendation-events-topic.dlt.name}") String name,
+            @Value("${spring.kafka.topics.recommendation-events-topic.dlt.partitions}") int partitions,
+            @Value("${spring.kafka.topics.recommendation-events-topic.dlt.replication-factor}") short replicas
     ) {
         return TopicBuilder.name(name)
                 .partitions(partitions)

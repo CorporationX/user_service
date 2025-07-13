@@ -43,7 +43,7 @@ public class SubscriptionService {
           TargetType.USER,
           followeeId
         );
-        dataSender.send(kafkaTopics.getFollowerEventsTopic(), event);
+        dataSender.send(kafkaTopics.getFollowerEvents(), event);
     }
 
     @Transactional

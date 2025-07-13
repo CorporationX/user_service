@@ -2,6 +2,9 @@ package school.faang.user_service.kafka.producer;
 
 import school.faang.user_service.kafka.Event;
 import school.faang.user_service.kafka.events.AnalyticsEvent;
+import school.faang.user_service.kafka.events.FollowerEvent;
+import school.faang.user_service.kafka.events.RecommendationEvent;
+
 
 import java.util.List;
 

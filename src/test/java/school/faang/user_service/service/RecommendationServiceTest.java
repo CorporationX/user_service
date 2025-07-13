@@ -14,15 +14,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.RecommendationDto;
+import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.kafka.events.RecommendationEvent;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
+import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +46,12 @@ public class RecommendationServiceTest {
     private RecommendationService recommendationService;
     @Spy
     private RecommendationMapperImpl recommendationMapper;
+    @Mock
+    private RecommendationEventMapper recommendationEventMapper;
+    @Mock
+    private KafkaTopics kafkaTopics;
+    @Mock
+    private KafkaDataSenderImpl dataSender;
 
     @BeforeEach
     void init() {
@@ -222,5 +234,118 @@ public class RecommendationServiceTest {
         assertThat(result.getContent()).isEqualTo(List.of(dto));
         verify(recommendationRepository).findAllByAuthorId(authorId, pageable);
         verify(mapper).toDto(recommendation);
+    }
+
+    @Test
+    void create_shouldMapEventSendAndLog() {
+        RecommendationDto dto = new RecommendationDto();
+        dto.setAuthorId(1L);
+        dto.setReceiverId(2L);
+        dto.setContent("Hello");
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L))
+                .thenReturn(Optional.empty());
+        when(recommendationRepository.create(1L, 2L, "Hello")).thenReturn(100L);
+        Recommendation saved = new Recommendation();
+        saved.setId(100L);
+        saved.setAuthor(new User());
+        saved.setReceiver(new User());
+        saved.setCreatedAt(LocalDateTime.now());
+        when(recommendationRepository.findById(100L)).thenReturn(Optional.of(saved));
+        RecommendationEvent event = new RecommendationEvent();
+        event.setId(100L);
+        event.setAuthorId(1L);
+        event.setRecipientId(2L);
+        event.setTimestamp(LocalDateTime.now());
+        when(recommendationEventMapper.fromRecommendation(saved)).thenReturn(event);
+
+        String topicName = "recommendation-events-topic";
+        when(kafkaTopics.getRecommendationEventsTopic()).thenReturn(topicName);
+
+        RecommendationDto returnedDto = new RecommendationDto();
+        when(recommendationMapper.toDto(saved)).thenReturn(returnedDto);
+
+        RecommendationDto result = recommendationService.create(dto);
+
+        verify(recommendationEventMapper).fromRecommendation(saved);
+        verify(dataSender).send(topicName, event);
+        assertThat(result).isSameAs(returnedDto);
+    }
+
+    @Test
+    void create_shouldThrowWhenRecentExists_noSendNoLog() {
+        RecommendationDto dto = new RecommendationDto();
+        dto.setAuthorId(1L);
+        dto.setReceiverId(2L);
+        dto.setContent("X");
+        Recommendation recent = new Recommendation();
+        recent.setCreatedAt(LocalDateTime.now().minusDays(10));
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
+                .thenReturn(Optional.of(recent));
+
+        assertThatThrownBy(() -> recommendationService.create(dto))
+                .isInstanceOf(DataValidationException.class);
+
+        verifyNoInteractions(dataSender);
+    }
+
+    @Test
+    void update_successful_shouldSendEventAndLog() {
+        RecommendationDto dto = new RecommendationDto();
+        dto.setId(50L);
+        dto.setAuthorId(1L);
+        dto.setReceiverId(2L);
+        dto.setContent("New content");
+        SkillOfferDto offerDto = new SkillOfferDto();
+        offerDto.setSkillId(100L);
+        dto.setSkillOffers(Collections.singletonList(offerDto));
+
+        Recommendation existing = new Recommendation();
+        existing.setId(50L);
+        existing.setAuthor(new User()); existing.getAuthor().setId(1L);
+        existing.setReceiver(new User()); existing.getReceiver().setId(2L);
+        existing.setCreatedAt(LocalDateTime.now().minusDays(10));
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
+                .thenReturn(Optional.of(existing));
+
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L))
+                .thenReturn(Optional.of(existing));
+
+        when(skillOfferRepository.findAllOffersOfSkill(100L, 2L))
+                .thenReturn(Collections.emptyList());
+        when(skillOfferRepository.create(100L, existing.getId())).thenReturn(1L); // если create возвращает ID
+
+        Recommendation updated = new Recommendation();
+        updated.setId(existing.getId());
+        updated.setAuthor(existing.getAuthor());
+        updated.setReceiver(existing.getReceiver());
+        updated.setContent("New content");
+        updated.setCreatedAt(existing.getCreatedAt());
+        updated.setUpdatedAt(LocalDateTime.now());
+        when(recommendationRepository.findById(existing.getId()))
+                .thenReturn(Optional.of(updated));
+
+        RecommendationEvent event = new RecommendationEvent();
+        event.setId(existing.getId());
+        event.setAuthorId(1L);
+        event.setRecipientId(2L);
+        event.setTimestamp(LocalDateTime.now());
+        when(recommendationEventMapper.fromRecommendation(updated)).thenReturn(event);
+
+        String topicName = "recommendation-events-topic";
+        when(kafkaTopics.getRecommendationEventsTopic()).thenReturn(topicName);
+        RecommendationDto returnedDto = new RecommendationDto();
+        when(recommendationMapper.toDto(updated)).thenReturn(returnedDto);
+
+        RecommendationDto result = recommendationService.update(dto);
+
+        verify(recommendationRepository).findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L);
+        verify(recommendationRepository).update(1L, 2L, "New content");
+        verify(skillOfferRepository).deleteAllByRecommendationId(existing.getId());
+        verify(skillOfferRepository).findAllOffersOfSkill(100L, 2L);
+        verify(skillOfferRepository).create(100L, existing.getId());
+        verify(recommendationRepository).findById(existing.getId());
+        verify(recommendationEventMapper).fromRecommendation(updated);
+        verify(dataSender).send(topicName, event);
+        assertThat(result).isSameAs(returnedDto);
     }
 }

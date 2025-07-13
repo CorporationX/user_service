@@ -10,6 +10,9 @@ spring:
       discovery: user-service-i1
       config:
         enabled: true
+        prefix: config
+        default-context: user-service
+        format: KEY_VALUE
         watch:
           enabled: true
 
@@ -96,19 +99,34 @@ spring:
           name: ${spring.kafka.topics.logs-user-service.name}.DLT
           partitions: 1
           replication-factor: 3
-      recommendation-request-topic:
+      recommendation:
+        name: recommendation-events-topic
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: recommendation-events-topic.DLT
+          partitions: 1
+          replication-factor: 3
+      follower-events:
+        name: follower_events
+        partitions: 1
+        replication-factor: 3
+        dlt:
+          name: ${spring.kafka.topics.follower-events.name}.DLT
+          partitions: 1
+          replication-factor: 3
+
+      recommendation-request:
         name: recommendation-request-topic
         partitions: 4
         replication-factor: 3
-
 
 server:
   port: 8080
 
 logging:
   level:
-    root: info
-
+    root: INFO
 services:
   project-service:
     name: project-service

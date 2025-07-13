@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @ConfigurationProperties(prefix = "spring.kafka.topics")
 @Data
@@ -17,6 +16,8 @@ public class KafkaTopics {
     private Topic profileViewEventTopic;
     private Topic recommendationRequestTopic;
     private Topic premiumBoughtTopic;
+    private Topic recommendation;
+    private Topic followerEvents;
 
 
     @Data

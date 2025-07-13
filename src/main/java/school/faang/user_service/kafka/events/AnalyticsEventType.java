@@ -5,6 +5,7 @@ public enum AnalyticsEventType {
     EVENT_VIEW,
     PROJECT_VIEW,
     FOLLOWER,
+    FOLLOW,
     POST_PUBLISHED,
     POST_VIEW,
     POST_LIKE,

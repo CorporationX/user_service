@@ -9,6 +9,10 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.UserFollowersFilter;
+import school.faang.user_service.kafka.events.FollowerEvent;
+import school.faang.user_service.kafka.events.TargetType;
+import school.faang.user_service.kafka.producer.DataSender;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
@@ -22,6 +26,8 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFollowersFilter> followersFilter;
     private final UserMapper userMapper;
+    private final DataSender dataSender;
+    private final KafkaTopics kafkaTopics;
 
     @Transactional
     public void followUser(Long followerId, Long followeeId) {
@@ -31,6 +37,13 @@ public class SubscriptionService {
         }
         subscriptionRepository.followUser(followerId, followeeId);
         log.info("User {} successfully followed user {}", followerId, followeeId);
+
+        FollowerEvent event = new FollowerEvent(
+          followerId,
+          TargetType.USER,
+          followeeId
+        );
+        dataSender.send(kafkaTopics.getFollowerEventsTopic(), event);
     }
 
     @Transactional

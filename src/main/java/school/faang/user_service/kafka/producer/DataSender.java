@@ -11,4 +11,8 @@ public interface DataSender {
     void send(KafkaTopics.Topic topic, AnalyticsEvent analyticsEvent);
 
     void send(KafkaTopics.Topic topic, List<Long> ids);
+
+    void send(KafkaTopics.Topic topic, RecommendationEvent recommendationEvent);
+
+    void send(KafkaTopics.Topic topic, FollowerEvent followerEvent);
 }

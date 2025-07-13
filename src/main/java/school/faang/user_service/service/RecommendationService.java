@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,11 @@ import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.kafka.events.RecommendationEvent;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.recommendation.RecommendationEventMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -19,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
@@ -27,6 +33,9 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
     @Value("${recommendation.range-between-recommendation}")
     private int rangeBetweenRecommendation;
+    private final KafkaDataSenderImpl dataSender;
+    private final KafkaTopics kafkaTopics;
+    private final RecommendationEventMapper recommendationEventMapper;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         LocalDateTime sixMothsAgo = LocalDateTime.now().minusMonths(rangeBetweenRecommendation);
@@ -63,6 +72,10 @@ public class RecommendationService {
         }
         Recommendation saved = recommendationRepository
                 .findById(recommendationId).orElseThrow(() -> new DataValidationException("Recommendation not found"));
+
+        RecommendationEvent event = recommendationEventMapper.fromRecommendation(saved);
+        dataSender.send(kafkaTopics.getRecommendationEventsTopic(), event);
+        log.info("RecommendationEvent = {} sent to RecommendationEventTopic after create", event);
         return recommendationMapper.toDto(saved);
     }
 
@@ -98,6 +111,10 @@ public class RecommendationService {
         }
         Recommendation updated = recommendationRepository.findById(existing.getId())
                 .orElseThrow(() -> new DataValidationException("Recommendation not found"));
+
+        RecommendationEvent event = recommendationEventMapper.fromRecommendation(updated);
+        dataSender.send(kafkaTopics.getRecommendationEventsTopic(), event);
+        log.info("RecommendationEvent = {} sent to RecommendationEventTopic after update", event);
         return recommendationMapper.toDto(updated);
     }
 

@@ -151,9 +151,9 @@ public class KafkaTopicsConfig {
 
     @Bean
     public NewTopic requestRecommendationTopic(
-            @Value("${spring.kafka.topics.recommendation-request.name}") String name,
-            @Value("${spring.kafka.topics.recommendation-request.partitions}") short partitions,
-            @Value("${spring.kafka.topics.recommendation-request.replication-factor}") short replicas) {
+            @Value("${spring.kafka.topics.recommendation-request-topic.name}") String name,
+            @Value("${spring.kafka.topics.recommendation-request-topic.partitions}") short partitions,
+            @Value("${spring.kafka.topics.recommendation-request-topic.replication-factor}") short replicas) {
         return TopicBuilder
                 .name(name)
                 .partitions(partitions)

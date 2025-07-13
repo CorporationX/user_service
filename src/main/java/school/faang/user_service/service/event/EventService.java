@@ -80,7 +80,7 @@ public class EventService {
     private void sendAllEventsAnalytics(List<Event> allFilteredEvents, long userId) {
         for (Event event : allFilteredEvents) {
             AnalyticsEvent analyticsEvent = analyticsEventMapper.fromEvent(event, userId);
-            dataSender.send(kafkaTopics.getAnalyticsCreatedTopic(), analyticsEvent);
+            dataSender.send(kafkaTopics.getAnalyticsCreated(), analyticsEvent);
             log.info("AnalyticsEvent = {} sent to AnalyticsCreatedTopic", analyticsEvent);
         }
     }

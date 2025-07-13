@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -49,7 +48,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceImplTest {
     private static final long REQUESTER_ID = 1L;
-    private static  final long RECEIVER_ID = 2L;
+    private static final long RECEIVER_ID = 2L;
     private static final long REQUEST_ID = 100L;
     private static final long SKILL_ID = 10L;
 
@@ -113,6 +112,14 @@ class RecommendationRequestServiceImplTest {
         @Test
         @DisplayName("When create is called with valid DTO, then create and return DTO")
         void testCreate_Success() {
+            KafkaTopics.Topic recommendationRequestTopic = new KafkaTopics.Topic(
+                    "recommendation_request_topic",
+                    0,
+                    0,
+                    null
+            );
+            kafkaTopics.setRecommendationRequestTopic(recommendationRequestTopic);
+
             recommendationRequestDto = RecommendationRequestDto.builder()
                     .receiverId(RECEIVER_ID)
                     .skillIds(List.of(SKILL_ID))
@@ -121,13 +128,10 @@ class RecommendationRequestServiceImplTest {
             when(userContext.getUserId()).thenReturn(REQUESTER_ID);
             when(userRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(requester));
             when(userRepository.findById(RECEIVER_ID)).thenReturn(Optional.of(receiver));
-
             when(recommendationRequestRepository.findLatestPendingRequest(REQUESTER_ID, RECEIVER_ID))
                     .thenReturn(Optional.empty());
-
             RecommendationRequest newRequest = new RecommendationRequest();
             doReturn(newRequest).when(recommendationRequestMapper).toEntity(recommendationRequestDto);
-
             when(recommendationRequestRepository.existsById(any())).thenReturn(false);
             when(skillRepository.findAllById(any())).thenReturn(List.of(skill));
 
@@ -137,8 +141,10 @@ class RecommendationRequestServiceImplTest {
             when(recommendationRequestRepository.save(newRequest)).thenReturn(savedRequest);
             when(skillRequestRepository.save(any(SkillRequest.class))).thenReturn(new SkillRequest());
             when(userMapper.toDtoNotification(any(User.class))).thenReturn(new UserDtoNotification());
-            when(kafkaTopics.getRecommendationRequestTopic()).thenReturn("recommendation_request_topic");
-            doNothing().when(kafkaDataSender).send(anyString(), any(RecommendationRequestEvent.class));
+            when(kafkaTopics.getRecommendationRequestTopic()).thenReturn(recommendationRequestTopic);
+            doNothing().when(kafkaDataSender)
+                    .send(eq(recommendationRequestTopic),
+                            any(RecommendationRequestEvent.class));
 
             RecommendationRequestDto resultDto = RecommendationRequestDto.builder()
                     .id(REQUEST_ID)
@@ -152,7 +158,8 @@ class RecommendationRequestServiceImplTest {
 
             verify(recommendationRequestRepository).save(newRequest);
             verify(skillRequestRepository).save(any(SkillRequest.class));
-            verify(kafkaDataSender).send(eq("recommendation_request_topic"),
+            verify(kafkaDataSender).send(
+                    eq(recommendationRequestTopic),
                     any(RecommendationRequestEvent.class));
         }
 

@@ -6,9 +6,9 @@ import school.faang.user_service.kafka.events.AnalyticsEvent;
 import java.util.List;
 
 public interface DataSender {
-    void send(String topic, Event event);
+    void send(KafkaTopics.Topic topic, Event event);
 
-    void send(String topic, AnalyticsEvent analyticsEvent);
+    void send(KafkaTopics.Topic topic, AnalyticsEvent analyticsEvent);
 
-    void send(String topic, List<Long> ids);
+    void send(KafkaTopics.Topic topic, List<Long> ids);
 }

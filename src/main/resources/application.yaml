@@ -96,7 +96,7 @@ spring:
           name: ${spring.kafka.topics.logs-user-service.name}.DLT
           partitions: 1
           replication-factor: 3
-      recommendation-request:
+      recommendation-request-topic:
         name: recommendation-request-topic
         partitions: 4
         replication-factor: 3

@@ -13,6 +13,6 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
 
     default Country getByIdOrThrow(long countryId) {
         return findById(countryId)
-                .orElseThrow(() -> EntityNotFoundException.of(String.format("Country %d not found", countryId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Country %d not found", countryId)));
     }
 }

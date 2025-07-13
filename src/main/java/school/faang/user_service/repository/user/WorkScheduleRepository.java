@@ -12,7 +12,7 @@ public interface WorkScheduleRepository extends JpaRepository<WorkSchedule, Long
 
     default WorkSchedule getByIdOrThrow(long workScheduleId) {
         return findById(workScheduleId).orElseThrow(
-                () -> EntityNotFoundException.of(String.format("Work schedule %d not found", workScheduleId)));
+                () -> new EntityNotFoundException(String.format("Work schedule %d not found", workScheduleId)));
     }
 
 }

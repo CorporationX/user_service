@@ -68,7 +68,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long>, JpaSpecificat
 
     default Goal getByIdOrThrow(long goalId) {
         return findById(goalId).orElseThrow(
-                () -> EntityNotFoundException.of(String.format("Goal %d not found", goalId))
+                () -> new EntityNotFoundException(String.format("Goal %d not found", goalId))
         );
     }
 

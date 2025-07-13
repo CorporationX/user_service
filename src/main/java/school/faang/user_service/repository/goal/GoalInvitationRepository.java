@@ -9,7 +9,7 @@ public interface GoalInvitationRepository extends JpaRepository<GoalInvitation, 
     default GoalInvitation getByIdOrThrow(long invitationId) {
         return findById(invitationId)
                 .orElseThrow(
-                        () -> EntityNotFoundException.of(String.format("Goal invitation %d not found", invitationId))
+                        () -> new EntityNotFoundException(String.format("Goal invitation %d not found", invitationId))
                 );
     }
 }

@@ -12,7 +12,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     default Contact getByIdOrThrow(long contactId) {
         return findById(contactId).orElseThrow(
-                () -> EntityNotFoundException.of(String.format("Contact %d not found", contactId))
+                () -> new EntityNotFoundException(String.format("Contact %d not found", contactId))
         );
     }
 }

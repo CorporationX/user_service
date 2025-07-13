@@ -8,7 +8,7 @@ public interface CareerRepository extends JpaRepository<Career, Long> {
 
     default Career getByIdOrThrow(long careerId) {
         return findById(careerId).orElseThrow(
-                () -> EntityNotFoundException.of(String.format("Career %d not found", careerId))
+                () -> new EntityNotFoundException(String.format("Career %d not found", careerId))
         );
     }
 

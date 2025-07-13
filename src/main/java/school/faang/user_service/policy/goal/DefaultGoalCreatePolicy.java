@@ -46,7 +46,7 @@ public class DefaultGoalCreatePolicy implements GoalCreatePolicy {
 
     private void deny(String msg, long userId, CreateGoalDto dto) {
         String msgDetails = String.format("User %d cannot create goal for userIds=%s", userId, dto.userIds());
-        throw DataValidationException.withCustomDebug(msg, msg + ", " + msgDetails);
+        throw new DataValidationException(msg, msg + ", " + msgDetails);
     }
 
     private boolean isParticipantsGoalLimitExceeded(List<Long> userIds) {

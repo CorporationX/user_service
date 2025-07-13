@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(CreateUserDto userDto) {
         if (userDto.password().length() < minPasswordLength) {
-            throw DataValidationException.of("Password should be more than " + minPasswordLength + " symbols!");
+            throw new DataValidationException("Password should be more than " + minPasswordLength + " symbols!");
         }
         User user = userMapper.toUser(userDto);
         Country country = countryRepository.getByIdOrThrow(userDto.countryId());
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long userId, UpdateUserDto userDto) {
         long requesterId = userContext.getUserId();
         if (userId != requesterId) {
-            throw ForbiddenException.of("User " + requesterId + " doesn't match profile owner!");
+            throw new ForbiddenException("User " + requesterId + " doesn't match profile owner!");
         }
         User user = userRepository.getByIdOrThrow(userId);
         userMapper.update(userDto, user);

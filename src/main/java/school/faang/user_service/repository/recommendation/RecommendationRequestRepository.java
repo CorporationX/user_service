@@ -19,7 +19,7 @@ public interface RecommendationRequestRepository extends JpaRepository<Recommend
 
     default RecommendationRequest getByIdOrThrow(long requestId) {
         return findById(requestId).orElseThrow(
-                () -> EntityNotFoundException.of(String.format("Recommendation request %d not found", requestId))
+                () -> new EntityNotFoundException(String.format("Recommendation request %d not found", requestId))
         );
     }
 }

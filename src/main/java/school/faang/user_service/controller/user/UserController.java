@@ -35,13 +35,13 @@ public class UserController {
 
     private void validateString(String value, String paramName) {
         if (StringUtils.isNotBlank(value)) {
-            throw DataValidationException.of(paramName + " should be present!");
+            throw new DataValidationException(paramName + " should be present!");
         }
     }
 
     private void validateNotNull(Object value, String paramName) {
         if (value == null) {
-            throw DataValidationException.of(paramName + " should be present!");
+            throw new DataValidationException(paramName + " should be present!");
         }
     }
 }

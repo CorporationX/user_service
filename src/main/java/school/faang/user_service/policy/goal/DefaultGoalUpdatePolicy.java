@@ -42,7 +42,7 @@ public class DefaultGoalUpdatePolicy implements GoalUpdatePolicy {
                 "Goal ID: %d, Status: %s, CurrentUserId: %d, DTO : %s",
                 goal.getId(), goal.getStatus(), currentUserId, dto
         );
-        throw DataValidationException.withCustomDebug(msg, msg + ", " + msgDetail);
+        throw new DataValidationException(msg, msg + ", " + msgDetail);
     }
 }
 

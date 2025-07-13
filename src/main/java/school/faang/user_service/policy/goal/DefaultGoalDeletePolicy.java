@@ -30,7 +30,7 @@ public class DefaultGoalDeletePolicy implements GoalDeletePolicy {
                 "Goal ID: %d, Status: %s, CurrentUserId: %d",
                 goal.getId(), goal.getStatus(), currentUserId
         );
-        throw DataValidationException.withCustomDebug(msg, msg + ", " + msgDetail);
+        throw new DataValidationException(msg, msg + ", " + msgDetail);
     }
 }
 

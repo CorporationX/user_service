@@ -114,7 +114,7 @@ class SubscriptionServiceTest {
         );
         verify(subscriptionRepository, never())
                 .followUser(FOLLOWER_ID, FOLLOWEE_ID);
-        verify(dataSender, never()).send(recommendationRequestTopic, any(FollowerEvent.class));
+        verify(dataSender, never()).send(eq(recommendationRequestTopic), any(FollowerEvent.class));
 
     }
 

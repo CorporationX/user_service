@@ -11,6 +11,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import school.faang.user_service.dto.event.ProfileViewEventDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 
 @Slf4j
 @Configuration
@@ -34,6 +35,11 @@ public class KafkaConfig {
 
     @Bean
     public KafkaTemplate<String, ProfileViewEventDto> profileViewKafkaTemplate() {
+        return kafkaTemplate();
+    }
+
+    @Bean
+    public KafkaTemplate<String, MentorshipRequestDto> mentorshipKafkaTemplate() {
         return kafkaTemplate();
     }
 }

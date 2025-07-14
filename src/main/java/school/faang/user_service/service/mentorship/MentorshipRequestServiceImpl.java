@@ -2,6 +2,7 @@ package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -13,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.MentorshipRequestFilter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorship.MentorshipAcceptEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -23,12 +25,14 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipAcceptEventPublisher mentorshipAcceptEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
@@ -68,7 +72,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         return filteredRequestForMentorship.map(mentorshipRequestMapper::toDto).toList();
     }
 
-
     @Transactional
     public void acceptRequest(long id) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
@@ -76,12 +79,18 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         User mentee = request.getRequester();
         User mentor = request.getReceiver();
 
-        if (mentee.getMentors().contains(mentor)) {
+        if (mentee.getMentors().contains(mentor) && request.getStatus().equals(RequestStatus.ACCEPTED)) {
             throw new DataValidationException("User is already your mentor");
         }
+
         mentee.getMentors().add(mentor);
         request.setStatus(RequestStatus.ACCEPTED);
-        mentorshipRequestRepository.save(request);
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(request);
+        log.info("Менторство принято. Ментор id: {}, Ученик id: {}.", mentor.getId(), mentee.getId());
+        log.info("Статус: {}", mentorshipRequest.getStatus());
+        MentorshipRequestDto mentorshipRequestDto = mentorshipRequestMapper.toDto(mentorshipRequest);
+        mentorshipAcceptEventPublisher.publish(mentorshipRequestDto);
+        log.info("Сообщение о принятии менторства отправлено успешно.");
     }
 
     @Transactional

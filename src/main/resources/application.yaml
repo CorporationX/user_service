@@ -37,6 +37,7 @@ spring:
     enable-idempotence: true
     topics:
       profile-view: profile-view-events
+      mentorship-accept: mentorship-accept-event
 
 server:
   port: 8080

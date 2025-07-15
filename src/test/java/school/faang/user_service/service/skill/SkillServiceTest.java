@@ -1,6 +1,5 @@
 package school.faang.user_service.service.skill;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.skill.CreateSkillDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -146,7 +144,7 @@ public class SkillServiceTest {
         User user = createUser(USER_ID);
         User guarantor = createUser(GUARANTOR_ID);
         UserSkillGuarantee guarantee = createUserSkillGuarantee(user, guarantor);
-        Skill skill = createSkill(List.of(guarantee));
+        Skill skill = createSkillWithGuarantees(List.of(guarantee));
 
         when(skillRepository.findAllByUserId(USER_ID)).thenReturn(List.of(skill));
 
@@ -375,7 +373,7 @@ public class SkillServiceTest {
         return new UserDto(GUARANTOR_ID, USER_NAME, EMAIL, PHONE, ABOUT_ME);
     }
 
-    private Skill createSkill(List<UserSkillGuarantee> guarantees) {
+    private Skill createSkillWithGuarantees(List<UserSkillGuarantee> guarantees) {
         return Skill.builder()
                 .id(SKILL_ID)
                 .title(SKILL_TITLE)

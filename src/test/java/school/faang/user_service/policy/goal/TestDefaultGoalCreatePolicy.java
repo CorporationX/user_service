@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -28,7 +28,7 @@ public class TestDefaultGoalCreatePolicy {
     @InjectMocks
     DefaultGoalCreatePolicy policy;
     @Mock
-    private UserContext userContext;
+    private AuthUserContext authUserContext;
     @Mock
     private MentorshipRepository mentorshipRepository;
     @Mock
@@ -40,7 +40,7 @@ public class TestDefaultGoalCreatePolicy {
     public void testValidateMenteeCreateGoalWithoutExceededLimit() {
         long mentorId = 1L;
         List<Long> menteeIds = List.of(1L);
-        when(userContext.getUserId())
+        when(authUserContext.getUserId())
                 .thenReturn(mentorId);
         when(mentorshipRepository.existsByMentorIdAndMenteeIds(mentorId, menteeIds))
                 .thenReturn(true);
@@ -61,7 +61,7 @@ public class TestDefaultGoalCreatePolicy {
     public void testValidateMenteeCreateGoalWithExceededLimit() {
         long mentorId = 1L;
         List<Long> menteeIds = List.of(1L);
-        when(userContext.getUserId())
+        when(authUserContext.getUserId())
                 .thenReturn(mentorId);
         when(mentorshipRepository.existsByMentorIdAndMenteeIds(mentorId, menteeIds))
                 .thenReturn(true);

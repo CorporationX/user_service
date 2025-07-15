@@ -42,6 +42,7 @@ public class GoalController {
             @ParameterObject FilterGoalDto dto,
             @ParameterObject Pageable pageable
     ) {
+        System.out.println("iuy");
         return ResponseEntity
                 .ok()
                 .body(goalService.get(dto, pageable));
@@ -67,7 +68,7 @@ public class GoalController {
             description = "Обновляет данные цели по идентификатору",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Цель успешно обновлена"),
-                    @ApiResponse(responseCode = "400", description = "Невалидные данные цели"),
+                    @ApiResponse(responseCode = "422", description = "Невалидные данные цели"),
                     @ApiResponse(responseCode = "404", description = "Цель не найдена")
             }
     )

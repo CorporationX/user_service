@@ -10,8 +10,8 @@ import school.faang.user_service.entity.user.User;
 
 @Component
 @RequiredArgsConstructor
-public class AuthUserHolder {
-    public static User getCurrentUser() {
+public class AuthUserContext {
+    public User getUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
             throw new AuthenticationCredentialsNotFoundException("User is not authenticated");
@@ -25,7 +25,7 @@ public class AuthUserHolder {
         return user;
     }
 
-    public static long getCurrentUserId() {
-        return getCurrentUser().getId();
+    public long getUserId() {
+        return getUser().getId();
     }
 }

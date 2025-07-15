@@ -12,26 +12,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record CreateGoalDto(
-        @Schema(description = "Заголовок цели")
         @Size(max = 255, message = "Заголовок не должен превышать 255 символов")
         @NotBlank(message = "Введите заголовок цели")
+        @Schema(description = "Заголовок цели")
         String title,
 
-        @Schema(description = "Описание цели")
         @NotBlank(message = "Введите описание цели")
+        @Schema(description = "Описание цели")
         String description,
 
-        @Schema(description = "Дедлайн цели")
         @Future(message = "Некорректная дата дедлайна")
         @NotNull(message = "Введите дедлайн задачи")
+        @Schema(description = "Дедлайн цели")
         LocalDateTime deadline,
 
-        @Schema(description = "Ментор цели")
         @Nullable
+        @Schema(description = "Ментор цели")
         Long mentorId,
 
-        @Schema(description = "Участники цели")
         @NotEmpty(message = "Не заданы пользователи цели")
+        @Schema(description = "Участники цели")
         List<Long> userIds,
 
         @Nullable

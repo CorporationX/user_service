@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.UpdateGoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -30,7 +30,7 @@ public class TestDefaultGoalUpdatePolicy {
     @InjectMocks
     DefaultGoalUpdatePolicy policy;
     @Mock
-    private UserContext userContext;
+    private AuthUserContext authUserContext;
     @Mock
     private MentorshipRepository mentorshipRepository;
     @Mock
@@ -38,7 +38,7 @@ public class TestDefaultGoalUpdatePolicy {
 
     @BeforeEach
     void init() {
-        Mockito.when(userContext.getUserId()).thenReturn(CURRENT_USER_ID);
+        Mockito.when(authUserContext.getUserId()).thenReturn(CURRENT_USER_ID);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TestDefaultGoalUpdatePolicy {
         goal.setStatus(GoalStatus.COMPLETED);
 
         assertThrows(DataValidationException.class, () -> policy.validate(dto, goal));
-        verify(userContext, times(1)).getUserId();
+        verify(authUserContext, times(1)).getUserId();
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TestDefaultGoalUpdatePolicy {
         Goal goal = createGoal(1L, CURRENT_USER_ID, 0, 0);
 
         assertDoesNotThrow(() -> policy.validate(dto, goal));
-        verify(userContext, times(1)).getUserId();
+        verify(authUserContext, times(1)).getUserId();
     }
 
     @Test
@@ -78,7 +78,7 @@ public class TestDefaultGoalUpdatePolicy {
         Goal goal = createGoal(1L, null, (int) CURRENT_USER_ID, 0);
 
         assertDoesNotThrow(() -> policy.validate(dto, goal));
-        verify(userContext, times(1)).getUserId();
+        verify(authUserContext, times(1)).getUserId();
     }
 
     private Goal createGoal(Long goalId, Long mentorId, int participantCount, int skillsCount) {

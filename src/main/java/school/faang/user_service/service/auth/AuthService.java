@@ -1,11 +1,14 @@
 package school.faang.user_service.service.auth;
 
+import school.faang.user_service.dto.auth.Token;
 import school.faang.user_service.dto.auth.AuthRequest;
-import school.faang.user_service.dto.auth.AuthResponse;
+import school.faang.user_service.dto.auth.JwtTokens;
 import school.faang.user_service.dto.user.CreateUserDto;
 
 public interface AuthService {
-    public AuthResponse register(CreateUserDto dto);
+    public JwtTokens register(CreateUserDto dto);
 
-    public AuthResponse authenticate(AuthRequest dto);
+    public JwtTokens authenticate(AuthRequest dto);
+
+    Token refreshToken(String refreshToken);
 }

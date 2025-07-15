@@ -7,8 +7,11 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.auth.Token;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -16,9 +19,13 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     @Value("${jwt.access.secret}")
-    private String secret;
+    private String accessSecret;
     @Value("${jwt.access.expiration}")
-    private int expiration;
+    private int accessExpiration;
+    @Value("${jwt.refresh.secret}")
+    private String refreshSecret;
+    @Value("${jwt.refresh.expiration}")
+    private int refreshExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -30,7 +37,7 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSecretKey())
+                .verifyWith(getSecretKey(accessSecret))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -50,24 +57,35 @@ public class JwtService {
         return extractExpiredAt(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(Map.of(), userDetails);
+    public Token generateAccessToken(UserDetails userDetails) {
+        return generateAccessToken(Map.of(), userDetails);
     }
 
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ) {
-        return Jwts.builder()
-                .signWith(getSecretKey())
-                .claims().add(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .and().compact();
+    public Token generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return generateToken(extraClaims, userDetails.getUsername(), accessSecret, accessExpiration);
     }
 
-    private SecretKey getSecretKey() {
+    public Token generateRefreshToken(UserDetails userDetails) {
+        return generateToken(Map.of(), userDetails.getUsername(), refreshSecret, refreshExpiration);
+    }
+
+    private Token generateToken(Map<String, Object> extraClaims, String username, String secret, int expirationMillis) {
+        Token.TokenBuilder token = Token.builder();
+        LocalDateTime expiredAt = LocalDateTime.now()
+                .plus(expirationMillis, ChronoUnit.MILLIS);
+        token.value(Jwts.builder()
+                        .signWith(getSecretKey(secret))
+                        .claims().add(extraClaims)
+                        .subject(username)
+                        .issuedAt(new Date(System.currentTimeMillis()))
+                        .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+                        .and().compact())
+                .expireAt(expiredAt)
+                .expiration(expirationMillis);
+        return token.build();
+    }
+
+    private SecretKey getSecretKey(String secret) {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }

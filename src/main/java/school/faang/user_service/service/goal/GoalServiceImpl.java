@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.FilterGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -38,7 +38,7 @@ import java.util.Optional;
 public class GoalServiceImpl implements GoalService {
     private static final int MIN_USERS_TO_DELETE_GOAL = 1;
 
-    private final UserContext userContext;
+    private final AuthUserContext authUserContext;
     private final GoalRepository goalRepository;
     private final GoalMapper goalMapper;
     private final UserRepository userRepository;
@@ -137,7 +137,7 @@ public class GoalServiceImpl implements GoalService {
         Goal goal = goalRepository.getByIdOrThrow(id);
         goalDeletePolicy.validate(goal);
         long usersSize = goal.getUsers().size();
-        long currentUserId = userContext.getUserId();
+        long currentUserId = authUserContext.getUserId();
         boolean isMentor = goal.getMentor() != null
                            && goal.getMentor().getId().equals(currentUserId);
         if (isMentor || usersSize <= MIN_USERS_TO_DELETE_GOAL) {

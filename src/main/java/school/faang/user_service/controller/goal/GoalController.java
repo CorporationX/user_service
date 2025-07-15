@@ -42,7 +42,6 @@ public class GoalController {
             @ParameterObject FilterGoalDto dto,
             @ParameterObject Pageable pageable
     ) {
-        System.out.println("iuy");
         return ResponseEntity
                 .ok()
                 .body(goalService.get(dto, pageable));

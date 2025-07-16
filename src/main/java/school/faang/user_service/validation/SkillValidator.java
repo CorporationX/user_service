@@ -1,6 +1,5 @@
 package school.faang.user_service.validation;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.recommendation.SkillOffer;
@@ -11,11 +10,10 @@ import school.faang.user_service.exception.ForbiddenException;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class SkillValidator {
 
     @Value("${skill.min-offers-required}")
-    private final int minOffersRequired;
+    private int minOffersRequired;
 
     public void validateSkillTitleIsUnique(boolean exists, String title) {
         if (exists) {

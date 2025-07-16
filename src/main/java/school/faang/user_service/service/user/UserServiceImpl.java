@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.UserServiceApplication;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
@@ -15,6 +16,9 @@ import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -60,5 +64,17 @@ public class UserServiceImpl implements UserService {
     public UserDto getById(long userId) {
         User user = userRepository.getByIdOrThrow(userId);
         return userMapper.toUserDto(user);
+    }
+
+    @Override
+    public UserDto getUser(long userId) {
+        return userMapper.toUserDto(userRepository.findById(userId).orElseThrow());
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds).stream()
+                .map(userMapper::toUserDto)
+                .toList();
     }
 }

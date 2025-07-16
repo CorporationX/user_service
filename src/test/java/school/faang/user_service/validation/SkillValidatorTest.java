@@ -30,8 +30,7 @@ public class SkillValidatorTest {
 
     @BeforeEach
     void setUp() {
-        skillValidator = new SkillValidator();
-        ReflectionTestUtils.setField(skillValidator, "minOffersRequired", 3);
+        skillValidator = new SkillValidator(3);
     }
 
     @Test

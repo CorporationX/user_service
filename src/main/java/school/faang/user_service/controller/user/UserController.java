@@ -22,13 +22,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api")
 
-@Tag(name = "Пользователи", description = "Взаимодействие с пользователями")
+@Tag(name = "Users", description = "Interaction with users")
 public class UserController {
     private final UserService userService;
 
     @Operation(
-            summary = "Создание пользователя",
-            description = "Позволяет создать пользователя"
+            summary = "Create user",
+            description = "Allows you to create a user"
     )
     @PostMapping("/user/create")
     public UserDto create(@RequestBody @Valid CreateUserDto userDto) {
@@ -36,8 +36,8 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Поиск пользователя по идентификатору",
-            description = "Позволяет получить пользователя по его идентификатору"
+            summary = "Updating user data",
+            description = "Allows you to update user data"
     )
     @PatchMapping("/user/{userId}/update")
     public UserDto update(long userId, @RequestBody @Valid UpdateUserDto userDto) {
@@ -49,17 +49,17 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Поиск пользователя по идентификатору",
-            description = "Позволяет получить пользователя по его идентификатору"
+            summary = "Search user by ID",
+            description = "Allows you to get a user by their ID"
     )
-    @GetMapping("/users/{userId}")
+    @GetMapping("/user/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
 
     @Operation(
-            summary = "Поиск пользователей по идентификаторам",
-            description = "Позволяет получить список пользователей по списку идентификаторов"
+            summary = "Search users by IDs",
+            description = "Allows you to get a list of users by a list of IDs"
     )
     @PostMapping("/users")
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {

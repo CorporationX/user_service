@@ -3,7 +3,7 @@ package school.faang.user_service.validation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.config.properties.SkillProperties;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.user.User;
@@ -30,8 +30,8 @@ public class SkillValidatorTest {
 
     @BeforeEach
     void setUp() {
-        skillValidator = new SkillValidator();
-        ReflectionTestUtils.setField(skillValidator, "minOffersRequired", 3);
+        SkillProperties skillProperties = new SkillProperties(3);
+        skillValidator = new SkillValidator(skillProperties);
     }
 
     @Test

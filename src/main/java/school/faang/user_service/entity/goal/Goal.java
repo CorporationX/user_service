@@ -14,12 +14,13 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.user.Skill;
@@ -28,7 +29,10 @@ import school.faang.user_service.entity.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,6 +42,8 @@ public class Goal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "id")
     private Long id;
 
@@ -45,27 +51,36 @@ public class Goal {
     @JoinColumn(name = "parent_goal_id")
     private Goal parent;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "description", length = 128, nullable = false, unique = true)
     private String description;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private GoalStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @Column(name = "deadline")
     private LocalDateTime deadline;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

@@ -30,7 +30,7 @@ public class SkillValidator {
     public void validateUserDoesNotHaveSkill(boolean userHasSkill, long skillId, long userId) {
         if (userHasSkill) {
             throw new ForbiddenException("User with id " + userId
-                    + " already has skill with id " + skillId);
+                                        + " already has skill with id " + skillId);
         }
     }
 
@@ -41,7 +41,7 @@ public class SkillValidator {
                 .count();
         if (uniqueAuthorsCount < minOffersRequired) {
             throw new ForbiddenException("Skill cannot be acquired. At least "
-                    + minOffersRequired + " unique users must offer this skill.");
+                                        + minOffersRequired + " unique users must offer this skill.");
         }
     }
 }

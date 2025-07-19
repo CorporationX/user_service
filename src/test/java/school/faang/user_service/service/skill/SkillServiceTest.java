@@ -85,10 +85,8 @@ public class SkillServiceTest {
     private static final String EMAIL = "email";
     private static final String PHONE = "phone";
     private static final String ABOUT_ME = "aboutMe";
-    private static final String SKILL_ALREADY_EXISTS_MESSAGE =
-            "Skill with title: " + SKILL_TITLE + " already exists.";
-    private static final String SKILL_NOT_FOUND_MESSAGE =
-            "Skill with id " + SKILL_ID + " does not exist";
+    private static final String SKILL_ALREADY_EXISTS_MESSAGE = "Skill with title: %s already exists.";
+    private static final String SKILL_NOT_FOUND_MESSAGE = "Skill with id %d does not exist.";
     private static final String USER_ALREADY_HAS_SKILL_MESSAGE =
             "User already has this skill.";
     private static final String NOT_ENOUGH_OFFERS_MESSAGE =
@@ -122,7 +120,7 @@ public class SkillServiceTest {
 
         when(skillRepository.existsByTitle(SKILL_TITLE)).thenReturn(true);
 
-        doThrow(new DataValidationException(SKILL_ALREADY_EXISTS_MESSAGE))
+        doThrow(new DataValidationException(String.format(SKILL_ALREADY_EXISTS_MESSAGE, SKILL_TITLE)))
                 .when(skillValidator)
                 .validateSkillTitleIsUnique(true, SKILL_TITLE);
 
@@ -131,7 +129,7 @@ public class SkillServiceTest {
                 () -> skillService.create(createSkillDto)
         );
 
-        assertEquals(SKILL_ALREADY_EXISTS_MESSAGE, exception.getMessage());
+        assertEquals(String.format(SKILL_ALREADY_EXISTS_MESSAGE, SKILL_TITLE), exception.getMessage());
 
         verify(skillMapper, never()).toSkill(any());
         verify(skillRepository, never()).save(any());
@@ -223,15 +221,16 @@ public class SkillServiceTest {
     void acquireSkillFromOffersThrowsExceptionWhenSkillNotExists() {
         when(skillRepository.existsById(SKILL_ID)).thenReturn(false);
 
-        doThrow(new DataValidationException(SKILL_NOT_FOUND_MESSAGE))
-                .when(skillValidator).ensureSkillExists(false, SKILL_ID);
+        doThrow(new DataValidationException(String.format(SKILL_NOT_FOUND_MESSAGE, SKILL_ID)))
+                .when(skillValidator)
+                .ensureSkillExists(false, SKILL_ID);
 
         DataValidationException exception = assertThrows(
                 DataValidationException.class,
                 () -> skillService.acquireSkillFromOffers(SKILL_ID, USER_ID)
         );
 
-        assertEquals(SKILL_NOT_FOUND_MESSAGE, exception.getMessage());
+        assertEquals(String.format(SKILL_NOT_FOUND_MESSAGE, SKILL_ID), exception.getMessage());
 
         verify(skillRepository).existsById(SKILL_ID);
         verifyNoInteractions(skillOfferService, userSkillGuaranteeMapper, userSkillGuaranteeService);

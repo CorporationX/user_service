@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api")
+@RequestMapping(value = "/api/users")
 
 @Tag(name = "Users", description = "Interaction with users")
 public class UserController {
@@ -30,7 +30,7 @@ public class UserController {
             summary = "Create user",
             description = "Allows you to create a user"
     )
-    @PostMapping("/user/create")
+    @PostMapping()
     public UserDto create(@RequestBody @Valid CreateUserDto userDto) {
         return userService.create(userDto);
     }
@@ -39,8 +39,8 @@ public class UserController {
             summary = "Updating user data",
             description = "Allows you to update user data"
     )
-    @PatchMapping("/user/{userId}/update")
-    public UserDto update(long userId, @RequestBody @Valid UpdateUserDto userDto) {
+    @PatchMapping("/path/{userId}")
+    public UserDto update(@PathVariable long userId, @RequestBody @Valid UpdateUserDto userDto) {
         return userService.update(userId, userDto);
     }
 
@@ -52,7 +52,7 @@ public class UserController {
             summary = "Search user by ID",
             description = "Allows you to get a user by their ID"
     )
-    @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
@@ -61,7 +61,7 @@ public class UserController {
             summary = "Search users by IDs",
             description = "Allows you to get a list of users by a list of IDs"
     )
-    @PostMapping("/users")
+    @PostMapping("/all")
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }

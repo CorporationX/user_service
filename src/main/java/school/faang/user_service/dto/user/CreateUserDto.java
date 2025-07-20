@@ -5,17 +5,20 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record CreateUserDto(
-        @NotBlank
+        @NotBlank(message = "Введите username")
         @Schema(description = "Username пользователя")
         String username,
-        @NotBlank
-        @Email
+
+        @NotBlank(message = "Введите email")
+        @Email(message = "Некорректный email")
         @Schema(description = "Email", example = "test@gmail.com")
         String email,
-        @NotBlank
+
+        @NotBlank(message = "Введите пароль")
         @Schema(description = "Пароль")
         String password,
-        @NotBlank
+
+        @NotBlank(message = "Не определена страна пользователя")
         @Schema(description = "Id страны пользователя", example = "1")
         Long countryId
 ) {

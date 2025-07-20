@@ -1,10 +1,12 @@
 package school.faang.user_service.service.auth;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.auth.AuthRequest;
 import school.faang.user_service.dto.auth.JwtTokens;
 import school.faang.user_service.dto.auth.Token;
@@ -18,6 +20,10 @@ import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.RefreshTokenRepository;
 import school.faang.user_service.repository.user.UserRepository;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -30,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
+    @Transactional
     public JwtTokens register(CreateUserDto dto) {
         User user = userMapper.toUser(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -37,8 +44,9 @@ public class AuthServiceImpl implements AuthService {
         user.setCountry(country);
         userRepository.save(user);
         Token accessToken = jwtService.generateAccessToken(user);
-        Token refreshToken = jwtService.generateAccessToken(user);
+        Token refreshToken = jwtService.generateRefreshToken(user);
         createRefreshToken(refreshToken, user);
+        logAuthAction("Регистрация пользователя", user);
         return JwtTokens.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -46,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public JwtTokens authenticate(AuthRequest dto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.username(), dto.password())
@@ -53,8 +62,9 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(dto.username())
                 .orElseThrow();
         Token accessToken = jwtService.generateAccessToken(user);
-        Token refreshToken = jwtService.generateAccessToken(user);
+        Token refreshToken = jwtService.generateRefreshToken(user);
         createRefreshToken(refreshToken, user);
+        logAuthAction("Аутентификация пользователя", user);
         return JwtTokens.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -72,9 +82,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public Token refreshToken(String refreshToken) {
-        RefreshToken cantGetNewAccessToken = refreshTokenRepository.getValidToken(refreshToken)
+        RefreshToken refreshTokenEntity = refreshTokenRepository.getValidToken(refreshToken)
                 .orElseThrow(() -> new ForbiddenException("Cant get new access value"));
-        return jwtService.generateAccessToken(cantGetNewAccessToken.getUser());
+        User user = refreshTokenEntity.getUser();
+        LocalDateTime expiredAt = LocalDateTime.now()
+                .plus(jwtService.getRefreshSecretExpiration(), ChronoUnit.MILLIS);
+
+        refreshTokenEntity.setExpiredAt(expiredAt);
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        logAuthAction("Генерация access токена через refresh токена", user);
+        return jwtService.generateAccessToken(user);
+    }
+
+    private void logAuthAction(String msg, User user) {
+        log.info("{}. Id: {}, username: {}", msg, user.getId(), user.getUsername());
     }
 }

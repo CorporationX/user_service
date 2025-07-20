@@ -12,3 +12,6 @@ CREATE TABLE refresh_tokens (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+CREATE INDEX idx_refresh_tokens_token
+    ON refresh_tokens(token);

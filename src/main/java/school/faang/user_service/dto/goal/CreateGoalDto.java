@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.goal;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Future;
@@ -31,11 +32,15 @@ public record CreateGoalDto(
         Long mentorId,
 
         @NotEmpty(message = "Не заданы пользователи цели")
-        @Schema(description = "Участники цели")
+        @Schema(description = "Участники цели. Ограничение на количество активных целей у участника"
+                              + " описано в документации")
         List<Long> userIds,
 
         @Nullable
-        @Schema(description = "Навыки, которые прокачиваются данной целью")
+        @ArraySchema(
+                schema = @Schema(type = "integer", format = "int64"),
+                arraySchema = @Schema(description = "Навыки, которые прокачиваются данной целью")
+        )
         List<Long> skillIds
 ) {
 }

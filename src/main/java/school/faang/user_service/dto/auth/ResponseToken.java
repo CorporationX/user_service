@@ -6,7 +6,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "DTO, возвращающий токен аутентификации и информацию об его сроке действия")
+@Schema(description = "Содержит access-токен и информацию об его сроке действия")
 @Builder
 public record ResponseToken(
         @Schema(

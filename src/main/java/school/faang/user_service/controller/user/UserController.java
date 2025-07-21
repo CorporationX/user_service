@@ -44,10 +44,6 @@ public class UserController {
         return userService.update(userId, userDto);
     }
 
-    public UserDto getById(long userId) {
-        return userService.getById(userId);
-    }
-
     @Operation(
             summary = "Search user by ID",
             description = "Allows you to get a user by their ID"

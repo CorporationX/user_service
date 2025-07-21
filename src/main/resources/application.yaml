@@ -50,3 +50,8 @@ recommendation:
 
 skill:
   min-offers-required: 3
+
+date:
+  time:
+    out: 6
+

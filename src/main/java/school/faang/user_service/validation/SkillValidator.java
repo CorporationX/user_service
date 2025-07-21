@@ -1,7 +1,8 @@
 package school.faang.user_service.validation;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.config.properties.SkillProperties;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -10,10 +11,10 @@ import school.faang.user_service.exception.ForbiddenException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class SkillValidator {
 
-    @Value("${skill.min-offers-required}")
-    private int minOffersRequired;
+    private final SkillProperties skillProperties;
 
     public void validateSkillTitleIsUnique(boolean exists, String title) {
         if (exists) {
@@ -30,7 +31,7 @@ public class SkillValidator {
     public void validateUserDoesNotHaveSkill(boolean userHasSkill, long skillId, long userId) {
         if (userHasSkill) {
             throw new ForbiddenException("User with id " + userId
-                                        + " already has skill with id " + skillId);
+                    + " already has skill with id " + skillId);
         }
     }
 
@@ -39,9 +40,9 @@ public class SkillValidator {
                 .map(offer -> offer.getRecommendation().getAuthor().getId())
                 .distinct()
                 .count();
-        if (uniqueAuthorsCount < minOffersRequired) {
+        if (uniqueAuthorsCount < skillProperties.minOffersRequired()) {
             throw new ForbiddenException("Skill cannot be acquired. At least "
-                                        + minOffersRequired + " unique users must offer this skill.");
+                    + skillProperties.minOffersRequired() + " unique users must offer this skill.");
         }
     }
 }

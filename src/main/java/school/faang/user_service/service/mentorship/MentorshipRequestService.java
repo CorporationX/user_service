@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,7 @@ import school.faang.user_service.dto.mentorship.MentorshipResponseDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.filter.mentorship.MentorshipFilter;
+import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.mentorship.MentorshipResponseMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.Validator;
@@ -26,7 +26,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipResponseMapper mentorshipResponseMapper;
     private final List<Validator<MentorshipRequestDto>> validators;
-    private final List<MentorshipFilter> filters;
+    private final List<Filter<MentorshipFilterDto, MentorshipRequest>> filters;
 
     @Transactional
     public MentorshipResponseDto requestMentorship(MentorshipRequestDto dto) {
@@ -47,7 +47,7 @@ public class MentorshipRequestService {
     public List<MentorshipResponseDto> getRequests(MentorshipFilterDto filterDto) {
         Stream<MentorshipRequest> filteredRequests = mentorshipRequestRepository.findAll().stream();
 
-        for (MentorshipFilter mentorshipFilter : filters) {
+        for (Filter<MentorshipFilterDto, MentorshipRequest> mentorshipFilter : filters) {
             if (mentorshipFilter.isApplicable(filterDto)) {
                 filteredRequests = mentorshipFilter.apply(filteredRequests, filterDto);
             }

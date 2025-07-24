@@ -15,7 +15,7 @@ import school.faang.user_service.dto.mentorship.MentorshipFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipResponseDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
-import school.faang.user_service.service.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 

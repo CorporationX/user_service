@@ -3,11 +3,12 @@ package school.faang.user_service.filter.mentorship;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.filter.mentorship.MentorshipFilter;
+import school.faang.user_service.filter.Filter;
+
 import java.util.stream.Stream;
 
 @Component
-public class ReceiverIdFilter implements MentorshipFilter {
+public class ReceiverIdFilter implements Filter<MentorshipFilterDto, MentorshipRequest> {
     @Override
     public boolean isApplicable(MentorshipFilterDto filterDto) {
         return filterDto.receiverId() != null;
@@ -17,6 +18,6 @@ public class ReceiverIdFilter implements MentorshipFilter {
     public Stream<MentorshipRequest> apply(
             Stream<MentorshipRequest> mentorshipRequests, MentorshipFilterDto filterDto) {
         return mentorshipRequests
-                .filter(request -> filterDto.receiverId().equals(request.getReceiver()));
+                .filter(request -> filterDto.receiverId().equals(request.getReceiver().getId()));
     }
 }

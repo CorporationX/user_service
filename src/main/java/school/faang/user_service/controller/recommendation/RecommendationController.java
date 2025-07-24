@@ -1,8 +1,10 @@
 package school.faang.user_service.controller.recommendation;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,7 @@ import java.util.List;
 @RequestMapping("/api/recommendations")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Рекомендации")
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
@@ -33,6 +36,7 @@ public class RecommendationController {
     public RecommendationDto create(@RequestBody @Valid CreateRecommendationDto recommendationDto) {
         return recommendationService.create(recommendationDto);
     }
+
 
     @PatchMapping("/{id}")
     public RecommendationDto update(
@@ -47,7 +51,7 @@ public class RecommendationController {
     }
 
     @GetMapping
-    public List<RecommendationDto> getByFilters(@Valid RecommendationFilterDto filters) {
+    public List<RecommendationDto> getByFilters(@Valid @ParameterObject RecommendationFilterDto filters) {
         return recommendationService.getByFilters(filters);
     }
 

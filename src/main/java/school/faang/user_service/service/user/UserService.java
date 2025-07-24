@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
@@ -10,7 +11,7 @@ import java.util.List;
  * Сервис для управления пользователями.
  * Предоставляет методы для создания, обновления и получения информации о пользователях.
  */
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
     /**
      * Создаёт нового пользователя на основе переданных данных.

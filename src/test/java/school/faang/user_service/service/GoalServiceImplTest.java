@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.FilterGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -64,7 +64,7 @@ public class GoalServiceImplTest {
     @Spy
     private GoalMapper goalMapperImpl = Mappers.getMapper(GoalMapper.class);
     @Mock
-    private UserContext userContext;
+    private AuthUserContext authUserContext;
     @Mock
     private GoalRepository goalRepository;
     @Mock
@@ -110,7 +110,7 @@ public class GoalServiceImplTest {
         long id = GOAL_ID + 1L;
         Goal findedGoal = createGoal(GOAL_ID, MENTOR_ID, 1, 0);
         when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userContext.getUserId()).thenReturn(MENTOR_ID);
+        when(authUserContext.getUserId()).thenReturn(MENTOR_ID);
 
         goalService.delete(id);
 
@@ -124,7 +124,7 @@ public class GoalServiceImplTest {
         long id = GOAL_ID + 1L;
         Goal findedGoal = createGoal(GOAL_ID, USER_ID, 1, 0);
         when(goalRepository.getByIdOrThrow(id)).thenReturn(findedGoal);
-        when(userContext.getUserId()).thenReturn(USER_ID);
+        when(authUserContext.getUserId()).thenReturn(USER_ID);
 
         goalService.delete(id);
 
@@ -137,7 +137,7 @@ public class GoalServiceImplTest {
     public void testDeleteGoalsWhenMoreThenOneParticipant() {
         Goal findedGoal = createGoal(GOAL_ID, 1L, 2, 0);
         when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
-        when(userContext.getUserId()).thenReturn(USER_ID);
+        when(authUserContext.getUserId()).thenReturn(USER_ID);
 
         goalService.delete(GOAL_ID);
 

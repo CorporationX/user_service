@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
@@ -19,14 +19,14 @@ import java.util.List;
 public class DefaultGoalCreatePolicy implements GoalCreatePolicy {
     @Value("${user.goal.limit-active:2}")
     private int userMaxGoalLimit;
-    private final UserContext userContext;
+    private final AuthUserContext authUserContext;
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
     private final GoalPolicyUtils goalPolicyUtils;
 
     @Override
     public void validate(CreateGoalDto dto) {
-        long currentUserId = userContext.getUserId();
+        long currentUserId = authUserContext.getUserId();
         Long mentorId = dto.mentorId();
         boolean isMentee = mentorId != null
                            && mentorshipRepository.existsByMentorIdAndMenteeIds(mentorId, dto.userIds());

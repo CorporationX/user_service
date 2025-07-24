@@ -5,20 +5,20 @@ import jakarta.annotation.Nullable;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 public record FilterGoalDto(
-        @Schema(description = "Заголовок цели содержит строку")
         @Nullable
+        @Schema(description = "Заголовок цели содержит строку")
         String titleContains,
 
         @Nullable
         @Schema(description = "Описание цели содержит строку")
         String descriptionContains,
 
-        @Schema(description = "Цели с заданным статусом")
         @Nullable
+        @Schema(description = "Цели с заданным статусом")
         GoalStatus status,
 
-        @Schema(description = "Цели с заданным ментором")
         @Nullable
+        @Schema(description = "Цели с заданным ментором")
         Long mentorId
 ) {
 }

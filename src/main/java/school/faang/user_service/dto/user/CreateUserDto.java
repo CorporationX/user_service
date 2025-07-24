@@ -17,6 +17,8 @@ public record CreateUserDto(
         String password,
         @NotBlank(message = "Enter your country id")
         @Schema(description = "User countryId", example = "77")
+        @NotBlank(message = "Не определена страна пользователя")
+        @Schema(description = "Id страны пользователя", example = "1")
         Long countryId
 ) {
 }

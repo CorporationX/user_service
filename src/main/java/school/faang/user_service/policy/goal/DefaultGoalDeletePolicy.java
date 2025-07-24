@@ -3,7 +3,7 @@ package school.faang.user_service.policy.goal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
 
@@ -12,16 +12,16 @@ import school.faang.user_service.exception.DataValidationException;
 @AllArgsConstructor
 public class DefaultGoalDeletePolicy implements GoalDeletePolicy {
 
-    private final UserContext userContext;
+    private final AuthUserContext authUserContext;
     private final GoalPolicyUtils goalPolicyUtils;
 
     @Override
     public void validate(Goal goal) {
-        long currentUserId = userContext.getUserId();
+        long currentUserId = authUserContext.getUserId();
         goalPolicyUtils.denyIfNotMentorAndParticipant(
                 currentUserId,
                 goal,
-                () -> deny("Cannot update goal", goal, currentUserId)
+                () -> deny("Cannot delete goal", goal, currentUserId)
         );
     }
 

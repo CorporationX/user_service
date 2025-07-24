@@ -51,6 +51,14 @@ recommendation:
 skill:
   min-offers-required: 3
 
+jwt:
+  access:
+    secret: fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a
+    expiration: 600000
+  refresh:
+    secret: fe36efc1dc7ed4e847bba155b7932318f2729c68428c891f90de21849851aa4a
+    expiration: 604800000
+    
 date:
   time:
     out: 6

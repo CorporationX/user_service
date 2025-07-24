@@ -11,6 +11,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
@@ -60,7 +61,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(long userId) {
-        return userMapper.toUserDto(userRepository.findById(userId).orElseThrow());
+        return userMapper.toUserDto(userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId)));
     }
 
     @Override

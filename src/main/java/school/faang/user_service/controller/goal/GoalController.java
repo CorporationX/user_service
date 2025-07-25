@@ -13,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,13 +29,13 @@ import school.faang.user_service.service.goal.GoalService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/goals")
-@Tag(name = "Цели", description = "Взаимодействие с целями")
+@Tag(name = "Goals", description = "Operations for managing goals")
 public class GoalController {
     private final GoalService goalService;
 
     @Operation(
-            summary = "Список целей",
-            description = "Позволяет получить список отфильтрованных целей"
+            summary = "List goals",
+            description = "Retrieves a paginated list of goals based on given filters"
     )
     @GetMapping
     public ResponseEntity<Page<GoalDto>> getGoals(
@@ -48,8 +48,8 @@ public class GoalController {
     }
 
     @Operation(
-            summary = "Создать цель",
-            description = "Позволяет создать цель"
+            summary = "Create a goal",
+            description = "Creates a new goal"
     )
     @PostMapping
     public ResponseEntity<GoalDto> create(
@@ -63,15 +63,15 @@ public class GoalController {
     }
 
     @Operation(
-            summary = "Обновить существующую цель",
-            description = "Обновляет данные цели по идентификатору",
+            summary = "Update an existing goal",
+            description = "Updates the details of a goal by its identifier",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Цель успешно обновлена"),
-                    @ApiResponse(responseCode = "422", description = "Невалидные данные"),
-                    @ApiResponse(responseCode = "404", description = "Цель не найдена")
+                    @ApiResponse(responseCode = "200", description = "Goal successfully updated"),
+                    @ApiResponse(responseCode = "422", description = "Invalid data provided"),
+                    @ApiResponse(responseCode = "404", description = "Goal not found")
             }
     )
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<GoalDto> update(
             @PathVariable("id") Long id,
             @RequestBody @Valid UpdateGoalDto updateGoalDto
@@ -83,8 +83,8 @@ public class GoalController {
     }
 
     @Operation(
-            summary = "Удалить цель",
-            description = "Позволяет удалить цель"
+            summary = "Delete a goal",
+            description = "Deletes a goal by its identifier"
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(

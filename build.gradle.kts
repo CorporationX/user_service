@@ -52,6 +52,11 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
 
     /**
+     * Broker
+     */
+    implementation("org.springframework.kafka:spring-kafka")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+    /**
      * Utils & Logging
      */
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")

@@ -24,6 +24,8 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
+import school.faang.user_service.kafka.dto.user.update.UserUpdateEvent;
+import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.policy.goal.GoalCreatePolicy;
 import school.faang.user_service.policy.goal.GoalDeletePolicy;
@@ -69,6 +71,8 @@ public class GoalServiceImplTest {
     private GoalRepository goalRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserUpdateProducer userUpdateProducer;
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -222,11 +226,12 @@ public class GoalServiceImplTest {
 
         goalService.update(GOAL_ID, dto);
 
-        findedGoal.getSkillsToAchieve().forEach(skill -> {
-            findedGoal.getUsers().forEach(user -> {
+        findedGoal.getUsers().forEach(user -> {
+            findedGoal.getSkillsToAchieve().forEach(skill -> {
                 verify(skillRepository, times(1)).assignSkillToUser(skill.getId(), user.getId());
             });
         });
+        verify(userUpdateProducer, times(findedGoal.getUsers().size())).onUserUpdate(any(UserUpdateEvent.class));
     }
 
     @Test

@@ -18,6 +18,8 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
+import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
+import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.policy.goal.GoalCreatePolicy;
 import school.faang.user_service.policy.goal.GoalDeletePolicy;
@@ -48,6 +50,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalCreatePolicy goalCreatePolicy;
     private final GoalUpdatePolicy goalUpdatePolicy;
     private final GoalDeletePolicy goalDeletePolicy;
+    private final UserUpdateProducer userUpdateProducer;
 
     @Override
     @Transactional
@@ -120,15 +123,21 @@ public class GoalServiceImpl implements GoalService {
 
         goalMapper.update(goal, updateGoalDto);
 
+        Goal updatedGoal = goalRepository.save(goal);
+
         if (goal.getStatus() == GoalStatus.COMPLETED && goal.getSkillsToAchieve() != null && goal.getUsers() != null) {
-            for (Skill skill : goal.getSkillsToAchieve()) {
-                for (User user : goal.getUsers()) {
+            for (User user : goal.getUsers()) {
+                List<Long> skillIds = new ArrayList<>();
+                for (Skill skill : goal.getSkillsToAchieve()) {
                     skillRepository.assignSkillToUser(skill.getId(), user.getId());
+                    skillIds.add(skill.getId());
                 }
+                userUpdateProducer.onUserUpdate(
+                        new UserAddSkills(user.getId(), skillIds)
+                );
             }
         }
 
-        Goal updatedGoal = goalRepository.save(goal);
         return goalMapper.toGoalDto(updatedGoal);
     }
 

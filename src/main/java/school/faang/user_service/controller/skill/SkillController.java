@@ -48,6 +48,6 @@ public class SkillController {
 
     @PostMapping("/{skillId}/acquire")
     public void acquireSkillFromOffers(@PathVariable @NotNull @Positive Long skillId) {
-        skillService.acquireSkillFromOffers(skillId, userContext.getUserId());
+        skillService.acquireSkillFromOffers(skillId);
     }
 }

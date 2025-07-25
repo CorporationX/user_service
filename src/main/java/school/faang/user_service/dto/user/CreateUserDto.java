@@ -3,6 +3,7 @@ package school.faang.user_service.dto.user;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateUserDto(
         @NotBlank(message = "Введите username")
@@ -18,7 +19,7 @@ public record CreateUserDto(
         @Schema(description = "Пароль")
         String password,
 
-        @NotBlank(message = "Не определена страна пользователя")
+        @NotNull(message = "Не определена страна пользователя")
         @Schema(description = "Id страны пользователя", example = "1")
         Long countryId
 ) {

@@ -74,7 +74,6 @@ public interface SkillService {
      * Если условия не выполнены, выбрасывается {@code ForbiddenException} или {@code DataValidationException}.
      *
      * @param skillId идентификатор скилла, который пользователь хочет присвоить
-     * @param userId идентификатор пользователя, который пытается присвоить скилл
      */
-    void acquireSkillFromOffers(long skillId, long userId);
+    void acquireSkillFromOffers(long skillId);
 }

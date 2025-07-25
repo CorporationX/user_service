@@ -20,6 +20,8 @@ import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.RefreshToken;
 import school.faang.user_service.entity.user.User;
+import school.faang.user_service.kafka.dto.user.UserCreated;
+import school.faang.user_service.kafka.producer.UserCreatedProducer;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.RefreshTokenRepository;
@@ -60,6 +62,8 @@ public class AuthServiceImplTest {
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
+    private UserCreatedProducer userCreatedProducer;
+    @Mock
     private RefreshTokenRepository refreshTokenRepository;
     @Captor
     private ArgumentCaptor<User> userCaptor;
@@ -95,6 +99,7 @@ public class AuthServiceImplTest {
         verify(jwtService).generateAccessToken(any());
         verify(jwtService).generateRefreshToken(any());
         verify(refreshTokenRepository).save(any());
+        verify(userCreatedProducer).onUserCreate(any(UserCreated.class));
     }
 
     @Test

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.skill.CreateSkillDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -11,6 +12,8 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
+import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
+import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.user.SkillRepository;
@@ -33,6 +36,8 @@ public class SkillServiceImpl implements SkillService {
     private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
     private final UserService userService;
     private final SkillValidator skillValidator;
+    private final UserUpdateProducer userUpdateProducer;
+    private final AuthUserContext authUserContext;
 
     @Override
     public SkillDto create(CreateSkillDto skillDto) {
@@ -66,7 +71,8 @@ public class SkillServiceImpl implements SkillService {
 
     @Transactional
     @Override
-    public void acquireSkillFromOffers(long skillId, long userId) {
+    public void acquireSkillFromOffers(long skillId) {
+        long userId = authUserContext.getUserId();
         boolean skillExists = skillRepository.existsById(skillId);
         skillValidator.ensureSkillExists(skillExists, skillId);
         boolean userHasSkill = skillRepository.existsUserSkill(skillId, userId);
@@ -77,6 +83,10 @@ public class SkillServiceImpl implements SkillService {
         List<UserSkillGuarantee> userSkillGuarantees = userSkillGuaranteeMapper.toUserSkillGuarantees(offers);
         userSkillGuaranteeService.saveAll(userSkillGuarantees);
         log.info("Skill {} successfully assigned to user {}", skillId, userId);
+
+        userUpdateProducer.onUserUpdate(
+                new UserAddSkills(userId, List.of(skillId))
+        );
     }
 
     private List<UserDto> getGuarantorsForSkill(Skill skill, Long userId) {

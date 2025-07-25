@@ -15,6 +15,7 @@ import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.RefreshToken;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.kafka.producer.UserCreatedProducer;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.RefreshTokenRepository;
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserCreatedProducer userCreatedProducer;
 
     @Override
     @Transactional
@@ -42,11 +44,15 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Country country = countryRepository.getByIdOrThrow(dto.countryId());
         user.setCountry(country);
+        user.setActive(true);
         userRepository.save(user);
-        Token accessToken = jwtService.generateAccessToken(user);
         Token refreshToken = jwtService.generateRefreshToken(user);
         createRefreshToken(refreshToken, user);
         logAuthAction("Регистрация пользователя", user);
+        Token accessToken = jwtService.generateAccessToken(user);
+
+        userCreatedProducer.onUserCreate(userMapper.toUserCreatedDto(user));
+
         return JwtTokens.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

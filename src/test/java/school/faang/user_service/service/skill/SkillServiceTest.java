@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.skill.CreateSkillDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -21,6 +22,7 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.user.SkillRepository;
@@ -69,6 +71,12 @@ public class SkillServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private AuthUserContext authUserContext;
+
+    @Mock
+    private UserUpdateProducer userUpdateProducer;
 
     @Mock
     private SkillValidator skillValidator;
@@ -220,6 +228,7 @@ public class SkillServiceTest {
     @DisplayName("Should throw exception when skill does not exist during acquisition")
     void acquireSkillFromOffersThrowsExceptionWhenSkillNotExists() {
         when(skillRepository.existsById(SKILL_ID)).thenReturn(false);
+        when(authUserContext.getUserId()).thenReturn(USER_ID);
 
         doThrow(new DataValidationException(String.format(SKILL_NOT_FOUND_MESSAGE, SKILL_ID)))
                 .when(skillValidator)
@@ -227,7 +236,7 @@ public class SkillServiceTest {
 
         DataValidationException exception = assertThrows(
                 DataValidationException.class,
-                () -> skillService.acquireSkillFromOffers(SKILL_ID, USER_ID)
+                () -> skillService.acquireSkillFromOffers(SKILL_ID)
         );
 
         assertEquals(String.format(SKILL_NOT_FOUND_MESSAGE, SKILL_ID), exception.getMessage());
@@ -242,6 +251,7 @@ public class SkillServiceTest {
     void acquireSkillFromOffersThrowsExceptionWhenUserAlreadyHasSkill() {
         when(skillRepository.existsById(SKILL_ID)).thenReturn(true);
         when(skillRepository.existsUserSkill(SKILL_ID, USER_ID)).thenReturn(true);
+        when(authUserContext.getUserId()).thenReturn(USER_ID);
 
         doNothing().when(skillValidator).ensureSkillExists(true, SKILL_ID);
         doThrow(new ForbiddenException(USER_ALREADY_HAS_SKILL_MESSAGE))
@@ -249,7 +259,7 @@ public class SkillServiceTest {
 
         ForbiddenException exception = assertThrows(
                 ForbiddenException.class,
-                () -> skillService.acquireSkillFromOffers(SKILL_ID, USER_ID)
+                () -> skillService.acquireSkillFromOffers(SKILL_ID)
         );
 
         assertEquals(USER_ALREADY_HAS_SKILL_MESSAGE, exception.getMessage());
@@ -265,6 +275,7 @@ public class SkillServiceTest {
     void acquireSkillFromOffersThrowsExceptionWhenNotEnoughOffers() {
         when(skillRepository.existsById(SKILL_ID)).thenReturn(true);
         when(skillRepository.existsUserSkill(SKILL_ID, USER_ID)).thenReturn(false);
+        when(authUserContext.getUserId()).thenReturn(USER_ID);
 
         User author = createUser(AUTHOR_ID);
         Recommendation recommendation = createRecommendation(author);
@@ -281,7 +292,7 @@ public class SkillServiceTest {
 
         ForbiddenException exception = assertThrows(
                 ForbiddenException.class,
-                () -> skillService.acquireSkillFromOffers(SKILL_ID, USER_ID)
+                () -> skillService.acquireSkillFromOffers(SKILL_ID)
         );
 
         assertEquals(NOT_ENOUGH_OFFERS_MESSAGE, exception.getMessage());
@@ -298,6 +309,7 @@ public class SkillServiceTest {
     void acquireSkillFromOffersAssignsSkillWhenValid() {
         when(skillRepository.existsById(SKILL_ID)).thenReturn(true);
         when(skillRepository.existsUserSkill(SKILL_ID, USER_ID)).thenReturn(false);
+        when(authUserContext.getUserId()).thenReturn(USER_ID);
 
         Skill skill = createSkill();
         User receiver = createUser(USER_ID);
@@ -318,7 +330,7 @@ public class SkillServiceTest {
         doNothing().when(skillValidator).validateUserDoesNotHaveSkill(false, SKILL_ID, USER_ID);
         doNothing().when(skillValidator).validateEnoughSkillOffers(offers);
 
-        skillService.acquireSkillFromOffers(SKILL_ID, USER_ID);
+        skillService.acquireSkillFromOffers(SKILL_ID);
 
         verify(skillRepository, times(1)).assignSkillToUser(SKILL_ID, USER_ID);
         verify(userSkillGuaranteeMapper, times(1)).toUserSkillGuarantees(offers);

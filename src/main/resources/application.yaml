@@ -45,7 +45,7 @@ user:
 
 Mentorship:
   min:
-    MonthsBetweenRequests: 3
+    months-between-requests: 3
 
 skill:
   min-offers-required: 3

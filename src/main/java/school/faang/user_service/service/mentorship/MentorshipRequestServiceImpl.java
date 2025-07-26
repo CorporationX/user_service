@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mapership;
+package school.faang.user_service.service.mentorship;
 
 import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +21,7 @@ import school.faang.user_service.repository.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,7 +42,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         final Long requesterId = userContext.getUserId();
         final Long mentorId = requestDto.mentorId();
 
-        checkResaverIsResave(requesterId, mentorId);
+        checkMentorshipIsScheduled(requesterId, mentorId);
         checkResaverIsRequester(requesterId, mentorId);
         checkForMinMonthsBetweenRequest(requesterId, mentorId);
 
@@ -63,17 +64,17 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public void accept(long requestId) {
-        MentorshipRequest request = mentorshipRequestRepository.findById(requestId).orElse(null);
-        if (request == null) {
-            throw new EntityNotFoundException(String.format("Request not found, id: %s", requestId));
-        }
+        MentorshipRequest request = mentorshipRequestRepository
+                .findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Request not found, id: %s", requestId)));
 
         User mentor = request.getReceiver();
-        mentor.getMentors().add(mentor);
+        User mentee = request.getRequester();
+
+        mentor.getMentors().add(mentee);
         userRepository.save(mentor);
 
-        User mentee = request.getRequester();
-        mentee.getMentees().add(mentee);
+        mentee.getMentees().add(mentor);
         userRepository.save(mentee);
 
         request.setStatus(RequestStatus.ACCEPTED);
@@ -82,32 +83,29 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public void reject(long requestId, RejectionDto rejectionDto) {
-        MentorshipRequest request = mentorshipRequestRepository.findById(requestId).orElse(null);
-        if (request == null) {
-            throw new EntityNotFoundException(String.format("Request not found, id: %s", requestId));
-        }
+        MentorshipRequest request = mentorshipRequestRepository
+                .findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Request not found, id: %s", requestId)));
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejectionDto.reason());
         mentorshipRequestRepository.save(request);
     }
 
-    private void checkForMinMonthsBetweenRequest(Long requesterId, Long resaverId) {
+    private void checkForMinMonthsBetweenRequest(Long requesterId, Long receiverId) {
         MentorshipRequest latestRequest = mentorshipRequestRepository
-                .findLatestRequest(requesterId, resaverId)
-                .orElse(null);
+                .findLatestRequest(requesterId, receiverId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Latest request not found, requesterId: %s, receiverId: %s",
+                                requesterId, receiverId)
+                        )
+                );
 
-        if (latestRequest == null) {
-            return;
-        }
+        long monthsBetweenRequest = ChronoUnit.MONTHS.between(latestRequest.getCreatedAt(), LocalDateTime.now());
 
-        Period period = Period.between(
-                latestRequest.getCreatedAt().toLocalDate(),
-                LocalDateTime.now().toLocalDate());
-
-        if (period.getMonths() <= minMonthsBetweenRequests) {
+        if (monthsBetweenRequest <= minMonthsBetweenRequests) {
             throw new DataValidationException(
                     String.format("It hasn't been %s months for the request, it has: %s",
-                            minMonthsBetweenRequests, period.getMonths())
+                            minMonthsBetweenRequests, monthsBetweenRequest)
             );
         }
     }
@@ -119,14 +117,19 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         }
     }
 
-    private void checkResaverIsResave(Long requesterId, Long mentorId) {
-        MentorshipRequest request = mentorshipRequestRepository.findLatestRequest(requesterId, mentorId).orElse(null);
-        if (!Objects.isNull(request)) {
-            if (Objects.equals(mentorId, request.getRequester().getId())) {
-                throw new ForbiddenException(
-                        String.format("Mentorship has already been scheduled, is: %s", request.getId())
+    private void checkMentorshipIsScheduled(Long requesterId, Long mentorId) {
+        MentorshipRequest request = mentorshipRequestRepository
+                .findLatestRequest(requesterId, mentorId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                                String.format("Latest request not found, requesterId: %s, mentorId: %s",
+                                        requesterId, mentorId)
+                        )
                 );
-            }
+
+        if (Objects.equals(mentorId, request.getRequester().getId())) {
+            throw new ForbiddenException(
+                    String.format("Mentorship has already been scheduled, is: %s", request.getId())
+            );
         }
     }
 

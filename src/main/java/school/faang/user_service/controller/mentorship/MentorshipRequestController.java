@@ -8,7 +8,7 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.mapership.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
@@ -22,12 +22,7 @@ public class MentorshipRequestController {
         validateString(createMentorshipRequestDto.description(), "description");
         validateNotNull(createMentorshipRequestDto.mentorId(), "mentor id");
 
-        return mentorshipRequestService.create(
-                new CreateMentorshipRequestDto(
-                        createMentorshipRequestDto.description(),
-                        createMentorshipRequestDto.mentorId()
-                )
-        );
+        return mentorshipRequestService.create(createMentorshipRequestDto);
     }
 
     public List<MentorshipRequestDto> getByFilters(MentorshipRequestFilterDto filter) {
@@ -36,7 +31,7 @@ public class MentorshipRequestController {
     }
 
     public void accept(long requestId) {
-        validateNotNull(requestId, "requestUd");
+        validateNotNull(requestId, "requestId");
         mentorshipRequestService.accept(requestId);
     }
 

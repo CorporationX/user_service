@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mapership;
+package school.faang.user_service.service.mentorship;
 
 import school.faang.user_service.dto.mentorship.CreateMentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;

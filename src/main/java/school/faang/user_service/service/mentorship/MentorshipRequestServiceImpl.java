@@ -53,15 +53,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     }
 
     @Override
-    public List<MentorshipRequestDto> getByFilters(MentorshipRequestFilterDto filter) {
-        List<MentorshipRequest> mentorshipRequestList = mentorshipRequestRepository.findAll();
-        return mentorshipRequestList.stream()
-                .filter(request -> requestFilter(filter, request))
-                .map(mentorshipRequestMapper::toMentorshipRequestDto)
-                .toList();
-    }
-
-    @Override
     public void accept(long requestId) {
         MentorshipRequest request = mentorshipRequestRepository
                 .findById(requestId)
@@ -132,20 +123,39 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         }
     }
 
-    private boolean requestFilter(MentorshipRequestFilterDto filter, MentorshipRequest request) {
-        Long mentorId = request.getRequester().getId();
-        Long reciverId = request.getReceiver().getId();
+    @Override
+    public List<MentorshipRequestDto> getByFilters(MentorshipRequestFilterDto filter) {
+        List<MentorshipRequest> mentorshipRequestList = mentorshipRequestRepository.findAll();
+        return mentorshipRequestList.stream()
+                .filter(request -> requestFilter(filter, request))
+                .map(mentorshipRequestMapper::toMentorshipRequestDto)
+                .toList();
+    }
 
+    private boolean requestFilter(MentorshipRequestFilterDto filter, MentorshipRequest request) {
+        Long requesterId = request.getRequester().getId();
+        Long mentorId = request.getReceiver().getId();
+        RequestStatus status = request.getStatus();
+
+        boolean requesterFlag = true;
+        boolean mentorFlag = true;
+        boolean statusFlag = true;
+
+        if (requesterId != null) {
+            if (!Objects.equals(requesterId, filter.requesterId())) {
+                requesterFlag = false;
+            }
+        }
         if (mentorId != null) {
-            if (!Objects.equals(mentorId, filter.requesterId())) {
-                return false;
+            if (!Objects.equals(mentorId, filter.receiverId())) {
+                mentorFlag = false;
             }
         }
-        if (reciverId != null) {
-            if (!Objects.equals(reciverId, filter.receiverId())) {
-                return false;
+        if (status != null) {
+            if (!Objects.equals(status, filter.status())) {
+                statusFlag = false;
             }
         }
-        return request.getStatus().equals(filter.status());
+        return requesterFlag && mentorFlag && statusFlag;
     }
 }

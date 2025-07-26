@@ -67,7 +67,7 @@ public class GoalController {
             description = "Обновляет данные цели по идентификатору",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Цель успешно обновлена"),
-                    @ApiResponse(responseCode = "400", description = "Невалидные данные цели"),
+                    @ApiResponse(responseCode = "422", description = "Невалидные данные"),
                     @ApiResponse(responseCode = "404", description = "Цель не найдена")
             }
     )

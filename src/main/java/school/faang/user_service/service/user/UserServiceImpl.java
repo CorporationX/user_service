@@ -3,6 +3,8 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
@@ -11,10 +13,13 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -57,8 +62,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getById(long userId) {
-        User user = userRepository.getByIdOrThrow(userId);
-        return userMapper.toUserDto(user);
+    public UserDto getUser(long userId) {
+        return userMapper.toUserDto(userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId)));
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userMapper.toUserDtos(userRepository.findAllById(userIds));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

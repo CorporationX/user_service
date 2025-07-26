@@ -20,5 +20,6 @@ DROP TABLE goal;
 DROP TABLE skill;
 DROP TABLE users;
 DROP TABLE country;
+DROP TABLE refresh_tokens;
 
 DELETE FROM databasechangelog;

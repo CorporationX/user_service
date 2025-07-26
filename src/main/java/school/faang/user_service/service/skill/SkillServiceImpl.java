@@ -85,7 +85,7 @@ public class SkillServiceImpl implements SkillService {
         }
         return skill.getGuarantees().stream()
                 .filter(userSkillGuarantee -> userSkillGuarantee.getUser().getId().equals(userId))
-                .map(userSkillGuarantee -> userService.getById(userSkillGuarantee.getGuarantor().getId()))
+                .map(userSkillGuarantee -> userService.getUser(userSkillGuarantee.getGuarantor().getId()))
                 .toList();
     }
 }

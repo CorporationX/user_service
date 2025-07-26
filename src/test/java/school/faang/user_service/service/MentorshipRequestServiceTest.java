@@ -98,7 +98,6 @@ public class MentorshipRequestServiceTest {
     public void createToMentorshipRequestDto() {
         Long mentorId = 1L;
         Long requesterId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         User requester = new User();
         requester.setId(requesterId);
@@ -110,6 +109,8 @@ public class MentorshipRequestServiceTest {
         request.setRequester(requester);
         request.setReceiver(mentor);
         request.setDescription("");
+
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         Mockito.when(userContext.getUserId()).thenReturn(requesterId);
         Mockito.when(mentorshipRequestRepository
@@ -123,7 +124,7 @@ public class MentorshipRequestServiceTest {
 
     @Test
     @DisplayName("Testing trows EntityNotFound in accept method")
-    public void throwsEntityNotFoundEAccept() {
+    public void throwsEntityNotFoundExceptionAccept() {
         Long requestId = 1L;
 
         Mockito.when(mentorshipRequestRepository
@@ -139,7 +140,6 @@ public class MentorshipRequestServiceTest {
         Long requestId = 1L;
         Long menteeId = 1L;
         Long mentorId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         User mentee = new User();
         mentee.setId(menteeId);
@@ -155,6 +155,8 @@ public class MentorshipRequestServiceTest {
         Mockito.when(mentorshipRequestRepository
                 .findById(requestId))
                 .thenReturn(Optional.of(request));
+
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         mentorshipRequestService.create(createDto);
 
@@ -198,7 +200,7 @@ public class MentorshipRequestServiceTest {
 
     @Test
     @DisplayName("Testing throws EntityNotFound in reject method")
-    public void throwsEntityNotFoundEReject() {
+    public void throwsEntityNotFoundExceptionReject() {
         Long requestId = 1L;
 
         Mockito.when(mentorshipRequestRepository

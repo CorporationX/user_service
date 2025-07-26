@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-@Service
+@Service("Spring")
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
-    @Value("${Mentorship.min.MonthsBetweenRequests}")
+    @Value("${Mentorship.min.months-between-requests}")
     private int minMonthsBetweenRequests;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;

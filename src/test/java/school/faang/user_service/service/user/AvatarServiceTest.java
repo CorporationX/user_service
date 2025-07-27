@@ -8,9 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserAvatarDto;
+import school.faang.user_service.dto.s3.S3UploadResultDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
 import school.faang.user_service.service.image.ImageResizingService;
@@ -32,6 +35,12 @@ public class AvatarServiceTest {
 
     @Mock
     private UserRepositoryAdapter userRepositoryAdapter;
+
+    @Mock
+    private KafkaTopics kafkaTopics;
+
+    @Mock
+    private KafkaDataSenderImpl kafkaDataSender;
 
     @Mock
     private ImageResizingService imageResizingService;
@@ -109,9 +118,12 @@ public class AvatarServiceTest {
         when(imageResizingService.resizeImage(file, AvatarService.LARGE_IMAGE_SIZE)).thenReturn(largeBytes);
         when(imageResizingService.resizeImage(file, AvatarService.SMALL_IMAGE_SIZE)).thenReturn(smallBytes);
         when(s3Service.uploadFile(largeBytes, "image/png", "user_avatars_large"))
-                .thenReturn("largeKey");
+                .thenReturn(new S3UploadResultDto("largeKey", "https://s3.fake/largeKey"));
         when(s3Service.uploadFile(smallBytes, "image/png", "user_avatars_small"))
-                .thenReturn("smallKey");
+                .thenReturn(new S3UploadResultDto("smallKey", "https://s3.fake/smallKey"));
+
+        KafkaTopics.Topic mockTopic = new KafkaTopics.Topic("profile-pic-event-topic", 0, 0, null);
+        when(kafkaTopics.getProfilePicEventTopic()).thenReturn(mockTopic);
 
         avatarService.addAvatar(USER_ID, file);
 

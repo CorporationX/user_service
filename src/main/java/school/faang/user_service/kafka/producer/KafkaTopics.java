@@ -18,7 +18,7 @@ public class KafkaTopics {
     private Topic premiumBoughtTopic;
     private Topic recommendationEventsTopic;
     private Topic followerEvents;
-
+    private Topic profilePicEventTopic;
 
     @Data
     public static class Topic {

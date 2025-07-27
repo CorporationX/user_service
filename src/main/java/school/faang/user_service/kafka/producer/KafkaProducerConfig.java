@@ -35,7 +35,7 @@ public class KafkaProducerConfig {
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        properties.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
+        properties.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
         return new DefaultKafkaProducerFactory<>(getProducerFactory(properties));
     }
 

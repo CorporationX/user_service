@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.s3.S3UploadResultDto;
 import school.faang.user_service.exception.FileException;
 
 import java.io.ByteArrayInputStream;
@@ -29,7 +30,7 @@ public class S3Service {
 
     private static final long URL_EXPIRATION_MS = 15 * 60 * 1000;
 
-    public String uploadFile(byte[] data,
+    public S3UploadResultDto uploadFile(byte[] data,
                              String contentType,
                              String folder) {
         ByteArrayInputStream input = new ByteArrayInputStream(data);
@@ -47,7 +48,8 @@ public class S3Service {
             throw new FileException(e.getMessage());
         }
 
-        return key;
+        String url = getFileUrl(key);
+        return new S3UploadResultDto(key, url);
     }
 
     public String getFileUrl(String key) {

@@ -1,13 +1,18 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserAvatarDto;
+import school.faang.user_service.dto.s3.S3UploadResultDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.kafka.events.ProfilePicEvent;
+import school.faang.user_service.kafka.producer.KafkaDataSenderImpl;
+import school.faang.user_service.kafka.producer.KafkaTopics;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.user.UserRepositoryAdapter;
 import school.faang.user_service.service.dicebear.DicebearService;
@@ -16,6 +21,7 @@ import school.faang.user_service.service.s3.S3Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AvatarService {
 
     public static final int LARGE_IMAGE_SIZE = 1080;
@@ -25,6 +31,9 @@ public class AvatarService {
     private final ImageResizingService imageResizingService;
     private final S3Service s3Service;
     private final DicebearService dicebearService;
+
+    private final KafkaDataSenderImpl kafkaDataSender;
+    private final KafkaTopics kafkaTopics;
 
     public UserAvatarDto getAvatar(Long userId) {
         UserProfilePic avatar = userRepositoryAdapter.findById(userId)
@@ -48,18 +57,28 @@ public class AvatarService {
 
         String largeImageFolder = "user_avatars_large";
         String smallImageFolder = "user_avatars_small";
-        String largeFileId = s3Service.uploadFile(largeImageBytes, file.getContentType(), largeImageFolder);
-        String smallFileId = s3Service.uploadFile(smallImageBytes, file.getContentType(), smallImageFolder);
+        S3UploadResultDto largeImageUpload = s3Service.uploadFile(largeImageBytes, file.getContentType(), largeImageFolder);
+        S3UploadResultDto smallImageUpload = s3Service.uploadFile(smallImageBytes, file.getContentType(), smallImageFolder);
 
         UserProfilePic avatar = user.getUserProfilePic();
         if (avatar == null) {
             avatar = new UserProfilePic();
         }
-        avatar.setFileId(largeFileId);
-        avatar.setSmallFileId(smallFileId);
+        avatar.setFileId(largeImageUpload.getKey());
+        avatar.setSmallFileId(smallImageUpload.getKey());
 
         user.setUserProfilePic(avatar);
         userRepository.save(user);
+
+        ProfilePicEvent event = new ProfilePicEvent(
+            user.getId(),
+            largeImageUpload.getUrl()
+        );
+        log.info("Sending profile picture event for the user id {}", user.getId());
+        kafkaDataSender.send(
+            kafkaTopics.getProfilePicEventTopic(),
+            event
+        );
     }
 
     @Transactional
@@ -86,15 +105,15 @@ public class AvatarService {
 
         String largeImageFolder = "user_avatars_large";
         String smallImageFolder = "user_avatars_small";
-        String largeFileId = s3Service.uploadFile(largeImageBytes, "image/webp", largeImageFolder);
-        String smallFileId = s3Service.uploadFile(smallImageBytes, "image/webp", smallImageFolder);
+        S3UploadResultDto largeImageUpload = s3Service.uploadFile(largeImageBytes, "image/webp", largeImageFolder);
+        S3UploadResultDto smallImageUpload = s3Service.uploadFile(smallImageBytes, "image/webp", smallImageFolder);
 
         UserProfilePic avatar = user.getUserProfilePic();
         if (avatar == null) {
             avatar = new UserProfilePic();
         }
-        avatar.setFileId(largeFileId);
-        avatar.setSmallFileId(smallFileId);
+        avatar.setFileId(largeImageUpload.getKey());
+        avatar.setSmallFileId(smallImageUpload.getKey());
 
         user.setUserProfilePic(avatar);
         userRepository.save(user);

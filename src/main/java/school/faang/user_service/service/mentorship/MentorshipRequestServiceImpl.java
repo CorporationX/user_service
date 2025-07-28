@@ -156,6 +156,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                 statusFlag = false;
             }
         }
-        return requesterFlag && mentorFlag && statusFlag;
+        return requesterFlag || mentorFlag || statusFlag;
     }
 }

@@ -2,12 +2,12 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.mentorship.CreateMentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -18,12 +18,12 @@ import school.faang.user_service.entity.user.MentorshipRequest;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestServiceImpl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,23 +32,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
-
-    @Mock
-    private MentorshipRequestRepository mentorshipRequestRepository;
-    @Spy
-    private MentorshipRequestMapper mentorshipRequestMapper;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private UserContext userContext;
 
     @InjectMocks
     private MentorshipRequestServiceImpl mentorshipRequestService;
 
-    @Captor
-    private ArgumentCaptor<MentorshipRequest> requestCaptor;
+    @Mock
+    private MentorshipRequestRepository mentorshipRequestRepository;
+    @Spy
+    private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UserContext userContext;
 
     @Test
     @DisplayName("Testing when requester is mentor")
@@ -56,10 +55,10 @@ public class MentorshipRequestServiceTest {
         Long mentorAndResaverId = 1L;
         CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorAndResaverId);
 
-        Mockito.when(userContext.getUserId()).thenReturn(mentorAndResaverId);
+        when(userContext.getUserId()).thenReturn(mentorAndResaverId);
 
         assertThrows(
-                ForbiddenException.class,
+                EntityNotFoundException.class,
                 () -> mentorshipRequestService.create(createDto)
         );
     }
@@ -67,13 +66,18 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing when not enough time has passed between requests")
     public void createDtoWhenInvalidMouthsBetweenRequests() {
-        Long mentorId = 1L;
+        long mentorId = 1L;
         Long requesterId = 2L;
         CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
+        User requester = new User();
+        requester.setId(requesterId);
+        MentorshipRequest request = new MentorshipRequest();
+        request.setRequester(requester);
+        request.setCreatedAt(LocalDateTime.now());
 
-        Mockito.when(userContext.getUserId()).thenReturn(requesterId);
-        Mockito.when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
-                .thenReturn(Optional.of(new MentorshipRequest()));
+        when(userContext.getUserId()).thenReturn(requesterId);
+        when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
+                .thenReturn(Optional.of(request));
 
         assertThrows(DataValidationException.class, () -> mentorshipRequestService.create(createDto));
     }
@@ -81,11 +85,20 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing create mentorshipRequest")
     public void createMentorshipRequest() {
-        Long mentorId = 1L;
-        Long requesterId = 2L;
+        long mentorId = 1L;
+        long requesterId = 2L;
         CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
+        User requester = new User();
+        requester.setId(requesterId);
+        MentorshipRequest request = new MentorshipRequest();
+        request.setRequester(requester);
+        request.setId(1L);
+        request.setCreatedAt(LocalDateTime.of(2000, 1, 1, 1, 1));
 
-        Mockito.when(userContext.getUserId()).thenReturn(requesterId);
+        when(userContext.getUserId()).thenReturn(requesterId);
+        when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
+                .thenReturn(Optional.of(request));
+        when(mentorshipRequestRepository.create(requesterId, mentorId, "")).thenReturn(request);
 
         mentorshipRequestService.create(createDto);
 
@@ -96,26 +109,20 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing create mentorshipRequestDto")
     public void createToMentorshipRequestDto() {
-        Long mentorId = 1L;
-        Long requesterId = 2L;
-
+        long mentorId = 1L;
+        long requesterId = 2L;
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
         User requester = new User();
         requester.setId(requesterId);
-
-        User mentor = new User();
-        mentor.setId(mentorId);
-
         MentorshipRequest request = new MentorshipRequest();
         request.setRequester(requester);
-        request.setReceiver(mentor);
-        request.setDescription("");
+        request.setId(1L);
+        request.setCreatedAt(LocalDateTime.of(2000, 1, 1, 1, 1));
 
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
-
-        Mockito.when(userContext.getUserId()).thenReturn(requesterId);
-        Mockito.when(mentorshipRequestRepository
-                        .create(requesterId, mentorId, createDto.description()))
-                        .thenReturn(request);
+        when(userContext.getUserId()).thenReturn(requesterId);
+        when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
+                .thenReturn(Optional.of(request));
+        when(mentorshipRequestRepository.create(requesterId, mentorId, "")).thenReturn(request);
 
         mentorshipRequestService.create(createDto);
 
@@ -125,11 +132,11 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing trows EntityNotFound in accept method")
     public void throwsEntityNotFoundExceptionAccept() {
-        Long requestId = 1L;
+        long requestId = 1L;
 
-        Mockito.when(mentorshipRequestRepository
+        when(mentorshipRequestRepository
                 .findById(requestId))
-                .thenReturn(null);
+                .thenThrow(EntityNotFoundException.class);
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipRequestService.accept(requestId));
     }
@@ -137,14 +144,18 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing creating relation mentor-mentee in accept method")
     public void createRelationMentorMentee() {
-        Long requestId = 1L;
+        long requestId = 1L;
         Long menteeId = 1L;
         Long mentorId = 2L;
 
         User mentee = new User();
+        mentee.setMentors(new ArrayList<>());
+        mentee.setMentees(new ArrayList<>());
         mentee.setId(menteeId);
 
         User mentor = new User();
+        mentor.setMentees(new ArrayList<>());
+        mentor.setMentors(new ArrayList<>());
         mentor.setId(mentorId);
 
         MentorshipRequest request = new MentorshipRequest();
@@ -152,13 +163,11 @@ public class MentorshipRequestServiceTest {
         request.setRequester(mentee);
         request.setReceiver(mentor);
 
-        Mockito.when(mentorshipRequestRepository
+        when(mentorshipRequestRepository
                 .findById(requestId))
                 .thenReturn(Optional.of(request));
 
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
-
-        mentorshipRequestService.create(createDto);
+        mentorshipRequestService.accept(requestId);
 
         verify(userRepository).save(mentee);
         verify(userRepository).save(mentor);
@@ -167,33 +176,61 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing set status ACCEPTED in accept method")
     public void setStatusAccepted() {
-        Long requestId = 1L;
+        long requestId = 1L;
+        Long menteeId = 1L;
         Long mentorId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
-        Mockito.when(mentorshipRequestRepository
+        User mentee = new User();
+        mentee.setMentors(new ArrayList<>());
+        mentee.setMentees(new ArrayList<>());
+        mentee.setId(menteeId);
+
+        User mentor = new User();
+        mentor.setMentees(new ArrayList<>());
+        mentor.setMentors(new ArrayList<>());
+        mentor.setId(mentorId);
+
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(requestId);
+        request.setRequester(mentee);
+        request.setReceiver(mentor);
+
+        when(mentorshipRequestRepository
                 .findById(requestId))
-                .thenReturn(Optional.of(new MentorshipRequest()));
+                .thenReturn(Optional.of(request));
 
-        mentorshipRequestService.create(createDto);
+        mentorshipRequestService.accept(requestId);
 
-        MentorshipRequest request = requestCaptor.getValue();
         assertEquals(RequestStatus.ACCEPTED, request.getStatus());
     }
 
     @Test
     @DisplayName("Testing save request in accept method")
     public void saveRequest() {
-        Long requestId = 1L;
+        long requestId = 1L;
+        Long menteeId = 1L;
         Long mentorId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
-        MentorshipRequest request = new MentorshipRequest();
 
-        Mockito.when(mentorshipRequestRepository
+        User mentee = new User();
+        mentee.setMentors(new ArrayList<>());
+        mentee.setMentees(new ArrayList<>());
+        mentee.setId(menteeId);
+
+        User mentor = new User();
+        mentor.setMentees(new ArrayList<>());
+        mentor.setMentors(new ArrayList<>());
+        mentor.setId(mentorId);
+
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(requestId);
+        request.setRequester(mentee);
+        request.setReceiver(mentor);
+
+        when(mentorshipRequestRepository
                 .findById(requestId))
                 .thenReturn(Optional.of(request));
 
-        mentorshipRequestService.create(createDto);
+        mentorshipRequestService.accept(requestId);
 
         verify(mentorshipRequestRepository, times(1)).save(request);
     }
@@ -203,9 +240,9 @@ public class MentorshipRequestServiceTest {
     public void throwsEntityNotFoundExceptionReject() {
         Long requestId = 1L;
 
-        Mockito.when(mentorshipRequestRepository
+        when(mentorshipRequestRepository
                 .findById(requestId))
-                .thenReturn(null);
+                .thenThrow(EntityNotFoundException.class);
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipRequestRepository.findById(requestId));
     }
@@ -213,48 +250,34 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing set status Rejected in reject method")
     public void setRejectedStatus() {
-        Long requestId = 1L;
+        long requestId = 1L;
         RejectionDto dto = new RejectionDto("");
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(requestId);
 
-        Mockito.when(mentorshipRequestRepository
+        when(mentorshipRequestRepository
                 .findById(requestId))
-                .thenReturn(Optional.of(new MentorshipRequest()));
+                .thenReturn(Optional.of(request));
 
         mentorshipRequestService.reject(requestId, dto);
-        MentorshipRequest request = requestCaptor.getValue();
 
         assertEquals(RequestStatus.REJECTED, request.getStatus());
     }
 
     @Test
-    @DisplayName("Testing set Rejection reason in reject method")
-    public void setRejectionReason() {
-        Long requestId = 1L;
-        RejectionDto dto = new RejectionDto("");
-
-        Mockito.when(mentorshipRequestRepository
-                .findById(requestId))
-                .thenReturn(Optional.of(new MentorshipRequest()));
-
-        mentorshipRequestService.reject(requestId, dto);
-
-        MentorshipRequest request = requestCaptor.getValue();
-        verify(request, times(1)).setRejectionReason(dto.reason());
-    }
-
-    @Test
     @DisplayName("Testing save to repository in reject method")
     public void saveRejectedRequest() {
-        Long requestId = 1L;
+        long requestId = 1L;
         RejectionDto dto = new RejectionDto("");
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(requestId);
 
-        Mockito.when(mentorshipRequestRepository
+        when(mentorshipRequestRepository
                         .findById(requestId))
-                .thenReturn(Optional.of(new MentorshipRequest()));
+                .thenReturn(Optional.of(request));
 
         mentorshipRequestService.reject(requestId, dto);
 
-        MentorshipRequest request = requestCaptor.getValue();
         verify(mentorshipRequestRepository, times(1)).save(request);
     }
 
@@ -283,12 +306,12 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequest> requests = List.of(firstRequest, secondRequest);
 
         MentorshipRequestFilterDto filterDto = new MentorshipRequestFilterDto(
-                null, null, RequestStatus.ACCEPTED);
+                1L, null, null);
 
         List<MentorshipRequestDto> attackedFilteredRequests = new ArrayList<>();
         attackedFilteredRequests.add(mentorshipRequestMapper.toMentorshipRequestDto(firstRequest));
 
-        Mockito.when(mentorshipRequestRepository.findAll()).thenReturn(requests);
+        when(mentorshipRequestRepository.findAll()).thenReturn(requests);
         List<MentorshipRequestDto> defencedFilteredRequests = mentorshipRequestService.getByFilters(filterDto);
 
         assertEquals(attackedFilteredRequests, defencedFilteredRequests);

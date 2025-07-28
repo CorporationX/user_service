@@ -66,18 +66,19 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing when not enough time has passed between requests")
     public void createDtoWhenInvalidMouthsBetweenRequests() {
-        long mentorId = 1L;
         Long requesterId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
         User requester = new User();
         requester.setId(requesterId);
         MentorshipRequest request = new MentorshipRequest();
         request.setRequester(requester);
         request.setCreatedAt(LocalDateTime.now());
 
+        long mentorId = 1L;
         when(userContext.getUserId()).thenReturn(requesterId);
         when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
                 .thenReturn(Optional.of(request));
+
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         assertThrows(DataValidationException.class, () -> mentorshipRequestService.create(createDto));
     }
@@ -85,9 +86,7 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing create mentorshipRequest")
     public void createMentorshipRequest() {
-        long mentorId = 1L;
         long requesterId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
         User requester = new User();
         requester.setId(requesterId);
         MentorshipRequest request = new MentorshipRequest();
@@ -95,10 +94,13 @@ public class MentorshipRequestServiceTest {
         request.setId(1L);
         request.setCreatedAt(LocalDateTime.of(2000, 1, 1, 1, 1));
 
+        long mentorId = 1L;
         when(userContext.getUserId()).thenReturn(requesterId);
         when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
                 .thenReturn(Optional.of(request));
         when(mentorshipRequestRepository.create(requesterId, mentorId, "")).thenReturn(request);
+
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         mentorshipRequestService.create(createDto);
 
@@ -109,9 +111,7 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing create mentorshipRequestDto")
     public void createToMentorshipRequestDto() {
-        long mentorId = 1L;
         long requesterId = 2L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
         User requester = new User();
         requester.setId(requesterId);
         MentorshipRequest request = new MentorshipRequest();
@@ -119,10 +119,13 @@ public class MentorshipRequestServiceTest {
         request.setId(1L);
         request.setCreatedAt(LocalDateTime.of(2000, 1, 1, 1, 1));
 
+        long mentorId = 1L;
         when(userContext.getUserId()).thenReturn(requesterId);
         when(mentorshipRequestRepository.findLatestRequest(requesterId, mentorId))
                 .thenReturn(Optional.of(request));
         when(mentorshipRequestRepository.create(requesterId, mentorId, "")).thenReturn(request);
+
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorId);
 
         mentorshipRequestService.create(createDto);
 
@@ -144,20 +147,19 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing creating relation mentor-mentee in accept method")
     public void createRelationMentorMentee() {
-        long requestId = 1L;
         Long menteeId = 1L;
-        Long mentorId = 2L;
-
         User mentee = new User();
         mentee.setMentors(new ArrayList<>());
         mentee.setMentees(new ArrayList<>());
         mentee.setId(menteeId);
 
+        Long mentorId = 2L;
         User mentor = new User();
         mentor.setMentees(new ArrayList<>());
         mentor.setMentors(new ArrayList<>());
         mentor.setId(mentorId);
 
+        long requestId = 1L;
         MentorshipRequest request = new MentorshipRequest();
         request.setId(requestId);
         request.setRequester(mentee);
@@ -176,20 +178,20 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing set status ACCEPTED in accept method")
     public void setStatusAccepted() {
-        long requestId = 1L;
-        Long menteeId = 1L;
-        Long mentorId = 2L;
-
         User mentee = new User();
         mentee.setMentors(new ArrayList<>());
         mentee.setMentees(new ArrayList<>());
+        Long menteeId = 1L;
         mentee.setId(menteeId);
+
 
         User mentor = new User();
         mentor.setMentees(new ArrayList<>());
         mentor.setMentors(new ArrayList<>());
+        Long mentorId = 2L;
         mentor.setId(mentorId);
 
+        long requestId = 1L;
         MentorshipRequest request = new MentorshipRequest();
         request.setId(requestId);
         request.setRequester(mentee);
@@ -207,20 +209,19 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing save request in accept method")
     public void saveRequest() {
-        long requestId = 1L;
-        Long menteeId = 1L;
-        Long mentorId = 2L;
-
         User mentee = new User();
         mentee.setMentors(new ArrayList<>());
         mentee.setMentees(new ArrayList<>());
+        Long menteeId = 1L;
         mentee.setId(menteeId);
 
         User mentor = new User();
         mentor.setMentees(new ArrayList<>());
         mentor.setMentors(new ArrayList<>());
+        Long mentorId = 2L;
         mentor.setId(mentorId);
 
+        long requestId = 1L;
         MentorshipRequest request = new MentorshipRequest();
         request.setId(requestId);
         request.setRequester(mentee);

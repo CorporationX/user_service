@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class KafkaConfig {
+public class    KafkaConfig {
 
     @Value("${kafka.host}")
     private String host;

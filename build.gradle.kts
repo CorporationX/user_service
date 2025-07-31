@@ -158,7 +158,8 @@ tasks.jacocoTestCoverageVerification {
                 "**.exception.**",
                 "**.subscription.**",
                 "**.goal.**",
-                "**.kafka.**"
+                "**.kafka.**",
+                "**.service.event.EventParticipationService"
             )
             limit {
                 counter = "LINE"

@@ -29,6 +29,16 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
+    @Value("${redis.channels.profile_pic}")
+    private String profilePicChannel;
+
+    @Value("${redis.channels.follower_event}")
+    private String followerEventChannel;
+
+    @Value("${redis.channels.skill_acquired}")
+    private String skillAcquiredChannel;
+
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         log.info(String.valueOf(port));
@@ -59,19 +69,19 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Value("${redis.channels.profile_pic}")
-    private String profilePicChannel;
-
     @Bean
-    public ChannelTopic profilePicTopic() {
+    public ChannelTopic profilePicTopic()    {
         return new ChannelTopic(profilePicChannel);
     }
 
-    @Value("${redis.channels.skill_acquired}")
-    private String skillAcquiredChannel;
+    @Bean
+    public ChannelTopic followerEventTopic() {
+        return new ChannelTopic(followerEventChannel);
+    }
 
     @Bean
     public ChannelTopic skillAcquiredTopic() {
         return new ChannelTopic(skillAcquiredChannel);
     }
+
 }

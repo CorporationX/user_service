@@ -23,8 +23,9 @@ spring:
 
 redis:
   channels:
-    profile_pic: profile_pic_channel
-    skill_acquired: skill_acquired_topic
+   profile_pic: profile_pic_channel
+   follower_event: follower-events
+   skill_acquired: skill_acquired_topic
 
 server:
   port: 8080

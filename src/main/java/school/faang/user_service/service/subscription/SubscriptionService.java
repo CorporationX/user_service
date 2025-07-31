@@ -1,17 +1,19 @@
 package school.faang.user_service.service.subscription;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.FollowerEvent;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.filter.UserFilter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,13 +22,18 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Transactional
 public class SubscriptionService {
+
     private final SubscriptionRepository subscriptionRepository;
+    private final FollowerEventPublisher followerEventPublisher;
     private final UserMapper userMapper;
     private final List<UserFilter> filters;
 
     public void followUser(long followerId, long followeeId) {
         followValidation(followerId, followeeId, false);
         subscriptionRepository.followUser(followerId, followeeId);
+        followerEventPublisher.publish(new FollowerEvent(
+                followerId, followeeId, null, LocalDateTime.now()
+        ));
     }
 
     public void unfollowUser(long followerId, long followeeId) {

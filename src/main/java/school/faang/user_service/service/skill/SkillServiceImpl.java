@@ -12,6 +12,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
+import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
 import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.SkillMapper;
@@ -84,8 +85,16 @@ public class SkillServiceImpl implements SkillService {
         userSkillGuaranteeService.saveAll(userSkillGuarantees);
         log.info("Skill {} successfully assigned to user {}", skillId, userId);
 
+        Skill skill = offers.stream().findFirst()
+                .orElseThrow().getSkill();
+
         userUpdateProducer.onUserUpdate(
-                new UserAddSkills(userId, List.of(skillId))
+                new UserAddSkills(userId, List.of(
+                        SkillFilterDto.builder()
+                                .id(skillId)
+                                .name(skill.getTitle())
+                                .build()
+                ))
         );
     }
 

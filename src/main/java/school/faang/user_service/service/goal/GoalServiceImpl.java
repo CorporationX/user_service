@@ -18,6 +18,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
+import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
 import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
@@ -127,13 +128,18 @@ public class GoalServiceImpl implements GoalService {
 
         if (goal.getStatus() == GoalStatus.COMPLETED && goal.getSkillsToAchieve() != null && goal.getUsers() != null) {
             for (User user : goal.getUsers()) {
-                List<Long> skillIds = new ArrayList<>();
+                List<SkillFilterDto> skills = new ArrayList<>();
                 for (Skill skill : goal.getSkillsToAchieve()) {
                     skillRepository.assignSkillToUser(skill.getId(), user.getId());
-                    skillIds.add(skill.getId());
+                    skills.add(
+                            SkillFilterDto.builder()
+                                    .id(skill.getId())
+                                    .name(skill.getTitle())
+                                    .build()
+                    );
                 }
                 userUpdateProducer.onUserUpdate(
-                        new UserAddSkills(user.getId(), skillIds)
+                        new UserAddSkills(user.getId(), skills)
                 );
             }
         }

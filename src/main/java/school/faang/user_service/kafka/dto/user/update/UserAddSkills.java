@@ -1,10 +1,12 @@
 package school.faang.user_service.kafka.dto.user.update;
 
+import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
+
 import java.util.List;
 
 public record UserAddSkills(
         long id,
-        List<Long> skillIds
+        List<SkillFilterDto> skills
 ) implements UserUpdateEvent {
 
     @Override

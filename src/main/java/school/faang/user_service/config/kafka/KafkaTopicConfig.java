@@ -11,6 +11,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic userCreated() {
-        return TopicBuilder.name(KafkaTopic.USER_CREATED.getName()).build();
+        return TopicBuilder.name(KafkaTopic.USER_CREATE.getName()).build();
     }
 }

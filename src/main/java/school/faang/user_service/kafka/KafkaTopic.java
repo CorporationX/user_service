@@ -1,8 +1,8 @@
 package school.faang.user_service.kafka;
 
 public enum KafkaTopic {
-    USER_CREATED("user.created"),
-    USER_UPDATED("user.updated");
+    USER_CREATE("user.create"),
+    USER_UPDATED("user.update");
 
     private final String topicName;
 

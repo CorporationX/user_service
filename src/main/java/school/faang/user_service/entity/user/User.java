@@ -66,6 +66,9 @@ public class User implements UserDetails {
     @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Column(name = "headline")
+    private String headline;
+
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
 

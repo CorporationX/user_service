@@ -29,23 +29,23 @@ public class MentorshipController {
     private final MentorshipService service;
 
     @PostMapping("/{mentorId}")
-    public ResponseEntity<Void> addMentorship(@PathVariable long mentorId, long menteeId) {
+    public ResponseEntity<Void> addMentorship(@PathVariable Long mentorId, @PathVariable Long menteeId) {
         service.addMentorship(mentorId, menteeId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/mentees/{userId}")
-    public ResponseEntity<List<UserDto>> getMentees(@PathVariable long userId) {
+    public ResponseEntity<List<UserDto>> getMentees(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getMentees(userId));
     }
 
     @GetMapping("/mentors/{userId}")
-    public ResponseEntity<List<UserDto>> getMentors(@PathVariable long userId) {
+    public ResponseEntity<List<UserDto>> getMentors(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getMentors(userId));
     }
 
     @DeleteMapping("/{menteeId}")
-    public ResponseEntity<Void> deleteMentor(@PathVariable long menteeId, long mentorId) {
+    public ResponseEntity<Void> deleteMentor(@PathVariable Long menteeId, @PathVariable Long mentorId) {
         service.deleteMentorship(menteeId, mentorId);
         return ResponseEntity.ok().build();
     }

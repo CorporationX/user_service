@@ -46,13 +46,17 @@ user:
     min:
       length: 6
 
+Mentorship:
+  min:
+    months-between-requests: 3
+
+skill:
+  min-offers-required: 3
+  
 recommendation:
   delay:
     min:
       months: 6
-
-skill:
-  min-offers-required: 3
 
 jwt:
   access:
@@ -65,4 +69,3 @@ jwt:
 date:
   time:
     out: 6
-

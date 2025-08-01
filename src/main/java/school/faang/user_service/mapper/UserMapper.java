@@ -9,6 +9,8 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.kafka.dto.user.UserCreate;
 import school.faang.user_service.kafka.dto.user.update.UserUpdate;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface UserMapper {
 
@@ -17,6 +19,8 @@ public interface UserMapper {
     void update(UpdateUserDto userDto, @MappingTarget User entity);
 
     UserDto toUserDto(User user);
+
+    List<UserDto> toUserDtos(List<User> users);
 
     UserUpdate toUserUpdatedDto(User user);
 

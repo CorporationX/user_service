@@ -3,24 +3,24 @@ package school.faang.user_service.dto.user;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record CreateUserDto(
-        @NotBlank(message = "Введите username")
-        @Schema(description = "Username пользователя")
+        @NotBlank(message = "Enter your name")
+        @Schema(description = "User name", example = "Ivan")
         String username,
 
-        @NotBlank(message = "Введите email")
-        @Email(message = "Некорректный email")
-        @Schema(description = "Email", example = "test@gmail.com")
+        @NotBlank(message = "Enter your email")
+        @Email(message = "Enter your email")
+        @Schema(description = "User email", example = "Ivan@gmail.com")
         String email,
 
-        @NotBlank(message = "Введите пароль")
-        @Schema(description = "Пароль")
+        @Size(min = 8, message = "Please enter a password of at least 8 characters")
+        @Schema(description = "User password", example = "At least 8 characters")
         String password,
 
-        @NotNull(message = "Не определена страна пользователя")
-        @Schema(description = "Id страны пользователя", example = "1")
+        @NotBlank(message = "Enter your country id")
+        @Schema(description = "User countryId", example = "77")
         Long countryId
 ) {
 }

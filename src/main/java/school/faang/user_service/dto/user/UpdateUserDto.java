@@ -7,6 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UpdateUserDto(
+        @Nullable
+        String username,
+
+        @Nullable
+        String email,
+
+        @Nullable
         @NotBlank
         @Schema(description = "User’s phone number")
         String phone,
@@ -16,6 +23,7 @@ public record UpdateUserDto(
         @Schema(description = "Brief biography or personal description")
         String aboutMe,
 
+        @Nullable
         @NotNull
         @Schema(description = "Identifier of the user’s country")
         Long countryId,

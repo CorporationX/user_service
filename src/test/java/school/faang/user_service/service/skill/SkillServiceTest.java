@@ -155,7 +155,8 @@ public class SkillServiceTest {
         when(skillRepository.findAllByUserId(USER_ID)).thenReturn(List.of(skill));
 
         UserDto guarantorDto = createUserDto();
-        when(userService.getById(GUARANTOR_ID)).thenReturn(guarantorDto);
+
+        when(userService.getUser(GUARANTOR_ID)).thenReturn(guarantorDto);
 
         List<SkillDto> result = skillService.getByUserId(USER_ID);
 
@@ -168,7 +169,8 @@ public class SkillServiceTest {
         assertEquals(List.of(guarantorDto), skillDto.guarantors());
 
         verify(skillRepository).findAllByUserId(USER_ID);
-        verify(userService).getById(GUARANTOR_ID);
+
+        verify(userService).getUser(GUARANTOR_ID);
     }
 
     @Test

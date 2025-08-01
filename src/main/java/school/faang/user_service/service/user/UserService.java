@@ -5,6 +5,8 @@ import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 
+import java.util.List;
+
 /**
  * Сервис для управления пользователями.
  * Предоставляет методы для создания, обновления и получения информации о пользователях.
@@ -40,7 +42,7 @@ public interface UserService extends UserDetailsService {
      *         иначе выбрасывается {@code DataIntegrityViolationException}.</li>
      * </ul>
      *
-     * @param userId идентификатор пользователя, чьи данные необходимо обновить
+     * @param userId  идентификатор пользователя, чьи данные необходимо обновить
      * @param userDto объект {@link UpdateUserDto}, содержащий обновлённые данные пользователя
      * @return объект {@link UserDto}, представляющий обновлённого пользователя
      */
@@ -57,7 +59,10 @@ public interface UserService extends UserDetailsService {
      * @param userId идентификатор пользователя
      * @return объект {@link UserDto}, содержащий данные пользователя
      */
-    UserDto getById(long userId);
+
+    UserDto getUser(long userId);
+
+    List<UserDto> getUsersByIds(List<Long> userIds);
 }
 
 

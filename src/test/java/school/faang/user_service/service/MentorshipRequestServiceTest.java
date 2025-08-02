@@ -18,6 +18,7 @@ import school.faang.user_service.entity.user.MentorshipRequest;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.repository.user.UserRepository;
@@ -51,14 +52,21 @@ public class MentorshipRequestServiceTest {
 
     @Test
     @DisplayName("Testing when requester is mentor")
-    public void createDtoWhenMentorshipIsScheduled() {
-        Long mentorAndResaverId = 1L;
-        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", mentorAndResaverId);
+    public void createDtoWhenRequesterIsMentor() {
+        Long requesterAndMentorId = 1L;
+        User requester = new User();
+        requester.setId(requesterAndMentorId);
+        MentorshipRequest request = new MentorshipRequest();
+        request.setRequester(requester);
 
-        when(userContext.getUserId()).thenReturn(mentorAndResaverId);
+        when(userContext.getUserId()).thenReturn(requesterAndMentorId);
+        when(mentorshipRequestRepository.findLatestRequest(requesterAndMentorId, requesterAndMentorId))
+                .thenReturn(Optional.of(request));
+
+        CreateMentorshipRequestDto createDto = new CreateMentorshipRequestDto("", requesterAndMentorId);
 
         assertThrows(
-                EntityNotFoundException.class,
+                ForbiddenException.class,
                 () -> mentorshipRequestService.create(createDto)
         );
     }
@@ -239,13 +247,16 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Testing throws EntityNotFound in reject method")
     public void throwsEntityNotFoundExceptionReject() {
-        Long requestId = 1L;
+        long requestId = 1L;
+        RejectionDto dto = new RejectionDto("");
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(requestId);
 
         when(mentorshipRequestRepository
                 .findById(requestId))
                 .thenThrow(EntityNotFoundException.class);
 
-        assertThrows(EntityNotFoundException.class, () -> mentorshipRequestRepository.findById(requestId));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipRequestService.reject(requestId, dto));
     }
 
     @Test

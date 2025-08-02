@@ -135,7 +135,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     public void deactivateMentor(long mentorId) {
         User mentor = userRepository.getByIdOrThrow(mentorId);
-        mentor.getMentees().forEach(mentee -> {
+        List<User> mentees = mentor.getMentees();
+        mentees.forEach(mentee -> {
             mentee.getMentors().remove(mentor);
             userRepository.save(mentee);
         });

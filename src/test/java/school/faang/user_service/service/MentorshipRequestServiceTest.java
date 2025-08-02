@@ -349,4 +349,21 @@ public class MentorshipRequestServiceTest {
 
         assertEquals(attackedFilteredRequests, defencedFilteredRequests);
     }
+
+    @Test
+    @DisplayName("Should delete mentor from his mentees")
+    public void deleteMentorFromMentees() {
+        User mentor = User.builder()
+                .id(1L)
+                .build();
+        User mentee = User.builder()
+                .id(2L)
+                .mentors(new ArrayList<>(){{add(mentor);}})
+                .build();
+        mentor.setMentees(List.of(mentee));
+        when(userRepository.getByIdOrThrow(1L)).thenReturn(mentor);
+
+        mentorshipRequestService.deactivateMentor(mentor.getId());
+        assertEquals(new ArrayList<>(), mentee.getMentors());
+    }
 }

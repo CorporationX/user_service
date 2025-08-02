@@ -44,7 +44,11 @@ public class MentorshipRequestServiceTest {
                 .build();
         User mentee = User.builder()
                 .id(2L)
-                .mentors(new ArrayList<>(){{add(mentor);}})
+                .mentors(new ArrayList<>() {
+                    {
+                        add(mentor);
+                    }
+                })
                 .build();
         mentor.setMentees(List.of(mentee));
         when(userRepository.getByIdOrThrow(1L)).thenReturn(mentor);

@@ -60,4 +60,12 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
+
+    @Operation(
+            summary = "Deactivate user by ID",
+            description = "Allows you to deactivate user by their ID"
+    )
+    public UserDto deactivateUserById(long userId) {
+        return userService.deactivateUserById(userId);
+    }
 }

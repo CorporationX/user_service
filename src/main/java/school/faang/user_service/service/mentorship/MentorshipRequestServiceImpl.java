@@ -132,6 +132,16 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                 .toList();
     }
 
+    @Override
+    public void deactivateMentor(long mentorId) {
+        User mentor = userRepository.getByIdOrThrow(mentorId);
+        List<User> mentees = mentor.getMentees();
+        mentees.forEach(mentee -> {
+            mentee.getMentors().remove(mentor);
+            userRepository.save(mentee);
+        });
+    }
+
     private boolean requestFilter(MentorshipRequestFilterDto filter, MentorshipRequest request) {
         Long requesterId = request.getRequester().getId();
         Long mentorId = request.getReceiver().getId();

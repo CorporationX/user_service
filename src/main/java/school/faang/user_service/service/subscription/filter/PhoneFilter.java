@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class PhoneFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.phonePattern() != null;
+        return filters.phonePattern() != null && !filters.phonePattern().isBlank();
     }
 
     @Override

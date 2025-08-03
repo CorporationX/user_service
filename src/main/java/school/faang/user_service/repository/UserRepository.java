@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery = true, value = """

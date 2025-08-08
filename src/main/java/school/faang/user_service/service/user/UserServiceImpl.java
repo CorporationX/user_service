@@ -89,9 +89,8 @@ public class UserServiceImpl implements UserService {
     public UserDto deactivateUserById(Long userId) {
         User user = userRepository.getByIdOrThrow(userId);
 
-        deletedUserFromGoals(userId, user.getSetGoals());
         deletedUserFromGoals(userId, user.getGoals());
-        user.getParticipatedEvents().forEach(event -> eventRepository.deleteById(event.getId(), userId));
+        deletedUsersFromEvents(userId, user);
         user.setActive(false);
 
         userRepository.save(user);
@@ -101,9 +100,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(user);
     }
 
+    private void deletedUsersFromEvents(Long userId, User user) {
+        user.getParticipatedEvents().forEach(event -> eventRepository.deleteById(event.getId(), userId));
+    }
+
     private void deletedUserFromGoals(Long userId, List<Goal> goals) {
         goals.forEach(goal -> {
             goalRepository.deleteUserFromGoal(userId, goal.getId());
         });
     }
+
 }

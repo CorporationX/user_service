@@ -51,6 +51,27 @@ public class MentorshipRequestServiceTest {
     private UserContext userContext;
 
     @Test
+    @DisplayName("Should delete mentor from his mentees")
+    public void deleteMentorFromMentees() {
+        User mentor = User.builder()
+                .id(1L)
+                .build();
+        User mentee = User.builder()
+                .id(2L)
+                .mentors(new ArrayList<>() {
+                    {
+                        add(mentor);
+                    }
+                })
+                .build();
+        mentor.setMentees(List.of(mentee));
+        when(userRepository.getByIdOrThrow(1L)).thenReturn(mentor);
+
+        mentorshipRequestService.deactivateMentor(mentor.getId());
+        assertEquals(new ArrayList<>(), mentee.getMentors());
+    }
+
+    @Test
     @DisplayName("Testing when requester is mentor")
     public void createDtoWhenRequesterIsMentor() {
         Long requesterAndMentorId = 1L;

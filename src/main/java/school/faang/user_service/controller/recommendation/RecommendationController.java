@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("/api/recommendations")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Рекомендации")
+@Tag(name = "Recommendations")
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
@@ -36,7 +36,6 @@ public class RecommendationController {
     public RecommendationDto create(@RequestBody @Valid CreateRecommendationDto recommendationDto) {
         return recommendationService.create(recommendationDto);
     }
-
 
     @PatchMapping("/{id}")
     public RecommendationDto update(

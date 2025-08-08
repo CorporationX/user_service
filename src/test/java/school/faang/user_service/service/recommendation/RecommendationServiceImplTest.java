@@ -2,6 +2,8 @@ package school.faang.user_service.service.recommendation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -10,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.event.RecommendationReceivedEventDto;
 import school.faang.user_service.dto.recommendation.CreateRecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationFilterDto;
@@ -21,17 +24,18 @@ import school.faang.user_service.exception.recommendation.AnotherAuthorException
 import school.faang.user_service.filter.RecommendationFilter;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.validator.recommendation.RecommendationValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -45,6 +49,9 @@ class RecommendationServiceImplTest {
 
     @Mock
     private RecommendationRepository recommendationRepository;
+
+    @Mock
+    private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     @Spy
     private RecommendationMapper recommendationMapper = new RecommendationMapperImpl();
@@ -64,6 +71,9 @@ class RecommendationServiceImplTest {
     @Mock
     private RecommendationFilter filter2;
 
+    @Captor
+    private ArgumentCaptor<RecommendationReceivedEventDto> recommendationReceivedEventCaptor;
+
     @Test
     void createDoesNotSaveIfValidationException() {
         long receiverId = 2L;
@@ -77,7 +87,7 @@ class RecommendationServiceImplTest {
     }
 
     @Test
-    void createSavesRecommendationIfNoValidationException() {
+    void createSavesRecommendationAndPublishesEventIfNoValidationException() {
         long userId = 1L;
         User author = new User();
         author.setId(userId);
@@ -94,15 +104,20 @@ class RecommendationServiceImplTest {
                 .author(author)
                 .receiver(receiver)
                 .content(content)
+                .createdAt(LocalDateTime.now())
                 .build();
         when(recommendationRepository.save(Mockito.any())).thenReturn(resultRecommendation);
 
         RecommendationDto returnResult = recommendationService.create(createDto);
 
-        verify(recommendationRepository, Mockito.times(1)).save(Mockito.any());
         assertEquals(resultRecommendation.getReceiver().getId(), returnResult.receiverId());
         assertEquals(resultRecommendation.getAuthor().getId(), returnResult.authorId());
         assertEquals(resultRecommendation.getContent(), returnResult.content());
+        verify(recommendationRepository, Mockito.times(1)).save(Mockito.any());
+        verify(recommendationReceivedEventPublisher, Mockito.times(1))
+                .publish(recommendationReceivedEventCaptor.capture());
+        RecommendationReceivedEventDto capturedEventDto = recommendationReceivedEventCaptor.getValue();
+        assertEquals(receiverId, capturedEventDto.receiverId());
     }
 
     @Test

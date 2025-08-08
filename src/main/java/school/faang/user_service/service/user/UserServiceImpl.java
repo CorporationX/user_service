@@ -90,6 +90,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getByIdOrThrow(userId);
 
         deletedUserFromGoals(userId, user.getGoals());
+        deletedUserFromGoals(userId, user.getSetGoals());
         deletedUsersFromEvents(userId, user);
         user.setActive(false);
 
@@ -101,13 +102,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private void deletedUsersFromEvents(Long userId, User user) {
-        user.getParticipatedEvents().forEach(event -> eventRepository.deleteById(event.getId(), userId));
+        user.getParticipatedEvents().forEach(event -> eventRepository.deleteById(event.getId(), userId)
+        );
     }
 
     private void deletedUserFromGoals(Long userId, List<Goal> goals) {
-        goals.forEach(goal -> {
-            goalRepository.deleteUserFromGoal(userId, goal.getId());
-        });
+        goals.forEach(goal -> goalRepository.deleteUserFromGoal(userId, goal.getId()));
     }
 
 }

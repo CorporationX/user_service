@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.KafkaTopic;
 import school.faang.user_service.kafka.dto.EnvelopeMessage;
 import school.faang.user_service.kafka.dto.user.update.UserUpdateEvent;
 
@@ -19,7 +18,7 @@ public class UserUpdateProducerImpl implements UserUpdateProducer {
     public void onUserUpdate(UserUpdateEvent dto) {
         JsonNode payloadNode = objectMapper.valueToTree(dto);
         userCreatedProducer.send(
-                KafkaTopic.USER_UPDATED.getName(),
+                "user.update",
                 String.valueOf(dto.getId()),
                 new EnvelopeMessage(dto.getType(), payloadNode)
         );

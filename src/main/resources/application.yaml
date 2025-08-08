@@ -12,9 +12,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  kafka:
-    bootstrap-servers: localhost:9092
-    group-id: user_service
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml

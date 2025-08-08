@@ -4,7 +4,6 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
-import school.faang.user_service.kafka.KafkaTopic;
 
 @Configuration
 /**
@@ -18,7 +17,12 @@ import school.faang.user_service.kafka.KafkaTopic;
 public class KafkaTopicConfig {
 
     @Bean
-    public NewTopic userCreated() {
-        return TopicBuilder.name(KafkaTopic.USER_CREATE.getName()).build();
+    public NewTopic userCreate() {
+        return TopicBuilder.name("user.create").build();
+    }
+
+    @Bean
+    public NewTopic userUpdate() {
+        return TopicBuilder.name("user.update").build();
     }
 }

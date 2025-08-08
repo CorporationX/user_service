@@ -7,6 +7,14 @@ import org.springframework.kafka.config.TopicBuilder;
 import school.faang.user_service.kafka.KafkaTopic;
 
 @Configuration
+/**
+ *     Используется для конфигурирования топиков, пример:
+ *     @Bean
+ *     public NewTopic accountTransactionCommands() {
+ *         return TopicBuilder.name("account.transaction.commands").build();
+ *     }
+ *     При запуске приложения создаст топик "account.transaction.commands", если его нет
+ */
 public class KafkaTopicConfig {
 
     @Bean

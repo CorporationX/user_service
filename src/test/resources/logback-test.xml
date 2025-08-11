@@ -4,7 +4,7 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%blue(%thread)] %highlight(%-5level) %green(%logger{36}) - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="INFO">
+    <root level="OFF">
         <appender-ref ref="CONSOLE" />
     </root>
     <logger name="school.faang.user_service" level="OFF" additivity="false"/>

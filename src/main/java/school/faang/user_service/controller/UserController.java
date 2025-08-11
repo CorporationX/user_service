@@ -37,6 +37,4 @@ public class UserController {
         log.debug("getUsers list id: {}", userIds);
         return userService.getUsersDtoByIds(userIds);
     }
-
-
 }

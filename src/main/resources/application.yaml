@@ -116,3 +116,7 @@ springdoc:
         enabled: true
     api-docs:
         path: /api-docs
+
+event-cleanup:
+  cron: "0 0 2 * * MON"
+  batch-size: 100

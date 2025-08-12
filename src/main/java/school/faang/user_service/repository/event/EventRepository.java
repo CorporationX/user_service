@@ -1,9 +1,11 @@
 package school.faang.user_service.repository.event;
 
+import org.springframework.data.repository.query.Param;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import school.faang.user_service.entity.event.Event;
-
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
@@ -20,4 +22,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             WHERE ue.user_id = :userId
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Event e WHERE e.id IN :ids")
+    void deleteByIds(@Param("ids") List<Long> ids);
 }

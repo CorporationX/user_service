@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -14,7 +16,12 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.EventService;
 
+
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 @Service
@@ -24,6 +31,10 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> filters;
+    private final EventCleanupService eventCleanupService;
+    @Value("${event-cleanup.batch-size}")
+    private int batchSize;
+    private final ThreadPoolTaskExecutor executor;
 
     @Override
     public EventDto create(EventDto eventDto) {
@@ -79,6 +90,34 @@ public class EventServiceImpl implements EventService {
         return events.stream()
                 .map(eventMapper::toEventDto)
                 .toList();
+    }
+
+    @Override
+    public void deletePastEvents() {
+        List<Event> allEvents = eventRepository.findAll();
+        List<Event> pastEvents = allEvents.stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
+
+        List<Long> pastEventIds = pastEvents.stream()
+                .map(Event::getId)
+                .toList();
+
+        List<List<Long>> batches = splitIntoBatches(pastEventIds, batchSize);
+        List<CompletableFuture<Void>> futures = batches.stream()
+                .map(batch -> CompletableFuture.runAsync(()->eventCleanupService.deleteEventsBatch(batch),executor))
+                        .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+    }
+
+    private List<List<Long>> splitIntoBatches(List<Long> initialList, int batchSize) {
+        List<List<Long>> batches = new ArrayList<>();
+        for (int i = 0; i < initialList.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, initialList.size());
+            batches.add(initialList.subList(i, end));
+        }
+        return batches;
     }
 
     private void validateUserSkills(EventDto event) {

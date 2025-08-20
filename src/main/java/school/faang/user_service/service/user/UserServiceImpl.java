@@ -8,20 +8,26 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.avatar.service.UserAvatarService;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserCreateDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserUpdateDto;
-import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.messaging.dto.ProfileVisitEvent;
+import school.faang.user_service.messaging.dto.SearchAppearanceEvent;
+import school.faang.user_service.messaging.producer.EventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.service.filter.FilterService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -38,6 +44,9 @@ public class UserServiceImpl implements UserService {
     private final UserContext userContext;
     private final FilterService<User, UserFilterDto> filterService;
     private final UserAvatarService avatarService;
+    private final EventPublisher<SearchAppearanceEvent> searchAppearanceEventPublisher;
+    private final EventPublisher<ProfileVisitEvent> profileVisitAppearanceEventPublisher;
+    private final ExecutorService executor;
 
     @Override
     @Transactional
@@ -83,14 +92,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getById(long userId) {
+        var currentUserId = userContext.getUserId();
         User user = userRepository.getByIdOrThrow(userId);
+        var event = new ProfileVisitEvent(currentUserId, userId, LocalDateTime.now());
+        publishEvent(profileVisitAppearanceEventPublisher, event);
         return userMapper.toUserDto(user);
     }
-
 
     @Override
     @Transactional
     public List<UserDto> getUsers(UserFilterDto filter) {
+        var currentUserId = userContext.getUserId();
         Stream<User> users = null;
         if (filter.onlyPremium()) {
             users = userRepository.findPremiumUsers();
@@ -99,7 +111,20 @@ public class UserServiceImpl implements UserService {
         }
 
         users = filterService.getFilteredList(users.toList(), filter).stream();
-        return users.map(userMapper::toUserDto)
+        var now = LocalDateTime.now();
+        var result = users.map(userMapper::toUserDto)
                 .toList();
+        result.stream()
+                .map((user) -> new SearchAppearanceEvent(currentUserId, user.id(), now))
+                .forEach((event) -> publishEvent(searchAppearanceEventPublisher, event));
+        return result;
+    }
+
+    private <E> void publishEvent(EventPublisher<E> publisher, E event) {
+        CompletableFuture.runAsync(() -> publisher.publish(event), executor)
+                .exceptionally(ex -> {
+                    log.error("Ошибка публикации события {}", ex.getMessage(), ex);
+                    return null;
+                });
     }
 }

@@ -17,3 +17,7 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V008__add_personal_info_tables.sql
   - include:
       file: db/changelog/changeset/user_V009__add_avatar_url_column.sql
+  - include:
+      file: db/changelog/changeset/user_V010__add__profile_visit.sql
+  - include:
+      file: db/changelog/changeset/user_v011__add__search_appearance.sql

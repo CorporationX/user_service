@@ -83,15 +83,15 @@ class CareerControllerTest {
         long userId = 42L;
         long careerId = 1L;
         UpdateCareerDto updateDto = new UpdateCareerDto(
-                LocalDate.of(2025, 8, 19),
-                LocalDate.of(2027, 10, 19),
+                LocalDate.of(2024, 8, 19),
+                LocalDate.of(2024, 10, 19),
                 "NewCompany",
                 "Manager"
         );
         CareerViewDto viewDto = new CareerViewDto(
                 careerId,
-                LocalDate.of(2025, 8, 19),
-                LocalDate.of(2027, 10, 19),
+                LocalDate.of(2024, 8, 19),
+                LocalDate.of(2024, 10, 19),
                 "NewCompany",
                 "Manager"
         );

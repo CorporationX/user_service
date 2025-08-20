@@ -1,7 +1,7 @@
 package school.faang.user_service.dto.career;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +15,11 @@ import java.time.LocalDate;
 public class UpdateCareerDto {
 
     @NonNull
-    @Future(message = "The variable cannot be created in the future")
+    @Past(message = "The variable cannot be created in the future")
     private LocalDate from;
 
     @NonNull
-    @Future(message = "The variable cannot be created in the future")
+    @Past(message = "The variable cannot be created in the future")
     private LocalDate to;
 
     @NonNull

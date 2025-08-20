@@ -24,6 +24,7 @@ import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.service.filter.FilterService;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +49,8 @@ class UserServiceImplTest {
     private FilterService<User, UserFilterDto> filterService;
     @Mock
     private UserAvatarService avatarService;
-
+    @Mock
+    private ExecutorService executor;
     @InjectMocks
     private UserServiceImpl service;
 

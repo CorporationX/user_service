@@ -10,16 +10,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -35,12 +42,21 @@ public class UserServiceTest {
     private UserMapperImpl userMapper;
     @Mock
     private UserContext userContext;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private MentorshipRequestService mentorshipRequestService;
     @InjectMocks
     public UserServiceImpl userService;
 
     private static final long USER_ID = 1L;
     private static final long USER_TWO_ID = 2L;
     private static final long COUNTRY_ID = 77L;
+    private static final long GOAL_ID = 1L;
+    private static final long GOAL_TWO_ID = 2L;
+    private static final long EVENT_ID = 1L;
     private static final String COUNTRY = "USA";
     private static final String USER_NAME = "name";
     private static final String EMAIL = "email";
@@ -102,6 +118,56 @@ public class UserServiceTest {
         verify(userMapper).toUserDto(user);
     }
 
+    @Test
+    @DisplayName("Should delete user from goals")
+    public void deleteUserFromGoals() {
+        User user = createUser(USER_ID);
+        List<Goal> goals = List.of(createGoal(GOAL_ID));
+        List<Goal> setGoals = List.of(createGoal(GOAL_TWO_ID));
+        user.setGoals(goals);
+        user.setSetGoals(setGoals);
+
+        when(userRepository.getByIdOrThrow(USER_ID)).thenReturn(user);
+
+        userService.deactivateUserById(USER_ID);
+        verify(goalRepository).deleteUserFromGoal(USER_ID, GOAL_ID);
+        verify(goalRepository).deleteUserFromGoal(USER_ID, GOAL_TWO_ID);
+    }
+
+    @Test
+    @DisplayName("Should delete user from event")
+    public void deleteUserFromEvent() {
+        User user = createUser(USER_ID);
+        user.setParticipatedEvents(List.of(createEvent(EVENT_ID)));
+
+        when(userRepository.getByIdOrThrow(USER_ID)).thenReturn(user);
+
+        userService.deactivateUserById(USER_ID);
+        verify(eventRepository).deleteById(USER_ID, EVENT_ID);
+    }
+
+    @Test
+    @DisplayName("Should set active to false for user")
+    public void setFalseActiveForUser() {
+        User user = createUser(USER_ID);
+
+        when(userRepository.getByIdOrThrow(USER_ID)).thenReturn(user);
+
+        userService.deactivateUserById(USER_ID);
+        assertFalse(user.isActive());
+    }
+
+    @Test
+    @DisplayName("Should deactivate mentor from mentorship")
+    public void deactivateMentor() {
+        User user = createUser(USER_ID);
+
+        when(userRepository.getByIdOrThrow(USER_ID)).thenReturn(user);
+
+        userService.deactivateUserById(USER_ID);
+        verify(mentorshipRequestService).deactivateMentor(USER_ID);
+    }
+
     private CreateUserDto createCreateDto() {
         return new CreateUserDto(USER_NAME, EMAIL, PASSWORD, COUNTRY_ID);
     }
@@ -114,6 +180,9 @@ public class UserServiceTest {
                 .password(PASSWORD)
                 .aboutMe(ABOUT_ME)
                 .country(createCountry())
+                .goals(new ArrayList<>())
+                .setGoals(new ArrayList<>())
+                .participatedEvents(new ArrayList<>())
                 .build();
     }
 
@@ -125,6 +194,18 @@ public class UserServiceTest {
         return Country.builder()
                 .id(COUNTRY_ID)
                 .title(COUNTRY)
+                .build();
+    }
+
+    private Goal createGoal(long id) {
+        return Goal.builder()
+                .id(id)
+                .build();
+    }
+
+    private Event createEvent(long id) {
+        return Event.builder()
+                .id(id)
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import school.faang.user_service.dto.event.RecommendationReceivedEventDto;
 import school.faang.user_service.dto.recommendation.CreateRecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.UpdateRecommendationDto;
@@ -18,4 +19,8 @@ public interface RecommendationMapper {
     @Mapping(source = "author.id", target = "authorId")
     @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationDto toRecommendationDto(Recommendation recommendation);
+
+    @Mapping(source = "author.id", target = "authorId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    RecommendationReceivedEventDto toRecommendationReceivedEventDto(Recommendation recommendation);
 }

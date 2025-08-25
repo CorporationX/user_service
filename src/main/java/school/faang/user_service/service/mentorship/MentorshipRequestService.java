@@ -12,6 +12,8 @@ public interface MentorshipRequestService {
 
     List<MentorshipRequestDto> getByFilters(MentorshipRequestFilterDto filter);
 
+    void deactivateMentor(long mentorId);
+
     void accept(long requestId);
 
     void reject(long requestId, RejectionDto rejectionDto);

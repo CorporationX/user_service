@@ -14,6 +14,7 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.RecommendationFilter;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.validator.recommendation.RecommendationValidator;
@@ -32,6 +33,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final UserRepository userRepository;
     private final List<RecommendationFilter> recommendationFilters;
     private final RecommendationValidator recommendationValidator;
+    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
 
     @Override
@@ -45,7 +47,14 @@ public class RecommendationServiceImpl implements RecommendationService {
         recommendation.setAuthor(author);
         recommendation = recommendationRepository.save(recommendation);
         log.info("Recommendation {} created", recommendation.getId());
+        publishRecommendationReceivedEvent(recommendation);
         return recommendationMapper.toRecommendationDto(recommendation);
+    }
+
+    private void publishRecommendationReceivedEvent(Recommendation recommendation) {
+        recommendationReceivedEventPublisher.publish(
+                recommendationMapper.toRecommendationReceivedEventDto(recommendation)
+        );
     }
 
     @Override

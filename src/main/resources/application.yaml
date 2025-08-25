@@ -19,11 +19,15 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     group-id: user_service
+    producer:
+      retry-max-attempts: 3
+      retry-backoff-ms: 1000
     topics:
       user-create:
         name: users.create
       user-update:
         name: users.update
+      recommendationReceived: recommendation-received-topic
 
   data:
     redis:

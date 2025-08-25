@@ -63,6 +63,8 @@ public interface UserService extends UserDetailsService {
     UserDto getUser(long userId);
 
     List<UserDto> getUsersByIds(List<Long> userIds);
+
+    UserDto deactivateUserById(Long userId);
 }
 
 

@@ -9,6 +9,9 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import school.faang.user_service.kafka.dto.EnvelopeMessage;
+import school.faang.user_service.kafka.dto.user.UserCreate;
+import school.faang.user_service.kafka.dto.user.update.UserUpdateEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +22,7 @@ public class KafkaProducerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory() {
+    public ProducerFactory<String, ?> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -29,6 +32,20 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public KafkaTemplate<String, UserCreate> userCreateKafkaTemplate(
+            ProducerFactory<String, UserCreate> producerFactory
+    ) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public KafkaTemplate<String, EnvelopeMessage<UserUpdateEvent>> envelopeMessageUserUpdateKafkaTemplate(
+            ProducerFactory<String, EnvelopeMessage<UserUpdateEvent>> producerFactory
+    ) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

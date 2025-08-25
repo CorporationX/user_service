@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateMe(UpdateUserDto userDto) {
+    public UserDto updateProfile(UpdateUserDto userDto) {
         long userId = authUserContext.getUserId();
         User user = userRepository.getByIdOrThrow(userId);
         user = updateUserFields(user, userDto);

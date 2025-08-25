@@ -1,9 +1,7 @@
 package school.faang.user_service.kafka.dto;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-public record EnvelopeMessage(
+public record EnvelopeMessage<T>(
         String type,
-        JsonNode payload
+        T payload
 ) {
 }

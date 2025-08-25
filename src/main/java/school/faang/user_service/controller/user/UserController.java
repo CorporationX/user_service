@@ -44,12 +44,12 @@ public class UserController {
         return userService.update(userId, userDto);
     }
 
-    @PutMapping("/me")
+    @PutMapping("/profile")
     public UserDto update(
             @RequestBody
             UpdateUserDto dto
     ) {
-        return userService.updateMe(dto);
+        return userService.updateProfile(dto);
     }
 
     @Operation(

@@ -27,6 +27,7 @@ import school.faang.user_service.entity.user.UserSkillGuarantee;
 import school.faang.user_service.kafka.dto.user.update.UserUpdateEvent;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.policy.goal.GoalCreatePolicy;
 import school.faang.user_service.policy.goal.GoalDeletePolicy;
 import school.faang.user_service.policy.goal.GoalUpdatePolicy;
@@ -65,6 +66,8 @@ public class GoalServiceImplTest {
 
     @Spy
     private GoalMapper goalMapperImpl = Mappers.getMapper(GoalMapper.class);
+    @Spy
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
     @Mock
     private AuthUserContext authUserContext;
     @Mock
@@ -218,6 +221,7 @@ public class GoalServiceImplTest {
         List<Skill> skills = dto.skillIds().stream().map(skillId -> {
             Skill skill = new Skill();
             skill.setId(skillId);
+            skill.setTitle("title " + skillId);
             return skill;
         }).toList();
         when(goalRepository.getByIdOrThrow(GOAL_ID)).thenReturn(findedGoal);
@@ -232,6 +236,7 @@ public class GoalServiceImplTest {
             });
         });
         verify(userUpdateProducer, times(findedGoal.getUsers().size())).onUserUpdate(any(UserUpdateEvent.class));
+        verify(skillMapper, times(skills.size())).toSkillFilterDtos(anyList());
     }
 
     @Test

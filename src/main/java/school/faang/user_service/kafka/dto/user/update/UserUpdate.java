@@ -11,9 +11,11 @@ public record UserUpdate(
         String aboutMe,
         CountryFilterDto country
 ) implements UserUpdateEvent {
+    private static final String TYPE = "USER_UPDATE";
+
     @Override
     public String getType() {
-        return "USER_UPDATE";
+        return TYPE;
     }
 
     @Override

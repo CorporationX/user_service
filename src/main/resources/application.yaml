@@ -19,6 +19,11 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     group-id: user_service
+    topics:
+      user-create:
+        name: users.create
+      user-update:
+        name: users.update
 
   data:
     redis:

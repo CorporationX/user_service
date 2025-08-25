@@ -7,6 +7,7 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.Skill;
+import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
 
 import java.util.List;
 import java.util.function.Function;
@@ -38,4 +39,10 @@ public interface SkillMapper {
 
     @Mapping(target = "guarantors", source = "guarantors")
     SkillDto toSkillDtoWithGuarantors(Skill skill, List<UserDto> guarantors);
+
+    @Mapping(source = "title", target = "name")
+    SkillFilterDto toSkillFilterDto(Skill skill);
+
+    @Mapping(source = "title", target = "name")
+    List<SkillFilterDto> toSkillFilterDtos(List<Skill> skills);
 }

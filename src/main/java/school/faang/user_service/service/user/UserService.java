@@ -48,7 +48,7 @@ public interface UserService extends UserDetailsService {
      */
     UserDto update(long userId, UpdateUserDto userDto);
 
-    UserDto updateMe(UpdateUserDto userDto);
+    UserDto updateProfile(UpdateUserDto userDto);
 
     /**
      * Возвращает информацию о пользователе по его идентификатору.

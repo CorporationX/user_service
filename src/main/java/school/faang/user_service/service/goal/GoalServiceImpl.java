@@ -22,6 +22,7 @@ import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
 import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.policy.goal.GoalCreatePolicy;
 import school.faang.user_service.policy.goal.GoalDeletePolicy;
 import school.faang.user_service.policy.goal.GoalUpdatePolicy;
@@ -44,6 +45,7 @@ public class GoalServiceImpl implements GoalService {
     private final AuthUserContext authUserContext;
     private final GoalRepository goalRepository;
     private final GoalMapper goalMapper;
+    private final SkillMapper skillMapper;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
@@ -127,21 +129,15 @@ public class GoalServiceImpl implements GoalService {
         Goal updatedGoal = goalRepository.save(goal);
 
         if (goal.getStatus() == GoalStatus.COMPLETED && goal.getSkillsToAchieve() != null && goal.getUsers() != null) {
-            for (User user : goal.getUsers()) {
-                List<SkillFilterDto> skills = new ArrayList<>();
-                for (Skill skill : goal.getSkillsToAchieve()) {
-                    skillRepository.assignSkillToUser(skill.getId(), user.getId());
-                    skills.add(
-                            SkillFilterDto.builder()
-                                    .id(skill.getId())
-                                    .name(skill.getTitle())
-                                    .build()
-                    );
-                }
+            goal.getUsers().forEach(user -> {
+                List<SkillFilterDto> skills = skillMapper.toSkillFilterDtos(goal.getSkillsToAchieve());
+
+                skills.forEach(skill -> skillRepository.assignSkillToUser(skill.id(), user.getId()));
+
                 userUpdateProducer.onUserUpdate(
                         new UserAddSkills(user.getId(), skills)
                 );
-            }
+            });
         }
 
         return goalMapper.toGoalDto(updatedGoal);

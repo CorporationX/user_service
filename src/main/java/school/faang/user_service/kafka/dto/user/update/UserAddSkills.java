@@ -8,10 +8,11 @@ public record UserAddSkills(
         long id,
         List<SkillFilterDto> skills
 ) implements UserUpdateEvent {
+    private static final String TYPE = "USER_ADD_SKILLS";
 
     @Override
     public String getType() {
-        return "USER_ADD_SKILLS";
+        return TYPE;
     }
 
     @Override

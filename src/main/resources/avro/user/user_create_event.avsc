@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "UserCreate",
+  "namespace": "school.faang.avro.user",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "active",
+      "type": "boolean"
+    },
+    {
+      "name": "country",
+      "type": "school.faang.avro.common.CountryFilter"
+    }
+  ]
+}

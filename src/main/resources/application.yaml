@@ -19,7 +19,19 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     group-id: user_service
+    properties:
+      schema.registry.url: http://localhost:8081
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      group-id: user_service
+      properties:
+        specific.avro.reader: true
     producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        value.subject.name.strategy: io.confluent.kafka.serializers.subject.RecordNameStrategy
       retry-max-attempts: 3
       retry-backoff-ms: 1000
     topics:

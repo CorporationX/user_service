@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
         user = updateUserFields(user, userDto);
         log.info("User {} updated", user.getId());
 
-        userUpdateProducer.onUserUpdate(userMapper.toUserUpdatedDto(user));
+        userUpdateProducer.onUserUpdate(userMapper.toUserUpdate(user));
 
         return userMapper.toUserDto(user);
     }
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
         user = updateUserFields(user, userDto);
         log.info("Update me. User {} updated", user.getId());
 
-        userUpdateProducer.onUserUpdate(userMapper.toUserUpdatedDto(user));
+        userUpdateProducer.onUserUpdate(userMapper.toUserUpdate(user));
 
         return userMapper.toUserDto(user);
     }

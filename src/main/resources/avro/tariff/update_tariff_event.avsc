@@ -1,0 +1,19 @@
+{
+  "name": "UpdateTariffEvent",
+  "type": "record",
+  "namespace": "school.faang.avro.tariff",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "boostFactor",
+      "type": "double"
+    },
+    {
+      "name": "active",
+      "type": "boolean"
+    }
+  ]
+}

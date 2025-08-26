@@ -1,0 +1,63 @@
+{
+  "name": "UserUpdate",
+  "type": "record",
+  "namespace": "school.faang.avro.user",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "experience",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "active",
+      "type": "boolean"
+    },
+    {
+      "name": "headline",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "aboutMe",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "country",
+      "type": [
+        "null",
+        "school.faang.avro.common.CountryFilter"
+      ],
+      "default": null
+    },
+    {
+      "name": "tariffId",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    },
+    {
+      "name": "promotionId",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    }
+  ]
+}

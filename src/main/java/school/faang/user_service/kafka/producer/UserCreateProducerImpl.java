@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.kafka.dto.user.UserCreate;
+import school.faang.avro.user.UserCreate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,6 +18,6 @@ public class UserCreateProducerImpl implements UserCreateProducer {
 
     public void onUserCreate(UserCreate dto) {
         log.info("User create event, data: {}", dto);
-        producer.send(topic, String.valueOf(dto.id()), dto);
+        producer.send(topic, String.valueOf(dto.getId()), dto);
     }
 }

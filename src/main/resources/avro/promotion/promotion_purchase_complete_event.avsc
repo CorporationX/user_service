@@ -1,0 +1,32 @@
+{
+  "name": "PromotionPurchaseCompleteEvent",
+  "type": "record",
+  "namespace": "school.faang.avro.promotion",
+  "fields": [
+    {
+      "name": "userId",
+      "type": "long"
+    },
+    {
+      "name": "tariffId",
+      "type": "long"
+    },
+    {
+      "name": "promotionCount",
+      "type": "long"
+    },
+    {
+      "name": "paymentMethodId",
+      "type": "long"
+    },
+    {
+      "name": "price",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 2
+      }
+    }
+  ]
+}

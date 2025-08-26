@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.avro.common.SkillFilter;
+import school.faang.avro.user.UserAddSkills;
 import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.skill.CreateSkillDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -12,8 +14,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
-import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
-import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
@@ -88,11 +88,11 @@ public class SkillServiceImpl implements SkillService {
         Skill skill = offers.stream().findFirst()
                 .orElseThrow().getSkill();
 
-        userUpdateProducer.onUserUpdate(
+        userUpdateProducer.onUserAddSkills(
                 new UserAddSkills(userId, List.of(
-                        SkillFilterDto.builder()
-                                .id(skillId)
-                                .name(skill.getTitle())
+                        SkillFilter.newBuilder()
+                                .setId(skillId)
+                                .setTitle(skill.getTitle())
                                 .build()
                 ))
         );

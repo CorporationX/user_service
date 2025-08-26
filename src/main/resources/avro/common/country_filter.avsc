@@ -1,0 +1,15 @@
+{
+  "name": "CountryFilter",
+  "type": "record",
+  "namespace": "school.faang.avro.common",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "title",
+      "type": "string"
+    }
+  ]
+}

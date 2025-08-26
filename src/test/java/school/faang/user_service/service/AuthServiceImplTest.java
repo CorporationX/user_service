@@ -14,13 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import school.faang.avro.user.UserCreate;
 import school.faang.user_service.dto.auth.AuthRequest;
 import school.faang.user_service.dto.auth.Token;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.RefreshToken;
 import school.faang.user_service.entity.user.User;
-import school.faang.user_service.kafka.dto.user.UserCreate;
 import school.faang.user_service.kafka.producer.UserCreateProducer;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
@@ -75,6 +75,7 @@ public class AuthServiceImplTest {
     void setUp() {
         country = new Country();
         country.setId(1L);
+        country.setTitle("test");
     }
 
     @Test
@@ -85,6 +86,11 @@ public class AuthServiceImplTest {
         when(passwordEncoder.encode(any())).thenReturn(encodedPassword);
         when(jwtService.generateAccessToken(any())).thenReturn(new Token(null, null, 1L));
         when(jwtService.generateRefreshToken(any())).thenReturn(new Token(null, null, 1L));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            u.setId(1L);
+            return u;
+        });
         CreateUserDto createUserDto = new CreateUserDto("john", "pass", "password", 1L);
 
         authService.register(createUserDto);

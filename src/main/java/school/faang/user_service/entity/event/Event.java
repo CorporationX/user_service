@@ -25,7 +25,6 @@ import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -59,7 +58,7 @@ public class Event {
     private int maxAttendees;
 
     @ManyToMany(mappedBy = "participatedEvents")
-    private List<User> attendees = new ArrayList<>();
+    private List<User> attendees;
 
     @OneToMany(mappedBy = "event")
     private List<Rating> ratings;

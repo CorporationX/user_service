@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.avro.common.SkillFilter;
+import school.faang.avro.user.UserAddSkills;
 import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.FilterGoalDto;
@@ -18,8 +20,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
-import school.faang.user_service.kafka.dto.skill.SkillFilterDto;
-import school.faang.user_service.kafka.dto.user.update.UserAddSkills;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.SkillMapper;
@@ -130,12 +130,15 @@ public class GoalServiceImpl implements GoalService {
 
         if (goal.getStatus() == GoalStatus.COMPLETED && goal.getSkillsToAchieve() != null && goal.getUsers() != null) {
             goal.getUsers().forEach(user -> {
-                List<SkillFilterDto> skills = skillMapper.toSkillFilterDtos(goal.getSkillsToAchieve());
+                List<SkillFilter> skills = skillMapper.toSkillFilterDtos(goal.getSkillsToAchieve());
 
-                skills.forEach(skill -> skillRepository.assignSkillToUser(skill.id(), user.getId()));
+                skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
 
-                userUpdateProducer.onUserUpdate(
-                        new UserAddSkills(user.getId(), skills)
+                userUpdateProducer.onUserAddSkills(
+                        UserAddSkills.newBuilder()
+                                .setId(user.getId())
+                                .setSkills(skills)
+                                .build()
                 );
             });
         }

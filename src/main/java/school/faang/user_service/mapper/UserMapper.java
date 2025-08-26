@@ -2,12 +2,12 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
+import school.faang.avro.user.UserCreate;
+import school.faang.avro.user.UserUpdate;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
-import school.faang.user_service.kafka.dto.user.UserCreate;
-import school.faang.user_service.kafka.dto.user.update.UserUpdate;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface UserMapper {
 
     List<UserDto> toUserDtos(List<User> users);
 
-    UserUpdate toUserUpdatedDto(User user);
+    UserUpdate toUserUpdate(User user);
 
-    UserCreate toUserCreatedDto(User user);
+    UserCreate toUserCreate(User user);
 }

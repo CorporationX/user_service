@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         logAuthAction("Регистрация пользователя", user);
         Token accessToken = jwtService.generateAccessToken(user);
 
-        userCreateProducer.onUserCreate(userMapper.toUserCreatedDto(user));
+        userCreateProducer.onUserCreate(userMapper.toUserCreate(user));
 
         return JwtTokens.builder()
                 .accessToken(accessToken)

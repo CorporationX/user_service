@@ -1,0 +1,27 @@
+{
+  "name": "UserChangeTariffEvent",
+  "type": "record",
+  "namespace": "school.faang.avro.user",
+  "fields": [
+    {
+      "name": "userId",
+      "type": "long"
+    },
+    {
+      "name": "tariffId",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    },
+    {
+      "name": "promotionId",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "UserViewEvent",
+  "type": "record",
+  "namespace": "school.faang.avro.user",
+  "fields": [
+    {
+      "name": "userId",
+      "type": "long"
+    },
+    {
+      "name": "promotionId",
+      "type": "long"
+    }
+  ]
+}

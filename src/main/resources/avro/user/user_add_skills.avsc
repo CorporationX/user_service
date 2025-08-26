@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "UserAddSkills",
+  "namespace": "school.faang.avro.user",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "skills",
+      "type": {
+        "type": "array",
+        "items": "school.faang.avro.common.SkillFilter"
+      }
+    }
+  ]
+}

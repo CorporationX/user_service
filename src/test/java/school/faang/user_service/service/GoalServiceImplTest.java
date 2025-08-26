@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import school.faang.avro.user.UserAddSkills;
 import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.FilterGoalDto;
@@ -24,7 +25,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserSkillGuarantee;
-import school.faang.user_service.kafka.dto.user.update.UserUpdateEvent;
 import school.faang.user_service.kafka.producer.UserUpdateProducer;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.SkillMapper;
@@ -235,7 +235,7 @@ public class GoalServiceImplTest {
                 verify(skillRepository, times(1)).assignSkillToUser(skill.getId(), user.getId());
             });
         });
-        verify(userUpdateProducer, times(findedGoal.getUsers().size())).onUserUpdate(any(UserUpdateEvent.class));
+        verify(userUpdateProducer, times(findedGoal.getUsers().size())).onUserAddSkills(any(UserAddSkills.class));
         verify(skillMapper, times(skills.size())).toSkillFilterDtos(anyList());
     }
 

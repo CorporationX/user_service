@@ -49,6 +49,16 @@ user:
     min:
       length: 6
 
+
+redis:
+  host: localhost
+  port: 6379
+
+
+task:
+  scheduling:
+    cron: "0 * * * * ?"
+=======
 app:
   goals:
     max-active-goals: 3
@@ -62,3 +72,4 @@ premium:
   remover:
     cron: "0 0 0 * * MON"
     batch-size: 100
+

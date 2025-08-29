@@ -20,6 +20,9 @@ spring:
     redis:
       port: 6379
       host: localhost
+      channel:
+        profile-view: profile-view-events
+        mentorship-requested: mentorship.requested
   
   web:
     mvc:

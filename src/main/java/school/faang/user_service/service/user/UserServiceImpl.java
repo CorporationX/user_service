@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.config.context.AuthUserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
@@ -24,6 +27,8 @@ import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Slf4j
@@ -36,11 +41,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final UserMapper userMapper;
+    private final UserContext userContext;
+    private final UserCsvService userCsvService;
     private final AuthUserContext authUserContext;
     private final UserUpdateProducer userUpdateProducer;
     private final GoalRepository goalRepository;
     private final EventRepository eventRepository;
     private final MentorshipRequestService mentorshipRequestService;
+
 
     @Override
     public UserDto create(CreateUserDto userDto) {
@@ -99,6 +107,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getUsersByIds(List<Long> userIds) {
         return userMapper.toUserDtos(userRepository.findAllById(userIds));
+    }
+
+    @Override
+    public List<UserDto> addUsersToFile(MultipartFile file) {
+        try {
+            InputStream fileStream = file.getInputStream();
+            List<Person> persons = userCsvService.readPersonsFromCsv(fileStream);
+            List<User> users = userCsvService.convertPersonsToUsers(persons);
+            users = userRepository.saveAll(users);
+            return users.parallelStream()
+                    .map(userMapper::toUserDto)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException("Error while reading CSV", e);
+        }
     }
 
     @Override

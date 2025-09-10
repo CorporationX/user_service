@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"school.faang.user_service.service.user"}];updateSearchResults();

@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"school.faang.user_service.service.user","l":"UserSubscriptionService"}];updateSearchResults();

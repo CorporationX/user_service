@@ -5,7 +5,7 @@ skill:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5433/postgres
     username: user
     password: password
   jpa:
@@ -52,6 +52,16 @@ user:
     min:
       length: 6
 
+
+redis:
+  host: localhost
+  port: 6379
+
+
+task:
+  scheduling:
+    cron: "0 * * * * ?"
+
 app:
   goals:
     max-active-goals: 3
@@ -65,3 +75,4 @@ premium:
   remover:
     cron: "0 0 0 * * MON"
     batch-size: 100
+

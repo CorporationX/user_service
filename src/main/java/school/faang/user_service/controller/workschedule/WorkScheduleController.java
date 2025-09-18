@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.workschedule;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,11 @@ import school.faang.user_service.service.workschedule.WorkScheduleService;
 public class WorkScheduleController {
     private WorkScheduleService workScheduleService;
     private UserContext userContext;
+
+    public WorkScheduleController(UserContext userContext, WorkScheduleService workScheduleService) {
+        this.userContext = userContext;
+        this.workScheduleService = workScheduleService;
+    }
 
     @GetMapping("/addworkschedule")
     public WorkScheduleDto addWorkSchedule(WorkScheduleDto dto) {

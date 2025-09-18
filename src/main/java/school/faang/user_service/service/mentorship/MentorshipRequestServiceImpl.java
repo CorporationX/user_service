@@ -9,18 +9,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.controller.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.dto.mentorship.CreateMentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
-import school.faang.user_service.dto.system_event.MentorshipRequestedEvent;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.user.MentorshipRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.repository.user.UserRepository;
@@ -37,7 +35,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final UserContext userContext;
     private final UserRepository userRepository;
-    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Override
     public MentorshipRequestDto create(CreateMentorshipRequestDto dto) {
@@ -50,9 +47,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         MentorshipRequest request = mentorshipRequestRepository.create(
                 requesterId, receiverId, dto.description()
-        );
-        mentorshipRequestedEventPublisher.publish(
-                new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now())
         );
 
         request.setRequester(userRepository.findById(requesterId)

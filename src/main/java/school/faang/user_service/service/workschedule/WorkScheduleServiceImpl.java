@@ -7,7 +7,6 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.WorkSchedule;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
-import school.faang.user_service.mapper.WorkScheduleMapper;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.repository.user.WorkScheduleRepository;
 

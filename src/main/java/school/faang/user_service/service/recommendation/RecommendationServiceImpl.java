@@ -14,7 +14,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.event.RecommendationRequestedEvent;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.filter.RecommendationFilter;
-import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
 import java.time.LocalDateTime;

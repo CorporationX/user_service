@@ -1,7 +1,3 @@
-skill:
-  minimal:
-    offers: 3
-
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -39,6 +35,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+
+skill:
+  minimal:
+    offers: 3
 
 user:
   password:

@@ -2,6 +2,7 @@ package school.faang.user_service.repository.mentorship;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.user.MentorshipRequest;
 
 import java.util.Optional;
@@ -22,4 +23,10 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
             LIMIT 1
             """)
     Optional<MentorshipRequest> findLatestRequest(long requesterId, long receiverId);
+
+    Optional<MentorshipRequest> findTopByRequesterIdOrderByCreatedAtDesc(long requesterId);
+
+    boolean existsByReceiverIdAndRequesterIdAndStatus(Long receiverId, Long requesterId, RequestStatus status);
+
+    boolean existsByRequesterIdAndReceiverIdAndStatus(long requesterId, long receiverId, RequestStatus status);
 }

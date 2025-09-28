@@ -8,7 +8,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.recommendation.CreateRecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -23,6 +22,7 @@ import school.faang.user_service.filter.RecommendationFilter;
 import school.faang.user_service.filter.RecommendationReceiverFilterInstance;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.service.recommendation.RecommendationRequestedEventPublisher;
 import school.faang.user_service.service.recommendation.RecommendationServiceImpl;
 
 import java.time.LocalDateTime;
@@ -44,14 +44,15 @@ public class RecommendationServiceTest {
     private RecommendationServiceImpl recommendationService;
 
     @Mock
+    private RecommendationRequestedEventPublisher eventPublisher;
+    @Mock
     private RecommendationRepository recommendationRepository;
     @Mock
     private UserContext userContext;
     @Spy
     private RecommendationMapperImpl recommendationMapper;
 
-    @Value("${recommendation.repeat.limit}")
-    private int repeatRecommendationTimeLimit;
+    private final int repeatRecommendationTimeLimit = 6;
 
     private final RecommendationFilter authorFilter = new RecommendationAuthorFilterInstance();
     private final RecommendationFilter contentFilter = new RecommendationContentFilterInstance();
@@ -70,7 +71,9 @@ public class RecommendationServiceTest {
                 recommendationRepository,
                 recommendationMapper,
                 userContext,
-                List.of(authorFilter, contentFilter, receiverFilter)
+                6,
+                List.of(authorFilter, contentFilter, receiverFilter),
+                eventPublisher
         );
     }
 

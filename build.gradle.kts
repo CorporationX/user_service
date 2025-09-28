@@ -24,6 +24,7 @@ repositories {
 dependencies {
     /**
      * Spring boot starters
+     *
      */
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -32,6 +33,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+
+    // Другие зависимости вашего проекта
 
     /**
      * Database
@@ -215,9 +219,22 @@ tasks.checkstyleTest {
 
     classpath = files()
 }
+tasks.withType<JavaCompile>().configureEach {
+    if (name.contains("Test", ignoreCase = true)) {
+        destinationDirectory.set(file("$buildDir/classes/java/test"))
+        options.compilerArgs.addAll(
+            listOf("-s", "$buildDir/generated/sources/annotationProcessor/java/test")
+        )
+    } else {
+        destinationDirectory.set(file("$buildDir/classes/java/main"))
+        options.compilerArgs.addAll(
+            listOf("-s", "$buildDir/generated/sources/annotationProcessor/java/main")
+        )
+    }
+}
 
 tasks.register<Test>("unitTest") {
-    description = "Запускает только unit-тесты"
+    description = "запускает только unit-тесты"
     group = "verification"
     useJUnitPlatform {
         excludeTags("integration")

@@ -20,6 +20,11 @@ spring:
     redis:
       port: 6379
       host: localhost
+      channel:
+        mentorship-requested: mentorship_requested_channel
+        goal-completed: goal_completed_channel
+      topic:
+        recommendation: "recommendation:requested"
 
 server:
   port: 8080
@@ -27,6 +32,8 @@ server:
 logging:
   level:
     root: info
+    org.springframework.web: DEBUG
+    org.springframework.http.converter.json: DEBUG
 
 project-service:
   host: localhost
@@ -48,7 +55,12 @@ user:
 app:
   goals:
     max-active-goals: 3
-    
+
 recommendation:
   repeat:
     limit: 6
+
+premium:
+  remover:
+    cron: "0 0 0 * * MON"
+    batch-size: 100

@@ -31,13 +31,13 @@ public class MentorshipController {
     }
 
     // Посмотреть всех менти пользователя
-    @GetMapping("/mentee/{UserId}/")
+    @GetMapping("/mentee/{userId}")
     public List<UserDto> getMentees(@PathVariable long userId) {
         return mentorshipService.getMentees(userId);
     }
 
     // Посмотреть всех менторов пользователя
-    @GetMapping("/mentor/{UserId}/")
+    @GetMapping("/mentor/{userId}")
     public List<UserDto> getMentors(@PathVariable long userId) {
         return mentorshipService.getMentors(userId);
     }

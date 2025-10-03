@@ -11,6 +11,7 @@ public interface MentorshipService {
 
     /**
      * Добавляет связь между ментором и менти
+     *
      * @param mentorId id пользователя-ментора
      * @param menteeId id пользователя-менти
      * @throws ForbiddenException если currentUser не является ни ментором, ни менти
@@ -19,6 +20,7 @@ public interface MentorshipService {
 
     /**
      * Удаляет связь между ментором и менти
+     *
      * @param mentorId id ментора
      * @param menteeId id менти
      */
@@ -26,6 +28,7 @@ public interface MentorshipService {
 
     /**
      * Возвращает список всех менти данного пользователя
+     *
      * @param userId id пользователя
      * @return список DTO менти
      */
@@ -33,6 +36,7 @@ public interface MentorshipService {
 
     /**
      * Возвращает список всех менторов пользователя
+     *
      * @param userId id пользователя
      * @return список DTO менторов
      */

@@ -66,6 +66,9 @@ public class Recommendation {
     private LocalDateTime updatedAt;
 
     public void addSkillOffer(SkillOffer skillOffer) {
+        if (skillOffers == null) {
+            skillOffers = new ArrayList<>();
+        }
         skillOffers.add(skillOffer);
     }
 }

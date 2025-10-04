@@ -1,0 +1,15 @@
+package school.faang.user_service.dto.event;
+
+import lombok.Data;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.entity.event.EventType;
+
+@Component
+@Data
+public class EventFilterDto {
+    private String titleContains;
+    private String descriptionContains;
+    private long ownerId;
+    private long participantId;
+    private EventType eventType;
+}

@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper;
 
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import org.mapstruct.Mapper;
@@ -13,5 +14,8 @@ public interface EventMapper {
 
     EventDto toEventDto(Event event);
 
-    void update(UpdateEventDto eventDto, Event event);
+    void update(UpdateEventDto eventDto, @MappingTarget Event event);
+
+
+
 }

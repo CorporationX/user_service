@@ -10,6 +10,7 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.UpdateEventDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.user.UserRepository;
 

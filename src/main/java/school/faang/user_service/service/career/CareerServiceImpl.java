@@ -25,13 +25,13 @@ public class CareerServiceImpl implements CareerService {
     private final CareerMapper careerMapper;
 
     @Override
-    public CareerDto addCareer(long userId, CreateCareerDto CareerDto) {
+    public CareerDto addCareer(long userId, CreateCareerDto careerDto) {
         log.info("Creating new career entry");
-        if (CareerDto.from().isAfter(LocalDate.now())) {
+        if (careerDto.from().isAfter(LocalDate.now())) {
             throw new DataValidationException("From date should not be later than today!");
         }
         User user = userRepository.getByIdOrThrow(userId);
-        Career career = careerMapper.toCareer(CareerDto);
+        Career career = careerMapper.toCareer(careerDto);
         career.setUser(user);
         career = careerRepository.save(career);
         log.info("Career {} has been created", career.getId());

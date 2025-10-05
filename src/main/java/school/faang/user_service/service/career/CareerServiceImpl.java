@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.career.CareerDto;
+import school.faang.user_service.dto.career.CreateCareerDto;
+import school.faang.user_service.dto.career.UpdateCareerDto;
 import school.faang.user_service.entity.user.Career;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -23,12 +25,13 @@ public class CareerServiceImpl implements CareerService {
     private final CareerMapper careerMapper;
 
     @Override
-    public CareerDto addCareer(long userId, CareerDto careerDto) {
-        if (careerDto.from().isAfter(LocalDate.now())) {
+    public CareerDto addCareer(long userId, CreateCareerDto CareerDto) {
+        log.info("Creating new career entry");
+        if (CareerDto.from().isAfter(LocalDate.now())) {
             throw new DataValidationException("From date should not be later than today!");
         }
         User user = userRepository.getByIdOrThrow(userId);
-        Career career = careerMapper.toCareer(careerDto);
+        Career career = careerMapper.toCareer(CareerDto);
         career.setUser(user);
         career = careerRepository.save(career);
         log.info("Career {} has been created", career.getId());
@@ -36,16 +39,17 @@ public class CareerServiceImpl implements CareerService {
     }
 
     @Override
-    public CareerDto updateCareer(long userId, long careerId, CareerDto careerDto) {
+    public CareerDto updateCareer(long userId, long careerId, UpdateCareerDto careerDto) {
+        log.info("Updating career entry {}", careerId);
         if (careerDto.from().isAfter(LocalDate.now())) {
             throw new DataValidationException("From date should not be later than today!");
         }
         Career career = careerRepository.getByIdOrThrow(careerId);
         User user = career.getUser();
         if (userId != user.getId()) {
-            throw new ForbiddenException("ID mismatch: updating this career's details is not allowed for this user.");
+            throw new ForbiddenException("ID mismatch: updating this career's details is not allowed for this user!");
         }
-        career = careerMapper.toCareer(careerDto);
+        careerMapper.update(careerDto, career);
         career.setUser(user);
         careerRepository.save(career);
         log.info("Career {} has been updated", career.getId());
@@ -54,7 +58,9 @@ public class CareerServiceImpl implements CareerService {
 
     @Override
     public CareerDto getById(long careerId) {
+        log.info("Searching for career entry with ID {}", careerId);
         Career career = careerRepository.getByIdOrThrow(careerId);
+        log.info("Entry found");
         return careerMapper.toCareerDto(career);
     }
 }

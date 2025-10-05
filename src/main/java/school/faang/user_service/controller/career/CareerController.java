@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.career.CareerDto;
+import school.faang.user_service.dto.career.CreateCareerDto;
+import school.faang.user_service.dto.career.UpdateCareerDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.career.CareerService;
 
@@ -14,14 +16,14 @@ public class CareerController {
     private final CareerService careerService;
     private final UserContext userContext;
 
-    public CareerDto addCareer(CareerDto careerDto) {
+    public CareerDto addCareer(CreateCareerDto careerDto) {
         validateString(careerDto.company(), "company");
         validateString(careerDto.position(), "position");
         validateNotNull(careerDto.from(), "from date");
         return careerService.addCareer(userContext.getUserId(), careerDto);
     }
 
-    public CareerDto updateCareer(long careerId, CareerDto careerDto) {
+    public CareerDto updateCareer(long careerId, UpdateCareerDto careerDto) {
         validateString(careerDto.company(), "company");
         validateString(careerDto.position(), "position");
         validateNotNull(careerDto.from(), "from date");

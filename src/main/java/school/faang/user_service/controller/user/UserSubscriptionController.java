@@ -45,7 +45,7 @@ public class UserSubscriptionController {
     }
 
     @GetMapping("/users/{followerId}/followees")
-    public List<UserDto> getFollowees(@PathVariable long followerId, UserFiltersDto filters){
+    public List<UserDto> getFollowees(@PathVariable long followerId, UserFiltersDto filters) {
         return userSubscriptionService.getFollowees(followerId, filters);
     }
 }

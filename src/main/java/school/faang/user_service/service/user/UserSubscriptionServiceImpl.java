@@ -103,7 +103,7 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
         }
     }
 
-    private void validateUserOwnAction(long followerId, long currentUserId){
+    private void validateUserOwnAction(long followerId, long currentUserId) {
         if (followerId != currentUserId) {
             log.warn("User {} пытается подписаться или отписаться от лица пользователя: {}", currentUserId, followerId);
             throw new ForbiddenException("Вы не можете подписывать других пользователей.");
@@ -111,7 +111,9 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     }
 
     private boolean filterUser(UserDto user, UserFiltersDto filters) {
-        if (filters == null) return true;
+        if (filters == null) {
+            return true;
+        }
 
         boolean match = true;
 

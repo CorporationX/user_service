@@ -24,6 +24,7 @@ import school.faang.user_service.entity.user.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Getter
 @Setter

@@ -3,6 +3,7 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
@@ -11,6 +12,7 @@ import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,22 +26,56 @@ public class MentorshipServiceImpl implements MentorshipService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public void addMentorship(long mentorId, long menteeId) {
         log.info("Adding mentorship: mentorId={}, menteeId={}", mentorId, menteeId);
 
         MentorshipPair pair = authorizeAndLoadUsers(mentorId, menteeId);
-        pair.mentee.getMentors().add(pair.mentor);
+
+        List<User> mentors = pair.mentee.getMentors();
+        if (mentors == null) {
+            mentors = new ArrayList<>();
+            pair.mentee.setMentors(mentors);
+        }
+
+        boolean alreadyExists = mentors.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(mentor -> Objects.equals(mentor.getId(), mentorId));
+
+        if (alreadyExists) {
+            log.info("Mentorship already exists: mentorId={}, menteeId={}", mentorId, menteeId);
+            throw new DataValidationException("Связь уже существует");
+        }
+
+        mentors.add(pair.mentor);
         mentorshipRepository.save(pair.mentee);
+
 
         log.info("Mentorship added successfully: mentorId={}, menteeId={}", mentorId, menteeId);
     }
 
     @Override
+    @Transactional
     public void deleteMentorship(long mentorId, long menteeId) {
         log.info("Deleting mentorship: mentorId={}, menteeId={}", mentorId, menteeId);
 
         MentorshipPair pair = authorizeAndLoadUsers(mentorId, menteeId);
-        pair.mentee.getMentors().remove(pair.mentor);
+
+        List<User> mentors = pair.mentee.getMentors();
+        if (mentors == null || mentors.isEmpty()) {
+            log.warn("Mentorship not found (list is empty): mentorId={}, menteeId={}", mentorId, menteeId);
+            throw new DataValidationException("Связь не найдена");
+        }
+
+        boolean removed = mentors.removeIf(mentor ->
+                mentor != null && Objects.equals(mentor.getId(), mentorId)
+        );
+
+        if (!removed) {
+            log.warn("Mentorship not found: mentorId={}, menteeId={}", mentorId, menteeId);
+            throw new DataValidationException("Связь не найдена");
+        }
+
         mentorshipRepository.save(pair.mentee);
 
         log.info("Mentorship deleted successfully: mentorId={}, menteeId={}", mentorId, menteeId);

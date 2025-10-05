@@ -1,6 +1,8 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,25 +20,23 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    // Добавляем связь ментор-менти
-    @PostMapping("/{mentorId}/add/{menteeId}")
-    public void addMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
+    @PostMapping("/{mentorId}/{menteeId}")
+    public ResponseEntity<Void> addMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
         mentorshipService.addMentorship(mentorId, menteeId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // Удалить связь ментор-менти
-    @DeleteMapping("/{mentorId}/delete/{menteeId}")
-    public void deleteMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
+    @DeleteMapping("/{mentorId}/{menteeId}")
+    public ResponseEntity<Void> deleteMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
         mentorshipService.deleteMentorship(mentorId, menteeId);
+        return ResponseEntity.noContent().build();
     }
 
-    // Посмотреть всех менти пользователя
     @GetMapping("/mentee/{userId}")
     public List<UserDto> getMentees(@PathVariable long userId) {
         return mentorshipService.getMentees(userId);
     }
 
-    // Посмотреть всех менторов пользователя
     @GetMapping("/mentor/{userId}")
     public List<UserDto> getMentors(@PathVariable long userId) {
         return mentorshipService.getMentors(userId);

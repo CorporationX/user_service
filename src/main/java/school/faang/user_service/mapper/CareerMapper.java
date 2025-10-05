@@ -7,7 +7,7 @@ import school.faang.user_service.dto.career.CreateCareerDto;
 import school.faang.user_service.dto.career.UpdateCareerDto;
 import school.faang.user_service.entity.user.Career;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface CareerMapper {
 
     Career toCareer(CreateCareerDto careerDto);

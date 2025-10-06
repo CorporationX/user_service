@@ -2,7 +2,7 @@ package school.faang.user_service.controller.career;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.career.CareerDto;
 import school.faang.user_service.dto.career.CreateCareerDto;
@@ -10,8 +10,8 @@ import school.faang.user_service.dto.career.UpdateCareerDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.career.CareerService;
 
+@Controller
 @RequiredArgsConstructor
-@Component
 public class CareerController {
     private final CareerService careerService;
     private final UserContext userContext;

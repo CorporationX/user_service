@@ -1,7 +1,8 @@
 package school.faang.user_service.service.subscription;
 
-import school.faang.user_service.dto.subscription.CountResponse;
+import school.faang.user_service.dto.CountResponse;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFiltersDto;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public interface UserSubscriptionService {
      * @param followeeId ID пользователя.
      * @return объект {@code List<UserDto>} - список подписчиков.
      */
-    List<UserDto> getFollowers(long followeeId);
+    List<UserDto> getFollowers(long followeeId, UserFiltersDto userFilterDto);
 
     /**
      * Возвращает подписки пользователя по его ID.
@@ -62,5 +63,5 @@ public interface UserSubscriptionService {
      * @param followeeId ID пользователя.
      * @return объект {@code List<UserDto>} - список подписок (пользователи)
      */
-    List<UserDto> getFollowees(long followeeId);
+    List<UserDto> getFollowees(long followeeId, UserFiltersDto userFilterDto);
 }

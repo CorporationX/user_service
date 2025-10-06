@@ -3,13 +3,16 @@ package school.faang.user_service.service.subscription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.subscription.CountResponse;
+import school.faang.user_service.dto.CountResponse;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFiltersDto;
+import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.SubscriptionRepository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -49,15 +52,35 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     }
 
     @Override
-    public List<UserDto> getFollowers(long followeeId) {
-        return subscriptionRepository.findByFolloweeId(followeeId)
-                .map(userMapper::toUserDto)
-                .toList();
+    public List<UserDto> getFollowers(long followeeId, UserFiltersDto userFiltersDto) {
+        return applyFiltersAndMapToDto(followeeId, userFiltersDto, true);
     }
 
     @Override
-    public List<UserDto> getFollowees(long followerId) {
-        return subscriptionRepository.findByFollowerId(followerId)
+    public List<UserDto> getFollowees(long followerId, UserFiltersDto userFiltersDto) {
+        return applyFiltersAndMapToDto(followerId, userFiltersDto, false);
+    }
+
+    private List<UserDto> applyFiltersAndMapToDto(long userId, UserFiltersDto userFiltersDto, boolean isFollowee) {
+        if (isFollowee) {
+            Stream<User> followeeUserStream = subscriptionRepository.findByFolloweeId(userId);
+            return filterUserStreamAndGetUsersDtoList(followeeUserStream, userFiltersDto);
+        } else {
+            Stream<User> followerUserStream = subscriptionRepository.findByFollowerId(userId);
+            return filterUserStreamAndGetUsersDtoList(followerUserStream, userFiltersDto);
+        }
+    }
+
+    private List<UserDto> filterUserStreamAndGetUsersDtoList(Stream<User> userStream, UserFiltersDto userFiltersDto) {
+        String filtersName = userFiltersDto.namePattern().toLowerCase();
+        String filtersPhoneNumber = userFiltersDto.phoneNumber();
+        int filtersExperienceMin = userFiltersDto.experienceMin();
+        int filtersExperienceMax = userFiltersDto.experienceMax();
+
+        return userStream.filter(user -> user.getUsername().toLowerCase().contains(filtersName))
+                .filter(user -> user.getPhone().contains(filtersPhoneNumber))
+                .filter(user -> user.getExperience() >= filtersExperienceMin
+                        && user.getExperience() <= filtersExperienceMax)
                 .map(userMapper::toUserDto)
                 .toList();
     }

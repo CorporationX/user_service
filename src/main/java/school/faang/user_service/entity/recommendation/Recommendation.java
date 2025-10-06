@@ -66,10 +66,4 @@ public class Recommendation {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public void addSkillOffer(SkillOffer skillOffer) {
-        if (skillOffers == null) {
-            skillOffers = new ArrayList<>();
-        }
-        skillOffers.add(skillOffer);
-    }
 }

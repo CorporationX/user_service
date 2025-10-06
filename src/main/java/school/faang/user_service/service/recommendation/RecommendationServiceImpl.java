@@ -19,6 +19,7 @@ import school.faang.user_service.entity.user.UserSkillGuarantee;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.filter.RecommendationFilterStrategy;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -27,6 +28,7 @@ import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.repository.user.UserSkillGuaranteeRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,6 +48,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
     private final UserContext userContext;
+    private final List<RecommendationFilterStrategy> recommendationFilters;
 
     @Override
     @Transactional
@@ -147,7 +150,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         return allRecommendations.stream()
                 .filter(recommendation -> matchesFilters(recommendation, filters))
                 .map(recommendationMapper::toRecommendationDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void validateCreateRecommendation(CreateRecommendationDto dto, long authorId) {
@@ -188,7 +191,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .build();
             
             skillOffer = skillOfferRepository.save(skillOffer);
-            recommendation.addSkillOffer(skillOffer);
+            addSkillOfferToRecommendation(recommendation, skillOffer);
 
             boolean userHasSkill = receiver.getSkills().stream()
                     .anyMatch(userSkill -> userSkill.getId().equals(skillId));
@@ -216,22 +219,21 @@ public class RecommendationServiceImpl implements RecommendationService {
         }
     }
 
+    private void addSkillOfferToRecommendation(Recommendation recommendation, SkillOffer skillOffer) {
+        if (recommendation.getSkillOffers() == null) {
+            recommendation.setSkillOffers(new ArrayList<>());
+        }
+
+        recommendation.getSkillOffers().add(skillOffer);
+        skillOffer.setRecommendation(recommendation);
+    }
+
     private boolean matchesFilters(Recommendation recommendation, RecommendationFilterDto filters) {
-        if (filters.contentContains() != null
-            && !recommendation.getContent().toLowerCase().contains(filters.contentContains().toLowerCase())) {
-            return false;
+        if (recommendationFilters == null || recommendationFilters.isEmpty()) {
+            return true; // если фильтров нет, все рекомендации проходят
         }
-
-        if (filters.authorId() != null
-            && !recommendation.getAuthor().getId().equals(filters.authorId())) {
-            return false;
-        }
-
-        if (filters.receiverId() != null
-            && !recommendation.getReceiver().getId().equals(filters.receiverId())) {
-            return false;
-        }
-
-        return true;
+        return recommendationFilters.stream()
+                .filter(strategy -> strategy.isApplicable(filters))
+                .allMatch(strategy -> strategy.matchesFilters(recommendation, filters));
     }
 }

@@ -3,7 +3,15 @@ package school.faang.user_service.controller.recommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.CreateRecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationFilterDto;
@@ -14,8 +22,9 @@ import school.faang.user_service.service.recommendation.RecommendationService;
 import java.util.List;
 
 @Slf4j
-@Component
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/recommendations")
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
@@ -26,7 +35,8 @@ public class RecommendationController {
      * @param recommendationDto данные для создания рекомендации
      * @return созданная рекомендация
      */
-    public RecommendationDto create(CreateRecommendationDto recommendationDto) {
+    @PostMapping
+    public RecommendationDto create(@RequestBody CreateRecommendationDto recommendationDto) {
         log.info("Creating recommendation for receiver: {}", recommendationDto.receiverId());
         
         validateCreateRecommendation(recommendationDto);
@@ -40,7 +50,8 @@ public class RecommendationController {
      * @param recommendationDto данные для обновления
      * @return обновленная рекомендация
      */
-    public RecommendationDto update(long recommendationId, UpdateRecommendationDto recommendationDto) {
+    public RecommendationDto update( @PathVariable("id") long recommendationId,
+                                     @RequestBody UpdateRecommendationDto recommendationDto) {
         log.info("Updating recommendation: {}", recommendationId);
         
         validateUpdateRecommendation(recommendationDto);
@@ -52,9 +63,11 @@ public class RecommendationController {
      *
      * @param recommendationId идентификатор рекомендации
      */
-    public void delete(long recommendationId) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(long recommendationId) {
         log.info("Deleting recommendation: {}", recommendationId);
         recommendationService.delete(recommendationId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -63,8 +76,8 @@ public class RecommendationController {
      * @param filters критерии фильтрации
      * @return список рекомендаций, соответствующих критериям
      */
-    public List<RecommendationDto> getByFilters(RecommendationFilterDto filters) {
-        log.info("Getting recommendations with filters: {}", filters);
+    @GetMapping
+    public List<RecommendationDto> getByFilters(@ModelAttribute RecommendationFilterDto filters) {
         return recommendationService.getByFilters(filters);
     }
 

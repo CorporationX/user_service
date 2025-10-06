@@ -27,6 +27,6 @@ public interface RecommendationMapper {
         }
         return skillOffers.stream()
                 .map(offer -> offer.getSkill().getId())
-                .collect(Collectors.toList());
+                .toList();
     }
 }

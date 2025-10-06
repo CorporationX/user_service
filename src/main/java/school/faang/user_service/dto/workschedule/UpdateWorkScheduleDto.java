@@ -4,7 +4,7 @@ import java.time.LocalTime;
 
 public record UpdateWorkScheduleDto(
         LocalTime startTime,
-        LocalTime endTIme,
+        LocalTime endTime,
         LocalTime startLunch,
         LocalTime endLunch,
         String timezone

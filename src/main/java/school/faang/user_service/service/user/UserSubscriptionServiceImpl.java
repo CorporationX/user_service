@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.CountResponse;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFiltersDto;
+import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.SubscriptionRepository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import java.util.List;
 public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
+    private final List<UserFilter> userFilters;
 
     @Override
     public void followUser(long followerId, long followeeId) {
@@ -57,10 +61,14 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     @Override
     public List<UserDto> getFollowers(long followeeId, UserFiltersDto filters) {
         log.info("Получение подписчиков пользователя {} с фильтрами {}", followeeId, filters);
-        List<UserDto> followers = subscriptionRepository.findByFolloweeId(followeeId)
-                .map(userMapper::toUserDto)
-                .filter(userDto -> filterUser(userDto, filters))
-                .toList();
+        Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
+
+        for (UserFilter userFilter : userFilters) {
+            users = userFilter.apply(users, filters);
+        }
+
+        List<UserDto> followers = users.map(userMapper::toUserDto).toList();
+
         log.info("Найдено {} подписчиков для пользователя {}", followers.size(), followeeId);
         return followers;
     }
@@ -68,10 +76,14 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     @Override
     public List<UserDto> getFollowees(long followerId, UserFiltersDto filters) {
         log.info("Получение подписок пользователя {} с фильтрами {}", followerId, filters);
-        List<UserDto> followees = subscriptionRepository.findByFollowerId(followerId)
-                .map(userMapper::toUserDto)
-                .filter(userDto -> filterUser(userDto, filters))
-                .toList();
+        Stream<User> users = subscriptionRepository.findByFollowerId(followerId);
+
+        for (UserFilter userFilter : userFilters) {
+            users = userFilter.apply(users, filters);
+        }
+
+        List<UserDto> followees = users.map(userMapper::toUserDto).toList();
+
         log.info("Найдено {} подписок для пользователя {}", followees.size(), followerId);
         return followees;
     }
@@ -88,16 +100,14 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     }
 
     private void validateAlreadySubscribed(long followerId, long followeeId) {
-        boolean exists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (exists) {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             log.warn("User {} уже подписан на пользователя {}", followerId, followeeId);
             throw new DataValidationException("Пользователь уже подписан.");
         }
     }
 
     private void validateNotSubscribed(long followerId, long followeeId) {
-        boolean exists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (!exists) {
+        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             log.warn("User {} не был подписан на пользователя {}", followerId, followeeId);
             throw new DataValidationException("Пользователь не был подписан.");
         }
@@ -108,29 +118,5 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
             log.warn("User {} пытается подписаться или отписаться от лица пользователя: {}", currentUserId, followerId);
             throw new ForbiddenException("Вы не можете подписывать других пользователей.");
         }
-    }
-
-    private boolean filterUser(UserDto user, UserFiltersDto filters) {
-        if (filters == null) {
-            return true;
-        }
-
-        boolean match = true;
-
-        // данные из базы точно не null, поэтому у user.getUsername() и user.getPhone() проверки на null не нужны
-        if (filters.namePattern() != null && !filters.namePattern().isEmpty()) {
-            match &= user.username().toLowerCase().contains(filters.namePattern().toLowerCase());
-        }
-
-        if (filters.phonePattern() != null && !filters.phonePattern().isEmpty()) {
-            match &= user.phone().contains(filters.phonePattern());
-        }
-
-        if (user.experience() != null) {
-            match &= user.experience() >= filters.experienceMin()
-                    && user.experience() <= filters.experienceMax();
-        }
-
-        return match;
     }
 }

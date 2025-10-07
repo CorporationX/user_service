@@ -1,7 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
@@ -11,7 +11,7 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
@@ -36,6 +36,8 @@ public class MentorshipRequestController {
     }
 
     public void reject(long requestId, RejectionDto rejectionDto) {
+        validateReject(rejectionDto);
+
         mentorshipRequestService.reject(requestId, rejectionDto);
     }
 

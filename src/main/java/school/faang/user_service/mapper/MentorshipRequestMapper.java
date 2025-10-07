@@ -6,7 +6,7 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.user.MentorshipRequest;
 
 @Component
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MentorshipRequestMapper {
     MentorshipRequestDto toMentorshipRequestDto(MentorshipRequest mentorshipRequest);
 

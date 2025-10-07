@@ -21,8 +21,8 @@ public interface MentorshipRequestService {
      * @param requestDto Данные для создания запроса.
      * @return Созданный запрос на менторство.
      * @exception ForbiddenException если юзер попытается отправить запрос сам себе
-     * @exception DataValidationException если последний запрос был менее 3 месяцев назад
      * или выбранный ментор уже является ментором юзера
+     * @exception DataValidationException если последний запрос был менее 3 месяцев назад
      */
     MentorshipRequestDto create(CreateMentorshipRequestDto requestDto);
 
@@ -41,7 +41,7 @@ public interface MentorshipRequestService {
      *
      * @param requestId ID запроса, который требуется подтвердить.
      * @exception DataValidationException если запрос не найден
-     * или если его пытается подтвертить тот, кому не был адресован запрос
+     * @exception ForbiddenException если запрос пытается подтвертить тот, кому не был адресован запрос
      */
     void accept(long requestId);
 
@@ -51,7 +51,7 @@ public interface MentorshipRequestService {
      * @param requestId     ID запроса, который требуется отвергнуть.
      * @param rejectionDto  Объект, содержащий причину отказа.
      * @exception DataValidationException если запрос не найден
-     * или если его пытается отклонить тот, кому не был адресован запрос
+     * @exception ForbiddenException если запрос пытается отклонить тот, кому не был адресован запрос
      */
     void reject(long requestId, RejectionDto rejectionDto);
 }

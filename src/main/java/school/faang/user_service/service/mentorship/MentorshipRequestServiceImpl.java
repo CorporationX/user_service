@@ -97,7 +97,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             }
 
             if (latestRequest.getStatus() != RequestStatus.ACCEPTED) {
-                throw new DataValidationException("He already your mentor");
+                throw new ForbiddenException("He already your mentor");
             }
         }
     }
@@ -109,7 +109,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                 .orElseThrow(() -> new DataValidationException("Request not found"));
 
         if (!request.getReceiver().getId().equals(currentUserId)) {
-            throw new DataValidationException("Only receiver of the request can accept it.");
+            throw new ForbiddenException("Only receiver of the request can accept it.");
         }
     }
 }

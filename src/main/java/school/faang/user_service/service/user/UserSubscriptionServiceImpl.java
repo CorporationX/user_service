@@ -8,7 +8,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFiltersDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.SubscriptionRepository;
@@ -27,9 +26,7 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     @Override
     public void followUser(long followerId, long followeeId) {
         log.info("User {} пытается подписаться на пользователя {}", followerId, followeeId);
-        validateNotSelfAction(followerId, followeeId);
         validateAlreadySubscribed(followerId, followeeId);
-        validateUserOwnAction(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
         log.info("User {} успешно подписался на пользователя {}", followerId, followeeId);
     }
@@ -37,9 +34,7 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     @Override
     public void unfollowUser(long followerId, long followeeId) {
         log.info("User {} пытается отписаться от пользователя {}", followerId, followeeId);
-        validateNotSelfAction(followerId, followeeId);
         validateNotSubscribed(followerId, followeeId);
-        validateUserOwnAction(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
         log.info("User {} успешно отписался от пользователя {}", followerId, followeeId);
     }
@@ -62,42 +57,21 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
     public List<UserDto> getFollowers(long followeeId, UserFiltersDto filters) {
         log.info("Получение подписчиков пользователя {} с фильтрами {}", followeeId, filters);
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
-
-        for (UserFilter userFilter : userFilters) {
-            users = userFilter.apply(users, filters);
-        }
-
-        List<UserDto> followers = users.map(userMapper::toUserDto).toList();
-
-        log.info("Найдено {} подписчиков для пользователя {}", followers.size(), followeeId);
-        return followers;
+        log.info("Найдены подписчики для пользователя {}", followeeId);
+        return processUserStream(users, filters);
     }
 
     @Override
     public List<UserDto> getFollowees(long followerId, UserFiltersDto filters) {
         log.info("Получение подписок пользователя {} с фильтрами {}", followerId, filters);
         Stream<User> users = subscriptionRepository.findByFollowerId(followerId);
-
-        for (UserFilter userFilter : userFilters) {
-            users = userFilter.apply(users, filters);
-        }
-
-        List<UserDto> followees = users.map(userMapper::toUserDto).toList();
-
-        log.info("Найдено {} подписок для пользователя {}", followees.size(), followerId);
-        return followees;
+        log.info("Найдены подписки для пользователя {}", followerId);
+        return processUserStream(users, filters);
     }
 
     // ---------------------
     // Методы проверок
     // ---------------------
-
-    private void validateNotSelfAction(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            log.warn("User {} пытается подписаться или отписаться от самого себя", followerId);
-            throw new DataValidationException("Нельзя подписаться или отписаться от самого себя.");
-        }
-    }
 
     private void validateAlreadySubscribed(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
@@ -113,10 +87,10 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
         }
     }
 
-    private void validateUserOwnAction(long followerId, long currentUserId) {
-        if (followerId != currentUserId) {
-            log.warn("User {} пытается подписаться или отписаться от лица пользователя: {}", currentUserId, followerId);
-            throw new ForbiddenException("Вы не можете подписывать других пользователей.");
+    private List<UserDto> processUserStream(Stream<User> users, UserFiltersDto filters) {
+        for (UserFilter filter : userFilters) {
+            users = filter.apply(users, filters);
         }
+        return users.map(userMapper::toUserDto).toList();
     }
 }

@@ -22,12 +22,15 @@ import school.faang.user_service.service.user.EventParticipationServiceImpl;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceImplTest {
     private static final long DEFAULT_EVENT_ID = 1;
     private static final long DEFAULT_USER_ID = 1;
     private static final String BLANK_STRING = " ";
     private static final long COUNT = 1;
+    private static final int DEFAULT_NUMBER_OF_INVOCATION = 1;
     @Mock
     private EventParticipationRepository eventParticipationRepository;
     @Mock
@@ -41,7 +44,8 @@ public class EventParticipationServiceImplTest {
 
     @Test
     public void getAllParticipantsByEventId_shouldRevertParticipant() {
-        User user = preparationUser(DEFAULT_USER_ID);
+        User user = new User();
+        user.setId(DEFAULT_USER_ID);
         List<User> list = List.of(user);
         UserDto userDto = new UserDto(DEFAULT_USER_ID,
                 BLANK_STRING, BLANK_STRING, BLANK_STRING, BLANK_STRING);
@@ -54,10 +58,7 @@ public class EventParticipationServiceImplTest {
 
     @Test
     public void registerParticipant_userAlreadyAttendees_shouldThrowEntityNotFoundException() {
-        User user = preparationUser(DEFAULT_USER_ID);
-        Event event = preparationEvent(user);
-        Mockito.when(eventRepository.getByIdOrThrow(DEFAULT_EVENT_ID))
-                .thenReturn(event);
+        preparationData(DEFAULT_USER_ID, DEFAULT_EVENT_ID);
         Mockito.when(userContext.getUserId()).thenReturn(DEFAULT_USER_ID);
 
         Assert.assertThrows(EntityNotFoundException.class,
@@ -66,27 +67,20 @@ public class EventParticipationServiceImplTest {
 
     @Test
     public void registerParticipant_userUseNotYourId_shouldThrowForbiddenException() {
-        User user = preparationUser(DEFAULT_USER_ID);
-        Event event = preparationEvent(user);
-        Mockito.when(userContext.getUserId()).thenReturn(DEFAULT_USER_ID + DEFAULT_USER_ID);
-        Mockito.when(eventRepository.getByIdOrThrow(DEFAULT_EVENT_ID))
-                .thenReturn(event);
+        Mockito.when(userContext.getUserId()).thenReturn(anyLong());
+        preparationData(DEFAULT_USER_ID, DEFAULT_EVENT_ID);
 
         Assert.assertThrows(ForbiddenException.class,
                 () -> eventParticipationServiceImpl.registerParticipant(DEFAULT_EVENT_ID, DEFAULT_USER_ID));
     }
 
-
     @Test
     public void registerParticipant_registerParticipant_shouldCorrectRegisterParticipant() {
-        User user = preparationUser(DEFAULT_USER_ID + DEFAULT_USER_ID);
-        Event event = preparationEvent(user);
-        Mockito.when(eventRepository.getByIdOrThrow(DEFAULT_EVENT_ID))
-                .thenReturn(event);
+        preparationData(anyLong(), DEFAULT_EVENT_ID);
 
         eventParticipationServiceImpl.registerParticipant(DEFAULT_EVENT_ID, DEFAULT_USER_ID);
 
-        Mockito.verify(eventParticipationRepository, Mockito.times(1))
+        Mockito.verify(eventParticipationRepository, Mockito.times(DEFAULT_NUMBER_OF_INVOCATION))
                 .register(DEFAULT_EVENT_ID, DEFAULT_USER_ID);
     }
 
@@ -100,11 +94,8 @@ public class EventParticipationServiceImplTest {
 
     @Test
     public void unregisteredParticipation_userNotAttendee_shouldThrowEntityNotFoundException() {
-        User user = preparationUser(DEFAULT_USER_ID + DEFAULT_USER_ID);
-        Event event = preparationEvent(user);
         Mockito.when(userContext.getUserId()).thenReturn(DEFAULT_USER_ID);
-        Mockito.when(eventRepository.getByIdOrThrow(DEFAULT_EVENT_ID))
-                .thenReturn(event);
+        preparationData(anyLong(), DEFAULT_USER_ID);
 
         Assert.assertThrows(EntityNotFoundException.class,
                 () -> eventParticipationServiceImpl.unregisteredParticipation(DEFAULT_EVENT_ID, DEFAULT_USER_ID));
@@ -112,30 +103,30 @@ public class EventParticipationServiceImplTest {
 
     @Test
     public void unregisteredParticipation_userUseNotYourId_shouldThrowForbiddenException() {
-        User user = preparationUser(DEFAULT_USER_ID + DEFAULT_USER_ID);
-        Event event = preparationEvent(user);
         Mockito.when(userContext.getUserId()).thenReturn(DEFAULT_USER_ID);
-        Mockito.when(eventRepository.getByIdOrThrow(DEFAULT_EVENT_ID))
-                .thenReturn(event);
+        preparationData(anyLong(), DEFAULT_EVENT_ID);
+        long anotherIdUser = DEFAULT_USER_ID + DEFAULT_USER_ID;
+
         Assert.assertThrows(ForbiddenException.class,
-                () -> eventParticipationServiceImpl.unregisteredParticipation(DEFAULT_EVENT_ID, DEFAULT_USER_ID + DEFAULT_USER_ID + DEFAULT_USER_ID));
-
+                () -> eventParticipationServiceImpl.unregisteredParticipation(DEFAULT_EVENT_ID, anotherIdUser));
     }
 
-    public void preparationData(long userId) {
-
+    @Test
+    public void unregisteredParticipation_unregisteredParticipation_shouldUnregisterUser() {
+        preparationData(DEFAULT_EVENT_ID, DEFAULT_USER_ID);
+        eventParticipationServiceImpl.unregisteredParticipation(DEFAULT_EVENT_ID, DEFAULT_USER_ID);
+        Mockito.verify(eventParticipationRepository, Mockito.times(DEFAULT_NUMBER_OF_INVOCATION))
+                .unregister(DEFAULT_EVENT_ID, DEFAULT_USER_ID);
     }
 
-    //Переделать методы, вынести
-    private User preparationUser(long userId) {
+    public void preparationData(long userId, long eventId) {
         User user = new User();
         user.setId(userId);
-        return user;
-    }
-
-    private Event preparationEvent(User user) {
         Event event = new Event();
         event.setAttendees(List.of(user));
-        return event;
+
+        Mockito.when(eventRepository.getByIdOrThrow(eventId))
+                .thenReturn(event);
     }
 }
+

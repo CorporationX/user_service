@@ -13,7 +13,6 @@ public interface MentorshipService {
      *
      * @param mentorId айди ментора(User)
      * @param menteeId айди менти(User)
-     *
      */
     void addMentorship(long mentorId, long menteeId);
 

@@ -76,7 +76,7 @@ public class Event {
 
     @Column(name = "type")
     @Enumerated(EnumType.ORDINAL)
-    private EventType type;
+    private EventType eventType;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)

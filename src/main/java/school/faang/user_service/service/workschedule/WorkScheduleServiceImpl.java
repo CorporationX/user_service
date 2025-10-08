@@ -25,11 +25,11 @@ public class WorkScheduleServiceImpl implements WorkScheduleService {
     @Override
     public WorkScheduleDto addWorkSchedule(long userId, WorkScheduleDto workScheduleDto) {
         validateWorkSchedule(workScheduleDto);
-        validateUserAccess(userId, workScheduleDto.id());
 
         User user = userRepository.getByIdOrThrow(workScheduleDto.id());
 
         WorkSchedule workSchedule = workScheduleMapper.toWorkSchedule(workScheduleDto);
+        validateUserAccess(userId, workSchedule.getUser().getId());
         workSchedule.setUser(user);
         WorkSchedule savedWorkSchedule = workScheduleRepository.save(workSchedule);
 
@@ -38,11 +38,11 @@ public class WorkScheduleServiceImpl implements WorkScheduleService {
 
     public WorkScheduleDto updateWorkSchedule(long userId, long workScheduleId, WorkScheduleDto workScheduleDto) {
         validateWorkSchedule(workScheduleDto);
-        validateUserAccess(userId, workScheduleDto.id());
 
         WorkSchedule workSchedule = workScheduleRepository.getByIdOrThrow(workScheduleId);
 
         WorkSchedule newWorkSchedule = workScheduleMapper.toWorkSchedule(workScheduleDto);
+        validateUserAccess(userId, workSchedule.getUser().getId());
         newWorkSchedule.setUser(workSchedule.getUser());
         WorkSchedule updatedWorkSchedule = workScheduleRepository.save(newWorkSchedule);
 

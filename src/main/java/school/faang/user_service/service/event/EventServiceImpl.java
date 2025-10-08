@@ -40,6 +40,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new IllegalArgumentException("Пустое значение"));
         eventMapper.update(updateEventDto, event);
         return eventMapper.toEventDto(event);
+
     }
 
     @SuppressWarnings({"checkstyle:LineLength", "checkstyle:CommentsIndentation"})

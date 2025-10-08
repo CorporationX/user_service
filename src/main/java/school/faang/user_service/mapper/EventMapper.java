@@ -15,7 +15,4 @@ public interface EventMapper {
     EventDto toEventDto(Event event);
 
     void update(UpdateEventDto eventDto, @MappingTarget Event event);
-
-
-
 }

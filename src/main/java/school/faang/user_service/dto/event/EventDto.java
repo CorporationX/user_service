@@ -11,30 +11,30 @@ import java.time.LocalDateTime;
 @Component
 @Data
 public class EventDto {
-    @NotBlank @NotNull
+    @NotBlank
     private String title;
 
-    @NotBlank @NotNull
+    @NotBlank
     private String description;
 
-    @NotBlank @NotNull
+    @NotNull
     private LocalDateTime startDate;
 
-    @NotBlank @NotNull
+    @NotNull
     private LocalDateTime endDate;
 
-    @NotBlank @NotNull
-    private long ownerId;
+    @NotNull
+    private Long ownerId;
 
-    @NotBlank @NotNull
+    @NotNull
     private LocalDateTime createdAt;
 
-    @NotBlank @NotNull
+    @NotNull
     private LocalDateTime updatedAt;
 
-    @NotBlank @NotNull
+    @NotNull
     private EventType eventType;
 
-    @NotBlank @NotNull
+    @NotNull
     private EventStatus status;
 }

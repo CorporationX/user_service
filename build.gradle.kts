@@ -4,6 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
     kotlin("jvm")
+    jacoco
     checkstyle
 }
 
@@ -115,4 +116,61 @@ tasks.checkstyleTest {
     include("**/*.java")
 
     classpath = files()
+}
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(false)
+        csv.required.set(false)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
+}
+
+/* В случае, если понадобиться покрытие сервисных классов Тестами в 70% - раскомментировать
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            enabled = true
+            element = "CLASS"
+
+            excludes = listOf(
+                "**config**",
+                "**entity**",
+                "**dto**",
+                "**Application*",
+                "**exception*",
+                "**repository**",
+                "**controller**",
+                "**mapper**",
+                "**context**",
+                "**json**",
+                "**client**"
+            )
+
+            limit {
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = "0.7".toBigDecimal()
+
+            }
+        }
+    }
+}
+*/
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }

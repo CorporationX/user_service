@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationFilterDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
+import java.util.Objects;
+
 @Component
 public class ReceiverFilter implements RecommendationFilterStrategy {
 
@@ -14,7 +16,7 @@ public class ReceiverFilter implements RecommendationFilterStrategy {
 
     @Override
     public boolean matchesFilters(Recommendation recommendation, RecommendationFilterDto filters) {
-        return recommendation.getReceiver().getId().equals(filters.receiverId());
+        return Objects.equals(recommendation.getAuthor().getId(), filters.receiverId());
     }
 
 }

@@ -102,12 +102,17 @@ checkstyle {
     checkstyle.enableExternalDtdLoad.set(true)
 }
 
-checkstyle {
-    toolVersion = "10.17.0"
-    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-    enableExternalDtdLoad.set(true)
+tasks.checkstyleMain {
+    source = fileTree("${project.rootDir}/src/main/java")
+    include("**/*.java")
+    exclude("**/resources/**")
+
+    classpath = files()
 }
 
-tasks.withType<Checkstyle> {
-    ignoreFailures = true
+tasks.checkstyleTest {
+    source = fileTree("${project.rootDir}/src/test")
+    include("**/*.java")
+
+    classpath = files()
 }

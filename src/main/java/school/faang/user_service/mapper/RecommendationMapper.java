@@ -7,8 +7,8 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface RecommendationMapper {
@@ -23,7 +23,7 @@ public interface RecommendationMapper {
     @Named("mapSkillOffersToSkillIds")
     default List<Long> mapSkillOffersToSkillIds(List<SkillOffer> skillOffers) {
         if (skillOffers == null) {
-            return List.of();
+            return Collections.emptyList();
         }
         return skillOffers.stream()
                 .map(offer -> offer.getSkill().getId())

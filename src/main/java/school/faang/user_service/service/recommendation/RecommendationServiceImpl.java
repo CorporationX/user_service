@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,8 +54,6 @@ public class RecommendationServiceImpl implements RecommendationService {
     public RecommendationDto create(CreateRecommendationDto recommendationDto) {
         long authorId = userContext.getUserId();
         log.info("Creating recommendation from user {} to user {}", authorId, recommendationDto.receiverId());
-
-        validateCreateRecommendation(recommendationDto, authorId);
 
         if (authorId == recommendationDto.receiverId()) {
             throw new DataValidationException("User cannot write recommendation to themselves");
@@ -153,15 +150,6 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .toList();
     }
 
-    private void validateCreateRecommendation(CreateRecommendationDto dto, long authorId) {
-        if (dto.receiverId() == null) {
-            throw new DataValidationException("Receiver ID is required");
-        }
-        if (StringUtils.isBlank(dto.content())) {
-            throw new DataValidationException("Content cannot be empty");
-        }
-    }
-
     private void checkRecommendationCooldown(long authorId, long receiverId) {
         Optional<Recommendation> lastRecommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, receiverId);
@@ -172,7 +160,8 @@ public class RecommendationServiceImpl implements RecommendationService {
             
             if (LocalDateTime.now().isBefore(cooldownEnd)) {
                 throw new DataValidationException(
-                        String.format("Cannot create recommendation. Last recommendation was created less than %d months ago", 
+                        String.format(
+                                "Cannot create recommendation. Last recommendation was created less than %d months ago",
                                 recommendationCooldownMonths)
                 );
             }

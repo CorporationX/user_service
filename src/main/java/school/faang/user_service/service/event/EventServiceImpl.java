@@ -2,7 +2,6 @@ package school.faang.user_service.service.event;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.EventDto;
@@ -13,12 +12,12 @@ import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.user.UserRepository;
+
 import java.util.List;
 import java.util.stream.Stream;
 
-
 @Data
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @Service
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;

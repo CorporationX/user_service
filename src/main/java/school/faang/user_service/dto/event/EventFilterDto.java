@@ -1,7 +1,6 @@
 package school.faang.user_service.dto.event;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.event.EventType;
 
 

@@ -1,14 +1,12 @@
 package school.faang.user_service.mapper;
 
-import org.mapstruct.MappingTarget;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.EventDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.UpdateEventDto;
 import school.faang.user_service.entity.event.Event;
 
-@Component
-@Mapper
+@Mapper(componentModel = "spring")
 public interface EventMapper {
     Event toEvent(EventDto eventDto);
 

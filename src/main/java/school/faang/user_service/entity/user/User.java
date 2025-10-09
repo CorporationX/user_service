@@ -35,6 +35,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -100,13 +101,13 @@ public class User {
     private List<Event> ownedEvents;
 
     @ManyToMany(mappedBy = "mentors", cascade = CascadeType.ALL)
-    private List<User> mentees;
+    private List<User> mentees = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
-    private List<User> mentors;
+    private List<User> mentors = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver")
     private List<MentorshipRequest> receivedMentorshipRequests;

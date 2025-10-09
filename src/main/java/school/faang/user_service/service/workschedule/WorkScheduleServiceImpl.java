@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.workschedule.WorkScheduleDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.WorkSchedule;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.WorkScheduleMapper;
 import school.faang.user_service.repository.user.UserRepository;
@@ -24,7 +23,6 @@ public class WorkScheduleServiceImpl implements WorkScheduleService {
     @Override
     public WorkScheduleDto addWorkSchedule(long userId, WorkScheduleDto workScheduleDto) {
         log.info("Adding work schedule for user: {}", userId);
-        validateSchedule(workScheduleDto, userId);
         User user = userRepository.getByIdOrThrow(userId);
         WorkSchedule workSchedule = workScheduleMapper.toWorkSchedule(workScheduleDto);
         workSchedule.setUser(user);
@@ -36,15 +34,12 @@ public class WorkScheduleServiceImpl implements WorkScheduleService {
     @Override
     public WorkScheduleDto updateWorkSchedule(long userId, long workScheduleId, WorkScheduleDto workScheduleDto) {
         log.info("Updating work schedule {} for user: {}", workScheduleId, userId);
-        validateSchedule(workScheduleDto, userId);
-        WorkSchedule updatedWorkSchedule = workScheduleRepository.getByIdOrThrow(workScheduleId);
-        if (userId != updatedWorkSchedule.getUser().getId()) {
+        WorkSchedule workSchedule = workScheduleRepository.getByIdOrThrow(workScheduleId);
+        if (userId != workSchedule.getUser().getId()) {
             log.warn("User {} attempted to update another user's work schedule {}", userId, workScheduleId);
             throw new ForbiddenException("The user wants to update someone else's data.");
         }
-        WorkSchedule workSchedule = workScheduleMapper.toWorkSchedule(workScheduleDto);
-        workSchedule.setId(workScheduleId);
-        workSchedule.setUser(updatedWorkSchedule.getUser());
+        workScheduleMapper.updateWorkScheduleFromDto(workScheduleDto, workSchedule);
         workSchedule = workScheduleRepository.save(workSchedule);
         log.info("Work schedule updated with id: {}", workSchedule.getId());
         return workScheduleMapper.toWorkScheduleDto(workSchedule);
@@ -52,20 +47,8 @@ public class WorkScheduleServiceImpl implements WorkScheduleService {
 
     @Override
     public WorkScheduleDto getById(long workScheduleId) {
-        WorkSchedule workSchedule = workScheduleRepository.getByIdOrThrow(workScheduleId);
-        return workScheduleMapper.toWorkScheduleDto(workSchedule);
-    }
-
-    private void validateSchedule(WorkScheduleDto workScheduleDto, long userId) {
-        if (!isValidSchedule(workScheduleDto)) {
-            log.warn("Invalid work schedule times for user: {}", userId);
-            throw new DataValidationException("Expected: start < startLunch < endLunch < end");
-        }
-    }
-
-    private boolean isValidSchedule(WorkScheduleDto dto) {
-        return dto.startTime().isBefore(dto.startLunch())
-                && dto.startLunch().isBefore(dto.endLunch())
-                && dto.endLunch().isBefore(dto.endTime());
+        return workScheduleMapper.toWorkScheduleDto(
+                workScheduleRepository.getByIdOrThrow(workScheduleId)
+        );
     }
 }

@@ -199,7 +199,9 @@ public class CareerServiceImplTest {
         career.setDateTo(expectedCareerDto.to());
         career.setUser(user);
 
-        CareerDto result = careerMapper.toCareerDto(career);
+        Mockito.when(careerRepository.getByIdOrThrow(CAREER_ID)).thenReturn(career);
+
+        CareerDto result = careerService.getById(CAREER_ID);
 
         Mockito.verify(careerMapper).toCareerDto(career);
         assertEquals(expectedCareerDto, result);

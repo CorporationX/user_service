@@ -201,6 +201,7 @@ public class CareerServiceImplTest {
 
         CareerDto result = careerMapper.toCareerDto(career);
 
+        Mockito.verify(careerMapper).toCareerDto(career);
         assertEquals(expectedCareerDto, result);
     }
 }

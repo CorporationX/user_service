@@ -1,7 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
 import school.faang.user_service.dto.user.UserDto;
-
 import java.util.List;
 
 public interface MentorshipService {

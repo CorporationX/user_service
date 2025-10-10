@@ -3,26 +3,33 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MentorshipServiceImpl implements MentorshipService {
-    MentorshipRepository mentorshipRepository;
-    UserMapper userMapper;
+    private final MentorshipRepository mentorshipRepository;
+    private final UserMapper userMapper;
+    private final UserContext userContext;
 
     @Override
     public void addMentorship(long mentorId, long menteeId) {
-        validateUserIsNotSelfMentorOrMentee(mentorId, menteeId);
-        validateMentorshipExist(mentorId, menteeId);
+        ensureUserIsPartOfMentorship(userContext.getUserId(), mentorId, menteeId);
+        ensureUserIsNotSelfMentorOrMentee(mentorId, menteeId);
+
+        if (isMentorshipExist(mentorId, menteeId)) {
+            log.info("Такая связь уже существует");
+            return;
+        }
 
         User mentee = mentorshipRepository.getByIdOrThrow(menteeId);
         User mentor = mentorshipRepository.getByIdOrThrow(mentorId);
@@ -35,8 +42,13 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     @Override
     public void deleteMentorship(long menteeId, long mentorId) {
-        validateUserIsNotSelfMentorOrMentee(mentorId, menteeId);
-        validateMentorshipNotExist(mentorId, menteeId);
+        ensureUserIsPartOfMentorship(userContext.getUserId(), menteeId, mentorId);
+        ensureUserIsNotSelfMentorOrMentee(mentorId, menteeId);
+
+        if (!isMentorshipExist(mentorId, menteeId)) {
+            log.info("Такой связи нет");
+            return;
+        }
 
         User mentee = mentorshipRepository.getByIdOrThrow(menteeId);
         User mentor = mentorshipRepository.getByIdOrThrow(mentorId);
@@ -51,10 +63,6 @@ public class MentorshipServiceImpl implements MentorshipService {
     public List<UserDto> getMentees(long userId) {
         User mentor = mentorshipRepository.getByIdOrThrow(userId);
 
-        if (mentor.getMentees().isEmpty()) {
-            return new ArrayList<>();
-        }
-
         return mentor.getMentees().stream()
                 .map(userMapper::toUserDto)
                 .toList();
@@ -64,34 +72,26 @@ public class MentorshipServiceImpl implements MentorshipService {
     public List<UserDto> getMentors(long userId) {
         User mentee = mentorshipRepository.getByIdOrThrow(userId);
 
-        if (mentee.getMentees().isEmpty()) {
-            return new ArrayList<>();
-        }
-
         return mentee.getMentors().stream()
                 .map(userMapper::toUserDto)
                 .toList();
     }
 
-    private void validateMentorshipExist(long mentorId, long menteeId) {
-        if (mentorshipRepository.getByIdOrThrow(mentorId)
+    private boolean isMentorshipExist(long mentorId, long menteeId) {
+        return mentorshipRepository.getByIdOrThrow(mentorId)
                 .getMentees()
-                .contains(mentorshipRepository.getByIdOrThrow(menteeId))) {
-            throw new DataValidationException("Такая связь уже существует");
-        }
+                .contains(mentorshipRepository.getByIdOrThrow(menteeId));
     }
 
-    private void validateMentorshipNotExist(long mentorId, long menteeId) {
-        if (!mentorshipRepository.getByIdOrThrow(mentorId)
-                .getMentees()
-                .contains(mentorshipRepository.getByIdOrThrow(menteeId))) {
-            throw new DataValidationException("Такой связи нет");
-        }
-    }
-
-    private void validateUserIsNotSelfMentorOrMentee(long mentorId, long menteeId) {
+    private void ensureUserIsNotSelfMentorOrMentee(long mentorId, long menteeId) {
         if (mentorId == menteeId) {
-            throw new DataValidationException("Пользователь не может быть ментором/менти для самого себя");
+            throw new DataValidationException("Пользователь не может быть ментором/менти для самого себя...");
+        }
+    }
+
+    private void ensureUserIsPartOfMentorship(long userId, long mentorId, long menteeId) {
+        if (userId != mentorId && userId != menteeId) {
+            throw new ForbiddenException("Пользователь не является частью этой связи...");
         }
     }
 }

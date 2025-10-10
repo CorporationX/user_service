@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/mentorships")
 @RequiredArgsConstructor
 public class MentorshipController {
-    MentorshipService mentorshipService;
+    private final MentorshipService mentorshipService;
 
     @PostMapping("/add")
     public void addMentorship(

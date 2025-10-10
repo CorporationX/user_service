@@ -45,6 +45,7 @@ public class CareerServiceImplTest {
     private static final long CAREER_ID = 10L;
     private static final LocalDate VALID_FROM_DATE = LocalDate.now().minusDays(25);
     private static final LocalDate INVALID_FROM_DATE = LocalDate.now().plusDays(1);
+    private static final long INVALID_USER_ID = 2L;
     private final Career career = new Career();
     private final User user = new User();
     private final CareerDto expectedCareerDto = new CareerDto(CAREER_ID,
@@ -176,7 +177,6 @@ public class CareerServiceImplTest {
 
     @Test
     void testUpdateCareerInvalidUserId() {
-        long invalidUserId = 2L;
         User user = new User();
         user.setId(USER_ID);
         Career career = new Career();
@@ -186,18 +186,21 @@ public class CareerServiceImplTest {
                 "Test_company", "Test_position");
 
         Mockito.when(careerRepository.getByIdOrThrow(CAREER_ID)).thenReturn(career);
-        assertThrows(ForbiddenException.class, () -> careerService.updateCareer(invalidUserId, CAREER_ID, updateCareerDto),
+        assertThrows(ForbiddenException.class, () ->
+                        careerService.updateCareer(INVALID_USER_ID, CAREER_ID, updateCareerDto),
                 "ID mismatch: updating this career's details is not allowed for this user!");
     }
 
     @Test
     void testGetById() {
-        Career career = new Career();
-        career.setId(CAREER_ID);
-        CareerDto expectedDto = new CareerDto(CAREER_ID, null, null, null, null);
+        career.setPosition(expectedCareerDto.position());
+        career.setCompany(expectedCareerDto.company());
+        career.setDateFrom(expectedCareerDto.from());
+        career.setDateTo(expectedCareerDto.to());
+        career.setUser(user);
 
         CareerDto result = careerMapper.toCareerDto(career);
 
-        assertEquals(expectedDto, result);
+        assertEquals(expectedCareerDto, result);
     }
 }

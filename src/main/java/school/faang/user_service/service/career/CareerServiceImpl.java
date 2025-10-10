@@ -72,7 +72,7 @@ public class CareerServiceImpl implements CareerService {
     }
 
     private void validateString(String value, String paramName) {
-        if (StringUtils.isNotBlank(value)) {
+        if (StringUtils.isBlank(value)) {
             throw new DataValidationException(paramName + " should be present!");
         }
     }

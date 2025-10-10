@@ -47,9 +47,9 @@ public class CareerServiceImplTest {
     private static final LocalDate INVALID_FROM_DATE = LocalDate.now().plusDays(1);
     private final Career career = new Career();
     private final User user = new User();
-    private final CareerDto expectedCareerDto = new CareerDto(CAREER_ID
-            , VALID_FROM_DATE, LocalDate.now()
-            , "Test_company", "Test_position");
+    private final CareerDto expectedCareerDto = new CareerDto(CAREER_ID,
+            VALID_FROM_DATE, LocalDate.now(),
+            "Test_company", "Test_position");
 
     @BeforeEach
     void setUp() {
@@ -59,8 +59,8 @@ public class CareerServiceImplTest {
 
     @Test
     void testAddCareerSuccess() {
-        CreateCareerDto createCareerDto = new CreateCareerDto(VALID_FROM_DATE, LocalDate.now()
-                , "Test_company", "Test_position");
+        CreateCareerDto createCareerDto = new CreateCareerDto(VALID_FROM_DATE, LocalDate.now(),
+                "Test_company", "Test_position");
 
         career.setCompany(createCareerDto.company());
         career.setPosition(createCareerDto.position());
@@ -80,8 +80,8 @@ public class CareerServiceImplTest {
 
     @Test
     void testAddCareerCompanyIsBlank() {
-        CreateCareerDto companyIsBlankDto = new CreateCareerDto(VALID_FROM_DATE
-                , LocalDate.now(), "", "Test_position");
+        CreateCareerDto companyIsBlankDto = new CreateCareerDto(VALID_FROM_DATE,
+                LocalDate.now(), "", "Test_position");
 
         assertThrows(DataValidationException.class, () ->
                 careerService.addCareer(USER_ID, companyIsBlankDto), "company should be present!");
@@ -89,8 +89,8 @@ public class CareerServiceImplTest {
 
     @Test
     void testAddCareerPositionIsBlank() {
-        CreateCareerDto positionIsBlankDto = new CreateCareerDto(VALID_FROM_DATE
-                , LocalDate.now(), "Test_company", "");
+        CreateCareerDto positionIsBlankDto = new CreateCareerDto(VALID_FROM_DATE,
+                LocalDate.now(), "Test_company", "");
 
         assertThrows(DataValidationException.class, () ->
                 careerService.addCareer(USER_ID, positionIsBlankDto), "position should be present!");
@@ -98,8 +98,8 @@ public class CareerServiceImplTest {
 
     @Test
     void testAddCareerFromDateIsNull() {
-        CreateCareerDto fromDateIsNullDto = new CreateCareerDto(null, LocalDate.now()
-                , "Test_company", "Test_company");
+        CreateCareerDto fromDateIsNullDto = new CreateCareerDto(null, LocalDate.now(),
+                "Test_company", "Test_company");
 
         assertThrows(DataValidationException.class, () ->
                 careerService.addCareer(USER_ID, fromDateIsNullDto), "from date should be present!");
@@ -107,18 +107,18 @@ public class CareerServiceImplTest {
 
     @Test
     void testAddCareerInvalidFromDate() {
-        CreateCareerDto invalidFromDateDto = new CreateCareerDto(INVALID_FROM_DATE
-                , LocalDate.now(), "Test_company", "Test_position");
+        CreateCareerDto invalidFromDateDto = new CreateCareerDto(INVALID_FROM_DATE,
+                LocalDate.now(), "Test_company", "Test_position");
 
         assertThrows(DataValidationException.class, () ->
-                careerService.addCareer(USER_ID, invalidFromDateDto)
-                , "From date should not be later than today!");
+                        careerService.addCareer(USER_ID, invalidFromDateDto),
+                "From date should not be later than today!");
     }
 
     @Test
     void testUpdateCareerSuccess() {
-        UpdateCareerDto updateCareerDto = new UpdateCareerDto(VALID_FROM_DATE, LocalDate.now()
-                , "Test_company", "Test_position");
+        UpdateCareerDto updateCareerDto = new UpdateCareerDto(VALID_FROM_DATE, LocalDate.now(),
+                "Test_company", "Test_position");
 
         career.setPosition(updateCareerDto.position());
         career.setCompany(updateCareerDto.company());
@@ -136,40 +136,42 @@ public class CareerServiceImplTest {
 
     @Test
     void testUpdateCareerCompanyIsBlank() {
-        UpdateCareerDto companyIsBlankDto = new UpdateCareerDto(VALID_FROM_DATE
-                , LocalDate.now(), "", "Test_position");
+        UpdateCareerDto companyIsBlankDto = new UpdateCareerDto(VALID_FROM_DATE,
+                LocalDate.now(), "", "Test_position");
 
         assertThrows(DataValidationException.class, () ->
-                careerService.updateCareer(USER_ID, CAREER_ID, companyIsBlankDto)
-                , "company should be present!");
+                        careerService.updateCareer(USER_ID, CAREER_ID, companyIsBlankDto),
+                "company should be present!");
     }
 
     @Test
     void testUpdateCareerPositionIsBlank() {
-        UpdateCareerDto positionIsBlankDto = new UpdateCareerDto(VALID_FROM_DATE
-                , LocalDate.now(), "Test_company", "");
+        UpdateCareerDto positionIsBlankDto = new UpdateCareerDto(VALID_FROM_DATE,
+                LocalDate.now(), "Test_company", "");
 
         assertThrows(DataValidationException.class, () ->
-                careerService.updateCareer(USER_ID, CAREER_ID, positionIsBlankDto)
-                , "position should be present!");
+                        careerService.updateCareer(USER_ID, CAREER_ID, positionIsBlankDto),
+                "position should be present!");
     }
 
     @Test
     void testUpdateCareerFromDateIsNull() {
-        UpdateCareerDto fromDateIsNullDto = new UpdateCareerDto(null, LocalDate.now()
-                , "Test_company", "Test_company");
+        UpdateCareerDto fromDateIsNullDto = new UpdateCareerDto(null, LocalDate.now(),
+                "Test_company", "Test_company");
+
         assertThrows(DataValidationException.class, () ->
-                careerService.updateCareer(USER_ID, CAREER_ID, fromDateIsNullDto)
-                , "from date should be present!");
+                        careerService.updateCareer(USER_ID, CAREER_ID, fromDateIsNullDto),
+                "from date should be present!");
     }
 
     @Test
     void testUpdateCareerInvalidFromDate() {
-        UpdateCareerDto invalidFromDateDto = new UpdateCareerDto(INVALID_FROM_DATE
-                , LocalDate.now(), "Test_company", "Test_position");
+        UpdateCareerDto invalidFromDateDto = new UpdateCareerDto(INVALID_FROM_DATE,
+                LocalDate.now(), "Test_company", "Test_position");
+
         assertThrows(DataValidationException.class, () ->
-                careerService.updateCareer(USER_ID, CAREER_ID, invalidFromDateDto)
-                , "From date should not be later than today!");
+                        careerService.updateCareer(USER_ID, CAREER_ID, invalidFromDateDto),
+                "From date should not be later than today!");
     }
 
     @Test
@@ -180,12 +182,12 @@ public class CareerServiceImplTest {
         Career career = new Career();
         career.setUser(user);
         career.setId(CAREER_ID);
-        UpdateCareerDto updateCareerDto = new UpdateCareerDto(VALID_FROM_DATE, LocalDate.now()
-                , "Test_company", "Test_position");
+        UpdateCareerDto updateCareerDto = new UpdateCareerDto(VALID_FROM_DATE, LocalDate.now(),
+                "Test_company", "Test_position");
 
         Mockito.when(careerRepository.getByIdOrThrow(CAREER_ID)).thenReturn(career);
-        assertThrows(ForbiddenException.class, () -> careerService.updateCareer(invalidUserId, CAREER_ID, updateCareerDto)
-                , "ID mismatch: updating this career's details is not allowed for this user!");
+        assertThrows(ForbiddenException.class, () -> careerService.updateCareer(invalidUserId, CAREER_ID, updateCareerDto),
+                "ID mismatch: updating this career's details is not allowed for this user!");
     }
 
     @Test

@@ -1,7 +1,7 @@
 package school.faang.user_service.controller.subscription;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.CountResponse;
 import school.faang.user_service.dto.user.UserDto;
@@ -13,7 +13,7 @@ import school.faang.user_service.service.subscription.UserSubscriptionService;
 import java.util.List;
 import java.util.Objects;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class UserSubscriptionController {
     private final UserSubscriptionService userSubscriptionService;

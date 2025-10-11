@@ -53,34 +53,26 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
 
     @Override
     public List<UserDto> getFollowers(long followeeId, UserFiltersDto userFiltersDto) {
-        return applyFiltersAndMapToDto(followeeId, userFiltersDto, true);
+        Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);
+        return applyFiltersAndMapToDto(followers, userFiltersDto);
     }
 
     @Override
     public List<UserDto> getFollowees(long followerId, UserFiltersDto userFiltersDto) {
-        return applyFiltersAndMapToDto(followerId, userFiltersDto, false);
+        Stream<User> followees = subscriptionRepository.findByFollowerId(followerId);
+        return applyFiltersAndMapToDto(followees, userFiltersDto);
     }
 
-    private List<UserDto> applyFiltersAndMapToDto(long userId, UserFiltersDto userFiltersDto, boolean isFollowee) {
-        if (isFollowee) {
-            Stream<User> followeeUserStream = subscriptionRepository.findByFolloweeId(userId);
-            return filterUserStreamAndGetUsersDtoList(followeeUserStream, userFiltersDto);
-        } else {
-            Stream<User> followerUserStream = subscriptionRepository.findByFollowerId(userId);
-            return filterUserStreamAndGetUsersDtoList(followerUserStream, userFiltersDto);
-        }
-    }
+    private List<UserDto> applyFiltersAndMapToDto(Stream<User> userStream, UserFiltersDto userFiltersDto) {
+        String namePattern = userFiltersDto.namePattern().toLowerCase();
+        String phonePattern = userFiltersDto.phoneNumber();
+        int experienceMin = userFiltersDto.experienceMin();
+        int experienceMax = userFiltersDto.experienceMax();
 
-    private List<UserDto> filterUserStreamAndGetUsersDtoList(Stream<User> userStream, UserFiltersDto userFiltersDto) {
-        String filtersName = userFiltersDto.namePattern().toLowerCase();
-        String filtersPhoneNumber = userFiltersDto.phoneNumber();
-        int filtersExperienceMin = userFiltersDto.experienceMin();
-        int filtersExperienceMax = userFiltersDto.experienceMax();
-
-        return userStream.filter(user -> user.getUsername().toLowerCase().contains(filtersName))
-                .filter(user -> user.getPhone().contains(filtersPhoneNumber))
-                .filter(user -> user.getExperience() >= filtersExperienceMin
-                        && user.getExperience() <= filtersExperienceMax)
+        return userStream.filter(user -> user.getUsername().toLowerCase().contains(namePattern))
+                .filter(user -> user.getPhone().contains(phonePattern))
+                .filter(user -> user.getExperience() >= experienceMin
+                        && user.getExperience() <= experienceMax)
                 .map(userMapper::toUserDto)
                 .toList();
     }

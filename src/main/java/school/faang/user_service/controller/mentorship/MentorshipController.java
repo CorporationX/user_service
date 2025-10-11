@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
@@ -19,12 +22,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipController {
     private final MentorshipService mentorshipService;
+    private final UserContext userContext;
 
-    @PostMapping("/add")
+    @PostMapping
     public void addMentorship(
             @RequestParam @Min(1) long mentorId,
             @RequestParam @Min(1) long menteeId
     ) {
+        ensureUserIsPartOfMentorship(userContext.getUserId(), mentorId, menteeId);
+        ensureUserIsNotSelfMentorOrMentee(mentorId, menteeId);
+
         mentorshipService.addMentorship(mentorId, menteeId);
     }
 
@@ -38,11 +45,26 @@ public class MentorshipController {
         return mentorshipService.getMentors(menteeId);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public void deleteMentorship(
             @RequestParam @Min(1) long menteeId,
             @RequestParam @Min(1) long mentorId
     ) {
+        ensureUserIsPartOfMentorship(userContext.getUserId(), mentorId, menteeId);
+        ensureUserIsNotSelfMentorOrMentee(mentorId, menteeId);
+
         mentorshipService.deleteMentorship(menteeId, mentorId);
+    }
+
+    private void ensureUserIsPartOfMentorship(long userId, long mentorId, long menteeId) {
+        if (userId != mentorId && userId != menteeId) {
+            throw new ForbiddenException("Пользователь не является частью этой связи...");
+        }
+    }
+
+    private void ensureUserIsNotSelfMentorOrMentee(long mentorId, long menteeId) {
+        if (mentorId == menteeId) {
+            throw new DataValidationException("Пользователь не может быть ментором/менти для самого себя...");
+        }
     }
 }

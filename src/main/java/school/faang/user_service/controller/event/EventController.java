@@ -2,13 +2,10 @@ package school.faang.user_service.controller.event;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.UpdateEventDto;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
@@ -17,19 +14,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-    private final EventMapper eventMapper;
 
-    public EventDto create(@RequestBody @Valid EventDto eventDto) {
-        Event savedEvent = eventService.create(eventDto);
-        return eventMapper.toEventDto(savedEvent);
+    public EventDto create(@Valid EventDto eventDto) {
+        return eventService.create(eventDto);
     }
 
-    public EventDto update(long eventId, UpdateEventDto newEventDto) {
+    public EventDto update(long eventId, @Valid  UpdateEventDto newEventDto) {
         return eventService.update(eventId, newEventDto);
     }
 
-    public List<EventDto> getByFilters(EventFilterDto filters) {
-        return eventService.getByFilters(filters); // не понял как реализовать логику фильтрации
+    public List<EventDto> getByFilters(@Valid EventFilterDto filters) {
+        return eventService.getByFilters(filters);
     }
 
     public void delete(long eventId) {

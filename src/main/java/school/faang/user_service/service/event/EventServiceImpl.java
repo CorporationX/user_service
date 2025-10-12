@@ -28,11 +28,10 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public Event create(EventDto eventDto) {
+    public EventDto create(EventDto eventDto) {
         Event event = eventMapper.toEvent(eventDto);
-        return eventRepository.save(event);
+        return eventMapper.toEventDto(event);
     }
-
 
     @Override
     public EventDto update(long eventId, UpdateEventDto updateEventDto) {

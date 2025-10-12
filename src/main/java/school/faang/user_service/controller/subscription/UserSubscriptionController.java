@@ -69,11 +69,22 @@ public class UserSubscriptionController {
 
     private void ensureUserFiltersDtoValid(UserFiltersDto userFiltersDto) {
         Objects.requireNonNull(userFiltersDto, "user filters cannot be null");
-        if (userFiltersDto.namePattern() == null || userFiltersDto.namePattern().isBlank()) {
+        String namePattern = userFiltersDto.namePattern();
+        String phoneNumber = userFiltersDto.phoneNumber();
+        int experienceMin = userFiltersDto.experienceMin();
+        int experienceMax = userFiltersDto.experienceMax();
+
+        if (namePattern == null || namePattern.isBlank()) {
             throw new DataValidationException("user filters must include full name pattern");
         }
-        if (userFiltersDto.phoneNumber() == null || userFiltersDto.phoneNumber().isBlank()) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
             throw new DataValidationException("user filters must include full phone number");
+        }
+        if (experienceMin < 0 || experienceMax < 0) {
+            throw new DataValidationException("experience min or experience max cannot be less than zero");
+        }
+        if (experienceMin > experienceMax) {
+            throw new DataValidationException("experience min cannot be greater than experience max");
         }
     }
 }

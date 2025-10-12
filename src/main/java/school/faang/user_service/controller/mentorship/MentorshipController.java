@@ -2,6 +2,7 @@ package school.faang.user_service.controller.mentorship;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/mentorships")
 @RequiredArgsConstructor
 public class MentorshipController {

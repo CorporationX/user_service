@@ -1,4 +1,4 @@
-package school.faang.user_service.service.validator;
+package school.faang.user_service.service.workschedule.validator;
 
 import school.faang.user_service.dto.workschedule.WorkScheduleCreateDto;
 import school.faang.user_service.dto.workschedule.WorkScheduleDto;

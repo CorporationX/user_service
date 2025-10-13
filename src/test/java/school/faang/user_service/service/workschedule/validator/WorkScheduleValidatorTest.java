@@ -1,8 +1,8 @@
-package school.faang.user_service.service.validator;
+package school.faang.user_service.service.workschedule.validator;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.workschedule.WorkScheduleCreateDto;
 import school.faang.user_service.dto.workschedule.WorkScheduleDto;
 import school.faang.user_service.entity.user.WorkSchedule;

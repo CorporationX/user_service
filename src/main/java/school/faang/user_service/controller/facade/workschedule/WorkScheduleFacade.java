@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.facade;
+package school.faang.user_service.controller.facade.workschedule;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

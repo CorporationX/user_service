@@ -12,7 +12,7 @@ import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.WorkScheduleMapper;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.repository.user.WorkScheduleRepository;
-import school.faang.user_service.service.validator.WorkScheduleValidator;
+import school.faang.user_service.service.workschedule.validator.WorkScheduleValidator;
 
 import java.util.Objects;
 

@@ -2,8 +2,6 @@ package school.faang.user_service.controller.workschedule;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
-import org.hibernate.validator.HibernateValidator;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.controller.facade.WorkScheduleFacade;
-import school.faang.user_service.dto.workschedule.WorkScheduleUpdateDto;
 import school.faang.user_service.dto.workschedule.WorkScheduleCreateDto;
 import school.faang.user_service.dto.workschedule.WorkScheduleDto;
+import school.faang.user_service.dto.workschedule.WorkScheduleUpdateDto;
 
 @RequiredArgsConstructor
 @RequestMapping("/work-schedules")

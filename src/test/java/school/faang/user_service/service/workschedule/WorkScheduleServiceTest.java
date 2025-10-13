@@ -127,7 +127,7 @@ public class WorkScheduleServiceTest {
     }
 
     @Test
-    public void updateWorkSchedule_shouldThrow_WhenTryToUseOthersWorkSchedule() {
+    public void updateWorkSchedule_shouldThrowWhenTryToUseOthersWorkSchedule() {
         long userId = 1L;
         long workScheduleId = 1L;
         User user = new User();

@@ -40,12 +40,12 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public GoalDto create(CreateGoalDto createGoalDto) {
         log.info("Try to create a new goal in the Service");
-        long currentUserId = userContext.getUserId();
         Goal goal = goalMapper.toGoal(createGoalDto);
         goal.setUsers(new ArrayList<>());
         for (Long userId : createGoalDto.userIds()) {
             goal.getUsers().add(userRepository.getByIdOrThrow(userId));
         }
+        long currentUserId = userContext.getUserId();
         log.info("Check conditions to create");
         if (createGoalDto.mentorId() != null) {
             log.info("The person who is trying to create the goal is Mentor");

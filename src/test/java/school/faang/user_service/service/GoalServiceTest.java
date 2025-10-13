@@ -60,19 +60,19 @@ class GoalServiceTest {
 
     @Test
     public void testCreationByMentorAndActiveGoalLimitNotExceeded() {
-        CreateGoalDto createGoalDto = new CreateGoalDto(
+        final CreateGoalDto createGoalDto = new CreateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 1L,
                 List.of(2L, 3L));
-        User mentor = new User();
-        mentor.setId(createGoalDto.mentorId());
-        User menteeFirst = new User();
-        menteeFirst.setId(createGoalDto.userIds().get(0));
+        final User mentor = new User();
+        mentor.setId(1L);
+        final User menteeFirst = new User();
+        menteeFirst.setId(2L);
         menteeFirst.setGoals(List.of(new Goal()));
-        User menteeSecond = new User();
-        menteeSecond.setId(createGoalDto.userIds().get(1));
+        final User menteeSecond = new User();
+        menteeSecond.setId(3L);
         menteeSecond.setGoals(List.of(new Goal()));
         ReflectionTestUtils.setField(goalService, "activeGoals", 2);
         when(userContext.getUserId()).thenReturn(mentor.getId());
@@ -120,19 +120,19 @@ class GoalServiceTest {
 
     @Test
     public void testCreationByMentorAndActiveGoalLimitExceeded() {
-        CreateGoalDto createGoalDto = new CreateGoalDto(
+        final CreateGoalDto createGoalDto = new CreateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 1L,
                 List.of(2L, 3L));
-        User mentor = new User();
-        mentor.setId(createGoalDto.mentorId());
-        User menteeFirst = new User();
-        menteeFirst.setId(createGoalDto.userIds().get(0));
+        final User mentor = new User();
+        mentor.setId(1L);
+        final User menteeFirst = new User();
+        menteeFirst.setId(2L);
         menteeFirst.setGoals(List.of(new Goal()));
-        User menteeSecond = new User();
-        menteeSecond.setId(createGoalDto.userIds().get(1));
+        final User menteeSecond = new User();
+        menteeSecond.setId(3L);
         menteeSecond.setGoals(List.of(new Goal(), new Goal()));
         ReflectionTestUtils.setField(goalService, "activeGoals", 2);
         when(userContext.getUserId()).thenReturn(mentor.getId());
@@ -168,13 +168,13 @@ class GoalServiceTest {
 
     @Test
     public void testCreationByYourselfAndActiveGoalLimitNotExceeded() {
-        CreateGoalDto createGoalDto = new CreateGoalDto(
+        final CreateGoalDto createGoalDto = new CreateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 null,
                 List.of(1L));
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(1L);
         currentUser.setGoals(List.of(new Goal()));
         ReflectionTestUtils.setField(goalService, "activeGoals", 2);
@@ -201,13 +201,13 @@ class GoalServiceTest {
 
     @Test
     public void testCreationByYourselfAndActiveGoalLimitExceeded() {
-        CreateGoalDto createGoalDto = new CreateGoalDto(
+        final CreateGoalDto createGoalDto = new CreateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 null,
                 List.of(1L));
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(1L);
         currentUser.setGoals(List.of(new Goal(), new Goal()));
         ReflectionTestUtils.setField(goalService, "activeGoals", 2);
@@ -221,13 +221,13 @@ class GoalServiceTest {
 
     @Test
     public void testCreationByUnknownUser() {
-        CreateGoalDto createGoalDto = new CreateGoalDto(
+        final CreateGoalDto createGoalDto = new CreateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 null,
                 List.of(2L));
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(1L);
         when(userContext.getUserId()).thenReturn(currentUser.getId());
 
@@ -238,14 +238,14 @@ class GoalServiceTest {
 
     @Test
     public void testUpdateCompletedGoal() {
-        long goalId = 1L;
-        UpdateGoalDto updateGoalDto = new UpdateGoalDto(
+        final long goalId = 1L;
+        final UpdateGoalDto updateGoalDto = new UpdateGoalDto(
                 "New title",
                 "New description",
                 null,
                 null,
                 GoalStatus.COMPLETED);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -259,18 +259,18 @@ class GoalServiceTest {
 
     @Test
     public void testUpdateCompleteGoalByNonMentor() {
-        long goalId = 1L;
-        UpdateGoalDto updateGoalDto = new UpdateGoalDto(
+        final long goalId = 1L;
+        final UpdateGoalDto updateGoalDto = new UpdateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 null,
                 GoalStatus.COMPLETED);
-        User mentor = new User();
+        final User mentor = new User();
         mentor.setId(5L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -286,18 +286,18 @@ class GoalServiceTest {
 
     @Test
     public void testUpdateByUnknownUser() {
-        long goalId = 1L;
-        UpdateGoalDto updateGoalDto = new UpdateGoalDto(
+        final long goalId = 1L;
+        final UpdateGoalDto updateGoalDto = new UpdateGoalDto(
                 "New title",
                 "New description",
                 null,
                 null,
                 GoalStatus.ACTIVE);
-        User user = new User();
+        final User user = new User();
         user.setId(5L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -322,20 +322,20 @@ class GoalServiceTest {
 
     @Test
     public void testUpdateByAnotherMentor() {
-        long goalId = 1L;
-        UpdateGoalDto updateGoalDto = new UpdateGoalDto(
+        final long goalId = 1L;
+        final UpdateGoalDto updateGoalDto = new UpdateGoalDto(
                 "New title",
                 "New description",
                 null,
                 3L,
                 GoalStatus.ACTIVE);
-        User mentor = new User();
+        final User mentor = new User();
         mentor.setId(5L);
-        User mentee = new User();
+        final User mentee = new User();
         mentee.setId(9L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -361,20 +361,20 @@ class GoalServiceTest {
 
     @Test
     public void testUpdateSuccessfullyByMentor() {
-        long goalId = 1L;
-        UpdateGoalDto updateGoalDto = new UpdateGoalDto(
+        final long goalId = 1L;
+        final UpdateGoalDto updateGoalDto = new UpdateGoalDto(
                 "Some title",
                 "Some description",
                 null,
                 3L,
                 GoalStatus.COMPLETED);
-        User mentor = new User();
+        final User mentor = new User();
         mentor.setId(3L);
-        User mentee = new User();
+        final User mentee = new User();
         mentee.setId(5L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -414,18 +414,18 @@ class GoalServiceTest {
 
     @Test
     public void testUpdateSuccessfullyByUser() {
-        long goalId = 1L;
-        UpdateGoalDto updateGoalDto = new UpdateGoalDto(
+        final long goalId = 1L;
+        final UpdateGoalDto updateGoalDto = new UpdateGoalDto(
                 "New title",
                 "New description",
                 null,
                 null,
                 GoalStatus.ACTIVE);
-        User user = new User();
+        final User user = new User();
         user.setId(3L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -464,12 +464,12 @@ class GoalServiceTest {
 
     @Test
     public void testDeleteByUnknownUser() {
-        long goalId = 1L;
-        User currentUser = new User();
+        final long goalId = 1L;
+        final User currentUser = new User();
         currentUser.setId(3L);
-        User user = new User();
+        final User user = new User();
         user.setId(5L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -493,14 +493,14 @@ class GoalServiceTest {
 
     @Test
     public void testDeleteByAnotherMentor() {
-        long goalId = 1L;
-        User mentor = new User();
+        final long goalId = 1L;
+        final User mentor = new User();
         mentor.setId(5L);
-        User mentee = new User();
+        final User mentee = new User();
         mentee.setId(9L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -525,14 +525,14 @@ class GoalServiceTest {
 
     @Test
     public void testDeleteByMentor() {
-        long goalId = 1L;
-        User mentor = new User();
+        final long goalId = 1L;
+        final User mentor = new User();
         mentor.setId(3L);
-        User mentee = new User();
+        final User mentee = new User();
         mentee.setId(9L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
@@ -558,21 +558,19 @@ class GoalServiceTest {
 
     @Test
     public void testDeleteByUser() {
-        long goalId = 1L;
-        User userFirst = new User();
+        final long goalId = 1L;
+        final User userFirst = new User();
         userFirst.setId(3L);
-        User userSecond = new User();
+        final User userSecond = new User();
         userSecond.setId(9L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
-        currentGoal.setUsers(new ArrayList<>());
-        currentGoal.getUsers().add(userFirst);
-        currentGoal.getUsers().add(userSecond);
-        Goal expectedGoal = new Goal();
+        currentGoal.setUsers(new ArrayList<>(List.of(userFirst, userSecond)));
+        final Goal expectedGoal = new Goal();
         expectedGoal.setId(goalId);
         expectedGoal.setTitle("Some title");
         expectedGoal.setDescription("Some description");
@@ -598,17 +596,16 @@ class GoalServiceTest {
 
     @Test
     public void testDeleteByLastUser() {
-        long goalId = 1L;
-        User user = new User();
+        final long goalId = 1L;
+        final User user = new User();
         user.setId(3L);
-        User currentUser = new User();
+        final User currentUser = new User();
         currentUser.setId(3L);
-        Goal currentGoal = new Goal();
+        final Goal currentGoal = new Goal();
         currentGoal.setId(goalId);
         currentGoal.setTitle("Some title");
         currentGoal.setDescription("Some description");
-        currentGoal.setUsers(new ArrayList<>());
-        currentGoal.getUsers().add(user);
+        currentGoal.setUsers(new ArrayList<>(List.of(user)));
         when(goalRepository.getByIdOrThrow(goalId)).thenReturn(currentGoal);
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(userRepository.getByIdOrThrow(any(Long.class)))
@@ -635,61 +632,54 @@ class GoalServiceTest {
                 new GoalStatusFilter(),
                 new GoalMentorIdFilter());
         ReflectionTestUtils.setField(goalService, "goalFilters", goalFilters);
-        GoalFilterDto goalFilterDto = new GoalFilterDto(
+        final GoalFilterDto goalFilterDto = new GoalFilterDto(
                 "Improve",
                 "Java",
                 GoalStatus.ACTIVE,
                 3L);
-        User firstMentor = new User();
+        final User firstMentor = new User();
         firstMentor.setId(3L);
-        User secondMentor = new User();
+        final User secondMentor = new User();
         secondMentor.setId(5L);
-        Goal firstGoal = new Goal();
+        final Goal firstGoal = new Goal();
         firstGoal.setTitle("Improve skills");
         firstGoal.setDescription("You need improve skills in Java Core");
         firstGoal.setStatus(GoalStatus.COMPLETED);
         firstGoal.setMentor(firstMentor);
         firstGoal.setUsers(List.of(new User()));
         firstGoal.setSkillsToAchieve(List.of(new Skill()));
-        Goal secondGoal = new Goal();
+        final Goal secondGoal = new Goal();
         secondGoal.setTitle("Improve skills");
         secondGoal.setDescription("You need improve skills in Java MultiThreading");
         secondGoal.setStatus(GoalStatus.ACTIVE);
         secondGoal.setMentor(firstMentor);
         secondGoal.setUsers(List.of(new User()));
         secondGoal.setSkillsToAchieve(List.of(new Skill()));
-        Goal thirdGoal = new Goal();
+        final Goal thirdGoal = new Goal();
         thirdGoal.setTitle("Improve coding");
         thirdGoal.setDescription("You should start with Java Core");
         thirdGoal.setStatus(GoalStatus.ACTIVE);
         thirdGoal.setMentor(secondMentor);
         thirdGoal.setUsers(List.of(new User()));
         thirdGoal.setSkillsToAchieve(List.of(new Skill()));
-        Goal forthGoal = new Goal();
+        final Goal forthGoal = new Goal();
         forthGoal.setTitle("Start Streams");
         forthGoal.setDescription("Streams are required in Java");
         forthGoal.setStatus(GoalStatus.ACTIVE);
         forthGoal.setMentor(firstMentor);
         forthGoal.setUsers(List.of(new User()));
         forthGoal.setSkillsToAchieve(List.of(new Skill()));
-        Goal fifthGoal = new Goal();
+        final Goal fifthGoal = new Goal();
         fifthGoal.setTitle("Improve codestyle");
         fifthGoal.setDescription("You should learn codestyle tips");
         fifthGoal.setStatus(GoalStatus.ACTIVE);
         fifthGoal.setMentor(firstMentor);
         fifthGoal.setUsers(List.of(new User()));
         fifthGoal.setSkillsToAchieve(List.of(new Skill()));
-        GoalDto expectedResult = goalMapper.toGoalDto(secondGoal);
+        final GoalDto expectedResult = goalMapper.toGoalDto(secondGoal);
         when(goalRepository.findAll())
-                .thenAnswer(invocation -> {
-                    List<Goal> goals = new ArrayList<>();
-                    goals.add(firstGoal);
-                    goals.add(secondGoal);
-                    goals.add(thirdGoal);
-                    goals.add(forthGoal);
-                    goals.add(fifthGoal);
-                    return goals;
-                });
+                .thenAnswer(invocation ->
+                        new ArrayList<>(List.of(firstGoal, secondGoal, thirdGoal, forthGoal, fifthGoal)));
 
         List<GoalDto> goalDtos = goalService.getByFilters(goalFilterDto);
 

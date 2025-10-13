@@ -96,7 +96,7 @@ public class UserSubscriptionControllerTest {
     }
 
     @Test
-    void getFollowersCountShouldReturnCountOfFollowers() {
+    void getFollowersCountShouldReturnCountOfFollowersFromService() {
         long followeeId = 1L;
 
         when(subscriptionService.getFollowersCount(followeeId))
@@ -116,7 +116,7 @@ public class UserSubscriptionControllerTest {
     }
 
     @Test
-    void getFolloweesCountShouldReturnCountOfFollowees() {
+    void getFolloweesCountShouldReturnCountOfFolloweesFromService() {
         long followerId = 1L;
 
         when(subscriptionService.getFolloweesCount(followerId))
@@ -128,7 +128,7 @@ public class UserSubscriptionControllerTest {
     }
 
     @Test
-    void getFolloweesCountShouldThrowWhenFollowerIdNotValid() {
+    void getFolloweesCountShouldThrowWhenFollowerIdInvalid() {
         long invalidFollowerId = -1L;
 
         assertThrows(DataValidationException.class, () ->
@@ -136,7 +136,7 @@ public class UserSubscriptionControllerTest {
     }
 
     @Test
-    void getFollowersShouldReturnFilteredAndMappedFollowers() {
+    void getFollowersShouldReturnFilteredAndMappedFollowersFromService() {
         long followeeId = 1L;
         UserFiltersDto userFiltersDto = new UserFiltersDto(
                 "John", "123777000", 15, 30);
@@ -177,22 +177,23 @@ public class UserSubscriptionControllerTest {
     }
 
     @Test
-    void getFolloweesShouldCallServiceAndReturnUserDtoList() {
+    void getFolloweesShouldReturnFilteredAndMappedFolloweesFromService() {
         long followerId = 1L;
         UserFiltersDto userFiltersDto = new UserFiltersDto(
                 "Cyntia", "336699", 30, 45);
 
-        UserDto firstFollower = new UserDto(2L, "CyntiaJJJ", null, "783366991", null);
-        UserDto secondFollower = new UserDto(3L, "cyntiaaa", null, "331211113", null);
-        UserDto thirdFollower = new UserDto(4L, "CyNtIa54", null, "2333669932", null);
+        UserDto firstFollowee = new UserDto(2L, "CyntiaJJJ", null, "783366991", null);
+        UserDto secondFollowee = new UserDto(3L, "cyntiaaa", null, "331211113", null);
+        UserDto thirdFollowee = new UserDto(4L, "CyNtIa54", null, "2333669932", null);
 
-        List<UserDto> exceptedFollowees = List.of(firstFollower, thirdFollower);
+        List<UserDto> exceptedFollowees = List.of(firstFollowee, thirdFollowee);
 
         when(subscriptionService.getFollowees(followerId, userFiltersDto))
                 .thenReturn(exceptedFollowees);
 
         List<UserDto> actualFollowees = subscriptionController.getFollowees(followerId, userFiltersDto);
 
+        verify(subscriptionService).getFollowees(followerId, userFiltersDto);
         assertEquals(exceptedFollowees, actualFollowees);
     }
 

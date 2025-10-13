@@ -79,7 +79,7 @@ public class UserSubscriptionServiceImplTest {
     }
 
     @Test
-    void getFollowersCountShouldReturnCountOfFollowers() {
+    void getFollowersCountShouldReturnCountOfFollowersFromRepository() {
         long followeeId = 1L;
 
         when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId))
@@ -104,24 +104,24 @@ public class UserSubscriptionServiceImplTest {
 
     @Test
     void getFollowersShouldReturnFilteredAndMappedFollowers() {
-        long followeeId = 1L;
+        long followeeId = 203L;
         UserFiltersDto userFiltersDto = new UserFiltersDto(
                 "Cillian", "124555999", 40, 70);
 
         User firstFollower = User.builder()
-                .id(2L)
+                .id(674L)
                 .username("Johnnny112")
                 .phone("12434343999")
                 .experience(55)
                 .build();
         User secondFollower = User.builder()
-                .id(3L)
+                .id(596L)
                 .username("cILLIan77")
                 .phone("2287731124555999")
                 .experience(65)
                 .build();
         User thirdFollower = User.builder()
-                .id(4L)
+                .id(395L)
                 .username("mr.Cillian007")
                 .phone("4761245559998127")
                 .experience(57)
@@ -153,13 +153,13 @@ public class UserSubscriptionServiceImplTest {
                 .experience(55)
                 .build();
         User secondFollowee = User.builder()
-                .id(2L)
+                .id(3L)
                 .username("helen")
                 .phone("78910020030065")
                 .experience(50)
                 .build();
         User thirdFollowee = User.builder()
-                .id(3L)
+                .id(4L)
                 .username("helen11")
                 .phone("121343656")
                 .experience(65)

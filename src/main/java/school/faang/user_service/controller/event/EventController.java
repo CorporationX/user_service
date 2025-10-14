@@ -19,7 +19,7 @@ public class EventController {
         return eventService.create(eventDto);
     }
 
-    public EventDto update(long eventId, @Valid  UpdateEventDto newEventDto) {
+    public EventDto update(long eventId, @Valid UpdateEventDto newEventDto) {
         return eventService.update(eventId, newEventDto);
     }
 

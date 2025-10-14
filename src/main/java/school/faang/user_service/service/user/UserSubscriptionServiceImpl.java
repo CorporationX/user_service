@@ -89,7 +89,9 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
 
     private List<UserDto> processUserStream(Stream<User> users, UserFiltersDto filters) {
         for (UserFilter filter : userFilters) {
-            users = filter.apply(users, filters);
+            if (filter.isApplicable(filters)) {
+                users = filter.apply(users, filters);
+            }
         }
         return users.map(userMapper::toUserDto).toList();
     }

@@ -225,7 +225,7 @@ class UserSubscriptionServiceImplTest {
     }
 
     @Test
-    public void testGetFollowersWithFilters_GetAll_WithoutPhoneFilter() {
+    public void testGetFollowersWithoutPhoneFilter_GetAll() {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
                 userNameFilter, userExperienceFilter));
 
@@ -376,7 +376,7 @@ class UserSubscriptionServiceImplTest {
     }
 
     @Test
-    public void testGetFolloweesWithFilters_GetAll_WithoutPhoneFilter() {
+    public void testGetFolloweesWithoutPhoneFilter_GetAll() {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
                 userNameFilter, userExperienceFilter));
 

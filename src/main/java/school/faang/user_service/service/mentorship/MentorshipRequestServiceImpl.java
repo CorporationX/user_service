@@ -12,23 +12,27 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.user.MentorshipRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
+    private static final int MIN_MONTHS_BETWEEN = 3;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final UserContext userContext;
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
 
-    private static final int MONTHS_BETWEEN = 3;
 
     public MentorshipRequestDto create(CreateMentorshipRequestDto requestDto) {
         validateMentorshipRequest(requestDto);
@@ -41,16 +45,23 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         return mentorshipRequestMapper.toMentorshipRequestDto(mentorshipRequestRepository.save(mentorshipRequest));
     }
 
-    public List<MentorshipRequestDto> getByFilters(MentorshipRequestFilterDto filter) {
-        long requesterId = filter.requesterId();
-        long receiverId = filter.receiverId();
-        RequestStatus status = filter.status();
+    public MentorshipRequestDto toMentorshipRequestDto(long requestId) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new DataValidationException("Request not found"));
 
-        return mentorshipRequestRepository.findAll().stream()
-                .filter(user ->
-                        receiverId == user.getId() && requesterId == user.getId() && status == user.getStatus()
-                        || receiverId == user.getId() && status == user.getStatus()
-                        || requesterId == user.getId() && status == user.getStatus())
+        return mentorshipRequestMapper.toMentorshipRequestDto(request);
+    }
+
+    public List<MentorshipRequestDto> getByFilters(MentorshipRequestFilterDto filter) {
+        Stream<MentorshipRequest> allMentorshipRequests = mentorshipRequestRepository.findAll().stream();
+
+        for (MentorshipRequestFilter mentorshipRequestFilter : mentorshipRequestFilters) {
+            if (mentorshipRequestFilter.isApplicable(filter)) {
+                allMentorshipRequests = mentorshipRequestFilter.apply(allMentorshipRequests, filter);
+            }
+        }
+
+        return allMentorshipRequests
                 .map(mentorshipRequestMapper::toMentorshipRequestDto)
                 .toList();
     }
@@ -92,7 +103,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
             LocalDateTime now = LocalDateTime.now();
             long monthsBetween = ChronoUnit.MONTHS.between(latestRequest.getCreatedAt(), now);
 
-            if (monthsBetween < MONTHS_BETWEEN) {
+            if (monthsBetween < MIN_MONTHS_BETWEEN) {
                 throw new DataValidationException("Сan send request only every three months");
             }
 
@@ -108,7 +119,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new DataValidationException("Request not found"));
 
-        if (!request.getReceiver().getId().equals(currentUserId)) {
+        if (!Objects.equals(request.getReceiver().getId(), currentUserId)) {
             throw new ForbiddenException("Only receiver of the request can accept it.");
         }
     }

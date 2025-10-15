@@ -27,6 +27,14 @@ public interface MentorshipRequestService {
     MentorshipRequestDto create(CreateMentorshipRequestDto requestDto);
 
     /**
+     * Возвращает запрос на менторство по его идентификатору.
+     *
+     * @param requestId идентификатор запроса
+     * @return объект запроса в виде DTO
+     */
+    MentorshipRequestDto toMentorshipRequestDto(long requestId);
+
+    /**
      * Возвращает список запросов на менторство,
      * соответствующих фильтрам по ID юзера, ID ментора и по статусу запроса.
      *

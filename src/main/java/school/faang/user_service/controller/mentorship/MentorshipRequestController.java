@@ -20,7 +20,7 @@ public class MentorshipRequestController {
     public MentorshipRequestDto toMentorshipRequestDto(MentorshipRequest mentorshipRequest) {
         validateMentorshipRequest(mentorshipRequest);
 
-        return mentorshipRequestMapper.toMentorshipRequestDto(mentorshipRequest);
+        return mentorshipRequestService.toMentorshipRequestDto(mentorshipRequest.getId());
     }
 
     public List<MentorshipRequest> getByFilters(MentorshipRequestFilterDto filter) {
@@ -36,7 +36,7 @@ public class MentorshipRequestController {
     }
 
     public void reject(long requestId, RejectionDto rejectionDto) {
-        validateReject(rejectionDto);
+        validateRejectionDto(rejectionDto);
 
         mentorshipRequestService.reject(requestId, rejectionDto);
     }
@@ -55,7 +55,7 @@ public class MentorshipRequestController {
         }
     }
 
-    private void validateReject(RejectionDto rejectionDto) {
+    private void validateRejectionDto(RejectionDto rejectionDto) {
         if (rejectionDto.reason() == null || rejectionDto.reason().isBlank()) {
             throw new IllegalArgumentException("Specify reason for the rejection");
         }

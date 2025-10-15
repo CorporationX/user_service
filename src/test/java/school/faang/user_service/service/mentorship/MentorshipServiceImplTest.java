@@ -34,7 +34,7 @@ class MentorshipServiceImplTest {
     private MentorshipServiceImpl mentorshipService;
 
     @Test
-    void testAddMentorship_WhenValidIds_ThenSuccess() {
+    void testAddMentorshipWhenValidIdsThenSuccess() {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -58,7 +58,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testAddMentorship_WhenAlreadyExists_ThenThrowsException() {
+    void testAddMentorshipWhenAlreadyExistsThenThrowsException() {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -82,7 +82,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testDeleteMentorship_WhenMentorshipExists_ThenSuccess() {
+    void testDeleteMentorshipWhenMentorshipExistsThenSuccess() {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -104,7 +104,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testDeleteMentorship_WhenMentorshipNotFound_ThenThrowsException() {
+    void testDeleteMentorshipWhenMentorshipNotFoundThenThrowsException() {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -122,7 +122,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testGetMentees_WhenUserHasNoMentees_ThenReturnsEmptyList() {
+    void testGetMenteesWhenUserHasNoMenteesThenReturnsEmptyList() {
         long userId = 1L;
 
         User user = new User();
@@ -139,7 +139,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testGetMentees_WhenUserHasMentees_ThenReturnUserDtos() {
+    void testGetMenteesWhenUserHasMenteesThenReturnUserDtos() {
         long userId = 1L;
         long menteeId = 2L;
 
@@ -161,7 +161,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testGetMentors_WhenUserHasNoMentors_ThenReturnsEmptyList() {
+    void testGetMentorsWhenUserHasNoMentorsThenReturnsEmptyList() {
         long userId = 1L;
 
         User user = new User();
@@ -178,7 +178,7 @@ class MentorshipServiceImplTest {
     }
 
     @Test
-    void testGetMentors_WhenUserHasMentors_ThenReturnUserDtos() {
+    void testGetMentorsWhenUserHasMentorsThenReturnUserDtos() {
         long userId = 1L;
         long mentorId = 2L;
 

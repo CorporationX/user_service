@@ -35,7 +35,7 @@ public class MentorshipControllerTest {
     private UserContext userContext;
 
     @Test
-    void testAddMentorship_WhenValidRequest_ThenReturnsCreated() throws Exception {
+    void testAddMentorshipWhenValidRequestThenReturnsCreated() throws Exception {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -48,7 +48,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testAddMentorship_WhenUserNotAuthorized_ThenThrowsForbiddenException() throws Exception {
+    void testAddMentorshipWhenUserNotAuthorizedThenThrowsForbiddenException() throws Exception {
         long mentorId = 1L;
         long menteeId = 2L;
         long currentUserId = 999L;
@@ -60,7 +60,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testAddMentorship_WhenMentorIdEqualsMenteeId_ThenThrowsDataValidationException() throws Exception {
+    void testAddMentorshipWhenMentorIdEqualsMenteeIdThenThrowsDataValidationException() throws Exception {
         long userId = 1L;
 
         when(userContext.getUserId()).thenReturn(userId);
@@ -70,7 +70,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testDeleteMentorship_WhenValidRequest_ThenReturnsNoContent() throws Exception {
+    void testDeleteMentorshipWhenValidRequestThenReturnsNoContent() throws Exception {
         long mentorId = 1L;
         long menteeId = 2L;
 
@@ -83,7 +83,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testDeleteMentorship_WhenUserNotAuthorized_ThenThrowsForbiddenException() throws Exception {
+    void testDeleteMentorshipWhenUserNotAuthorizedThenThrowsForbiddenException() throws Exception {
         long mentorId = 1L;
         long menteeId = 2L;
         long currentUserId = 999L;
@@ -95,7 +95,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testDeleteMentorship_WhenMentorIdEqualsMenteeId_ThenThrowsDataValidationException() throws Exception {
+    void testDeleteMentorshipWhenMentorIdEqualsMenteeIdThenThrowsDataValidationException() throws Exception {
         long userId = 1L;
 
         when(userContext.getUserId()).thenReturn(userId);
@@ -105,7 +105,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testGetMentees_WhenValidRequest_ThenReturnsList() throws Exception {
+    void testGetMenteesWhenValidRequestThenReturnsList() throws Exception {
         long userId = 1L;
 
         List<UserDto> mentees = List.of(
@@ -125,7 +125,7 @@ public class MentorshipControllerTest {
     }
 
     @Test
-    void testGetMentors_WhenValidRequest_ThenReturnsList() throws Exception {
+    void testGetMentorsWhenValidRequestThenReturnsList() throws Exception {
         long userId = 1L;
 
         List<UserDto> mentors = List.of(

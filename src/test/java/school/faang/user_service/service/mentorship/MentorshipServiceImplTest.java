@@ -39,14 +39,11 @@ public class MentorshipServiceImplTest {
     @BeforeEach
     void initUser() {
         mentor = new User();
-        mentor.setId(MENTOR_ID);
+        mentor.setId(8L);
 
         mentee = new User();
-        mentee.setId(MENTEE_ID);
+        mentee.setId(7L);
     }
-
-    private final static long MENTOR_ID = 8L;
-    private final static long MENTEE_ID = 7L;
 
     private User mentor;
     private User mentee;

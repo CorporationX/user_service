@@ -43,7 +43,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@TestPropertySource(properties = {"goal.active.amount=2"})
 class GoalServiceTest {
     @Mock
     private GoalRepository goalRepository;
@@ -74,7 +73,7 @@ class GoalServiceTest {
         final User menteeSecond = new User();
         menteeSecond.setId(3L);
         menteeSecond.setGoals(List.of(new Goal()));
-        ReflectionTestUtils.setField(goalService, "activeGoals", 2);
+        ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
         when(userContext.getUserId()).thenReturn(mentor.getId());
         when(userRepository.getByIdOrThrow(any(Long.class)))
                 .thenAnswer(invocation -> {
@@ -134,7 +133,7 @@ class GoalServiceTest {
         final User menteeSecond = new User();
         menteeSecond.setId(3L);
         menteeSecond.setGoals(List.of(new Goal(), new Goal()));
-        ReflectionTestUtils.setField(goalService, "activeGoals", 2);
+        ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
         when(userContext.getUserId()).thenReturn(mentor.getId());
         when(userRepository.getByIdOrThrow(any(Long.class)))
                 .thenAnswer(invocation -> {
@@ -177,7 +176,7 @@ class GoalServiceTest {
         final User currentUser = new User();
         currentUser.setId(1L);
         currentUser.setGoals(List.of(new Goal()));
-        ReflectionTestUtils.setField(goalService, "activeGoals", 2);
+        ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(goalRepository.countActiveGoalsPerUser(currentUser.getId())).thenReturn(currentUser.getGoals().size());
         when(userRepository.getByIdOrThrow(currentUser.getId())).thenReturn(currentUser);
@@ -210,7 +209,7 @@ class GoalServiceTest {
         final User currentUser = new User();
         currentUser.setId(1L);
         currentUser.setGoals(List.of(new Goal(), new Goal()));
-        ReflectionTestUtils.setField(goalService, "activeGoals", 2);
+        ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(goalRepository.countActiveGoalsPerUser(currentUser.getId())).thenReturn(currentUser.getGoals().size());
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -30,7 +31,7 @@ public class GoalServiceImpl implements GoalService {
     private static final String SUCCESSFULLY_LOG = "Successfully";
 
     @Value("${goal.active.amount}")
-    private int activeGoals;
+    private int maxActiveGoals;
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final GoalMapper goalMapper;
@@ -38,6 +39,7 @@ public class GoalServiceImpl implements GoalService {
     private final List<GoalFilter> goalFilters;
 
     @Override
+    @Transactional
     public GoalDto create(CreateGoalDto createGoalDto) {
         log.info("Try to create a new goal in the Service");
         Goal goal = goalMapper.toGoal(createGoalDto);
@@ -50,29 +52,24 @@ public class GoalServiceImpl implements GoalService {
         if (createGoalDto.mentorId() != null) {
             log.info("The person who is trying to create the goal is Mentor");
             goal.setMentor(userRepository.getByIdOrThrow(createGoalDto.mentorId()));
-            boolean isExceptionOccured = false;
             for (User user : goal.getUsers()) {
                 log.info("Count active goals for user #{}", user.getId());
-                if (goalRepository.countActiveGoalsPerUser(user.getId()) < activeGoals) {
+                if (goalRepository.countActiveGoalsPerUser(user.getId()) < maxActiveGoals) {
                     log.info("The goal is added to user #{}", user.getId());
                 } else {
-                    log.error("User #{} has either {} or more active goals", user.getId(), activeGoals);
-                    isExceptionOccured = true;
-                    break;
+                    log.error("User #{} has either {} or more active goals", user.getId(), maxActiveGoals);
+                    throw new DataValidationException(
+                            String.format("Unable to create more than %d goals per user", maxActiveGoals));
                 }
-            }
-            if (isExceptionOccured) {
-                throw new DataValidationException(
-                        String.format("Unable to create more than %d goals per user", activeGoals));
             }
         } else if (createGoalDto.userIds().contains(currentUserId)) {
             log.info("The person who is trying to create the goal is User. Goal will be created for this User");
-            if (goalRepository.countActiveGoalsPerUser(currentUserId) < activeGoals) {
+            if (goalRepository.countActiveGoalsPerUser(currentUserId) < maxActiveGoals) {
                 log.info("The goal is added to user #{}", currentUserId);
             } else {
-                log.error("User #{} has either {} or more active goals", currentUserId, activeGoals);
+                log.error("User #{} has either {} or more active goals", currentUserId, maxActiveGoals);
                 throw new DataValidationException(
-                        String.format("Unable to create more than %d goals per user", activeGoals));
+                        String.format("Unable to create more than %d goals per user", maxActiveGoals));
             }
         } else {
             log.error("The person who is trying to create the goal is an unknown user");
@@ -85,6 +82,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    @Transactional
     public GoalDto update(long goalId, UpdateGoalDto updateGoalDto) {
         log.info("Try to update a goal in the Service");
         Goal currentGoal = goalRepository.getByIdOrThrow(goalId);
@@ -95,49 +93,50 @@ public class GoalServiceImpl implements GoalService {
             throw new ForbiddenException("Unable to update completed goal");
         }
         log.info("Check who is trying to update the goal");
+        long currentUserId = userContext.getUserId();
         if (currentGoal.getMentor() != null
                 && updateGoalDto.status() == GoalStatus.COMPLETED
-                && !currentGoal.getMentor().getId().equals(userContext.getUserId())) {
+                && currentGoal.getMentor().getId() != currentUserId) {
             log.error("The goal #{} has mentor. The person who is trying to complete the goal is not mentor", goalId);
             throw new ForbiddenException("The goal can be completed by mentor only");
         }
-        if (!currentGoal.getUsers().contains(userRepository.getByIdOrThrow(userContext.getUserId()))
-                && (currentGoal.getMentor() == null || userContext.getUserId() != currentGoal.getMentor().getId())) {
+        if (!hasAccessToAct(currentGoal, userRepository.getByIdOrThrow(currentUserId))) {
             log.error("The person who is trying to update the goal #{} is an unknown user", goalId);
             throw new ForbiddenException("The goal can be updated by either mentor or goal participant");
         }
         log.info(SUCCESSFULLY_LOG);
-        goalMapper.update(goalRepository.getByIdOrThrow(goalId), updateGoalDto);
+        goalMapper.update(currentGoal, updateGoalDto);
         log.info("The goal #{} is updated", goalId);
-        return goalMapper.toGoalDto(goalRepository.getByIdOrThrow(goalId));
+        return goalMapper.toGoalDto(currentGoal);
     }
 
     @Override
+    @Transactional
     public void delete(long goalId) {
         log.info("Try to delete a goal in the Service");
         Goal currentGoal = goalRepository.getByIdOrThrow(goalId);
+        long currentUserId = userContext.getUserId();
+        User currentUser = userRepository.getByIdOrThrow(currentUserId);
         log.info("Check who is trying to delete the goal #{}", goalId);
-        if (!currentGoal.getUsers().contains(userRepository.getByIdOrThrow(userContext.getUserId()))
-                && (currentGoal.getMentor() == null || userContext.getUserId() != currentGoal.getMentor().getId())) {
+        if (!hasAccessToAct(currentGoal, currentUser)) {
             log.error("The person who is trying to delete the goal #{} is an unknown user", goalId);
             throw new ForbiddenException("The goal can be deleted by either mentor or goal participant");
         }
-        if (currentGoal.getMentor() != null
-                && currentGoal.getMentor().equals(userRepository.getByIdOrThrow(userContext.getUserId()))) {
-            goalRepository.delete(goalRepository.getByIdOrThrow(goalId));
+        if (checkIfCurrentMentor(currentGoal, currentUser)) {
+            goalRepository.delete(currentGoal);
             log.info("Mentor deleted the goal #{} from the mentees", goalId);
         } else {
-            goalRepository.getByIdOrThrow(goalId).getUsers()
-                    .remove(userRepository.getByIdOrThrow(userContext.getUserId()));
-            log.info("User #{} no longer has the goal #{}", userContext.getUserId(), goalId);
-            if (goalRepository.getByIdOrThrow(goalId).getUsers().isEmpty()) {
-                goalRepository.delete(goalRepository.getByIdOrThrow(goalId));
+            currentGoal.getUsers().remove(currentUser);
+            log.info("User #{} no longer has the goal #{}", currentUserId, goalId);
+            if (currentGoal.getUsers().isEmpty()) {
+                goalRepository.delete(currentGoal);
                 log.info("No other user has the goal #{}. The goal is deleted", goalId);
             }
         }
     }
 
     @Override
+    @Transactional
     public List<GoalDto> getByFilters(GoalFilterDto goalFilterDto) {
         log.info("Try to filter goals in the Service");
         Stream<Goal> filteredGoals = goalRepository.findAll().stream();
@@ -150,5 +149,12 @@ public class GoalServiceImpl implements GoalService {
         return filteredGoals
                 .map(goalMapper::toGoalDto)
                 .toList();
+    }
+    private boolean checkIfCurrentMentor(Goal currentGoal, User currentUser) {
+        return currentGoal.getMentor() != null && currentGoal.getMentor().equals(currentUser);
+    }
+
+    private boolean hasAccessToAct(Goal currentGoal, User currentUser) {
+        return currentGoal.getUsers().contains(currentUser) || checkIfCurrentMentor(currentGoal, currentUser);
     }
 }

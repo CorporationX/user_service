@@ -368,8 +368,8 @@ class UserSubscriptionServiceImplTest {
         when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
             Stream<User> stream = invocation.getArgument(0);
             UserFiltersDto filters = invocation.getArgument(1);
-            return stream.filter(user -> user.getExperience() >= filters.experienceMin() &&
-                    user.getExperience() <= filters.experienceMax());
+            return stream.filter(user -> user.getExperience() >= filters.experienceMin()
+                    && user.getExperience() <= filters.experienceMax());
         });
     }
 }

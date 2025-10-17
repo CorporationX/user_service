@@ -15,7 +15,6 @@ import school.faang.user_service.dto.user.CountResponse;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFiltersDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.service.user.UserSubscriptionService;
 
 import java.util.List;
@@ -32,7 +31,6 @@ public class UserSubscriptionController {
     public void followUser(@PathVariable long followeeId) {
         long followerId = userContext.getUserId();
         validateNotSelfAction(followerId, followeeId);
-        validateUserOwnAction(followerId, followeeId);
         userSubscriptionService.followUser(followerId, followeeId);
     }
 
@@ -40,7 +38,6 @@ public class UserSubscriptionController {
     public void unfollowUser(@PathVariable long followeeId) {
         long followerId = userContext.getUserId();
         validateNotSelfAction(followerId, followeeId);
-        validateUserOwnAction(followerId, followeeId);
         userSubscriptionService.unfollowUser(followerId, followeeId);
     }
 
@@ -72,13 +69,6 @@ public class UserSubscriptionController {
         if (followerId == followeeId) {
             log.warn("User {} пытается подписаться или отписаться от самого себя", followerId);
             throw new DataValidationException("Нельзя подписаться или отписаться от самого себя.");
-        }
-    }
-
-    private void validateUserOwnAction(long followerId, long currentUserId) {
-        if (followerId != currentUserId) {
-            log.warn("User {} пытается подписаться или отписаться от лица пользователя: {}", currentUserId, followerId);
-            throw new ForbiddenException("Вы не можете подписывать других пользователей.");
         }
     }
 }

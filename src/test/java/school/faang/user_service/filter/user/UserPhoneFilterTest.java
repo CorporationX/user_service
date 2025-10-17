@@ -69,8 +69,8 @@ public class UserPhoneFilterTest {
     @Test
     public void testApplyWrongPhoneNumber() {
         Stream<User> users = Stream.of(
-                User.builder().username("111111111").build(),
-                User.builder().username("222222222").build());
+                User.builder().phone("111111111").build(),
+                User.builder().phone("222222222").build());
 
         List<User> userList = userPhoneFilter
                 .apply(users, new UserFiltersDto(null, "777901485", 0, 0))

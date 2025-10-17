@@ -69,7 +69,7 @@ class UserSubscriptionServiceImplTest {
 
         service.followUser(followerId, followeeId);
 
-        verify(subscriptionRepository, timeout(1)).followUser(followerId, followeeId);
+        verify(subscriptionRepository, timeout(1000)).followUser(followerId, followeeId);
     }
 
     @Test
@@ -90,7 +90,7 @@ class UserSubscriptionServiceImplTest {
 
         service.unfollowUser(followerId, followeeId);
 
-        verify(subscriptionRepository, timeout(1)).unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository, timeout(1000)).unfollowUser(followerId, followeeId);
     }
 
     @Test
@@ -126,49 +126,46 @@ class UserSubscriptionServiceImplTest {
     // getFollowers()
     // -------------------------------------------------
     @Test
-    public void testGetFollowersWithFilters_GetNone() {
+    public void testGetFollowersWithNameFilter_GetNone() {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
-                userNameFilter, userPhoneFilter, userExperienceFilter));
+                userNameFilter));
 
-        User user1 = User.builder()
-                .username("GLEB")
-                .phone("123456789")
-                .experience(3)
-                .build();
-        User user2 = User.builder()
-                .username("Gleb")
-                .phone("222222222")
-                .experience(8)
-                .build();
-        User user3 = User.builder()
-                .username("Max")
-                .phone("222222222")
-                .experience(5)
-                .build();
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.of(user1, user2, user3));
-
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(sampleUsers());
         when(userNameFilter.isApplicable(any())).thenReturn(true);
-        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
-        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
-
-        when(userNameFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getUsername().equalsIgnoreCase("Gleb"));
-        });
-        when(userPhoneFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getPhone().equals("123456789"));
-        });
-        when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            UserFiltersDto filters = invocation.getArgument(1);
-            int min = filters.experienceMin();
-            int max = filters.experienceMax();
-            return stream.filter(user -> user.getExperience() >= min && user.getExperience() <= max);
-        });
+        setUserNameFilter();
 
         List<UserDto> result = service
-                .getFollowers(followeeId, new UserFiltersDto(null, null, 1, 2));
+                .getFollowers(followeeId, new UserFiltersDto("Oleg", null, 0, 0));
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetFollowersWithPhoneFilter_GetNone() {
+        service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
+                userPhoneFilter));
+
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(sampleUsers());
+        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
+        setUserPhoneFilter();
+
+        List<UserDto> result = service
+                .getFollowers(followeeId, new UserFiltersDto(null, "000000000", 0, 0));
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetFollowersWithExperienceFilter_GetNone() {
+        service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
+                userExperienceFilter));
+
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(sampleUsers());
+        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
+        setUserExperienceFilter();
+
+        List<UserDto> result = service
+                .getFollowers(followeeId, new UserFiltersDto(null, null, 0, 1));
 
         assertTrue(result.isEmpty());
     }
@@ -178,50 +175,20 @@ class UserSubscriptionServiceImplTest {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
                 userNameFilter, userPhoneFilter, userExperienceFilter));
 
-        User user1 = User.builder()
-                .username("GLEB")
-                .phone("123456789")
-                .experience(3)
-                .build();
-        User user2 = User.builder()
-                .username("Gleb")
-                .phone("222222222")
-                .experience(8)
-                .build();
-        User user3 = User.builder()
-                .username("Max")
-                .phone("222222222")
-                .experience(5)
-                .build();
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.of(user1, user2, user3));
-
-        when(userNameFilter.isApplicable(any())).thenReturn(true);
-        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
-        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
-
-        when(userNameFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getUsername().equalsIgnoreCase("Gleb"));
-        });
-        when(userPhoneFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getPhone().equals("123456789"));
-        });
-        when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            UserFiltersDto filters = invocation.getArgument(1);
-            int min = filters.experienceMin();
-            int max = filters.experienceMax();
-            return stream.filter(user -> user.getExperience() >= min && user.getExperience() <= max);
-        });
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(sampleUsers());
+        mockFilters_IsApplicable();
+        setUserNameFilter();
+        setUserPhoneFilter();
+        setUserExperienceFilter();
 
         List<UserDto> result = service
-                .getFollowers(followeeId, new UserFiltersDto(null, null, 1, 3));
+                .getFollowers(followeeId, new UserFiltersDto("Gleb", "123456789", 0, 2));
 
         assertEquals(1, result.size());
+
         assertEquals("GLEB", result.get(0).username());
         assertEquals("123456789", result.get(0).phone());
-        assertEquals(3, result.get(0).experience());
+        assertEquals(2, result.get(0).experience());
     }
 
     @Test
@@ -229,97 +196,76 @@ class UserSubscriptionServiceImplTest {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
                 userNameFilter, userExperienceFilter));
 
-        User user1 = User.builder()
-                .username("GLEB")
-                .phone("123456789")
-                .experience(3)
-                .build();
-        User user2 = User.builder()
-                .username("Gleb")
-                .phone("222222222")
-                .experience(1)
-                .build();
-        User user3 = User.builder()
-                .username("GlEb")
-                .phone("222222222")
-                .experience(5)
-                .build();
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.of(user1, user2, user3));
-
-        when(userNameFilter.isApplicable(any())).thenReturn(true);
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(sampleUsers());
         when(userExperienceFilter.isApplicable(any())).thenReturn(true);
-
-        when(userNameFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getUsername().equalsIgnoreCase("Gleb"));
-        });
-        when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            UserFiltersDto filters = invocation.getArgument(1);
-            int min = filters.experienceMin();
-            int max = filters.experienceMax();
-            return stream.filter(user -> user.getExperience() >= min && user.getExperience() <= max);
-        });
+        setUserExperienceFilter();
 
         List<UserDto> result = service
-                .getFollowers(followeeId, new UserFiltersDto(null, null, 1, 5));
+                .getFollowers(followeeId, new UserFiltersDto(null, null, 0, 5));
 
-        assertEquals(3, result.size());
+        assertEquals(4, result.size());
+
         assertEquals("GLEB", result.get(0).username());
         assertEquals("123456789", result.get(0).phone());
-        assertEquals(3, result.get(0).experience());
-        assertEquals("Gleb", result.get(1).username());
-        assertEquals("222222222", result.get(1).phone());
-        assertEquals(1, result.get(1).experience());
+        assertEquals(2, result.get(0).experience());
+
+        assertEquals("gleb", result.get(1).username());
+        assertEquals("123456789", result.get(1).phone());
+        assertEquals(3, result.get(1).experience());
+
+        assertEquals("GleB", result.get(2).username());
+        assertEquals("222222222", result.get(2).phone());
+        assertEquals(4, result.get(2).experience());
+
+        assertEquals("Max", result.get(3).username());
+        assertEquals("222222222", result.get(3).phone());
+        assertEquals(5, result.get(3).experience());
     }
 
     // -------------------------------------------------
     // getFollowees()
     // -------------------------------------------------
     @Test
-    public void testGetFolloweesWithFilters_GetNone() {
+    public void testGetFolloweesWithNameFilter_GetNone() {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
-                userNameFilter, userPhoneFilter, userExperienceFilter));
+                userNameFilter));
 
-        User user1 = User.builder()
-                .username("GLEB")
-                .phone("123456789")
-                .experience(3)
-                .build();
-        User user2 = User.builder()
-                .username("Gleb")
-                .phone("222222222")
-                .experience(8)
-                .build();
-        User user3 = User.builder()
-                .username("Max")
-                .phone("222222222")
-                .experience(5)
-                .build();
-        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(Stream.of(user1, user2, user3));
-
+        when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(sampleUsers());
         when(userNameFilter.isApplicable(any())).thenReturn(true);
-        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
-        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
-
-        when(userNameFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getUsername().equalsIgnoreCase("Gleb"));
-        });
-        when(userPhoneFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getPhone().equals("123456789"));
-        });
-        when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            UserFiltersDto filters = invocation.getArgument(1);
-            int min = filters.experienceMin();
-            int max = filters.experienceMax();
-            return stream.filter(user -> user.getExperience() >= min && user.getExperience() <= max);
-        });
+        setUserNameFilter();
 
         List<UserDto> result = service
-                .getFollowees(followerId, new UserFiltersDto(null, null, 1, 2));
+                .getFollowers(followerId, new UserFiltersDto("Oleg", null, 0, 0));
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetFolloweesWithPhoneFilter_GetNone() {
+        service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
+                userPhoneFilter));
+
+        when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(sampleUsers());
+        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
+        setUserPhoneFilter();
+
+        List<UserDto> result = service
+                .getFollowers(followerId, new UserFiltersDto(null, "000000000", 0, 0));
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetFolloweesWithExperienceFilter_GetNone() {
+        service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
+                userExperienceFilter));
+
+        when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(sampleUsers());
+        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
+        setUserExperienceFilter();
+
+        List<UserDto> result = service
+                .getFollowers(followerId, new UserFiltersDto(null, null, 0, 1));
 
         assertTrue(result.isEmpty());
     }
@@ -329,50 +275,20 @@ class UserSubscriptionServiceImplTest {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
                 userNameFilter, userPhoneFilter, userExperienceFilter));
 
-        User user1 = User.builder()
-                .username("GLEB")
-                .phone("123456789")
-                .experience(3)
-                .build();
-        User user2 = User.builder()
-                .username("Gleb")
-                .phone("222222222")
-                .experience(8)
-                .build();
-        User user3 = User.builder()
-                .username("Max")
-                .phone("222222222")
-                .experience(5)
-                .build();
-        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(Stream.of(user1, user2, user3));
-
-        when(userNameFilter.isApplicable(any())).thenReturn(true);
-        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
-        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
-
-        when(userNameFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getUsername().equalsIgnoreCase("Gleb"));
-        });
-        when(userPhoneFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getPhone().equals("123456789"));
-        });
-        when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
-            Stream<User> stream = invocation.getArgument(0);
-            UserFiltersDto filters = invocation.getArgument(1);
-            int min = filters.experienceMin();
-            int max = filters.experienceMax();
-            return stream.filter(user -> user.getExperience() >= min && user.getExperience() <= max);
-        });
+        when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(sampleUsers());
+        mockFilters_IsApplicable();
+        setUserNameFilter();
+        setUserPhoneFilter();
+        setUserExperienceFilter();
 
         List<UserDto> result = service
-                .getFollowees(followerId, new UserFiltersDto(null, null, 1, 3));
+                .getFollowers(followerId, new UserFiltersDto("Gleb", "123456789", 0, 2));
 
         assertEquals(1, result.size());
+
         assertEquals("GLEB", result.get(0).username());
         assertEquals("123456789", result.get(0).phone());
-        assertEquals(3, result.get(0).experience());
+        assertEquals(2, result.get(0).experience());
     }
 
     @Test
@@ -380,48 +296,80 @@ class UserSubscriptionServiceImplTest {
         service = new UserSubscriptionServiceImpl(subscriptionRepository, userMapper, List.of(
                 userNameFilter, userExperienceFilter));
 
-        User user1 = User.builder()
-                .username("GLEB")
-                .phone("123456789")
-                .experience(3)
-                .build();
-        User user2 = User.builder()
-                .username("Gleb")
-                .phone("222222222")
-                .experience(1)
-                .build();
-        User user3 = User.builder()
-                .username("GlEb")
-                .phone("222222222")
-                .experience(5)
-                .build();
-        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(Stream.of(user1, user2, user3));
-
-        when(userNameFilter.isApplicable(any())).thenReturn(true);
+        when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(sampleUsers());
         when(userExperienceFilter.isApplicable(any())).thenReturn(true);
+        setUserExperienceFilter();
 
+        List<UserDto> result = service
+                .getFollowers(followerId, new UserFiltersDto(null, null, 0, 5));
+
+        assertEquals(4, result.size());
+
+        assertEquals("GLEB", result.get(0).username());
+        assertEquals("123456789", result.get(0).phone());
+        assertEquals(2, result.get(0).experience());
+
+        assertEquals("gleb", result.get(1).username());
+        assertEquals("123456789", result.get(1).phone());
+        assertEquals(3, result.get(1).experience());
+
+        assertEquals("GleB", result.get(2).username());
+        assertEquals("222222222", result.get(2).phone());
+        assertEquals(4, result.get(2).experience());
+
+        assertEquals("Max", result.get(3).username());
+        assertEquals("222222222", result.get(3).phone());
+        assertEquals(5, result.get(3).experience());
+    }
+
+    // -------------------------------------------------
+    // Additional methods
+    // -------------------------------------------------
+    private Stream<User> sampleUsers() {
+        return Stream.of(
+                user("GLEB", "123456789", 2),
+                user("gleb", "123456789", 3),
+                user("GleB", "222222222", 4),
+                user("Max", "222222222", 5)
+        );
+    }
+
+    private User user(String username, String phone, int experience) {
+        return User.builder()
+                .username(username)
+                .phone(phone)
+                .experience(experience)
+                .build();
+    }
+
+    private void mockFilters_IsApplicable() {
+        when(userNameFilter.isApplicable(any())).thenReturn(true);
+        when(userPhoneFilter.isApplicable(any())).thenReturn(true);
+        when(userExperienceFilter.isApplicable(any())).thenReturn(true);
+    }
+
+    private void setUserNameFilter() {
         when(userNameFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
             Stream<User> stream = invocation.getArgument(0);
-            return stream.filter(user -> user.getUsername().equalsIgnoreCase("Gleb"));
+            UserFiltersDto filters = invocation.getArgument(1);
+            return stream.filter(user -> user.getUsername().equalsIgnoreCase(filters.namePattern()));
         });
+    }
+
+    private void setUserPhoneFilter() {
+        when(userPhoneFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
+            Stream<User> stream = invocation.getArgument(0);
+            UserFiltersDto filters = invocation.getArgument(1);
+            return stream.filter(user -> user.getPhone().equalsIgnoreCase(filters.phonePattern()));
+        });
+    }
+
+    private void setUserExperienceFilter() {
         when(userExperienceFilter.apply(any(), any())).thenAnswer((Answer<Stream<User>>) invocation -> {
             Stream<User> stream = invocation.getArgument(0);
             UserFiltersDto filters = invocation.getArgument(1);
-            int min = filters.experienceMin();
-            int max = filters.experienceMax();
-            return stream.filter(user -> user.getExperience() >= min && user.getExperience() <= max);
+            return stream.filter(user -> user.getExperience() >= filters.experienceMin() &&
+                    user.getExperience() <= filters.experienceMax());
         });
-
-        List<UserDto> result = service
-                .getFollowees(followerId, new UserFiltersDto(null, null, 1, 5));
-
-        assertEquals(3, result.size());
-        assertEquals("GLEB", result.get(0).username());
-        assertEquals("123456789", result.get(0).phone());
-        assertEquals(3, result.get(0).experience());
-        assertEquals("Gleb", result.get(1).username());
-        assertEquals("222222222", result.get(1).phone());
-        assertEquals(1, result.get(1).experience());
     }
-
 }

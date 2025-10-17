@@ -42,21 +42,29 @@ public class MentorshipControllerTest {
         );
     }
 
+    private final long userContextId = 5L;
+
     @Test
     void testAddMentorship() {
-        when(userContext.getUserId()).thenReturn(5L);
+        long mentorId = 5L;
+        long menteeId = 4L;
 
-        mentorshipController.addMentorship(5L, 4L);
+        when(userContext.getUserId()).thenReturn(userContextId);
 
-        verify(mentorshipService, times(1)).addMentorship(5L, 4L);
+        mentorshipController.addMentorship(mentorId, menteeId);
+
+        verify(mentorshipService, times(1)).addMentorship(mentorId, menteeId);
     }
 
     @Test
     void testAddMentorship_shouldThrow_whenIdenticalIds() {
-        when(userContext.getUserId()).thenReturn(5L);
+        long mentorId = 5L;
+        long menteeId = 5L;
+
+        when(userContext.getUserId()).thenReturn(userContextId);
 
         assertThrows(DataValidationException.class, () ->
-                mentorshipController.addMentorship(5L, 5L)
+                mentorshipController.addMentorship(mentorId, menteeId)
         );
 
         verify(mentorshipService, never()).addMentorship(anyLong(), anyLong());
@@ -64,10 +72,13 @@ public class MentorshipControllerTest {
 
     @Test
     void testAddMentorship_shouldThrow_whenUserNotInRelation() {
-        when(userContext.getUserId()).thenReturn(5L);
+        long mentorId = 4L;
+        long menteeId = 3L;
+
+        when(userContext.getUserId()).thenReturn(userContextId);
 
         assertThrows(ForbiddenException.class, () ->
-                mentorshipController.addMentorship(4L, 3L)
+                mentorshipController.addMentorship(mentorId, menteeId)
         );
 
         verify(mentorshipService, never()).addMentorship(anyLong(), anyLong());
@@ -75,19 +86,24 @@ public class MentorshipControllerTest {
 
     @Test
     void testDeleteMentorship() {
-        when(userContext.getUserId()).thenReturn(5L);
+        long menteeId = 5L;
+        long mentorId = 4L;
 
-        mentorshipController.deleteMentorship(5L, 4L);
+        when(userContext.getUserId()).thenReturn(userContextId);
 
-        verify(mentorshipService, times(1)).deleteMentorship(5L, 4L);
+        mentorshipController.deleteMentorship(menteeId, mentorId);
+
+        verify(mentorshipService, times(1)).deleteMentorship(menteeId, mentorId);
     }
 
     @Test
     void testDeleteMentorship_shouldThrow_whenIdenticalIds() {
-        when(userContext.getUserId()).thenReturn(5L);
+        long mentorAndMenteeIds = 5L;
+
+        when(userContext.getUserId()).thenReturn(userContextId);
 
         assertThrows(DataValidationException.class, () ->
-                mentorshipController.deleteMentorship(5L, 5L)
+                mentorshipController.deleteMentorship(mentorAndMenteeIds, mentorAndMenteeIds)
         );
 
         verify(mentorshipService, never()).deleteMentorship(anyLong(), anyLong());
@@ -95,10 +111,13 @@ public class MentorshipControllerTest {
 
     @Test
     void testDeleteMentorship_shouldThrow_whenUserNotInRelation() {
-        when(userContext.getUserId()).thenReturn(5L);
+        long menteeId = 4L;
+        long mentorId = 3L;
+
+        when(userContext.getUserId()).thenReturn(userContextId);
 
         assertThrows(ForbiddenException.class, () ->
-                mentorshipController.deleteMentorship(4L, 3L)
+                mentorshipController.deleteMentorship(menteeId, mentorId)
         );
 
         verify(mentorshipService, never()).deleteMentorship(anyLong(), anyLong());

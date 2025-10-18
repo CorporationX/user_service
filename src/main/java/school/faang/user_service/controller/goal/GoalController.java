@@ -2,7 +2,12 @@ package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
@@ -12,7 +17,7 @@ import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Slf4j
 public class GoalController {
@@ -21,7 +26,8 @@ public class GoalController {
 
     private final GoalService goalService;
 
-    public GoalDto create(CreateGoalDto createGoalDto) {
+    @PostMapping("/goal")
+    public GoalDto create(@RequestBody CreateGoalDto createGoalDto) {
         log.info("Try to create a new goal in the Controller");
         validateTitle(createGoalDto.title());
         validateDescription(createGoalDto.description());
@@ -30,7 +36,8 @@ public class GoalController {
         return goalService.create(createGoalDto);
     }
 
-    public GoalDto update(long goalId, UpdateGoalDto updateGoalDto) {
+    @PutMapping("/goal/{goalId}")
+    public GoalDto update(@PathVariable long goalId, @RequestBody UpdateGoalDto updateGoalDto) {
         log.info("Try to update the goal in the Controller");
         validateTitle(updateGoalDto.title());
         validateDescription(updateGoalDto.description());
@@ -38,13 +45,15 @@ public class GoalController {
         return goalService.update(goalId, updateGoalDto);
     }
 
-    public void delete(long goalId) {
+    @DeleteMapping("goal/{goalId}")
+    public void delete(@PathVariable long goalId) {
         log.info("Try to delete the goal in the Controller");
         goalService.delete(goalId);
         log.info(SUCCESSFULLY_LOG);
     }
 
-    public List<GoalDto> getByFilters(GoalFilterDto goalFilterDto) {
+    @PostMapping("/goals")
+    public List<GoalDto> getByFilters(@RequestBody GoalFilterDto goalFilterDto) {
         log.info("Try to filter goals in the Controller");
         return goalService.getByFilters(goalFilterDto);
     }

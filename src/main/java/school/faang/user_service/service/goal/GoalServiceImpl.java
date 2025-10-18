@@ -144,6 +144,7 @@ public class GoalServiceImpl implements GoalService {
                 .map(goalMapper::toGoalDto)
                 .toList();
     }
+
     private boolean checkIfCurrentMentor(Goal currentGoal, User currentUser) {
         return currentGoal.getMentor() != null && currentGoal.getMentor().equals(currentUser);
     }

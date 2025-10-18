@@ -12,5 +12,6 @@ public record GoalDto(
         Long mentorId,
         List<Long> userIds,
         GoalStatus status,
-        List<Long> skillIds) {
+        List<Long> skillIds
+) {
 }

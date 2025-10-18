@@ -6,5 +6,6 @@ public record GoalFilterDto(
         String titleContains,
         String descriptionContains,
         GoalStatus status,
-        Long mentorId) {
+        Long mentorId
+) {
 }

@@ -8,5 +8,6 @@ public record CreateGoalDto(
         String description,
         LocalDateTime deadline,
         Long mentorId,
-        List<Long> userIds) {
+        List<Long> userIds
+) {
 }

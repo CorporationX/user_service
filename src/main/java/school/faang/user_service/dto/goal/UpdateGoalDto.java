@@ -9,5 +9,6 @@ public record UpdateGoalDto(
         String description,
         LocalDateTime deadline,
         Long mentorId,
-        GoalStatus status) {
+        GoalStatus status
+) {
 }

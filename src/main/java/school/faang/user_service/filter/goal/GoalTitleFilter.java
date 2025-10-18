@@ -12,13 +12,11 @@ import java.util.stream.Stream;
 public class GoalTitleFilter implements GoalFilter {
     @Override
     public boolean isApplicable(GoalFilterDto goalFilterDto) {
-        log.info("Check if title filter is selected");
         return goalFilterDto.titleContains() != null;
     }
 
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto goalFilterDto) {
-        log.info("Apply title filter");
         return goals
                 .filter(goal -> goal.getTitle().contains(goalFilterDto.titleContains()));
     }

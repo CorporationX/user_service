@@ -12,13 +12,11 @@ import java.util.stream.Stream;
 public class GoalStatusFilter implements GoalFilter {
     @Override
     public boolean isApplicable(GoalFilterDto goalFilterDto) {
-        log.info("Check if status filter is selected");
         return goalFilterDto.status() != null;
     }
 
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto goalFilterDto) {
-        log.info("Apply status filter");
         return goals
                 .filter(goal -> goal.getStatus() == goalFilterDto.status());
     }

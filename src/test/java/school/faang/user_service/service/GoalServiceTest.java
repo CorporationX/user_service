@@ -102,6 +102,8 @@ class GoalServiceTest {
         when(goalRepository.save(any(Goal.class)))
                 .thenAnswer(invocation -> {
                     Goal newGoal = invocation.getArgument(0);
+                    newGoal.setId(2L);
+                    newGoal.setTitle(createGoalDto.title());
                     newGoal.setSkillsToAchieve(List.of(new Skill(), new Skill()));
                     return newGoal;
                 });
@@ -183,6 +185,8 @@ class GoalServiceTest {
         when(goalRepository.save(any(Goal.class)))
                 .thenAnswer(invocation -> {
                     Goal newGoal = invocation.getArgument(0);
+                    newGoal.setId(2L);
+                    newGoal.setTitle(createGoalDto.title());
                     newGoal.setSkillsToAchieve(List.of(new Skill(), new Skill()));
                     return newGoal;
                 });
@@ -640,45 +644,48 @@ class GoalServiceTest {
         firstMentor.setId(3L);
         final User secondMentor = new User();
         secondMentor.setId(5L);
+        final User user = new User();
+        user.setId(1L);
         final Goal firstGoal = new Goal();
         firstGoal.setTitle("Improve skills");
         firstGoal.setDescription("You need improve skills in Java Core");
         firstGoal.setStatus(GoalStatus.COMPLETED);
         firstGoal.setMentor(firstMentor);
-        firstGoal.setUsers(List.of(new User()));
+        firstGoal.setUsers(List.of(user));
         firstGoal.setSkillsToAchieve(List.of(new Skill()));
         final Goal secondGoal = new Goal();
         secondGoal.setTitle("Improve skills");
         secondGoal.setDescription("You need improve skills in Java MultiThreading");
         secondGoal.setStatus(GoalStatus.ACTIVE);
         secondGoal.setMentor(firstMentor);
-        secondGoal.setUsers(List.of(new User()));
+        secondGoal.setUsers(List.of(user));
         secondGoal.setSkillsToAchieve(List.of(new Skill()));
         final Goal thirdGoal = new Goal();
         thirdGoal.setTitle("Improve coding");
         thirdGoal.setDescription("You should start with Java Core");
         thirdGoal.setStatus(GoalStatus.ACTIVE);
         thirdGoal.setMentor(secondMentor);
-        thirdGoal.setUsers(List.of(new User()));
+        thirdGoal.setUsers(List.of(user));
         thirdGoal.setSkillsToAchieve(List.of(new Skill()));
         final Goal forthGoal = new Goal();
         forthGoal.setTitle("Start Streams");
         forthGoal.setDescription("Streams are required in Java");
         forthGoal.setStatus(GoalStatus.ACTIVE);
         forthGoal.setMentor(firstMentor);
-        forthGoal.setUsers(List.of(new User()));
+        forthGoal.setUsers(List.of(user));
         forthGoal.setSkillsToAchieve(List.of(new Skill()));
         final Goal fifthGoal = new Goal();
         fifthGoal.setTitle("Improve codestyle");
         fifthGoal.setDescription("You should learn codestyle tips");
         fifthGoal.setStatus(GoalStatus.ACTIVE);
         fifthGoal.setMentor(firstMentor);
-        fifthGoal.setUsers(List.of(new User()));
+        fifthGoal.setUsers(List.of(user));
         fifthGoal.setSkillsToAchieve(List.of(new Skill()));
         final GoalDto expectedResult = goalMapper.toGoalDto(secondGoal);
         when(goalRepository.findAll())
                 .thenAnswer(invocation ->
                         new ArrayList<>(List.of(firstGoal, secondGoal, thirdGoal, forthGoal, fifthGoal)));
+        when(userContext.getUserId()).thenReturn(user.getId());
 
         List<GoalDto> goalDtos = goalService.getByFilters(goalFilterDto);
 

@@ -12,13 +12,11 @@ import java.util.stream.Stream;
 public class GoalMentorIdFilter implements GoalFilter {
     @Override
     public boolean isApplicable(GoalFilterDto goalFilterDto) {
-        log.info("Check if mentorId filter is selected");
         return goalFilterDto.mentorId() != null;
     }
 
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto goalFilterDto) {
-        log.info("Apply mentorId filter");
         return goals
                 .filter(goal -> goal.getMentor().getId().equals(goalFilterDto.mentorId()));
     }

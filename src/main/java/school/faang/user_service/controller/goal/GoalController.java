@@ -21,69 +21,53 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class GoalController {
-    private static final String SUCCESSFULLY_LOG = "Successfully";
-    private static final String COMPLETED_LOG = "Validation completed";
 
     private final GoalService goalService;
 
     @PostMapping("/goal")
     public GoalDto create(@RequestBody CreateGoalDto createGoalDto) {
-        log.info("Try to create a new goal in the Controller");
+        log.info("Validate a new goal");
         validateTitle(createGoalDto.title());
         validateDescription(createGoalDto.description());
         validateUsersIds(createGoalDto.userIds());
-        log.info(COMPLETED_LOG);
+        log.info("The goal '{}' is valid", createGoalDto.title());
         return goalService.create(createGoalDto);
     }
 
     @PutMapping("/goal/{goalId}")
     public GoalDto update(@PathVariable long goalId, @RequestBody UpdateGoalDto updateGoalDto) {
-        log.info("Try to update the goal in the Controller");
+        log.info("Validate the goal #{}", goalId);
         validateTitle(updateGoalDto.title());
         validateDescription(updateGoalDto.description());
-        log.info(COMPLETED_LOG);
+        log.info("The goal #{} is valid", goalId);
         return goalService.update(goalId, updateGoalDto);
     }
 
     @DeleteMapping("goal/{goalId}")
     public void delete(@PathVariable long goalId) {
-        log.info("Try to delete the goal in the Controller");
         goalService.delete(goalId);
-        log.info(SUCCESSFULLY_LOG);
     }
 
     @PostMapping("/goals")
     public List<GoalDto> getByFilters(@RequestBody GoalFilterDto goalFilterDto) {
-        log.info("Try to filter goals in the Controller");
         return goalService.getByFilters(goalFilterDto);
     }
 
     private void validateTitle(String title) {
-        log.info("Goal title validation");
         if (title == null || title.isBlank()) {
-            log.error("Invalid goal title");
             throw new DataValidationException("The goal title must exist and be non-empty");
-        } else {
-            log.info(SUCCESSFULLY_LOG);
         }
     }
 
     private void validateDescription(String description) {
-        log.info("Goal description validation");
         if (description == null || description.isBlank()) {
-            log.error("Invalid goal description");
             throw new DataValidationException("The goal description must exist and be non-empty");
-        } else {
-            log.info(SUCCESSFULLY_LOG);
         }
     }
 
     private void validateUsersIds(List<Long> usersIds) {
-        log.info("User`s IDs validation");
         if (usersIds == null || usersIds.isEmpty()) {
-            log.error("Invalid user`s IDs");
             throw new DataValidationException("User`s IDs must exist and be non-empty");
         }
-        log.info(SUCCESSFULLY_LOG);
     }
 }

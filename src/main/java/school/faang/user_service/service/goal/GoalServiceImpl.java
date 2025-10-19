@@ -14,6 +14,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
@@ -42,38 +43,28 @@ public class GoalServiceImpl implements GoalService {
     @Transactional
     public GoalDto create(CreateGoalDto createGoalDto) {
         Goal goal = goalMapper.toGoal(createGoalDto);
-        goal.setUsers(new ArrayList<>());
-        for (Long userId : createGoalDto.userIds()) {
-            goal.getUsers().add(userRepository.getByIdOrThrow(userId));
-        }
+        List<User> users = userRepository.findAllById(createGoalDto.userIds());
+        validateAllUsersExist(users, createGoalDto.userIds());
+        goal.setUsers(new ArrayList<>(users));
         long currentUserId = userContext.getUserId();
         log.info("Check conditions to create the goal '{}'", createGoalDto.title());
+        if (createGoalDto.mentorId() == null && !createGoalDto.userIds().contains(currentUserId)) {
+            log.error("The person who is trying to create the goal '{}' is an unknown user", createGoalDto.title());
+            throw new ForbiddenException("The goal can be created by either mentor for mentee or user for yourself");
+        }
+        if (createGoalDto.mentorId() == null && createGoalDto.userIds().contains(currentUserId)) {
+            log.info("The person who is trying to create the goal '{}' is User #{}",
+                    createGoalDto.title(), currentUserId);
+            checkCountUsersActiveGoals(createGoalDto.title(), currentUserId);
+        }
         if (createGoalDto.mentorId() != null) {
             log.info("The person who is trying to create the goal '{}' is Mentor #{}",
                     createGoalDto.title(), createGoalDto.mentorId());
             goal.setMentor(userRepository.getByIdOrThrow(createGoalDto.mentorId()));
             for (User user : goal.getUsers()) {
                 log.info("Count active goals for User #{}", user.getId());
-                if (goalRepository.countActiveGoalsPerUser(user.getId()) < maxActiveGoals) {
-                    log.info("The goal '{}' is added to User #{}", createGoalDto.title(), user.getId());
-                } else {
-                    log.error("User #{} has either {} or more active goals", user.getId(), maxActiveGoals);
-                    throw new DataValidationException(
-                            String.format("Unable to create more than %d goals per user", maxActiveGoals));
-                }
+                checkCountUsersActiveGoals(createGoalDto.title(), user.getId());
             }
-        } else if (createGoalDto.userIds().contains(currentUserId)) {
-            log.info("The person who is trying to create the goal is User #{}", currentUserId);
-            if (goalRepository.countActiveGoalsPerUser(currentUserId) < maxActiveGoals) {
-                log.info("The goal '{}' is added to User #{}", createGoalDto.title(), currentUserId);
-            } else {
-                log.error("User #{} has either {} or more active goals", currentUserId, maxActiveGoals);
-                throw new DataValidationException(
-                        String.format("Unable to create more than %d goals per user", maxActiveGoals));
-            }
-        } else {
-            log.error("The person who is trying to create the goal '{}' is an unknown user", createGoalDto.title());
-            throw new ForbiddenException("The goal can be created by either mentor for mentee or user for yourself");
         }
         goal = goalRepository.save(goal);
         log.info("The goal '{}' is created. The goal has got ID={}", goal.getTitle(), goal.getId());
@@ -116,16 +107,18 @@ public class GoalServiceImpl implements GoalService {
             log.error("The person who is trying to delete the goal #{} is an unknown user", goalId);
             throw new ForbiddenException("The goal can be deleted by either mentor or goal participant");
         }
-        if (checkIfCurrentMentor(currentGoal, currentUser)) {
+        if (isCurrentMentor(currentGoal, currentUser)) {
             goalRepository.delete(currentGoal);
             log.info("Mentor deleted the goal #{} from the mentees", goalId);
-        } else {
+            return;
+        }
+        if (currentGoal.getUsers().contains(currentUser)) {
             currentGoal.getUsers().remove(currentUser);
             log.info("User #{} no longer has the goal #{}", currentUserId, goalId);
-            if (currentGoal.getUsers().isEmpty()) {
-                goalRepository.delete(currentGoal);
-                log.info("No other user has the goal #{}. The goal is deleted", goalId);
-            }
+        }
+        if (currentGoal.getUsers().isEmpty()) {
+            goalRepository.delete(currentGoal);
+            log.info("No other user has the goal #{}. The goal is deleted", goalId);
         }
     }
 
@@ -145,11 +138,34 @@ public class GoalServiceImpl implements GoalService {
                 .toList();
     }
 
-    private boolean checkIfCurrentMentor(Goal currentGoal, User currentUser) {
+    private void validateAllUsersExist(List<User> users, List<Long> userIds) {
+        if (users.size() != userIds.size()) {
+            List<Long> foundUserIds = users.stream()
+                    .map(User::getId)
+                    .toList();
+            userIds.stream()
+                    .filter(id -> !foundUserIds.contains(id))
+                    .forEach(id -> log.error("User #{} is not found", id));
+            throw new EntityNotFoundException("Could not find all users");
+        }
+
+    }
+
+    private void checkCountUsersActiveGoals(String title, long userId) {
+        if (goalRepository.countActiveGoalsPerUser(userId) < maxActiveGoals) {
+            log.info("The goal '{}' is added to User #{}", title, userId);
+        } else {
+            log.error("User #{} has either {} or more active goals", userId, maxActiveGoals);
+            throw new DataValidationException(
+                    String.format("Unable to create more than %d goals per user", maxActiveGoals));
+        }
+    }
+
+    private boolean isCurrentMentor(Goal currentGoal, User currentUser) {
         return currentGoal.getMentor() != null && currentGoal.getMentor().equals(currentUser);
     }
 
     private boolean hasAccessToAct(Goal currentGoal, User currentUser) {
-        return currentGoal.getUsers().contains(currentUser) || checkIfCurrentMentor(currentGoal, currentUser);
+        return currentGoal.getUsers().contains(currentUser) || isCurrentMentor(currentGoal, currentUser);
     }
 }

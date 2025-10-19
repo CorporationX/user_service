@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
@@ -74,20 +73,18 @@ class GoalServiceTest {
         menteeSecond.setId(3L);
         menteeSecond.setGoals(List.of(new Goal()));
         ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
+        when(userRepository.findAllById(createGoalDto.userIds()))
+                .thenAnswer(invocation ->
+                        createGoalDto.userIds().stream()
+                                .map(id -> {
+                                    User user = new User();
+                                    user.setId(id);
+                                    return user;
+                                })
+                                .toList()
+                );
         when(userContext.getUserId()).thenReturn(mentor.getId());
-        when(userRepository.getByIdOrThrow(any(Long.class)))
-                .thenAnswer(invocation -> {
-                    long id = invocation.getArgument(0);
-                    if (id == mentor.getId()) {
-                        return mentor;
-                    } else if (id == menteeFirst.getId()) {
-                        return menteeFirst;
-                    } else if (id == menteeSecond.getId()) {
-                        return menteeSecond;
-                    } else {
-                        return null;
-                    }
-                });
+        when(userRepository.getByIdOrThrow(createGoalDto.mentorId())).thenReturn(mentor);
         when(goalRepository.countActiveGoalsPerUser(any(Long.class)))
                 .thenAnswer(invocation -> {
                     long id = invocation.getArgument(0);
@@ -104,6 +101,15 @@ class GoalServiceTest {
                     Goal newGoal = invocation.getArgument(0);
                     newGoal.setId(2L);
                     newGoal.setTitle(createGoalDto.title());
+                    newGoal.setUsers(
+                            createGoalDto.userIds().stream()
+                                    .map(id -> {
+                                        User user = new User();
+                                        user.setId(id);
+                                        return user;
+                                    })
+                                    .toList()
+                    );
                     newGoal.setSkillsToAchieve(List.of(new Skill(), new Skill()));
                     return newGoal;
                 });
@@ -136,20 +142,18 @@ class GoalServiceTest {
         menteeSecond.setId(3L);
         menteeSecond.setGoals(List.of(new Goal(), new Goal()));
         ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
+        when(userRepository.findAllById(createGoalDto.userIds()))
+                .thenAnswer(invocation ->
+                        createGoalDto.userIds().stream()
+                                .map(id -> {
+                                    User user = new User();
+                                    user.setId(id);
+                                    return user;
+                                })
+                                .toList()
+                );
         when(userContext.getUserId()).thenReturn(mentor.getId());
-        when(userRepository.getByIdOrThrow(any(Long.class)))
-                .thenAnswer(invocation -> {
-                    long id = invocation.getArgument(0);
-                    if (id == mentor.getId()) {
-                        return mentor;
-                    } else if (id == menteeFirst.getId()) {
-                        return menteeFirst;
-                    } else if (id == menteeSecond.getId()) {
-                        return menteeSecond;
-                    } else {
-                        return null;
-                    }
-                });
+        when(userRepository.getByIdOrThrow(createGoalDto.mentorId())).thenReturn(mentor);
         when(goalRepository.countActiveGoalsPerUser(any(Long.class)))
                 .thenAnswer(invocation -> {
                     long id = invocation.getArgument(0);
@@ -179,14 +183,32 @@ class GoalServiceTest {
         currentUser.setId(1L);
         currentUser.setGoals(List.of(new Goal()));
         ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
+        when(userRepository.findAllById(createGoalDto.userIds()))
+                .thenAnswer(invocation ->
+                        createGoalDto.userIds().stream()
+                                .map(id -> {
+                                    User user = new User();
+                                    user.setId(id);
+                                    return user;
+                                })
+                                .toList()
+                );
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(goalRepository.countActiveGoalsPerUser(currentUser.getId())).thenReturn(currentUser.getGoals().size());
-        when(userRepository.getByIdOrThrow(currentUser.getId())).thenReturn(currentUser);
         when(goalRepository.save(any(Goal.class)))
                 .thenAnswer(invocation -> {
                     Goal newGoal = invocation.getArgument(0);
                     newGoal.setId(2L);
                     newGoal.setTitle(createGoalDto.title());
+                    newGoal.setUsers(
+                            createGoalDto.userIds().stream()
+                                    .map(id -> {
+                                        User user = new User();
+                                        user.setId(id);
+                                        return user;
+                                    })
+                                    .toList()
+                    );
                     newGoal.setSkillsToAchieve(List.of(new Skill(), new Skill()));
                     return newGoal;
                 });
@@ -214,6 +236,16 @@ class GoalServiceTest {
         currentUser.setId(1L);
         currentUser.setGoals(List.of(new Goal(), new Goal()));
         ReflectionTestUtils.setField(goalService, "maxActiveGoals", 2);
+        when(userRepository.findAllById(createGoalDto.userIds()))
+                .thenAnswer(invocation ->
+                        createGoalDto.userIds().stream()
+                                .map(id -> {
+                                    User user = new User();
+                                    user.setId(id);
+                                    return user;
+                                })
+                                .toList()
+                );
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(goalRepository.countActiveGoalsPerUser(currentUser.getId())).thenReturn(currentUser.getGoals().size());
 
@@ -232,6 +264,16 @@ class GoalServiceTest {
                 List.of(2L));
         final User currentUser = new User();
         currentUser.setId(1L);
+        when(userRepository.findAllById(createGoalDto.userIds()))
+                .thenAnswer(invocation ->
+                        createGoalDto.userIds().stream()
+                                .map(id -> {
+                                    User user = new User();
+                                    user.setId(id);
+                                    return user;
+                                })
+                                .toList()
+                );
         when(userContext.getUserId()).thenReturn(currentUser.getId());
 
         assertThrows(ForbiddenException.class, () -> goalService.create(createGoalDto));

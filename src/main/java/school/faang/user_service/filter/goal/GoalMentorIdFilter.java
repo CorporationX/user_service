@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Component
@@ -18,6 +19,7 @@ public class GoalMentorIdFilter implements GoalFilter {
     @Override
     public Stream<Goal> apply(Stream<Goal> goals, GoalFilterDto goalFilterDto) {
         return goals
-                .filter(goal -> goal.getMentor().getId().equals(goalFilterDto.mentorId()));
+                .filter(goal ->
+                        goal.getMentor() != null && Objects.equals(goal.getMentor().getId(), goalFilterDto.mentorId()));
     }
 }

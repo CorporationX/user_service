@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -114,7 +115,7 @@ class MentorshipServiceImplTest {
         when(mentorshipRepository.getByIdOrThrow(menteeId)).thenReturn(mentee);
 
         assertThrows(
-                DataValidationException.class,
+                EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentorship(mentorId, menteeId)
         );
 

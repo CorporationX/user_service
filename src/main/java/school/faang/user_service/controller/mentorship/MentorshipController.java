@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,10 @@ public class MentorshipController {
     @PostMapping("/{mentorId}/{menteeId}")
     @Operation(
             summary = "Добавить связь ментор-менти",
-            description = "Создаёт связь между ментором и менти. Только сам ментор может добавить связь."
+            description = "Создаёт связь между ментором и менти. Только сам ментор может добавить связь.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Связь успешно создана")
+            }
     )
     public ResponseEntity<Void> addMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
 

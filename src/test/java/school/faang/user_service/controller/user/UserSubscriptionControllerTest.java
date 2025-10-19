@@ -51,6 +51,6 @@ public class UserSubscriptionControllerTest {
 
         assertThrows(DataValidationException.class, () -> controller.unfollowUser(followeeId));
 
-        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+        verify(subscriptionRepository, never()).unfollowUser(anyLong(), anyLong());
     }
 }

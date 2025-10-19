@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,12 +24,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/mentorship")
 @RequiredArgsConstructor
+@Tag(name = "Mentorship", description = "Управление связями ментор-менти")
 public class MentorshipController {
 
     private final MentorshipService mentorshipService;
     private final UserContext userContext;
 
     @PostMapping("/{mentorId}/{menteeId}")
+    @Operation(
+            summary = "Добавить связь ментор-менти",
+            description = "Создаёт связь между ментором и менти. Только сам ментор может добавить связь."
+    )
     public ResponseEntity<Void> addMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
 
         long currentUserId = userContext.getUserId();
@@ -49,6 +56,10 @@ public class MentorshipController {
     }
 
     @DeleteMapping("/{mentorId}/{menteeId}")
+    @Operation(
+            summary = "Удалить связь ментор-менти",
+            description = "Удаляет существующую связь между ментором и менти. Только сам ментор или менти может удалить связь."
+    )
     public ResponseEntity<Void> deleteMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
 
         long currentUserId = userContext.getUserId();
@@ -70,11 +81,19 @@ public class MentorshipController {
     }
 
     @GetMapping("/mentee/{userId}")
+    @Operation(
+            summary = "Получить список менти",
+            description = "Возвращает всех менти (учеников) указанного пользователя (ментора)."
+    )
     public List<UserDto> getMentees(@PathVariable long userId) {
         return mentorshipService.getMentees(userId);
     }
 
     @GetMapping("/mentor/{userId}")
+    @Operation(
+            summary = "Получить список менторов",
+            description = "Возвращает всех менторов указанного пользователя (менти)."
+    )
     public List<UserDto> getMentors(@PathVariable long userId) {
         return mentorshipService.getMentors(userId);
     }

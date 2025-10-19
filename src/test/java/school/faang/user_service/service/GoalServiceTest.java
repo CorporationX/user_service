@@ -81,8 +81,7 @@ class GoalServiceTest {
                                     user.setId(id);
                                     return user;
                                 })
-                                .toList()
-                );
+                                .toList());
         when(userContext.getUserId()).thenReturn(mentor.getId());
         when(userRepository.getByIdOrThrow(createGoalDto.mentorId())).thenReturn(mentor);
         when(goalRepository.countActiveGoalsPerUser(any(Long.class)))
@@ -150,8 +149,7 @@ class GoalServiceTest {
                                     user.setId(id);
                                     return user;
                                 })
-                                .toList()
-                );
+                                .toList());
         when(userContext.getUserId()).thenReturn(mentor.getId());
         when(userRepository.getByIdOrThrow(createGoalDto.mentorId())).thenReturn(mentor);
         when(goalRepository.countActiveGoalsPerUser(any(Long.class)))
@@ -191,8 +189,7 @@ class GoalServiceTest {
                                     user.setId(id);
                                     return user;
                                 })
-                                .toList()
-                );
+                                .toList());
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(goalRepository.countActiveGoalsPerUser(currentUser.getId())).thenReturn(currentUser.getGoals().size());
         when(goalRepository.save(any(Goal.class)))
@@ -244,8 +241,7 @@ class GoalServiceTest {
                                     user.setId(id);
                                     return user;
                                 })
-                                .toList()
-                );
+                                .toList());
         when(userContext.getUserId()).thenReturn(currentUser.getId());
         when(goalRepository.countActiveGoalsPerUser(currentUser.getId())).thenReturn(currentUser.getGoals().size());
 
@@ -272,8 +268,7 @@ class GoalServiceTest {
                                     user.setId(id);
                                     return user;
                                 })
-                                .toList()
-                );
+                                .toList());
         when(userContext.getUserId()).thenReturn(currentUser.getId());
 
         assertThrows(ForbiddenException.class, () -> goalService.create(createGoalDto));

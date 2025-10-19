@@ -34,7 +34,8 @@ public class MentorshipController {
     @PostMapping("/{mentorId}/{menteeId}")
     @Operation(
             summary = "Добавить связь ментор-менти",
-            description = "Создаёт связь между ментором и менти. Только сам ментор может добавить связь.",
+            description = "Создаёт связь между ментором и менти. " +
+                    "Только сам ментор может добавить связь.",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Связь успешно создана")
             }
@@ -62,7 +63,8 @@ public class MentorshipController {
     @DeleteMapping("/{mentorId}/{menteeId}")
     @Operation(
             summary = "Удалить связь ментор-менти",
-            description = "Удаляет существующую связь между ментором и менти. Только сам ментор или менти может удалить связь."
+            description = "Удаляет существующую связь между ментором и менти. " +
+                    "Только сам ментор или менти может удалить связь."
     )
     public ResponseEntity<Void> deleteMentorship(@PathVariable long mentorId, @PathVariable long menteeId) {
 

@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Slf4j
 public class GoalServiceImpl implements GoalService {
-    private static final String SUCCESSFULLY_LOG = "Successfully";
 
     @Value("${goal.active.amount}")
     private int maxActiveGoals;

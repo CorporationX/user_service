@@ -15,9 +15,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataValidationException.class)
     public ResponseEntity<String> handleDataValidationException(DataValidationException ex) {
-        if (ex.getMessage().contains("уже существует")) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

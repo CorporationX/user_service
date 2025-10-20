@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("jacoco")
     kotlin("jvm")
     checkstyle
 }
@@ -74,6 +75,72 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+
+configure<JacocoPluginExtension> {
+    toolVersion = "0.8.13"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+fun FileTree.excludeCommon(): FileTree = this.matching {
+exclude(
+        "**/generated/**",
+        "**/build/**",
+        "**/dto/**",
+        "**/entity/**",
+        "**/config/**",
+        "**/configuration/**",
+        "**/exceptions/**",
+        "**/constants/**",
+        "**/vo/**",
+        "**/pojo/**",
+        "**/model/**",
+        "**/mapper/**",
+        "**/repository/**",
+        "**/controller/**",
+        "com/json/student/**",
+        "**/*Application*"
+    )
+}
+
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
+
+    val filtered = files(classDirectories.files.map { fileTree(it).excludeCommon() })
+    classDirectories.setFrom(filtered)
+}
+
+tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn(tasks.test)
+
+    val filtered = files(sourceSets.main.get().output.classesDirs.files.map {
+        fileTree(it).excludeCommon()
+    })
+    classDirectories.setFrom(filtered)
+
+    violationRules {
+        rule {
+            limit {
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.named("jacocoTestReport"))
+}
+
+tasks.check {
+    dependsOn(tasks.named("jacocoTestCoverageVerification"))
 }
 
 jsonSchema2Pojo {

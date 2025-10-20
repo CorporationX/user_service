@@ -23,6 +23,8 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 logging:
   level:
@@ -40,3 +42,11 @@ user:
   password:
     min:
       length: 6
+
+mentorship:
+  request:
+    limitation: 3
+
+recommendation:
+  cooldown:
+    months: 6

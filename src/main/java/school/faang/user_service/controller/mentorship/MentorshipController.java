@@ -71,13 +71,11 @@ public class MentorshipController {
 
     @GetMapping("/mentee/{userId}")
     public List<UserDto> getMentees(@PathVariable long userId) {
-
         return mentorshipService.getMentees(userId);
     }
 
     @GetMapping("/mentor/{userId}")
     public List<UserDto> getMentors(@PathVariable long userId) {
-
         return mentorshipService.getMentors(userId);
     }
 }

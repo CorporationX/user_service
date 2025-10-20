@@ -3,7 +3,6 @@ package school.faang.user_service.service.event;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.UpdateEventDto;
@@ -11,8 +10,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.repository.user.UserRepository;
-
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -21,15 +18,14 @@ import java.util.stream.Stream;
 @Service
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
     private final EventMapper eventMapper;
-    private final UserContext userContext;
     private final List<EventFilter> filters;
 
 
     @Override
     public EventDto create(EventDto eventDto) {
         Event event = eventMapper.toEvent(eventDto);
+        eventRepository.save(event);
         return eventMapper.toEventDto(event);
     }
 
@@ -38,6 +34,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Пустое значение"));
         eventMapper.update(updateEventDto, event);
+        eventRepository.save(event);
         return eventMapper.toEventDto(event);
 
     }

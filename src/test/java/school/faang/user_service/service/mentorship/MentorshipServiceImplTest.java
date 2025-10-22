@@ -8,6 +8,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
+import school.faang.user_service.exception.ConflictException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
@@ -74,7 +75,7 @@ class MentorshipServiceImplTest {
         when(mentorshipRepository.getByIdOrThrow(menteeId)).thenReturn(mentee);
 
         assertThrows(
-                DataValidationException.class,
+                ConflictException.class,
                 () -> mentorshipService.addMentorship(mentorId, menteeId)
         );
 

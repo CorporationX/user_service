@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,6 @@ import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.user.UserRepository;
-import school.faang.user_service.service.goal.GoalServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,7 +13,6 @@ public class UpdateEventDto {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private Long ownerId;
     private EventType eventType;
     private EventStatus eventStatus;
 }

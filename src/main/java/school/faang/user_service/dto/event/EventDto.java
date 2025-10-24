@@ -26,9 +26,6 @@ public class EventDto {
     private LocalDateTime endDate;
 
     @NotNull
-    private Long ownerId;
-
-    @NotNull
     private LocalDateTime createdAt;
 
     @NotNull
@@ -38,5 +35,5 @@ public class EventDto {
     private EventType eventType;
 
     @NotNull
-    private EventStatus status;
+    private EventStatus eventStatus;
 }

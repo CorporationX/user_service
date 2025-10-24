@@ -7,7 +7,6 @@ import school.faang.user_service.entity.event.EventType;
 public class EventFilterDto {
     private String titleContains;
     private String descriptionContains;
-    private long ownerId;
     private long participantId;
     private EventType eventType;
 }

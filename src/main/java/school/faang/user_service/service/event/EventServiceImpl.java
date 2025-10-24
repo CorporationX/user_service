@@ -36,7 +36,6 @@ public class EventServiceImpl implements EventService {
         eventMapper.update(updateEventDto, event);
         eventRepository.save(event);
         return eventMapper.toEventDto(event);
-
     }
 
     @SuppressWarnings({"checkstyle:LineLength", "checkstyle:CommentsIndentation"})
